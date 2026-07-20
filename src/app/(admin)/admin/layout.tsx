@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react'
 
 interface AdminLayoutProps {
-    children: ReactNode;
+  children: ReactNode;
 }
 
 function AdminLayout({children}: AdminLayoutProps) {
