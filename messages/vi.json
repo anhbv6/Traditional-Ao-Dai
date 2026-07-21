@@ -12,6 +12,7 @@
     "search": "Tìm kiếm",
     "searchPlaceholder": "Nhập tên áo dài, bộ sưu tập...",
     "searchSupportingText": "Gõ tên sản phẩm hoặc từ khóa để tìm nhanh",
+    "tagline": "Tôn nét dịu dàng Áo Việt, Lưu nét thanh xuân Đời người",
     "login": "Đăng nhập",
     "profile": "Tài khoản",
     "orders": "Đơn hàng",
@@ -19,7 +20,30 @@
   },
   "HomePage": {
     "title": "Chào mừng đến với Webshop",
-    "subtitle": "Khám phá các mẫu áo dài thanh lịch"
+    "subtitle": "Khám phá các mẫu áo dài thanh lịch",
+    "hero": {
+      "eyebrow": "Bộ sưu tập mới",
+      "title": "Áo dài thanh lịch cho mùa lễ hội",
+      "subtitle": "Những thiết kế mềm mại, phom dáng thoáng và chi tiết hoa lá tinh tế dành cho khoảnh khắc trang trọng nhưng vẫn nhẹ nhàng.",
+      "primaryAction": "Khám phá ngay",
+      "secondaryAction": "Câu chuyện thương hiệu",
+      "imageAlt": "Minh họa áo dài hoa sen màu đỏ đô",
+      "note": "Lụa mềm, thêu hoa thủ công và phom dáng được tinh chỉnh cho từng dịp.",
+      "metrics": {
+        "designs": {
+          "value": "48+",
+          "label": "mẫu áo dài"
+        },
+        "fabric": {
+          "value": "12",
+          "label": "dòng chất liệu"
+        },
+        "fitting": {
+          "value": "3D",
+          "label": "tư vấn phom dáng"
+        }
+      }
+    }
   },
   "Auth": {
     "login": "Đăng nhập",

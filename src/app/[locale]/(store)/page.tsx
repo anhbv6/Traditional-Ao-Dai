@@ -1,13 +1,23 @@
 import { getTranslations } from "next-intl/server";
+import { HeroBanner } from "@/components/home/HeroBanner";
 
 export default async function Home() {
-
   const t = await getTranslations('HomePage');
 
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold">{t('title')}</h1>
-      <p className="mt-2 text-gray-600">{t('subtitle')}</p>
-    </div>
+    <HeroBanner
+      eyebrow={t('hero.eyebrow')}
+      title={t('hero.title')}
+      subtitle={t('hero.subtitle')}
+      primaryAction={t('hero.primaryAction')}
+      secondaryAction={t('hero.secondaryAction')}
+      imageAlt={t('hero.imageAlt')}
+      note={t('hero.note')}
+      metrics={[
+        { value: t('hero.metrics.designs.value'), label: t('hero.metrics.designs.label') },
+        { value: t('hero.metrics.fabric.value'), label: t('hero.metrics.fabric.label') },
+        { value: t('hero.metrics.fitting.value'), label: t('hero.metrics.fitting.label') },
+      ]}
+    />
   );
 }

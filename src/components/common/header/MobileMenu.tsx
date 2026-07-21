@@ -20,22 +20,20 @@ import type { NavItem } from './types';
 
 type MobileMenuProps = {
   items: NavItem[];
-  searchLabel?: string;
   searchPlaceholder?: string;
   loginLabel?: string;
   wishlistCount?: number;
-  wishlistLabel?: string;
   languageLabel?: string;
+  taglineDrawer?: string;
 };
 
 export function MobileMenu({
   items,
-  searchLabel = 'Search',
   searchPlaceholder = 'Search...',
   loginLabel = 'Login',
   wishlistCount = 0,
-  wishlistLabel = 'Wishlist',
   languageLabel = 'Ngôn ngữ',
+  taglineDrawer,
 }: MobileMenuProps) {
   const currentLocale = useLocale();
   const pathname = usePathname();
@@ -73,7 +71,7 @@ export function MobileMenu({
                 <Logo />
               </DrawerTitle>
               <DrawerDescription className="mt-1 text-sm font-semibold tracking-wide font-[family-name:var(--font-dancing)] text-[#800020] leading-relaxed">
-                &ldquo;Áo dài thanh lịch cho những khoảnh khắc đáng nhớ&rdquo;
+                &ldquo;{taglineDrawer}&rdquo;
               </DrawerDescription>
             </div>
             <DrawerCloseButton />
@@ -81,17 +79,15 @@ export function MobileMenu({
 
           <div className="flex-1 flex flex-col justify-between overflow-y-auto px-5 pb-5">
             <div>
-              {/* Search Input Bar (Truyền i18n label, placeholder & supportingText) */}
-              <div className="mt-3 pb-5">
+              <div className="pb-5">
                 <SearchBar
                   compact={false}
                   placeholder={searchPlaceholder}
                 />
               </div>
 
-              {/* Navigation Links (Bao gồm danh sách trang, Wishlist & Mục Ngôn ngữ với icon Plus) */}
-              <nav className="mt-5 grid gap-1" aria-label="Mobile navigation">
-                {items.map((item, index) => (
+              <nav className="grid gap-1" aria-label="Mobile navigation">
+                {items.map((item) => (
                   <DrawerClose key={item.href} asChild>
                     <Link
                       href={item.href}

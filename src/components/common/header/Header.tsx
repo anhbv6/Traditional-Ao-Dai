@@ -55,12 +55,11 @@ export async function Header({ sticky = true, cartCount = 0, wishlistCount = 0 }
             <CartButton count={cartCount} label={t('cart')} />
             <MobileMenu
               items={mobileNavItems}
-              searchLabel={t('search')}
               searchPlaceholder={t('searchPlaceholder')}
               loginLabel={t('login')}
               wishlistCount={wishlistCount}
-              wishlistLabel={t('wishlist')}
               languageLabel={t('language')}
+              taglineDrawer={t(('tagline'))}
             />
           </div>
         </div>
