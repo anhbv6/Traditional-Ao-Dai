@@ -1,36 +1,9 @@
-import type { Metadata } from "next";
-import { Lora, Playfair_Display } from "next/font/google";
-import "./globals.css";
+import { ReactNode } from "react";
 
-const lora = Lora({
-  subsets: ["latin", "vietnamese"],
-  variable: "--font-lora",
-  display: "swap",
-});
-
-const playfair = Playfair_Display({
-  subsets: ["latin", "vietnamese"],
-  variable: "--font-playfair",
-  display: "swap",
-});
-
-export const metadata: Metadata = {
-  title: "Traditional Ao Dai",
-  description: "Áo dài truyền thống Việt Nam",
+type Props = {
+  children: ReactNode;
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <html
-      lang="vi"
-      className={`${lora.variable} ${playfair.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
-    </html>
-  );
+export default function RootLayout({ children }: Props) {
+  return children;
 }
-

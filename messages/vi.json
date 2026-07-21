@@ -1,0 +1,17 @@
+{
+    "Common": {
+        "home": "Trang chủ",
+        "products": "Sản phẩm",
+        "cart": "Giỏ hàng",
+        "switchLang": "English"
+    },
+    "HomePage": {
+        "title": "Chào mừng đến với Webshop",
+        "subtitle": "Khám phá các sản phẩm công nghệ mới nhất"
+    },
+    "Auth": {
+        "login": "Đăng nhập",
+        "signin": "Đăng ký",
+        "forgotPassword": "Quên mật khẩu?"
+    }
+}

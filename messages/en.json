@@ -1,0 +1,17 @@
+{
+    "Common": {
+        "home": "Home",
+        "products": "Products",
+        "cart": "Cart",
+        "switchLang": "Tiếng Việt"
+    },
+    "HomePage": {
+        "title": "Welcome to Webshop",
+        "subtitle": "Discover the latest tech products"
+    },
+    "Auth": {
+        "login": "Login",
+        "signin": "Register",
+        "forgotPassword": "Forgot password?"
+    }
+}
