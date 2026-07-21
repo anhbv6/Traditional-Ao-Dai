@@ -1,17 +1,29 @@
 {
-    "Common": {
-        "home": "Home",
-        "products": "Products",
-        "cart": "Cart",
-        "switchLang": "Tiếng Việt"
-    },
-    "HomePage": {
-        "title": "Welcome to Webshop",
-        "subtitle": "Discover the latest tech products"
-    },
-    "Auth": {
-        "login": "Login",
-        "signin": "Register",
-        "forgotPassword": "Forgot password?"
-    }
+  "Common": {
+    "home": "Home",
+    "products": "Products",
+    "shop": "Shop",
+    "ourStory": "Our Story",
+    "blog": "Blog",
+    "contact": "Contact Us",
+    "cart": "Cart",
+    "wishlist": "Wishlist",
+    "language": "Language",
+    "search": "Search",
+    "searchPlaceholder": "Enter product name, collection...",
+    "searchSupportingText": "Type product name or keyword to search",
+    "login": "Login",
+    "profile": "Profile",
+    "orders": "Orders",
+    "switchLang": "Tiếng Việt"
+  },
+  "HomePage": {
+    "title": "Welcome to Webshop",
+    "subtitle": "Discover elegant Ao Dai designs"
+  },
+  "Auth": {
+    "login": "Login",
+    "signin": "Register",
+    "forgotPassword": "Forgot password?"
+  }
 }

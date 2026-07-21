@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Lora, Playfair_Display } from "next/font/google";
+import { Dancing_Script, Lora, Playfair_Display } from "next/font/google";
 import "../globals.css";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
@@ -15,6 +15,12 @@ const lora = Lora({
 const playfair = Playfair_Display({
   subsets: ["latin", "vietnamese"],
   variable: "--font-playfair",
+  display: "swap",
+});
+
+const dancingScript = Dancing_Script({
+  subsets: ["latin", "vietnamese"],
+  variable: "--font-dancing",
   display: "swap",
 });
 
@@ -47,9 +53,10 @@ export default async function LocaleLayout({
   return (
     <html
       lang={locale}
-      className={`${lora.variable} ${playfair.variable} h-full antialiased`}
+      className={`${lora.variable} ${playfair.variable} ${dancingScript.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <NextIntlClientProvider messages={messages}>
           {children}
         </NextIntlClientProvider>
