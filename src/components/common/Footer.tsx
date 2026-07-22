@@ -82,6 +82,8 @@ export async function Footer() {
         { label: t('company.story'), href: '/about' },
         { label: t('company.careers'), href: '/about#careers' },
         { label: t('company.partners'), href: '/contact#agency' },
+        { label: t('legal.privacy'), href: '/faqs#privacy' },
+        { label: t('legal.terms'), href: '/faqs#terms' },
       ],
     },
     {
@@ -122,7 +124,7 @@ export async function Footer() {
               name="email"
               type="email"
               placeholder={t('newsletter.emailPlaceholder')}
-              className="min-h-12 rounded-md border border-white/20 bg-white px-4 text-sm text-[#2A2525] outline-none transition focus:border-[#E2A79E] focus:ring-2 focus:ring-[#E2A79E]/40"
+              className="min-h-12 rounded-md border border-white/20 bg-white px-4 text-sm text-[var(--text-main)] outline-none transition focus:border-[var(--accent-color)] focus:ring-2 focus:ring-[var(--accent-color)]/40"
             />
             <label className="sr-only" htmlFor="footer-phone">
               {t('newsletter.phoneLabel')}
@@ -132,11 +134,11 @@ export async function Footer() {
               name="phone"
               type="tel"
               placeholder={t('newsletter.phonePlaceholder')}
-              className="min-h-12 rounded-md border border-white/20 bg-white px-4 text-sm text-[#2A2525] outline-none transition focus:border-[#E2A79E] focus:ring-2 focus:ring-[#E2A79E]/40"
+              className="min-h-12 rounded-md border border-white/20 bg-white px-4 text-sm text-[var(--text-main)] outline-none transition focus:border-[var(--accent-color)] focus:ring-2 focus:ring-[var(--accent-color)]/40"
             />
             <button
               type="submit"
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-[#E2A79E] px-5 text-xs font-semibold uppercase tracking-[1.5px] text-white transition-colors hover:bg-[#2A2525]"
+              className="cursor-pointer inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-[var(--accent-color)] px-5 text-xs font-semibold uppercase tracking-[1.5px] text-white transition-colors hover:bg-[var(--text-main)]"
             >
               {t('newsletter.submit')}
               <Send size={15} strokeWidth={1.8} />
@@ -246,15 +248,7 @@ export async function Footer() {
         </div>
       </section>
 
-      <section className="border-y border-[#E2A79E]/30 bg-[#F3ECE7] mx-auto flex w-full flex-col gap-3 px-5 py-5 text-xs text-[#706565] sm:px-8 md:flex-row md:items-center md:justify-between lg:px-12">
-        <div className="flex flex-wrap gap-x-5 gap-y-2">
-          <Link href="/faqs#privacy" className="transition-colors hover:text-[#800020]">
-            {t('legal.privacy')}
-          </Link>
-          <Link href="/faqs#terms" className="transition-colors hover:text-[#800020]">
-            {t('legal.terms')}
-          </Link>
-        </div>
+      <section className="border-y border-[#E2A79E]/30 bg-[#F3ECE7] mx-auto flex w-full flex-col gap-3 px-4 py-4 text-xs text-[#706565] sm:px-8 md:flex-row md:items-center md:justify-center lg:px-12">
         <p>{t('legal.copyright')}</p>
       </section>
     </footer>

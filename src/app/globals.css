@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@source "../components/**/*.{ts,tsx}";
+@source "../features/**/*.{ts,tsx}";
 
 /* Design System - CSS Variables */
 :root {

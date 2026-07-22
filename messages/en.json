@@ -43,7 +43,19 @@
           "label": "fit guidance"
         }
       }
+    },
+    "bestSellers": {
+      "eyebrow": "Best Sellers",
+      "title": "Best Sellers / Trending",
+      "description": "Most selected Ao Dai designs for weddings, Tet holiday, yearbooks, and formal events.",
+      "viewAll": "View all products"
     }
+  },
+  "Product": {
+    "addToCart": "Add to Cart",
+    "addToWishlist": "Add to Wishlist",
+    "compare": "Compare Product",
+    "quickView": "Quick View"
   },
   "Auth": {
     "login": "Login",

@@ -43,7 +43,19 @@
           "label": "tư vấn phom dáng"
         }
       }
+    },
+    "bestSellers": {
+      "eyebrow": "Sản Phẩm Nổi Bật",
+      "title": "Sản phẩm bán chạy / Xu hướng",
+      "description": "Các mẫu áo dài được chọn nhiều cho mùa cưới, Tết, kỷ yếu và những dịp trang trọng.",
+      "viewAll": "Xem tất cả sản phẩm"
     }
+  },
+  "Product": {
+    "addToCart": "Thêm vào giỏ hàng",
+    "addToWishlist": "Thêm vào yêu thích",
+    "compare": "So sánh sản phẩm",
+    "quickView": "Xem nhanh"
   },
   "Auth": {
     "login": "Đăng nhập",
