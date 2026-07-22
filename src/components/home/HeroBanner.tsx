@@ -30,7 +30,7 @@ export function HeroBanner({
 }: HeroBannerProps) {
   return (
     <section className="relative overflow-hidden bg-[#FAF7F5]">
-      <div className="mx-auto grid min-h-[calc(100vh-80px)] w-full max-w-7xl items-center gap-8 px-5 py-8 sm:px-8 sm:py-10 lg:grid-cols-[0.95fr_1.05fr] lg:px-12 lg:py-8 xl:gap-12">
+      <div className="mx-auto grid min-h-[calc(70vh-80px)] w-full max-w-7xl items-center gap-8 px-5 py-8 sm:px-8 sm:py-10 lg:grid-cols-[0.95fr_1.05fr] lg:px-12 lg:py-8 xl:gap-12">
         <div className="relative z-10 flex max-w-2xl flex-col lg:py-10">
           <p className="mb-4 font-[family-name:var(--font-lora)] text-xs font-semibold uppercase tracking-[3px] text-[#800020]">
             {eyebrow}

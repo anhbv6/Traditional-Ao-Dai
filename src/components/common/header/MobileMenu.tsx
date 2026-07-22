@@ -79,7 +79,7 @@ export function MobileMenu({
 
           <div className="flex-1 flex flex-col justify-between overflow-y-auto px-5 pb-5">
             <div>
-              <div className="pb-5">
+              <div className="py-5">
                 <SearchBar
                   compact={false}
                   placeholder={searchPlaceholder}

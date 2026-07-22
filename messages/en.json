@@ -49,5 +49,60 @@
     "login": "Login",
     "signin": "Register",
     "forgotPassword": "Forgot password?"
+  },
+  "Footer": {
+    "newsletter": {
+      "eyebrow": "Newsletter / VIP Club",
+      "title": "Subscribe for new collections & 10% off your first order",
+      "description": "Get launch notes for Tet, wedding season, yearbook season, and private offers for loyal customers.",
+      "emailLabel": "Email",
+      "phoneLabel": "Phone number",
+      "emailPlaceholder": "Your email",
+      "phonePlaceholder": "Phone number",
+      "submit": "Subscribe"
+    },
+    "brand": {
+      "tagline": "Preserving the beauty of Vietnamese Ao Dai",
+      "address": "AODAI Showroom, District 1, Ho Chi Minh City",
+      "hotline": "Hotline: 0909 000 000",
+      "hotlineValue": "0909000000",
+      "email": "Email: hello@aodai.vn",
+      "emailValue": "hello@aodai.vn",
+      "hours": "Hours: 09:00 - 21:00, Monday - Sunday",
+      "socialLabel": "Social channels"
+    },
+    "customerCare": {
+      "title": "Customer Care",
+      "sizeGuide": "Size guide / Standard measurement chart",
+      "returnPolicy": "Return policy & seam warranty",
+      "customFit": "Custom-fit tailoring policy",
+      "careGuide": "Ao Dai washing & care guide"
+    },
+    "company": {
+      "title": "Company",
+      "story": "Brand story",
+      "careers": "Careers",
+      "partners": "Agency system / Franchise"
+    },
+    "quickLinks": {
+      "title": "Featured Categories",
+      "wedding": "Wedding Ao Dai",
+      "modern": "Modern Ao Dai",
+      "silk": "Mulberry silk Ao Dai",
+      "accessories": "Ao Dai accessories",
+      "custom": "Custom-made Ao Dai",
+      "handEmbroidery": "Hand-embroidered Ao Dai"
+    },
+    "trust": {
+      "payment": "Payment methods",
+      "shipping": "Shipping partners",
+      "certification": "Certification",
+      "ministryBadge": "Notified to Ministry of Industry and Trade"
+    },
+    "legal": {
+      "copyright": "© 2026 AODAI. All rights reserved.",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Use"
+    }
   }
 }

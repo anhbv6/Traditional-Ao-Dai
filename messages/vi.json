@@ -49,5 +49,60 @@
     "login": "Đăng nhập",
     "signin": "Đăng ký",
     "forgotPassword": "Quên mật khẩu?"
+  },
+  "Footer": {
+    "newsletter": {
+      "eyebrow": "Newsletter / VIP Club",
+      "title": "Đăng ký nhận thông tin BST mới & Mã giảm giá 10% cho đơn hàng đầu tiên",
+      "description": "Nhận lịch ra mắt áo dài Tết, mùa cưới, mùa kỷ yếu và các ưu đãi riêng cho khách hàng thân thiết.",
+      "emailLabel": "Email",
+      "phoneLabel": "Số điện thoại",
+      "emailPlaceholder": "Email của bạn",
+      "phonePlaceholder": "Số điện thoại",
+      "submit": "Đăng ký"
+    },
+    "brand": {
+      "tagline": "Gìn giữ nét đẹp Áo dài Việt",
+      "address": "Showroom AODAI, Quận 1, TP. Hồ Chí Minh",
+      "hotline": "Hotline: 0909 000 000",
+      "hotlineValue": "0909000000",
+      "email": "Email: hello@aodai.vn",
+      "emailValue": "hello@aodai.vn",
+      "hours": "Giờ làm việc: 09:00 - 21:00, Thứ 2 - Chủ nhật",
+      "socialLabel": "Kênh mạng xã hội"
+    },
+    "customerCare": {
+      "title": "Hỗ trợ khách hàng",
+      "sizeGuide": "Hướng dẫn chọn size / Bảng số đo chuẩn",
+      "returnPolicy": "Chính sách đổi trả & Bảo hành đường may",
+      "customFit": "Chính sách may đo theo yêu cầu",
+      "careGuide": "Hướng dẫn giặt & Bảo quản áo dài"
+    },
+    "company": {
+      "title": "Về chúng tôi",
+      "story": "Câu chuyện thương hiệu",
+      "careers": "Tuyển dụng",
+      "partners": "Hệ thống đại lý / Nhượng quyền"
+    },
+    "quickLinks": {
+      "title": "Danh mục nổi bật",
+      "wedding": "Áo dài cưới",
+      "modern": "Áo dài cách tân",
+      "silk": "Áo dài lụa tơ tằm",
+      "accessories": "Phụ kiện áo dài",
+      "custom": "Áo dài may đo",
+      "handEmbroidery": "Áo dài thêu tay"
+    },
+    "trust": {
+      "payment": "Phương thức thanh toán",
+      "shipping": "Đơn vị vận chuyển",
+      "certification": "Chứng nhận",
+      "ministryBadge": "Đã thông báo Bộ Công Thương"
+    },
+    "legal": {
+      "copyright": "© 2026 AODAI. All rights reserved.",
+      "privacy": "Chính sách bảo mật",
+      "terms": "Điều khoản sử dụng"
+    }
   }
 }

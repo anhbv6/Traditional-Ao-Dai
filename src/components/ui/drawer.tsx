@@ -72,7 +72,7 @@ function DrawerContent({
 }
 
 function DrawerHeader({ className, ...props }: React.ComponentProps<'div'>) {
-  return <div className={cn('flex items-start justify-between gap-4 px-5 pb-3 pt-5', className)} {...props} />;
+  return <div className={cn('flex items-start justify-between gap-4 px-5 pb-3 pt-5 border-b border-[#E2A79E]/35', className)} {...props} />;
 }
 
 function DrawerTitle({ className, ...props }: React.ComponentProps<typeof DrawerPrimitive.Title>) {
