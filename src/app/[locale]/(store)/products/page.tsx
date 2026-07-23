@@ -1,7 +1,8 @@
-import { Container } from '@/components/ui/container'
-import { Breadcrumbs } from '@/components/common/Breadcrumbs'
-import { ProductBanner } from '@/components/products/ProductBanner'
-import { getTranslations } from 'next-intl/server'
+import { Breadcrumbs } from '@/components/common/Breadcrumbs';
+import { ProductBanner } from '@/components/products/ProductBanner';
+import { Container } from '@/components/ui/container';
+import { ProductsCollection } from '@/features/products/components/ProductsCollection';
+import { getTranslations } from 'next-intl/server';
 
 async function Products() {
   const t = await getTranslations('ProductsPage');
@@ -17,17 +18,10 @@ async function Products() {
   return (
     <Container as="section" className="py-12">
       <Breadcrumbs />
-      <ProductBanner
-        title={t('banner.title')}
-        subtitle={t('banner.subtitle')}
-        texts={morphingTexts}
-      />
-      <div className="mt-12 text-center text-[var(--text-light)]">
-        <h2 className="text-xl font-semibold">Danh sách Sản phẩm</h2>
-        <p className="mt-2">Các thiết kế áo dài độc bản sẽ sớm ra mắt.</p>
-      </div>
+      <ProductBanner title={t('banner.title')} subtitle={t('banner.subtitle')} texts={morphingTexts} />
+      <ProductsCollection />
     </Container>
-  )
+  );
 }
 
-export default Products
+export default Products;
