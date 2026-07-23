@@ -11,27 +11,33 @@ function BestSellers() {
   const locale = useLocale() as 'vi' | 'en';
 
   return (
-    <section className="bg-[#FAF7F5] px-5 py-14 sm:px-8 lg:px-12">
+    <section className="bg-[#FAF7F5] px-5 pt-14 sm:px-8 lg:px-12">
         <div className="mx-auto max-w-[1440px]">
             <div className="relative">
                 <SectionHeading
                     eyebrow={t('eyebrow')}
                     title={t('title')}
                     description={t('description')}
+                    className='sm:mb-9'
                 />
             </div>
 
-            <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
-                {mockProducts.map((product) => (
-                    <ProductCard
+            <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-8 sm:mt-10 sm:gap-x-6 sm:gap-y-10 lg:grid-cols-4 xl:gap-x-8">
+                {mockProducts.map((product, index) => (
+                    <div 
                         key={product.id}
-                        imageSrc={product.imageSrc}
-                        imageAlt={product.imageAlt}
-                        name={product.name[locale]}
-                        description={product.description[locale]}
-                        price={product.price[locale]}
-                        originalPrice={product.originalPrice?.[locale]}
-                    />
+                        className="animate-fade-in-up"
+                        style={{ animationDelay: `${index * 120}ms` }}
+                    >
+                        <ProductCard
+                            imageSrc={product.imageSrc}
+                            imageAlt={product.imageAlt}
+                            name={product.name[locale]}
+                            description={product.description[locale]}
+                            price={product.price[locale]}
+                            originalPrice={product.originalPrice?.[locale]}
+                        />
+                    </div>
                 ))}
             </div>
         </div>
