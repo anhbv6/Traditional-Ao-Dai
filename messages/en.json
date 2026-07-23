@@ -169,5 +169,29 @@
       "privacy": "Privacy Policy",
       "terms": "Terms of Use"
     }
+  },
+  "Breadcrumbs": {
+    "home": "Home",
+    "products": "Products",
+    "about": "About Us",
+    "news": "News",
+    "contact": "Contact",
+    "cart": "Shopping Cart",
+    "wishlist": "Wishlist",
+    "profile": "My Profile",
+    "orders": "Orders",
+    "checkout": "Checkout",
+    "faqs": "FAQs"
+  },
+  "ProductsPage": {
+    "banner": {
+      "title": "Grace of Áo Dài",
+      "subtitle": "A perfect blend of traditional Vietnamese heritage and contemporary design",
+      "morph1": "Graceful",
+      "morph2": "Elegant",
+      "morph3": "Exquisite",
+      "morph4": "Modern",
+      "morph5": "Proud"
+    }
   }
 }

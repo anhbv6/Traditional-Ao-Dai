@@ -11,8 +11,8 @@ function BestSellers() {
   const locale = useLocale() as 'vi' | 'en';
 
   return (
-    <section className="bg-[#FAF7F5] px-5 pt-14 sm:px-8 lg:px-12">
-        <div className="mx-auto max-w-[1440px]">
+    <section className='pt-4'>
+        <div>
             <div className="relative">
                 <SectionHeading
                     eyebrow={t('eyebrow')}

@@ -32,6 +32,7 @@ function ZaloIcon({ size = 17, ...props }: ZaloIconProps) {
 import { getLocale, getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 import { Logo } from './header/Logo';
+import { OnlyOnHome } from './OnlyOnHome';
 
 type FooterLink = {
   label: string;
@@ -101,51 +102,53 @@ export async function Footer() {
 
   return (
     <footer className="mt-auto border-t border-[#E2A79E]/30 bg-[#FAF7F5]">
-      <section className="bg-[#800020] text-white">
-        <div className="mx-auto grid w-full max-w-7xl gap-5 px-5 py-8 sm:px-8 lg:grid-cols-[1fr_1.15fr] lg:items-center lg:px-12">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[2px] text-[#E2A79E]">
-              {t('newsletter.eyebrow')}
-            </p>
-            <h2 className="mt-2 max-w-2xl font-[family-name:var(--font-playfair)] text-2xl font-semibold leading-tight text-white sm:text-3xl">
-              {t('newsletter.title')}
-            </h2>
-            <p className="mt-3 max-w-xl text-sm leading-6 text-white/78">
-              {t('newsletter.description')}
-            </p>
-          </div>
+      <OnlyOnHome>
+        <section className="bg-[#800020] text-white">
+          <div className="mx-auto grid w-full max-w-7xl gap-5 px-5 py-8 sm:px-8 lg:grid-cols-[1fr_1.15fr] lg:items-center lg:px-12">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[2px] text-[#E2A79E]">
+                {t('newsletter.eyebrow')}
+              </p>
+              <h2 className="mt-2 max-w-2xl font-[family-name:var(--font-playfair)] text-2xl font-semibold leading-tight text-white sm:text-3xl">
+                {t('newsletter.title')}
+              </h2>
+              <p className="mt-3 max-w-xl text-sm leading-6 text-white/78">
+                {t('newsletter.description')}
+              </p>
+            </div>
 
-          <form className="grid gap-3 sm:grid-cols-[1fr_0.75fr_auto]" action={`/${locale}/contact`} method="get">
-            <label className="sr-only" htmlFor="footer-email">
-              {t('newsletter.emailLabel')}
-            </label>
-            <input
-              id="footer-email"
-              name="email"
-              type="email"
-              placeholder={t('newsletter.emailPlaceholder')}
-              className="min-h-12 rounded-md border border-white/20 bg-white px-4 text-sm text-[var(--text-main)] outline-none transition focus:border-[var(--accent-color)] focus:ring-2 focus:ring-[var(--accent-color)]/40"
-            />
-            <label className="sr-only" htmlFor="footer-phone">
-              {t('newsletter.phoneLabel')}
-            </label>
-            <input
-              id="footer-phone"
-              name="phone"
-              type="tel"
-              placeholder={t('newsletter.phonePlaceholder')}
-              className="min-h-12 rounded-md border border-white/20 bg-white px-4 text-sm text-[var(--text-main)] outline-none transition focus:border-[var(--accent-color)] focus:ring-2 focus:ring-[var(--accent-color)]/40"
-            />
-            <button
-              type="submit"
-              className="cursor-pointer inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-[var(--accent-color)] px-5 text-xs font-semibold uppercase tracking-[1.5px] text-white transition-colors hover:bg-[var(--text-main)]"
-            >
-              {t('newsletter.submit')}
-              <Send size={15} strokeWidth={1.8} />
-            </button>
-          </form>
-        </div>
-      </section>
+            <form className="grid gap-3 sm:grid-cols-[1fr_0.75fr_auto]" action={`/${locale}/contact`} method="get">
+              <label className="sr-only" htmlFor="footer-email">
+                {t('newsletter.emailLabel')}
+              </label>
+              <input
+                id="footer-email"
+                name="email"
+                type="email"
+                placeholder={t('newsletter.emailPlaceholder')}
+                className="min-h-12 rounded-md border border-white/20 bg-white px-4 text-sm text-[var(--text-main)] outline-none transition focus:border-[var(--accent-color)] focus:ring-2 focus:ring-[var(--accent-color)]/40"
+              />
+              <label className="sr-only" htmlFor="footer-phone">
+                {t('newsletter.phoneLabel')}
+              </label>
+              <input
+                id="footer-phone"
+                name="phone"
+                type="tel"
+                placeholder={t('newsletter.phonePlaceholder')}
+                className="min-h-12 rounded-md border border-white/20 bg-white px-4 text-sm text-[var(--text-main)] outline-none transition focus:border-[var(--accent-color)] focus:ring-2 focus:ring-[var(--accent-color)]/40"
+              />
+              <button
+                type="submit"
+                className="cursor-pointer inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-[var(--accent-color)] px-5 text-xs font-semibold uppercase tracking-[1.5px] text-white transition-colors hover:bg-[var(--text-main)]"
+              >
+                {t('newsletter.submit')}
+                <Send size={15} strokeWidth={1.8} />
+              </button>
+            </form>
+          </div>
+        </section>
+      </OnlyOnHome>
 
       <section className="mx-auto grid w-full gap-8 px-5 py-10 sm:px-8 lg:grid-cols-[1fr_1.7fr_0.3fr] lg:px-12 lg:py-12">
         <div className="max-w-md">

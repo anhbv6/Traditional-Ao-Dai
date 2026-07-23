@@ -169,5 +169,29 @@
       "privacy": "Chính sách bảo mật",
       "terms": "Điều khoản sử dụng"
     }
+  },
+  "Breadcrumbs": {
+    "home": "Trang chủ",
+    "products": "Sản phẩm",
+    "about": "Về chúng tôi",
+    "news": "Tin tức",
+    "contact": "Liên hệ",
+    "cart": "Giỏ hàng",
+    "wishlist": "Sản phẩm yêu thích",
+    "profile": "Tài khoản",
+    "orders": "Đơn hàng",
+    "checkout": "Thanh toán",
+    "faqs": "Hỏi đáp"
+  },
+  "ProductsPage": {
+    "banner": {
+      "title": "Áo Dài Sắc Việt",
+      "subtitle": "Sự kết hợp hoàn mỹ giữa nét đẹp truyền thống và phong cách đương đại",
+      "morph1": "Duyên Dáng",
+      "morph2": "Thanh Lịch",
+      "morph3": "Kiêu Sa",
+      "morph4": "Hiện Đại",
+      "morph5": "Tự Hào"
+    }
   }
 }

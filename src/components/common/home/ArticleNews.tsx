@@ -25,7 +25,7 @@ function ArticleNews() {
   }));
 
   return (
-    <section className="bg-[#FAF7F5] px-5 py-16 sm:px-8 lg:px-12">
+    <section className="py-16">
       <div className="mx-auto max-w-[1440px]">
         {/* Section Header */}
         <SectionHeading

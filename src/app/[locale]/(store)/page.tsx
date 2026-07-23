@@ -3,6 +3,7 @@ import BestSellers from "@/components/common/home/BestSellers";
 import FeaturedCollections from "@/components/common/home/FeaturedCollections";
 import { HeroBanner } from "@/components/common/home/HeroBanner";
 import PromoteFeedBack from "@/components/common/home/PromoteFeedBack";
+import { Container } from "@/components/ui/container";
 import { getTranslations } from "next-intl/server";
 
 export default async function Home() {
@@ -24,12 +25,12 @@ export default async function Home() {
           { value: t('hero.metrics.fitting.value'), label: t('hero.metrics.fitting.label') },
         ]}
       />
-      <div>
+      <Container>
         <BestSellers />
         <FeaturedCollections />
         <PromoteFeedBack />
         <ArticleNews />
-      </div>
+      </Container>
     </>
   );
 }

@@ -1,16 +1,21 @@
+import { Container } from '@/components/ui/container'
+import { Breadcrumbs } from '@/components/common/Breadcrumbs'
 import React from 'react'
 
 interface DetailProductsProps {
-  params: {
+  params: Promise<{
     slug: string;
-  }
+  }>;
 }
 
-function DetailProducts({params}: DetailProductsProps) {
-  console.log("params", params.slug);
+async function DetailProducts({ params }: DetailProductsProps) {
+  const { slug } = await params;
   
   return (
-    <div>DetailProducts</div>
+    <Container as="section" className="py-12">
+      <Breadcrumbs />
+      <div>DetailProducts: {slug}</div>
+    </Container>
   )
 }
 

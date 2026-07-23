@@ -42,32 +42,30 @@ function FeaturedCollections() {
     ];
 
     return (
-        <section className="bg-[#FAF7F5] px-5 pt-14 sm:px-8 lg:px-12">
-            <div className="mx-auto max-w-[1440px]">
-                <SectionHeading
-                    eyebrow={t('eyebrow')}
-                    title={t('title')}
-                    description={t('description')}
-                    className='sm:mb-0'
-                />
-                
-                <main className="w-full bg-[#FAF7F5] flex items-center justify-center">
-                    <div className="w-full h-[500px] -mt-[80px] md:-mt-[10px]">
-                        <CircularGallery
-                            items={collections} 
-                            bend={1.5} 
-                            textColor="#800020"
-                            font="700 35px 'Playfair Display', serif"
-                            fontUrl="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&display=swap"
-                            borderRadius={0.05} 
-                            onItemClick={(item) => {
-                                const target = item as typeof collections[0];
-                                router.push(`/products?category=${target.category}`);
-                            }}
-                        />
-                    </div>
-                </main>
-            </div>
+        <section className='pt-12'>
+            <SectionHeading
+                eyebrow={t('eyebrow')}
+                title={t('title')}
+                description={t('description')}
+                className='sm:mb-0'
+            />
+            
+            <main className="w-full bg-[#FAF7F5] flex items-center justify-center">
+                <div className="w-full h-[500px] -mt-[80px] md:-mt-[30px]">
+                    <CircularGallery
+                        items={collections} 
+                        bend={1.5} 
+                        textColor="#800020"
+                        font="700 35px 'Playfair Display', serif"
+                        fontUrl="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&display=swap"
+                        borderRadius={0.05} 
+                        onItemClick={(item) => {
+                            const target = item as typeof collections[0];
+                            router.push(`/products?category=${target.category}`);
+                        }}
+                    />
+                </div>
+            </main>
         </section>
     )
 }

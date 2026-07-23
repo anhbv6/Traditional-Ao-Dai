@@ -82,7 +82,7 @@ function PromoteFeedBack() {
   const row2 = reviews.slice(3, 6);
 
   return (
-    <section className="bg-[#FAF7F5] px-5 pt-16 sm:px-8 lg:px-12 overflow-hidden">
+    <section className="pt-16 overflow-hidden">
       <div className="mx-auto max-w-[1440px]">
         <SectionHeading
           eyebrow={t('eyebrow')}
