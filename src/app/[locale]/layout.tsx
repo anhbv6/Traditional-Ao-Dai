@@ -5,6 +5,7 @@ import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
+import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
 
 const lora = Lora({
   subsets: ["latin", "vietnamese"],
@@ -58,7 +59,9 @@ export default async function LocaleLayout({
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <NextIntlClientProvider messages={messages}>
-          {children}
+          <SmoothScrollProvider>
+            {children}
+          </SmoothScrollProvider>
         </NextIntlClientProvider>
       </body>
     </html>

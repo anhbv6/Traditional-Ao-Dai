@@ -78,10 +78,10 @@ function ProductCard({
       </div>
 
       <div className="pb-4 pt-6">
-        <h3 className="cursor-pointer font-[family-name:var(--font-playfair)] text-base font-semibold leading-tight text-[var(--primary-color)] sm:text-2xl">
+        <h3 className="cursor-pointer font-[family-name:var(--font-playfair)] text-base font-semibold leading-tight text-[var(--primary-color)] sm:text-lg">
           {name}
         </h3>
-        <p title={description} className="mt-2 text-xs leading-relaxed text-[var(--text-light)] sm:text-base line-clamp-2">
+        <p title={description} className="mt-2 text-xs leading-relaxed text-[var(--text-light)] sm:text-sm line-clamp-2">
           {description}
         </p>
         <div className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-sm leading-none sm:mt-3 sm:text-lg">
