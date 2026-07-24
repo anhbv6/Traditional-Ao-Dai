@@ -16,7 +16,9 @@
     "login": "Login",
     "profile": "Profile",
     "orders": "Orders",
-    "switchLang": "Tiếng Việt"
+    "switchLang": "Tiếng Việt",
+    "previous": "Previous",
+    "next": "Next"
   },
   "HomePage": {
     "title": "Welcome to Webshop",
@@ -108,7 +110,47 @@
     "addToCart": "Add to Cart",
     "addToWishlist": "Add to Wishlist",
     "compare": "Compare Product",
-    "quickView": "Quick View"
+    "quickView": "Quick View",
+    "close": "Close",
+    "sizeLabel": "Size",
+    "materialLabel": "Material",
+    "purchaseTypeLabel": "Type",
+    "materials": {
+      "silk": "Mulberry Silk",
+      "brocade": "Brocade",
+      "velvet": "Velvet",
+      "chiffon": "Chiffon",
+      "default": "Premium Silk"
+    },
+    "purchaseTypes": {
+      "ready": "Ready-to-wear",
+      "custom": "Custom tailoring",
+      "readyDescription": "Ready-to-wear",
+      "customDescription": "Custom tailoring to your measurements",
+      "default": "Ready / Custom-fit"
+    },
+    "categories": {
+      "wedding": "Wedding Ao Dai",
+      "modern": "Modern Ao Dai",
+      "festival": "Festival Ao Dai",
+      "kids": "Kids Ao Dai",
+      "accessories": "Accessories"
+    },
+    "colors": {
+      "red": "Red",
+      "yellow": "Yellow",
+      "pink": "Pink",
+      "white": "White",
+      "plainSilk": "Plain Silk",
+      "embroideredBrocade": "Embroidered Brocade"
+    },
+    "collections": {
+      "wedding": "Wedding Collection",
+      "modern": "Modern Collection",
+      "silk": "Silk Collection",
+      "brocade": "Luxury Brocade",
+      "embroidered": "Embroidered Art"
+    }
   },
   "Auth": {
     "login": "Login",
@@ -192,6 +234,38 @@
       "morph3": "Exquisite",
       "morph4": "Modern",
       "morph5": "Proud"
+    },
+    "filter": {
+      "title": "Filters",
+      "subtitle": "Find your fit",
+      "searchTitle": "Search",
+      "searchPlaceholder": "Search name or ID...",
+      "categoryTitle": "Category / Occasion",
+      "collectionTitle": "Collection",
+      "purchaseTypeTitle": "Purchase Type",
+      "colorTitle": "Colors",
+      "materialTitle": "Materials",
+      "priceTitle": "Price Range",
+      "priceRange": "Price: {min}đ - {max}đ",
+      "clearThisFilter": "Clear this filter"
+    },
+    "collection": {
+      "foundCount": "Found {count} matching products",
+      "sortByLabel": "Sort by:",
+      "sortByPlaceholder": "Sort by",
+      "columnsLabel": "Columns:",
+      "columnsPlaceholder": "Select columns",
+      "cols3": "3 Columns",
+      "cols4": "4 Columns",
+      "cols5": "5 Columns",
+      "sortOptions": {
+        "all": "Show all",
+        "newest": "Newest",
+        "priceAsc": "Price: Low to High",
+        "priceDesc": "Price: High to Low",
+        "bestSeller": "Best sellers",
+        "favorite": "Most favorited"
+      }
     }
   }
 }

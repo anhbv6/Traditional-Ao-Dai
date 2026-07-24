@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Eye, Heart, ShoppingBag } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 export type ProductColorSwatch = {
   name: string;
@@ -20,12 +21,19 @@ type ProductCardProps = {
   description?: string;
   price?: string;
   originalPrice?: string;
-  badge?: string;
+  // badge?: string;
   colorSwatches?: ProductColorSwatch[];
   sizes?: string[];
   material?: string;
   purchaseType?: string;
   objectFit?: 'cover' | 'contain';
+};
+
+const materialKeys: Record<string, string> = {
+  'Lụa Tơ Tằm': 'silk',
+  'Gấm': 'brocade',
+  'Tơ Nhung': 'velvet',
+  'Voan': 'chiffon',
 };
 
 function ProductCard({
@@ -36,7 +44,7 @@ function ProductCard({
   description = 'Women Textured Handheld Bag',
   price = '$80.00',
   originalPrice = '$100.00',
-  badge,
+  // badge,
   colorSwatches = [],
   sizes = [],
   material,
@@ -74,11 +82,11 @@ function ProductCard({
           className={imageClassName}
           onError={() => setFailedImageSrc(displayImageSrc)}
         />
-        {badge ? (
+        {/* {badge ? (
           <span className="absolute left-3 top-3 bg-[var(--primary-color)] px-3 py-1 text-[10px] font-bold uppercase tracking-[1.6px] text-white shadow-sm">
             {badge}
           </span>
-        ) : null}
+        ) : null} */}
 
         <div className="absolute right-2 top-3 flex translate-x-0 flex-col gap-2 opacity-100 transition-all duration-[600ms] ease-out sm:right-4 sm:top-4 sm:translate-x-3 sm:opacity-0 sm:group-hover:translate-x-0 sm:group-hover:opacity-100">
           <button
@@ -105,8 +113,8 @@ function ProductCard({
           </button>
         </div>
 
-        <div className="absolute inset-x-3 bottom-3 translate-y-0 bg-white/95 p-2 shadow-md transition-all duration-[600ms] ease-out sm:inset-x-5 sm:bottom-5 sm:translate-y-4 sm:opacity-0 sm:group-hover:translate-y-0 sm:group-hover:opacity-100">
-          {sizes.length ? (
+        <div className="absolute inset-x-3 bottom-3 rounded-xl translate-y-0 shadow-md transition-all duration-[600ms] ease-out sm:inset-x-5 sm:bottom-5 sm:translate-y-4 sm:opacity-0 sm:group-hover:translate-y-0 sm:group-hover:opacity-100">
+          {/* {sizes.length ? (
             <div className="mb-2 grid grid-cols-5 gap-1">
               {sizes.slice(0, 5).map((size) => (
                 <button
@@ -122,10 +130,10 @@ function ProductCard({
                 </button>
               ))}
             </div>
-          ) : null}
+          ) : null} */}
           <button
             type="button"
-            className="cursor-pointer flex min-h-9 w-full items-center justify-center gap-2 bg-white px-2 text-[10px] font-bold uppercase tracking-wider text-[var(--text-main)] transition-all duration-300 hover:bg-[var(--primary-color)] hover:text-white sm:text-xs"
+            className="cursor-pointer flex min-h-9 w-full rounded-[8px] items-center justify-center gap-2 bg-white px-2 text-[10px] font-bold uppercase tracking-wider text-[var(--text-main)] transition-all duration-300 hover:bg-[var(--primary-color)] hover:text-white sm:text-xs"
           >
             <ShoppingBag size={14} />
             {t('addToCart')}
@@ -133,8 +141,8 @@ function ProductCard({
         </div>
       </div>
 
-      <div className="pb-4 pt-6">
-        {colorSwatches.length ? (
+      <div className="pb-4 pt-6 w-full min-w-0 overflow-hidden">
+        {/* {colorSwatches.length ? (
           <div className="mb-4 flex items-center gap-2">
             {colorSwatches.map((color, index) => (
               <button
@@ -152,11 +160,27 @@ function ProductCard({
               />
             ))}
           </div>
-        ) : null}
+        ) : null} */}
 
-        <h3 className="cursor-pointer font-[family-name:var(--font-playfair)] text-base font-semibold leading-tight text-[var(--primary-color)] sm:text-lg">
-          {name}
-        </h3>
+        <TooltipProvider delay={200}>
+          <Tooltip>
+            <h3 className="w-full min-w-0">
+              <TooltipTrigger
+                render={
+                  <button
+                    type="button"
+                    className="block w-full min-w-0 max-w-full cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap border-0 bg-transparent p-0 text-left font-[family-name:var(--font-playfair)] text-base font-semibold leading-tight text-[var(--primary-color)] sm:text-lg"
+                  />
+                }
+              >
+                {name}
+              </TooltipTrigger>
+            </h3>
+            <TooltipContent className="bg-[var(--primary-color)] text-white border-0 shadow-md text-xs font-[family-name:var(--font-lora)] px-3 py-2 rounded-md">
+              {name}
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
         <p title={description} className="mt-2 text-xs leading-relaxed text-[var(--text-light)] sm:text-sm line-clamp-2">
           {description}
         </p>
@@ -188,16 +212,26 @@ function ProductCard({
             <p className="mt-4 text-sm leading-7 text-[var(--text-light)]">{description}</p>
             <dl className="mt-5 grid grid-cols-2 gap-3 text-sm">
               <div className="bg-white p-3">
-                <dt className="text-xs uppercase tracking-[1.5px] text-[var(--text-light)]">Size</dt>
+                <dt className="text-xs uppercase tracking-[1.5px] text-[var(--text-light)]">{t('sizeLabel')}</dt>
                 <dd className="mt-1 font-semibold text-[var(--text-main)]">{sizes.join(', ') || 'Free-size'}</dd>
               </div>
               <div className="bg-white p-3">
-                <dt className="text-xs uppercase tracking-[1.5px] text-[var(--text-light)]">Chất liệu</dt>
-                <dd className="mt-1 font-semibold text-[var(--text-main)]">{material ?? 'Lụa cao cấp'}</dd>
+                <dt className="text-xs uppercase tracking-[1.5px] text-[var(--text-light)]">{t('materialLabel')}</dt>
+                <dd className="mt-1 font-semibold text-[var(--text-main)]">
+                  {material && materialKeys[material]
+                    ? t(`materials.${materialKeys[material]}`)
+                    : (material || t('materials.default'))}
+                </dd>
               </div>
               <div className="col-span-2 bg-white p-3">
-                <dt className="text-xs uppercase tracking-[1.5px] text-[var(--text-light)]">Hình thức</dt>
-                <dd className="mt-1 font-semibold text-[var(--text-main)]">{purchaseType ?? 'Có sẵn / May đo'}</dd>
+                <dt className="text-xs uppercase tracking-[1.5px] text-[var(--text-light)]">{t('purchaseTypeLabel')}</dt>
+                <dd className="mt-1 font-semibold text-[var(--text-main)]">
+                  {purchaseType === 'ready'
+                    ? t('purchaseTypes.readyDescription')
+                    : purchaseType === 'custom'
+                    ? t('purchaseTypes.customDescription')
+                    : (purchaseType || t('purchaseTypes.default'))}
+                </dd>
               </div>
             </dl>
           </div>

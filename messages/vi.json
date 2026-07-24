@@ -16,7 +16,9 @@
     "login": "Đăng nhập",
     "profile": "Tài khoản",
     "orders": "Đơn hàng",
-    "switchLang": "English"
+    "switchLang": "English",
+    "previous": "Trước",
+    "next": "Sau"
   },
   "HomePage": {
     "title": "Chào mừng đến với Webshop",
@@ -108,7 +110,47 @@
     "addToCart": "Thêm vào giỏ hàng",
     "addToWishlist": "Thêm vào yêu thích",
     "compare": "So sánh sản phẩm",
-    "quickView": "Xem nhanh"
+    "quickView": "Xem nhanh",
+    "close": "Đóng",
+    "sizeLabel": "Size",
+    "materialLabel": "Chất liệu",
+    "purchaseTypeLabel": "Hình thức",
+    "materials": {
+      "silk": "Lụa Tơ Tằm",
+      "brocade": "Gấm",
+      "velvet": "Tơ Nhung",
+      "chiffon": "Voan",
+      "default": "Lụa cao cấp"
+    },
+    "purchaseTypes": {
+      "ready": "Hàng có sẵn",
+      "custom": "Nhận may đo riêng",
+      "readyDescription": "Hàng có sẵn",
+      "customDescription": "Nhận may đo theo số đo riêng",
+      "default": "Có sẵn / May đo"
+    },
+    "categories": {
+      "wedding": "Áo dài Cưới",
+      "modern": "Áo dài Cách tân",
+      "festival": "Áo dài Lễ/Tết",
+      "kids": "Áo dài Trẻ em",
+      "accessories": "Phụ kiện"
+    },
+    "colors": {
+      "red": "Đỏ",
+      "yellow": "Vàng",
+      "pink": "Hồng",
+      "white": "Trắng",
+      "plainSilk": "Lụa trơn",
+      "embroideredBrocade": "Gấm thêu"
+    },
+    "collections": {
+      "wedding": "Áo Dài Cưới",
+      "modern": "Áo Dài Cách Tân",
+      "silk": "Áo Dài Lụa Tơ Tằm",
+      "brocade": "Áo Dài Gấm Luxury",
+      "embroidered": "Áo Dài Thêu Tay"
+    }
   },
   "Auth": {
     "login": "Đăng nhập",
@@ -192,6 +234,38 @@
       "morph3": "Kiêu Sa",
       "morph4": "Hiện Đại",
       "morph5": "Tự Hào"
+    },
+    "filter": {
+      "title": "Bộ lọc",
+      "subtitle": "Tìm đúng mẫu",
+      "searchTitle": "Tìm kiếm",
+      "searchPlaceholder": "Tìm tên hoặc mã sản phẩm...",
+      "categoryTitle": "Loại sản phẩm / Dịp",
+      "collectionTitle": "Bộ sưu tập",
+      "purchaseTypeTitle": "Hình thức mua",
+      "colorTitle": "Màu sắc",
+      "materialTitle": "Chất liệu",
+      "priceTitle": "Khoảng giá",
+      "priceRange": "Giá: {min}đ - {max}đ",
+      "clearThisFilter": "Xóa bộ lọc mục này"
+    },
+    "collection": {
+      "foundCount": "Tìm thấy {count} sản phẩm phù hợp",
+      "sortByLabel": "Sắp xếp:",
+      "sortByPlaceholder": "Sắp xếp theo",
+      "columnsLabel": "Cột hiển thị:",
+      "columnsPlaceholder": "Chọn cột",
+      "cols3": "3 Cột",
+      "cols4": "4 Cột",
+      "cols5": "5 Cột",
+      "sortOptions": {
+        "all": "Hiển thị tất cả",
+        "newest": "Mới nhất",
+        "priceAsc": "Giá tăng dần",
+        "priceDesc": "Giá giảm dần",
+        "bestSeller": "Bán chạy nhất",
+        "favorite": "Được yêu thích nhất"
+      }
     }
   }
 }
