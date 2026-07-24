@@ -48,8 +48,10 @@ function PaginationLink({
     <ButtonPrimitive
       nativeButton={false}
       className={cn(
-        "inline-flex shrink-0 items-center justify-center text-sm font-semibold transition-colors outline-none select-none cursor-pointer border",
-        size === "icon" ? "size-10" : "h-10 px-4 gap-1.5",
+        "inline-flex shrink-0 items-center justify-center text-xs sm:text-sm font-semibold transition-colors outline-none select-none cursor-pointer border rounded-[4px]",
+        size === "icon" 
+          ? "size-8 sm:size-10" 
+          : "h-8 px-2.5 gap-1 sm:h-10 sm:px-4 sm:gap-1.5",
         isActive
           ? "border-[var(--primary-color)] bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)] hover:text-white"
           : "border-[var(--bg-secondary)] bg-white text-[var(--text-main)] hover:border-[var(--primary-color)] hover:text-[var(--primary-color)] hover:bg-white",
@@ -76,7 +78,7 @@ function PaginationPrevious({
     <PaginationLink
       aria-label="Go to previous page"
       size="default"
-      className={cn("pl-2.5", className)}
+      className={cn("pl-2 sm:pl-2.5", className)}
       {...props}
     >
       <ChevronLeftIcon className="size-4" />
@@ -94,7 +96,7 @@ function PaginationNext({
     <PaginationLink
       aria-label="Go to next page"
       size="default"
-      className={cn("pr-2.5", className)}
+      className={cn("pr-2 sm:pr-2.5", className)}
       {...props}
     >
       <span className="hidden sm:block">{text}</span>
@@ -112,7 +114,7 @@ function PaginationEllipsis({
       aria-hidden
       data-slot="pagination-ellipsis"
       className={cn(
-        "flex size-10 items-center justify-center text-[var(--text-light)]",
+        "flex size-8 sm:size-10 items-center justify-center text-[var(--text-light)]",
         className
       )}
       {...props}

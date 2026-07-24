@@ -251,6 +251,7 @@
     },
     "collection": {
       "foundCount": "Tìm thấy {count} sản phẩm phù hợp",
+      "foundCountMobile": "{count} sản phẩm",
       "sortByLabel": "Sắp xếp:",
       "sortByPlaceholder": "Sắp xếp theo",
       "columnsLabel": "Cột hiển thị:",

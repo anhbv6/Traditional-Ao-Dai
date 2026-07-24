@@ -251,6 +251,7 @@
     },
     "collection": {
       "foundCount": "Found {count} matching products",
+      "foundCountMobile": "{count} products",
       "sortByLabel": "Sort by:",
       "sortByPlaceholder": "Sort by",
       "columnsLabel": "Columns:",

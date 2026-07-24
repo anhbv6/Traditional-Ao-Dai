@@ -211,7 +211,7 @@ export function ProductsCollection({ initialCategory }: ProductsCollectionProps)
   };
 
   return (
-    <div className="mt-12 grid gap-10 pb-28 lg:grid-cols-[280px_1fr] lg:pb-0">
+    <div className="mt-12 grid gap-10 sm:pb-28 lg:grid-cols-[280px_1fr] lg:pb-0">
       <FilterSidebar
         locale={locale}
         searchQuery={searchQuery}
@@ -257,15 +257,20 @@ export function ProductsCollection({ initialCategory }: ProductsCollectionProps)
       <div>
         <div
           ref={productListTopRef}
-          className="mb-8 scroll-mt-28 flex flex-col gap-4 border-b border-[var(--bg-secondary)] pb-5 sm:flex-row sm:items-center sm:justify-between"
+          className="scroll-mt-28 flex flex-row gap-4  pb-5 justify-between items-center sm:flex-row sm:border-b border-[var(--bg-secondary)] sm:mb-8"
         >
           <div className="text-sm text-[var(--text-light)]">
-            {t('collection.foundCount', { count: filteredProducts.length })}
+            <span className="hidden sm:inline">
+              {t('collection.foundCount', { count: filteredProducts.length })}
+            </span>
+            <span className="inline sm:hidden font-medium">
+              {t('collection.foundCountMobile', { count: filteredProducts.length })}
+            </span>
           </div>
 
           <div className="flex items-center gap-3">
             <span className="text-sm text-[var(--text-light)]">{t('collection.sortByLabel')}</span>
-            <div className='min-w-[160px] cursor-pointer'>
+            <div className='min-w-[100px] cursor-pointer sm:min-w-[160px]'>
               <Select
                 value={sortKey}
                 onValueChange={(value) => {
@@ -315,7 +320,7 @@ export function ProductsCollection({ initialCategory }: ProductsCollectionProps)
         </div>
 
         {/* pagination & layout controller footer bar */}
-        <div className="mt-12 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between border-t border-[var(--bg-secondary)] pt-6">
+        <div className=" flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between sm:border-t sm:border-[var(--bg-secondary)] sm:mt-12 pt-6">
           {/* Item count status */}
           {/* <div className="text-sm text-[var(--text-light)]">
             Hiển thị <span className="font-semibold text-[var(--text-main)]">{filteredProducts.length ? pageStart + 1 : 0}-{Math.min(pageStart + pageSize, filteredProducts.length)}</span> của{' '}
@@ -354,7 +359,7 @@ export function ProductsCollection({ initialCategory }: ProductsCollectionProps)
           )}
 
           {/* Grid column size controller */}
-          <div className="flex items-center gap-3">
+          <div className="hidden sm:flex items-center gap-3">
             <span className="text-nowrap text-sm text-[var(--text-light)]">{t('collection.columnsLabel')}</span>
             <div className="w-[100px] cursor-pointer">
               <Select

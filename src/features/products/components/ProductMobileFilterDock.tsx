@@ -1,25 +1,24 @@
 'use client';
 
 import { Check, CircleDollarSign, Layers3, Palette, Search, Shapes, Shirt, Tags } from 'lucide-react';
-import type { ComponentType, Dispatch, ReactNode, SetStateAction } from 'react';
+import { useEffect, useRef, useState, type ComponentType, Dispatch, ReactNode, SetStateAction } from 'react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Dock, DockIcon } from '@/components/ui/dock';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
+  Popover,
+  PopoverContent,
+  PopoverDescription,
+  PopoverHeader,
+  PopoverTitle,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import {
   categoryOptions,
   CheckOption,
   collectionOptions,
   colorOptions,
-  FilterSection,
   formatPrice,
   materialOptions,
   maxPrice,
@@ -79,18 +78,34 @@ function FilterDockDialog({
   description,
   icon: Icon,
   active = false,
+  onClear,
+  clearLabel,
+  popoverWidth,
   children,
 }: {
   title: string;
-  description: string;
+  description?: string;
   icon: ComponentType<{ size?: number; strokeWidth?: number; className?: string }>;
   active?: boolean;
+  onClear?: () => void;
+  clearLabel?: string;
+  popoverWidth?: number;
   children: ReactNode;
 }) {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <Dialog>
-      <DockIcon className={cn('bg-white text-[var(--primary-color)] shadow-sm', active && 'bg-[var(--primary-color)] text-white')}>
-        <DialogTrigger
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <DockIcon
+        className={cn(
+          'shadow-sm transition-all duration-300',
+          active
+            ? 'bg-[var(--primary-color)] text-white shadow-[0_8px_18px_rgba(128,0,32,0.22)]'
+            : 'bg-[var(--bg-main)] text-[var(--primary-color)] hover:bg-[var(--bg-secondary)]',
+          isOpen && 'z-50 scale-110 bg-[var(--primary-color)] text-white ring-2 ring-[var(--accent-color)] ring-offset-2 ring-offset-[var(--bg-main)] shadow-md'
+        )}
+      >
+        <PopoverTrigger
           render={
             <button
               type="button"
@@ -100,20 +115,43 @@ function FilterDockDialog({
           }
         >
           <Icon size={18} strokeWidth={2} />
-        </DialogTrigger>
+        </PopoverTrigger>
       </DockIcon>
-      <DialogContent className="max-h-[78vh] overflow-y-auto rounded-lg bg-[var(--bg-main)] p-5 text-[var(--text-main)] sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="font-[family-name:var(--font-playfair)] text-xl font-semibold text-[var(--primary-color)]">
-            {title}
-          </DialogTitle>
-          <DialogDescription className="text-sm leading-6 text-[var(--text-light)]">
-            {description}
-          </DialogDescription>
-        </DialogHeader>
+      <PopoverContent
+        side="top"
+        align="center"
+        collisionPadding={12}
+        sideOffset={28}
+        positionMethod="fixed"
+        className="max-h-[60vh] overflow-y-auto rounded-[18px] border border-[var(--primary-color)]/15 bg-[var(--bg-main)] p-4 text-[var(--text-main)] shadow-[0_22px_70px_rgba(42,37,37,0.22)] ring-1 ring-[var(--primary-color)]/10"
+        style={{ width: popoverWidth ? `${popoverWidth}px` : 'calc(100vw - 1.5rem)' }}
+      >
+        <PopoverHeader className="mb-4 border-b border-[var(--primary-color)]/10 pb-3">
+          <div className="flex items-center justify-between w-full">
+            <div className="flex flex-col gap-0.5">
+              <PopoverTitle className="font-[family-name:var(--font-playfair)] text-base font-bold text-[var(--primary-color)] leading-tight">
+                {title}
+              </PopoverTitle>
+              {description && (
+                <PopoverDescription className="text-[10px] text-[var(--text-light)] mt-0.5 leading-tight">
+                  {description}
+                </PopoverDescription>
+              )}
+            </div>
+            {active && onClear && (
+              <button
+                type="button"
+                onClick={onClear}
+                className="shrink-0 cursor-pointer rounded-full border border-[var(--primary-color)]/15 bg-white px-2.5 py-1 text-[10px] font-bold text-[var(--primary-color)] transition-all duration-200 hover:bg-[var(--primary-color)] hover:text-white"
+              >
+                {clearLabel || 'Clear'}
+              </button>
+            )}
+          </div>
+        </PopoverHeader>
         <div className="mt-1">{children}</div>
-      </DialogContent>
-    </Dialog>
+      </PopoverContent>
+    </Popover>
   );
 }
 
@@ -139,20 +177,55 @@ export function ProductMobileFilterDock({
 }: ProductMobileFilterDockProps) {
   const t = useTranslations('ProductsPage.filter');
   const tp = useTranslations('Product');
+  const dockRef = useRef<HTMLDivElement>(null);
+  const [popoverWidth, setPopoverWidth] = useState<number>();
+
+  useEffect(() => {
+    const syncWidth = () => {
+      const dockWidth = dockRef.current?.getBoundingClientRect().width;
+
+      if (dockWidth) {
+        setPopoverWidth(Math.round(dockWidth));
+      }
+    };
+
+    syncWidth();
+
+    const resizeObserver = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(syncWidth);
+
+    if (dockRef.current && resizeObserver) {
+      resizeObserver.observe(dockRef.current);
+    }
+
+    window.addEventListener('resize', syncWidth);
+
+    return () => {
+      resizeObserver?.disconnect();
+      window.removeEventListener('resize', syncWidth);
+    };
+  }, []);
 
   return (
     <div className="fixed inset-x-0 bottom-4 z-40 flex justify-center px-3 lg:hidden">
       <Dock
+        ref={dockRef}
         iconSize={36}
         iconMagnification={44}
         iconDistance={90}
-        className="mt-0 h-14 max-w-[calc(100vw-1.5rem)] gap-1 overflow-x-auto rounded-full border-[var(--bg-secondary)] bg-white/85 px-2 shadow-[0_18px_50px_rgba(42,37,37,0.18)]"
+        className="mt-0 h-14 w-[calc(100vw-1.5rem)] gap-1 overflow-x-auto rounded-full border-[var(--primary-color)]/10 bg-[var(--bg-main)]/92 px-2 shadow-[0_18px_50px_rgba(42,37,37,0.18)] ring-1 ring-white/70"
+        style={{ width: 'calc(100vw - 1.5rem)' }}
       >
         <FilterDockDialog
           title={t('searchTitle')}
           description={t('searchPlaceholder')}
           icon={Search}
           active={searchQuery.length > 0}
+          popoverWidth={popoverWidth}
+          onClear={() => {
+            setSearchQuery('');
+            onFilterChange();
+          }}
+          clearLabel={locale === 'vi' ? 'Xóa' : 'Clear'}
         >
           <Input
             type="text"
@@ -162,24 +235,22 @@ export function ProductMobileFilterDock({
               onFilterChange();
             }}
             placeholder={t('searchPlaceholder')}
-            className="bg-white"
+            className="border-[var(--primary-color)]/15 bg-white text-[var(--text-main)] placeholder:text-[var(--text-light)] focus:border-[var(--primary-color)] focus:ring-[var(--accent-color)]/30"
           />
         </FilterDockDialog>
 
         <FilterDockDialog
           title={t('categoryTitle')}
-          description={t('clearThisFilter')}
           icon={Tags}
           active={selectedCategories.length > 0}
+          popoverWidth={popoverWidth}
+          onClear={() => {
+            setSelectedCategories([]);
+            onFilterChange();
+          }}
+          clearLabel={locale === 'vi' ? 'Xóa bộ lọc' : 'Clear filter'}
         >
-          <FilterSection
-            title={t('categoryTitle')}
-            onClear={() => {
-              setSelectedCategories([]);
-              onFilterChange();
-            }}
-            hasActiveFilters={selectedCategories.length > 0}
-          >
+          <div className="flex flex-col gap-3 py-1">
             {categoryOptions.map((category) => (
               <CheckOption
                 key={category}
@@ -189,23 +260,21 @@ export function ProductMobileFilterDock({
                 onCheckedChange={() => toggleValue(category, selectedCategories, setSelectedCategories)}
               />
             ))}
-          </FilterSection>
+          </div>
         </FilterDockDialog>
 
         <FilterDockDialog
           title={t('collectionTitle')}
-          description={t('clearThisFilter')}
           icon={Layers3}
           active={selectedCollections.length > 0}
+          popoverWidth={popoverWidth}
+          onClear={() => {
+            setSelectedCollections([]);
+            onFilterChange();
+          }}
+          clearLabel={locale === 'vi' ? 'Xóa bộ lọc' : 'Clear filter'}
         >
-          <FilterSection
-            title={t('collectionTitle')}
-            onClear={() => {
-              setSelectedCollections([]);
-              onFilterChange();
-            }}
-            hasActiveFilters={selectedCollections.length > 0}
-          >
+          <div className="flex flex-col gap-3 py-1">
             {collectionOptions.map((collection) => (
               <CheckOption
                 key={collection.id}
@@ -215,23 +284,21 @@ export function ProductMobileFilterDock({
                 onCheckedChange={() => toggleValue(collection.id, selectedCollections, setSelectedCollections)}
               />
             ))}
-          </FilterSection>
+          </div>
         </FilterDockDialog>
 
         <FilterDockDialog
           title={t('purchaseTypeTitle')}
-          description={t('clearThisFilter')}
           icon={Shirt}
           active={selectedPurchaseTypes.length > 0}
+          popoverWidth={popoverWidth}
+          onClear={() => {
+            setSelectedPurchaseTypes([]);
+            onFilterChange();
+          }}
+          clearLabel={locale === 'vi' ? 'Xóa bộ lọc' : 'Clear filter'}
         >
-          <FilterSection
-            title={t('purchaseTypeTitle')}
-            onClear={() => {
-              setSelectedPurchaseTypes([]);
-              onFilterChange();
-            }}
-            hasActiveFilters={selectedPurchaseTypes.length > 0}
-          >
+          <div className="flex flex-col gap-3 py-1">
             {purchaseOptions.map((option) => (
               <CheckOption
                 key={option.id}
@@ -241,16 +308,21 @@ export function ProductMobileFilterDock({
                 onCheckedChange={() => toggleValue(option.id, selectedPurchaseTypes, setSelectedPurchaseTypes)}
               />
             ))}
-          </FilterSection>
+          </div>
         </FilterDockDialog>
 
         <FilterDockDialog
           title={t('colorTitle')}
-          description={t('clearThisFilter')}
           icon={Palette}
           active={selectedColors.length > 0}
+          popoverWidth={popoverWidth}
+          onClear={() => {
+            setSelectedColors([]);
+            onFilterChange();
+          }}
+          clearLabel={locale === 'vi' ? 'Xóa bộ lọc' : 'Clear filter'}
         >
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3 py-1">
             {colorOptions.map((color) => {
               const isSelected = selectedColors.includes(color.name);
 
@@ -260,8 +332,8 @@ export function ProductMobileFilterDock({
                   type="button"
                   onClick={() => toggleValue(color.name, selectedColors, setSelectedColors)}
                   className={cn(
-                    'flex min-h-10 cursor-pointer items-center gap-2.5 text-left text-sm text-[var(--text-light)] transition-all duration-200 hover:text-[var(--primary-color)]',
-                    isSelected && 'font-bold text-[var(--primary-color)]'
+                    'flex min-h-10 cursor-pointer items-center gap-2.5 rounded-md px-1.5 text-left text-sm text-[var(--text-light)] transition-all duration-200 hover:bg-white hover:text-[var(--primary-color)]',
+                    isSelected && 'bg-white font-bold text-[var(--primary-color)]'
                   )}
                 >
                   <span
@@ -288,18 +360,16 @@ export function ProductMobileFilterDock({
 
         <FilterDockDialog
           title={t('materialTitle')}
-          description={t('clearThisFilter')}
           icon={Shapes}
           active={selectedMaterials.length > 0}
+          popoverWidth={popoverWidth}
+          onClear={() => {
+            setSelectedMaterials([]);
+            onFilterChange();
+          }}
+          clearLabel={locale === 'vi' ? 'Xóa bộ lọc' : 'Clear filter'}
         >
-          <FilterSection
-            title={t('materialTitle')}
-            onClear={() => {
-              setSelectedMaterials([]);
-              onFilterChange();
-            }}
-            hasActiveFilters={selectedMaterials.length > 0}
-          >
+          <div className="flex flex-col gap-3 py-1">
             {materialOptions.map((material) => (
               <CheckOption
                 key={material}
@@ -309,7 +379,7 @@ export function ProductMobileFilterDock({
                 onCheckedChange={() => toggleValue(material, selectedMaterials, setSelectedMaterials)}
               />
             ))}
-          </FilterSection>
+          </div>
         </FilterDockDialog>
 
         <FilterDockDialog
@@ -317,22 +387,27 @@ export function ProductMobileFilterDock({
           description={t('priceRange', { min: formatPrice(minPrice, locale), max: formatPrice(priceLimit, locale) })}
           icon={CircleDollarSign}
           active={priceLimit < maxPrice}
+          popoverWidth={popoverWidth}
+          onClear={() => {
+            setPriceLimit(maxPrice);
+            onFilterChange();
+          }}
+          clearLabel={locale === 'vi' ? 'Đặt lại' : 'Reset'}
         >
-          <p className="mb-4 text-sm text-[var(--text-light)]">
-            {t('priceRange', { min: formatPrice(minPrice, locale), max: formatPrice(priceLimit, locale) })}
-          </p>
-          <input
-            type="range"
-            min={minPrice}
-            max={maxPrice}
-            step={100000}
-            value={priceLimit}
-            onChange={(event) => {
-              setPriceLimit(Number(event.target.value));
-              onFilterChange();
-            }}
-            className="h-1 w-full cursor-pointer accent-[var(--primary-color)]"
-          />
+          <div className="py-2">
+            <input
+              type="range"
+              min={minPrice}
+              max={maxPrice}
+              step={100000}
+              value={priceLimit}
+              onChange={(event) => {
+                setPriceLimit(Number(event.target.value));
+                onFilterChange();
+              }}
+              className="h-1.5 w-full cursor-pointer rounded-lg bg-[var(--bg-secondary)] accent-[var(--primary-color)]"
+            />
+          </div>
         </FilterDockDialog>
       </Dock>
     </div>
