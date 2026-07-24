@@ -2,6 +2,7 @@
 
 import { Check, CircleDollarSign, Layers3, Palette, Search, Shapes, Shirt, Tags } from 'lucide-react';
 import { useEffect, useRef, useState, type ComponentType, Dispatch, ReactNode, SetStateAction } from 'react';
+import { useLenis } from 'lenis/react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
@@ -73,6 +74,10 @@ const materialKeys: Record<string, string> = {
   'Voan': 'chiffon',
 };
 
+let mobilePopoverLockCount = 0;
+let mobilePopoverScrollY = 0;
+let previousBodyStyles: Pick<CSSStyleDeclaration, 'position' | 'top' | 'left' | 'right' | 'width'> | null = null;
+
 function FilterDockDialog({
   title,
   description,
@@ -93,9 +98,57 @@ function FilterDockDialog({
   children: ReactNode;
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const lenis = useLenis();
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const html = document.documentElement;
+    const body = document.body;
+    const shouldApplyLock = mobilePopoverLockCount === 0;
+
+    mobilePopoverLockCount += 1;
+
+    if (shouldApplyLock) {
+      mobilePopoverScrollY = window.scrollY;
+      previousBodyStyles = {
+        position: body.style.position,
+        top: body.style.top,
+        left: body.style.left,
+        right: body.style.right,
+        width: body.style.width,
+      };
+      body.style.position = 'fixed';
+      body.style.top = `-${mobilePopoverScrollY}px`;
+      body.style.left = '0';
+      body.style.right = '0';
+      body.style.width = '100%';
+    }
+
+    html.classList.add('is-scroll-locked');
+    lenis?.stop();
+
+    return () => {
+      mobilePopoverLockCount = Math.max(0, mobilePopoverLockCount - 1);
+
+      if (mobilePopoverLockCount === 0) {
+        html.classList.remove('is-scroll-locked');
+        body.style.position = previousBodyStyles?.position ?? '';
+        body.style.top = previousBodyStyles?.top ?? '';
+        body.style.left = previousBodyStyles?.left ?? '';
+        body.style.right = previousBodyStyles?.right ?? '';
+        body.style.width = previousBodyStyles?.width ?? '';
+        previousBodyStyles = null;
+        window.scrollTo(0, mobilePopoverScrollY);
+        lenis?.start();
+      }
+    };
+  }, [isOpen, lenis]);
 
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
+    <Popover open={isOpen} onOpenChange={setIsOpen} modal={true}>
       <DockIcon
         className={cn(
           'shadow-sm transition-all duration-300',
@@ -123,17 +176,17 @@ function FilterDockDialog({
         collisionPadding={12}
         sideOffset={28}
         positionMethod="fixed"
-        className="max-h-[60vh] overflow-y-auto rounded-[18px] border border-[var(--primary-color)]/15 bg-[var(--bg-main)] p-4 text-[var(--text-main)] shadow-[0_22px_70px_rgba(42,37,37,0.22)] ring-1 ring-[var(--primary-color)]/10"
+        className="max-h-[min(68vh,520px)] overflow-y-auto rounded-lg border border-primary/15 bg-popover p-4 font-[family-name:var(--font-lora)] text-popover-foreground shadow-[0_22px_70px_rgba(42,37,37,0.22)] ring-1 ring-primary/10 [overscroll-behavior:contain] sm:p-5"
         style={{ width: popoverWidth ? `${popoverWidth}px` : 'calc(100vw - 1.5rem)' }}
       >
-        <PopoverHeader className="mb-4 border-b border-[var(--primary-color)]/10 pb-3">
-          <div className="flex items-center justify-between w-full">
-            <div className="flex flex-col gap-0.5">
-              <PopoverTitle className="font-[family-name:var(--font-playfair)] text-base font-bold text-[var(--primary-color)] leading-tight">
+        <PopoverHeader className="mb-4 border-b border-primary/10 pb-3">
+          <div className="flex w-full items-start justify-between gap-3">
+            <div className="flex min-w-0 flex-col gap-1">
+              <PopoverTitle className="font-[family-name:var(--font-playfair)] text-lg font-bold leading-tight text-primary">
                 {title}
               </PopoverTitle>
               {description && (
-                <PopoverDescription className="text-[10px] text-[var(--text-light)] mt-0.5 leading-tight">
+                <PopoverDescription className="mt-0.5 text-xs leading-5 text-muted-foreground">
                   {description}
                 </PopoverDescription>
               )}
@@ -142,14 +195,14 @@ function FilterDockDialog({
               <button
                 type="button"
                 onClick={onClear}
-                className="shrink-0 cursor-pointer rounded-full border border-[var(--primary-color)]/15 bg-white px-2.5 py-1 text-[10px] font-bold text-[var(--primary-color)] transition-all duration-200 hover:bg-[var(--primary-color)] hover:text-white"
+                className="min-h-8 shrink-0 cursor-pointer rounded-md border border-primary/15 bg-white px-2.5 py-1 text-[11px] font-bold text-primary transition-all duration-200 hover:bg-primary hover:text-primary-foreground"
               >
                 {clearLabel || 'Clear'}
               </button>
             )}
           </div>
         </PopoverHeader>
-        <div className="mt-1">{children}</div>
+        <div className="mt-1 text-sm text-foreground">{children}</div>
       </PopoverContent>
     </Popover>
   );

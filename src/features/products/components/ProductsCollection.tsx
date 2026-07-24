@@ -319,78 +319,72 @@ export function ProductsCollection({ initialCategory }: ProductsCollectionProps)
           ))}
         </div>
 
-        {/* pagination & layout controller footer bar */}
-        <div className=" flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between sm:border-t sm:border-[var(--bg-secondary)] sm:mt-12 pt-6">
-          {/* Item count status */}
-          {/* <div className="text-sm text-[var(--text-light)]">
-            Hiển thị <span className="font-semibold text-[var(--text-main)]">{filteredProducts.length ? pageStart + 1 : 0}-{Math.min(pageStart + pageSize, filteredProducts.length)}</span> của{' '}
-            <span className="font-semibold text-[var(--text-main)]">{filteredProducts.length}</span> sản phẩm
-          </div> */}
+        {filteredProducts.length > 0 && (
+          <div className=" flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between sm:border-t sm:border-[var(--bg-secondary)] sm:mt-12 pt-6">
+            {pageCount > 1 ? (
+              <Pagination className="mx-0 w-auto">
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={() => safePage > 1 && setPageAndScroll(safePage - 1)}
+                      text={tc('previous')}
+                      className={cn(
+                        safePage === 1 && "pointer-events-none opacity-40 cursor-not-allowed"
+                      )}
+                    />
+                  </PaginationItem>
 
-          {/* Centered Pagination controls */}
-          {pageCount > 1 ? (
-            <Pagination className="mx-0 w-auto">
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious
-                    onClick={() => safePage > 1 && setPageAndScroll(safePage - 1)}
-                    text={tc('previous')}
-                    className={cn(
-                      safePage === 1 && "pointer-events-none opacity-40 cursor-not-allowed"
-                    )}
-                  />
-                </PaginationItem>
+                  {renderPaginationItems()}
 
-                {renderPaginationItems()}
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() => safePage < pageCount && setPageAndScroll(safePage + 1)}
+                      text={tc('next')}
+                      className={cn(
+                        safePage === pageCount && "pointer-events-none opacity-40 cursor-not-allowed"
+                      )}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            ) : (
+              <div />
+            )}
 
-                <PaginationItem>
-                  <PaginationNext
-                    onClick={() => safePage < pageCount && setPageAndScroll(safePage + 1)}
-                    text={tc('next')}
-                    className={cn(
-                      safePage === pageCount && "pointer-events-none opacity-40 cursor-not-allowed"
-                    )}
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
-          ) : (
-            <div />
-          )}
-
-          {/* Grid column size controller */}
-          <div className="hidden sm:flex items-center gap-3">
-            <span className="text-nowrap text-sm text-[var(--text-light)]">{t('collection.columnsLabel')}</span>
-            <div className="w-[100px] cursor-pointer">
-              <Select
-                value={String(gridSize)}
-                onValueChange={(value) => {
-                  if (value) {
-                    setGridSize(Number(value) as GridSize);
-                    resetPageAndScroll();
-                  }
-                }}
-              >
-                <SelectTrigger className="h-9 w-full bg-white text-[var(--text-main)] hover:border-[var(--primary-color)] transition-colors text-xs font-semibold">
-                  <SelectValue placeholder={t('collection.columnsPlaceholder')} />
-                </SelectTrigger>
-                <SelectContent className="w-28 bg-white text-[var(--text-main)] border border-[var(--bg-secondary)] shadow-md text-xs">
-                  <SelectGroup>
-                    <SelectItem value="3" className="cursor-pointer text-xs">
-                      {t('collection.cols3')}
-                    </SelectItem>
-                    <SelectItem value="4" className="cursor-pointer text-xs">
-                      {t('collection.cols4')}
-                    </SelectItem>
-                    <SelectItem value="5" className="cursor-pointer text-xs">
-                      {t('collection.cols5')}
-                    </SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
+            {/* Grid column size controller */}
+            <div className="hidden sm:flex items-center gap-3">
+              <span className="text-nowrap text-sm text-[var(--text-light)]">{t('collection.columnsLabel')}</span>
+              <div className="w-[100px] cursor-pointer">
+                <Select
+                  value={String(gridSize)}
+                  onValueChange={(value) => {
+                    if (value) {
+                      setGridSize(Number(value) as GridSize);
+                      resetPageAndScroll();
+                    }
+                  }}
+                >
+                  <SelectTrigger className="h-9 w-full bg-white text-[var(--text-main)] hover:border-[var(--primary-color)] transition-colors text-xs font-semibold">
+                    <SelectValue placeholder={t('collection.columnsPlaceholder')} />
+                  </SelectTrigger>
+                  <SelectContent className="w-28 bg-white text-[var(--text-main)] border border-[var(--bg-secondary)] shadow-md text-xs">
+                    <SelectGroup>
+                      <SelectItem value="3" className="cursor-pointer text-xs">
+                        {t('collection.cols3')}
+                      </SelectItem>
+                      <SelectItem value="4" className="cursor-pointer text-xs">
+                        {t('collection.cols4')}
+                      </SelectItem>
+                      <SelectItem value="5" className="cursor-pointer text-xs">
+                        {t('collection.cols5')}
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

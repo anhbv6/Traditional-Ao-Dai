@@ -4,8 +4,8 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { Eye, Heart, ShoppingBag } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 export type ProductColorSwatch = {
   name: string;
@@ -54,8 +54,7 @@ function ProductCard({
   const t = useTranslations('Product');
   const fallbackImageSrc = '/logoPage.png';
   const [isHovered, setIsHovered] = useState(false);
-  const [selectedColorIndex, setSelectedColorIndex] = useState<number | null>(null);
-  const [selectedSize, setSelectedSize] = useState(sizes[0] ?? '');
+  const selectedColorIndex: number | null = null;
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
   const [failedImageSrc, setFailedImageSrc] = useState<string | null>(null);
   const swatchImageSrc = selectedColorIndex === null ? undefined : colorSwatches[selectedColorIndex]?.imageSrc;
@@ -192,51 +191,108 @@ function ProductCard({
         </div>
       </div>
 
-      {isQuickViewOpen ? (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/45 p-4" role="dialog" aria-modal="true">
-          <div className="w-full max-w-md bg-[var(--bg-main)] p-6 shadow-2xl">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-[2px] text-[var(--text-light)]">{t('quickView')}</p>
-                <h3 className="mt-2 text-2xl font-semibold text-[var(--primary-color)]">{name}</h3>
-              </div>
-              <button
-                type="button"
-                aria-label="Close"
-                onClick={() => setIsQuickViewOpen(false)}
-                className="grid size-9 cursor-pointer place-items-center border border-[var(--bg-secondary)] text-[var(--text-main)] hover:bg-[var(--primary-color)] hover:text-white"
-              >
-                ×
-              </button>
+      <Dialog open={isQuickViewOpen} onOpenChange={setIsQuickViewOpen} modal={true}>
+        <DialogContent className="h-[60svh] max-h-[60svh] w-[60vw] max-w-[520px] overflow-hidden rounded-lg border border-[var(--bg-secondary)] bg-[var(--bg-main)] p-0 shadow-2xl md:max-w-[680px]">
+          <div className="grid max-h-[inherit] min-h-0 grid-cols-1 md:grid-cols-2">
+            {/* Left Side: Product Image */}
+            <div className="relative h-[20svh] min-h-[110px] bg-[var(--bg-secondary)] md:h-auto md:min-h-0">
+              <Image
+                src={currentImageSrc}
+                alt={imageAlt}
+                fill={true}
+                sizes="(max-width: 640px) 90vw, 400px"
+                className="object-cover"
+              />
             </div>
-            <p className="mt-4 text-sm leading-7 text-[var(--text-light)]">{description}</p>
-            <dl className="mt-5 grid grid-cols-2 gap-3 text-sm">
-              <div className="bg-white p-3">
-                <dt className="text-xs uppercase tracking-[1.5px] text-[var(--text-light)]">{t('sizeLabel')}</dt>
-                <dd className="mt-1 font-semibold text-[var(--text-main)]">{sizes.join(', ') || 'Free-size'}</dd>
+            {/* Right Side: Product Details */}
+            <div className="min-h-0 overflow-y-auto p-3 font-[family-name:var(--font-lora)] text-[var(--text-main)] [overscroll-behavior:contain] sm:p-4 md:flex md:flex-col">
+              <div className="flex-1">
+                <span className="rounded bg-[var(--primary-color)]/10 px-2 py-0.5 text-[8px] font-bold uppercase tracking-[1.4px] text-[var(--primary-color)] sm:text-[9px]">
+                  {t('quickView')}
+                </span>
+                <DialogHeader className="mt-2 sm:mt-3">
+                  <DialogTitle className="font-[family-name:var(--font-playfair)] text-base font-bold leading-tight text-[var(--primary-color)] sm:text-lg">
+                    {name}
+                  </DialogTitle>
+                </DialogHeader>
+                
+                {/* Price display */}
+                <div className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-1 sm:mt-3 sm:gap-x-2.5">
+                  <span className="text-base font-bold text-[var(--primary-color)] sm:text-lg">{price}</span>
+                  {originalPrice && (
+                    <span className="text-xs text-[var(--text-light)]/60 line-through sm:text-sm">{originalPrice}</span>
+                  )}
+                </div>
+
+                <DialogDescription className="mt-2 text-[11px] leading-5 text-[var(--text-light)] line-clamp-2 sm:line-clamp-3">
+                  {description}
+                </DialogDescription>
+
+                <div className="mt-3 space-y-2.5 sm:space-y-3">
+                  {/* Sizes */}
+                  <div>
+                    <span className="text-[9px] font-bold uppercase tracking-[1.4px] text-[var(--text-light)] sm:text-[10px]">
+                      {t('sizeLabel')}
+                    </span>
+                    <div className="mt-1 flex flex-wrap gap-1.5 sm:mt-1.5">
+                      {sizes.length > 0 ? (
+                        sizes.map((size) => (
+                          <span key={size} className="rounded-sm border border-[var(--bg-secondary)] bg-white px-2 py-0.5 text-[10px] font-semibold text-[var(--text-main)] sm:px-2.5 sm:py-1">
+                            {size}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="rounded-sm border border-[var(--bg-secondary)] bg-white px-2 py-0.5 text-[10px] font-semibold text-[var(--text-main)] sm:px-2.5 sm:py-1">
+                          Free-size
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Material */}
+                  {material && (
+                    <div>
+                      <span className="text-[9px] font-bold uppercase tracking-[1.4px] text-[var(--text-light)] sm:text-[10px]">
+                        {t('materialLabel')}
+                      </span>
+                      <p className="mt-0.5 text-xs font-semibold text-[var(--text-main)] sm:mt-1">
+                        {materialKeys[material] ? t(`materials.${materialKeys[material]}`) : material}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Purchase Type */}
+                  {purchaseType && (
+                    <div>
+                      <span className="text-[9px] font-bold uppercase tracking-[1.4px] text-[var(--text-light)] sm:text-[10px]">
+                        {t('purchaseTypeLabel')}
+                      </span>
+                      <p className="mt-0.5 text-xs font-semibold text-[var(--text-main)] sm:mt-1">
+                        {purchaseType === 'ready'
+                          ? t('purchaseTypes.readyDescription')
+                          : purchaseType === 'custom'
+                          ? t('purchaseTypes.customDescription')
+                          : purchaseType}
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
-              <div className="bg-white p-3">
-                <dt className="text-xs uppercase tracking-[1.5px] text-[var(--text-light)]">{t('materialLabel')}</dt>
-                <dd className="mt-1 font-semibold text-[var(--text-main)]">
-                  {material && materialKeys[material]
-                    ? t(`materials.${materialKeys[material]}`)
-                    : (material || t('materials.default'))}
-                </dd>
+
+              {/* Action button */}
+              <div className="mt-3 border-t border-[var(--bg-secondary)] pt-2.5 sm:pt-3">
+                <button
+                  type="button"
+                  className="flex min-h-8 w-full cursor-pointer items-center justify-center gap-2 rounded-[8px] bg-[var(--primary-color)] px-3 text-[10px] font-bold uppercase tracking-wider text-white shadow-md transition-all duration-300 hover:bg-[var(--text-main)] sm:min-h-9 sm:text-[11px]"
+                >
+                  <ShoppingBag size={14} />
+                  {t('addToCart')}
+                </button>
               </div>
-              <div className="col-span-2 bg-white p-3">
-                <dt className="text-xs uppercase tracking-[1.5px] text-[var(--text-light)]">{t('purchaseTypeLabel')}</dt>
-                <dd className="mt-1 font-semibold text-[var(--text-main)]">
-                  {purchaseType === 'ready'
-                    ? t('purchaseTypes.readyDescription')
-                    : purchaseType === 'custom'
-                    ? t('purchaseTypes.customDescription')
-                    : (purchaseType || t('purchaseTypes.default'))}
-                </dd>
-              </div>
-            </dl>
+            </div>
           </div>
-        </div>
-      ) : null}
+        </DialogContent>
+      </Dialog>
     </article>
   );
 }

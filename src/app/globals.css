@@ -12,6 +12,27 @@
   --bg-secondary: #F3ECE7;     /* Phân tách khối nội dung */
   --text-main: #2A2525;        /* Chữ dễ đọc, không mỏi mắt */
   --text-light: #706565;       /* Chữ cho ngày tháng, thông tin phụ */
+  --border: #E2D9D2;
+  --ring: #E2A79E;
+  --destructive: #B42318;
+}
+
+@theme inline {
+  --color-background: var(--bg-main);
+  --color-foreground: var(--text-main);
+  --color-primary: var(--primary-color);
+  --color-primary-foreground: #ffffff;
+  --color-secondary: var(--bg-secondary);
+  --color-secondary-foreground: var(--text-main);
+  --color-muted: var(--bg-secondary);
+  --color-muted-foreground: var(--text-light);
+  --color-popover: var(--bg-main);
+  --color-popover-foreground: var(--text-main);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --color-input: var(--bg-main);
+  --color-destructive: var(--destructive);
+  --radius-md: 8px;
 }
 
 /* Modern CSS Reset - Bọc trong @layer base để không đè các utility class margin (mt-*, mb-*, mx-*, m-*) của Tailwind */
@@ -26,6 +47,12 @@
 
   html, body {
     min-height: 100%;
+  }
+
+  html.is-scroll-locked,
+  html.is-scroll-locked body {
+    overflow: hidden;
+    overscroll-behavior: none;
   }
 
   body {
