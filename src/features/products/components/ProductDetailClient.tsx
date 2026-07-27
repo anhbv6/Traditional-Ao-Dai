@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 import ProductGallery from './detail/ProductGallery';
 import ProductInfo from './detail/ProductInfo';
@@ -66,6 +67,7 @@ export default function ProductDetailClient({
   relatedProducts,
   customMeasurementFields = [],
 }: ProductDetailClientProps) {
+  const t = useTranslations('Product');
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [selectedColor, setSelectedColor] = useState(product.colors[0]?.name || '');
   const [selectedSize, setSelectedSize] = useState(product.sizes[0] || '');
@@ -82,36 +84,19 @@ export default function ProductDetailClient({
 
   const handleAddToCart = () => {
     const isCustomSize = selectedSize.toLowerCase().includes('may đo') || selectedSize.toLowerCase().includes('custom');
-    const details = {
-      product: product.name,
-      color: selectedColor,
-      size: selectedSize,
-      quantity,
-      customMeasurements: isCustomSize ? customMeasurements : null,
-    };
+    const customMeasurementsStr = isCustomSize && Object.keys(customMeasurements).length > 0
+      ? t('details.customMeasurementsPrefix') + Object.entries(customMeasurements)
+          .map(([k, v]) => `${k.toUpperCase()}=${v}cm`)
+          .join(', ') + '\n'
+      : '';
 
     alert(
-      locale === 'vi'
-        ? `🛒 ĐÃ THÊM VÀO GIỎ HÀNG!\n\n` +
-          `• Sản phẩm: ${details.product}\n` +
-          `• Màu sắc: ${details.color}\n` +
-          `• Kích thước: ${details.size}\n` +
-          `• Số lượng: ${details.quantity}\n` +
-          (details.customMeasurements && Object.keys(details.customMeasurements).length > 0
-            ? `• Số đo may đo: ${Object.entries(details.customMeasurements)
-                .map(([k, v]) => `${k.toUpperCase()}=${v}cm`)
-                .join(', ')}\n`
-            : '')
-        : `🛒 ADDED TO CART!\n\n` +
-          `• Product: ${details.product}\n` +
-          `• Color: ${details.color}\n` +
-          `• Size: ${details.size}\n` +
-          `• Quantity: ${details.quantity}\n` +
-          (details.customMeasurements && Object.keys(details.customMeasurements).length > 0
-            ? `• Custom Measurements: ${Object.entries(details.customMeasurements)
-                .map(([k, v]) => `${k.toUpperCase()}=${v}cm`)
-                .join(', ')}\n`
-            : '')
+      t('details.addedToCart', {
+        product: product.name,
+        color: selectedColor,
+        size: selectedSize,
+        quantity: quantity,
+      }) + customMeasurementsStr
     );
   };
 

@@ -1,7 +1,11 @@
 'use client';
 
-import { Star, Minus, Plus, ShoppingBag, Heart } from 'lucide-react';
+import { Minus, Plus, ShoppingBag } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { Rating, RoundedStar } from '@smastrom/react-rating';
+import '@smastrom/react-rating/style.css';
+import UseAnimations from 'react-useanimations';
+import heart from 'react-useanimations/lib/heart';
 
 import { Button } from '@/components/ui/button';
 import Counter from '@/components/Counter';
@@ -23,6 +27,12 @@ interface ProductInfoProps {
   onWishlistToggle: () => void;
   onAddToCart: () => void;
 }
+
+const ratingStyles = {
+  itemShapes: RoundedStar,
+  activeFillColor: '#ff9e00',
+  inactiveFillColor: '#ffeed6',
+};
 
 export default function ProductInfo({
   product,
@@ -59,11 +69,14 @@ export default function ProductInfo({
       <p className="mt-2 text-sm text-[var(--text-main)]">{product.description}</p>
 
       <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-[var(--text-light)]">
-        <span className="flex items-center gap-0.5 text-[#FFC107]">
-          {Array.from({ length: 5 }).map((_, index) => (
-            <Star key={index} size={17} fill="currentColor" strokeWidth={0} />
-          ))}
-        </span>
+        <div className="flex items-center">
+          <Rating
+            style={{ maxWidth: 85 }}
+            value={parseFloat(product.rating) || 5}
+            itemStyles={ratingStyles}
+            readOnly
+          />
+        </div>
         <span className="font-semibold text-[var(--text-main)]">{product.rating}</span>
         <span>({product.reviewCount})</span>
       </div>
@@ -80,7 +93,7 @@ export default function ProductInfo({
       {/* Color Switch Swatches */}
       <div className="mt-6">
         <h2 className="text-sm font-semibold text-[var(--text-main)]">
-          {product.colors.length > 0 ? (locale === 'vi' ? 'Màu sắc' : 'Colors') : ''}
+          {product.colors.length > 0 ? t('details.color') : ''}
         </h2>
         <div className="mt-3 flex flex-wrap gap-2">
           {product.colors.map((color) => (
@@ -104,7 +117,7 @@ export default function ProductInfo({
       {/* Size Select Swatches */}
       <div className="mt-6">
         <h2 className="text-sm font-semibold text-[var(--text-main)]">
-          {product.sizes.length > 0 ? (locale === 'vi' ? 'Kích thước' : 'Sizes') : ''}
+          {product.sizes.length > 0 ? t('details.size') : ''}
         </h2>
         <div className="mt-3 flex flex-wrap gap-2">
           {product.sizes.map((size) => (
@@ -128,7 +141,7 @@ export default function ProductInfo({
       {isCustomSizeSelected && customMeasurementFields.length > 0 && (
         <div className="mt-6 bg-[var(--bg-secondary)] border border-[var(--border)] p-4 transition-all duration-300">
           <h4 className="text-xs font-bold text-[var(--primary-color)] uppercase tracking-wider mb-3">
-            {locale === 'vi' ? 'Nhập số đo của bạn (cm)' : 'Enter your measurements (cm)'}
+            {t('details.enterMeasurements')}
           </h4>
           <div className="grid gap-3 grid-cols-2 sm:grid-cols-3">
             {customMeasurementFields.map((field) => (
@@ -149,21 +162,21 @@ export default function ProductInfo({
       )}
 
       {/* Action Row: Quantity + Add to Cart + Wishlist */}
-      <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-        <div className="flex h-12 w-full rounded-[4px] items-center justify-between border border-[var(--border)] bg-[var(--bg-main)] px-4 sm:w-32">
+      <div className="mt-8 flex flex-row gap-2 sm:gap-3 items-center w-full">
+        <div className="flex h-10 sm:h-12 w-[28%] sm:w-32 rounded-[4px] items-center justify-between border border-[var(--border)] bg-[var(--bg-main)] px-1.5 sm:px-4">
           <button
             type="button"
             aria-label="Decrease quantity"
             onClick={() => onQuantityChange(Math.max(1, quantity - 1))}
-            className="cursor-pointer text-[var(--text-main)] p-1"
+            className="cursor-pointer text-[var(--text-main)] p-0.5 sm:p-1"
           >
-            <Minus size={16} />
+            <Minus size={14} />
           </button>
-          <div className="flex items-center justify-center font-semibold select-none text-[var(--text-main)] min-w-[2rem] text-center">
+          <div className="flex items-center justify-center font-semibold select-none text-[var(--text-main)] min-w-[1.25rem] sm:min-w-[2rem] text-center">
             <Counter
               value={quantity}
-              fontSize={16}
-              padding={2}
+              fontSize={14}
+              padding={1}
               textColor="var(--text-main)"
               gradientFrom="var(--bg-main)"
               gradientTo="transparent"
@@ -176,40 +189,44 @@ export default function ProductInfo({
             type="button"
             aria-label="Increase quantity"
             onClick={() => onQuantityChange(quantity + 1)}
-            className="cursor-pointer text-[var(--text-main)] p-1"
+            className="cursor-pointer text-[var(--text-main)] p-0.5 sm:p-1"
           >
-            <Plus size={16} />
+            <Plus size={14} />
           </button>
         </div>
         <Button
-          className="h-12 flex-1 rounded-[4px] bg-[var(--primary-color)] text-white hover:bg-[var(--accent-color)]"
+          className="h-10 sm:h-12 flex-1 rounded-[4px] bg-[var(--primary-color)] text-white hover:bg-[var(--accent-color)] text-xs sm:text-sm px-1.5 sm:px-6 gap-1 sm:gap-1.5"
           onClick={onAddToCart}
         >
-          <ShoppingBag size={17} />
+          <ShoppingBag size={15} />
           {t('addToCart')}
         </Button>
         <Button
           variant="outline"
           size="icon-lg"
           aria-label={t('addToWishlist')}
-          className={`h-12 w-full rounded-none border-[var(--border)] bg-transparent transition-colors sm:w-12 hover:border-[var(--primary-color)] ${
-            isWishlisted ? 'text-[var(--primary-color)] border-[var(--primary-color)]' : 'text-[var(--text-main)]'
-          }`}
+          className={`h-10 sm:h-12 w-[14%] sm:w-12 rounded-none !shadow-none border-[var(--border)] transition-colors hover:!bg-transparent hover:!transition-colors ${
+            isWishlisted ? 'text-red-500 border-red-500' : ''
+          } flex items-center justify-center`}
           onClick={onWishlistToggle}
         >
-          <Heart size={18} fill={isWishlisted ? 'currentColor' : 'none'} />
+          <UseAnimations
+            animation={heart}
+            size={20}
+            reverse={isWishlisted}
+            strokeColor="currentColor"
+            fillColor="currentColor"
+          />
         </Button>
       </div>
 
       {/* Product Meta Specifications */}
       <div className="mt-6 grid gap-2 border-t border-[var(--border)] pt-5 text-sm text-[var(--text-light)] sm:grid-cols-2">
         <p>
-          <span className="font-semibold text-[var(--text-main)]">{product.sku}:</span> {product.id}
+          <span className="font-semibold text-[var(--text-main)]">{t('details.sku')}:</span> {product.id}
         </p>
         <p>
-          <span className="font-semibold text-[var(--text-main)]">
-            {locale === 'vi' ? 'Danh mục:' : 'Category:'}
-          </span>{' '}
+          <span className="font-semibold text-[var(--text-main)]">{t('details.category')}:</span>{' '}
           {product.category}
         </p>
         <p>

@@ -1,8 +1,10 @@
 'use client';
 
+import { useState } from 'react';
 import Image from 'next/image';
-import { Star } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { Rating, RoundedStar } from '@smastrom/react-rating';
+import '@smastrom/react-rating/style.css';
 
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -13,23 +15,17 @@ interface ProductTabsProps {
   locale: 'vi' | 'en';
 }
 
+const ratingStyles = {
+  itemShapes: RoundedStar,
+  activeFillColor: '#ff9e00',
+  inactiveFillColor: '#ffeed6',
+};
+
 export default function ProductTabs({ product, locale }: ProductTabsProps) {
   const t = useTranslations('Product');
+  const [rating, setRating] = useState(0);
 
-  const reviewCopy = {
-    title: locale === 'vi' ? 'Đánh giá của khách hàng' : 'Customer Reviews',
-    addTitle: locale === 'vi' ? 'Thêm đánh giá của bạn' : 'Add your Review',
-    ratingLabel: locale === 'vi' ? 'Đánh giá của bạn' : 'Your Rating',
-    nameLabel: locale === 'vi' ? 'Tên' : 'Name',
-    emailLabel: locale === 'vi' ? 'Email' : 'Email Address',
-    reviewLabel: locale === 'vi' ? 'Nội dung đánh giá' : 'Your Review',
-    namePlaceholder: locale === 'vi' ? 'Nhập tên của bạn' : 'Enter Your Name',
-    emailPlaceholder: locale === 'vi' ? 'Nhập email của bạn' : 'Enter Your Email',
-    reviewPlaceholder: locale === 'vi' ? 'Nhập đánh giá của bạn' : 'Enter Your Review',
-    submit: locale === 'vi' ? 'Gửi đánh giá' : 'Submit',
-    reviewBy: locale === 'vi' ? 'Đánh giá bởi' : 'Review by',
-    postedOn: locale === 'vi' ? 'đăng ngày' : 'Posted on',
-  };
+  // Translations are loaded dynamically using next-intl
 
   const customerReviews = [
     {
@@ -57,43 +53,70 @@ export default function ProductTabs({ product, locale }: ProductTabsProps) {
   ];
 
   return (
-    <Tabs defaultValue="description" className="flex-col mt-12 border-t border-b border-[var(--border)] py-5">
-      <TabsList variant="line" className="h-auto gap-6 p-0">
+    <Tabs defaultValue="description" className="flex-col mt-12 border-t border-[var(--border)] py-5">
+      <TabsList variant="line" className="h-auto gap-4 sm:gap-6 p-0 flex w-full overflow-x-auto md:overflow-x-visible whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <TabsTrigger
           value="description"
-          className="px-0 pb-3 text-sm font-semibold data-active:text-[var(--primary-color)] data-active:border-b-[var(--primary-color)] data-active:border-t-transparent data-active:border-x-transparent data-active:rounded-none"
+          className="px-0 pb-2 sm:pb-3 text-xs sm:text-sm font-semibold shrink-0 data-active:text-[var(--primary-color)] data-active:border-b-[var(--primary-color)] data-active:border-t-transparent data-active:border-x-transparent data-active:rounded-none"
         >
-          {locale === 'vi' ? 'Mô tả' : 'Description'}
+          {t('details.description')}
         </TabsTrigger>
         <TabsTrigger
           value="information"
-          className="px-0 pb-3 text-sm font-semibold data-active:text-[var(--primary-color)] data-active:border-b-[var(--primary-color)] data-active:border-t-transparent data-active:border-x-transparent data-active:rounded-none"
+          className="px-0 pb-2 sm:pb-3 text-xs sm:text-sm font-semibold shrink-0 data-active:text-[var(--primary-color)] data-active:border-b-[var(--primary-color)] data-active:border-t-transparent data-active:border-x-transparent data-active:rounded-none"
         >
-          {locale === 'vi' ? 'Thông tin bổ sung' : 'Additional Information'}
+          {t('details.information')}
         </TabsTrigger>
         <TabsTrigger
           value="reviews"
-          className="px-0 pb-3 text-sm font-semibold data-active:text-[var(--primary-color)] data-active:border-b-[var(--primary-color)] data-active:border-t-transparent data-active:border-x-transparent data-active:rounded-none"
+          className="px-0 pb-2 sm:pb-3 text-xs sm:text-sm font-semibold shrink-0 data-active:text-[var(--primary-color)] data-active:border-b-[var(--primary-color)] data-active:border-t-transparent data-active:border-x-transparent data-active:rounded-none"
         >
-          {locale === 'vi' ? 'Đánh giá' : 'Reviews'}
+          {t('details.reviews')}
         </TabsTrigger>
       </TabsList>
-      <TabsContent value="description" className="max-w-5xl pt-5 text-sm leading-7 text-[var(--text-main)]">
+      <TabsContent value="description" className="w-full pt-5 text-sm leading-7 text-[var(--text-main)]">
         <p>{product.longDescription}</p>
         <p className="mt-4">{product.secondaryDescription}</p>
       </TabsContent>
-      <TabsContent value="information" className="max-w-5xl pt-5 text-sm leading-7 text-[var(--text-main)]">
-        <p>
-          {t('materialLabel')}: {product.material}. {t('sizeLabel')}: {product.sizes.join(', ')}.
-        </p>
+      <TabsContent value="information" className="w-full pt-5 text-sm leading-7 text-[var(--text-main)]">
+        <div className="max-w-2xl pb-4">
+          {product.colors && product.colors.length > 0 && (
+            <div className="flex py-3.5">
+              <span className="w-28 sm:w-36 font-bold text-[var(--text-main)] shrink-0">
+                {t('details.color')}
+              </span>
+              <span className="text-[var(--text-light)]">
+                {product.colors.map((c) => c.name).join(', ')}
+              </span>
+            </div>
+          )}
+          {product.sizes && product.sizes.length > 0 && (
+            <div className="flex py-3.5">
+              <span className="w-28 sm:w-36 font-bold text-[var(--text-main)] shrink-0">
+                {t('details.size')}
+              </span>
+              <span className="text-[var(--text-light)]">
+                {product.sizes.join(', ')}
+              </span>
+            </div>
+          )}
+          {product.material && (
+            <div className="flex py-3.5">
+              <span className="w-28 sm:w-36 font-bold text-[var(--text-main)] shrink-0">
+                {t('materialLabel')}
+              </span>
+              <span className="text-[var(--text-light)]">{product.material}</span>
+            </div>
+          )}
+        </div>
       </TabsContent>
-      <TabsContent value="reviews" className="max-w-6xl pt-5 text-sm text-[var(--text-main)]">
+      <TabsContent value="reviews" className="w-full pt-5 text-sm text-[var(--text-main)]">
         <div>
           <h3 className="font-[family-name:var(--font-lora)] text-xl font-bold text-[var(--text-main)]">
-            {reviewCopy.title}
+            {t('details.customerReviewsTitle')}
           </h3>
 
-          <div className="mt-5 divide-y divide-[var(--border)]">
+          <div className="mt-5">
             {customerReviews.map((review) => (
               <article key={review.name} className="flex gap-4 py-6 first:pt-0">
                 <div className="relative size-12 shrink-0 overflow-hidden rounded-full bg-[var(--bg-secondary)]">
@@ -101,16 +124,18 @@ export default function ProductTabs({ product, locale }: ProductTabsProps) {
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="font-medium leading-none text-[var(--text-main)]">{review.name}</p>
-                  <div className="mt-2 flex text-[var(--accent-color)]" aria-label={`${product.rating} stars`}>
-                    {Array.from({ length: 5 }).map((_, index) => (
-                      <Star key={index} size={17} fill="currentColor" strokeWidth={0} />
-                    ))}
+                  <div className="mt-2">
+                    <Rating
+                      style={{ maxWidth: 85 }}
+                      value={5}
+                      itemStyles={ratingStyles}
+                      readOnly
+                    />
                   </div>
                   <h4 className="mt-3 text-base font-bold leading-6 text-[var(--text-main)]">{review.title}</h4>
                   <p className="mt-2 leading-7 text-[var(--text-main)]">{review.content}</p>
                   <p className="mt-3 text-xs text-[var(--text-light)]">
-                    {reviewCopy.reviewBy} <span className="font-medium text-[var(--text-main)]">{review.reviewer}</span>{' '}
-                    {reviewCopy.postedOn} <span className="font-medium text-[var(--text-main)]">{review.date}</span>
+                    {review.date}
                   </p>
                 </div>
               </article>
@@ -119,58 +144,53 @@ export default function ProductTabs({ product, locale }: ProductTabsProps) {
 
           <form className="mt-7 space-y-5" onSubmit={(e) => e.preventDefault()}>
             <h3 className="font-[family-name:var(--font-lora)] text-xl font-bold text-[var(--text-main)]">
-              {reviewCopy.addTitle}
+              {t('details.addReview')}
             </h3>
 
             <div>
-              <label className="text-sm text-[var(--text-main)]">{reviewCopy.ratingLabel}</label>
-              <div className="mt-3 flex flex-wrap gap-5 text-[var(--text-light)]">
-                {[1, 2, 3, 4, 5].map((rating) => (
-                  <button
-                    key={rating}
-                    type="button"
-                    className="flex cursor-pointer gap-0.5 transition-colors hover:text-[var(--accent-color)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
-                    aria-label={`${rating} stars`}
-                  >
-                    {Array.from({ length: rating }).map((_, index) => (
-                      <Star key={index} size={18} />
-                    ))}
-                  </button>
-                ))}
+              <label className="text-sm text-[var(--text-main)]">{t('details.yourRating')}</label>
+              <div className="mt-3">
+                <Rating
+                  style={{ maxWidth: 130 }}
+                  value={rating}
+                  onChange={setRating}
+                  itemStyles={ratingStyles}
+                  isRequired
+                />
               </div>
             </div>
 
             <div>
               <label htmlFor="review-name" className="text-xs font-medium text-[var(--text-main)]">
-                {reviewCopy.nameLabel}
+                {t('details.nameLabel')}
               </label>
               <input
                 id="review-name"
                 type="text"
-                placeholder={reviewCopy.namePlaceholder}
+                placeholder={t('details.namePlaceholder')}
                 className="mt-2 h-12 w-full rounded-md border border-[var(--border)] bg-[var(--bg-main)] px-4 text-sm text-[var(--text-main)] outline-none transition-colors placeholder:text-[var(--text-light)]/50 focus:border-[var(--primary-color)] focus:ring-2 focus:ring-[var(--ring)]/25"
               />
             </div>
 
             <div>
               <label htmlFor="review-email" className="text-xs font-medium text-[var(--text-main)]">
-                {reviewCopy.emailLabel}
+                {t('details.emailLabel')}
               </label>
               <input
                 id="review-email"
                 type="email"
-                placeholder={reviewCopy.emailPlaceholder}
+                placeholder={t('details.emailPlaceholder')}
                 className="mt-2 h-12 w-full rounded-md border border-[var(--border)] bg-[var(--bg-main)] px-4 text-sm text-[var(--text-main)] outline-none transition-colors placeholder:text-[var(--text-light)]/50 focus:border-[var(--primary-color)] focus:ring-2 focus:ring-[var(--ring)]/25"
               />
             </div>
 
             <div>
               <label htmlFor="review-content" className="text-xs font-medium text-[var(--text-main)]">
-                {reviewCopy.reviewLabel}
+                {t('details.reviewLabel')}
               </label>
               <textarea
                 id="review-content"
-                placeholder={reviewCopy.reviewPlaceholder}
+                placeholder={t('details.reviewPlaceholder')}
                 rows={5}
                 className="mt-2 w-full resize-y rounded-md border border-[var(--border)] bg-[var(--bg-main)] px-4 py-3 text-sm leading-6 text-[var(--text-main)] outline-none transition-colors placeholder:text-[var(--text-light)]/50 focus:border-[var(--primary-color)] focus:ring-2 focus:ring-[var(--ring)]/25"
               />
@@ -180,7 +200,7 @@ export default function ProductTabs({ product, locale }: ProductTabsProps) {
               type="submit"
               className="h-12 min-w-32 rounded-md bg-[var(--primary-color)] px-8 text-white hover:bg-[var(--accent-color)]"
             >
-              {reviewCopy.submit}
+              {t('details.submitReview')}
             </Button>
           </form>
         </div>
