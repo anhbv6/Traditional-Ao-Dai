@@ -344,5 +344,21 @@
         "answer": "Sản phẩm có sẵn hỗ trợ đổi size theo chính sách nếu còn tem và chưa qua sử dụng."
       }
     }
+  },
+  "NewsPage": {
+    "title": "Tạp Chí Áo Dài & Cẩm Nang Thời Trang",
+    "subtitle": "Khám phá câu chuyện văn hóa, bí quyết may đo, cẩm nang chọn size và phương pháp bảo quản áo dài từ các nghệ nhân.",
+    "categories": {
+      "all": "Tất cả",
+      "guide": "Cẩm Nang",
+      "tips": "Kinh Nghiệm",
+      "culture": "Văn Hóa",
+      "trends": "Xu Hướng",
+      "tailoring": "May Đo"
+    },
+    "readMore": "Xem chi tiết",
+    "loadMore": "Xem thêm bài viết",
+    "allLoaded": "Đã tải hết bài viết",
+    "noArticles": "Không tìm thấy bài viết nào trong danh mục này."
   }
 }

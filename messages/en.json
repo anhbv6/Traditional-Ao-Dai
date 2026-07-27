@@ -344,5 +344,21 @@
         "answer": "Ready-to-wear items support size exchange by policy if tags remain and the item is unused."
       }
     }
+  },
+  "NewsPage": {
+    "title": "Ao Dai Journal & Fashion Guide",
+    "subtitle": "Discover cultural stories, tailoring secrets, size selection tips, and expert preservation advice for your Vietnamese gowns.",
+    "categories": {
+      "all": "All",
+      "guide": "Guide",
+      "tips": "Tips",
+      "culture": "Culture",
+      "trends": "Trends",
+      "tailoring": "Tailoring"
+    },
+    "readMore": "Read more",
+    "loadMore": "Load more articles",
+    "allLoaded": "All articles loaded",
+    "noArticles": "No articles found in this category."
   }
 }
