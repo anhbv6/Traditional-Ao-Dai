@@ -72,10 +72,13 @@ async function Contact({ params }: ContactProps) {
   return (
     <Container as="section" className="py-8 sm:py-12">
       <Breadcrumbs />
-
-      <section className='flex flex-col items-center text-center'>
-        <h1 className="mt-3 text-3xl sm:text-4xl font-bold font-[family-name:var(--font-playfair)] text-[var(--primary-color)] text-center">{t('title')}</h1>
-        <p className="mt-3 max-w-2xl text-sm sm:text-base leading-7 text-[var(--text-light)] text-center">{t('subtitle')}</p>
+      <section className="mt-4 mb-8 text-center max-w-3xl mx-auto flex flex-col items-center">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-[family-name:var(--font-playfair)] text-[var(--primary-color)] leading-tight">
+          {t('title')}
+        </h1>
+        <p className="mt-3.5 text-sm sm:text-base leading-7 text-[var(--text-light)]">
+          {t('subtitle')}
+        </p>
       </section>
 
       <section className="mt-8 grid gap-6 sm:gap-8 lg:grid-cols-[0.95fr_1.05fr]">

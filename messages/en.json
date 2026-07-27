@@ -298,8 +298,7 @@
     }
   },
   "ContactPage": {
-    "eyebrow": "Contact & consultation",
-    "title": "Contact AODAI",
+    "title": "Contact & Consultation",
     "subtitle": "Our consultants are ready to help with styling, fitting appointments, and custom tailoring requests for meaningful occasions.",
     "directTitle": "Direct information",
     "directSubtitle": "Reach the showroom and tailoring team quickly",
@@ -359,6 +358,16 @@
     "readMore": "Read more",
     "loadMore": "Load more articles",
     "allLoaded": "All articles loaded",
-    "noArticles": "No articles found in this category."
+    "noArticles": "No articles found in this category.",
+    "readArticle": "Read Article",
+    "viewAll": "View All",
+    "sections": {
+      "latestNews": "Latest News",
+      "trendsStyle": "Trends & Style",
+      "guidesLife": "Guides & Life"
+    },
+    "similarNews": "Similar News",
+    "articleNotFound": "Article not found",
+    "backToNews": "Back to News"
   }
 }

@@ -261,4 +261,178 @@ export const mockArticles: MockArticle[] = [
       en: '5 min read',
     },
   },
+  {
+    id: '9',
+    slug: 'latest-innovations-sustainable-future',
+    category: {
+      vi: 'Xu Hướng',
+      en: 'Trends',
+    },
+    title: {
+      vi: 'Những cải tiến mới mở đường cho tương lai bền vững',
+      en: 'Latest Innovations Pave the Way to a Sustainable Future',
+    },
+    description: {
+      vi: 'Khám phá các chất liệu sợi tự nhiên thân thiện với môi trường đang dẫn đầu xu hướng thiết kế xanh.',
+      en: 'Explore eco-friendly natural fibers leading the green design trend.',
+    },
+    dateShort: {
+      vi: '18/06/2026',
+      en: '18/06/2026',
+    },
+    dateLong: {
+      vi: '18 Tháng 6, 2026',
+      en: 'June 18, 2026',
+    },
+    imageSrc: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=800&auto=format&fit=crop',
+    readTime: {
+      vi: '5 phút đọc',
+      en: '5 min read',
+    },
+  },
+  {
+    id: '10',
+    slug: 'understanding-role-big-data-tech',
+    category: {
+      vi: 'Xu Hướng',
+      en: 'Trends',
+    },
+    title: {
+      vi: 'Vai trò của dữ liệu lớn trong thúc đẩy công nghệ thời trang',
+      en: 'Understanding the role of big data in driving technological',
+    },
+    description: {
+      vi: 'Cách phân tích hành vi người dùng bằng AI và Big Data đang giúp các nhà mốt thiết kế áo dài tối ưu.',
+      en: 'How AI and Big Data are helping fashion houses optimize sizing and user choices.',
+    },
+    dateShort: {
+      vi: '15/06/2026',
+      en: '15/06/2026',
+    },
+    dateLong: {
+      vi: '15 Tháng 6, 2026',
+      en: 'June 15, 2026',
+    },
+    imageSrc: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800&auto=format&fit=crop',
+    readTime: {
+      vi: '6 phút đọc',
+      en: '6 min read',
+    },
+  },
+  {
+    id: '11',
+    slug: 'exploring-latest-developments-ai-robotics',
+    category: {
+      vi: 'Xu Hướng',
+      en: 'Trends',
+    },
+    title: {
+      vi: 'Khám phá sự phát triển mới của AI và Robotics trong thiết kế',
+      en: 'Exploring the latest developments in AI, Robotics',
+    },
+    description: {
+      vi: 'Từ dệt tự động đến thiết kế 3D bằng trí tuệ nhân tạo đang thay đổi hoàn toàn bộ mặt xưởng may.',
+      en: 'From automated weaving to 3D designs by AI changing the tailor workshop face.',
+    },
+    dateShort: {
+      vi: '12/06/2026',
+      en: '12/06/2026',
+    },
+    dateLong: {
+      vi: '12 Tháng 6, 2026',
+      en: 'June 12, 2026',
+    },
+    imageSrc: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?q=80&w=800&auto=format&fit=crop',
+    readTime: {
+      vi: '7 phút đọc',
+      en: '7 min read',
+    },
+  },
+  {
+    id: '12',
+    slug: 'future-computing-modern-society',
+    category: {
+      vi: 'Xu Hướng',
+      en: 'Trends',
+    },
+    title: {
+      vi: 'Tương lai của máy tính và ý nghĩa đối với xã hội hiện đại',
+      en: 'Future of computing and what it means for society',
+    },
+    description: {
+      vi: 'Tìm hiểu các giải pháp số hóa di sản văn hóa Việt Nam và bảo tồn hoa văn áo dài cổ truyền.',
+      en: 'Learn digital solutions for preserving Vietnamese cultural heritage and traditional Ao Dai patterns.',
+    },
+    dateShort: {
+      vi: '10/06/2026',
+      en: '10/06/2026',
+    },
+    dateLong: {
+      vi: '10 Tháng 6, 2026',
+      en: 'June 10, 2026',
+    },
+    imageSrc: 'https://images.unsplash.com/photo-1531297484001-80022131f5a1?q=80&w=800&auto=format&fit=crop',
+    readTime: {
+      vi: '5 phút đọc',
+      en: '5 min read',
+    },
+  },
+  {
+    id: '13',
+    slug: 'connecting-ideas-people-perspectives',
+    category: {
+      vi: 'Cẩm Nang',
+      en: 'Guide',
+    },
+    title: {
+      vi: 'Kết nối ý tưởng, con người và góc nhìn qua nghệ thuật thêu',
+      en: 'Connecting ideas, people, and perspectives',
+    },
+    description: {
+      vi: 'Buổi chia sẻ của các nghệ nhân thêu tay truyền thống về hành trình truyền cảm hứng cho thế hệ trẻ.',
+      en: 'A sharing session by hand-embroidery artisans inspiring design journeys for the youth.',
+    },
+    dateShort: {
+      vi: '08/06/2026',
+      en: '08/06/2026',
+    },
+    dateLong: {
+      vi: '08 Tháng 6, 2026',
+      en: 'June 08, 2026',
+    },
+    imageSrc: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=800&auto=format&fit=crop',
+    readTime: {
+      vi: '10 phút đọc',
+      en: '10 min read',
+    },
+  },
+  {
+    id: '14',
+    slug: 'exploring-thought-provoking-topics-weekly',
+    category: {
+      vi: 'Kinh Nghiệm',
+      en: 'Tips',
+    },
+    title: {
+      vi: 'Khám phá các chủ đề thời trang hàng tuần cùng chuyên gia',
+      en: 'Exploring thought-provoking topics weekly',
+    },
+    description: {
+      vi: 'Chuyên mục giải đáp thắc mắc về cách lựa chọn chất liệu gấm, lụa và thiết kế phù hợp.',
+      en: 'Weekly answers for choosing brocade, silk, and designs that match body shapes.',
+    },
+    dateShort: {
+      vi: '05/06/2026',
+      en: '05/06/2026',
+    },
+    dateLong: {
+      vi: '05 Tháng 6, 2026',
+      en: 'June 05, 2026',
+    },
+    imageSrc: 'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=800&auto=format&fit=crop',
+    readTime: {
+      vi: '10 phút đọc',
+      en: '10 min read',
+    },
+  },
 ];

@@ -2,15 +2,13 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { Calendar, Clock, ChevronRight, ArrowRight } from 'lucide-react';
+import { Calendar, Clock, ArrowRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 
 import { Container } from '@/components/ui/container';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
-import { Button } from '@/components/ui/button';
 import { mockArticles } from '../data/mockArticles';
-import NewsCard from './NewsCard';
 
 const categoryKeys = ['all', 'guide', 'tips', 'culture', 'trends', 'tailoring'] as const;
 
@@ -22,13 +20,16 @@ const categoryFilterMap: Record<string, { vi: string; en: string }> = {
   tailoring: { vi: 'May Đo', en: 'Tailoring' },
 };
 
-const ITEMS_PER_PAGE = 6;
+const authors = ['Guy Hawkins', 'Jenny Wilson', 'Kristin Watson', 'Albert Flores', 'Eleanor Pena'] as const;
+const getAuthor = (id: string) => {
+  const index = parseInt(id, 10);
+  return isNaN(index) ? 'Guy Hawkins' : (authors[index % authors.length] || 'Guy Hawkins');
+};
 
 export default function NewsClient() {
   const t = useTranslations('NewsPage');
   const locale = useLocale() as 'vi' | 'en';
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [visibleCount, setVisibleCount] = useState<number>(ITEMS_PER_PAGE);
 
   // Filter articles based on selected category
   const filteredArticles = selectedCategory === 'all'
@@ -42,24 +43,19 @@ export default function NewsClient() {
         );
       });
 
-  // Extract featured articles (up to 3)
-  const featuredArticles = filteredArticles.slice(0, 3);
-  const heroArticle = featuredArticles[0];
-  const sideArticles = featuredArticles.slice(1, 3);
+  // Extract slices for sequential layouts
+  const heroArticle = filteredArticles[0];
+  const latestNewsArticles = filteredArticles.slice(1, 4);
+  const leftLatestArticle = latestNewsArticles[0];
+  const rightLatestArticles = latestNewsArticles.slice(1, 3);
 
-  // Extract main grid articles (index 3 and onwards)
-  const gridArticles = filteredArticles.slice(3);
-  const displayedGridArticles = gridArticles.slice(0, visibleCount);
-
-  const hasMore = gridArticles.length > visibleCount;
-
-  const handleLoadMore = () => {
-    setVisibleCount((prev) => prev + ITEMS_PER_PAGE);
-  };
+  const trendsArticles = filteredArticles.slice(4, 8);
+  const guidesArticles = filteredArticles.slice(8, 14);
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
-    setVisibleCount(ITEMS_PER_PAGE); // Reset pagination on filter change
+    // Scroll smoothly to top of articles after filter change
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -77,8 +73,8 @@ export default function NewsClient() {
       </section>
 
       {/* Category Tabs */}
-      <section className="mb-10">
-        <div className="flex w-full items-center gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden border-b border-[var(--border)] pb-3">
+      <section className="mb-10 border-y border-[var(--border)] py-4">
+        <div className="flex w-full items-center justify-start md:justify-center gap-6 md:gap-10 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden px-4 md:px-0">
           {categoryKeys.map((key) => {
             const isActive = selectedCategory === key;
             return (
@@ -86,10 +82,10 @@ export default function NewsClient() {
                 key={key}
                 type="button"
                 onClick={() => handleCategoryChange(key)}
-                className={`cursor-pointer whitespace-nowrap rounded-full px-5 py-2 text-xs font-semibold uppercase tracking-wider transition-all duration-300 ${
+                className={`cursor-pointer whitespace-nowrap text-sm font-semibold transition-colors duration-300 font-[family-name:var(--font-lora)] ${
                   isActive
-                    ? 'bg-[var(--primary-color)] text-white shadow-xs'
-                    : 'bg-[var(--bg-secondary)] text-[var(--text-main)] hover:bg-[var(--primary-color)]/10 hover:text-[var(--primary-color)]'
+                    ? 'text-[var(--primary-color)] font-bold'
+                    : 'text-[var(--text-light)] hover:text-[var(--primary-color)]'
                 }`}
               >
                 {t(`categories.${key}`)}
@@ -99,162 +95,267 @@ export default function NewsClient() {
         </div>
       </section>
 
-      {/* Featured Articles Section */}
       {filteredArticles.length > 0 ? (
-        <section className="mb-14">
-          <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-            {/* Hero Big Card (Left) */}
-            {heroArticle && (
+        <>
+          {/* Hero Section (Article 0) */}
+          {heroArticle && (
+            <section className="mb-14">
+              {/* Large Cover Image */}
               <Link
                 href={`/news/${heroArticle.slug}`}
-                className="group relative flex flex-col justify-end overflow-hidden rounded-2xl border border-[var(--border)] bg-black min-h-[350px] sm:min-h-[420px] lg:min-h-[480px] hover:border-[var(--accent-color)] shadow-sm hover:shadow-md transition-all duration-500"
+                className="group block overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-secondary)] relative aspect-[16/10] md:aspect-[21/9] w-full hover:border-[var(--accent-color)] transition-all duration-500 shadow-sm"
               >
-                {/* Background Image */}
                 <Image
                   src={heroArticle.imageSrc}
                   alt={heroArticle.title[locale]}
                   fill
                   priority
-                  sizes="(max-width: 1024px) 100vw, 800px"
-                  className="object-cover opacity-85 transition-transform duration-[1200ms] group-hover:scale-[1.03]"
+                  sizes="100vw"
+                  className="object-cover transition-transform duration-[1200ms] group-hover:scale-[1.02]"
                 />
-                {/* Gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-10" />
+              </Link>
 
-                {/* Content Overlay */}
-                <div className="relative z-20 p-5 sm:p-8 md:p-10 max-w-full">
-                  {/* Category tag */}
-                  <span className="inline-block rounded-md bg-[var(--primary-color)] px-2.5 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-white mb-3">
+              {/* Meta details row */}
+              <div className="flex flex-wrap items-center justify-between gap-3 mt-4 text-xs font-[family-name:var(--font-lora)] text-[var(--text-light)]">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="rounded-full border border-[var(--border)] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[var(--primary-color)]">
                     {heroArticle.category[locale]}
                   </span>
-
-                  {/* Title */}
-                  <h2 className="font-[family-name:var(--font-playfair)] text-xl sm:text-2xl md:text-3xl font-bold text-white leading-snug">
-                    {heroArticle.title[locale]}
-                  </h2>
-
-                  {/* Description */}
-                  <p className="mt-3 font-[family-name:var(--font-lora)] text-xs sm:text-sm text-white/80 leading-relaxed line-clamp-2 max-w-2xl">
-                    {heroArticle.description[locale]}
-                  </p>
-
-                  {/* Meta details */}
-                  <div className="mt-5 flex items-center gap-4 text-[10px] sm:text-xs text-white/60 font-[family-name:var(--font-lora)]">
-                    <span className="flex items-center gap-1.5">
-                      <Calendar size={11} className="text-white/80" />
-                      {heroArticle.dateLong[locale]}
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      <Clock size={11} className="text-white/80" />
-                      {heroArticle.readTime[locale]}
-                    </span>
-                  </div>
-                </div>
-              </Link>
-            )}
-
-            {/* Stacked Side Cards (Right) */}
-            <div className="flex flex-col gap-6 justify-between">
-              {sideArticles.map((article) => (
-                <Link
-                  key={article.id}
-                  href={`/news/${article.slug}`}
-                  className="group flex flex-row items-center gap-4 rounded-xl border border-[var(--border)] bg-[var(--bg-main)] p-3 sm:p-4 hover:border-[var(--accent-color)] hover:shadow-xs transition-all duration-300 flex-1 min-h-[160px] sm:min-h-[190px]"
-                >
-                  {/* Left Small Image */}
-                  <div className="relative w-1/3 aspect-[4/3] rounded-lg overflow-hidden shrink-0 bg-[var(--bg-secondary)]">
-                    <Image
-                      src={article.imageSrc}
-                      alt={article.title[locale]}
-                      fill
-                      sizes="(max-width: 640px) 120px, 200px"
-                      className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
-                    />
-                  </div>
-
-                  {/* Right Content */}
-                  <div className="flex-1 min-w-0 pr-1">
-                    <span className="text-[9px] font-bold uppercase tracking-wider text-[var(--accent-color)]">
-                      {article.category[locale]}
-                    </span>
-                    <h3 className="mt-1 font-[family-name:var(--font-playfair)] text-sm sm:text-base md:text-lg font-bold text-[var(--primary-color)] leading-snug line-clamp-2 transition-colors duration-300 group-hover:text-[var(--accent-color)]">
-                      {article.title[locale]}
-                    </h3>
-                    <p className="mt-1.5 hidden sm:line-clamp-2 font-[family-name:var(--font-lora)] text-[11px] sm:text-xs text-[var(--text-light)] leading-relaxed">
-                      {article.description[locale]}
-                    </p>
-                    <div className="mt-3 flex items-center gap-3 text-[9px] sm:text-xs text-[var(--text-light)]/80 font-[family-name:var(--font-lora)]">
-                      <span className="flex items-center gap-1">
-                        <Calendar size={10} className="text-[var(--primary-color)]" />
-                        {article.dateShort[locale]}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Clock size={10} className="text-[var(--primary-color)]" />
-                        {article.readTime[locale]}
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-
-              {/* If only Hero exists, render placeholders or stretch Hero */}
-              {sideArticles.length === 0 && (
-                <div className="hidden lg:flex flex-col gap-6 justify-center items-center border border-dashed border-[var(--border)] rounded-xl p-8 h-full bg-[var(--bg-secondary)]/10">
-                  <span className="text-xs text-[var(--text-light)] font-medium">
-                    {t('noArticles')}
+                  <span className="rounded-full border border-[var(--border)] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[var(--text-light)]">
+                    {getAuthor(heroArticle.id)}
                   </span>
                 </div>
-              )}
-            </div>
-          </div>
-        </section>
+                <div className="flex items-center gap-2 font-semibold">
+                  <span>{heroArticle.dateLong[locale]}</span>
+                  <span>—</span>
+                  <span>{heroArticle.readTime[locale]}</span>
+                </div>
+              </div>
+
+              {/* Title & Link */}
+              <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mt-3">
+                <h2 className="font-[family-name:var(--font-playfair)] text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-[var(--primary-color)] leading-tight max-w-4xl hover:text-[var(--accent-color)] transition-colors duration-300">
+                  <Link href={`/news/${heroArticle.slug}`}>{heroArticle.title[locale]}</Link>
+                </h2>
+                <Link
+                  href={`/news/${heroArticle.slug}`}
+                  className="inline-flex items-center gap-1.5 font-semibold text-sm text-[var(--primary-color)] hover:text-[var(--accent-color)] transition-colors whitespace-nowrap group shrink-0 mt-1 md:mt-2"
+                >
+                  {t('readArticle')}
+                  <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
+                </Link>
+              </div>
+            </section>
+          )}
+
+          {/* Section 2: Latest News (Article 1, 2, 3) */}
+          {latestNewsArticles.length > 0 && (
+            <section className="mb-14">
+              {/* Section Heading */}
+              <div className="flex items-end justify-between border-b border-[var(--border)] pb-2 mb-6">
+                <h2 className="font-[family-name:var(--font-playfair)] text-lg sm:text-xl md:text-2xl font-bold uppercase tracking-wider text-[var(--primary-color)]">
+                  {t('sections.latestNews')}
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => handleCategoryChange('all')}
+                  className="text-xs font-bold text-[var(--text-light)] hover:text-[var(--primary-color)] transition-colors uppercase inline-flex items-center gap-1 cursor-pointer"
+                >
+                  {t('viewAll')}
+                  <ArrowRight size={12} />
+                </button>
+              </div>
+
+              {/* Grid content */}
+              <div className="grid gap-8 lg:grid-cols-2">
+                {/* Left Card: 1 Large overlay text card */}
+                {leftLatestArticle && (
+                  <Link
+                    href={`/news/${leftLatestArticle.slug}`}
+                    className="group relative flex flex-col justify-end overflow-hidden rounded-xl border border-[var(--border)] min-h-[350px] sm:min-h-[400px] hover:border-[var(--accent-color)] transition-all duration-500 shadow-sm"
+                  >
+                    <Image
+                      src={leftLatestArticle.imageSrc}
+                      alt={leftLatestArticle.title[locale]}
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 600px"
+                      className="object-cover transition-transform duration-[1000ms] group-hover:scale-[1.03]"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/35 to-transparent z-10" />
+
+                    <div className="relative z-20 p-5 sm:p-8 max-w-full">
+                      <h3 className="font-[family-name:var(--font-playfair)] text-lg sm:text-xl lg:text-2xl font-bold text-white leading-snug">
+                        {leftLatestArticle.title[locale]}
+                      </h3>
+                      <div className="mt-2.5 flex items-center gap-2 text-xs font-semibold text-white/80 font-[family-name:var(--font-lora)]">
+                        <span>{leftLatestArticle.category[locale]}</span>
+                        <span>—</span>
+                        <span>{leftLatestArticle.dateLong[locale]}</span>
+                      </div>
+                    </div>
+                  </Link>
+                )}
+
+                {/* Right Stack: 2 vertical row cards */}
+                <div className="flex flex-col gap-6 justify-between">
+                  {rightLatestArticles.map((article) => (
+                    <Link
+                      key={article.id}
+                      href={`/news/${article.slug}`}
+                      className="group flex flex-row gap-4 rounded-xl border border-[var(--border)] bg-[var(--bg-main)] p-4 hover:border-[var(--accent-color)] transition-all duration-300 flex-1 min-h-[150px] items-center"
+                    >
+                      {/* Left Text */}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-[family-name:var(--font-playfair)] text-sm sm:text-base md:text-lg font-bold text-[var(--primary-color)] leading-snug line-clamp-2 transition-colors duration-300 group-hover:text-[var(--accent-color)]">
+                          {article.title[locale]}
+                        </h3>
+                        <div className="mt-2 flex items-center gap-2 text-xs text-[var(--text-light)] font-[family-name:var(--font-lora)]">
+                          <span className="font-semibold text-[var(--accent-color)]">{article.category[locale]}</span>
+                          <span>—</span>
+                          <span>{article.dateShort[locale]}</span>
+                        </div>
+                      </div>
+
+                      {/* Right Image */}
+                      <div className="relative w-20 sm:w-36 aspect-[4/3] rounded-lg overflow-hidden shrink-0 bg-[var(--bg-secondary)] border border-[var(--border)]">
+                        <Image
+                          src={article.imageSrc}
+                          alt={article.title[locale]}
+                          fill
+                          sizes="(max-width: 640px) 100px, 150px"
+                          className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                        />
+                      </div>
+                    </Link>
+                  ))}
+
+                  {/* Empty state if rightLatestArticles is empty */}
+                  {rightLatestArticles.length === 0 && (
+                    <div className="flex-1 flex items-center justify-center border border-dashed border-[var(--border)] rounded-xl p-8 bg-[var(--bg-secondary)]/10">
+                      <span className="text-xs text-[var(--text-light)] font-medium">
+                        {t('noArticles')}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </section>
+          )}
+
+          {/* Section 3: Technology News (Trends / Articles 4, 5, 6, 7) */}
+          {trendsArticles.length > 0 && (
+            <section className="mb-14">
+              {/* Section Heading */}
+              <div className="flex items-end justify-between border-b border-[var(--border)] pb-2 mb-6">
+                <h2 className="font-[family-name:var(--font-playfair)] text-lg sm:text-xl md:text-2xl font-bold uppercase tracking-wider text-[var(--primary-color)]">
+                  {t('sections.trendsStyle')}
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => handleCategoryChange('trends')}
+                  className="text-xs font-bold text-[var(--text-light)] hover:text-[var(--primary-color)] transition-colors uppercase inline-flex items-center gap-1 cursor-pointer"
+                >
+                  {t('viewAll')}
+                  <ArrowRight size={12} />
+                </button>
+              </div>
+
+              {/* Grid Layout (4 column cards) */}
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                {trendsArticles.map((article) => (
+                  <Link
+                    key={article.id}
+                    href={`/news/${article.slug}`}
+                    className="group block"
+                  >
+                    <div className="relative aspect-[4/3] rounded-lg overflow-hidden bg-[var(--bg-secondary)] border border-[var(--border)] group-hover:border-[var(--accent-color)] transition-all duration-300">
+                      <Image
+                        src={article.imageSrc}
+                        alt={article.title[locale]}
+                        fill
+                        sizes="(max-width: 640px) 100vw, 300px"
+                        className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                      />
+                    </div>
+                    <div className="mt-2.5 flex items-center gap-2 text-[10px] sm:text-xs font-[family-name:var(--font-lora)] text-[var(--text-light)]/80">
+                      <span>{getAuthor(article.id)}</span>
+                      <span>—</span>
+                      <span>{article.dateShort[locale]}</span>
+                    </div>
+                    <h3 className="mt-1 font-[family-name:var(--font-playfair)] text-sm sm:text-base font-bold text-[var(--primary-color)] leading-snug line-clamp-2 transition-colors duration-300 group-hover:text-[var(--accent-color)]">
+                      {article.title[locale]}
+                    </h3>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Section 4: Guides & Podcasts (Articles 8 to 13) */}
+          {guidesArticles.length > 0 && (
+            <section className="mb-14">
+              {/* Section Heading */}
+              <div className="flex items-end justify-between border-b border-[var(--border)] pb-2 mb-6">
+                <h2 className="font-[family-name:var(--font-playfair)] text-lg sm:text-xl md:text-2xl font-bold uppercase tracking-wider text-[var(--primary-color)]">
+                  {t('sections.guidesLife')}
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => handleCategoryChange('guide')}
+                  className="text-xs font-bold text-[var(--text-light)] hover:text-[var(--primary-color)] transition-colors uppercase inline-flex items-center gap-1 cursor-pointer"
+                >
+                  {t('viewAll')}
+                  <ArrowRight size={12} />
+                </button>
+              </div>
+
+              {/* Grid layout (3 column horizontal cards) */}
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {guidesArticles.map((article) => (
+                  <Link
+                    key={article.id}
+                    href={`/news/${article.slug}`}
+                    className="group flex gap-4 items-start p-4 border border-[var(--border)] bg-[var(--bg-main)] rounded-lg hover:border-[var(--accent-color)] hover:shadow-xs transition-all duration-300 h-full"
+                  >
+                    {/* Left Square Image */}
+                    <div className="relative w-20 sm:w-24 aspect-square rounded-md overflow-hidden shrink-0 bg-[var(--bg-secondary)] border border-[var(--border)]">
+                      <Image
+                        src={article.imageSrc}
+                        alt={article.title[locale]}
+                        fill
+                        sizes="100px"
+                        className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                      />
+                    </div>
+
+                    {/* Right Content */}
+                    <div className="flex-1 min-w-0 flex flex-col justify-between h-full">
+                      <div>
+                        <h3 className="font-[family-name:var(--font-playfair)] text-sm sm:text-base font-bold text-[var(--primary-color)] line-clamp-1 group-hover:text-[var(--accent-color)] transition-colors duration-300">
+                          {article.title[locale]}
+                        </h3>
+                        <p className="mt-1 font-[family-name:var(--font-lora)] text-[11px] sm:text-xs text-[var(--text-light)] line-clamp-2 leading-relaxed">
+                          {article.description[locale]}
+                        </p>
+                      </div>
+                      <div className="mt-2.5 flex items-center gap-2 text-[10px] sm:text-xs text-[var(--text-light)]/80 font-[family-name:var(--font-lora)]">
+                        <span className="font-semibold">{article.readTime[locale]}</span>
+                        <span>—</span>
+                        <span>{getAuthor(article.id)}</span>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
+        </>
       ) : (
         <div className="text-center py-16 border border-dashed border-[var(--border)] rounded-2xl bg-[var(--bg-secondary)]/10 mb-14">
           <p className="text-sm text-[var(--text-light)] font-medium">
             {t('noArticles')}
           </p>
         </div>
-      )}
-
-      {/* Main Grid List */}
-      {displayedGridArticles.length > 0 && (
-        <section className="mb-14">
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {displayedGridArticles.map((article) => (
-              <NewsCard
-                key={article.id}
-                slug={article.slug}
-                category={article.category[locale]}
-                title={article.title[locale]}
-                description={article.description[locale]}
-                dateShort={article.dateShort[locale]}
-                dateLong={article.dateLong[locale]}
-                imageSrc={article.imageSrc}
-                readTime={article.readTime[locale]}
-                readMoreLabel={t('readMore')}
-              />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Pagination / Load More */}
-      {gridArticles.length > 0 && (
-        <section className="flex justify-center mt-6">
-          {hasMore ? (
-            <Button
-              type="button"
-              onClick={handleLoadMore}
-              className="h-11 px-8 rounded-md border border-[var(--primary-color)] bg-transparent text-[var(--primary-color)] hover:bg-[var(--primary-color)] hover:text-white transition-all duration-300 font-semibold text-xs tracking-wider uppercase shadow-none cursor-pointer"
-            >
-              {t('loadMore')}
-            </Button>
-          ) : (
-            <span className="text-xs font-semibold tracking-wider text-[var(--text-light)] uppercase border-t border-[var(--border)] pt-4 w-full text-center">
-              {t('allLoaded')}
-            </span>
-          )}
-        </section>
       )}
     </Container>
   );

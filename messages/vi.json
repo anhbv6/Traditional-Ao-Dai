@@ -298,8 +298,7 @@
     }
   },
   "ContactPage": {
-    "eyebrow": "Liên hệ & tư vấn",
-    "title": "Liên Hệ Với AODAI",
+    "title": "Liên hệ & Tư vấn",
     "subtitle": "Đội ngũ tư vấn luôn sẵn sàng hỗ trợ chọn mẫu, đặt lịch thử đồ và giải đáp yêu cầu may đo riêng cho từng dịp quan trọng.",
     "directTitle": "Thông tin trực tiếp",
     "directSubtitle": "Kết nối nhanh với showroom và xưởng may",
@@ -359,6 +358,16 @@
     "readMore": "Xem chi tiết",
     "loadMore": "Xem thêm bài viết",
     "allLoaded": "Đã tải hết bài viết",
-    "noArticles": "Không tìm thấy bài viết nào trong danh mục này."
+    "noArticles": "Không tìm thấy bài viết nào trong danh mục này.",
+    "readArticle": "Xem chi tiết",
+    "viewAll": "Tất cả",
+    "sections": {
+      "latestNews": "Tin Mới Nhất",
+      "trendsStyle": "Xu Hướng & Phong Cách",
+      "guidesLife": "Cẩm Nang & Đời Sống"
+    },
+    "similarNews": "Bài Viết Liên Quan",
+    "articleNotFound": "Không tìm thấy bài viết",
+    "backToNews": "Quay lại Tin tức"
   }
 }
