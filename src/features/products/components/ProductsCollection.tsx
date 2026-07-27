@@ -314,6 +314,7 @@ export function ProductsCollection({ initialCategory }: ProductsCollectionProps)
                 sizes={product.sizes}
                 material={product.material}
                 purchaseType={product.purchaseType}
+                productHref={`/products/${product.id}`}
               />
             </div>
           ))}

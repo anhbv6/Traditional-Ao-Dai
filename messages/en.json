@@ -107,6 +107,21 @@
     }
   },
   "Product": {
+    "details": {
+      "stock": "In Stock",
+      "reviewCount": "121 Reviews",
+      "color": "Color",
+      "size": "Size",
+      "description": "Descriptions",
+      "information": "Additional Information",
+      "reviews": "Reviews",
+      "related": "Related Products",
+      "sku": "SKU",
+      "category": "Category",
+      "rating": "5.0",
+      "longDescription": "This design is finished with a graceful silhouette, selected fabric, and refined details for formal occasions. It keeps the traditional elegance of Ao Dai while remaining easy to wear in a modern wardrobe.",
+      "secondaryDescription": "Each piece can be advised against real body measurements to keep the fit comfortable through long events."
+    },
     "addToCart": "Add to Cart",
     "addToWishlist": "Add to Wishlist",
     "compare": "Compare Product",
