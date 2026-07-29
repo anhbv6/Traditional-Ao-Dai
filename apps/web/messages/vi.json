@@ -183,7 +183,35 @@
   "Auth": {
     "login": "Đăng nhập",
     "signin": "Đăng ký",
-    "forgotPassword": "Quên mật khẩu?"
+    "forgotPassword": "Quên mật khẩu?",
+    "welcomeBack": "Chào mừng trở lại",
+    "pleaseLogin": "Vui lòng đăng nhập tài khoản của bạn để tiếp tục",
+    "emailAddress": "Địa chỉ Email",
+    "password": "Mật khẩu",
+    "rememberMe": "Ghi nhớ đăng nhập",
+    "dontHaveAccount": "Bạn chưa có tài khoản?",
+    "createAccount": "Đăng ký ngay",
+    "signupTitle": "Đăng ký tài khoản",
+    "signupSubtitle": "Trở thành thành viên để nhận ưu đãi và trải nghiệm may đo riêng biệt",
+    "fullName": "Họ và tên",
+    "confirmPassword": "Xác nhận mật khẩu",
+    "agreeTerms": "Tôi đồng ý với các Điều khoản & Chính sách dịch vụ",
+    "alreadyHaveAccount": "Đã có tài khoản?",
+    "loginNow": "Đăng nhập ngay",
+    "forgotTitle": "Quên mật khẩu?",
+    "forgotSubtitle": "Nhập địa chỉ email của bạn và chúng tôi sẽ gửi hướng dẫn khôi phục mật khẩu.",
+    "sendLink": "Gửi liên kết khôi phục",
+    "backToLogin": "Quay lại đăng nhập",
+    "otpTitle": "Xác minh mã OTP",
+    "otpSubtitle": "Chúng tôi đã gửi mã xác thực gồm 6 chữ số đến email của bạn.",
+    "otpCode": "Mã xác thực OTP",
+    "verifyButton": "Xác thực mã OTP",
+    "resendOtp": "Gửi lại mã OTP",
+    "changePasswordTitle": "Đặt lại mật khẩu",
+    "changePasswordSubtitle": "Vui lòng nhập mật khẩu mới và xác nhận để cập nhật tài khoản.",
+    "newPassword": "Mật khẩu mới",
+    "confirmNewPassword": "Xác nhận mật khẩu mới",
+    "resetButton": "Cập nhật mật khẩu"
   },
   "Footer": {
     "newsletter": {
@@ -369,5 +397,173 @@
     "similarNews": "Bài Viết Liên Quan",
     "articleNotFound": "Không tìm thấy bài viết",
     "backToNews": "Quay lại Tin tức"
+  },
+  "AboutPage": {
+    "nav": {
+      "hero": "Khởi đầu",
+      "pain-solution": "Vấn đề & Giải pháp",
+      "fit-model": "Phom dáng chuẩn",
+      "atelier": "Xưởng may nghệ nhân",
+      "testimonials": "Cảm nhận khách hàng"
+    },
+    "hero": {
+      "eyebrow": "Câu chuyện AODAI",
+      "title": "Kiến tạo phom dáng Áo dài chuẩn xác từng milimet",
+      "subtitle": "Chúng tôi không chỉ may đo áo dài. Chúng tôi nghiên cứu chuyển động cơ thể để tạo nên những tà áo thoải mái, vừa vặn tôn dáng nhất cho người phụ nữ Việt.",
+      "badges": {
+        "armhole": "Không căng nách",
+        "belly": "Che khuyết điểm bụng",
+        "realFit": "Tư vấn phom dáng 3D"
+      },
+      "imageAlt": "Nghệ nhân đo may áo dài truyền thống",
+      "measureTitle": "Tỉ mỉ từng số đo",
+      "measureText": "Đội ngũ chuyên nghiệp thực hiện tối thiểu 12 phép đo cơ thể để đảm bảo độ khít hoàn hảo."
+    },
+    "pain": {
+      "eyebrow": "Vấn đề của tà áo dài truyền thống",
+      "title": "Tại sao áo dài mua sẵn thường gây khó chịu?",
+      "description": "Nhiều phụ nữ ngần ngại mặc áo dài vì cảm giác bó khít, khó thở khi ngồi hoặc căng nách khi vận động. AODAI giải quyết những nỗi lo đó bằng kỹ thuật cắt đo cải tiến.",
+      "cards": {
+        "armhole": {
+          "title": "Căng nách khó chịu",
+          "text": "Đường cắt nách quá hẹp hoặc không đúng góc khiến bạn không thể nhấc tay thoải mái."
+        },
+        "belly": {
+          "title": "Lộ khuyết điểm eo bụng",
+          "text": "Chất vải ôm sát không có sự co giãn hoặc tà eo xẻ quá cao dễ làm lộ khuyết điểm khi ngồi."
+        },
+        "fit": {
+          "title": "Phom dáng chung chung",
+          "text": "May đo công nghiệp theo size rập chuẩn chung thường không vừa vặn với các dáng người thực tế."
+        }
+      },
+      "solutionEyebrow": "Giải pháp từ AODAI",
+      "solutionText": "Chúng tôi nghiên cứu và tinh chỉnh các chi tiết nách, eo, và tà xẻ để tà áo dài vừa giữ nét tôn dáng, vừa thoải mái tối đa khi mặc cả ngày."
+    },
+    "fit": {
+      "eyebrow": "Thử nghiệm phom dáng",
+      "title": "Phù hợp với từng vóc dáng thực tế",
+      "description": "Chúng tôi phân tích và thiết kế dựa trên các dáng người khác nhau để đảm bảo sự vừa vặn tối ưu.",
+      "beforeLabel": "Trước cải tiến",
+      "afterLabel": "Sau cải tiến từ AODAI",
+      "profiles": {
+        "slender": {
+          "label": "Dáng người thanh mảnh",
+          "note": "Tối ưu hóa đường cong cơ thể tự nhiên và độ rủ mềm mại của tà áo.",
+          "before": "Tà áo bị phẳng, thiếu đường cong eo, có nếp nhăn dọc ngực và vai.",
+          "after": "Tôn dáng ngực đầy đặn hơn, vai ôm khít mềm mại và eo thon gọn tinh tế.",
+          "imageAlt": "Áo dài trên dáng người thanh mảnh",
+          "stats": {
+            "shoulder": {
+              "label": "Độ mở vai",
+              "value": "Cân đối"
+            },
+            "waist": {
+              "label": "Đường eo",
+              "value": "Ôm mềm"
+            },
+            "panel": {
+              "label": "Độ rủ tà",
+              "value": "Mượt mà"
+            }
+          }
+        },
+        "curvy": {
+          "label": "Dáng người đầy đặn",
+          "note": "Nới lỏng thông minh ở nách và làm mềm các điểm chuyển tiếp vùng hông.",
+          "before": "Nách bị bó chật, hông bị kéo căng ngang và lộ khuyết điểm eo khi ngồi.",
+          "after": "Nách thoải mái tăng 2cm cử động, eo hạ tà che khuyết điểm, hông co giãn nhẹ.",
+          "imageAlt": "Áo dài trên dáng người đầy đặn",
+          "stats": {
+            "armhole": {
+              "label": "Vòng nách",
+              "value": "+2cm"
+            },
+            "belly": {
+              "label": "Vùng bụng",
+              "value": "Ẩn khéo"
+            },
+            "hip": {
+              "label": "Vòng hông",
+              "value": "Co giãn nhẹ"
+            }
+          }
+        }
+      }
+    },
+    "atelier": {
+      "eyebrow": "Nghệ nhân & Xưởng may",
+      "title": "Sự tỉ mỉ đứng sau từng tà áo",
+      "description": "Mỗi chiếc áo dài của AODAI đều đi qua đôi tay điêu luyện của những người thợ lành nghề nhất.",
+      "stories": {
+        "founder": {
+          "imageAlt": "Người sáng lập AODAI",
+          "role": "Người sáng lập & Thiết kế",
+          "title": "Chị Linh An",
+          "story": "Ý tưởng của tôi là kết hợp nghệ thuật thêu tay thủ công truyền thống với kỹ thuật cắt rập 3D hiện đại để chiếc áo dài dễ tiếp cận hơn."
+        },
+        "tailor": {
+          "imageAlt": "Thợ may ráp áo dài",
+          "role": "Thợ may ráp chính (15 năm kinh nghiệm)",
+          "title": "Cô Mai Hạnh",
+          "story": "Một tà áo dài đẹp nằm ở từng đường kim mũi chỉ thẳng tắp và cách điều phối độ giãn của thớ lụa khi may các đường cong uốn lượn."
+        },
+        "cutting": {
+          "imageAlt": "Nghệ nhân cắt rập",
+          "role": "Nghệ nhân cắt rập & Tạo phom",
+          "title": "Chú Hoàng Nam",
+          "story": "Cắt rập là bước định hình linh hồn chiếc áo. Một nhát kéo lệch vài milimet cũng có thể làm mất đi độ bay bổng tự nhiên của tà áo."
+        }
+      },
+      "metrics": {
+        "checks": {
+          "value": "3 lượt",
+          "label": "Kiểm tra chất lượng"
+        },
+        "years": {
+          "value": "15+ năm",
+          "label": "Kinh nghiệm thợ may"
+        },
+        "consulting": {
+          "value": "1-1",
+          "label": "Tư vấn số đo cá nhân"
+        }
+      }
+    },
+    "testimonials": {
+      "eyebrow": "Khách hàng chia sẻ",
+      "title": "Khoảnh khắc trọn vẹn cùng AODAI",
+      "description": "Lắng nghe chia sẻ chân thực từ những người phụ nữ đã tự tin diện tà áo dài thiết kế của chúng tôi trong các dịp trọng đại nhất cuộc đời.",
+      "previous": "Trước đó",
+      "next": "Tiếp theo",
+      "customerPhoto": "Ảnh chụp thực tế",
+      "goTo": "Xem trang {index}",
+      "items": {
+        "wedding": {
+          "imageAlt": "Khách hàng mặc áo dài cưới đỏ đô",
+          "quote": "Chiếc áo dài cưới thêu hoa sen đỏ đô làm tôi vô cùng tự hào trong ngày trọng đại. Phom dáng ôm khít tôn dáng cực kỳ và thêu tay vô cùng tinh xảo.",
+          "name": "Khánh Linh",
+          "occasion": "Cô dâu mới"
+        },
+        "graduation": {
+          "imageAlt": "Khách hàng mặc áo dài kỷ yếu trắng",
+          "quote": "Diện áo dài lụa tơ tằm trắng trong lễ tốt nghiệp, tôi thấy chụp góc nào cũng đẹp và mặc cả ngày dài nắng nóng vẫn rất thoáng mát, dễ chịu.",
+          "name": "Hoàng Yến",
+          "occasion": "Tốt nghiệp Đại học"
+        },
+        "tet": {
+          "imageAlt": "Khách hàng mặc áo dài Tết gấm hoa",
+          "quote": "Năm nào cả nhà tôi cũng may áo dài Tết ở đây. Gấm dày dặn sang trọng, hoa văn chìm tinh tế lắm, mặc chụp ảnh xuân ai cũng khen hết lời.",
+          "name": "Chị Thanh Hằng",
+          "occasion": "Diện Tết truyền thống"
+        },
+        "engagement": {
+          "imageAlt": "Khách hàng mặc áo dài đính hôn pastel",
+          "quote": "Áo dáng cách tân thêu ren pastel vừa dịu dàng thanh lịch, vừa giữ được sự kín đáo trang nghiêm cần thiết cho lễ ăn hỏi của tôi.",
+          "name": "Thu Hương",
+          "occasion": "Lễ đính hôn"
+        }
+      }
+    }
   }
 }

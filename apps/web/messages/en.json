@@ -183,7 +183,35 @@
   "Auth": {
     "login": "Login",
     "signin": "Register",
-    "forgotPassword": "Forgot password?"
+    "forgotPassword": "Forgot password?",
+    "welcomeBack": "Welcome Back",
+    "pleaseLogin": "Please log in to your account to continue",
+    "emailAddress": "Email Address",
+    "password": "Password",
+    "rememberMe": "Remember me",
+    "dontHaveAccount": "Don't have an account?",
+    "createAccount": "Sign up now",
+    "signupTitle": "Create Account",
+    "signupSubtitle": "Become a member to receive offers and a personalized tailoring experience",
+    "fullName": "Full Name",
+    "confirmPassword": "Confirm Password",
+    "agreeTerms": "I agree with the Terms of Service & Privacy Policy",
+    "alreadyHaveAccount": "Already have an account?",
+    "loginNow": "Log in now",
+    "forgotTitle": "Forgot Password?",
+    "forgotSubtitle": "Enter your email address and we'll send you instructions to reset your password.",
+    "sendLink": "Send reset link",
+    "backToLogin": "Back to login",
+    "otpTitle": "Verify OTP Code",
+    "otpSubtitle": "We have sent a 6-digit verification code to your email.",
+    "otpCode": "OTP Verification Code",
+    "verifyButton": "Verify OTP Code",
+    "resendOtp": "Resend OTP Code",
+    "changePasswordTitle": "Reset Password",
+    "changePasswordSubtitle": "Please enter a new password and confirm it to update your account.",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "resetButton": "Update Password"
   },
   "Footer": {
     "newsletter": {
@@ -369,5 +397,173 @@
     "similarNews": "Similar News",
     "articleNotFound": "Article not found",
     "backToNews": "Back to News"
+  },
+  "AboutPage": {
+    "nav": {
+      "hero": "Intro",
+      "pain-solution": "Pain & Solution",
+      "fit-model": "Fit Model",
+      "atelier": "Atelier",
+      "testimonials": "Testimonials"
+    },
+    "hero": {
+      "eyebrow": "AODAI Story",
+      "title": "Crafting Gowns to Fit Every Curve Perfectly",
+      "subtitle": "We don't just tailor Ao Dai. We study body movements to create the most comfortable, flattering silhouette for every woman.",
+      "badges": {
+        "armhole": "Easy Armhole Ease",
+        "belly": "Flattering Waistlines",
+        "realFit": "3D Fitting Advice"
+      },
+      "imageAlt": "Artisans tailoring traditional Vietnamese gown",
+      "measureTitle": "Precise Measurements",
+      "measureText": "Our professional fit specialists take a minimum of 12 distinct measurements to ensure a perfect second-skin fit."
+    },
+    "pain": {
+      "eyebrow": "Traditional Ao Dai Issues",
+      "title": "Why Off-the-Shelf Ao Dai Can Be Uncomfortable",
+      "description": "Many women hesitate to wear Ao Dai due to tight armholes, restricted breathing while sitting, or awkward fit. AODAI resolves these pain points with advanced tailoring techniques.",
+      "cards": {
+        "armhole": {
+          "title": "Tight Armholes",
+          "text": "Narrow cuts or rigid lines prevent you from lifting your arms comfortably or moving naturally."
+        },
+        "belly": {
+          "title": "Exposed Waistline",
+          "text": "Fitted fabrics without flexible ease can make you feel self-conscious and restricted when sitting down."
+        },
+        "fit": {
+          "title": "Generic Size Charts",
+          "text": "Mass-produced sizing templates fail to accommodate the beautiful diversity of real body shapes."
+        }
+      },
+      "solutionEyebrow": "The AODAI Solution",
+      "solutionText": "We re-engineered the armholes, waist ease, and slit points to ensure your Ao Dai is both stunning and comfortably wearable all day."
+    },
+    "fit": {
+      "eyebrow": "Fit Profiling",
+      "title": "Designed for Diverse Silhouette Profiles",
+      "description": "We analyze and design patterns around distinct body profiles to ensure personalized, optimal fit.",
+      "beforeLabel": "Standard Fit",
+      "afterLabel": "AODAI Enhanced Fit",
+      "profiles": {
+        "slender": {
+          "label": "Slender Profile",
+          "note": "Optimizing natural body curves and the elegant drape of silk panels.",
+          "before": "Flat front panel, vertical folding around shoulder lines, and loose waist definition.",
+          "after": "Enhanced bust silhouette, seamless shoulder drape, and refined, clean waist definition.",
+          "imageAlt": "Ao Dai on a slender figure",
+          "stats": {
+            "shoulder": {
+              "label": "Shoulder Fit",
+              "value": "Balanced"
+            },
+            "waist": {
+              "label": "Waistline",
+              "value": "Clean"
+            },
+            "panel": {
+              "label": "Panel Drape",
+              "value": "Fluid"
+            }
+          }
+        },
+        "curvy": {
+          "label": "Curvy Profile",
+          "note": "Smart ease added at armholes and smooth, flexible transitions around hips.",
+          "before": "Restricted armhole movement, horizontal tension lines across hips, and tight waist pressure.",
+          "after": "Comfortable armhole with +2cm ease, hidden waist pressure, and flexible hip ease.",
+          "imageAlt": "Ao Dai on a curvy figure",
+          "stats": {
+            "armhole": {
+              "label": "Armhole Ease",
+              "value": "+2cm"
+            },
+            "belly": {
+              "label": "Midsection",
+              "value": "Disguised"
+            },
+            "hip": {
+              "label": "Hip Area",
+              "value": "Flexible"
+            }
+          }
+        }
+      }
+    },
+    "atelier": {
+      "eyebrow": "Our Artisans & Atelier",
+      "title": "The Care and Craft in Every Single Seam",
+      "description": "Every single AODAI gown passes through the skilled hands of our most experienced artisans.",
+      "stories": {
+        "founder": {
+          "imageAlt": "Founder of AODAI",
+          "role": "Founder & Lead Designer",
+          "title": "Linh An",
+          "story": "My goal is to merge traditional hand-embroidery with modern 3D pattern drafting, making custom Ao Dai accessible to modern women."
+        },
+        "tailor": {
+          "imageAlt": "Artisan tailoring gown",
+          "role": "Master Tailor (15+ Years Experience)",
+          "title": "Ms. Mai Hanh",
+          "story": "The beauty of Ao Dai lies in perfectly aligned seams and understanding how to guide the grain of silk along curves."
+        },
+        "cutting": {
+          "imageAlt": "Artisan cutting fabric patterns",
+          "role": "Master Pattern Maker",
+          "title": "Mr. Hoàng Nam",
+          "story": "Pattern cutting dictates the flow of the dress. Even a variance of a few millimeters can alter the natural movement of the panels."
+        }
+      },
+      "metrics": {
+        "checks": {
+          "value": "3 Steps",
+          "label": "Quality Checks"
+        },
+        "years": {
+          "value": "15+ Years",
+          "label": "Tailor Experience"
+        },
+        "consulting": {
+          "value": "1-on-1",
+          "label": "Measurement Advice"
+        }
+      }
+    },
+    "testimonials": {
+      "eyebrow": "Client Stories",
+      "title": "Cherished Moments with AODAI",
+      "description": "Read stories from women who wore our custom-designed gowns during the most meaningful moments of their lives.",
+      "previous": "Previous",
+      "next": "Next",
+      "customerPhoto": "Customer Photo",
+      "goTo": "Go to slide {index}",
+      "items": {
+        "wedding": {
+          "imageAlt": "Customer wearing red wedding Ao Dai",
+          "quote": "My burgundy lotus wedding gown made me feel extremely proud. The custom fit was flawless, and the hand-embroidery was exceptionally intricate.",
+          "name": "Khanh Linh",
+          "occasion": "Bridal Gown"
+        },
+        "graduation": {
+          "imageAlt": "Customer wearing white graduation Ao Dai",
+          "quote": "Wearing the mulberry silk gown for graduation, I felt comfortable all day in the summer heat and every photo turned out beautifully.",
+          "name": "Hoang Yen",
+          "occasion": "Graduation Day"
+        },
+        "tet": {
+          "imageAlt": "Customer wearing Tet brocade Ao Dai",
+          "quote": "Our family gets custom Tet gowns here every year. The brocade has a premium texture and elegant motifs. Everyone complimented our spring photos.",
+          "name": "Mrs. Thanh Hang",
+          "occasion": "Tet Festival"
+        },
+        "engagement": {
+          "imageAlt": "Customer wearing pastel engagement Ao Dai",
+          "quote": "The modern pastel gown was elegant and kept the dignified coverage needed for my engagement ceremony. Highly recommend!",
+          "name": "Thu Huong",
+          "occasion": "Engagement Ceremony"
+        }
+      }
+    }
   }
 }
