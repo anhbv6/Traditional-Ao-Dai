@@ -1,6 +1,6 @@
 import { Container } from '@/components/ui/container'
 import { Breadcrumbs } from '@/components/common/Breadcrumbs'
-import { AboutExperience } from '@/components/about/AboutExperience'
+import { AboutExperience } from '@/features/about'
 import React from 'react'
 
 function About() {
