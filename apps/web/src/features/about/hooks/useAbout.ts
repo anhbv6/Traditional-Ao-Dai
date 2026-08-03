@@ -1,12 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useLenis } from "lenis/react";
-import { sectionIds } from "../types/about.types";
+import { sectionIds, type SectionId } from "../types/about.types";
 
 const HEADER_OFFSET = 96;
 
-export function useAbout(rootRef: React.RefObject<HTMLDivElement | null>) {
+export function useAbout() {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [activeSectionId, setActiveSectionId] = useState<SectionId>("hero");
   const lenis = useLenis();
   const activeIndexRef = useRef(0);
   const lockRef = useRef(false);
@@ -33,15 +35,14 @@ export function useAbout(rootRef: React.RefObject<HTMLDivElement | null>) {
     return nearestIndex;
   }, []);
 
-  const scrollToIndex = useCallback(
-    (nextIndex: number) => {
-      const safeIndex = Math.max(0, Math.min(sectionIds.length - 1, nextIndex));
-      const id = sectionIds[safeIndex];
+  const scrollToSection = useCallback(
+    (id: SectionId) => {
       const section = document.getElementById(`about-${id}`);
-
       if (!section) return;
 
-      activeIndexRef.current = safeIndex;
+      const nextIndex = sectionIds.indexOf(id);
+      activeIndexRef.current = nextIndex;
+      setActiveSectionId(id);
       lockRef.current = true;
 
       if (lenis) {
@@ -57,6 +58,15 @@ export function useAbout(rootRef: React.RefObject<HTMLDivElement | null>) {
     [lenis]
   );
 
+  const scrollToIndex = useCallback(
+    (nextIndex: number) => {
+      const safeIndex = Math.max(0, Math.min(sectionIds.length - 1, nextIndex));
+      const id = sectionIds[safeIndex];
+      scrollToSection(id);
+    },
+    [scrollToSection]
+  );
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -64,11 +74,10 @@ export function useAbout(rootRef: React.RefObject<HTMLDivElement | null>) {
           .filter((entry) => entry.isIntersecting)
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
 
-        const rawId = visible?.target.id.replace("about-", "") as (typeof sectionIds)[number] | undefined;
-        const nextIndex = rawId ? sectionIds.findIndex((id) => id === rawId) : -1;
-
-        if (rawId && nextIndex >= 0) {
-          activeIndexRef.current = nextIndex;
+        const rawId = visible?.target.id.replace("about-", "") as SectionId | undefined;
+        if (rawId && sectionIds.includes(rawId)) {
+          setActiveSectionId(rawId);
+          activeIndexRef.current = sectionIds.indexOf(rawId);
         }
       },
       { rootMargin: "-42% 0px -42% 0px", threshold: [0.2, 0.45, 0.7] }
@@ -142,5 +151,11 @@ export function useAbout(rootRef: React.RefObject<HTMLDivElement | null>) {
       window.removeEventListener("touchstart", handleTouchStart);
       window.removeEventListener("touchmove", handleTouchMove);
     };
-  }, [getCurrentSectionIndex, rootRef, scrollToIndex]);
+  }, [getCurrentSectionIndex, scrollToIndex]);
+
+  return {
+    rootRef,
+    activeSectionId,
+    scrollToSection,
+  };
 }

@@ -12,8 +12,7 @@ import { atelierStories } from "../types/about.types";
 
 export function AboutExperience() {
   const t = useTranslations("AboutPage");
-  const rootRef = useRef<HTMLDivElement>(null);
-  useAbout(rootRef);
+  const { rootRef } = useAbout();
 
   return (
     <div ref={rootRef} className="overflow-hidden bg-[#FAF7F5]">

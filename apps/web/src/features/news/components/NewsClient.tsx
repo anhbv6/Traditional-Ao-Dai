@@ -1,62 +1,30 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Image from 'next/image';
 import { Calendar, Clock, ArrowRight } from 'lucide-react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 
 import { Container } from '@/components/ui/container';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
-import { mockArticles } from '../data/mockArticles';
+import { useNews } from '../hooks/useNews';
+import { categoryKeys, getAuthor } from '../types/news.types';
 
-const categoryKeys = ['all', 'guide', 'tips', 'culture', 'trends', 'tailoring'] as const;
-
-const categoryFilterMap: Record<string, { vi: string; en: string }> = {
-  guide: { vi: 'Cẩm Nang', en: 'Guide' },
-  tips: { vi: 'Kinh Nghiệm', en: 'Tips' },
-  culture: { vi: 'Văn Hóa', en: 'Culture' },
-  trends: { vi: 'Xu Hướng', en: 'Trends' },
-  tailoring: { vi: 'May Đo', en: 'Tailoring' },
-};
-
-const authors = ['Guy Hawkins', 'Jenny Wilson', 'Kristin Watson', 'Albert Flores', 'Eleanor Pena'] as const;
-const getAuthor = (id: string) => {
-  const index = parseInt(id, 10);
-  return isNaN(index) ? 'Guy Hawkins' : (authors[index % authors.length] || 'Guy Hawkins');
-};
-
-export default function NewsClient() {
+export function NewsClient() {
   const t = useTranslations('NewsPage');
-  const locale = useLocale() as 'vi' | 'en';
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-
-  // Filter articles based on selected category
-  const filteredArticles = selectedCategory === 'all'
-    ? mockArticles
-    : mockArticles.filter((article) => {
-        const filter = categoryFilterMap[selectedCategory];
-        if (!filter) return false;
-        return (
-          article.category.vi.toLowerCase() === filter.vi.toLowerCase() ||
-          article.category.en.toLowerCase() === filter.en.toLowerCase()
-        );
-      });
-
-  // Extract slices for sequential layouts
-  const heroArticle = filteredArticles[0];
-  const latestNewsArticles = filteredArticles.slice(1, 4);
-  const leftLatestArticle = latestNewsArticles[0];
-  const rightLatestArticles = latestNewsArticles.slice(1, 3);
-
-  const trendsArticles = filteredArticles.slice(4, 8);
-  const guidesArticles = filteredArticles.slice(8, 14);
-
-  const handleCategoryChange = (category: string) => {
-    setSelectedCategory(category);
-    // Scroll smoothly to top of articles after filter change
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  const {
+    selectedCategory,
+    filteredArticles,
+    heroArticle,
+    latestNewsArticles,
+    leftLatestArticle,
+    rightLatestArticles,
+    trendsArticles,
+    guidesArticles,
+    handleCategoryChange,
+    locale,
+  } = useNews();
 
   return (
     <Container as="div" className="py-8 sm:py-12">
@@ -73,7 +41,7 @@ export default function NewsClient() {
       </section>
 
       {/* Category Tabs */}
-      <section className="mb-10 border-y border-[var(--border)] py-4">
+      <section className="border-y border-[var(--border)] py-4 mb-10">
         <div className="flex w-full items-center justify-start md:justify-center gap-6 md:gap-10 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden px-4 md:px-0">
           {categoryKeys.map((key) => {
             const isActive = selectedCategory === key;

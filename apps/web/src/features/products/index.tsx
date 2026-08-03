@@ -1,0 +1,7 @@
+export * from "./api/products.api";
+export * from "./components/ProductsCollection";
+export * from "./components/ProductDetailClient";
+export * from "./components/ProductDetail";
+export * from "./types/products.types";
+export * from "./hooks/useProducts";
+export * from "./hooks/useProductDetail";

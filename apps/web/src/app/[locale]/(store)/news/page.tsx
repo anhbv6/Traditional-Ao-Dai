@@ -1,4 +1,4 @@
-import NewsClient from '@/features/news/components/NewsClient';
+import { NewsClient } from '@/features/news';
 
 export default function NewsPage() {
   return <NewsClient />;

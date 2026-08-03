@@ -17,7 +17,7 @@ export interface NewsCardProps {
   readMoreLabel: string;
 }
 
-export default function NewsCard({
+export function NewsCard({
   slug,
   category,
   title,

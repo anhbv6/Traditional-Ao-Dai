@@ -1,12 +1,11 @@
 'use client';
 
-import { useState } from 'react';
-import { useTranslations } from 'next-intl';
-
+import React from 'react';
 import ProductGallery from './detail/ProductGallery';
 import ProductInfo from './detail/ProductInfo';
 import ProductTabs from './detail/ProductTabs';
 import RelatedProducts from './detail/RelatedProducts';
+import { useProductDetail } from '../hooks/useProductDetail';
 
 export interface DisplayColor {
   name: string;
@@ -60,45 +59,28 @@ interface ProductDetailClientProps {
   customMeasurementFields?: Array<{ field_key: string; label: string; placeholder: string; required: boolean }>;
 }
 
-export default function ProductDetailClient({
+export function ProductDetailClient({
   product,
   locale,
   galleryImages,
   relatedProducts,
   customMeasurementFields = [],
 }: ProductDetailClientProps) {
-  const t = useTranslations('Product');
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [selectedColor, setSelectedColor] = useState(product.colors[0]?.name || '');
-  const [selectedSize, setSelectedSize] = useState(product.sizes[0] || '');
-  const [quantity, setQuantity] = useState(1);
-  const [isWishlisted, setIsWishlisted] = useState(false);
-  const [customMeasurements, setCustomMeasurements] = useState<Record<string, string>>({});
-
-  const handleInputChange = (fieldKey: string, value: string) => {
-    setCustomMeasurements((prev) => ({
-      ...prev,
-      [fieldKey]: value,
-    }));
-  };
-
-  const handleAddToCart = () => {
-    const isCustomSize = selectedSize.toLowerCase().includes('may đo') || selectedSize.toLowerCase().includes('custom');
-    const customMeasurementsStr = isCustomSize && Object.keys(customMeasurements).length > 0
-      ? t('details.customMeasurementsPrefix') + Object.entries(customMeasurements)
-          .map(([k, v]) => `${k.toUpperCase()}=${v}cm`)
-          .join(', ') + '\n'
-      : '';
-
-    alert(
-      t('details.addedToCart', {
-        product: product.name,
-        color: selectedColor,
-        size: selectedSize,
-        quantity: quantity,
-      }) + customMeasurementsStr
-    );
-  };
+  const {
+    activeImageIndex,
+    setActiveImageIndex,
+    selectedColor,
+    onColorSelect,
+    selectedSize,
+    setSelectedSize,
+    quantity,
+    setQuantity,
+    isWishlisted,
+    onWishlistToggle,
+    customMeasurements,
+    onCustomMeasurementChange,
+    onAddToCart,
+  } = useProductDetail(product, galleryImages);
 
   return (
     <>
@@ -119,24 +101,16 @@ export default function ProductDetailClient({
           locale={locale}
           customMeasurementFields={customMeasurementFields}
           selectedColor={selectedColor}
-          onColorSelect={(colorName, imageSrc) => {
-            setSelectedColor(colorName);
-            if (imageSrc) {
-              const imgIdx = galleryImages.indexOf(imageSrc);
-              if (imgIdx !== -1) {
-                setActiveImageIndex(imgIdx);
-              }
-            }
-          }}
+          onColorSelect={onColorSelect}
           selectedSize={selectedSize}
           onSizeSelect={setSelectedSize}
           customMeasurements={customMeasurements}
-          onCustomMeasurementChange={handleInputChange}
+          onCustomMeasurementChange={onCustomMeasurementChange}
           quantity={quantity}
           onQuantityChange={setQuantity}
           isWishlisted={isWishlisted}
-          onWishlistToggle={() => setIsWishlisted(!isWishlisted)}
-          onAddToCart={handleAddToCart}
+          onWishlistToggle={onWishlistToggle}
+          onAddToCart={onAddToCart}
         />
       </div>
 

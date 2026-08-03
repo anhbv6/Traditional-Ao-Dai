@@ -4,8 +4,7 @@ import React from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import SectionHeading from './SectionHeading';
 import Carousel from '@/components/Carousel';
-import { mockArticles } from '@/features/news/data/mockArticles';
-import NewsCard from '@/features/news/components/NewsCard';
+import { mockArticles, NewsCard } from '@/features/news';
 
 function ArticleNews() {
   const t = useTranslations('HomePage.articleNews');
