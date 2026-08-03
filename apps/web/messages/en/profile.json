@@ -1,0 +1,92 @@
+{
+  "title": "Account Settings",
+  "subtitle": "Manage your profile details, orders, addresses, and payment methods.",
+  "tabs": {
+    "personal": "Personal Information",
+    "orders": "Order History",
+    "address": "Manage Address",
+    "payment": "Manage Payment",
+    "setting": "Account Settings"
+  },
+  "personal": {
+    "title": "Personal Information",
+    "subtitle": "Update your account details and contact info.",
+    "fullName": "Full Name",
+    "email": "Email Address",
+    "phone": "Phone Number",
+    "gender": "Gender",
+    "genderMale": "Male",
+    "genderFemale": "Female",
+    "genderOther": "Other",
+    "dob": "Date of Birth",
+    "saveBtn": "Save Changes",
+    "successMsg": "Personal information updated successfully!",
+    "editAvatar": "Change avatar",
+    "previewAvatar": "Profile picture",
+    "selectDate": "Select date",
+    "changeInfoBtn": "Change info",
+    "cancelBtn": "Cancel"
+  },
+  "orders": {
+    "title": "Order History",
+    "subtitle": "View and track your orders.",
+    "empty": "You haven't placed any orders yet.",
+    "orderId": "Order ID",
+    "date": "Date",
+    "status": "Status",
+    "total": "Total",
+    "action": "Action",
+    "viewDetail": "Details",
+    "statusPending": "Pending",
+    "statusProcessing": "Processing",
+    "statusShipped": "Shipped",
+    "statusDelivered": "Delivered",
+    "statusCancelled": "Cancelled"
+  },
+  "address": {
+    "title": "Manage Address",
+    "subtitle": "Add or modify your shipping addresses.",
+    "addBtn": "Add New Address",
+    "default": "Default",
+    "edit": "Edit",
+    "delete": "Delete",
+    "setAsDefault": "Set as default",
+    "form": {
+      "receiverName": "Receiver Name",
+      "receiverPhone": "Receiver Phone",
+      "province": "Province/City",
+      "district": "District",
+      "ward": "Ward",
+      "detail": "Detail Address (House No, Street...)",
+      "isDefault": "Set as default address",
+      "cancelBtn": "Cancel",
+      "submitBtn": "Save Address"
+    }
+  },
+  "payment": {
+    "title": "Manage Payment",
+    "subtitle": "Manage your credit cards and other payment accounts.",
+    "addBtn": "Add Payment Method",
+    "cardEnding": "Card ending in",
+    "expiry": "Expires",
+    "default": "Default",
+    "form": {
+      "cardHolder": "Cardholder Name",
+      "cardNumber": "Card Number",
+      "expiryDate": "Expiry Date (MM/YY)",
+      "cvv": "CVV/CVC"
+    }
+  },
+  "setting": {
+    "title": "Account Settings",
+    "subtitle": "Configure your security settings and notifications.",
+    "changePassword": "Change Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm Password",
+    "securityTitle": "Security",
+    "notifTitle": "Notifications",
+    "notifPromo": "Receive promotional emails",
+    "notifOrder": "Receive order updates"
+  }
+}

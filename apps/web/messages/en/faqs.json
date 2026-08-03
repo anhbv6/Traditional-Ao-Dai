@@ -1,0 +1,47 @@
+{
+  "title": "Frequently Asked Questions (FAQs)",
+  "subtitle": "Find quick answers to common questions about sizing, tailoring, shipping, and payments.",
+  "searchPlaceholder": "Search for your questions...",
+  "noResults": "No results found matching your search term.",
+  "categories": {
+    "all": "All Questions",
+    "sizing": "Sizing & Tailoring",
+    "shipping": "Order & Shipping",
+    "materials": "Materials & Care",
+    "refunds": "Payments & Returns"
+  },
+  "questions": {
+    "q1": {
+      "question": "How do I choose the best fitting size?",
+      "answer": "We provide a detailed size chart based on shoulder, bust, waist, and hip measurements inside each product description. For customized items, please follow our measurement instructions to submit your details or consult with our 1-on-1 fashion advisors."
+    },
+    "q2": {
+      "question": "Can I request custom tailoring to my exact measurements?",
+      "answer": "Yes, AODAI specializes in bespoke tailoring. Simply select the 'Custom Tailoring' option when customizing your product, and fill out your body measurements in the form provided."
+    },
+    "q3": {
+      "question": "How long does custom tailoring and delivery take?",
+      "answer": "For ready-to-wear items, domestic processing and delivery takes 2-4 business days. For customized orders, our master tailors need approximately 7-10 days to draft patterns and stitch details before handing off to the courier."
+    },
+    "q4": {
+      "question": "Do you offer international shipping?",
+      "answer": "Yes, we proudly ship our Vietnamese gowns worldwide. AODAI partners with premium carriers like DHL/FedEx to ship to over 50 countries, with transit times averaging 5-9 business days."
+    },
+    "q5": {
+      "question": "What fabrics are used in your Ao Dai?",
+      "answer": "We prioritize premium natural fibers: original Ha Dong mulberry silk, traditional gold-threaded/subtle brocades, smooth velvets, and fluid chiffon silk. These materials provide maximum breathability and are gentle on the skin."
+    },
+    "q6": {
+      "question": "How should I wash and preserve my silk Ao Dai?",
+      "answer": "Dry cleaning or gentle handwashing with shampoo in cool water is highly recommended. Avoid wringing or twisting the fabric, and dry in a cool shaded area. Iron using a steam iron at a designated silk setting."
+    },
+    "q7": {
+      "question": "What is your return and exchange policy?",
+      "answer": "For ready-to-wear products, we support size/style exchanges within 7 days of delivery, provided the item is unworn, unwashed, and retains all original tags. For custom-tailored items, we unfortunately cannot accept returns unless the product has a production defect."
+    },
+    "q8": {
+      "question": "What payment methods do you support?",
+      "answer": "We accept Cash on Delivery (COD - nationwide in Vietnam), Bank Transfer QR code, local e-wallets (Momo, VNPay), and international credit cards (Visa, Mastercard)."
+    }
+  }
+}

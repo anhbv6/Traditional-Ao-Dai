@@ -1,0 +1,92 @@
+{
+  "title": "Quản lý tài khoản",
+  "subtitle": "Quản lý thông tin cá nhân, đơn hàng, sổ địa chỉ và phương thức thanh toán.",
+  "tabs": {
+    "personal": "Thông tin cá nhân",
+    "orders": "Lịch sử đơn hàng",
+    "address": "Sổ địa chỉ",
+    "payment": "Phương thức thanh toán",
+    "setting": "Cài đặt tài khoản"
+  },
+  "personal": {
+    "title": "Thông tin cá nhân",
+    "subtitle": "Cập nhật thông tin chi tiết và thông tin liên lạc của bạn.",
+    "fullName": "Họ và tên",
+    "email": "Địa chỉ Email",
+    "phone": "Số điện thoại",
+    "gender": "Giới tính",
+    "genderMale": "Nam",
+    "genderFemale": "Nữ",
+    "genderOther": "Khác",
+    "dob": "Ngày sinh",
+    "saveBtn": "Lưu thay đổi",
+    "successMsg": "Cập nhật thông tin cá nhân thành công!",
+    "editAvatar": "Chỉnh sửa ảnh đại diện",
+    "previewAvatar": "Ảnh đại diện",
+    "selectDate": "Chọn ngày",
+    "changeInfoBtn": "Thay đổi thông tin",
+    "cancelBtn": "Hủy bỏ"
+  },
+  "orders": {
+    "title": "Lịch sử đơn hàng",
+    "subtitle": "Xem và theo dõi các đơn hàng đã đặt của bạn.",
+    "empty": "Bạn chưa có đơn hàng nào.",
+    "orderId": "Mã đơn hàng",
+    "date": "Ngày đặt",
+    "status": "Trạng thái",
+    "total": "Tổng tiền",
+    "action": "Thao tác",
+    "viewDetail": "Chi tiết",
+    "statusPending": "Chờ thanh toán",
+    "statusProcessing": "Đang xử lý",
+    "statusShipped": "Đang giao hàng",
+    "statusDelivered": "Đã giao hàng",
+    "statusCancelled": "Đã hủy"
+  },
+  "address": {
+    "title": "Sổ địa chỉ",
+    "subtitle": "Thêm hoặc chỉnh sửa địa chỉ nhận hàng của bạn.",
+    "addBtn": "Thêm địa chỉ mới",
+    "default": "Mặc định",
+    "edit": "Chỉnh sửa",
+    "delete": "Xóa",
+    "setAsDefault": "Đặt làm mặc định",
+    "form": {
+      "receiverName": "Tên người nhận",
+      "receiverPhone": "Số điện thoại nhận hàng",
+      "province": "Tỉnh/Thành phố",
+      "district": "Quận/Huyện",
+      "ward": "Phường/Xã",
+      "detail": "Địa chỉ chi tiết (Số nhà, đường...)",
+      "isDefault": "Đặt làm địa chỉ mặc định",
+      "cancelBtn": "Hủy",
+      "submitBtn": "Lưu địa chỉ"
+    }
+  },
+  "payment": {
+    "title": "Phương thức thanh toán",
+    "subtitle": "Quản lý thẻ tín dụng và tài khoản thanh toán của bạn.",
+    "addBtn": "Thêm thẻ thanh toán mới",
+    "cardEnding": "Thẻ kết thúc bằng đuôi",
+    "expiry": "Hạn dùng",
+    "default": "Mặc định",
+    "form": {
+      "cardHolder": "Tên chủ thẻ",
+      "cardNumber": "Số thẻ",
+      "expiryDate": "Ngày hết hạn (MM/YY)",
+      "cvv": "Mã CVV"
+    }
+  },
+  "setting": {
+    "title": "Cài đặt tài khoản",
+    "subtitle": "Thiết lập cài đặt bảo mật và thông báo của bạn.",
+    "changePassword": "Đổi mật khẩu",
+    "currentPassword": "Mật khẩu hiện tại",
+    "newPassword": "Mật khẩu mới",
+    "confirmPassword": "Xác nhận mật khẩu mới",
+    "securityTitle": "Bảo mật",
+    "notifTitle": "Nhận thông báo",
+    "notifPromo": "Nhận email chương trình khuyến mãi",
+    "notifOrder": "Nhận thông báo về cập nhật đơn hàng"
+  }
+}

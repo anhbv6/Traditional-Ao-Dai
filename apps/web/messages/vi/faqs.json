@@ -1,0 +1,47 @@
+{
+  "title": "Câu hỏi thường gặp (FAQs)",
+  "subtitle": "Tìm câu trả lời nhanh chóng cho các câu hỏi phổ biến về kích thước, quy trình may đo, giao hàng và thanh toán.",
+  "searchPlaceholder": "Tìm kiếm câu hỏi của bạn...",
+  "noResults": "Không tìm thấy kết quả phù hợp cho từ khóa của bạn.",
+  "categories": {
+    "all": "Tất cả câu hỏi",
+    "sizing": "May đo & Kích thước",
+    "shipping": "Đơn hàng & Giao nhận",
+    "materials": "Chất liệu & Bảo quản",
+    "refunds": "Thanh toán & Đổi trả"
+  },
+  "questions": {
+    "q1": {
+      "question": "Làm thế nào để chọn size áo dài vừa vặn nhất?",
+      "answer": "Chúng tôi cung cấp bảng kích thước (size chart) chi tiết dựa trên số đo vai, ngực, eo và hông trong phần mô tả sản phẩm. Đối với các sản phẩm may đo (custom), bạn vui lòng làm theo hướng dẫn đo đạc của chúng tôi để gửi số đo chính xác nhất hoặc liên hệ tư vấn viên 1-1."
+    },
+    "q2": {
+      "question": "Tôi có thể đặt may theo số đo riêng không?",
+      "answer": "Có, AODAI chuyên cung cấp dịch vụ may đo riêng biệt. Bạn chỉ cần chọn phân loại 'Đặt may theo số đo' khi cấu hình sản phẩm và điền thông tin số đo cơ thể theo biểu mẫu hướng dẫn đi kèm."
+    },
+    "q3": {
+      "question": "Thời gian may đo thủ công và giao hàng mất bao lâu?",
+      "answer": "Đối với sản phẩm có sẵn, thời gian xử lý và giao hàng nội địa từ 2-4 ngày làm việc. Đối với sản phẩm đặt may riêng (custom), nghệ nhân của chúng tôi cần khoảng 7-10 ngày để cắt rập và hoàn thiện tỉ mỉ trước khi bàn giao cho đơn vị vận chuyển."
+    },
+    "q4": {
+      "question": "Shop có hỗ trợ giao hàng quốc tế không?",
+      "answer": "Có, chúng tôi tự hào mang tà áo dài Việt Nam đến khắp nơi trên thế giới. AODAI liên kết giao hàng quốc tế nhanh qua DHL/FedEx đến hơn 50 quốc gia, thời gian vận chuyển từ 5-9 ngày làm việc."
+    },
+    "q5": {
+      "question": "Áo dài của shop sử dụng chất liệu vải gì?",
+      "answer": "Chúng tôi ưu tiên các loại vải sợi tự nhiên cao cấp như lụa tơ tằm Hà Đông nguyên bản, gấm dệt chỉ vàng/chìm truyền thống, nhung tơ mịn màng và voan tơ cát bay bổng, đem lại cảm giác thoáng mát và thân thiện tối đa với da."
+    },
+    "q6": {
+      "question": "Làm sao để giặt và bảo quản áo dài lụa tơ tằm luôn như mới?",
+      "answer": "Khuyên dùng phương pháp giặt khô hoặc giặt nhẹ bằng tay với dầu gội đầu ở nhiệt độ thường. Tránh sử dụng chất tẩy mạnh, không vắt xoắn tà áo và nên phơi trong bóng râm mát. Nên là/ủi bằng bàn là hơi nước ở nhiệt độ thích hợp cho lụa."
+    },
+    "q7": {
+      "question": "Chính sách đổi trả sản phẩm của shop như thế nào?",
+      "answer": "Đối với áo dài may sẵn (ready-to-wear), chúng tôi hỗ trợ đổi size/mẫu khác trong vòng 7 ngày kể từ ngày nhận hàng với điều kiện sản phẩm còn nguyên mác, chưa qua sử dụng hoặc giặt ủi. Đối với áo dài đặt may đo riêng (custom/bespoke), rất tiếc chúng tôi không hỗ trợ đổi trả trừ trường hợp sản phẩm có lỗi kỹ thuật từ khâu sản xuất."
+    },
+    "q8": {
+      "question": "Tôi có thể thanh toán qua các phương thức nào?",
+      "answer": "Chúng tôi hỗ trợ các hình thức thanh toán đa dạng: Thanh toán khi nhận hàng (COD - áp dụng toàn quốc), Chuyển khoản ngân hàng trực tiếp qua QR code, Ví điện tử (Momo, VNPay) hoặc thẻ tín dụng quốc tế (Visa, Mastercard)."
+    }
+  }
+}

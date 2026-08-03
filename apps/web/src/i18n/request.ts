@@ -19,7 +19,9 @@ export default getRequestConfig(async ({requestLocale}) => {
       home,
       news,
       product,
-      products
+      products,
+      profile,
+      faqs
     ] = await Promise.all([
       import(`../../messages/${locale}/about.json`).then(m => m.default),
       import(`../../messages/${locale}/auth.json`).then(m => m.default),
@@ -31,6 +33,8 @@ export default getRequestConfig(async ({requestLocale}) => {
       import(`../../messages/${locale}/news.json`).then(m => m.default),
       import(`../../messages/${locale}/product.json`).then(m => m.default),
       import(`../../messages/${locale}/products.json`).then(m => m.default),
+      import(`../../messages/${locale}/profile.json`).then(m => m.default),
+      import(`../../messages/${locale}/faqs.json`).then(m => m.default),
     ]);
 
     return {
@@ -46,6 +50,8 @@ export default getRequestConfig(async ({requestLocale}) => {
             NewsPage: news,
             Product: product,
             ProductsPage: products,
+            ProfilePage: profile,
+            FaqsPage: faqs,
         }
     };
 });

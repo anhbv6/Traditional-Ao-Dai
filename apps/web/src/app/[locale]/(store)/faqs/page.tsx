@@ -1,14 +1,6 @@
-import { Container } from '@/components/ui/container'
-import { Breadcrumbs } from '@/components/common/Breadcrumbs'
-import React from 'react'
+import React from "react";
+import { FaqsExperience } from "@/components/faqs/FaqsExperience";
 
-function Faqs() {
-  return (
-    <Container as="section" className="py-12">
-      <Breadcrumbs />
-      <div>Faqs</div>
-    </Container>
-  )
+export default function FaqsPage() {
+  return <FaqsExperience />;
 }
-
-export default Faqs
