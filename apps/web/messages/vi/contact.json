@@ -1,0 +1,47 @@
+{
+  "title": "Liên hệ & Tư vấn",
+  "subtitle": "Đội ngũ tư vấn luôn sẵn sàng hỗ trợ chọn mẫu, đặt lịch thử đồ và giải đáp yêu cầu may đo riêng cho từng dịp quan trọng.",
+  "directTitle": "Thông tin trực tiếp",
+  "directSubtitle": "Kết nối nhanh với showroom và xưởng may",
+  "hotline": "Hotline & Zalo tư vấn nhanh",
+  "hotlineValue": "0909 000 000",
+  "address": "Địa chỉ showroom / xưởng may",
+  "addressValue": "AODAI Showroom, Quận 1, TP. Hồ Chí Minh",
+  "hours": "Giờ mở cửa",
+  "hoursValue": "09:00 - 21:00, Thứ 2 - Chủ nhật",
+  "email": "Email CSKH",
+  "emailValue": "hello@aodai.vn",
+  "map": "Google Map nhúng",
+  "formTitle": "Gửi yêu cầu tư vấn",
+  "formSubtitle": "Cho chúng tôi biết nhu cầu của bạn",
+  "name": "Họ và tên",
+  "phoneEmail": "Số điện thoại / Email",
+  "requestType": "Loại nhu cầu",
+  "message": "Nội dung lời nhắn",
+  "submit": "Gửi yêu cầu tư vấn",
+  "namePlaceholder": "Nhập họ và tên",
+  "contactPlaceholder": "Nhập số điện thoại hoặc email",
+  "messagePlaceholder": "Bạn cần tư vấn mẫu áo, lịch thử đồ hay may đo riêng?",
+  "options": {
+    "model": "Tư vấn chọn mẫu",
+    "fitting": "Đặt lịch thử đồ",
+    "custom": "May đo riêng",
+    "order": "Hỏi về đơn hàng"
+  },
+  "faqTitle": "Câu hỏi thường gặp",
+  "faqSubtitle": "Tối ưu giảm tải cho bộ phận CSKH",
+  "faqs": {
+    "reply": {
+      "question": "Bao lâu nhận được phản hồi?",
+      "answer": "Thông thường trong 15-30 phút trong giờ làm việc."
+    },
+    "custom": {
+      "question": "Có nhận may đo riêng không?",
+      "answer": "Có. Bạn có thể gửi số đo hoặc đặt lịch tới showroom để được tư vấn trực tiếp."
+    },
+    "exchange": {
+      "question": "Có thể đổi size sau khi nhận hàng?",
+      "answer": "Sản phẩm có sẵn hỗ trợ đổi size theo chính sách nếu còn tem và chưa qua sử dụng."
+    }
+  }
+}

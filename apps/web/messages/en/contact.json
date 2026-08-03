@@ -1,0 +1,47 @@
+{
+  "title": "Contact & Consultation",
+  "subtitle": "Our consultants are ready to help with styling, fitting appointments, and custom tailoring requests for meaningful occasions.",
+  "directTitle": "Direct information",
+  "directSubtitle": "Reach the showroom and tailoring team quickly",
+  "hotline": "Hotline & Zalo quick support",
+  "hotlineValue": "0909 000 000",
+  "address": "Showroom / workshop address",
+  "addressValue": "AODAI Showroom, District 1, Ho Chi Minh City",
+  "hours": "Opening hours",
+  "hoursValue": "09:00 - 21:00, Monday - Sunday",
+  "email": "Customer care email",
+  "emailValue": "hello@aodai.vn",
+  "map": "Embedded Google Map",
+  "formTitle": "Send a consultation request",
+  "formSubtitle": "Tell us what you need",
+  "name": "Full name",
+  "phoneEmail": "Phone number / Email",
+  "requestType": "Request type",
+  "message": "Message",
+  "submit": "Send request",
+  "namePlaceholder": "Enter your full name",
+  "contactPlaceholder": "Enter your phone number or email",
+  "messagePlaceholder": "Tell us about your preferred design, fitting schedule, or custom request.",
+  "options": {
+    "model": "Style consultation",
+    "fitting": "Book a fitting",
+    "custom": "Custom tailoring",
+    "order": "Order support"
+  },
+  "faqTitle": "Frequently asked questions",
+  "faqSubtitle": "Helpful answers before contacting support",
+  "faqs": {
+    "reply": {
+      "question": "How fast will I receive a reply?",
+      "answer": "Usually within 15-30 minutes during working hours."
+    },
+    "custom": {
+      "question": "Do you offer custom tailoring?",
+      "answer": "Yes. You can submit measurements or book a showroom appointment for direct guidance."
+    },
+    "exchange": {
+      "question": "Can I exchange size after delivery?",
+      "answer": "Ready-to-wear items support size exchange by policy if tags remain and the item is unused."
+    }
+  }
+}

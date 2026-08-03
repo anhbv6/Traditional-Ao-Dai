@@ -1,0 +1,86 @@
+{
+  "title": "Chào mừng đến với Webshop",
+  "subtitle": "Khám phá các mẫu áo dài thanh lịch",
+  "hero": {
+    "eyebrow": "Bộ sưu tập mới",
+    "title": "Áo dài thanh lịch cho mùa lễ hội",
+    "subtitle": "Những thiết kế mềm mại, phom dáng thoáng và chi tiết hoa lá tinh tế dành cho khoảnh khắc trang trọng nhưng vẫn nhẹ nhàng.",
+    "primaryAction": "Khám phá ngay",
+    "secondaryAction": "Câu chuyện thương hiệu",
+    "imageAlt": "Minh họa áo dài hoa sen màu đỏ đô",
+    "note": "Lụa mềm, thêu hoa thủ công và phom dáng được tinh chỉnh cho từng dịp.",
+    "metrics": {
+      "designs": {
+        "value": "48+",
+        "label": "mẫu áo dài"
+      },
+      "fabric": {
+        "value": "12",
+        "label": "dòng chất liệu"
+      },
+      "fitting": {
+        "value": "3D",
+        "label": "tư vấn phom dáng"
+      }
+    }
+  },
+  "bestSellers": {
+    "eyebrow": "Sản Phẩm Nổi Bật",
+    "title": "Sản phẩm bán chạy / Xu hướng",
+    "description": "Các mẫu áo dài được chọn nhiều cho mùa cưới, Tết, kỷ yếu và những dịp trang trọng.",
+    "viewAll": "Xem tất cả sản phẩm"
+  },
+  "featuredCollections": {
+    "eyebrow": "BST Nổi Bật",
+    "title": "Bộ Sưu Tập Nổi Bật",
+    "description": "Đi thẳng đến các dòng áo dài đang được quan tâm nhất trong mùa này.",
+    "wedding": "Áo Dài Cưới",
+    "modern": "Áo Dài Cách Tân",
+    "silk": "Áo Dài Lụa Tơ Tằm",
+    "brocade": "Áo Dài Gấm Luxury",
+    "embroidered": "Áo Dài Thêu Tay"
+  },
+  "promoteFeedback": {
+    "eyebrow": "Cảm Nhận Khách Hàng",
+    "title": "Khoảnh Khắc Ý Nghĩa",
+    "description": "Chia sẻ chân thực từ những vị khách quý khi diện lên mình tà áo Việt.",
+    "reviews": {
+      "1": {
+        "name": "Lê Mai Anh",
+        "role": "Cô dâu (Tháng 5/2026)",
+        "content": "Bộ áo dài cưới thêu hoa sen đỏ đô làm tôi vô cùng tự hào trong ngày cưới. Từng đường kim mũi chỉ thêu tay tỉ mỉ và phom dáng ôm khít tôn dáng cực kỳ."
+      },
+      "2": {
+        "name": "Minh Thư",
+        "role": "Doanh nhân",
+        "content": "Tôi đặt may chiếc áo dài lụa tơ tằm mặc tiếp đối tác nước ngoài. Ai cũng khen phom dáng sang trọng và chất lụa mát rượi, giữ nếp rất tốt."
+      },
+      "3": {
+        "name": "Nguyễn Hoàng Oanh",
+        "role": "Mẫu ảnh tự do",
+        "content": "BST áo dài cách tân mùa này có thiết kế sáng tạo, phối màu pastel thanh nhã nhưng vẫn giữ được nét kín đáo đặc trưng của người con gái Việt."
+      },
+      "4": {
+        "name": "Quỳnh Chi",
+        "role": "Khách hàng mua Tết",
+        "content": "Năm nào cũng đặt áo dài Tết ở đây cho cả gia đình. Chất vải gấm dày dặn sang trọng, hoa văn chìm tinh xảo lắm. Cả nhà chụp ảnh ai cũng khen."
+      },
+      "5": {
+        "name": "Elizabeth Smith",
+        "role": "Khách du lịch từ Úc",
+        "content": "Trải nghiệm may đo ở đây thật tuyệt vời. Dù tôi ở lại Việt Nam rất ngắn ngày nhưng các bạn vẫn kịp hoàn thành chiếc áo dài thêu tinh tế vừa khít cơ thể tôi."
+      },
+      "6": {
+        "name": "Trần Thu Trang",
+        "role": "Giáo viên trung học",
+        "content": "Mặc áo dài đứng lớp cả ngày mà không hề thấy bí bách. Chất vải thoáng khí, đường may rất chắc chắn, giặt nhiều lần vẫn bền màu như mới."
+      }
+    }
+  },
+  "articleNews": {
+    "eyebrow": "Bản Tin Áo Dài",
+    "title": "Câu Chuyện & Cẩm Nang",
+    "description": "Cập nhật các bài viết mới nhất về văn hóa áo dài, bí quyết chọn lựa và bảo quản trang phục từ chuyên gia.",
+    "readMore": "Xem chi tiết"
+  }
+}

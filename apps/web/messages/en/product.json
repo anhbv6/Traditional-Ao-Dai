@@ -1,0 +1,74 @@
+{
+  "details": {
+    "stock": "In Stock",
+    "reviewCount": "121 Reviews",
+    "color": "Color",
+    "size": "Size",
+    "description": "Descriptions",
+    "information": "Additional Information",
+    "reviews": "Reviews",
+    "related": "Related Products",
+    "sku": "SKU",
+    "category": "Category",
+    "rating": "5.0",
+    "longDescription": "This design is finished with a graceful silhouette, selected fabric, and refined details for formal occasions. It keeps the traditional elegance of Ao Dai while remaining easy to wear in a modern wardrobe.",
+    "secondaryDescription": "Each piece can be advised against real body measurements to keep the fit comfortable through long events.",
+    "enterMeasurements": "Enter your measurements (cm)",
+    "addedToCart": "🛒 ADDED TO CART!\n\n• Product: {product}\n• Color: {color}\n• Size: {size}\n• Quantity: {quantity}\n",
+    "customMeasurementsPrefix": "• Custom Measurements: ",
+    "customerReviewsTitle": "Customer Reviews",
+    "addReview": "Add your Review",
+    "yourRating": "Your Rating",
+    "nameLabel": "Name",
+    "emailLabel": "Email Address",
+    "reviewLabel": "Your Review",
+    "namePlaceholder": "Enter Your Name",
+    "emailPlaceholder": "Enter Your Email",
+    "reviewPlaceholder": "Enter Your Review",
+    "submitReview": "Submit"
+  },
+  "addToCart": "Add to Cart",
+  "addToWishlist": "Add to Wishlist",
+  "compare": "Compare Product",
+  "quickView": "Quick View",
+  "close": "Close",
+  "sizeLabel": "Size",
+  "materialLabel": "Material",
+  "purchaseTypeLabel": "Type",
+  "materials": {
+    "silk": "Mulberry Silk",
+    "brocade": "Brocade",
+    "velvet": "Velvet",
+    "chiffon": "Chiffon",
+    "default": "Premium Silk"
+  },
+  "purchaseTypes": {
+    "ready": "Ready-to-wear",
+    "custom": "Custom tailoring",
+    "readyDescription": "Ready-to-wear",
+    "customDescription": "Custom tailoring to your measurements",
+    "default": "Ready / Custom-fit"
+  },
+  "categories": {
+    "wedding": "Wedding Ao Dai",
+    "modern": "Modern Ao Dai",
+    "festival": "Festival Ao Dai",
+    "kids": "Kids Ao Dai",
+    "accessories": "Accessories"
+  },
+  "colors": {
+    "red": "Red",
+    "yellow": "Yellow",
+    "pink": "Pink",
+    "white": "White",
+    "plainSilk": "Plain Silk",
+    "embroideredBrocade": "Embroidered Brocade"
+  },
+  "collections": {
+    "wedding": "Wedding Collection",
+    "modern": "Modern Collection",
+    "silk": "Silk Collection",
+    "brocade": "Luxury Brocade",
+    "embroidered": "Embroidered Art"
+  }
+}

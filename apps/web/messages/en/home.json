@@ -1,0 +1,86 @@
+{
+  "title": "Welcome to Webshop",
+  "subtitle": "Discover elegant Ao Dai designs",
+  "hero": {
+    "eyebrow": "New collection",
+    "title": "Elegant Ao Dai for graceful occasions",
+    "subtitle": "Soft silhouettes, airy tailoring, and delicate botanical details designed for formal moments that still feel gentle.",
+    "primaryAction": "Explore now",
+    "secondaryAction": "Our story",
+    "imageAlt": "Burgundy lotus Ao Dai illustration",
+    "note": "Soft silk, hand-finished floral details, and refined fits for every occasion.",
+    "metrics": {
+      "designs": {
+        "value": "48+",
+        "label": "Ao Dai designs"
+      },
+      "fabric": {
+        "value": "12",
+        "label": "fabric lines"
+      },
+      "fitting": {
+        "value": "3D",
+        "label": "fit guidance"
+      }
+    }
+  },
+  "bestSellers": {
+    "eyebrow": "Best Sellers",
+    "title": "Best Sellers / Trending",
+    "description": "Most selected Ao Dai designs for weddings, Tet holiday, yearbooks, and formal events.",
+    "viewAll": "View all products"
+  },
+  "featuredCollections": {
+    "eyebrow": "Featured Collections",
+    "title": "Our Signature Lines",
+    "description": "Explore our most anticipated traditional and modern silhouettes of the season.",
+    "wedding": "Wedding Collection",
+    "modern": "Modern Collection",
+    "silk": "Silk Collection",
+    "brocade": "Luxury Brocade",
+    "embroidered": "Embroidered Art"
+  },
+  "promoteFeedback": {
+    "eyebrow": "Client Stories",
+    "title": "Heartwarming Moments",
+    "description": "Genuine sharing from our beloved customers wearing our traditional creations.",
+    "reviews": {
+      "1": {
+        "name": "Mai Anh Le",
+        "role": "Bride (May 2026)",
+        "content": "The burgundy lotus-embroidered wedding Ao Dai made me so proud on my big day. Every hand-stitched detail was exquisite and it fit like a glove."
+      },
+      "2": {
+        "name": "Minh Thu",
+        "role": "Entrepreneur",
+        "content": "I ordered a mulberry silk Ao Dai for a foreign partner meeting. Everyone praised the elegant silhouette and the breathable, crease-resistant silk."
+      },
+      "3": {
+        "name": "Oanh Nguyen",
+        "role": "Freelance Model",
+        "content": "The modern collection this season is highly creative with pastel hues, combining contemporary design with traditional Vietnamese modesty."
+      },
+      "4": {
+        "name": "Quynh Chi",
+        "role": "Lunar New Year Client",
+        "content": "I buy Tet Ao Dai here for my whole family every year. The brocade fabric is thick and premium, with beautiful subtle woven patterns."
+      },
+      "5": {
+        "name": "Elizabeth Smith",
+        "role": "Tourist from Australia",
+        "content": "The custom tailoring service was incredible! Even with my tight travel schedule, they delivered a perfectly fitted, beautifully embroidered gown."
+      },
+      "6": {
+        "name": "Thu Trang Tran",
+        "role": "High School Teacher",
+        "content": "Wearing this to teach all day is extremely comfortable. The fabric is highly breathable, the stitching is durable, and the colors stay brand new."
+      }
+    }
+  },
+  "articleNews": {
+    "eyebrow": "Ao Dai Journal",
+    "title": "Stories & Insights",
+    "description": "Read the latest stories about Ao Dai culture, tailoring tips, and preservation guides from our experts.",
+    "readMore": "Read more"
+  }
+}

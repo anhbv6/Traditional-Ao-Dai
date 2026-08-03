@@ -1,0 +1,44 @@
+{
+  "banner": {
+    "title": "Áo Dài Sắc Việt",
+    "subtitle": "Sự kết hợp hoàn mỹ giữa nét đẹp truyền thống và phong cách đương đại",
+    "morph1": "Duyên Dáng",
+    "morph2": "Thanh Lịch",
+    "morph3": "Kiêu Sa",
+    "morph4": "Hiện Đại",
+    "morph5": "Tự Hào"
+  },
+  "filter": {
+    "title": "Bộ lọc",
+    "subtitle": "Tìm đúng mẫu",
+    "searchTitle": "Tìm kiếm",
+    "searchPlaceholder": "Tìm tên hoặc mã sản phẩm...",
+    "categoryTitle": "Loại sản phẩm / Dịp",
+    "collectionTitle": "Bộ sưu tập",
+    "purchaseTypeTitle": "Hình thức mua",
+    "colorTitle": "Màu sắc",
+    "materialTitle": "Chất liệu",
+    "priceTitle": "Khoảng giá",
+    "priceRange": "Giá: {min}đ - {max}đ",
+    "clearThisFilter": "Xóa bộ lọc mục này"
+  },
+  "collection": {
+    "foundCount": "Tìm thấy {count} sản phẩm phù hợp",
+    "foundCountMobile": "{count} sản phẩm",
+    "sortByLabel": "Sắp xếp:",
+    "sortByPlaceholder": "Sắp xếp theo",
+    "columnsLabel": "Cột hiển thị:",
+    "columnsPlaceholder": "Chọn cột",
+    "cols3": "3 Cột",
+    "cols4": "4 Cột",
+    "cols5": "5 Cột",
+    "sortOptions": {
+      "all": "Hiển thị tất cả",
+      "newest": "Mới nhất",
+      "priceAsc": "Giá tăng dần",
+      "priceDesc": "Giá giảm dần",
+      "bestSeller": "Bán chạy nhất",
+      "favorite": "Được yêu thích nhất"
+    }
+  }
+}
