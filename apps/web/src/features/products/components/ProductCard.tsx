@@ -40,7 +40,7 @@ const materialKeys: Record<string, string> = {
   'Voan': 'chiffon',
 };
 
-function ProductCard({
+export function ProductCard({
   imageSrc = '/logoPage.png',
   hoverImageSrc,
   imageAlt = 'Product image',
@@ -134,5 +134,3 @@ function ProductCard({
     </article>
   );
 }
-
-export default ProductCard;

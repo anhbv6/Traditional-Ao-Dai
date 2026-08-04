@@ -2,7 +2,7 @@ import { type DisplayProduct, type RelatedProductItem, type DisplayColor } from 
 import { type MockProduct } from "../data/mockProducts";
 
 export type { DisplayProduct, RelatedProductItem, DisplayColor, MockProduct };
-export { productCatalog } from "../data/mockProducts";
+export { productCatalog, mockProducts } from "../data/mockProducts";
 export { mockDetailProducts } from "../data/detailMockProduct";
 
 export type Locale = "vi" | "en";

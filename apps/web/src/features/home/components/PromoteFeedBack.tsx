@@ -4,21 +4,14 @@ import React from 'react';
 import Image from 'next/image';
 import { Star } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import SectionHeading from './SectionHeading';
+import { SectionHeading } from './SectionHeading';
 import { Marquee } from '@/components/ui/marquee';
-
-interface TestimonialCardProps {
-  name: string;
-  role: string;
-  content: string;
-  avatar: string;
-}
+import { type TestimonialCardProps } from '../types/home.types';
 
 const TestimonialCard = ({ name, role, content, avatar }: TestimonialCardProps) => {
   return (
     <div className="w-[340px] flex flex-col justify-between bg-white border border-[color:var(--bg-secondary)] p-6 rounded-2xl shadow-sm transition-all duration-300 hover:shadow-md hover:border-[var(--accent-color)] select-none">
       <div>
-        {/* Reviewer Rating */}
         <div className="flex gap-1 text-[var(--accent-color)]">
           {Array(5)
             .fill(0)
@@ -27,13 +20,11 @@ const TestimonialCard = ({ name, role, content, avatar }: TestimonialCardProps) 
             ))}
         </div>
         
-        {/* Testimonial Quote */}
         <p className="mt-4 font-[family-name:var(--font-lora)] text-[var(--text-main)] text-[14px] leading-relaxed italic">
           "{content}"
         </p>
       </div>
       
-      {/* Reviewer Profile */}
       <div className="mt-6 flex items-center gap-3">
         <div className="relative size-10 overflow-hidden rounded-full border border-[color:var(--bg-secondary)] bg-[var(--bg-secondary)]">
           <Image
@@ -57,7 +48,7 @@ const TestimonialCard = ({ name, role, content, avatar }: TestimonialCardProps) 
   );
 };
 
-function PromoteFeedBack() {
+export function PromoteFeedBack() {
   const t = useTranslations('HomePage.promoteFeedback');
   const indices = ['1', '2', '3', '4', '5', '6'];
 
@@ -77,7 +68,6 @@ function PromoteFeedBack() {
     avatar: avatars[i],
   }));
 
-  // Split reviews into two streams for a diverse dual-row marquee
   const row1 = reviews.slice(0, 3);
   const row2 = reviews.slice(3, 6);
 
@@ -92,7 +82,6 @@ function PromoteFeedBack() {
         />
 
         <div className="relative flex flex-col gap-6 w-full py-2">
-          {/* Top Marquee (Slides left) */}
           <Marquee className="[--duration:30s] gap-6" pauseOnHover>
             {row1.map((rev, i) => (
               <TestimonialCard
@@ -105,7 +94,6 @@ function PromoteFeedBack() {
             ))}
           </Marquee>
 
-          {/* Bottom Marquee (Slides right) */}
           <Marquee className="[--duration:30s] gap-6" reverse pauseOnHover>
             {row2.map((rev, i) => (
               <TestimonialCard
@@ -118,15 +106,11 @@ function PromoteFeedBack() {
             ))}
           </Marquee>
 
-          {/* Left Gradient Fade Overlays */}
           <div className="pointer-events-none absolute inset-y-0 left-0 w-1/12 bg-gradient-to-r from-[#FAF7F5] to-transparent z-10" />
-          
-          {/* Right Gradient Fade Overlays */}
           <div className="pointer-events-none absolute inset-y-0 right-0 w-1/12 bg-gradient-to-l from-[#FAF7F5] to-transparent z-10" />
         </div>
       </div>
     </section>
   );
 }
-
 export default PromoteFeedBack;

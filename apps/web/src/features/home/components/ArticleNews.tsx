@@ -2,11 +2,11 @@
 
 import React from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import SectionHeading from './SectionHeading';
+import { SectionHeading } from './SectionHeading';
 import Carousel from '@/components/Carousel';
 import { mockArticles, NewsCard } from '@/features/news';
 
-function ArticleNews() {
+export function ArticleNews() {
   const t = useTranslations('HomePage.articleNews');
   const locale = useLocale() as 'vi' | 'en';
 
@@ -60,5 +60,4 @@ function ArticleNews() {
     </section>
   );
 }
-
 export default ArticleNews;

@@ -1,6 +1,6 @@
 'use client';
 
-import ProductCard from '@/features/products/components/ProductCard';
+import { ProductCard } from '@/features/products';
 import { RelatedProductItem } from '../ProductDetailClient';
 
 interface RelatedProductsProps {

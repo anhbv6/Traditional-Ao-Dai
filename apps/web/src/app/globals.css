@@ -26,6 +26,7 @@
   --color-secondary-foreground: var(--text-main);
   --color-muted: var(--bg-secondary);
   --color-muted-foreground: var(--text-light);
+  --color-accent: var(--accent-color);
   --color-popover: var(--bg-main);
   --color-popover-foreground: var(--text-main);
   --color-border: var(--border);

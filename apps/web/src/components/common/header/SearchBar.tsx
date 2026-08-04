@@ -50,7 +50,7 @@ export function SearchBar({
         <Search
           size={22}
           strokeWidth={1.5}
-          className="text-[#800020] transition-opacity hover:opacity-75"
+          className="text-primary transition-opacity hover:opacity-75"
           aria-hidden="true"
         />
         <button className="absolute inset-0" type="submit" aria-label={placeholder} />
@@ -63,7 +63,7 @@ export function SearchBar({
       <Search
         size={18}
         strokeWidth={1.8}
-        className="pointer-events-none absolute left-3.5 top-1/2 z-10 -translate-y-[35%] text-[#800020]"
+        className="pointer-events-none absolute left-3.5 top-1/2 z-10 -translate-y-[35%] text-primary"
         aria-hidden="true"
       />
       <Input
@@ -72,7 +72,7 @@ export function SearchBar({
         value={searchValue}
         onChange={(event) => handleChange(event.target.value)}
         placeholder={placeholder}
-        className="h-12 rounded-xl border-[#E2D9D2] bg-white pl-11 pr-4 font-[family-name:var(--font-lora)] placeholder:text-[#706565]/60"
+        className="h-12 rounded-xl border-border bg-white pl-11 pr-4 font-[family-name:var(--font-lora)] placeholder:text-muted-foreground/60"
       />
     </form>
   );

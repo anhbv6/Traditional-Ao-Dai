@@ -23,7 +23,7 @@ export function UserMenu({
     return (
       <Link
         href="/profile"
-        className="min-w-[130px] ml-5 hidden h-11 items-center justify-center rounded-md bg-[#800020] px-6 text-xs font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 sm:inline-flex"
+        className="min-w-[130px] ml-5 hidden h-11 items-center justify-center rounded-md bg-primary px-6 text-xs font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 sm:inline-flex"
       >
         {loginLabel}
       </Link>
@@ -35,18 +35,18 @@ export function UserMenu({
       <button
         type="button"
         onClick={() => setIsOpen((current) => !current)}
-        className="grid h-11 w-11 place-items-center text-[#800020] transition-opacity hover:opacity-75"
+        className="grid h-11 w-11 place-items-center text-primary transition-opacity hover:opacity-75"
         aria-expanded={isOpen}
         aria-label={profileLabel}
       >
         <UserRound size={22} strokeWidth={1.5} aria-hidden="true" />
       </button>
       {isOpen ? (
-        <div className="absolute right-0 top-12 w-44 border border-[#F3ECE7] bg-[#FAF7F5] p-2 shadow-lg">
-          <Link href="/profile" className="block px-3 py-2 text-sm font-semibold text-[#2A2525] hover:text-[#800020]">
+        <div className="absolute right-0 top-12 w-44 border border-secondary bg-background p-2 shadow-lg">
+          <Link href="/profile" className="block px-3 py-2 text-sm font-semibold text-foreground hover:text-primary">
             {profileLabel}
           </Link>
-          <Link href="/profile/orders" className="block px-3 py-2 text-sm font-semibold text-[#2A2525] hover:text-[#800020]">
+          <Link href="/profile/orders" className="block px-3 py-2 text-sm font-semibold text-foreground hover:text-primary">
             {ordersLabel}
           </Link>
         </div>

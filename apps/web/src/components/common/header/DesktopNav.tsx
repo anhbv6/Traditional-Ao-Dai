@@ -23,8 +23,8 @@ export function DesktopNav({ items }: DesktopNavProps) {
             className={[
               'relative flex items-center gap-1.5 py-1 text-[14px] uppercase tracking-[1px] font-[family-name:var(--font-lora)] transition-colors duration-200',
               isActive
-                ? 'text-[#800020] font-semibold after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-full after:bg-[#800020]'
-                : 'text-[#2A2525] font-normal hover:text-[#800020] after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-0 after:bg-[#800020] hover:after:w-full after:transition-all after:duration-200',
+                ? 'text-primary font-semibold after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-full after:bg-primary'
+                : 'text-foreground font-normal hover:text-primary after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-0 after:bg-primary hover:after:w-full after:transition-all after:duration-200',
             ].join(' ')}
           >
             {item.label}

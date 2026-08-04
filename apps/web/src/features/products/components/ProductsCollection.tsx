@@ -21,7 +21,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination';
-import ProductCard from './ProductCard';
+import { ProductCard } from './ProductCard';
 import { ProductMobileFilterDock } from './ProductMobileFilterDock';
 import { FilterSidebar } from './FilterSidebar';
 import { useProducts } from '../hooks/useProducts';

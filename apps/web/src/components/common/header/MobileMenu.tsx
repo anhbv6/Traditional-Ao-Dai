@@ -58,7 +58,7 @@ export function MobileMenu({
         <DrawerTrigger asChild>
           <button
             type="button"
-            className="grid h-11 w-11 place-items-center rounded-md text-[#800020] transition-colors hover:bg-[var(--bg-secondary)]"
+            className="grid h-11 w-11 place-items-center rounded-md text-primary transition-colors hover:bg-secondary"
             aria-label="Open navigation"
           >
             <Menu size={24} strokeWidth={1.5} />
@@ -70,7 +70,7 @@ export function MobileMenu({
               <DrawerTitle>
                 <Logo />
               </DrawerTitle>
-              <DrawerDescription className="mt-1 text-sm font-semibold tracking-wide font-[family-name:var(--font-dancing)] text-[#800020] leading-relaxed">
+              <DrawerDescription className="mt-1 text-sm font-semibold tracking-wide font-[family-name:var(--font-dancing)] text-primary leading-relaxed">
                 &ldquo;{taglineDrawer}&rdquo;
               </DrawerDescription>
             </div>
@@ -91,12 +91,12 @@ export function MobileMenu({
                   <DrawerClose key={item.href} asChild>
                     <Link
                       href={item.href}
-                      className="group flex min-h-12 items-center justify-between border-b border-[color:var(--bg-secondary)] py-3 text-sm font-normal uppercase tracking-[1px] text-[#2A2525] transition-colors hover:text-[#800020]"
+                      className="group flex min-h-12 items-center justify-between border-b border-secondary py-3 text-sm font-normal uppercase tracking-[1px] text-foreground transition-colors hover:text-primary"
                     >
                       <span className="font-[family-name:var(--font-lora)]">
                         {item.label}
                         {item.href === '/wishlist' && wishlistCount > 0 ? (
-                          <span className="ml-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[#800020] px-1 text-[10px] font-bold text-white">
+                          <span className="ml-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-white">
                             {wishlistCount}
                           </span>
                         ) : null}
@@ -106,24 +106,24 @@ export function MobileMenu({
                 ))}
 
                 {/* Mục Ngôn ngữ với Icon Dấu Plus (+) xổ xuống danh sách lựa chọn */}
-                <div className="border-b border-[color:var(--bg-secondary)] py-1">
+                <div className="border-b border-secondary py-1">
                   <button
                     type="button"
                     onClick={() => setIsLangOpen((prev) => !prev)}
-                    className="flex min-h-12 w-full items-center justify-between py-2 text-sm font-normal uppercase tracking-[1px] text-[#2A2525] transition-colors hover:text-[#800020]"
+                    className="flex min-h-12 w-full items-center justify-between py-2 text-sm font-normal uppercase tracking-[1px] text-foreground transition-colors hover:text-primary"
                     aria-expanded={isLangOpen}
                   >
                     <span className="font-[family-name:var(--font-lora)]">
                       {languageLabel} ({currentLocale.toUpperCase()})
                     </span>
-                    <span className="grid h-8 w-8 place-items-center text-[#800020] transition-colors">
+                    <span className="grid h-8 w-8 place-items-center text-primary transition-colors">
                       {isLangOpen ? <Minus size={16} strokeWidth={1.8} /> : <Plus size={16} strokeWidth={1.8} />}
                     </span>
                   </button>
 
                   {/* Submenu danh sách ngôn ngữ khi bấm nút Plus */}
                   {isLangOpen && (
-                    <div className="my-2 ml-2 flex flex-col gap-1.5 border-l-2 border-[#800020]/30 pl-4 py-1">
+                    <div className="my-2 ml-2 flex flex-col gap-1.5 border-l-2 border-primary/30 pl-4 py-1">
                       {locales.map((loc) => {
                         const isSelected = loc === currentLocale;
                         const langName = loc === 'vi' ? 'Tiếng Việt' : 'English';
@@ -137,12 +137,12 @@ export function MobileMenu({
                             className={[
                               'flex items-center justify-between rounded-lg px-3 py-2.5 text-xs font-semibold uppercase tracking-wider transition-colors',
                               isSelected
-                                ? 'bg-[#FAF7F5] text-[#800020] '
-                                : 'text-[#706565] hover:bg-[#FAF7F5] hover:text-[#800020]',
+                                ? 'bg-background text-primary '
+                                : 'text-muted-foreground hover:bg-background hover:text-primary',
                             ].join(' ')}
                           >
                             <span>{langName} ({loc.toUpperCase()})</span>
-                            {isSelected && <Check size={14} className="text-[#800020]" />}
+                            {isSelected && <Check size={14} className="text-primary" />}
                           </button>
                         );
                       })}
@@ -157,7 +157,7 @@ export function MobileMenu({
               <DrawerClose asChild>
                 <Link
                   href="/profile"
-                  className="flex min-h-12 items-center justify-center gap-2 rounded-md bg-[#800020] px-4 text-xs font-semibold uppercase tracking-wider text-white transition-colors hover:bg-[#111018]"
+                  className="flex min-h-12 items-center justify-center gap-2 rounded-md bg-primary px-4 text-xs font-semibold uppercase tracking-wider text-white transition-colors hover:bg-[#111018]"
                 >
                   <UserRound size={16} strokeWidth={1.5} />
                   {loginLabel}
@@ -167,7 +167,7 @@ export function MobileMenu({
               <DrawerClose asChild>
                 <Link
                   href="/products"
-                  className="flex min-h-12 items-center justify-between rounded-md bg-[#111018] px-4 text-xs font-semibold uppercase tracking-wider text-white transition-colors hover:bg-[#800020]"
+                  className="flex min-h-12 items-center justify-between rounded-md bg-[#111018] px-4 text-xs font-semibold uppercase tracking-wider text-white transition-colors hover:bg-primary"
                 >
                   Shop now
                   <ArrowRight size={16} strokeWidth={1.8} />

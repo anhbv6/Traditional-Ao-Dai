@@ -1,13 +1,10 @@
+import React from 'react';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import { Link } from '@/i18n/routing';
+import { type HeroMetric } from '../types/home.types';
 
-type HeroMetric = {
-  value: string;
-  label: string;
-};
-
-type HeroBannerProps = {
+interface HeroBannerProps {
   eyebrow: string;
   title: string;
   subtitle: string;
@@ -16,7 +13,7 @@ type HeroBannerProps = {
   imageAlt: string;
   note: string;
   metrics: HeroMetric[];
-};
+}
 
 export function HeroBanner({
   eyebrow,

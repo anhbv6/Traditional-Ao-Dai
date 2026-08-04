@@ -1,10 +1,13 @@
-import ArticleNews from "@/components/common/home/ArticleNews";
-import BestSellers from "@/components/common/home/BestSellers";
-import FeaturedCollections from "@/components/common/home/FeaturedCollections";
-import { HeroBanner } from "@/components/common/home/HeroBanner";
-import PromoteFeedBack from "@/components/common/home/PromoteFeedBack";
-import { Container } from "@/components/ui/container";
+import React from "react";
 import { getTranslations } from "next-intl/server";
+import { Container } from "@/components/ui/container";
+import {
+  HeroBanner,
+  BestSellers,
+  FeaturedCollections,
+  PromoteFeedBack,
+  ArticleNews,
+} from "@/features/home";
 
 export default async function Home() {
   const t = await getTranslations('HomePage');

@@ -1,5 +1,5 @@
 import React from "react";
-import { FaqsExperience } from "@/components/faqs/FaqsExperience";
+import { FaqsExperience } from "@/features/faqs";
 
 export default function FaqsPage() {
   return <FaqsExperience />;

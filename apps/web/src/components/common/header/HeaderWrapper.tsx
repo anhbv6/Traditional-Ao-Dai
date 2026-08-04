@@ -9,7 +9,7 @@ export function HeaderWrapper({ children, sticky = false }: HeaderWrapperProps) 
   return (
     <div
       className={[
-        'w-full bg-[#FAF7F5]',
+        'w-full bg-background',
         sticky ? 'sticky top-0 z-50' : '',
       ].join(' ')}
     >

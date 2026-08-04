@@ -46,11 +46,11 @@ export function LanguageSwitcher() {
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
         disabled={isPending}
-        className="min-w-[70px] cursor-pointer flex h-9 items-center justify-center gap-1 rounded-xl border border-[#E2D9D2] bg-[#FAF7F5] px-2.5 text-[11px] font-bold uppercase tracking-wider text-[#800020] shadow-2xs transition-colors hover:border-[#800020]/50"
+        className="min-w-[70px] cursor-pointer flex h-9 items-center justify-center gap-1 rounded-xl border border-border bg-background px-2.5 text-[11px] font-bold uppercase tracking-wider text-primary shadow-2xs transition-colors hover:border-primary/50"
         aria-label={`Current language: ${currentLocale.toUpperCase()}`}
         aria-expanded={isOpen}
       >
-        <Globe size={13} strokeWidth={1.5} className="text-[#800020]" />
+        <Globe size={13} strokeWidth={1.5} className="text-primary" />
         {currentLocale.toUpperCase()}
       </button>
 
@@ -63,10 +63,10 @@ export function LanguageSwitcher() {
             : 'invisible opacity-0 -translate-y-1 pointer-events-none',
         ].join(' ')}
       >
-        <div className="relative flex flex-col gap-1 rounded-xl border border-[#E2D9D2] bg-[#FAF7F5] p-1.5 shadow-lg min-w-[84px]">
+        <div className="relative flex flex-col gap-1 rounded-xl border border-border bg-background p-1.5 shadow-lg min-w-[84px]">
           {/* Mũi tên nhọn arrow tương thích responsive */}
           <div
-            className="absolute -top-1.5 right-3 sm:left-1/2 sm:right-auto h-3 w-3 sm:-translate-x-1/2 rotate-45 border-l border-t border-[#E2D9D2] bg-[#FAF7F5]"
+            className="absolute -top-1.5 right-3 sm:left-1/2 sm:right-auto h-3 w-3 sm:-translate-x-1/2 rotate-45 border-l border-t border-border bg-background"
             aria-hidden="true"
           />
 
@@ -82,8 +82,8 @@ export function LanguageSwitcher() {
                 className={[
                   'cursor-pointer relative z-10 flex h-8 items-center justify-center rounded-lg border text-[11px] font-bold uppercase tracking-wider transition-colors duration-150 px-3',
                   isSelected
-                    ? 'bg-white border-[#800020] text-[#800020] shadow-2xs'
-                    : 'border-transparent text-[#706565] hover:bg-white hover:text-[#800020] hover:border-[#E2D9D2]',
+                    ? 'bg-white border-primary text-primary shadow-2xs'
+                    : 'border-transparent text-muted-foreground hover:bg-white hover:text-primary hover:border-border',
                 ].join(' ')}
               >
                 {loc.toUpperCase()}
