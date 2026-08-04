@@ -44,6 +44,34 @@ export const initialCards: PaymentCard[] = [
 
 export const mockOrders: Order[] = [
   {
+    id: "AD-99905",
+    date: "2026-08-03",
+    status: "pending",
+    total: "1.590.000 ₫",
+    items: [
+      {
+        name: { vi: "Áo Dài Phượng Hoàng", en: "Phoenix Ao Dai" },
+        price: "1.590.000 ₫",
+        quantity: 1,
+        image: "https://cdn.pixabay.com/photo/2021/11/14/06/17/ao-dai-6792949_640.jpg",
+      },
+    ],
+  },
+  {
+    id: "AD-99890",
+    date: "2026-08-01",
+    status: "processing",
+    total: "2.100.000 ₫",
+    items: [
+      {
+        name: { vi: "Áo Dài Thêu Hoa Sen", en: "Lotus Embroidered Ao Dai" },
+        price: "2.100.000 ₫",
+        quantity: 1,
+        image: "https://cdn.pixabay.com/photo/2016/11/19/11/33/girl-1838779_640.jpg",
+      },
+    ],
+  },
+  {
     id: "AD-99823",
     date: "2026-07-28",
     status: "delivered",

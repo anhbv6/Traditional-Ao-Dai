@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { CreditCard, Plus, Trash2, Check, Sparkles } from "lucide-react";
 import { useManagePayment } from "../hooks/useProfile";
 import { type PaymentCard } from "../types/profile.types";
+import { Input } from "@/components/ui/input";
 
 export function ManagePaymentTab() {
   const t = useTranslations("ProfilePage.payment");
@@ -34,7 +35,7 @@ export function ManagePaymentTab() {
   };
 
   return (
-    <div className="rounded-2xl border border-[#800020]/10 bg-white p-6 shadow-sm sm:p-8">
+    <div className="rounded-2xl border border-[#800020]/10 bg-white p-6 shadow-sm sm:p-8 animate-fade-in">
       <div className="flex items-center justify-between border-b border-[#E2D9D2]/60 pb-5">
         <div>
           <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-[#800020]">
@@ -44,104 +45,22 @@ export function ManagePaymentTab() {
             {t("subtitle")}
           </p>
         </div>
-        {!isAdding && (
-          <button
-            onClick={handleStartAdd}
-            className="inline-flex min-h-10 items-center gap-1.5 rounded-lg bg-[#800020] px-4 text-xs font-semibold uppercase tracking-wider text-white transition-all hover:bg-[#800020]/90"
-          >
-            <Plus size={15} />
-            {t("addBtn")}
-          </button>
-        )}
+        <button
+          onClick={handleStartAdd}
+          className="inline-flex min-h-10 items-center gap-1.5 rounded-lg bg-[#800020] px-4 text-xs font-semibold uppercase tracking-wider text-white transition-all hover:bg-[#800020]/90 cursor-pointer"
+        >
+          <Plus size={15} />
+          {t("addBtn")}
+        </button>
       </div>
 
-      {isAdding ? (
-        <form onSubmit={handleSubmit} className="mt-6 space-y-6">
-          <div className="grid gap-6 sm:grid-cols-2">
-            {/* Card Holder */}
-            <div className="space-y-2">
-              <label className="text-xs font-semibold uppercase tracking-wider text-[#706565]">
-                {t("form.cardHolder")}
-              </label>
-              <input
-                type="text"
-                required
-                placeholder="NGUYEN THI AN"
-                value={holder}
-                onChange={(e) => setHolder(e.target.value)}
-                className="w-full rounded-lg border border-[#E2D9D2] bg-white py-3 px-4 text-sm text-[#2A2525] outline-none transition-all focus:border-[#800020] focus:ring-1 focus:ring-[#800020]"
-              />
-            </div>
-
-            {/* Card Number */}
-            <div className="space-y-2">
-              <label className="text-xs font-semibold uppercase tracking-wider text-[#706565]">
-                {t("form.cardNumber")}
-              </label>
-              <div className="relative">
-                <CreditCard className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#706565]/60" />
-                <input
-                  type="text"
-                  required
-                  maxLength={16}
-                  placeholder="4123 4567 8901 2345"
-                  value={number}
-                  onChange={(e) => setNumber(e.target.value.replace(/\D/g, ""))}
-                  className="w-full rounded-lg border border-[#E2D9D2] bg-white py-3 pl-11 pr-4 text-sm text-[#2A2525] outline-none transition-all focus:border-[#800020] focus:ring-1 focus:ring-[#800020]"
-                />
-              </div>
-            </div>
-
-            {/* Expiry Date */}
-            <div className="space-y-2">
-              <label className="text-xs font-semibold uppercase tracking-wider text-[#706565]">
-                {t("form.expiryDate")}
-              </label>
-              <input
-                type="text"
-                required
-                maxLength={5}
-                placeholder="MM/YY"
-                value={expiry}
-                onChange={(e) => setExpiry(e.target.value)}
-                className="w-full rounded-lg border border-[#E2D9D2] bg-white py-3 px-4 text-sm text-[#2A2525] outline-none transition-all focus:border-[#800020] focus:ring-1 focus:ring-[#800020]"
-              />
-            </div>
-
-            {/* CVV */}
-            <div className="space-y-2">
-              <label className="text-xs font-semibold uppercase tracking-wider text-[#706565]">
-                {t("form.cvv")}
-              </label>
-              <input
-                type="password"
-                required
-                maxLength={4}
-                placeholder="•••"
-                value={cvv}
-                onChange={(e) => setCvv(e.target.value.replace(/\D/g, ""))}
-                className="w-full rounded-lg border border-[#E2D9D2] bg-white py-3 px-4 text-sm text-[#2A2525] outline-none transition-all focus:border-[#800020] focus:ring-1 focus:ring-[#800020]"
-              />
-            </div>
+      {cards.length === 0 ? (
+        <div className="my-16 flex flex-col items-center justify-center text-center animate-fade-in">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#FAF7F5] text-[#706565]/40 border border-[#E2D9D2]/30">
+            <CreditCard size={28} />
           </div>
-
-          {/* Form Actions */}
-          <div className="flex justify-end gap-3 pt-2">
-            <button
-              type="button"
-              onClick={() => setIsAdding(false)}
-              className="inline-flex min-h-11 items-center justify-center rounded-lg border border-[#E2D9D2] bg-white px-6 text-xs font-semibold uppercase tracking-[1px] text-[#706565] transition-all hover:bg-[#FAF7F5]"
-            >
-              Hủy
-            </button>
-            <button
-              type="submit"
-              className="inline-flex min-h-11 items-center justify-center rounded-lg bg-[#800020] px-6 text-xs font-semibold uppercase tracking-[1px] text-white transition-all hover:bg-[#800020]/90"
-            >
-              Lưu thẻ
-            </button>
-          </div>
-        </form>
+          <p className="mt-4 text-[#706565] font-medium">{t("empty")}</p>
+        </div>
       ) : (
         <div className="mt-6 grid gap-6 md:grid-cols-2">
           {cards.map((card) => (
@@ -201,7 +120,7 @@ export function ManagePaymentTab() {
                 {!card.isDefault ? (
                   <button
                     onClick={() => handleSetDefault(card.id)}
-                    className="hover:text-white hover:underline font-semibold"
+                    className="hover:text-white hover:underline font-semibold cursor-pointer"
                   >
                     {t("setAsDefault")}
                   </button>
@@ -213,7 +132,7 @@ export function ManagePaymentTab() {
                 )}
                 <button
                   onClick={() => handleDelete(card.id)}
-                  className="hover:text-rose-300 flex items-center gap-1 transition-colors"
+                  className="hover:text-rose-300 flex items-center gap-1 transition-colors cursor-pointer"
                   title="Remove card"
                 >
                   <Trash2 size={13} />
@@ -222,6 +141,112 @@ export function ManagePaymentTab() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Modal Dialog Form */}
+      {isAdding && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm animate-fade-in">
+          <div className="w-full max-w-xl overflow-hidden rounded-2xl border border-[#800020]/10 bg-white shadow-xl animate-scale-up">
+            {/* Header */}
+            <div className="border-b border-[#E2D9D2]/60 bg-[#FAF7F5] px-6 py-4 flex items-center justify-between">
+              <h3 className="font-[family-name:var(--font-playfair)] text-xl font-bold text-[#800020]">
+                {t("addBtn")}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setIsAdding(false)}
+                className="rounded-lg p-1.5 text-[#706565] hover:bg-[#E2D9D2]/40 transition-colors cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="p-6 space-y-6">
+              <div className="grid gap-6 sm:grid-cols-2">
+                {/* Card Holder */}
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-[#706565]">
+                    {t("form.cardHolder")}
+                  </label>
+                  <Input
+                    type="text"
+                    required
+                    placeholder="NGUYEN THI AN"
+                    value={holder}
+                    onChange={(e) => setHolder(e.target.value)}
+                  />
+                </div>
+
+                {/* Card Number */}
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-[#706565]">
+                    {t("form.cardNumber")}
+                  </label>
+                  <div className="relative">
+                    <CreditCard className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#706565]/60 z-10" />
+                    <Input
+                      type="text"
+                      required
+                      maxLength={16}
+                      placeholder="4123 4567 8901 2345"
+                      value={number}
+                      onChange={(e) => setNumber(e.target.value.replace(/\D/g, ""))}
+                      className="pl-11"
+                    />
+                  </div>
+                </div>
+
+                {/* Expiry Date */}
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-[#706565]">
+                    {t("form.expiryDate")}
+                  </label>
+                  <Input
+                    type="text"
+                    required
+                    maxLength={5}
+                    placeholder="MM/YY"
+                    value={expiry}
+                    onChange={(e) => setExpiry(e.target.value)}
+                  />
+                </div>
+
+                {/* CVV */}
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-[#706565]">
+                    {t("form.cvv")}
+                  </label>
+                  <Input
+                    type="password"
+                    required
+                    maxLength={4}
+                    placeholder="•••"
+                    value={cvv}
+                    onChange={(e) => setCvv(e.target.value.replace(/\D/g, ""))}
+                  />
+                </div>
+              </div>
+
+              {/* Form Actions */}
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsAdding(false)}
+                  className="inline-flex min-h-11 items-center justify-center rounded-lg border border-[#E2D9D2] bg-white px-6 text-xs font-semibold uppercase tracking-[1px] text-[#706565] transition-all hover:bg-[#FAF7F5] cursor-pointer"
+                >
+                  {t("form.cancelBtn")}
+                </button>
+                <button
+                  type="submit"
+                  className="inline-flex min-h-11 items-center justify-center rounded-lg bg-[#800020] px-6 text-xs font-semibold uppercase tracking-[1px] text-white transition-all hover:bg-[#800020]/90 cursor-pointer"
+                >
+                  {t("form.submitBtn")}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>

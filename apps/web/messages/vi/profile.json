@@ -37,6 +37,7 @@
     "total": "Tổng tiền",
     "action": "Thao tác",
     "viewDetail": "Chi tiết",
+    "statusAll": "Tất cả",
     "statusPending": "Chờ thanh toán",
     "statusProcessing": "Đang xử lý",
     "statusShipped": "Đang giao hàng",
@@ -46,7 +47,9 @@
   "address": {
     "title": "Sổ địa chỉ",
     "subtitle": "Thêm hoặc chỉnh sửa địa chỉ nhận hàng của bạn.",
+    "empty": "Bạn chưa có địa chỉ nhận hàng nào.",
     "addBtn": "Thêm địa chỉ mới",
+    "editTitle": "Chỉnh sửa địa chỉ",
     "default": "Mặc định",
     "edit": "Chỉnh sửa",
     "delete": "Xóa",
@@ -60,33 +63,59 @@
       "detail": "Địa chỉ chi tiết (Số nhà, đường...)",
       "isDefault": "Đặt làm địa chỉ mặc định",
       "cancelBtn": "Hủy",
-      "submitBtn": "Lưu địa chỉ"
+      "submitBtn": "Lưu địa chỉ",
+      "placeholderName": "Ví dụ: Nguyễn Văn A",
+      "placeholderPhone": "Ví dụ: 0912345678",
+      "placeholderProvince": "Ví dụ: Hà Nội",
+      "placeholderDistrict": "Ví dụ: Ba Đình",
+      "placeholderWard": "Ví dụ: Trúc Bạch",
+      "placeholderDetail": "Ví dụ: Số 15, ngõ 12, đường Trúc Lạc..."
     }
   },
   "payment": {
     "title": "Phương thức thanh toán",
     "subtitle": "Quản lý thẻ tín dụng và tài khoản thanh toán của bạn.",
+    "empty": "Bạn chưa liên kết thẻ thanh toán nào.",
     "addBtn": "Thêm thẻ thanh toán mới",
     "cardEnding": "Thẻ kết thúc bằng đuôi",
     "expiry": "Hạn dùng",
     "default": "Mặc định",
+    "setAsDefault": "Đặt làm mặc định",
     "form": {
       "cardHolder": "Tên chủ thẻ",
       "cardNumber": "Số thẻ",
       "expiryDate": "Ngày hết hạn (MM/YY)",
-      "cvv": "Mã CVV"
+      "cvv": "Mã CVV",
+      "cancelBtn": "Hủy",
+      "submitBtn": "Lưu thẻ"
     }
   },
   "setting": {
     "title": "Cài đặt tài khoản",
     "subtitle": "Thiết lập cài đặt bảo mật và thông báo của bạn.",
-    "changePassword": "Đổi mật khẩu",
-    "currentPassword": "Mật khẩu hiện tại",
-    "newPassword": "Mật khẩu mới",
-    "confirmPassword": "Xác nhận mật khẩu mới",
-    "securityTitle": "Bảo mật",
-    "notifTitle": "Nhận thông báo",
-    "notifPromo": "Nhận email chương trình khuyến mãi",
-    "notifOrder": "Nhận thông báo về cập nhật đơn hàng"
+    "appearance": {
+      "title": "Giao diện",
+      "description": "Tùy chỉnh giao diện hiển thị trên thiết bị của bạn"
+    },
+    "language": {
+      "title": "Ngôn ngữ",
+      "description": "Lựa chọn ngôn ngữ của bạn"
+    },
+    "twoFactor": {
+      "title": "Xác thực 2 yếu tố",
+      "description": "Bảo vệ tài khoản bằng cách kích hoạt 2FA qua email"
+    },
+    "push": {
+      "title": "Thông báo đẩy",
+      "description": "Nhận thông báo đẩy trên trình duyệt"
+    },
+    "desktop": {
+      "title": "Thông báo máy tính",
+      "description": "Nhận thông báo đẩy trên máy tính"
+    },
+    "email": {
+      "title": "Thông báo email",
+      "description": "Nhận thông báo qua thư điện tử"
+    }
   }
 }

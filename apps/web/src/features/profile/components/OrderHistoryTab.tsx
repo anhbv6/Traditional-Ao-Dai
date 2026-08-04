@@ -1,17 +1,22 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { ShoppingBag, Eye, Calendar } from "lucide-react";
+import { ShoppingBag, Eye, Calendar as CalendarIcon } from "lucide-react";
 import Image from "next/image";
 import { useOrderHistory } from "../hooks/useProfile";
 import { mockOrders } from "../api/profile.api";
 import { type Order } from "../types/profile.types";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { type DateRange } from "react-day-picker";
 
 export function OrderHistoryTab() {
   const t = useTranslations("ProfilePage.orders");
   const locale = useLocale() as "vi" | "en";
   const { selectedOrder, setSelectedOrder } = useOrderHistory();
+  const [activeStatus, setActiveStatus] = useState<"all" | Order["status"]>("all");
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
 
   const getStatusColor = (status: Order["status"]) => {
     switch (status) {
@@ -43,11 +48,88 @@ export function OrderHistoryTab() {
     }
   };
 
+  const getOrderDate = (dateStr: string) => {
+    return new Date(dateStr + "T00:00:00");
+  };
+
+  const getOrderCountByStatus = (status: "all" | Order["status"]) => {
+    return mockOrders.filter((order) => {
+      const matchesStatus = status === "all" || order.status === status;
+      let matchesDate = true;
+      if (dateRange) {
+        const orderTime = getOrderDate(order.date).getTime();
+        if (dateRange.from) {
+          const fromDateCopy = new Date(dateRange.from);
+          const fromTime = fromDateCopy.setHours(0, 0, 0, 0);
+          matchesDate = matchesDate && orderTime >= fromTime;
+        }
+        if (dateRange.to) {
+          const toDateCopy = new Date(dateRange.to);
+          const toTime = toDateCopy.setHours(23, 59, 59, 999);
+          matchesDate = matchesDate && orderTime <= toTime;
+        }
+      }
+      return matchesStatus && matchesDate;
+    }).length;
+  };
+
+  const filterTabs: { id: "all" | Order["status"]; label: string }[] = [
+    { id: "all", label: t("statusAll") },
+    { id: "pending", label: t("statusPending") },
+    { id: "processing", label: t("statusProcessing") },
+    { id: "shipped", label: t("statusShipped") },
+    { id: "delivered", label: t("statusDelivered") },
+    { id: "cancelled", label: t("statusCancelled") },
+  ];
+
+  const filteredOrders = mockOrders.filter((order) => {
+    // 1. Status Filter
+    const matchesStatus = activeStatus === "all" || order.status === activeStatus;
+
+    // 2. Date Range Filter
+    let matchesDate = true;
+    if (dateRange) {
+      const orderTime = getOrderDate(order.date).getTime();
+      if (dateRange.from) {
+        const fromDateCopy = new Date(dateRange.from);
+        const fromTime = fromDateCopy.setHours(0, 0, 0, 0);
+        matchesDate = matchesDate && orderTime >= fromTime;
+      }
+      if (dateRange.to) {
+        const toDateCopy = new Date(dateRange.to);
+        const toTime = toDateCopy.setHours(23, 59, 59, 999);
+        matchesDate = matchesDate && orderTime <= toTime;
+      }
+    }
+
+    return matchesStatus && matchesDate;
+  });
+
+  const formatDateRange = (range: DateRange | undefined) => {
+    if (!range) return locale === "vi" ? "Chọn khoảng ngày" : "Select date range";
+    
+    const formatDate = (d: Date | undefined) => {
+      if (!d) return "";
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      const dd = String(d.getDate()).padStart(2, "0");
+      return `${dd}/${mm}/${yyyy}`;
+    };
+
+    if (range.from && range.to) {
+      return `${formatDate(range.from)} - ${formatDate(range.to)}`;
+    }
+    if (range.from) {
+      return `${formatDate(range.from)} - ...`;
+    }
+    return locale === "vi" ? "Chọn khoảng ngày" : "Select date range";
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       {/* List / Main Panel */}
       <div className="rounded-2xl border border-[#800020]/10 bg-white p-6 shadow-sm sm:p-8">
-        <div>
+        <div className="border-b border-[#E2D9D2]/40 pb-5">
           <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-[#800020]">
             {t("title")}
           </h2>
@@ -56,13 +138,82 @@ export function OrderHistoryTab() {
           </p>
         </div>
 
-        {mockOrders.length === 0 ? (
-          <div className="my-12 flex flex-col items-center justify-center text-center">
-            <ShoppingBag size={48} className="text-[#706565]/35" />
-            <p className="mt-4 text-[#706565]">{t("empty")}</p>
+        {/* Filter Tabs */}
+        <div className="mt-5 flex items-center gap-2 overflow-x-auto border-b border-[#E2D9D2]/40 pb-px scrollbar-none select-none">
+          {filterTabs.map((tab) => {
+            const isActive = activeStatus === tab.id;
+            const count = getOrderCountByStatus(tab.id);
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveStatus(tab.id)}
+                className={`relative pb-3.5 pt-2 px-3 text-sm font-semibold transition-all duration-300 whitespace-nowrap flex items-center gap-1.5 border-b-2 -mb-px hover:text-[#800020] cursor-pointer ${
+                  isActive
+                    ? "text-[#800020] border-[#800020]"
+                    : "text-[#706565] border-transparent"
+                }`}
+              >
+                <span>{tab.label}</span>
+                <span
+                  className={`rounded-full px-2 py-0.5 text-xs font-medium transition-colors ${
+                    isActive
+                      ? "bg-[#800020]/10 text-[#800020]"
+                      : "bg-[#FAF7F5] text-[#706565] border border-[#E2D9D2]/40"
+                  }`}
+                >
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Date Range Picker Row */}
+        <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-2 border-b border-[#E2D9D2]/20">
+          <div className="text-xs font-semibold uppercase tracking-wider text-[#706565]/80">
+            {locale === "vi" ? "Bộ lọc thời gian" : "Date Filter"}
+          </div>
+          <div className="flex items-center gap-2 z-20">
+            <Popover>
+              <PopoverTrigger render={
+                <button
+                  type="button"
+                  className="flex h-10 items-center gap-2 rounded-lg border border-[#E2D9D2] bg-white px-3.5 text-xs font-semibold text-[#706565] hover:border-[#800020] hover:text-[#800020] transition-colors cursor-pointer outline-none shadow-xs"
+                >
+                  <CalendarIcon size={14} className="text-[#800020]" />
+                  <span>{formatDateRange(dateRange)}</span>
+                </button>
+              } />
+              <PopoverContent className="w-auto p-0 bg-white border border-[#E2D9D2] rounded-xl shadow-lg z-50">
+                <Calendar
+                  mode="range"
+                  selected={dateRange}
+                  onSelect={setDateRange}
+                />
+              </PopoverContent>
+            </Popover>
+
+            {dateRange && (dateRange.from || dateRange.to) && (
+              <button
+                onClick={() => setDateRange(undefined)}
+                className="flex size-10 items-center justify-center rounded-lg border border-[#E2D9D2] bg-white text-[#706565] hover:border-rose-300 hover:text-rose-600 transition-colors cursor-pointer"
+                title="Xóa lọc ngày"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+        </div>
+
+        {filteredOrders.length === 0 ? (
+          <div className="my-16 flex flex-col items-center justify-center text-center animate-fade-in">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#FAF7F5] text-[#706565]/40 border border-[#E2D9D2]/30">
+              <ShoppingBag size={28} />
+            </div>
+            <p className="mt-4 text-[#706565] font-medium">{t("empty")}</p>
           </div>
         ) : (
-          <div className="mt-8 overflow-x-auto">
+          <div className="mt-6 overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-[#E2D9D2]/60 text-xs font-semibold uppercase tracking-wider text-[#706565]">
@@ -74,7 +225,7 @@ export function OrderHistoryTab() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#E2D9D2]/40 text-sm text-[#2A2525]">
-                {mockOrders.map((order) => (
+                {filteredOrders.map((order) => (
                   <tr key={order.id} className="hover:bg-[#FAF7F5]/30">
                     <td className="py-4 pr-4 font-semibold text-[#800020]">
                       #{order.id}
@@ -93,7 +244,7 @@ export function OrderHistoryTab() {
                     <td className="py-4 text-right">
                       <button
                         onClick={() => setSelectedOrder(order)}
-                        className="inline-flex size-9 items-center justify-center rounded-lg border border-[#800020]/15 text-[#800020] hover:bg-[#800020] hover:text-white transition-colors"
+                        className="inline-flex size-9 items-center justify-center rounded-lg border border-[#800020]/15 text-[#800020] hover:bg-[#800020] hover:text-white transition-colors cursor-pointer"
                         title={t("viewDetail")}
                       >
                         <Eye size={16} />
@@ -118,13 +269,13 @@ export function OrderHistoryTab() {
                   {t("orderId")}: #{selectedOrder.id}
                 </h3>
                 <p className="mt-0.5 flex items-center gap-1.5 text-xs text-[#706565]">
-                  <Calendar size={13} />
+                  <CalendarIcon size={13} />
                   {selectedOrder.date}
                 </p>
               </div>
               <button
                 onClick={() => setSelectedOrder(null)}
-                className="rounded-lg p-1.5 text-[#706565] hover:bg-[#E2D9D2]/40 transition-colors"
+                className="rounded-lg p-1.5 text-[#706565] hover:bg-[#E2D9D2]/40 transition-colors cursor-pointer"
               >
                 ✕
               </button>

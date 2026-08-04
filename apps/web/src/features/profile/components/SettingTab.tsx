@@ -1,224 +1,218 @@
 "use client";
 
-import React from "react";
-import { useTranslations } from "next-intl";
-import { Lock, Eye, EyeOff, Bell, Shield, Sparkles } from "lucide-react";
-import { useSetting } from "../hooks/useProfile";
+import React, { useState, useEffect, useTransition } from "react";
+import { useTranslations, useLocale } from "next-intl";
+import { ChevronDown } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { usePathname, useRouter } from "@/i18n/routing";
+import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 
 export function SettingTab() {
   const t = useTranslations("ProfilePage.setting");
-  const {
-    currentPassword,
-    setCurrentPassword,
-    newPassword,
-    setNewPassword,
-    confirmPassword,
-    setConfirmPassword,
-    showCurrent,
-    setShowCurrent,
-    showNew,
-    setShowNew,
-    showConfirm,
-    setShowConfirm,
-    showSuccessPass,
-    notifPromo,
-    setNotifPromo,
-    notifOrder,
-    setNotifOrder,
-    showSuccessNotif,
-    handlePasswordSubmit,
-    handleNotifSubmit,
-  } = useSetting();
+  const currentLocale = useLocale();
+  const pathname = usePathname();
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+
+  const [twoFactor, setTwoFactor] = useState(true);
+  const [pushNotifications, setPushNotifications] = useState(true);
+  const [desktopNotifications, setDesktopNotifications] = useState(true);
+  const [emailNotifications, setEmailNotifications] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+
+    const saved2FA = localStorage.getItem("2fa");
+    if (saved2FA !== null) setTwoFactor(saved2FA === "true");
+
+    const savedPush = localStorage.getItem("push");
+    if (savedPush !== null) setPushNotifications(savedPush === "true");
+
+    const savedDesktop = localStorage.getItem("desktop");
+    if (savedDesktop !== null) setDesktopNotifications(savedDesktop === "true");
+
+    const savedEmail = localStorage.getItem("email");
+    if (savedEmail !== null) setEmailNotifications(savedEmail === "true");
+  }, []);
+
+  const handleLanguageChange = (newLocale: string) => {
+    if (newLocale === currentLocale || isPending) return;
+    startTransition(() => {
+      router.replace(pathname, { locale: newLocale });
+    });
+  };
+
+  const handleToggle = (key: string, value: boolean, setter: (val: boolean) => void) => {
+    setter(value);
+    localStorage.setItem(key, String(value));
+  };
+
+  if (!mounted) {
+    return (
+      <div className="rounded-2xl border border-[#800020]/10 bg-white p-6 shadow-sm sm:p-8 min-h-[400px] flex items-center justify-center">
+        <div className="size-8 animate-spin rounded-full border-4 border-[#800020] border-t-transparent" />
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      {/* Change Password */}
-      <div className="rounded-2xl border border-[#800020]/10 bg-white p-6 shadow-sm sm:p-8">
-        <div className="flex items-center gap-3 border-b border-[#E2D9D2]/60 pb-5">
-          <div className="grid size-10 place-items-center rounded-lg bg-[#FAF7F5] text-[#800020]">
-            <Shield size={20} />
-          </div>
-          <div>
-            <h2 className="font-[family-name:var(--font-playfair)] text-xl font-bold text-[#800020]">
-              {t("securityTitle")}
-            </h2>
-            <p className="text-xs text-[#706565]">
-              {t("changePassword")}
-            </p>
-          </div>
-        </div>
-
-        <form onSubmit={handlePasswordSubmit} className="mt-6 space-y-4 max-w-md">
-          {showSuccessPass && (
-            <div className="flex items-center gap-2 rounded-lg bg-green-50 p-4 text-sm text-green-700 border border-green-200">
-              <Sparkles size={18} className="text-green-600 shrink-0" />
-              <p className="font-medium">Cập nhật mật khẩu thành công!</p>
-            </div>
-          )}
-
-          {/* Current Password */}
-          <div className="space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-wider text-[#706565]">
-              {t("currentPassword")}
-            </label>
-            <div className="relative">
-              <Lock className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#706565]/60" />
-              <input
-                type={showCurrent ? "text" : "password"}
-                required
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                className="w-full rounded-lg border border-[#E2D9D2] bg-white py-3 pl-11 pr-11 text-sm text-[#2A2525] outline-none transition-all focus:border-[#800020] focus:ring-1 focus:ring-[#800020]"
-              />
-              <button
-                type="button"
-                onClick={() => setShowCurrent(!showCurrent)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#706565]/60 hover:text-[#800020]"
-              >
-                {showCurrent ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
-            </div>
-          </div>
-
-          {/* New Password */}
-          <div className="space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-wider text-[#706565]">
-              {t("newPassword")}
-            </label>
-            <div className="relative">
-              <Lock className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#706565]/60" />
-              <input
-                type={showNew ? "text" : "password"}
-                required
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full rounded-lg border border-[#E2D9D2] bg-white py-3 pl-11 pr-11 text-sm text-[#2A2525] outline-none transition-all focus:border-[#800020] focus:ring-1 focus:ring-[#800020]"
-              />
-              <button
-                type="button"
-                onClick={() => setShowNew(!showNew)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#706565]/60 hover:text-[#800020]"
-              >
-                {showNew ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
-            </div>
-          </div>
-
-          {/* Confirm Password */}
-          <div className="space-y-2">
-            <label className="text-xs font-semibold uppercase tracking-wider text-[#706565]">
-              {t("confirmPassword")}
-            </label>
-            <div className="relative">
-              <Lock className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#706565]/60" />
-              <input
-                type={showConfirm ? "text" : "password"}
-                required
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full rounded-lg border border-[#E2D9D2] bg-white py-3 pl-11 pr-11 text-sm text-[#2A2525] outline-none transition-all focus:border-[#800020] focus:ring-1 focus:ring-[#800020]"
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirm(!showConfirm)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#706565]/60 hover:text-[#800020]"
-              >
-                {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
-            </div>
-          </div>
-
-          {/* Submit */}
-          <div className="pt-2">
-            <button
-              type="submit"
-              className="inline-flex min-h-11 items-center justify-center rounded-lg bg-[#800020] px-6 text-xs font-semibold uppercase tracking-[1px] text-white transition-all hover:bg-[#800020]/90"
-            >
-              {t("changePassword")}
-            </button>
-          </div>
-        </form>
+    <div className="rounded-2xl border border-[#800020]/10 bg-white p-6 shadow-sm sm:p-8 animate-fade-in">
+      {/* Header */}
+      <div className="border-b border-[#E2D9D2]/60 pb-5 mb-2">
+        <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-[#800020]">
+          {t("title")}
+        </h2>
+        <p className="mt-1 text-sm text-[#706565]">
+          {t("subtitle")}
+        </p>
       </div>
 
-      {/* Notifications */}
-      <div className="rounded-2xl border border-[#800020]/10 bg-white p-6 shadow-sm sm:p-8">
-        <div className="flex items-center gap-3 border-b border-[#E2D9D2]/60 pb-5">
-          <div className="grid size-10 place-items-center rounded-lg bg-[#FAF7F5] text-[#800020]">
-            <Bell size={20} />
-          </div>
-          <div>
-            <h2 className="font-[family-name:var(--font-playfair)] text-xl font-bold text-[#800020]">
-              {t("notifTitle")}
-            </h2>
+      <div className="divide-y divide-[#E2D9D2]/30">
+        {/* Appearance Row */}
+        <div className="flex items-center justify-between py-5">
+          <div className="space-y-1 pr-4">
+            <h3 className="font-semibold text-[#2A2525] text-sm sm:text-base">
+              {t("appearance.title")}
+            </h3>
             <p className="text-xs text-[#706565]">
-              Quản lý nhận thông tin tiếp thị và đơn hàng.
+              {t("appearance.description")}
             </p>
+          </div>
+          <div className="shrink-0 z-30 flex items-center">
+            <AnimatedThemeToggler
+              variant="circle"
+              className="flex size-9 items-center justify-center rounded-lg border border-[#E2D9D2] bg-[#FAF7F5]/50 text-[#706565] hover:border-[#800020] hover:text-[#800020] transition-colors cursor-pointer outline-none shadow-xs [&_svg]:size-4"
+            />
           </div>
         </div>
 
-        <form onSubmit={handleNotifSubmit} className="mt-6 space-y-6">
-          {showSuccessNotif && (
-            <div className="flex items-center gap-2 rounded-lg bg-green-50 p-4 text-sm text-green-700 border border-green-200">
-              <Sparkles size={18} className="text-green-600 shrink-0" />
-              <p className="font-medium">Lưu cài đặt thông báo thành công!</p>
-            </div>
-          )}
-
-          <div className="space-y-4">
-            {/* Promo */}
-            <div className="flex items-start gap-3">
-              <input
-                type="checkbox"
-                id="notifPromo"
-                checked={notifPromo}
-                onChange={(e) => setNotifPromo(e.target.checked)}
-                className="mt-1 size-4 rounded border-[#E2D9D2] text-[#800020] focus:ring-[#800020]"
-              />
-              <div>
-                <label
-                  htmlFor="notifPromo"
-                  className="cursor-pointer text-sm font-semibold text-[#2A2525]"
-                >
-                  {t("notifPromo")}
-                </label>
-                <p className="text-xs text-[#706565]">
-                  Nhận thông tin về các ưu đãi, bộ sưu tập mới và sự kiện sắp tới.
-                </p>
-              </div>
-            </div>
-
-            {/* Order Updates */}
-            <div className="flex items-start gap-3">
-              <input
-                type="checkbox"
-                id="notifOrder"
-                checked={notifOrder}
-                onChange={(e) => setNotifOrder(e.target.checked)}
-                className="mt-1 size-4 rounded border-[#E2D9D2] text-[#800020] focus:ring-[#800020]"
-              />
-              <div>
-                <label
-                  htmlFor="notifOrder"
-                  className="cursor-pointer text-sm font-semibold text-[#2A2525]"
-                >
-                  {t("notifOrder")}
-                </label>
-                <p className="text-xs text-[#706565]">
-                  Cập nhật tự động về trạng thái đặt hàng, giao hàng và thanh toán.
-                </p>
-              </div>
-            </div>
+        {/* Language Row */}
+        <div className="flex items-center justify-between py-5">
+          <div className="space-y-1 pr-4">
+            <h3 className="font-semibold text-[#2A2525] text-sm sm:text-base">
+              {t("language.title")}
+            </h3>
+            <p className="text-xs text-[#706565]">
+              {t("language.description")}
+            </p>
           </div>
-
-          <div className="pt-2">
-            <button
-              type="submit"
-              className="inline-flex min-h-11 items-center justify-center rounded-lg bg-[#800020] px-6 text-xs font-semibold uppercase tracking-[1px] text-white transition-all hover:bg-[#800020]/90"
-            >
-              Lưu cài đặt
-            </button>
+          <div className="shrink-0 z-20">
+            <Popover>
+              <PopoverTrigger render={
+                <button
+                  type="button"
+                  disabled={isPending}
+                  className="flex h-9 items-center justify-between gap-2.5 rounded-lg border border-[#E2D9D2] bg-[#FAF7F5]/50 px-3.5 text-xs font-semibold text-[#2A2525] hover:border-[#800020] transition-colors cursor-pointer outline-none shadow-xs min-w-[100px]"
+                >
+                  <span>{currentLocale === "vi" ? "Tiếng Việt" : "English"}</span>
+                  <ChevronDown size={14} className="text-[#706565]" />
+                </button>
+              } />
+              <PopoverContent className="w-36 p-1 bg-white border border-[#E2D9D2] rounded-xl shadow-lg z-50">
+                <button
+                  onClick={() => handleLanguageChange("en")}
+                  disabled={isPending}
+                  className={`flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-xs font-semibold text-left cursor-pointer transition-colors ${
+                    currentLocale === "en"
+                      ? "bg-[#800020] text-white"
+                      : "text-[#2A2525] hover:bg-[#FAF7F5]"
+                  }`}
+                >
+                  <span>English</span>
+                </button>
+                <button
+                  onClick={() => handleLanguageChange("vi")}
+                  disabled={isPending}
+                  className={`flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-xs font-semibold text-left cursor-pointer transition-colors ${
+                    currentLocale === "vi"
+                      ? "bg-[#800020] text-white"
+                      : "text-[#2A2525] hover:bg-[#FAF7F5]"
+                  }`}
+                >
+                  <span>Tiếng Việt</span>
+                </button>
+              </PopoverContent>
+            </Popover>
           </div>
-        </form>
+        </div>
+
+        {/* Two-factor Authentication Row */}
+        <div className="flex items-center justify-between py-5">
+          <div className="space-y-1 pr-4">
+            <h3 className="font-semibold text-[#2A2525] text-sm sm:text-base">
+              {t("twoFactor.title")}
+            </h3>
+            <p className="text-xs text-[#706565]">
+              {t("twoFactor.description")}
+            </p>
+          </div>
+          <div className="shrink-0 flex items-center">
+            <Switch
+              checked={twoFactor}
+              onCheckedChange={(val) => handleToggle("2fa", val, setTwoFactor)}
+              className="cursor-pointer"
+            />
+          </div>
+        </div>
+
+        {/* Push Notifications Row */}
+        <div className="flex items-center justify-between py-5">
+          <div className="space-y-1 pr-4">
+            <h3 className="font-semibold text-[#2A2525] text-sm sm:text-base">
+              {t("push.title")}
+            </h3>
+            <p className="text-xs text-[#706565]">
+              {t("push.description")}
+            </p>
+          </div>
+          <div className="shrink-0 flex items-center">
+            <Switch
+              checked={pushNotifications}
+              onCheckedChange={(val) => handleToggle("push", val, setPushNotifications)}
+              className="cursor-pointer"
+            />
+          </div>
+        </div>
+
+        {/* Desktop Notification Row */}
+        <div className="flex items-center justify-between py-5">
+          <div className="space-y-1 pr-4">
+            <h3 className="font-semibold text-[#2A2525] text-sm sm:text-base">
+              {t("desktop.title")}
+            </h3>
+            <p className="text-xs text-[#706565]">
+              {t("desktop.description")}
+            </p>
+          </div>
+          <div className="shrink-0 flex items-center">
+            <Switch
+              checked={desktopNotifications}
+              onCheckedChange={(val) => handleToggle("desktop", val, setDesktopNotifications)}
+              className="cursor-pointer"
+            />
+          </div>
+        </div>
+
+        {/* Email Notifications Row */}
+        <div className="flex items-center justify-between py-5 last:pb-0">
+          <div className="space-y-1 pr-4">
+            <h3 className="font-semibold text-[#2A2525] text-sm sm:text-base">
+              {t("email.title")}
+            </h3>
+            <p className="text-xs text-[#706565]">
+              {t("email.description")}
+            </p>
+          </div>
+          <div className="shrink-0 flex items-center">
+            <Switch
+              checked={emailNotifications}
+              onCheckedChange={(val) => handleToggle("email", val, setEmailNotifications)}
+              className="cursor-pointer"
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

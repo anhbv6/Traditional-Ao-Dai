@@ -150,19 +150,132 @@
   --animate-marquee: marquee var(--duration) infinite linear;
   --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
   @keyframes marquee {
-  from {
-    transform: translateX(0);
+    from {
+      transform: translateX(0);
     }
-  to {
-    transform: translateX(calc(-100% - var(--gap)));
+    to {
+      transform: translateX(calc(-100% - var(--gap)));
     }
   }
   @keyframes marquee-vertical {
-  from {
-    transform: translateY(0);
+    from {
+      transform: translateY(0);
     }
-  to {
-    transform: translateY(calc(-100% - var(--gap)));
+    to {
+      transform: translateY(calc(-100% - var(--gap)));
     }
   }
+}
+
+::view-transition-old(root), ::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* Custom CSS Variables - Dark Mode (Đã tối ưu chuẩn UI/UX thời trang) */
+.dark {
+  /* 1. Nền web: Chuyển sang tông xám than ấm sâu hơn để tạo độ sang */
+  --bg-main: #121010;          
+  --bg-secondary: #1E1A1A;     /* Nền Card/Sidebar tách biệt rõ ràng hơn */
+  
+  /* 2. Chữ: Đưa tiêu đề về màu sáng để đọc cực rõ trên nền tối */
+  --text-main: #F7F4F0;        /* Chữ chính & Tiêu đề H1, H2, H3 (Sáng kem) */
+  --text-light: #A89F99;       /* Mô tả phụ, Subtitle */
+  
+  /* 3. Màu thương hiệu & Điểm nhấn */
+  --primary-color: #A32A3B;    /* Đỏ Burgundy (Chủ yếu dùng cho Nền Nút bấm) */
+  --accent-color: #E8B4AC;     /* Hồng đất pastel (Dùng cho Subtitle nhỏ, Icon, Link active) */
+  
+  --border: #2D2625;           /* Viền mỏng phân tách rõ các khối */
+  --ring: #E8B4AC;
+  --destructive: #F04438;
+}
+
+/* Mapping hệ thống Theme */
+.dark {
+  --color-background: var(--bg-main);
+  
+  /* Đổi foreground thành màu sáng để Tiêu đề không bị đỏ chìm nữa */
+  --color-foreground: var(--text-main);
+  
+  --color-primary: var(--primary-color);
+  --color-primary-foreground: #ffffff; /* Chữ trắng nổi bật trên nút đỏ */
+  
+  --color-secondary: var(--bg-secondary);
+  --color-secondary-foreground: var(--text-main);
+  
+  --color-muted: var(--bg-secondary);
+  --color-muted-foreground: var(--text-light);
+  
+  --color-accent: var(--accent-color);
+  --color-accent-foreground: #121010;
+  
+  --color-popover: var(--bg-secondary);
+  --color-popover-foreground: var(--text-main);
+  
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --color-input: var(--bg-secondary);
+  --color-destructive: var(--destructive);
+}
+
+.dark .bg-white {
+  background-color: var(--bg-secondary) !important;
+}
+
+.dark .text-\[\#2A2525\] {
+  color: var(--text-main) !important;
+}
+
+.dark .text-\[\#706565\] {
+  color: var(--text-light) !important;
+}
+
+.dark .text-\[\#706565\]\/60 {
+  color: rgba(168, 159, 153, 0.6) !important;
+}
+
+.dark .text-\[\#706565\]\/80 {
+  color: rgba(168, 159, 153, 0.8) !important;
+}
+
+.dark .border-\[\#E2D9D2\] {
+  border-color: var(--border) !important;
+}
+
+.dark .border-\[\#E2D9D2\]\/40 {
+  border-color: rgba(45, 38, 37, 0.4) !important;
+}
+
+.dark .border-\[\#E2D9D2\]\/60 {
+  border-color: rgba(45, 38, 37, 0.6) !important;
+}
+
+.dark .divide-\[\#E2D9D2\]\/30 > * + * {
+  border-color: rgba(45, 38, 37, 0.3) !important;
+}
+
+.dark .divide-\[\#E2D9D2\]\/40 > * + * {
+  border-color: rgba(45, 38, 37, 0.4) !important;
+}
+
+.dark .bg-\[\#FAF7F5\] {
+  background-color: var(--bg-main) !important;
+}
+
+.dark .bg-\[\#FAF7F5\]\/30 {
+  background-color: rgba(18, 16, 16, 0.3) !important;
+}
+
+.dark .bg-\[\#F3ECE7\] {
+  background-color: var(--bg-secondary) !important;
+}
+
+.dark .bg-\[\#F3ECE7\]\/30 {
+  background-color: rgba(30, 26, 26, 0.3) !important;
+}
+
+/* Force titles to use light foreground color in dark mode */
+.dark h1, .dark h2, .dark h3, .dark .product-title {
+  color: var(--text-main) !important;
 }
