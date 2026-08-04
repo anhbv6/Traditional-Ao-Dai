@@ -67,6 +67,27 @@ export function ProductCard({
     fitMode === 'cover' ? 'object-cover' : 'object-contain px-8 py-10 sm:px-10'
   }`;
 
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const rawPrice = price.replace(/[^0-9.]/g, "");
+    const parsedPrice = parseFloat(rawPrice) || 0;
+
+    const cartEvent = new CustomEvent("cart-add-item", {
+      detail: {
+        id: Date.now(),
+        name,
+        slug: name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, ""),
+        image: currentImageSrc,
+        quantity: 1,
+        price: parsedPrice,
+        size: "M"
+      }
+    });
+    window.dispatchEvent(cartEvent);
+  };
+
   return (
     <article
       className="group w-full overflow-hidden font-[family-name:var(--font-lora)] text-[var(--text-main)]"
@@ -93,8 +114,9 @@ export function ProductCard({
           </button>
           <button
             type="button"
+            onClick={handleAddToCart}
             aria-label={t('addToCart')}
-            className="cursor-pointer grid size-8 place-items-center rounded-full bg-white text-[var(--text-main)] shadow-sm transition-colors duration-300 hover:bg-[var(--primary-color)] hover:text-white sm:size-10"
+            className="cursor-pointer grid size-8 place-items-center rounded-full bg-white text-[var(--text-main)] shadow-sm transition-colors duration-300 hover:bg-[var(--primary-color)] hover:text-white sm:size-10 active:scale-90"
           >
             <ShoppingBag size={16} strokeWidth={2} />
           </button>
