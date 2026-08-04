@@ -6,6 +6,7 @@
     "orders": "Order History",
     "address": "Manage Address",
     "payment": "Manage Payment",
+    "security": "Account Security",
     "setting": "Account Settings"
   },
   "personal": {
@@ -116,6 +117,35 @@
     "email": {
       "title": "Email Notifications",
       "description": "Receive email notification"
+    }
+  },
+  "security": {
+    "title": "Account Security",
+    "subtitle": "Update your password, activate two-factor authentication, and manage active sessions.",
+    "password": {
+      "title": "Change Password",
+      "subtitle": "To secure your account, use a strong password with at least 8 characters.",
+      "current": "Current Password",
+      "new": "New Password",
+      "confirm": "Confirm New Password",
+      "submit": "Update Password",
+      "success": "Password changed successfully!"
+    },
+    "twoFactor": {
+      "title": "Two-Factor Authentication (2FA)",
+      "subtitle": "Activate OTP codes to secure your account from unauthorized access.",
+      "statusEnabled": "Activated",
+      "statusDisabled": "Not Activated",
+      "setupTitle": "Set Up Two-Factor Authentication",
+      "setupSubtitle": "Scan the QR code below using Google Authenticator and enter the 6-digit code to activate.",
+      "verifyBtn": "Verify & Activate",
+      "success": "Two-factor authentication activated successfully!"
+    },
+    "sessions": {
+      "title": "Login History",
+      "subtitle": "Manage active sessions and browsers currently logged into your account.",
+      "revokeBtn": "Log Out Device",
+      "revokeAll": "Log Out All Other Devices"
     }
   }
 }

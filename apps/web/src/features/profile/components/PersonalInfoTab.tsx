@@ -103,7 +103,7 @@ export function PersonalInfoTab() {
   };
 
   return (
-    <div className="rounded-2xl border border-[#800020]/10 bg-white p-6 shadow-sm sm:p-8">
+    <div className="rounded-2xl border border-[#800020]/10 bg-white p-5 shadow-sm sm:p-8">
       <div>
         <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-[#800020]">
           {t("title")}
@@ -122,47 +122,56 @@ export function PersonalInfoTab() {
         )}
 
         {/* Avatar Section */}
-        <div className="flex flex-row items-center justify-between pr-5">
-          <div>
-            <div className="relative">
-              <Avatar 
-                size="xl" 
-                onClick={() => setIsModalOpen(true)}
-                className="size-24 border border-[#E2D9D2] hover:border-[#800020] transition-all duration-300 cursor-pointer shadow-xs hover:shadow-sm"
+        <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-[#800020]/10">
+          <div className="relative group">
+            <Avatar 
+              size="xl" 
+              onClick={() => setIsModalOpen(true)}
+              className="size-24 border-2 border-[#E2D9D2] hover:border-[#800020] transition-all duration-300 cursor-pointer shadow-sm hover:shadow-md"
+            >
+              <AvatarImage src={avatarUrl} alt={fullName} className="object-cover" />
+              <AvatarFallback className="bg-[#FAF7F5] text-[#800020] font-bold text-2xl uppercase">
+                {fullName ? fullName.slice(0, 2) : "US"}
+              </AvatarFallback>
+            </Avatar>
+            
+            {/* Edit Button */}
+            {isEditing && (
+              <button
+                type="button"
+                onClick={triggerFileSelect}
+                className="absolute bottom-0 right-0 p-2.5 rounded-full bg-[#800020] text-white hover:bg-[#800020]/95 shadow-md border-2 border-white flex items-center justify-center transition-all duration-300 cursor-pointer hover:scale-105 active:scale-95"
+                aria-label={t("editAvatar")}
+                title={t("editAvatar")}
               >
-                <AvatarImage src={avatarUrl} alt={fullName} className="object-cover" />
-                <AvatarFallback className="bg-[#FAF7F5] text-[#800020] font-bold text-xl uppercase">
-                  {fullName ? fullName.slice(0, 2) : "US"}
-                </AvatarFallback>
-              </Avatar>
-              
-              {/* Edit Button */}
-              {isEditing && (
-                <button
-                  type="button"
-                  onClick={triggerFileSelect}
-                  className="absolute bottom-0 right-0 p-2 rounded-full bg-[#800020] text-white hover:bg-[#800020]/95 shadow-md border-2 border-white flex items-center justify-center transition-all duration-300 cursor-pointer hover:scale-105 active:scale-95"
-                  aria-label={t("editAvatar")}
-                  title={t("editAvatar")}
-                >
-                  <Camera size={14} className="text-white" />
-                </button>
-              )}
-            </div>
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              accept="image/*"
-              className="hidden"
-            />
+                <Camera size={14} className="text-white" />
+              </button>
+            )}
           </div>
-          <div>
+          
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            accept="image/*"
+            className="hidden"
+          />
+
+          <div className="flex-1 text-center sm:text-left space-y-1">
+            <h3 className="text-lg font-bold text-[#2A2525] font-[family-name:var(--font-playfair)]">
+              {fullName || "Người dùng"}
+            </h3>
+            <p className="text-xs text-[#706565]">
+              {email || "Chưa cập nhật email"}
+            </p>
+          </div>
+
+          <div className="w-full sm:w-auto flex justify-center">
             {!isEditing ? (
               <button
                 type="button"
                 onClick={handleStartEdit}
-                className="inline-flex h-9 items-center justify-center rounded-lg border border-[#800020] bg-white px-4 text-xs font-semibold uppercase tracking-[1px] text-[#800020] transition-all hover:bg-[#800020] hover:text-white cursor-pointer shadow-xs hover:shadow-sm"
+                className="w-full sm:w-auto inline-flex h-10 items-center justify-center rounded-lg border border-[#800020] bg-white px-5 text-xs font-semibold uppercase tracking-[1px] text-[#800020] transition-all hover:bg-[#800020] hover:text-white cursor-pointer shadow-sm hover:shadow-md active:scale-95 duration-200"
               >
                 {t("changeInfoBtn")}
               </button>
@@ -170,7 +179,7 @@ export function PersonalInfoTab() {
               <button
                 type="button"
                 onClick={handleCancelEdit}
-                className="inline-flex h-9 items-center justify-center rounded-lg border border-[#E2D9D2] bg-white px-4 text-xs font-semibold uppercase tracking-[1px] text-gray-700 transition-all hover:bg-gray-50 cursor-pointer shadow-xs hover:shadow-sm"
+                className="w-full sm:w-auto inline-flex h-10 items-center justify-center rounded-lg border border-[#E2D9D2] bg-white px-5 text-xs font-semibold uppercase tracking-[1px] text-gray-700 transition-all hover:bg-gray-50 cursor-pointer shadow-sm hover:shadow-md active:scale-95 duration-200"
               >
                 {t("cancelBtn")}
               </button>
@@ -180,12 +189,12 @@ export function PersonalInfoTab() {
 
         {/* Modal Popup to view full-size avatar */}
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-          <DialogContent className="max-w-md !p-0 overflow-hidden rounded-xl shadow-lg !border-none">
+          <DialogContent className="max-w-[280px] sm:max-w-[360px] !p-0 overflow-hidden rounded-2xl shadow-2xl !border-none">
             {avatarUrl && (
               <img 
                 src={avatarUrl} 
                 alt={fullName} 
-                className="w-full max-h-[80vh] object-contain block" 
+                className="w-full aspect-square object-cover block" 
               />
             )}
           </DialogContent>
@@ -205,7 +214,7 @@ export function PersonalInfoTab() {
                 onChange={(e) => setFullName(e.target.value)}
                 required
                 disabled={!isEditing}
-                className="w-full rounded-lg border border-[#E2D9D2] bg-white py-3 pl-11 pr-4 text-sm text-[#2A2525] outline-none transition-all focus:border-[#800020] focus:ring-1 focus:ring-[#800020] disabled:bg-[#F3ECE7]/30 disabled:text-[#706565]/70 disabled:cursor-not-allowed"
+                className="w-full rounded-lg border border-[#E2D9D2] bg-white py-3 pl-11 pr-4 text-sm text-[#2A2525] outline-none transition-all duration-300 focus:border-[#800020] focus:ring-1 focus:ring-[#800020] hover:border-[#800020]/30 disabled:bg-[#F3ECE7]/10 disabled:border-[#E2D9D2]/40 disabled:text-[#706565]/80 disabled:cursor-not-allowed"
               />
             </div>
           </div>
@@ -223,7 +232,7 @@ export function PersonalInfoTab() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={!isEditing}
-                className="w-full rounded-lg border border-[#E2D9D2] bg-white py-3 pl-11 pr-4 text-sm text-[#2A2525] outline-none transition-all focus:border-[#800020] focus:ring-1 focus:ring-[#800020] disabled:bg-[#F3ECE7]/30 disabled:text-[#706565]/70 disabled:cursor-not-allowed"
+                className="w-full rounded-lg border border-[#E2D9D2] bg-white py-3 pl-11 pr-4 text-sm text-[#2A2525] outline-none transition-all duration-300 focus:border-[#800020] focus:ring-1 focus:ring-[#800020] hover:border-[#800020]/30 disabled:bg-[#F3ECE7]/10 disabled:border-[#E2D9D2]/40 disabled:text-[#706565]/80 disabled:cursor-not-allowed"
               />
             </div>
           </div>
@@ -241,7 +250,7 @@ export function PersonalInfoTab() {
                 onChange={(e) => setPhone(e.target.value)}
                 required
                 disabled={!isEditing}
-                className="w-full rounded-lg border border-[#E2D9D2] bg-white py-3 pl-11 pr-4 text-sm text-[#2A2525] outline-none transition-all focus:border-[#800020] focus:ring-1 focus:ring-[#800020] disabled:bg-[#F3ECE7]/30 disabled:text-[#706565]/70 disabled:cursor-not-allowed"
+                className="w-full rounded-lg border border-[#E2D9D2] bg-white py-3 pl-11 pr-4 text-sm text-[#2A2525] outline-none transition-all duration-300 focus:border-[#800020] focus:ring-1 focus:ring-[#800020] hover:border-[#800020]/30 disabled:bg-[#F3ECE7]/10 disabled:border-[#E2D9D2]/40 disabled:text-[#706565]/80 disabled:cursor-not-allowed"
               />
             </div>
           </div>
@@ -257,7 +266,7 @@ export function PersonalInfoTab() {
                   <button
                     type="button"
                     disabled={!isEditing}
-                    className="w-full text-left rounded-lg border border-[#E2D9D2] bg-white py-3 pl-11 pr-4 text-sm text-[#2A2525] outline-none transition-all focus:border-[#800020] focus:ring-1 focus:ring-[#800020] cursor-pointer disabled:bg-[#F3ECE7]/30 disabled:text-[#706565]/70 disabled:cursor-not-allowed"
+                    className="w-full text-left rounded-lg border border-[#E2D9D2] bg-white py-3 pl-11 pr-4 text-sm text-[#2A2525] outline-none transition-all duration-300 focus:border-[#800020] focus:ring-1 focus:ring-[#800020] cursor-pointer hover:border-[#800020]/30 disabled:bg-[#F3ECE7]/10 disabled:border-[#E2D9D2]/40 disabled:text-[#706565]/80 disabled:cursor-not-allowed"
                   >
                     {formatLocalDate(dob)}
                   </button>
@@ -279,45 +288,51 @@ export function PersonalInfoTab() {
         </div>
 
         {/* Gender */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           <span className="text-xs font-semibold uppercase tracking-wider text-[#706565]">
             {t("gender")}
           </span>
-          <div className="flex flex-wrap gap-4">
-            {["male", "female", "other"].map((value) => (
-              <label
-                key={value}
-                className="flex cursor-pointer items-center gap-2 text-sm text-[#2A2525]"
-              >
-                <input
-                  type="radio"
-                  name="gender"
-                  value={value}
-                  checked={gender === value}
-                  onChange={() => setGender(value)}
+          <div className="flex flex-wrap gap-3">
+            {["male", "female", "other"].map((value) => {
+              const isSelected = gender === value;
+              return (
+                <button
+                  key={value}
+                  type="button"
                   disabled={!isEditing}
-                  className="size-4 border-[#E2D9D2] text-[#800020] focus:ring-[#800020] disabled:cursor-not-allowed disabled:opacity-70"
-                />
-                <span>
+                  onClick={() => setGender(value)}
+                  className={`flex-1 min-w-[90px] sm:flex-initial px-4 py-2.5 rounded-lg border text-xs font-semibold uppercase tracking-wider text-center transition-all duration-300 cursor-pointer
+                    ${isSelected 
+                      ? "border-[#800020] bg-[#800020]/5 text-[#800020] shadow-xs font-semibold" 
+                      : "border-[#E2D9D2] bg-white text-[#706565] hover:border-[#800020]/30"} 
+                    ${!isEditing ? "opacity-70 cursor-not-allowed bg-[#FAF8F6] border-[#E2D9D2]/40 text-[#706565]/80" : ""}`}
+                >
                   {value === "male"
                     ? t("genderMale")
                     : value === "female"
                     ? t("genderFemale")
                     : t("genderOther")}
-                </span>
-              </label>
-            ))}
+                </button>
+              );
+            })}
           </div>
         </div>
 
         {/* Submit */}
         {isEditing && (
-          <div className="pt-2 animate-fade-in">
+          <div className="pt-4 animate-fade-in flex flex-col sm:flex-row gap-3">
             <button
               type="submit"
-              className="inline-flex min-h-11 items-center justify-center rounded-lg bg-[#800020] px-6 text-xs font-semibold uppercase tracking-[1.5px] text-white transition-all hover:bg-[#800020]/90 focus:outline-none focus:ring-2 focus:ring-[#800020] focus:ring-offset-2 cursor-pointer shadow-xs hover:shadow-sm"
+              className="w-full sm:w-auto inline-flex min-h-11 items-center justify-center rounded-lg bg-[#800020] px-8 text-xs font-semibold uppercase tracking-[1.5px] text-white transition-all hover:bg-[#800020]/90 focus:outline-none focus:ring-2 focus:ring-[#800020] focus:ring-offset-2 cursor-pointer shadow-sm hover:shadow-md duration-200"
             >
               {t("saveBtn")}
+            </button>
+            <button
+              type="button"
+              onClick={handleCancelEdit}
+              className="w-full sm:w-auto inline-flex min-h-11 items-center justify-center rounded-lg border border-[#E2D9D2] bg-white px-8 text-xs font-semibold uppercase tracking-[1.5px] text-gray-700 transition-all hover:bg-gray-50 cursor-pointer shadow-sm hover:shadow-md duration-200"
+            >
+              {t("cancelBtn")}
             </button>
           </div>
         )}

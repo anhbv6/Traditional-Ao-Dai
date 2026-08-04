@@ -33,4 +33,4 @@ export interface Order {
   items: OrderItem[];
 }
 
-export type TabId = "personal" | "orders" | "address" | "payment" | "setting";
+export type TabId = "personal" | "orders" | "address" | "payment" | "security" | "setting";

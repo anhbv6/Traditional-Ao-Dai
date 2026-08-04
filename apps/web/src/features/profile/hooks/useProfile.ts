@@ -316,3 +316,109 @@ export function useOrderHistory() {
     setSelectedOrder,
   };
 }
+
+// Security Hook
+export function useSecurity() {
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  const [showSuccessPass, setShowSuccessPass] = useState(false);
+
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  const [show2faSetup, setShow2faSetup] = useState(false);
+  const [otpCode, setOtpCode] = useState("");
+  const [showSuccess2fa, setShowSuccess2fa] = useState(false);
+
+  // Mock sessions
+  const [sessions, setSessions] = useState([
+    {
+      id: "sess-1",
+      device: "MacBook Pro 14\"",
+      browser: "Chrome (macOS)",
+      ip: "14.161.22.84",
+      location: "Hà Nội, VN",
+      time: "Đang hoạt động",
+      isCurrent: true,
+    },
+    {
+      id: "sess-2",
+      device: "iPhone 15 Pro",
+      browser: "Safari (iOS)",
+      ip: "115.79.42.109",
+      location: "TP. Hồ Chí Minh, VN",
+      time: "2 giờ trước",
+      isCurrent: false,
+    },
+  ]);
+
+  const handlePasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newPassword !== confirmPassword) {
+      alert("Mật khẩu xác nhận không khớp.");
+      return;
+    }
+    setShowSuccessPass(true);
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setTimeout(() => setShowSuccessPass(false), 3000);
+  };
+
+  const handle2faToggle = () => {
+    if (twoFactorEnabled) {
+      setTwoFactorEnabled(false);
+    } else {
+      setShow2faSetup(true);
+    }
+  };
+
+  const handle2faVerify = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (otpCode.length === 6) {
+      setTwoFactorEnabled(true);
+      setShow2faSetup(false);
+      setOtpCode("");
+      setShowSuccess2fa(true);
+      setTimeout(() => setShowSuccess2fa(false), 3000);
+    } else {
+      alert("Mã OTP không hợp lệ.");
+    }
+  };
+
+  const handleRevokeSession = (id: string) => {
+    setSessions((prev) => prev.filter((s) => s.id !== id));
+  };
+
+  return {
+    currentPassword,
+    setCurrentPassword,
+    newPassword,
+    setNewPassword,
+    confirmPassword,
+    setConfirmPassword,
+    showCurrent,
+    setShowCurrent,
+    showNew,
+    setShowNew,
+    showConfirm,
+    setShowConfirm,
+    showSuccessPass,
+    handlePasswordSubmit,
+    twoFactorEnabled,
+    handle2faToggle,
+    show2faSetup,
+    setShow2faSetup,
+    otpCode,
+    setOtpCode,
+    handle2faVerify,
+    showSuccess2fa,
+    sessions,
+    handleRevokeSession,
+  };
+}
+

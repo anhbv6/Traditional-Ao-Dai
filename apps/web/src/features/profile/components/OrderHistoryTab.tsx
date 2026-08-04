@@ -128,7 +128,7 @@ export function OrderHistoryTab() {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* List / Main Panel */}
-      <div className="rounded-2xl border border-[#800020]/10 bg-white p-6 shadow-sm sm:p-8">
+      <div className="rounded-2xl border border-[#800020]/10 bg-white p-5 shadow-sm sm:p-8">
         <div className="border-b border-[#E2D9D2]/40 pb-5">
           <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-[#800020]">
             {t("title")}
@@ -139,7 +139,7 @@ export function OrderHistoryTab() {
         </div>
 
         {/* Filter Tabs */}
-        <div className="mt-5 flex items-center gap-2 overflow-x-auto border-b border-[#E2D9D2]/40 pb-px scrollbar-none select-none">
+        <div className="mt-5 flex items-center gap-1.5 overflow-x-auto border-b border-[#E2D9D2]/40 pb-px scrollbar-none select-none">
           {filterTabs.map((tab) => {
             const isActive = activeStatus === tab.id;
             const count = getOrderCountByStatus(tab.id);
@@ -147,7 +147,7 @@ export function OrderHistoryTab() {
               <button
                 key={tab.id}
                 onClick={() => setActiveStatus(tab.id)}
-                className={`relative pb-3.5 pt-2 px-3 text-sm font-semibold transition-all duration-300 whitespace-nowrap flex items-center gap-1.5 border-b-2 -mb-px hover:text-[#800020] cursor-pointer ${
+                className={`relative pb-3 pt-1.5 px-2.5 text-xs sm:text-sm font-semibold transition-all duration-300 whitespace-nowrap flex items-center gap-1.5 border-b-2 -mb-px hover:text-[#800020] cursor-pointer ${
                   isActive
                     ? "text-[#800020] border-[#800020]"
                     : "text-[#706565] border-transparent"
@@ -155,7 +155,7 @@ export function OrderHistoryTab() {
               >
                 <span>{tab.label}</span>
                 <span
-                  className={`rounded-full px-2 py-0.5 text-xs font-medium transition-colors ${
+                  className={`rounded-full px-1.5 py-0.5 text-[10px] sm:text-xs font-medium transition-colors ${
                     isActive
                       ? "bg-[#800020]/10 text-[#800020]"
                       : "bg-[#FAF7F5] text-[#706565] border border-[#E2D9D2]/40"
@@ -170,7 +170,7 @@ export function OrderHistoryTab() {
 
         {/* Date Range Picker Row */}
         <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-2 border-b border-[#E2D9D2]/20">
-          <div className="text-xs font-semibold uppercase tracking-wider text-[#706565]/80">
+          <div className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[#706565]/80">
             {locale === "vi" ? "Bộ lọc thời gian" : "Date Filter"}
           </div>
           <div className="flex items-center gap-2 z-20">
@@ -178,9 +178,9 @@ export function OrderHistoryTab() {
               <PopoverTrigger render={
                 <button
                   type="button"
-                  className="flex h-10 items-center gap-2 rounded-lg border border-[#E2D9D2] bg-white px-3.5 text-xs font-semibold text-[#706565] hover:border-[#800020] hover:text-[#800020] transition-colors cursor-pointer outline-none shadow-xs"
+                  className="flex h-9 items-center gap-2 rounded-lg border border-[#E2D9D2] bg-white px-3 text-[11px] sm:text-xs font-semibold text-[#706565] hover:border-[#800020] hover:text-[#800020] transition-colors cursor-pointer outline-none shadow-xs"
                 >
-                  <CalendarIcon size={14} className="text-[#800020]" />
+                  <CalendarIcon size={12} className="text-[#800020]" />
                   <span>{formatDateRange(dateRange)}</span>
                 </button>
               } />
@@ -196,7 +196,7 @@ export function OrderHistoryTab() {
             {dateRange && (dateRange.from || dateRange.to) && (
               <button
                 onClick={() => setDateRange(undefined)}
-                className="flex size-10 items-center justify-center rounded-lg border border-[#E2D9D2] bg-white text-[#706565] hover:border-rose-300 hover:text-rose-600 transition-colors cursor-pointer"
+                className="flex size-9 items-center justify-center rounded-lg border border-[#E2D9D2] bg-white text-[#706565] hover:border-rose-300 hover:text-rose-600 transition-colors cursor-pointer text-xs"
                 title="Xóa lọc ngày"
               >
                 ✕
@@ -207,102 +207,152 @@ export function OrderHistoryTab() {
 
         {filteredOrders.length === 0 ? (
           <div className="my-16 flex flex-col items-center justify-center text-center animate-fade-in">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#FAF7F5] text-[#706565]/40 border border-[#E2D9D2]/30">
-              <ShoppingBag size={28} />
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#FAF7F5] text-[#706565]/40 border border-[#E2D9D2]/30">
+              <ShoppingBag size={24} />
             </div>
-            <p className="mt-4 text-[#706565] font-medium">{t("empty")}</p>
+            <p className="mt-4 text-xs sm:text-sm text-[#706565] font-medium">{t("empty")}</p>
           </div>
         ) : (
-          <div className="mt-6 overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-[#E2D9D2]/60 text-xs font-semibold uppercase tracking-wider text-[#706565]">
-                  <th className="pb-4 pr-4">{t("orderId")}</th>
-                  <th className="pb-4 pr-4">{t("date")}</th>
-                  <th className="pb-4 pr-4">{t("status")}</th>
-                  <th className="pb-4 pr-4">{t("total")}</th>
-                  <th className="pb-4 text-right">{t("action")}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#E2D9D2]/40 text-sm text-[#2A2525]">
-                {filteredOrders.map((order) => (
-                  <tr key={order.id} className="hover:bg-[#FAF7F5]/30">
-                    <td className="py-4 pr-4 font-semibold text-[#800020]">
-                      #{order.id}
-                    </td>
-                    <td className="py-4 pr-4 text-[#706565]">{order.date}</td>
-                    <td className="py-4 pr-4">
-                      <span
-                        className={`inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-medium ${getStatusColor(
-                          order.status
-                        )}`}
-                      >
-                        {getStatusText(order.status)}
-                      </span>
-                    </td>
-                    <td className="py-4 pr-4 font-medium">{order.total}</td>
-                    <td className="py-4 text-right">
-                      <button
-                        onClick={() => setSelectedOrder(order)}
-                        className="inline-flex size-9 items-center justify-center rounded-lg border border-[#800020]/15 text-[#800020] hover:bg-[#800020] hover:text-white transition-colors cursor-pointer"
-                        title={t("viewDetail")}
-                      >
-                        <Eye size={16} />
-                      </button>
-                    </td>
+          <>
+            {/* Desktop Table View */}
+            <div className="mt-6 hidden sm:block overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-[#E2D9D2]/60 text-xs font-semibold uppercase tracking-wider text-[#706565]">
+                    <th className="pb-4 pr-4">{t("orderId")}</th>
+                    <th className="pb-4 pr-4">{t("date")}</th>
+                    <th className="pb-4 pr-4">{t("status")}</th>
+                    <th className="pb-4 pr-4">{t("total")}</th>
+                    <th className="pb-4 text-right">{t("action")}</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-[#E2D9D2]/40 text-sm text-[#2A2525]">
+                  {filteredOrders.map((order) => (
+                    <tr key={order.id} className="hover:bg-[#FAF7F5]/30">
+                      <td className="py-4 pr-4 font-semibold text-[#800020]">
+                        #{order.id}
+                      </td>
+                      <td className="py-4 pr-4 text-[#706565]">{order.date}</td>
+                      <td className="py-4 pr-4">
+                        <span
+                          className={`inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-medium ${getStatusColor(
+                            order.status
+                          )}`}
+                        >
+                          {getStatusText(order.status)}
+                        </span>
+                      </td>
+                      <td className="py-4 pr-4 font-medium">{order.total}</td>
+                      <td className="py-4 text-right">
+                        <button
+                          onClick={() => setSelectedOrder(order)}
+                          className="inline-flex size-9 items-center justify-center rounded-lg border border-[#800020]/15 text-[#800020] hover:bg-[#800020] hover:text-white transition-colors cursor-pointer"
+                          title={t("viewDetail")}
+                        >
+                          <Eye size={16} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Card List View */}
+            <div className="mt-4 space-y-3 sm:hidden">
+              {filteredOrders.map((order) => (
+                <div 
+                  key={order.id}
+                  onClick={() => setSelectedOrder(order)}
+                  className="rounded-xl border border-[#E2D9D2]/60 bg-[#FAF7F5]/30 p-4 hover:border-[#800020]/30 transition-all duration-300 space-y-3 active:scale-[0.99]"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-[#800020] text-xs">#{order.id}</span>
+                    <span
+                      className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[9px] font-semibold tracking-wide uppercase ${getStatusColor(
+                        order.status
+                      )}`}
+                    >
+                      {getStatusText(order.status)}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                      <span className="block text-[9px] uppercase tracking-wider text-[#706565]/60 mb-0.5">{t("date")}</span>
+                      <span className="font-medium text-[#2A2525]">{order.date}</span>
+                    </div>
+                    <div className="text-right">
+                      <span className="block text-[9px] uppercase tracking-wider text-[#706565]/60 mb-0.5">{t("total")}</span>
+                      <span className="font-bold text-[#800020]">{order.total}</span>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-[#E2D9D2]/30 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedOrder(order);
+                      }}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-[#800020]/20 bg-white text-[11px] font-semibold text-[#800020] hover:bg-[#800020] hover:text-white transition-all duration-200 cursor-pointer"
+                    >
+                      <Eye size={12} />
+                      <span>{t("viewDetail")}</span>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
 
       {/* Modal / Detail View */}
       {selectedOrder && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm animate-fade-in">
-          <div className="w-full max-w-2xl overflow-hidden rounded-2xl border border-[#800020]/10 bg-white shadow-xl animate-scale-up">
+          <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-[#800020]/10 bg-white shadow-xl animate-scale-up">
             {/* Header */}
-            <div className="border-b border-[#E2D9D2]/60 bg-[#FAF7F5] px-6 py-4 flex items-center justify-between">
+            <div className="border-b border-[#E2D9D2]/60 bg-[#FAF7F5] px-4 py-3 sm:px-6 sm:py-4 flex items-center justify-between">
               <div>
-                <h3 className="font-[family-name:var(--font-playfair)] text-xl font-bold text-[#800020]">
+                <h3 className="font-[family-name:var(--font-playfair)] text-base sm:text-lg font-bold text-[#800020]">
                   {t("orderId")}: #{selectedOrder.id}
                 </h3>
-                <p className="mt-0.5 flex items-center gap-1.5 text-xs text-[#706565]">
-                  <CalendarIcon size={13} />
+                <p className="mt-0.5 flex items-center gap-1.5 text-[10px] sm:text-xs text-[#706565]">
+                  <CalendarIcon size={12} />
                   {selectedOrder.date}
                 </p>
               </div>
               <button
                 onClick={() => setSelectedOrder(null)}
-                className="rounded-lg p-1.5 text-[#706565] hover:bg-[#E2D9D2]/40 transition-colors cursor-pointer"
+                className="rounded-lg p-1.5 text-[#706565] hover:bg-[#E2D9D2]/40 transition-colors cursor-pointer text-xs"
               >
                 ✕
               </button>
             </div>
 
             {/* Items */}
-            <div className="p-6 space-y-4 max-h-[350px] overflow-y-auto">
+            <div className="p-4 sm:p-6 space-y-3 max-h-[300px] sm:max-h-[350px] overflow-y-auto">
               {selectedOrder.items.map((item, index) => (
                 <div
                   key={index}
-                  className="flex gap-4 rounded-xl border border-[#E2D9D2]/50 p-3 hover:border-[#800020]/20 transition-colors"
+                  className="flex gap-3 sm:gap-4 rounded-xl border border-[#E2D9D2]/50 p-2.5 sm:p-3 hover:border-[#800020]/20 transition-colors"
                 >
-                  <div className="relative size-16 shrink-0 overflow-hidden rounded-lg bg-[#FAF7F5]">
+                  <div className="relative size-12 sm:size-16 shrink-0 overflow-hidden rounded-lg bg-[#FAF7F5]">
                     <Image
                       src={item.image}
                       alt={item.name[locale]}
                       fill
-                      sizes="64px"
+                      sizes="(max-width: 640px) 48px, 64px"
                       className="object-cover"
                       unoptimized
                     />
                   </div>
-                  <div className="flex flex-1 flex-col justify-center">
-                    <h4 className="font-[family-name:var(--font-playfair)] text-sm font-semibold text-[#800020]">
+                  <div className="flex flex-1 flex-col justify-center min-w-0">
+                    <h4 className="font-[family-name:var(--font-playfair)] text-xs sm:text-sm font-semibold text-[#800020] truncate">
                       {item.name[locale]}
                     </h4>
-                    <p className="mt-1 text-xs text-[#706565]">
+                    <p className="mt-0.5 text-[10px] sm:text-xs text-[#706565]">
                       {item.price} x {item.quantity}
                     </p>
                   </div>
@@ -311,10 +361,10 @@ export function OrderHistoryTab() {
             </div>
 
             {/* Footer Summary */}
-            <div className="border-t border-[#E2D9D2]/60 bg-[#FAF7F5] p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div className="flex items-center gap-3">
+            <div className="border-t border-[#E2D9D2]/60 bg-[#FAF7F5] p-4 sm:p-6 flex flex-row items-center justify-between gap-4">
+              <div className="flex items-center">
                 <span
-                  className={`inline-flex items-center rounded-md border px-3 py-1 text-xs font-semibold ${getStatusColor(
+                  className={`inline-flex items-center rounded-md border px-2.5 py-0.5 text-[10px] sm:text-xs font-semibold uppercase tracking-wider ${getStatusColor(
                     selectedOrder.status
                   )}`}
                 >
@@ -322,8 +372,8 @@ export function OrderHistoryTab() {
                 </span>
               </div>
               <div className="text-right">
-                <p className="text-xs text-[#706565]">{t("total")}</p>
-                <p className="mt-1 font-[family-name:var(--font-playfair)] text-2xl font-bold text-[#800020]">
+                <p className="text-[10px] sm:text-xs text-[#706565]">{t("total")}</p>
+                <p className="mt-0.5 font-[family-name:var(--font-playfair)] text-lg sm:text-2xl font-bold text-[#800020]">
                   {selectedOrder.total}
                 </p>
               </div>

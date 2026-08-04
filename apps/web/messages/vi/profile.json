@@ -6,6 +6,7 @@
     "orders": "Lịch sử đơn hàng",
     "address": "Sổ địa chỉ",
     "payment": "Phương thức thanh toán",
+    "security": "Bảo mật tài khoản",
     "setting": "Cài đặt tài khoản"
   },
   "personal": {
@@ -116,6 +117,35 @@
     "email": {
       "title": "Thông báo email",
       "description": "Nhận thông báo qua thư điện tử"
+    }
+  },
+  "security": {
+    "title": "Bảo mật tài khoản",
+    "subtitle": "Cập nhật mật khẩu, kích hoạt xác thực hai yếu tố và quản lý lịch sử đăng nhập.",
+    "password": {
+      "title": "Đổi mật khẩu",
+      "subtitle": "Để bảo vệ tài khoản, hãy sử dụng mật khẩu mạnh có ít nhất 8 ký tự.",
+      "current": "Mật khẩu hiện tại",
+      "new": "Mật khẩu mới",
+      "confirm": "Xác nhận mật khẩu mới",
+      "submit": "Cập nhật mật khẩu",
+      "success": "Đổi mật khẩu thành công!"
+    },
+    "twoFactor": {
+      "title": "Xác thực 2 yếu tố (2FA)",
+      "subtitle": "Kích hoạt mã xác thực OTP để bảo vệ tài khoản của bạn khỏi truy cập trái phép.",
+      "statusEnabled": "Đã kích hoạt",
+      "statusDisabled": "Chưa kích hoạt",
+      "setupTitle": "Thiết lập Xác thực 2 yếu tố",
+      "setupSubtitle": "Quét mã QR dưới đây bằng ứng dụng Google Authenticator và nhập mã 6 số để kích hoạt.",
+      "verifyBtn": "Xác thực & Kích hoạt",
+      "success": "Kích hoạt Xác thực 2 yếu tố thành công!"
+    },
+    "sessions": {
+      "title": "Lịch sử đăng nhập",
+      "subtitle": "Quản lý các thiết bị và trình duyệt đang đăng nhập tài khoản của bạn.",
+      "revokeBtn": "Đăng xuất thiết bị",
+      "revokeAll": "Đăng xuất tất cả thiết bị khác"
     }
   }
 }
