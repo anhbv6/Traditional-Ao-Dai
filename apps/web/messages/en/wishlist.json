@@ -1,0 +1,27 @@
+{
+  "title": "My Wishlist",
+  "subtitle": "Save your favorite Ao Dai designs here to easily track, tailor, and purchase later.",
+  "itemCount": "{count} designs",
+  "empty": {
+    "title": "Your wishlist is empty",
+    "description": "Explore our Ao Dai collections and add designs to your wishlist.",
+    "action": "Continue Shopping"
+  },
+  "actions": {
+    "addAll": "Add All to Cart",
+    "clearAll": "Clear All",
+    "addToCart": "Add to Cart",
+    "customTailor": "Custom Tailor",
+    "remove": "Remove"
+  },
+  "status": {
+    "inStock": "In Stock",
+    "custom": "Custom Tailoring",
+    "outOfStock": "Out of Stock"
+  },
+  "toast": {
+    "removed": "Removed from wishlist!",
+    "cleared": "Cleared all items from wishlist!",
+    "addedToCart": "Added to cart!"
+  }
+}

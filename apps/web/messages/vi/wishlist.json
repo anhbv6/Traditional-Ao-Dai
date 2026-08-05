@@ -1,0 +1,27 @@
+{
+  "title": "Danh sách yêu thích",
+  "subtitle": "Lưu lại các thiết kế áo dài bạn yêu thích nhất để dễ dàng theo dõi và mua sắm.",
+  "itemCount": "{count} thiết kế",
+  "empty": {
+    "title": "Danh sách yêu thích trống",
+    "description": "Hãy khám phá bộ sưu tập áo dài của chúng tôi và chọn các thiết kế yêu thích của bạn.",
+    "action": "Tiếp tục mua sắm"
+  },
+  "actions": {
+    "addAll": "Thêm tất cả vào giỏ",
+    "clearAll": "Xóa tất cả",
+    "addToCart": "Thêm vào giỏ hàng",
+    "customTailor": "Đặt may đo",
+    "remove": "Xóa"
+  },
+  "status": {
+    "inStock": "Còn hàng",
+    "custom": "Đặt may theo số đo",
+    "outOfStock": "Hết hàng"
+  },
+  "toast": {
+    "removed": "Đã xóa khỏi danh sách yêu thích!",
+    "cleared": "Đã xóa toàn bộ danh sách yêu thích!",
+    "addedToCart": "Đã thêm sản phẩm vào giỏ hàng!"
+  }
+}
