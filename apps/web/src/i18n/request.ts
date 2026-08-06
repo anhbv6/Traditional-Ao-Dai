@@ -22,7 +22,8 @@ export default getRequestConfig(async ({requestLocale}) => {
       products,
       profile,
       faqs,
-      wishlist
+      wishlist,
+      admin
     ] = await Promise.all([
       import(`../../messages/${locale}/about.json`).then(m => m.default),
       import(`../../messages/${locale}/auth.json`).then(m => m.default),
@@ -37,6 +38,7 @@ export default getRequestConfig(async ({requestLocale}) => {
       import(`../../messages/${locale}/profile.json`).then(m => m.default),
       import(`../../messages/${locale}/faqs.json`).then(m => m.default),
       import(`../../messages/${locale}/wishlist.json`).then(m => m.default),
+      import(`../../messages/${locale}/admin.json`).then(m => m.default),
     ]);
 
     return {
@@ -55,6 +57,7 @@ export default getRequestConfig(async ({requestLocale}) => {
             ProfilePage: profile,
             FaqsPage: faqs,
             WishlistPage: wishlist,
+            AdminPage: admin,
         }
     };
 });

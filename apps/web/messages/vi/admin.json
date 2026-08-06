@@ -1,0 +1,52 @@
+{
+  "title": "Bảng quản trị AODAI",
+  "subtitle": "Tổng quan hoạt động kinh doanh, tiến độ may đo và tình trạng kho vật liệu.",
+  "filters": {
+    "today": "Hôm nay",
+    "week": "Tuần này",
+    "month": "Tháng này"
+  },
+  "stats": {
+    "revenue": "Tổng doanh thu",
+    "orders": "Tổng đơn hàng",
+    "pending": "Đơn hàng chờ xử lý",
+    "ratio": "Tỷ lệ Đơn hàng",
+    "ratioCustom": "May đo",
+    "ratioReady": "May sẵn"
+  },
+  "alerts": {
+    "tailoring": "Tiến độ May đo",
+    "lowStock": "Sản phẩm sắp hết hàng (< 5 SP)",
+    "lowFabrics": "Vật liệu / Kho vải sắp hết",
+    "needImport": "Cần nhập gấp",
+    "tailorStep": {
+      "measuring": "Đo đạc & Lên rập",
+      "cutting": "Cắt vải",
+      "sewing": "Khâu ráp",
+      "embellishing": "Đính kết",
+      "finishing": "Hoàn thiện & Ủi phẳng"
+    }
+  },
+  "orders": {
+    "title": "Hoạt động & Đơn hàng mới nhất",
+    "orderId": "Mã đơn",
+    "customer": "Khách hàng",
+    "type": "Loại đơn",
+    "total": "Tổng tiền",
+    "status": "Trạng thái",
+    "action": "Xử lý",
+    "typeCustom": "Đặt may đo",
+    "typeReady": "Mua sẵn",
+    "detailTitle": "Chi tiết xử lý đơn hàng",
+    "updateStatus": "Cập nhật trạng thái",
+    "customerInfo": "Thông tin khách hàng",
+    "tailorSpecs": "Số đo may đo của khách",
+    "statusLabels": {
+      "pending_approval": "Chờ duyệt",
+      "cutting_fabric": "Đang cắt vải",
+      "sewing_job": "Đang khâu ráp",
+      "completed": "Hoàn thành",
+      "shipping": "Đang giao"
+    }
+  }
+}

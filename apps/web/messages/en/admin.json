@@ -1,0 +1,52 @@
+{
+  "title": "AODAI Admin Dashboard",
+  "subtitle": "Overview of sales activities, tailoring progress, and material stock levels.",
+  "filters": {
+    "today": "Today",
+    "week": "This Week",
+    "month": "This Month"
+  },
+  "stats": {
+    "revenue": "Total Revenue",
+    "orders": "Total Orders",
+    "pending": "Pending Orders",
+    "ratio": "Order Type Ratio",
+    "ratioCustom": "Custom Tailor",
+    "ratioReady": "Ready-to-wear"
+  },
+  "alerts": {
+    "tailoring": "Bespoke Tailoring Progress",
+    "lowStock": "Low Stock Products (< 5 Qty)",
+    "lowFabrics": "Low Stock Fabrics & Materials",
+    "needImport": "Need Import",
+    "tailorStep": {
+      "measuring": "Pattern Drafting",
+      "cutting": "Fabric Cutting",
+      "sewing": "Hand Sewing",
+      "embellishing": "Embellishment",
+      "finishing": "Pressing & Finishing"
+    }
+  },
+  "orders": {
+    "title": "Recent Activity & Live Orders",
+    "orderId": "Order ID",
+    "customer": "Customer",
+    "type": "Type",
+    "total": "Total",
+    "status": "Status",
+    "action": "Action",
+    "typeCustom": "Custom Tailored",
+    "typeReady": "Ready-to-wear",
+    "detailTitle": "Order Processing Detail",
+    "updateStatus": "Update Status",
+    "customerInfo": "Customer Details",
+    "tailorSpecs": "Customer Tailoring Measurements",
+    "statusLabels": {
+      "pending_approval": "Pending Approval",
+      "cutting_fabric": "Cutting Fabric",
+      "sewing_job": "Stitching",
+      "completed": "Completed",
+      "shipping": "Shipping"
+    }
+  }
+}
