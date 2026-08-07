@@ -1,327 +1,137 @@
 # 🌸 Traditional Ao Dai - Vietnamese Traditional Ao Dai E-commerce Webshop
-*(Vietnamese version below / Phiên bản Tiếng Việt ở phía dưới)*
 
-A modern and smooth e-commerce platform specializing in Vietnamese traditional, customized, and wedding Ao Dai. The platform supports custom measurements for tailoring. 
+Nền tảng thương mại điện tử chuyên nghiệp cung cấp Áo dài truyền thống, cách tân, áo dài cưới và dịch vụ **đặt may theo số đo riêng (Custom Measurement)**. 
 
-This project is built using a **PNPM Monorepo** architecture to cleanly separate the Frontend (Next.js), Backend (Express), and Database layer (Prisma).
+Dự án được xây dựng theo kiến trúc **PNPM Monorepo** phân tách rõ ràng giữa Frontend (Next.js), Backend (Express) và Database (Prisma).
 
 ---
 
-## 🏗️ Monorepo Architecture
-
-The project is structured as a monorepo managed by **PNPM Workspaces**:
+## 🏗️ Cấu Trúc Monorepo & Trạng Thái Hiện Tại
 
 ```text
 learn-ecommerce-shop/
 ├── apps/
-│   ├── web/               # Frontend Storefront (Next.js 16, React 19)
+│   ├── web/               # 💻 Frontend (Next.js 16, React 19, Tailwind CSS v4)
 │   │   └── src/
-│   │       ├── app/       # App Router with multi-language /[locale] routing
-│   │       ├── components/# Reusable UI components
-│   │       └── features/  # Feature modules (products, cart, profile...)
-│   └── api/               # Backend REST API (Express.js, TypeScript)
+│   │       ├── app/       # Hệ thống App Router hỗ trợ đa ngôn ngữ /[locale]
+│   │       └── features/  # Chứa các component & logic chia theo module chức năng
+│   └── api/               # ⚙️ Backend REST API (Express.js, TypeScript)
 │       └── src/
-│           └── index.ts   # Server entrypoint
+│           └── index.ts   # Điểm khởi chạy API (Hiện chỉ có health check & get user cơ bản)
 ├── packages/
-│   └── db/                # Database layer shared package (@repo/db)
+│   └── db/                # 🗄️ Database Shared Package (@repo/db)
 │       ├── prisma/
-│       │   └── schema.prisma # Prisma Schema configuration (PostgreSQL)
+│       │   └── schema.prisma # Cấu hình Prisma Schema (Hiện mới chỉ có bảng User)
 │       └── src/
-│           └── index.ts   # Shared Prisma Client instance
-├── .env.example           # Root environment variable template
-├── package.json           # Root workspace scripts
-└── pnpm-workspace.yaml    # Workspace packages declaration
-```
-
----
-
-## ✨ Key Features
-
-- 🌐 **Multi-language (i18n):** Smooth switching between English and Vietnamese via the `/[locale]` routing.
-- 🛍️ **Immersive Shopping Experience:**
-  - Modern UI, fully responsive on both Desktop and Mobile.
-  - Smooth scrolling (Lenis Smooth Scroll) and fluid animations (Motion).
-  - Elegant product and collection presentation using Embla Carousel.
-- 📐 **Tailoring Support (Custom Measurement):** Customers can input their body measurements (in cm) when placing orders for a custom fit.
-- 🛒 **Full E-commerce capabilities:**
-  - Cart & Wishlist management.
-  - Product Comparison & Quick View.
-  - Checkout flow & User Profile page.
-- 📰 **Blog & Articles:** Informative articles on Ao Dai culture and garment care.
-- 🔐 **Admin Dashboard:** Separated `/admin` route group inside `apps/web`, ready for back-office management.
-- 🔌 **Shared Database Client:** Schema and database client are managed centrally in `packages/db` and shared between the API and other packages.
-
----
-
-## 🛠️ Technology Stack
-
-### Monorepo Tooling
-- **Package Manager:** [PNPM Workspaces](https://pnpm.io/workspaces)
-
-### Frontend (`apps/web`)
-- **Core Framework:** [Next.js 16 (App Router)](https://nextjs.org/) & [React 19](https://react.dev/)
-- **Language:** [TypeScript](https://www.typescriptlang.org/)
-- **Styling:** [Tailwind CSS v4](https://tailwindcss.com/) & PostCSS
-- **Localization:** [next-intl](https://next-intl-docs.vercel.app/)
-- **Animations:** 
-  - [Motion (Framer Motion 12)](https://motion.dev/)
-  - [Lenis](https://lenis.darkroom.engineering/) (Smooth Scroll)
-  - [DotLottie React](https://lottiefiles.com/)
-- **UI Components & Primitives:**
-  - [Base UI React](https://base-ui.com/) (Component primitives)
-  - [Vaul](https://github.com/emilkowalski/vaul) (Drawer/Modal)
-  - [Embla Carousel](https://www.embla-carousel.com/) (Carousel/Slider)
-  - [React Rating](https://github.com/smastrom/react-rating) (Star rating)
-  - [Lucide React](https://lucide.dev/) & [React Icons](https://react-icons.github.io/react-icons/) (Icon systems)
-
-### Backend (`apps/api`)
-- **Core Server:** [Express.js](https://expressjs.com/)
-- **Runtime Compiler:** [TSX](https://github.com/privatenumber/tsx) (TypeScript Execute)
-- **Database Connector:** `@repo/db` (Internal workspace package)
-
-### Database Layer (`packages/db`)
-- **ORM:** [Prisma](https://www.prisma.io/)
-- **Database Engine:** [PostgreSQL](https://www.postgresql.org/)
-
----
-
-## 📦 Setup & Installation
-
-### Prerequisites
-- Node.js >= 18.x
-- [PNPM](https://pnpm.io/) installed globally (`npm install -g pnpm`)
-- PostgreSQL database instance running
-
-### Steps
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/username/project-name.git
-   cd project-name
-   ```
-
-2. **Configure Environment Variables:**
-   Copy the `.env.example` file to `.env` in the project root and fill in your database credentials:
-   ```bash
-   cp .env.example .env
-   ```
-   Modify `.env`:
-   ```env
-   DATABASE_URL="postgresql://username:password@localhost:5432/ecommerce?schema=public"
-   PORT=3001
-   ```
-
-3. **Install dependencies:**
-   ```bash
-   pnpm install
-   ```
-
-4. **Initialize the Database:**
-   Generate the Prisma client and run migrations to create tables in your PostgreSQL database:
-   ```bash
-   pnpm db:generate
-   pnpm db:migrate
-   ```
-
-5. **Run the development servers:**
-   To spin up the web frontend, the backend API, and watch for schema changes simultaneously:
-   ```bash
-   pnpm dev
-   ```
-   - **Frontend Web:** [http://localhost:3000](http://localhost:3000)
-   - **Backend API:** [http://localhost:3001](http://localhost:3001)
-
-### Workspace Specific Commands
-
-You can run commands for specific applications using the `--filter` flag:
-
-- **Run only the frontend (Next.js):**
-  ```bash
-  pnpm --filter @repo/web dev
-  ```
-- **Run only the backend (Express API):**
-  ```bash
-  pnpm --filter @repo/api dev
-  ```
-- **Generate database artifacts:**
-  ```bash
-  pnpm --filter @repo/db generate
-  ```
-
----
-
-## 🚀 Production Deployment
-
-1. **Build all applications:**
-   ```bash
-   pnpm build
-   ```
-2. **Start the production servers:**
-   ```bash
-   pnpm start
-   ```
-
----
----
-
-# 🌸 Traditional Ao Dai - Cửa Hàng Áo Dài Truyền Thống Việt Nam
-
-Nền tảng thương mại điện tử hiện đại, mượt mà chuyên cung cấp các sản phẩm Áo dài truyền thống, áo dài cách tân, áo dài cưới,... được thiết kế tinh xảo, hỗ trợ đặt may theo số đo riêng của khách hàng.
-
-Dự án này sử dụng kiến trúc **PNPM Monorepo** giúp phân tách rõ ràng giữa Frontend (Next.js), Backend (Express) và lớp Database (Prisma).
-
----
-
-## 🏗️ Kiến Trúc Monorepo
-
-Dự án được cấu trúc dưới dạng monorepo được quản lý bởi **PNPM Workspaces**:
-
-```text
-learn-ecommerce-shop/
-├── apps/
-│   ├── web/               # Ứng dụng Frontend Storefront (Next.js 16, React 19)
-│   │   └── src/
-│   │       ├── app/       # Cấu trúc App Router với đa ngôn ngữ /[locale]
-│   │       ├── components/# Các UI component dùng chung
-│   │       └── features/  # Các module tính năng (sản phẩm, giỏ hàng, cá nhân...)
-│   └── api/               # Ứng dụng Backend REST API (Express.js, TypeScript)
-│       └── src/
-│           └── index.ts   # Điểm khởi chạy API server
-├── packages/
-│   └── db/                # Lớp cơ sở dữ liệu dùng chung (@repo/db)
-│       ├── prisma/
-│       │   └── schema.prisma # Cấu hình Prisma Schema (PostgreSQL)
-│       └── src/
-│           └── index.ts   # Khởi tạo Prisma Client dùng chung
+│           └── index.ts   # Khởi tạo Prisma Client dùng chung cho API
 ├── .env.example           # File mẫu biến môi trường ở thư mục gốc
-├── package.json           # Các script chạy chung của toàn workspace
-└── pnpm-workspace.yaml    # Khai báo các package trong workspace
+├── package.json           # Các script chạy chung của toàn bộ workspace
+└── pnpm-workspace.yaml    # Khai báo các gói trong workspace
 ```
 
 ---
 
-## ✨ Tính năng chính
-
-- 🌐 **Đa ngôn ngữ (i18n):** Hỗ trợ chuyển đổi mượt mà giữa Tiếng Anh và Tiếng Việt thông qua hệ thống route `/[locale]`.
-- 🛍️ **Trải nghiệm mua sắm mượt mà:**
-  - Giao diện hiện đại, responsive hoàn hảo trên cả Desktop và Mobile.
-  - Hiệu ứng cuộn mượt mà (Lenis Smooth Scroll) và chuyển động sinh động (Motion).
-  - Trình chiếu bộ sưu tập & sản phẩm đẹp mắt với Embla Carousel.
-- 📐 **Hỗ trợ May đo (Custom Measurement):** Cho phép người dùng nhập trực tiếp số đo cơ thể (cm) khi đặt hàng để may đo riêng.
-- 🛒 **Tính năng E-commerce đầy đủ:**
-  - Quản lý giỏ hàng (Cart) & Danh sách yêu thích (Wishlist).
-  - So sánh sản phẩm (Product Compare) & Xem nhanh sản phẩm (Quick View).
-  - Luồng Thanh toán (Checkout) & Trang Cá nhân (Profile).
-- 📰 **Bản tin & Cẩm nang:** Blog chia sẻ kiến thức về văn hóa áo dài và cách bảo quản.
-- 🔐 **Hệ thống Admin Dashboard:** Nhóm route `/admin` bên trong `apps/web` sẵn sàng cho việc mở rộng quản trị.
-- 🔌 **Chia sẻ Client Kết nối DB:** Schema và client kết nối được quản lý tập trung tại package `@repo/db`, chia sẻ trực tiếp cho backend API.
-
----
-
-## 🛠️ Công nghệ sử dụng
+## 🛠️ Công Nghệ & Thư Viện Sử Dụng
 
 ### Monorepo Tooling
-- **Trình quản lý package:** [PNPM Workspaces](https://pnpm.io/workspaces)
+*   **PNPM Workspaces**: Trình quản lý package hiệu năng cao hỗ trợ cấu trúc Monorepo.
 
 ### Frontend (`apps/web`)
-- **Core Framework:** [Next.js 16 (App Router)](https://nextjs.org/) & [React 19](https://react.dev/)
-- **Ngôn ngữ:** [TypeScript](https://www.typescriptlang.org/)
-- **Styling:** [Tailwind CSS v4](https://tailwindcss.com/) & PostCSS
-- **Đa ngôn ngữ:** [next-intl](https://next-intl-docs.vercel.app/)
-- **Hiệu ứng & Animation:** 
-  - [Motion (Framer Motion 12)](https://motion.dev/)
-  - [Lenis](https://lenis.darkroom.engineering/) (Smooth Scroll)
-  - [DotLottie React](https://lottiefiles.com/)
-- **UI Components & Thư viện bổ trợ:**
-  - [Base UI React](https://base-ui.com/) (Component primitives)
-  - [Vaul](https://github.com/emilkowalski/vaul) (Drawer/Modal)
-  - [Embla Carousel](https://www.embla-carousel.com/) (Carousel/Slider)
-  - [React Rating](https://github.com/smastrom/react-rating) (Đánh giá sao)
-  - [Lucide React](https://lucide.dev/) & [React Icons](https://react-icons.github.io/react-icons/) (Hệ thống icon)
+*   **Next.js 16 (App Router) & React 19**: Core framework dựng giao diện và tối ưu hóa SEO/SSR.
+*   **TypeScript (v5)**: Đảm bảo kiểm soát kiểu dữ liệu an toàn.
+*   **Tailwind CSS (v4) & PostCSS**: Thiết kế giao diện utility-first hiện đại.
+*   **Tailwind Merge & Class Variance Authority (CVA)**: Quản lý và tùy biến các class CSS dễ dàng.
+*   **Motion (Framer Motion 12)**: Thư viện tạo hiệu ứng chuyển động mượt mà.
+*   **Lenis Smooth Scroll**: Hiệu ứng cuộn trang mượt mà.
+*   **OGL (WebGL Library)**: Render hiệu ứng canvas 2D/3D hiệu năng cao.
+*   **DotLottie React & React UseAnimations**: Phát các animation Lottie và micro-interactions.
+*   **Next-intl**: Hỗ trợ đa ngôn ngữ (Localization/i18n).
+*   **Embla Carousel React**: Thư viện làm slider/carousel kéo vuốt mượt mà.
+*   **Base UI React & Vaul**: Các component nguyên bản (Primitives) và Drawer/Modal tiện lợi.
+*   **React Day Picker & Smastrom React Rating**: Component lịch và đánh giá sao (rating).
+*   **React Hot Toast**: Hiển thị thông báo (toast alerts) nhanh chóng.
+*   **Date-fns**: Xử lý và định dạng thời gian.
 
 ### Backend (`apps/api`)
-- **Server:** [Express.js](https://expressjs.com/)
-- **Trình chạy code TS trực tiếp:** [TSX](https://github.com/privatenumber/tsx)
-- **Thư viện DB kết nối nội bộ:** `@repo/db` (workspace package)
+*   **Express.js**: Framework dựng API RESTful nhanh gọn.
+*   **TSX**: Chạy trực tiếp các file TypeScript trong môi trường phát triển.
+*   **@repo/db**: Thư viện kết nối database dùng chung trong monorepo.
 
-### Database Layer (`packages/db`)
-- **ORM:** [Prisma](https://www.prisma.io/)
-- **Cơ sở dữ liệu:** [PostgreSQL](https://www.postgresql.org/)
+### Database (`packages/db`)
+*   **Prisma ORM**: Trình ánh xạ quan hệ đối tượng giúp thao tác database dễ dàng.
+*   **PostgreSQL**: Hệ quản trị cơ sở dữ liệu quan hệ mạnh mẽ.
 
 ---
 
-## 📦 Hướng dẫn cài đặt & Khởi chạy
+## 📝 DANH SÁCH VIỆC CẦN LÀM (TODO LIST)
+
+### 1. Database & Backend API
+- [ ] **Mở rộng Schema Database (`packages/db/prisma/schema.prisma`)**:
+  - [ ] Bảng `Product` & `Category` (quản lý sản phẩm áo dài, danh mục, giá, hình ảnh, size).
+  - [ ] Bảng `Order` & `OrderItem` (**Đặc biệt thêm các trường lưu số đo may riêng**: ngực, eo, mông, chiều cao, cân nặng, độ dài áo/quần...).
+  - [ ] Bảng `Cart` & `CartItem` (đồng bộ giỏ hàng).
+  - [ ] Bảng `Review` (đánh giá sản phẩm).
+- [ ] **Phát triển API RESTful (`apps/api`)**:
+  - [ ] Hệ thống Authentication (Đăng ký, đăng nhập, phân quyền Admin JWT).
+  - [ ] API Products (Tìm kiếm, bộ lọc danh mục, chi tiết sản phẩm).
+  - [ ] API Orders & Checkout (Xử lý đơn hàng kèm dữ liệu số đo tự chọn).
+  - [ ] API Admin (Quản lý kho hàng, đơn hàng, khách hàng).
+
+### 2. Frontend Storefront (`apps/web`)
+- [ ] **Tích hợp Đa Ngôn Ngữ (i18n)**: Hoàn thiện các file dịch trong thư mục `messages/` cho cả Tiếng Anh và Tiếng Việt.
+- [ ] **Trang Chi Tiết Sản Phẩm & Form Đo**:
+  - [ ] Thiết kế form chọn Size tiêu chuẩn hoặc nhập số đo cá nhân (Bust, Waist, Hips, Height, Weight...).
+  - [ ] Thêm hình ảnh/hướng dẫn cách đo trực quan cho khách hàng dễ thực hiện.
+- [ ] **Giỏ hàng & Thanh toán**:
+  - [ ] Thiết lập state lưu trữ giỏ hàng, thông tin số đo đã nhập.
+  - [ ] Luồng Checkout, chọn phương thức giao hàng và xác nhận đơn hàng.
+- [ ] **Trang Admin Dashboard**:
+  - [ ] Trang danh sách đơn hàng để admin xem số đo chi tiết của khách và gửi cho xưởng may.
+  - [ ] Quản lý thêm/sửa/xóa sản phẩm và danh mục.
+
+---
+
+## 🛠️ Hướng Dẫn Cài Đặt & Khởi Chạy
 
 ### Điều kiện cần
 - Node.js >= 18.x
-- Cài đặt sẵn [PNPM](https://pnpm.io/) trên máy (`npm install -g pnpm`)
-- Cơ sở dữ liệu PostgreSQL đang hoạt động
+- Cài đặt sẵn PNPM: `npm install -g pnpm`
+- Cơ sở dữ liệu PostgreSQL đang chạy
 
-### Các bước thực hiện
+### Các bước cài đặt
 
-1. **Clone repository:**
+1. **Clone repository và cài đặt thư viện**:
    ```bash
-   git clone https://github.com/username/project-name.git
-   cd project-name
+   git clone <url-du-an>
+   cd learn-ecommerce-shop
+   pnpm install
    ```
 
-2. **Cấu hình biến môi trường:**
-   Sao chép file `.env.example` thành `.env` tại thư mục gốc và điền các cấu hình kết nối database của bạn:
+2. **Cấu hình môi trường**:
+   Sao chép file `.env.example` thành `.env` tại thư mục gốc và cấu hình kết nối database của bạn:
    ```bash
    cp .env.example .env
    ```
-   Chỉnh sửa file `.env`:
+   *Chỉnh sửa file `.env`*:
    ```env
    DATABASE_URL="postgresql://username:password@localhost:5432/ecommerce?schema=public"
    PORT=3001
    ```
 
-3. **Cài đặt thư viện:**
-   ```bash
-   pnpm install
-   ```
-
-4. **Khởi tạo Cơ sở Dữ liệu:**
-   Tạo Prisma client và chạy migration để đồng bộ các bảng cơ sở dữ liệu vào PostgreSQL:
+3. **Khởi tạo Database**:
    ```bash
    pnpm db:generate
    pnpm db:migrate
    ```
 
-5. **Chạy môi trường phát triển (Development):**
-   Lệnh này sẽ khởi chạy song song cả ứng dụng Web frontend, Backend API và tự động theo dõi thay đổi Prisma schema:
+4. **Khởi chạy môi trường phát triển (Chạy song song cả FE và BE)**:
    ```bash
    pnpm dev
    ```
-   - **Frontend Web:** Mở [http://localhost:3000](http://localhost:3000) trên trình duyệt.
-   - **Backend API:** Chạy tại [http://localhost:3001](http://localhost:3001).
+   *   **Frontend Web**: [http://localhost:3000](http://localhost:3000)
+   *   **Backend API**: [http://localhost:3001](http://localhost:3001)
 
-### Các lệnh chạy riêng cho từng ứng dụng
-
-Bạn có thể chạy riêng các tác vụ của từng package thông qua tham số `--filter`:
-
-- **Chỉ chạy Web Frontend:**
-  ```bash
-  pnpm --filter @repo/web dev
-  ```
-- **Chỉ chạy Backend API:**
-  ```bash
-  pnpm --filter @repo/api dev
-  ```
-- **Tạo lại Prisma Client cho package DB:**
-  ```bash
-  pnpm --filter @repo/db generate
-  ```
-
----
-
-## 🚀 Triển khai Production
-
-1. **Build toàn bộ ứng dụng:**
-   ```bash
-   pnpm build
-   ```
-2. **Khởi chạy ứng dụng production:**
-   ```bash
-   pnpm start
-   ```
+### Các lệnh chạy riêng lẻ (nếu cần)
+*   **Chỉ chạy Web Frontend**: `pnpm --filter @repo/web dev`
+*   **Chỉ chạy Backend API**: `pnpm --filter @repo/api dev`
+*   **Tạo lại Prisma Client**: `pnpm --filter @repo/db generate`
