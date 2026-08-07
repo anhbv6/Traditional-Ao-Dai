@@ -6,28 +6,79 @@ Dự án được xây dựng theo kiến trúc **PNPM Monorepo** phân tách r�
 
 ---
 
-## 🏗️ Cấu Trúc Monorepo & Trạng Thái Hiện Tại
+## 🏗️ Cấu Trúc Monorepo & Thiết Kế Hệ Thống
+
+Dự án được cấu trúc dưới dạng monorepo để quản lý đồng thời cả Frontend, Backend và Database. Hệ thống áp dụng các mô hình kiến trúc hiện đại: Frontend sử dụng **Feature-based Architecture** và Backend thiết kế theo mô hình **Modular Monolith**.
+
+### 📁 Sơ đồ thư mục dự án
 
 ```text
 learn-ecommerce-shop/
 ├── apps/
-│   ├── web/               # 💻 Frontend (Next.js 16, React 19, Tailwind CSS v4)
+│   ├── web/               # 💻 Frontend Storefront (Next.js 16, React 19)
 │   │   └── src/
-│   │       ├── app/       # Hệ thống App Router hỗ trợ đa ngôn ngữ /[locale]
-│   │       └── features/  # Chứa các component & logic chia theo module chức năng
-│   └── api/               # ⚙️ Backend REST API (Express.js, TypeScript)
+│   │       ├── app/       # App Router đa ngôn ngữ /[locale] (Routing & Layout layer)
+│   │       │   └── [locale]/
+│   │       │       ├── (store)/  # Nhóm trang bán hàng (home, products, cart...)
+│   │       │       ├── (auth)/   # Nhóm trang xác thực (login, signin...)
+│   │       │       └── (admin)/  # Nhóm trang quản trị
+│   │       ├── components/# Các UI component dùng chung toàn cục (Global UI)
+│   │       ├── features/  # Module nghiệp vụ tách biệt (Feature-based Architecture)
+│   │       │   └── products/ # Ví dụ: Module quản lý sản phẩm
+│   │       │       ├── components/ # React components riêng biệt cho feature
+│   │       │       ├── api/        # Logic gọi API/fetching liên quan
+│   │       │       ├── hooks/      # Custom hooks của riêng feature
+│   │       │       ├── data/       # Dữ liệu tĩnh hoặc cấu hình cục bộ
+│   │       │       ├── types/      # Các định nghĩa kiểu (TypeScript types)
+│   │       │       └── index.ts    # Public API của feature (nơi export component ra ngoài)
+│   │       ├── i18n/      # Cấu hình đa ngôn ngữ (Localization)
+│   │       ├── lib/       # Cấu hình các thư viện (như axios client, utils...)
+│   │       └── types/     # Định nghĩa kiểu dùng chung cho frontend
+│   └── api/               # ⚙️ Backend API (Express.js, TypeScript) - Modular Monolith
 │       └── src/
-│           └── index.ts   # Điểm khởi chạy API (Hiện chỉ có health check & get user cơ bản)
+│           ├── index.ts   # Entrypoint khởi chạy API server & gắn middleware toàn cục
+│           ├── routes.ts  # Bộ định tuyến trung tâm (central router)
+│           ├── modules/   # Các module nghiệp vụ tự đóng gói (Self-contained)
+│           │   └── auth/  # Ví dụ: Module xác thực (routes, controller, service, schema)
+│           └── shared/    # Các thành phần dùng chung (config, middlewares, utils)
 ├── packages/
-│   └── db/                # 🗄️ Database Shared Package (@repo/db)
+│   └── db/                # 🗄️ Database layer dùng chung (@repo/db)
 │       ├── prisma/
-│       │   └── schema.prisma # Cấu hình Prisma Schema (Hiện mới chỉ có bảng User)
+│       │   └── schema.prisma # Định nghĩa cấu hình DB Schema (PostgreSQL)
 │       └── src/
-│           └── index.ts   # Khởi tạo Prisma Client dùng chung cho API
+│           └── index.ts   # Khởi tạo Prisma Client instance dùng chung
 ├── .env.example           # File mẫu biến môi trường ở thư mục gốc
 ├── package.json           # Các script chạy chung của toàn bộ workspace
-└── pnpm-workspace.yaml    # Khai báo các gói trong workspace
+└── pnpm-workspace.yaml    # Khai báo các package trong workspace
 ```
+
+### 💻 Thiết kế Frontend (Feature-based Architecture)
+
+Frontend nằm tại [`apps/web`](file:///E:/draftcode/learn-ecommerce-shop/apps/web) được thiết kế theo kiến trúc **Feature-based**, giúp dễ dàng mở rộng và bảo trì bằng cách đóng gói các thành phần giao diện và logic có liên quan chặt chẽ vào từng module chức năng (Features):
+
+*   **`features/`**: Mỗi thư mục con đại diện cho một chức năng nghiệp vụ của hệ thống (ví dụ: `auth`, `products`, `cart`, `checkout`). Cấu trúc bên trong mỗi feature tuân thủ nguyên tắc tự đóng gói:
+    *   `components/`: Các React component phục vụ riêng cho tính năng đó.
+    *   `api/`: Các truy vấn API, query/mutation hooks phục vụ riêng cho dữ liệu của feature.
+    *   `hooks/`: Các custom hooks chứa logic nghiệp vụ và state riêng biệt.
+    *   `types/`: Định nghĩa kiểu dữ liệu TS cho riêng feature.
+    *   `data/`: Dữ liệu tĩnh hoặc cấu hình cục bộ.
+    *   `index.ts`: Điểm xuất khẩu (export) duy nhất. Chỉ những gì được export ở đây mới có thể được import sử dụng ở bên ngoài module (tránh việc import sâu gây rối mã nguồn).
+*   **`app/[locale]/`**: Đóng vai trò là lớp Router (routing layer) và Layout. Lớp này chỉ import các features từ thư mục `features/` để lắp ráp thành một trang hoàn thiện, hạn chế viết trực tiếp logic nghiệp vụ hay UI lớn tại đây.
+*   **`components/` (ở ngoài cùng `src`)**: Chứa các component dùng chung cho toàn ứng dụng (ví dụ: `Header`, `Footer`, `Button` dùng chung, `TextField`, v.v.).
+
+### ⚙️ Thiết kế Backend (Modular Monolith)
+
+Backend API nằm tại [`apps/api`](file:///E:/draftcode/learn-ecommerce-shop/apps/api) được chia thành các cấu trúc thành phần rõ ràng:
+
+*   **`modules/`**: Chứa các module chức năng độc lập. Mỗi module tự chịu trách nhiệm về logic của riêng mình và bao gồm:
+    *   `*.routes.ts`: Khai báo các endpoints cho module đó.
+    *   `*.controller.ts`: Xử lý HTTP request/response và nhận/phản hồi dữ liệu.
+    *   `*.service.ts`: Xử lý logic nghiệp vụ chính (Business logic) và tương tác database qua Prisma.
+    *   `*.schema.ts`: Định nghĩa và kiểm tra (validate) định dạng dữ liệu gửi lên (sử dụng Zod).
+*   **`shared/`**: Chứa các phần dùng chung cho tất cả các module trong ứng dụng:
+    *   `config/`: Chứa các cấu hình toàn cục (như cấu hình các biến môi trường validated qua Zod).
+    *   `middlewares/`: Chứa các middleware dùng chung như `authGuard` (xác thực token), `errorHandler` (bắt và xử lý lỗi tập trung) và `validate` (validate dữ liệu đầu vào).
+    *   `utils/`: Chứa các hàm tiện ích (như xử lý password, ký và kiểm tra JWT token).
 
 ---
 
