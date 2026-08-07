@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Dancing_Script, Lora, Playfair_Display } from "next/font/google";
+import { Dancing_Script, Lora, Playfair_Display, Geist } from "next/font/google";
 import "../globals.css";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
@@ -23,6 +23,12 @@ const playfair = Playfair_Display({
 const dancingScript = Dancing_Script({
   subsets: ["latin", "vietnamese"],
   variable: "--font-dancing",
+  display: "swap",
+});
+
+const geistSans = Geist({
+  subsets: ["latin"],
+  variable: "--font-geist-sans",
   display: "swap",
 });
 
@@ -55,7 +61,7 @@ export default async function LocaleLayout({
   return (
     <html
       lang={locale}
-      className={`${lora.variable} ${playfair.variable} ${dancingScript.variable} h-full antialiased`}
+      className={`${lora.variable} ${playfair.variable} ${dancingScript.variable} ${geistSans.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>

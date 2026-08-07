@@ -63,34 +63,6 @@ learn-ecommerce-shop/
 
 ---
 
-## 📝 DANH SÁCH VIỆC CẦN LÀM (TODO LIST)
-
-### 1. Database & Backend API
-- [ ] **Mở rộng Schema Database (`packages/db/prisma/schema.prisma`)**:
-  - [ ] Bảng `Product` & `Category` (quản lý sản phẩm áo dài, danh mục, giá, hình ảnh, size).
-  - [ ] Bảng `Order` & `OrderItem` (**Đặc biệt thêm các trường lưu số đo may riêng**: ngực, eo, mông, chiều cao, cân nặng, độ dài áo/quần...).
-  - [ ] Bảng `Cart` & `CartItem` (đồng bộ giỏ hàng).
-  - [ ] Bảng `Review` (đánh giá sản phẩm).
-- [ ] **Phát triển API RESTful (`apps/api`)**:
-  - [ ] Hệ thống Authentication (Đăng ký, đăng nhập, phân quyền Admin JWT).
-  - [ ] API Products (Tìm kiếm, bộ lọc danh mục, chi tiết sản phẩm).
-  - [ ] API Orders & Checkout (Xử lý đơn hàng kèm dữ liệu số đo tự chọn).
-  - [ ] API Admin (Quản lý kho hàng, đơn hàng, khách hàng).
-
-### 2. Frontend Storefront (`apps/web`)
-- [ ] **Tích hợp Đa Ngôn Ngữ (i18n)**: Hoàn thiện các file dịch trong thư mục `messages/` cho cả Tiếng Anh và Tiếng Việt.
-- [ ] **Trang Chi Tiết Sản Phẩm & Form Đo**:
-  - [ ] Thiết kế form chọn Size tiêu chuẩn hoặc nhập số đo cá nhân (Bust, Waist, Hips, Height, Weight...).
-  - [ ] Thêm hình ảnh/hướng dẫn cách đo trực quan cho khách hàng dễ thực hiện.
-- [ ] **Giỏ hàng & Thanh toán**:
-  - [ ] Thiết lập state lưu trữ giỏ hàng, thông tin số đo đã nhập.
-  - [ ] Luồng Checkout, chọn phương thức giao hàng và xác nhận đơn hàng.
-- [ ] **Trang Admin Dashboard**:
-  - [ ] Trang danh sách đơn hàng để admin xem số đo chi tiết của khách và gửi cho xưởng may.
-  - [ ] Quản lý thêm/sửa/xóa sản phẩm và danh mục.
-
----
-
 ## 🛠️ Hướng Dẫn Cài Đặt & Khởi Chạy
 
 ### Điều kiện cần
