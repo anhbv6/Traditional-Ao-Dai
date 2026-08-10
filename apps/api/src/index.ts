@@ -1,5 +1,7 @@
 import express from 'express'
 import cors from 'cors'
+import swaggerUi from 'swagger-ui-express'
+import { swaggerSpec } from './shared/config/swagger'
 import { env } from './shared/config/env'
 import { prisma } from '@repo/db'
 import apiRouter from './routes'
@@ -11,10 +13,33 @@ const PORT = env.PORT
 app.use(cors())
 app.use(express.json())
 
-// Health check
+/**
+ * @openapi
+ * /api/health:
+ *   get:
+ *     summary: Retrieve service health status
+ *     description: Returns the status and name of the running API service.
+ *     responses:
+ *       200:
+ *         description: Service is healthy
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: ok
+ *                 service:
+ *                   type: string
+ *                   example: Node.js Backend API
+ */
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', service: 'Node.js Backend API' })
 })
+
+// Mount Swagger Documentation UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 
 // Centralized API router
 app.use('/api', apiRouter)

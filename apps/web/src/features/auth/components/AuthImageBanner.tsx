@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import { motion } from 'motion/react';
 
 type AuthImageBannerProps = {
@@ -9,9 +10,12 @@ type AuthImageBannerProps = {
 };
 
 export function AuthImageBanner({
-  quote = 'Tôn nét dịu dàng Áo Việt, Lưu nét thanh xuân Đời người',
-  author = 'AODAI Heritage',
+  quote,
+  author,
 }: AuthImageBannerProps) {
+  const t = useTranslations('Auth');
+  const displayQuote = quote || t('bannerQuote');
+  const displayAuthor = author || t('bannerAuthor');
   return (
     <div className="relative hidden h-full w-full overflow-hidden bg-[var(--bg-secondary)] lg:block">
       {/* Decorative Outer Border */}
@@ -39,7 +43,7 @@ export function AuthImageBanner({
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-black/30 z-10" />
 
       {/* Brand Floating Logo */}
-      <div className="absolute left-12 top-12 z-20">
+      {/* <div className="absolute left-12 top-12 z-20">
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -59,7 +63,7 @@ export function AuthImageBanner({
             AODAI
           </span>
         </motion.div>
-      </div>
+      </div> */}
 
       {/* Quote Overlay at the bottom */}
       <div className="absolute bottom-16 left-12 right-12 z-20 text-white">
@@ -70,12 +74,12 @@ export function AuthImageBanner({
           className="max-w-md"
         >
           <p className="font-[family-name:var(--font-dancing)] text-3xl font-normal leading-relaxed text-[var(--accent-color)]">
-            {quote}
+            {displayQuote}
           </p>
           <div className="mt-4 flex items-center gap-3">
             <div className="h-[1px] w-8 bg-white/40" />
             <p className="font-[family-name:var(--font-lora)] text-xs font-medium uppercase tracking-[2px] text-white/70">
-              {author}
+              {displayAuthor}
             </p>
           </div>
         </motion.div>

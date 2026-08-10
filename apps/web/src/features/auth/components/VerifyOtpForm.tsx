@@ -192,7 +192,7 @@ export function VerifyOtpForm({
           {/* Resend Action */}
           <div className="flex items-center justify-between font-[family-name:var(--font-lora)] text-xs">
             <span className="text-[var(--text-light)]">
-              {timer > 0 ? `Gửi lại mã sau ${timer}s` : 'Không nhận được mã?'}
+              {timer > 0 ? t('resendTimer', { timer }) : t('noCodeReceived')}
             </span>
             <button
               type="button"
@@ -214,7 +214,7 @@ export function VerifyOtpForm({
             disabled={otp.join('').length < 6 || isLoading}
             className="w-full h-12 bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/95 shadow-sm transition-all hover:shadow duration-300 flex items-center justify-center gap-2 group/btn font-semibold tracking-wider text-xs uppercase rounded-lg disabled:opacity-50 disabled:pointer-events-none"
           >
-            {isLoading ? 'Đang xác thực...' : t('verifyButton')}
+            {isLoading ? t('verifying') : t('verifyButton')}
           </Button>
         </motion.form>
 
@@ -228,7 +228,7 @@ export function VerifyOtpForm({
             className="inline-flex items-center gap-1.5 font-semibold text-[var(--primary-color)] hover:text-[var(--accent-color)] transition-colors group/back"
           >
             <ArrowLeft size={14} className="transition-transform group-hover/back:-translate-x-0.5" />
-            <span>Quay lại nhập email</span>
+            <span>{t('backToEmail')}</span>
           </Link>
         </motion.p>
       </motion.div>

@@ -13,13 +13,17 @@ import { Checkbox } from '@/components/ui/checkbox';
 export function LoginForm() {
   const t = useTranslations('Auth');
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState('');
+  const [emailOrPhone, setEmailOrPhone] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Logging in with:', { email, password, rememberMe });
+    console.log('Logging in with:', { emailOrPhone, password, rememberMe });
+  };
+
+  const handleGoogleLogin = () => {
+    console.log('Logging in with Google');
   };
 
   const containerVariants = {
@@ -82,21 +86,21 @@ export function LoginForm() {
         {/* Form */}
         <motion.form variants={itemVariants} onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-5">
-            {/* Email Field */}
+            {/* Email or Phone Field */}
             <div className="space-y-2">
               <label
-                htmlFor="email"
+                htmlFor="emailOrPhone"
                 className="block font-[family-name:var(--font-lora)] text-xs font-semibold uppercase tracking-wider text-[var(--text-main)]"
               >
-                {t('emailAddress')}
+                {t('emailOrPhone')}
               </label>
               <Input
-                id="email"
-                type="email"
+                id="emailOrPhone"
+                type="text"
                 required
-                placeholder="example@aodai.vn"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                placeholder={t('emailOrPhonePlaceholder')}
+                value={emailOrPhone}
+                onChange={(e) => setEmailOrPhone(e.target.value)}
                 className="w-full border-[var(--border)] focus:border-[var(--primary-color)]"
               />
             </div>
@@ -124,8 +128,8 @@ export function LoginForm() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-light)] hover:text-[var(--text-main)] transition-colors focus:outline-none"
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  className="cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-light)] hover:text-[var(--text-main)] transition-colors focus:outline-none"
+                  aria-label={showPassword ? t('hidePassword') : t('showPassword')}
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
@@ -163,6 +167,43 @@ export function LoginForm() {
           >
             <span>{t('login')}</span>
             <ArrowRight size={14} className="transition-transform group-hover/btn:translate-x-1" />
+          </Button>
+
+          {/* Divider */}
+          <div className="relative flex py-2 items-center">
+            <div className="flex-grow border-t border-[var(--border)]"></div>
+            <span className="flex-shrink mx-4 text-[var(--text-light)] text-[10px] font-bold uppercase tracking-widest">
+              {t('orContinueWith')}
+            </span>
+            <div className="flex-grow border-t border-[var(--border)]"></div>
+          </div>
+
+          {/* Google Login Button */}
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleGoogleLogin}
+            className="w-full h-12 bg-white text-zinc-700 border border-zinc-300 hover:bg-zinc-50 hover:border-zinc-400 shadow-sm flex items-center justify-center gap-3 font-semibold tracking-wider text-xs uppercase rounded-lg transition-all"
+          >
+            <svg className="h-4 w-4" viewBox="0 0 24 24">
+              <path
+                fill="#4285F4"
+                d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v3.9h6.6c-.28 1.48-1.12 2.73-2.38 3.58v3h3.84c2.25-2.07 3.53-5.1 3.53-8.6c.01-.27-.03-.54-.05-.81Z"
+              />
+              <path
+                fill="#34A853"
+                d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.84-3c-1.07.72-2.45 1.16-4.09 1.16c-3.14 0-5.8-2.11-6.75-4.96H1.41v3.1c2 3.97 6.09 6.5 10.59 6.5Z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M5.25 14.29c-.25-.72-.38-1.49-.38-2.29c0-.8.13-1.57.38-2.29V6.6H1.41C.51 8.38 0 10.38 0 12.5s.51 4.12 1.41 5.9l3.84-3.11Z"
+              />
+              <path
+                fill="#EA4335"
+                d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.08 15.24 0 12 0C7.5 0 3.41 2.53 1.41 6.5l3.84 3.1c.95-2.85 3.61-4.85 6.75-4.85Z"
+              />
+            </svg>
+            <span>{t('continueWithGoogle')}</span>
           </Button>
         </motion.form>
 

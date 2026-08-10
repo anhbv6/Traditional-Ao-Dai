@@ -61,10 +61,10 @@ export function ChangePasswordForm() {
           </div>
           <div className="space-y-2">
             <h2 className="font-[family-name:var(--font-playfair)] text-3xl font-semibold text-[var(--primary-color)]">
-              Thành công!
+              {t('success')}
             </h2>
             <p className="font-[family-name:var(--font-lora)] text-sm text-[var(--text-light)]">
-              Mật khẩu của bạn đã được cập nhật thành công. Vui lòng sử dụng mật khẩu mới để đăng nhập.
+              {t('passwordUpdated')}
             </p>
           </div>
           <Button
@@ -173,7 +173,7 @@ export function ChangePasswordForm() {
               />
               {confirmPassword && password !== confirmPassword && (
                 <p className="font-[family-name:var(--font-lora)] text-xs text-red-500 mt-1">
-                  Mật khẩu xác nhận không trùng khớp.
+                  {t('passwordsDoNotMatch')}
                 </p>
               )}
             </div>
@@ -185,7 +185,7 @@ export function ChangePasswordForm() {
             disabled={!password || password !== confirmPassword || isLoading}
             className="w-full h-12 bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/95 shadow-sm transition-all hover:shadow duration-300 flex items-center justify-center gap-2 group/btn font-semibold tracking-wider text-xs uppercase rounded-lg disabled:opacity-50 disabled:pointer-events-none"
           >
-            {isLoading ? 'Đang cập nhật...' : t('resetButton')}
+            {isLoading ? t('updating') : t('resetButton')}
           </Button>
         </motion.form>
       </motion.div>

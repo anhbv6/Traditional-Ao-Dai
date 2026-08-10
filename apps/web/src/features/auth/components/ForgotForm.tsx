@@ -80,7 +80,7 @@ export function ForgotForm({ onSubmitSuccess }: ForgotFormProps) {
             variants={itemVariants}
             className="font-[family-name:var(--font-lora)] text-sm text-[var(--text-light)] leading-relaxed"
           >
-            {submitted ? 'Liên kết khôi phục mật khẩu đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư.' : t('forgotSubtitle')}
+            {submitted ? t('resetLinkSent') : t('forgotSubtitle')}
           </motion.p>
         </div>
 
@@ -121,7 +121,7 @@ export function ForgotForm({ onSubmitSuccess }: ForgotFormProps) {
               variant="outline"
               className="w-full h-12 border-[var(--border)] hover:bg-[var(--bg-secondary)] font-[family-name:var(--font-lora)] text-sm rounded-lg"
             >
-              Gửi lại email
+              {t('resendEmail')}
             </Button>
           </motion.div>
         )}
