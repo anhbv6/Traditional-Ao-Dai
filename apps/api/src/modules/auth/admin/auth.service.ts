@@ -1,8 +1,8 @@
 import { prisma } from '@repo/db'
-import { comparePassword } from '../../shared/utils/password'
-import { generateToken } from '../../shared/utils/jwt'
-import { AppError } from '../../shared/middlewares/errorHandler'
-import { LoginInput } from './auth.schema'
+import { comparePassword } from '../../../shared/utils/password'
+import { generateToken } from '../../../shared/utils/jwt'
+import { AppError } from '../../../shared/middlewares/errorHandler'
+import { LoginInput } from '../auth.schema'
 
 /**
  * Validates admin credentials and generates a JWT access token.
@@ -25,7 +25,7 @@ export async function adminLogin(input: LoginInput['body']) {
   }
 
   // Verify password
-  const isPasswordMatch = await comparePassword(password, user.password)
+  const isPasswordMatch = await comparePassword(password, user.password || '')
   if (!isPasswordMatch) {
     throw new AppError(401, 'Mật khẩu không chính xác')
   }
@@ -33,7 +33,6 @@ export async function adminLogin(input: LoginInput['body']) {
   // Generate JWT token containing key user claims
   const token = generateToken({
     userId: user.id,
-    email: user.email,
     role: user.role,
   })
 

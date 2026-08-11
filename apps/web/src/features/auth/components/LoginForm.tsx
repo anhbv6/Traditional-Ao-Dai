@@ -207,19 +207,32 @@ export function LoginForm() {
           </Button>
         </motion.form>
 
-        {/* Footer Link */}
-        <motion.p
-          variants={itemVariants}
-          className="text-center font-[family-name:var(--font-lora)] text-xs text-[var(--text-light)]"
-        >
-          {t('dontHaveAccount')}{' '}
-          <Link
-            href="/signin"
-            className="font-semibold text-[var(--primary-color)] hover:text-[var(--accent-color)] transition-colors underline decoration-[var(--primary-color)]/20 underline-offset-4"
+        {/* Footer Links */}
+        <div className="space-y-3.5 text-center">
+          <motion.p
+            variants={itemVariants}
+            className="font-[family-name:var(--font-lora)] text-xs text-[var(--text-light)]"
           >
-            {t('createAccount')}
-          </Link>
-        </motion.p>
+            {t('dontHaveAccount')}{' '}
+            <Link
+              href="/signin"
+              className="font-semibold text-[var(--primary-color)] hover:text-[var(--accent-color)] transition-colors underline decoration-[var(--primary-color)]/20 underline-offset-4"
+            >
+              {t('createAccount')}
+            </Link>
+          </motion.p>
+          <motion.p
+            variants={itemVariants}
+            className="font-[family-name:var(--font-lora)] text-xs"
+          >
+            <Link
+              href="/"
+              className="font-medium text-[var(--text-light)] hover:text-[var(--primary-color)] transition-colors underline underline-offset-4 decoration-[var(--text-light)]/20"
+            >
+              {t('continueAsGuest')}
+            </Link>
+          </motion.p>
+        </div>
       </motion.div>
     </div>
   );

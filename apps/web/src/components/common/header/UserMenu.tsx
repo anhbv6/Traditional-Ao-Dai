@@ -22,7 +22,7 @@ export function UserMenu({
   if (!userName) {
     return (
       <Link
-        href="/profile"
+        href="/login"
         className="min-w-[130px] ml-5 hidden h-11 items-center justify-center rounded-md bg-primary px-6 text-xs font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 sm:inline-flex"
       >
         {loginLabel}

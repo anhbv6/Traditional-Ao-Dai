@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from 'express'
-import { AnyZodObject, ZodError } from 'zod'
+import { ZodObject, ZodError } from 'zod'
 
 /**
  * Validates request payload against a Zod schema.
  */
-export const validate = (schema: AnyZodObject) => {
+export const validate = (schema: ZodObject<any, any>) => {
   return async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
       const parsed = await schema.parseAsync({
@@ -14,8 +14,8 @@ export const validate = (schema: AnyZodObject) => {
       })
       // Assign back the parsed/typed values
       req.body = parsed.body
-      req.query = parsed.query
-      req.params = parsed.params
+      req.query = parsed.query as any
+      req.params = parsed.params as any
       return next()
     } catch (error) {
       if (error instanceof ZodError) {
@@ -23,7 +23,7 @@ export const validate = (schema: AnyZodObject) => {
           status: 'error',
           statusCode: 400,
           message: 'Validation error',
-          errors: error.errors.map((err) => ({
+          errors: error.issues.map((err: any) => ({
             field: err.path.slice(1).join('.'), // e.g., 'body.email' -> 'email'
             message: err.message,
           })),

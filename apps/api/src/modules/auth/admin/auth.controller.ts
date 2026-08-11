@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import * as authService from './auth.service'
-import { AuthenticatedRequest } from '../../shared/middlewares/authGuard'
+import { AuthenticatedRequest } from '../../../shared/middlewares/authGuard'
 
 /**
  * Controller handler for Admin Login

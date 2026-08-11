@@ -65,9 +65,22 @@ model User {
   measurements      UserMeasurement[]
   orders            Order[]
 
-  refreshToken      String?         @db.Text
+  sessions          UserSession[]
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
+}
+
+model UserSession {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refreshToken String   @db.Text
+  deviceInfo   String?  // Trình duyệt / OS của thiết bị
+  ipAddress    String?  // IP truy cập
+  expiresAt    DateTime // Thời gian hết hạn của Refresh Token
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  @@index([userId])
 }
 
 model UserMeasurement {

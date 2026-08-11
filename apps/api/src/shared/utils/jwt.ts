@@ -4,20 +4,23 @@ import { Role } from '@repo/db'
 
 export interface JWTPayload {
   userId: string
-  email: string
   role: Role
 }
+
+// Decode base64 keys
+const privateKey = Buffer.from(env.JWT_PRIVATE_KEY, 'base64').toString('utf8')
+const publicKey = Buffer.from(env.JWT_PUBLIC_KEY, 'base64').toString('utf8')
 
 /**
  * Generates a JWT token for a given user payload.
  */
-export function generateToken(payload: JWTPayload, expiresIn: string = '1d'): string {
-  return jwt.sign(payload, env.JWT_SECRET, { expiresIn })
+export function generateToken(payload: JWTPayload, expiresIn: string = env.JWT_EXPIRES_IN): string {
+  return jwt.sign(payload, privateKey, { algorithm: 'RS256', expiresIn: expiresIn as any })
 }
 
 /**
  * Verifies a JWT token and returns the decoded payload.
  */
 export function verifyToken(token: string): JWTPayload {
-  return jwt.verify(token, env.JWT_SECRET) as JWTPayload
+  return jwt.verify(token, publicKey, { algorithms: ['RS256'] }) as JWTPayload
 }
