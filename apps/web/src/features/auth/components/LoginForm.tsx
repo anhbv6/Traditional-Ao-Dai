@@ -4,15 +4,14 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { motion } from 'motion/react';
-import { Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Link } from '@/i18n/routing';
-import { Input } from '@/components/ui/input';
+import { FormInput } from '@/components/shared/FormInput';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 
 export function LoginForm() {
   const t = useTranslations('Auth');
-  const [showPassword, setShowPassword] = useState(false);
   const [emailOrPhone, setEmailOrPhone] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
@@ -87,54 +86,30 @@ export function LoginForm() {
         <motion.form variants={itemVariants} onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-5">
             {/* Email or Phone Field */}
-            <div className="space-y-2">
-              <label
-                htmlFor="emailOrPhone"
-                className="block font-[family-name:var(--font-lora)] text-xs font-semibold uppercase tracking-wider text-[var(--text-main)]"
-              >
-                {t('emailOrPhone')}
-              </label>
-              <Input
-                id="emailOrPhone"
-                type="text"
-                required
-                placeholder={t('emailOrPhonePlaceholder')}
-                value={emailOrPhone}
-                onChange={(e) => setEmailOrPhone(e.target.value)}
-                className="w-full border-[var(--border)] focus:border-[var(--primary-color)]"
-              />
-            </div>
+            <FormInput
+              id="emailOrPhone"
+              type="text"
+              required
+              label={t('emailOrPhone')}
+              placeholder={t('emailOrPhonePlaceholder')}
+              value={emailOrPhone}
+              onChange={(e) => setEmailOrPhone(e.target.value)}
+            />
 
             {/* Password Field */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label
-                  htmlFor="password"
-                  className="block font-[family-name:var(--font-lora)] text-xs font-semibold uppercase tracking-wider text-[var(--text-main)]"
-                >
-                  {t('password')}
-                </label>
-              </div>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  placeholder="••••••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pr-10 border-[var(--border)] focus:border-[var(--primary-color)]"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-light)] hover:text-[var(--text-main)] transition-colors focus:outline-none"
-                  aria-label={showPassword ? t('hidePassword') : t('showPassword')}
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
-            </div>
+            <FormInput
+              id="password"
+              type="password"
+              required
+              label={t('password')}
+              placeholder="••••••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              passwordToggleLabels={{
+                show: t('showPassword'),
+                hide: t('hidePassword'),
+              }}
+            />
           </div>
 
           {/* Remember Me & Forgot Password */}

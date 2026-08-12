@@ -1,4 +1,4 @@
-Cấu hình tạo key JWT RS256 của JWT_PRIVATE_KEY và JWT_PUBLIC_KEY
+Cấu hình tạo key JWT RS256 bất đối xứng của JWT_PRIVATE_KEY và JWT_PUBLIC_KEY
 - private.pem (dùng để ký token) lệnh:
 openssl genpkey -algorithm RSA -out private.pem -pkeyopt rsa_keygen_bits:2048
 

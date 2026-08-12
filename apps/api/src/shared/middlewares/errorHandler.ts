@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
+import { sendError } from '../utils/response'
 
 /**
  * Custom Operational Error Class
@@ -27,10 +28,9 @@ export function errorHandler(
     console.error(`[Error] ${statusCode} - ${req.method} ${req.url}:`, err)
   }
 
-  res.status(statusCode).json({
-    status: 'error',
-    statusCode,
+  sendError(res, {
     message,
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
+    statusCode,
+    stack: err.stack,
   })
 }
