@@ -1,9 +1,9 @@
 'use client';
 
-import { ArrowRight, Check, Menu, Minus, Plus, UserRound } from 'lucide-react';
+import { ArrowRight, Check, LogOut, Menu, Minus, Plus, UserRound } from 'lucide-react';
 import { Link, usePathname, useRouter, routing } from '@/i18n/routing';
 import { useLocale } from 'next-intl';
-import { useState, useTransition } from 'react';
+import { useState, useSyncExternalStore, useTransition } from 'react';
 import {
   Drawer,
   DrawerClose,
@@ -17,20 +17,64 @@ import {
 import { SearchBar } from './SearchBar';
 import { Logo } from './Logo';
 import type { NavItem } from './types';
+import { logoutApi } from '@/features/auth/api/auth.api';
+import { clearBrowserAuthTokens } from '@/lib/api-client';
 
 type MobileMenuProps = {
   items: NavItem[];
   searchPlaceholder?: string;
   loginLabel?: string;
+  profileLabel?: string;
+  logoutLabel?: string;
   wishlistCount?: number;
   languageLabel?: string;
   taglineDrawer?: string;
 };
 
+function subscribeToAuthStore(callback: () => void) {
+  window.addEventListener('storage', callback);
+  window.addEventListener('auth-storage-change', callback);
+
+  return () => {
+    window.removeEventListener('storage', callback);
+    window.removeEventListener('auth-storage-change', callback);
+  };
+}
+
+function getAuthSnapshot() {
+  const accessToken = localStorage.getItem('accessToken');
+  const userInfo = localStorage.getItem('userInfo');
+  return JSON.stringify({ accessToken, userInfo });
+}
+
+function getServerAuthSnapshot() {
+  return JSON.stringify({ accessToken: null, userInfo: null });
+}
+
+function getStoredUserName(snapshot: string) {
+  const { accessToken, userInfo } = JSON.parse(snapshot) as { accessToken: string | null; userInfo: string | null };
+  if (!accessToken) {
+    return undefined;
+  }
+
+  if (!userInfo) {
+    return 'Account';
+  }
+
+  try {
+    const user = JSON.parse(userInfo) as { name?: string | null; email?: string | null };
+    return user.name || user.email || 'Account';
+  } catch {
+    return 'Account';
+  }
+}
+
 export function MobileMenu({
   items,
   searchPlaceholder = 'Search...',
   loginLabel = 'Login',
+  profileLabel = 'Profile',
+  logoutLabel = 'Logout',
   wishlistCount = 0,
   languageLabel = 'Ngôn ngữ',
   taglineDrawer,
@@ -41,6 +85,8 @@ export function MobileMenu({
   const [isPending, startTransition] = useTransition();
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const authSnapshot = useSyncExternalStore(subscribeToAuthStore, getAuthSnapshot, getServerAuthSnapshot);
+  const userName = getStoredUserName(authSnapshot);
 
   const handleSelectLanguage = (newLocale: string) => {
     if (newLocale === currentLocale || isPending) return;
@@ -51,6 +97,22 @@ export function MobileMenu({
   };
 
   const locales = routing.locales;
+
+  const handleLogout = () => {
+    setIsDrawerOpen(false);
+    startTransition(async () => {
+      const refreshToken = localStorage.getItem('refreshToken') || undefined;
+      try {
+        await logoutApi(refreshToken);
+      } catch {
+        // Local logout should still complete if the server session is already gone.
+      } finally {
+        clearBrowserAuthTokens();
+        router.push('/login');
+        router.refresh();
+      }
+    });
+  };
 
   return (
     <div className="lg:hidden">
@@ -154,15 +216,38 @@ export function MobileMenu({
 
             {/* Account / Login & Shop Now */}
             <div className="mt-6 grid gap-3">
-              <DrawerClose asChild>
-                <Link
-                  href="/profile"
-                  className="flex min-h-12 items-center justify-center gap-2 rounded-md bg-primary px-4 text-xs font-semibold uppercase tracking-wider text-white transition-colors hover:bg-[#111018]"
-                >
-                  <UserRound size={16} strokeWidth={1.5} />
-                  {loginLabel}
-                </Link>
-              </DrawerClose>
+              {userName ? (
+                <>
+                  <DrawerClose asChild>
+                    <Link
+                      href="/profile"
+                      className="flex min-h-12 items-center justify-center gap-2 rounded-md bg-primary px-4 text-xs font-semibold uppercase tracking-wider text-white transition-colors hover:bg-[#111018]"
+                    >
+                      <UserRound size={16} strokeWidth={1.5} />
+                      {profileLabel}
+                    </Link>
+                  </DrawerClose>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    disabled={isPending}
+                    className="flex min-h-12 items-center justify-center gap-2 rounded-md border border-secondary px-4 text-xs font-semibold uppercase tracking-wider text-foreground transition-colors hover:text-primary disabled:opacity-60"
+                  >
+                    <LogOut size={16} strokeWidth={1.5} />
+                    {logoutLabel}
+                  </button>
+                </>
+              ) : (
+                <DrawerClose asChild>
+                  <Link
+                    href="/login"
+                    className="flex min-h-12 items-center justify-center gap-2 rounded-md bg-primary px-4 text-xs font-semibold uppercase tracking-wider text-white transition-colors hover:bg-[#111018]"
+                  >
+                    <UserRound size={16} strokeWidth={1.5} />
+                    {loginLabel}
+                  </Link>
+                </DrawerClose>
+              )}
 
               <DrawerClose asChild>
                 <Link

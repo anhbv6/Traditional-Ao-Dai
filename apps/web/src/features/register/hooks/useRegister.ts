@@ -7,7 +7,8 @@ import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { createRegisterSchema, type RegisterFormData } from '../types/register.types';
-import { mockCheckEmailApi } from '../api/register.api';
+import { mockCheckEmailApi, checkPhoneApi, registerApi } from '../api/register.api';
+import { showToast } from '@/components/ui/toast';
 
 export function useRegister() {
   const t = useTranslations('Auth');
@@ -25,6 +26,12 @@ export function useRegister() {
   // Debounce API Check States
   const [isCheckingEmail, setIsCheckingEmail] = useState(false);
   const [emailCheckResult, setEmailCheckResult] = useState<'available' | 'taken' | null>(null);
+  const [isCheckingPhone, setIsCheckingPhone] = useState(false);
+  const [phoneCheckResult, setPhoneCheckResult] = useState<'available' | 'taken' | null>(null);
+
+  const [emailApiError, setEmailApiError] = useState('');
+  const [phoneApiError, setPhoneApiError] = useState('');
+  const [isRegistering, setIsRegistering] = useState(false);
 
   const {
     register,
@@ -51,6 +58,7 @@ export function useRegister() {
 
   const registerType = useWatch({ control, name: 'registerType' });
   const emailVal = useWatch({ control, name: 'email' });
+  const phoneVal = useWatch({ control, name: 'phone' });
 
   // Debounced Email Availability API Check (650ms)
   useEffect(() => {
@@ -59,6 +67,7 @@ export function useRegister() {
       if (!isActive) return;
       setIsCheckingEmail(false);
       setEmailCheckResult(null);
+      setEmailApiError('');
     };
 
     if (registerType !== 'email' || !emailVal) {
@@ -82,6 +91,7 @@ export function useRegister() {
       if (!isActive) return;
       setIsCheckingEmail(true);
       setEmailCheckResult(null);
+      setEmailApiError('');
       clearErrors('email');
     }, 0);
 
@@ -91,10 +101,13 @@ export function useRegister() {
         if (!isActive) return;
 
         if (res.isTaken) {
+          const errMsg = res.reason === 'EMAIL_TAKEN' ? t('emailTaken') : t('emailTaken');
           setEmailCheckResult('taken');
-          setError('email', { message: t('emailTaken') });
+          setEmailApiError(errMsg);
+          setError('email', { message: errMsg });
         } else {
           setEmailCheckResult('available');
+          setEmailApiError('');
           clearErrors('email');
         }
       } catch (err) {
@@ -113,15 +126,108 @@ export function useRegister() {
     };
   }, [emailVal, registerType, setError, clearErrors, t]);
 
-  const onFormSubmit = (data: RegisterFormData) => {
+  // Debounced Phone Availability API Check (650ms)
+  useEffect(() => {
+    let isActive = true;
+    const resetStatus = () => {
+      if (!isActive) return;
+      setIsCheckingPhone(false);
+      setPhoneCheckResult(null);
+      setPhoneApiError('');
+    };
+
+    if (registerType !== 'phone' || !phoneVal) {
+      const resetDelay = setTimeout(resetStatus, 0);
+      return () => {
+        isActive = false;
+        clearTimeout(resetDelay);
+      };
+    }
+
+    const phoneValid = z.string().regex(/^[0-9]{10,11}$/).safeParse(phoneVal).success;
+    if (!phoneValid) {
+      const resetDelay = setTimeout(resetStatus, 0);
+      return () => {
+        isActive = false;
+        clearTimeout(resetDelay);
+      };
+    }
+
+    const checkingDelay = setTimeout(() => {
+      if (!isActive) return;
+      setIsCheckingPhone(true);
+      setPhoneCheckResult(null);
+      setPhoneApiError('');
+      clearErrors('phone');
+    }, 0);
+
+    const delay = setTimeout(async () => {
+      try {
+        const res = await checkPhoneApi(phoneVal);
+        if (!isActive) return;
+
+        if (res.isTaken) {
+          const errMsg = res.reason === 'PHONE_TAKEN' ? t('phoneTaken') : t('phoneTaken');
+          setPhoneCheckResult('taken');
+          setPhoneApiError(errMsg);
+          setError('phone', { message: errMsg });
+        } else {
+          setPhoneCheckResult('available');
+          setPhoneApiError('');
+          clearErrors('phone');
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        if (isActive) {
+          setIsCheckingPhone(false);
+        }
+      }
+    }, 650);
+
+    return () => {
+      isActive = false;
+      clearTimeout(checkingDelay);
+      clearTimeout(delay);
+    };
+  }, [phoneVal, registerType, setError, clearErrors, t]);
+
+
+  const onFormSubmit = async (data: RegisterFormData) => {
     if (data.registerType === 'email') {
       if (emailCheckResult === 'taken') {
-        setError('email', { message: t('emailTaken') });
+        setError('email', { message: emailApiError || t('emailTaken') });
         return;
       }
-      alert(t('registerSuccessEmail', { name: data.fullName }));
-      router.push('/login');
+      try {
+        setIsRegistering(true);
+        const res = await registerApi({
+          registerType: 'email',
+          name: data.fullName,
+          password: data.password,
+          email: data.email,
+        });
+        const successMsg = t(res.message) || t('registerSuccessEmail', { name: data.fullName });
+        showToast.success(successMsg);
+        router.push('/login');
+      } catch (err: any) {
+        console.error('Registration failed:', err);
+        const apiMsg = err.response?.data?.message || err.message || 'Registration failed';
+        if (apiMsg.toLowerCase().includes('email')) {
+          setError('email', { message: apiMsg });
+        } else if (apiMsg.toLowerCase().includes('số điện thoại') || apiMsg.toLowerCase().includes('phone')) {
+          setError('phone', { message: apiMsg });
+        } else {
+          showToast.error(apiMsg);
+        }
+      } finally {
+        setIsRegistering(false);
+      }
     } else {
+      if (phoneCheckResult === 'taken') {
+        setError('phone', { message: phoneApiError || t('phoneTaken') });
+        return;
+      }
       const randomOtp = Math.floor(100000 + Math.random() * 900000).toString();
       setOtpSentCode(randomOtp);
       setOtpError('');
@@ -133,12 +239,29 @@ export function useRegister() {
     }
   };
 
-  const handleVerifyOtp = (e: React.FormEvent) => {
+  const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (otpInput === otpSentCode) {
-      alert(t('registerSuccessPhone'));
-      setIsOtpStep(false);
-      router.push('/login');
+      setIsRegistering(true);
+      const data = watch();
+      try {
+        const res = await registerApi({
+          registerType: 'phone',
+          name: data.fullName,
+          password: data.password,
+          phone: data.phone,
+        });
+        const successMsg = t(res.message) || t('registerSuccessPhone');
+        showToast.success(successMsg);
+        setIsOtpStep(false);
+        router.push('/login');
+      } catch (err: any) {
+        console.error('Registration failed:', err);
+        const apiMsg = err.response?.data?.message || err.message || 'Registration failed';
+        setOtpError(apiMsg);
+      } finally {
+        setIsRegistering(false);
+      }
     } else {
       setOtpError(t('otpInvalid'));
     }
@@ -167,6 +290,11 @@ export function useRegister() {
     setOtpError,
     isCheckingEmail,
     emailCheckResult,
+    emailApiError,
+    isCheckingPhone,
+    phoneCheckResult,
+    phoneApiError,
+    isRegistering,
     register,
     handleSubmit,
     watch,

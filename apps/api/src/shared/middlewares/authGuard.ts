@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { Role } from '@repo/db'
+import { prisma, Role } from '@repo/db'
 import { verifyToken, JWTPayload } from '../utils/jwt'
 import { AppError } from './errorHandler'
 
@@ -13,7 +13,7 @@ export interface AuthenticatedRequest extends Request {
 /**
  * Middleware to require a valid JWT bearer token.
  */
-export function requireAuth(req: AuthenticatedRequest, res: Response, next: NextFunction): void {
+export async function requireAuth(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
   const authHeader = req.headers.authorization
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -28,6 +28,26 @@ export function requireAuth(req: AuthenticatedRequest, res: Response, next: Next
 
   try {
     const decoded = verifyToken(token)
+    if (decoded.tokenType && decoded.tokenType !== 'access') {
+      return next(new AppError(401, 'Invalid authentication token type'))
+    }
+
+    if (decoded.sessionId) {
+      const session = await prisma.userSession.findFirst({
+        where: {
+          id: decoded.sessionId,
+          userId: decoded.userId,
+          expiresAt: {
+            gt: new Date(),
+          },
+        },
+      })
+
+      if (!session) {
+        return next(new AppError(401, 'Session expired or revoked'))
+      }
+    }
+
     req.user = decoded
     return next()
   } catch (error) {

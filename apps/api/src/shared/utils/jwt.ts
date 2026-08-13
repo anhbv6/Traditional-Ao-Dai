@@ -5,6 +5,8 @@ import { Role } from '@repo/db'
 export interface JWTPayload {
   userId: string
   role: Role
+  sessionId?: string
+  tokenType?: 'access' | 'refresh'
 }
 
 // Decode base64 keys
@@ -16,6 +18,14 @@ const publicKey = Buffer.from(env.JWT_PUBLIC_KEY, 'base64').toString('utf8')
  */
 export function generateToken(payload: JWTPayload, expiresIn: string = env.JWT_EXPIRES_IN): string {
   return jwt.sign(payload, privateKey, { algorithm: 'RS256', expiresIn: expiresIn as any })
+}
+
+export function generateAccessToken(payload: Omit<JWTPayload, 'tokenType'>): string {
+  return generateToken({ ...payload, tokenType: 'access' }, env.JWT_EXPIRES_IN)
+}
+
+export function generateRefreshToken(payload: Omit<JWTPayload, 'tokenType'>): string {
+  return generateToken({ ...payload, tokenType: 'refresh' }, env.JWT_REFRESH_EXPIRES_IN)
 }
 
 /**

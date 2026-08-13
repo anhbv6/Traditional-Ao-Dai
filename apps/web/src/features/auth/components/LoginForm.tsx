@@ -4,21 +4,23 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { motion } from 'motion/react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { FormInput } from '@/components/shared/FormInput';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useLogin } from '../hooks/useLogin';
 
 export function LoginForm() {
   const t = useTranslations('Auth');
+  const { login, isLoading } = useLogin();
   const [emailOrPhone, setEmailOrPhone] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Logging in with:', { emailOrPhone, password, rememberMe });
+    login(emailOrPhone, password);
   };
 
   const handleGoogleLogin = () => {
@@ -138,10 +140,17 @@ export function LoginForm() {
           {/* Action Button */}
           <Button
             type="submit"
-            className="w-full h-12 bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/95 shadow-sm transition-all hover:shadow duration-300 flex items-center justify-center gap-2 group/btn font-semibold tracking-wider text-xs uppercase rounded-lg"
+            disabled={isLoading}
+            className="w-full h-12 bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/95 shadow-sm transition-all hover:shadow duration-300 flex items-center justify-center gap-2 group/btn font-semibold tracking-wider text-xs uppercase rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <span>{t('login')}</span>
-            <ArrowRight size={14} className="transition-transform group-hover/btn:translate-x-1" />
+            {isLoading ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <>
+                <span>{t('login')}</span>
+                <ArrowRight size={14} className="transition-transform group-hover/btn:translate-x-1" />
+              </>
+            )}
           </Button>
 
           {/* Divider */}

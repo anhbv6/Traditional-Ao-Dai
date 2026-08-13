@@ -11,7 +11,7 @@ export async function loginAdmin(req: Request, res: Response, next: NextFunction
     const result = await authService.adminLogin(req.body)
     return sendSuccess(res, {
       data: result,
-      message: 'Đăng nhập Admin thành công',
+      message: 'ADMIN_LOGIN_SUCCESS',
     })
   } catch (error) {
     return next(error)
@@ -27,13 +27,14 @@ export async function getMe(req: AuthenticatedRequest, res: Response, next: Next
     if (!userId) {
       return sendError(res, {
         statusCode: 401,
-        message: 'Không tìm thấy thông tin định danh người dùng',
+        message: 'UNAUTHORIZED',
       })
     }
 
     const user = await authService.getUserById(userId)
     return sendSuccess(res, {
       data: user,
+      message: 'GET_PROFILE_SUCCESS',
     })
   } catch (error) {
     return next(error)

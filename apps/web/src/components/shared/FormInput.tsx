@@ -96,6 +96,10 @@ export interface FormInputProps extends Omit<React.ComponentProps<typeof Input>,
    * Higher values render this input's tooltip above lower-priority inputs.
    */
   tooltipPriority?: number;
+  /**
+   * If true, restricts the input value to digits (0-9) only.
+   */
+  onlyDigits?: boolean;
 }
 
 export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
@@ -125,6 +129,8 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
       validationTooltipSignal,
       validationTooltipTarget,
       tooltipPriority = 0,
+      onlyDigits,
+      onChange,
       ...props
     },
     ref
@@ -341,6 +347,17 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
             }}
             onBlur={(e) => {
               props.onBlur?.(e);
+            }}
+            onChange={(e) => {
+              if (onlyDigits) {
+                e.target.value = e.target.value.replace(/\D/g, '');
+              } else if (type === 'tel') {
+                // Keep only digits and "+"
+                e.target.value = e.target.value.replace(/[^\d+]/g, '');
+              } else if (type === 'number') {
+                e.target.value = e.target.value.replace(/\D/g, '');
+              }
+              onChange?.(e);
             }}
             className={cn(
               'w-full border-[var(--border)] focus:border-[var(--primary-color)]',

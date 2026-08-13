@@ -6,10 +6,7 @@ export function createRegisterSchema(t: RegisterTranslation) {
   const baseSchema = z.object({
     fullName: z.string()
       .min(2, { message: t('fullNameMin') })
-      .max(50, { message: t('fullNameMax') })
-      .regex(/^[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂÂĐÊÔƠưăâđêôơ\s]+$/, {
-        message: t('fullNameFormat'),
-      }),
+      .max(50, { message: t('fullNameMax') }),
     password: z.string()
       .min(8, { message: t('passwordMin') })
       .regex(/[A-Z]/, { message: t('passwordUpper') })

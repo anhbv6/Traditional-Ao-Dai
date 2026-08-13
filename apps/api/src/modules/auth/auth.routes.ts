@@ -2,7 +2,7 @@ import { Router } from 'express'
 import * as adminAuthController from './admin/auth.controller'
 import * as clientAuthController from './client/auth.controller'
 import { validate } from '../../shared/middlewares/validate'
-import { loginSchema, registerSchema } from './auth.schema'
+import { loginSchema, registerSchema, checkAccountSchema, refreshTokenSchema, logoutSchema } from './auth.schema'
 import { requireAuth } from '../../shared/middlewares/authGuard'
 
 const router = Router()
@@ -65,7 +65,7 @@ router.post('/admin/login', validate(loginSchema), adminAuthController.loginAdmi
  * /api/auth/client/login:
  *   post:
  *     summary: Client Login
- *     description: Authenticate customers using email and password. Returns a JWT access token.
+ *     description: Authenticate customers using email or phone and password. Returns an access token, refresh token, and creates a user session.
  *     tags:
  *       - Auth
  *     requestBody:
@@ -103,15 +103,45 @@ router.post('/admin/login', validate(loginSchema), adminAuthController.loginAdmi
  *                 data:
  *                   type: object
  *                   properties:
- *                     token:
+ *                     accessToken:
  *                       type: string
- *                       example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *                       example: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
+ *                     refreshToken:
+ *                       type: string
+ *                       example: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
+ *                     refreshTokenExpiresAt:
+ *                       type: string
+ *                       format: date-time
  *       400:
  *         description: Validation error
  *       401:
  *         description: Invalid credentials
  */
 router.post('/client/login', validate(loginSchema), clientAuthController.loginClient)
+
+/**
+ * @openapi
+ * /api/auth/client/refresh-token:
+ *   post:
+ *     summary: Refresh Client Token
+ *     description: Rotate a valid refresh token and return a new access token and refresh token pair.
+ *     tags:
+ *       - Auth
+ */
+router.post('/client/refresh-token', validate(refreshTokenSchema), clientAuthController.refreshClientToken)
+
+/**
+ * @openapi
+ * /api/auth/client/logout:
+ *   post:
+ *     summary: Client Logout
+ *     description: Revoke the current customer session.
+ *     tags:
+ *       - Auth
+ *     security:
+ *       - bearerAuth: []
+ */
+router.post('/client/logout', requireAuth as any, validate(logoutSchema), clientAuthController.logoutClient)
 
 /**
  * @openapi
@@ -201,5 +231,57 @@ router.post('/client/register', validate(registerSchema), clientAuthController.r
  *         description: Unauthorized - JWT token missing, invalid or expired
  */
 router.get('/me', requireAuth as any, clientAuthController.getMe)
+
+/**
+ * @openapi
+ * /api/auth/check-account:
+ *   get:
+ *     summary: Check Account Availability
+ *     description: Verify if an email or phone number is already registered in the system.
+ *     tags:
+ *       - Auth
+ *     parameters:
+ *       - in: query
+ *         name: email
+ *         schema:
+ *           type: string
+ *           format: email
+ *         description: The email address to check
+ *         example: admin@gmail.com
+ *       - in: query
+ *         name: phone
+ *         schema:
+ *           type: string
+ *         description: The phone number to check
+ *         example: "0987654321"
+ *     responses:
+ *       200:
+ *         description: Check completed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: Account availability checked successfully
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     available:
+ *                       type: boolean
+ *                       example: true
+ *                     reason:
+ *                       type: string
+ *                       example: AVAILABLE
+
+
+ *       400:
+ *         description: Validation error or missing parameters
+ */
+router.get('/check-account', validate(checkAccountSchema), clientAuthController.checkAccount)
 
 export default router

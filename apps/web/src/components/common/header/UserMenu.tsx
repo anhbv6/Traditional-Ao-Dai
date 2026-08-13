@@ -1,23 +1,90 @@
 'use client';
 
-import { useState } from 'react';
-import { UserRound } from 'lucide-react';
-import { Link } from '@/i18n/routing';
+import { useState, useSyncExternalStore, useTransition } from 'react';
+import { LogOut, UserRound } from 'lucide-react';
+import { Link, useRouter } from '@/i18n/routing';
+import { logoutApi } from '@/features/auth/api/auth.api';
+import { clearBrowserAuthTokens } from '@/lib/api-client';
 
 type UserMenuProps = {
   loginLabel?: string;
   profileLabel?: string;
   ordersLabel?: string;
+  logoutLabel?: string;
   userName?: string;
 };
+
+type StoredUser = {
+  name?: string | null;
+  email?: string | null;
+};
+
+function subscribeToAuthStore(callback: () => void) {
+  window.addEventListener('storage', callback);
+  window.addEventListener('auth-storage-change', callback);
+
+  return () => {
+    window.removeEventListener('storage', callback);
+    window.removeEventListener('auth-storage-change', callback);
+  };
+}
+
+function getAuthSnapshot() {
+  const accessToken = localStorage.getItem('accessToken');
+  const userInfo = localStorage.getItem('userInfo');
+  return JSON.stringify({ accessToken, userInfo });
+}
+
+function getServerAuthSnapshot() {
+  return JSON.stringify({ accessToken: null, userInfo: null });
+}
+
+function getStoredUserName(snapshot: string) {
+  const { accessToken, userInfo } = JSON.parse(snapshot) as { accessToken: string | null; userInfo: string | null };
+  if (!accessToken) {
+    return undefined;
+  }
+
+  if (!userInfo) {
+    return 'Account';
+  }
+
+  try {
+    const user = JSON.parse(userInfo) as StoredUser;
+    return user.name || user.email || 'Account';
+  } catch {
+    return 'Account';
+  }
+}
 
 export function UserMenu({
   loginLabel = 'Login',
   profileLabel = 'Profile',
   ordersLabel = 'Orders',
-  userName,
+  logoutLabel = 'Logout',
+  userName: initialUserName,
 }: UserMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
+  const authSnapshot = useSyncExternalStore(subscribeToAuthStore, getAuthSnapshot, getServerAuthSnapshot);
+  const userName = initialUserName || getStoredUserName(authSnapshot);
+
+  const handleLogout = () => {
+    setIsOpen(false);
+    startTransition(async () => {
+      const refreshToken = localStorage.getItem('refreshToken') || undefined;
+      try {
+        await logoutApi(refreshToken);
+      } catch {
+        // Local logout should still complete if the server session is already gone.
+      } finally {
+        clearBrowserAuthTokens();
+        router.push('/login');
+        router.refresh();
+      }
+    });
+  };
 
   if (!userName) {
     return (
@@ -49,6 +116,15 @@ export function UserMenu({
           <Link href="/profile/orders" className="block px-3 py-2 text-sm font-semibold text-foreground hover:text-primary">
             {ordersLabel}
           </Link>
+          <button
+            type="button"
+            onClick={handleLogout}
+            disabled={isPending}
+            className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm font-semibold text-foreground hover:text-primary disabled:opacity-60"
+          >
+            <LogOut size={15} strokeWidth={1.6} />
+            {logoutLabel}
+          </button>
         </div>
       ) : null}
     </div>

@@ -47,7 +47,7 @@ export async function Header({ sticky = true, cartCount = 0, wishlistCount = 0 }
             <WishlistButton count={wishlistCount} label={t('wishlist')} />
             <CartButton count={cartCount} label={t('cart')} />
             <LanguageSwitcher />
-            <UserMenu loginLabel={t('login')} profileLabel={t('profile')} ordersLabel={t('orders')} />
+            <UserMenu loginLabel={t('login')} profileLabel={t('profile')} ordersLabel={t('orders')} logoutLabel={t('logout')} />
           </div>
 
           {/* Mobile Header Items: Cart icon + Mobile Menu Drawer */}
@@ -57,6 +57,8 @@ export async function Header({ sticky = true, cartCount = 0, wishlistCount = 0 }
               items={mobileNavItems}
               searchPlaceholder={t('searchPlaceholder')}
               loginLabel={t('login')}
+              profileLabel={t('profile')}
+              logoutLabel={t('logout')}
               wishlistCount={wishlistCount}
               languageLabel={t('language')}
               taglineDrawer={t(('tagline'))}

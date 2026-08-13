@@ -191,6 +191,11 @@ export function RegisterForm() {
     otpError,
     isCheckingEmail,
     emailCheckResult,
+    emailApiError,
+    isCheckingPhone,
+    phoneCheckResult,
+    phoneApiError,
+    isRegistering,
     register,
     handleSubmit,
     watch,
@@ -213,8 +218,7 @@ export function RegisterForm() {
   // Full name validations
   const fnRequired = fullNameValue.trim().length > 0;
   const fnLength = fullNameValue.length >= 2 && fullNameValue.length <= 50;
-  const fnFormat = fullNameValue.length > 0 && /^[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂÂĐÊÔƠưăâđêôơ\s]+$/.test(fullNameValue);
-  const fnAllValid = fnRequired && fnLength && fnFormat;
+  const fnAllValid = fnRequired && fnLength;
   const hasFullNameError = (fullNameValue.length > 0 && !fnAllValid) || !!errors.fullName;
   const isFullNameSuccess = fnAllValid;
 
@@ -222,15 +226,17 @@ export function RegisterForm() {
   const emailRequired = emailValue.trim().length > 0;
   const emailFormat = emailValue.length > 0 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue);
   const emailAllValid = emailRequired && emailFormat;
-  const hasEmailError = (emailValue.length > 0 && !emailAllValid) || !!errors.email;
+  const hasEmailError = (emailValue.length > 0 && !emailAllValid) || !!errors.email || emailCheckResult === 'taken';
   const isEmailSuccess = emailAllValid && emailCheckResult === 'available';
+  const emailErrorMessage = errors.email?.message || (emailCheckResult === 'taken' ? (emailApiError || t('emailTaken')) : undefined);
 
   const phoneRequired = phoneValue.trim().length > 0;
   const phoneDigits = phoneValue.length === 10 && /^\d+$/.test(phoneValue);
   const phonePrefix = phoneValue.length >= 2 && /^0[35789]/.test(phoneValue);
   const phoneAllValid = phoneRequired && phoneDigits && phonePrefix;
-  const hasPhoneError = (phoneValue.length > 0 && !phoneAllValid) || !!errors.phone;
-  const isPhoneSuccess = phoneAllValid;
+  const hasPhoneError = (phoneValue.length > 0 && !phoneAllValid) || !!errors.phone || phoneCheckResult === 'taken';
+  const isPhoneSuccess = phoneAllValid && phoneCheckResult === 'available';
+  const phoneErrorMessage = errors.phone?.message || (phoneCheckResult === 'taken' ? (phoneApiError || t('phoneTaken')) : undefined);
 
   // Password validations
   const pwRequired = passwordValue.length > 0;
@@ -287,7 +293,6 @@ export function RegisterForm() {
       items={[
         { label: t('fullNameRuleRequired'), isValid: fnRequired },
         { label: t('fullNameRuleLength'), isValid: fnLength },
-        { label: t('fullNameRuleFormat'), isValid: fnFormat },
       ]}
     />
   );
@@ -297,6 +302,7 @@ export function RegisterForm() {
       items={[
         { label: t('emailRuleRequired'), isValid: emailRequired },
         { label: t('emailRuleFormat'), isValid: emailFormat },
+        ...(emailCheckResult === 'taken' ? [{ label: emailApiError || t('emailTaken'), isValid: false }] : []),
       ]}
     />
   );
@@ -307,6 +313,7 @@ export function RegisterForm() {
         { label: t('phoneRuleRequired'), isValid: phoneRequired },
         { label: t('phoneRuleDigits'), isValid: phoneDigits },
         { label: t('phoneRulePrefix'), isValid: phonePrefix },
+        ...(phoneCheckResult === 'taken' ? [{ label: phoneApiError || t('phoneTaken'), isValid: false }] : []),
       ]}
     />
   );
@@ -436,7 +443,7 @@ export function RegisterForm() {
                     }
                     placeholder={t('emailPlaceholder')}
                     isInvalid={hasEmailError}
-                    error={errors.email?.message}
+                    error={emailErrorMessage}
                     isSuccess={isEmailSuccess}
                     validationTooltipSignal={validationTooltipSignal}
                     validationTooltipTarget={validationTooltipTarget}
@@ -489,11 +496,34 @@ export function RegisterForm() {
                     }
                     placeholder={t('phonePlaceholder')}
                     isInvalid={hasPhoneError}
-                    error={errors.phone?.message}
+                    error={phoneErrorMessage}
                     isSuccess={isPhoneSuccess}
                     validationTooltipSignal={validationTooltipSignal}
                     validationTooltipTarget={validationTooltipTarget}
                     tooltipPriority={40}
+                    rightElement={
+                      <div className="flex items-center">
+                        {isCheckingPhone && (
+                          <RefreshCw size={14} className="text-[#800020] animate-spin" />
+                        )}
+                        {!isCheckingPhone && phoneCheckResult === 'available' && (
+                          <CheckCircle2 size={15} className="text-green-600" />
+                        )}
+                      </div>
+                    }
+                    successMessage={
+                      <span className="flex items-center gap-1">
+                        <CheckCircle2 size={12} />
+                        {t('phoneAvailable')}
+                      </span>
+                    }
+                    helperText={
+                      isCheckingPhone ? (
+                        <span className="flex items-center gap-1 font-semibold text-gray-500">
+                          {t('phoneChecking')}
+                        </span>
+                      ) : undefined
+                    }
                     {...register('phone')}
                   />
                 )}
@@ -596,10 +626,17 @@ export function RegisterForm() {
               <Button
                 type="submit"
                 data-tooltip-submit="true"
-                className="w-full h-12 bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/95 shadow-sm transition-all hover:shadow duration-300 flex items-center justify-center gap-2 group/btn font-semibold tracking-wider text-xs uppercase rounded-lg mt-2 cursor-pointer"
+                disabled={isRegistering || isCheckingEmail || isCheckingPhone}
+                className="w-full h-12 bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/95 shadow-sm transition-all hover:shadow duration-300 flex items-center justify-center gap-2 group/btn font-semibold tracking-wider text-xs uppercase rounded-lg mt-2 cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
               >
-                <span>{t('signin')}</span>
-                <ArrowRight size={14} className="transition-transform group-hover/btn:translate-x-1" />
+                {isRegistering ? (
+                  <RefreshCw size={14} className="animate-spin" />
+                ) : (
+                  <>
+                    <span>{t('signin')}</span>
+                    <ArrowRight size={14} className="transition-transform group-hover/btn:translate-x-1" />
+                  </>
+                )}
               </Button>
 
               {/* Divider */}
@@ -691,9 +728,14 @@ export function RegisterForm() {
 
               <Button
                 type="submit"
-                className="w-full h-12 bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/95 shadow-sm font-semibold tracking-wider text-xs uppercase rounded-lg cursor-pointer"
+                disabled={isRegistering}
+                className="w-full h-12 bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/95 shadow-sm font-semibold tracking-wider text-xs uppercase rounded-lg cursor-pointer disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-2"
               >
-                {t('verifyButton')}
+                {isRegistering ? (
+                  <RefreshCw size={14} className="animate-spin" />
+                ) : (
+                  t('verifyButton')
+                )}
               </Button>
 
               <div className="flex justify-between text-xs font-semibold font-[family-name:var(--font-lora)] px-1">
