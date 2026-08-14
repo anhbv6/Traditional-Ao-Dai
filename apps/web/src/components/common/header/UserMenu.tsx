@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useSyncExternalStore, useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import { LogOut, UserRound } from 'lucide-react';
 import { Link, useRouter } from '@/i18n/routing';
 import { logoutApi } from '@/features/auth/api/auth.api';
+import { useCurrentUser } from '@/features/auth/hooks/useCurrentUser';
 import { clearBrowserAuthTokens } from '@/lib/api-client';
 
 type UserMenuProps = {
@@ -13,49 +14,6 @@ type UserMenuProps = {
   logoutLabel?: string;
   userName?: string;
 };
-
-type StoredUser = {
-  name?: string | null;
-  email?: string | null;
-};
-
-function subscribeToAuthStore(callback: () => void) {
-  window.addEventListener('storage', callback);
-  window.addEventListener('auth-storage-change', callback);
-
-  return () => {
-    window.removeEventListener('storage', callback);
-    window.removeEventListener('auth-storage-change', callback);
-  };
-}
-
-function getAuthSnapshot() {
-  const accessToken = localStorage.getItem('accessToken');
-  const userInfo = localStorage.getItem('userInfo');
-  return JSON.stringify({ accessToken, userInfo });
-}
-
-function getServerAuthSnapshot() {
-  return JSON.stringify({ accessToken: null, userInfo: null });
-}
-
-function getStoredUserName(snapshot: string) {
-  const { accessToken, userInfo } = JSON.parse(snapshot) as { accessToken: string | null; userInfo: string | null };
-  if (!accessToken) {
-    return undefined;
-  }
-
-  if (!userInfo) {
-    return 'Account';
-  }
-
-  try {
-    const user = JSON.parse(userInfo) as StoredUser;
-    return user.name || user.email || 'Account';
-  } catch {
-    return 'Account';
-  }
-}
 
 export function UserMenu({
   loginLabel = 'Login',
@@ -67,8 +25,8 @@ export function UserMenu({
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
-  const authSnapshot = useSyncExternalStore(subscribeToAuthStore, getAuthSnapshot, getServerAuthSnapshot);
-  const userName = initialUserName || getStoredUserName(authSnapshot);
+  const { isAuthenticated, user } = useCurrentUser();
+  const userName = initialUserName || user?.name || user?.email || (isAuthenticated ? 'Account' : undefined);
 
   const handleLogout = () => {
     setIsOpen(false);

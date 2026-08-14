@@ -231,6 +231,7 @@ router.post('/client/register', validate(registerSchema), clientAuthController.r
  *         description: Unauthorized - JWT token missing, invalid or expired
  */
 router.get('/me', requireAuth as any, clientAuthController.getMe)
+router.get('/client/me', requireAuth as any, clientAuthController.getMe)
 
 /**
  * @openapi

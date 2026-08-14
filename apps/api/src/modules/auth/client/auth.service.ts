@@ -62,17 +62,17 @@ export async function clientLogin(input: LoginInput['body'], meta: SessionMeta =
 
   // Check user existence, verify they are a CUSTOMER
   if (!user || user.role !== 'CUSTOMER') {
-    throw new AppError(401, 'Tài khoản không tồn tại hoặc không phải là tài khoản khách hàng')
+    throw new AppError(401, 'Account does not exist or is not a customer account.')
   }
 
   if (!user.isActive) {
-    throw new AppError(403, 'Tài khoản này đã bị khóa hoặc ngưng hoạt động')
+    throw new AppError(403, 'This account has been locked or deactivated.')
   }
 
   // Verify password
   const isPasswordMatch = await comparePassword(password, user.password || '')
   if (!isPasswordMatch) {
-    throw new AppError(401, 'Mật khẩu không chính xác')
+    throw new AppError(401, 'Incorrect password.')
   }
 
   const refreshExpiresAt = new Date(Date.now() + durationToMs(env.JWT_REFRESH_EXPIRES_IN))
@@ -251,8 +251,12 @@ export async function getUserById(id: string) {
     where: { id },
   })
 
-  if (!user) {
+  if (!user || user.role !== 'CUSTOMER') {
     throw new AppError(404, 'Không tìm thấy người dùng')
+  }
+
+  if (!user.isActive) {
+    throw new AppError(403, 'TÃ i khoáº£n nÃ y Ä‘Ã£ bá»‹ khÃ³a hoáº·c ngÆ°ng hoáº¡t Ä‘á»™ng')
   }
 
   const { password: _, ...safeUser } = user

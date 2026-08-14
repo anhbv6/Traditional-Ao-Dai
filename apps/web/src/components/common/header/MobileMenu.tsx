@@ -3,7 +3,7 @@
 import { ArrowRight, Check, LogOut, Menu, Minus, Plus, UserRound } from 'lucide-react';
 import { Link, usePathname, useRouter, routing } from '@/i18n/routing';
 import { useLocale } from 'next-intl';
-import { useState, useSyncExternalStore, useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import {
   Drawer,
   DrawerClose,
@@ -18,6 +18,7 @@ import { SearchBar } from './SearchBar';
 import { Logo } from './Logo';
 import type { NavItem } from './types';
 import { logoutApi } from '@/features/auth/api/auth.api';
+import { useCurrentUser } from '@/features/auth/hooks/useCurrentUser';
 import { clearBrowserAuthTokens } from '@/lib/api-client';
 
 type MobileMenuProps = {
@@ -30,44 +31,6 @@ type MobileMenuProps = {
   languageLabel?: string;
   taglineDrawer?: string;
 };
-
-function subscribeToAuthStore(callback: () => void) {
-  window.addEventListener('storage', callback);
-  window.addEventListener('auth-storage-change', callback);
-
-  return () => {
-    window.removeEventListener('storage', callback);
-    window.removeEventListener('auth-storage-change', callback);
-  };
-}
-
-function getAuthSnapshot() {
-  const accessToken = localStorage.getItem('accessToken');
-  const userInfo = localStorage.getItem('userInfo');
-  return JSON.stringify({ accessToken, userInfo });
-}
-
-function getServerAuthSnapshot() {
-  return JSON.stringify({ accessToken: null, userInfo: null });
-}
-
-function getStoredUserName(snapshot: string) {
-  const { accessToken, userInfo } = JSON.parse(snapshot) as { accessToken: string | null; userInfo: string | null };
-  if (!accessToken) {
-    return undefined;
-  }
-
-  if (!userInfo) {
-    return 'Account';
-  }
-
-  try {
-    const user = JSON.parse(userInfo) as { name?: string | null; email?: string | null };
-    return user.name || user.email || 'Account';
-  } catch {
-    return 'Account';
-  }
-}
 
 export function MobileMenu({
   items,
@@ -85,8 +48,8 @@ export function MobileMenu({
   const [isPending, startTransition] = useTransition();
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const authSnapshot = useSyncExternalStore(subscribeToAuthStore, getAuthSnapshot, getServerAuthSnapshot);
-  const userName = getStoredUserName(authSnapshot);
+  const { isAuthenticated, user } = useCurrentUser();
+  const userName = user?.name || user?.email || (isAuthenticated ? 'Account' : undefined);
 
   const handleSelectLanguage = (newLocale: string) => {
     if (newLocale === currentLocale || isPending) return;

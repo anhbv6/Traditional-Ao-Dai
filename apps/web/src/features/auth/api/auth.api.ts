@@ -1,5 +1,18 @@
 import { apiClient } from '@/lib/api-client';
 
+export interface AuthUser {
+  id: string;
+  email: string;
+  name: string | null;
+  phone: string | null;
+  avatar?: string | null;
+  birth?: string | null;
+  gender?: string;
+  role: string;
+  isActive: boolean;
+  isEmailVerified?: boolean;
+}
+
 export interface LoginResponse {
   status: string;
   statusCode: number;
@@ -8,18 +21,18 @@ export interface LoginResponse {
     accessToken: string;
     refreshToken: string;
     refreshTokenExpiresAt: string;
-    user: {
-      id: string;
-      email: string;
-      name: string | null;
-      phone: string | null;
-      role: string;
-      isActive: boolean;
-    };
+    user: AuthUser;
   };
 }
 
 export type RefreshTokenResponse = LoginResponse;
+
+export interface MeResponse {
+  status: string;
+  statusCode: number;
+  message: string;
+  data: AuthUser;
+}
 
 /**
  * Sends a client credentials login request to the backend.
@@ -41,4 +54,8 @@ export const refreshTokenApi = async (refreshToken: string): Promise<RefreshToke
 
 export const logoutApi = async (refreshToken?: string): Promise<void> => {
   await apiClient.post('/auth/client/logout', refreshToken ? { refreshToken } : {});
+};
+
+export const getMeApi = async (): Promise<MeResponse> => {
+  return apiClient.get<MeResponse>('/auth/client/me');
 };
