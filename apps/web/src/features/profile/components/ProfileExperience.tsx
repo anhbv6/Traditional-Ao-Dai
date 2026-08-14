@@ -14,12 +14,30 @@ import { ManagePaymentTab } from "./ManagePaymentTab";
 import { SecurityTab } from "./SecurityTab";
 import { SettingTab } from "./SettingTab";
 import { useProfile } from "../hooks/useProfile";
-import { type TabId } from "../types/profile.types";
+import { useRouter } from "@/i18n/routing";
+import { useAuthStore } from "@/features/auth/store/authStore";
+import { logoutApi } from "@/features/auth/api/auth.api";
+import { clearBrowserAuthTokens } from "@/lib/api-client";
 
 export function ProfileExperience() {
   const t = useTranslations("ProfilePage");
   const { activeTab, setActiveTab } = useProfile();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const router = useRouter();
+  const logoutStore = useAuthStore((state) => state.logout);
+
+  const handleLogout = async () => {
+    try {
+      await logoutApi();
+    } catch {
+      // Ignore API error to proceed with local logout
+    } finally {
+      clearBrowserAuthTokens();
+      logoutStore();
+      router.push("/login");
+      router.refresh();
+    }
+  };
 
   const tabList = [
     { id: "personal" as const, label: t("tabs.personal"), icon: User },
@@ -91,7 +109,7 @@ export function ProfileExperience() {
             {/* Logout Button */}
             <div className="border-t border-[#E2D9D2]/40 mt-3 pt-2">
               <button
-                onClick={() => alert("Đăng xuất thành công")}
+                onClick={handleLogout}
                 className="flex w-full items-center gap-3.5 rounded-xl px-4 py-3 text-sm font-semibold text-rose-600 hover:bg-rose-50 transition-all duration-300"
               >
                 <LogOut size={18} className="shrink-0" />
@@ -99,7 +117,7 @@ export function ProfileExperience() {
               </button>
             </div>
           </nav>
-
+ 
           {/* Mobile Floating Action Button (FAB) Menu */}
           <div className="lg:hidden fixed bottom-6 left-6 z-50">
             {/* Overlay Backdrop to click outside and close */}
@@ -146,7 +164,7 @@ export function ProfileExperience() {
               <button
                 onClick={() => {
                   setIsMobileMenuOpen(false);
-                  alert("Đăng xuất thành công");
+                  void handleLogout();
                 }}
                 className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white border border-rose-100 text-rose-600 shadow-md text-xs font-semibold whitespace-nowrap transition-all duration-300 active:scale-95 cursor-pointer w-fit min-w-[180px]"
               >

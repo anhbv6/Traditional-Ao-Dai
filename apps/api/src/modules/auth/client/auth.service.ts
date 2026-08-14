@@ -48,17 +48,26 @@ function hashToken(token: string) {
   return createHash('sha256').update(token).digest('hex')
 }
 
+function normalizeVietnamPhone(phone?: string | null) {
+  if (!phone) {
+    return phone
+  }
+
+  return phone.startsWith('+84') ? `0${phone.slice(3)}` : phone
+}
+
 /**
  * Validates client credentials and generates a JWT access token.
  */
 export async function clientLogin(input: LoginInput['body'], meta: SessionMeta = {}) {
-  const { email, password } = input
+  const emailOrPhone = input.email.trim()
+  const password = input.password
 
   // Find user by email or phone depending on input format
-  const isEmail = email.includes('@')
+  const isEmail = emailOrPhone.includes('@')
   const user = isEmail
-    ? await prisma.user.findUnique({ where: { email } })
-    : await prisma.user.findFirst({ where: { phone: email } })
+    ? await prisma.user.findFirst({ where: { email: { equals: emailOrPhone, mode: 'insensitive' } } })
+    : await prisma.user.findFirst({ where: { phone: normalizeVietnamPhone(emailOrPhone) } })
 
   // Check user existence, verify they are a CUSTOMER
   if (!user || user.role !== 'CUSTOMER') {
@@ -183,6 +192,28 @@ export async function logoutClient(userId: string, sessionId?: string, refreshTo
   })
 }
 
+export async function logoutClientByRefreshToken(refreshToken: string) {
+  let decoded: JWTPayload
+
+  try {
+    decoded = verifyToken(refreshToken)
+  } catch (error) {
+    return
+  }
+
+  if (decoded.tokenType !== 'refresh' || !decoded.sessionId) {
+    return
+  }
+
+  await prisma.userSession.deleteMany({
+    where: {
+      id: decoded.sessionId,
+      userId: decoded.userId,
+      refreshToken: hashToken(refreshToken),
+    },
+  })
+}
+
 /**
  * Registers a new client (customer).
  */
@@ -193,8 +224,8 @@ export async function clientRegister(input: RegisterInput['body']) {
 
   if (registerType === 'email') {
     const { email, phone } = input
-    finalEmail = email
-    finalPhone = phone || null
+    finalEmail = email.trim().toLowerCase()
+    finalPhone = normalizeVietnamPhone(phone) || null
 
     // Check email conflict
     const existingUser = await prisma.user.findUnique({
@@ -205,8 +236,8 @@ export async function clientRegister(input: RegisterInput['body']) {
     }
   } else {
     const { phone, email } = input
-    finalPhone = phone
-    finalEmail = email || `${phone}@aodai.local`
+    finalPhone = normalizeVietnamPhone(phone)!
+    finalEmail = email ? email.trim().toLowerCase() : `${finalPhone}@aodai.local`
 
     // Check dummy email conflict
     const existingEmailUser = await prisma.user.findUnique({
@@ -278,7 +309,7 @@ export async function checkAccountAvailability(email?: string, phone?: string): 
 
   if (email) {
     const user = await prisma.user.findUnique({
-      where: { email },
+      where: { email: email.trim().toLowerCase() },
     })
     return {
       available: !user,
@@ -288,12 +319,69 @@ export async function checkAccountAvailability(email?: string, phone?: string): 
 
   // If email is not provided, phone must be provided
   const user = await prisma.user.findUnique({
-    where: { phone: phone! },
+    where: { phone: normalizeVietnamPhone(phone)! },
   })
   return {
     available: !user,
     reason: user ? 'PHONE_TAKEN' : 'AVAILABLE',
   }
+}
+
+/**
+ * Updates user profile details in the database.
+ */
+export async function updateUserProfile(
+  id: string,
+  data: { name?: string; phone?: string; avatar?: string; dob?: string; gender?: string }
+) {
+  const updateData: any = {}
+
+  if (data.name !== undefined) {
+    updateData.name = data.name
+  }
+
+  if (data.phone !== undefined) {
+    // Check if phone number is already in use by another user
+    if (data.phone) {
+      const existingPhoneUser = await prisma.user.findFirst({
+        where: {
+          phone: data.phone,
+          NOT: { id },
+        },
+      })
+      if (existingPhoneUser) {
+        throw new AppError(400, 'Số điện thoại này đã được đăng ký sử dụng bởi tài khoản khác')
+      }
+    }
+    updateData.phone = data.phone || null
+  }
+
+  if (data.avatar !== undefined) {
+    updateData.avatar = data.avatar
+  }
+
+  if (data.dob !== undefined) {
+    updateData.birth = data.dob ? new Date(data.dob) : null
+  }
+
+  if (data.gender !== undefined) {
+    const genderUpper = String(data.gender).toUpperCase()
+    if (genderUpper === 'MALE') {
+      updateData.gender = 'MALE'
+    } else if (genderUpper === 'FEMALE') {
+      updateData.gender = 'FEMALE'
+    } else {
+      updateData.gender = 'OTHER'
+    }
+  }
+
+  const updatedUser = await prisma.user.update({
+    where: { id },
+    data: updateData,
+  })
+
+  const { password: _, ...safeUser } = updatedUser
+  return safeUser
 }
 
 

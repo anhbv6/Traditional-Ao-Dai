@@ -5,6 +5,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { Shield, LayoutDashboard, LogOut, Globe, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ProtectedRoute } from "@/components/providers/ProtectedRoute";
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -24,7 +25,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] flex flex-col font-[family-name:var(--font-geist-sans)] text-[#09090B] antialiased">
+    <ProtectedRoute adminOnly>
+      <div className="min-h-screen bg-[#FAFAFA] flex flex-col font-[family-name:var(--font-geist-sans)] text-[#09090B] antialiased">
       {/* Admin Header */}
       <header className="bg-white border-b border-[#E4E4E7] sticky top-0 z-40 select-none">
         <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12 h-16 flex items-center justify-between">
@@ -66,5 +68,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         {children}
       </main>
     </div>
+    </ProtectedRoute>
   );
 }

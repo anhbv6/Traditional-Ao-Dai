@@ -19,9 +19,6 @@ export interface LoginResponse {
   message: string;
   data: {
     accessToken: string;
-    refreshToken: string;
-    refreshTokenExpiresAt: string;
-    user: AuthUser;
   };
 }
 
@@ -41,21 +38,17 @@ export const loginApi = async (data: {
   email: string;
   password: string;
 }): Promise<LoginResponse> => {
-  return apiClient.post<LoginResponse>('/auth/client/login', data);
+  return apiClient.post<LoginResponse>('/api/auth/login', data, { skipAuth: true, retryOnUnauthorized: false });
 };
 
-export const refreshTokenApi = async (refreshToken: string): Promise<RefreshTokenResponse> => {
-  return apiClient.post<RefreshTokenResponse>(
-    '/auth/client/refresh-token',
-    { refreshToken },
-    { skipAuth: true, retryOnUnauthorized: false }
-  );
+export const refreshTokenApi = async (): Promise<RefreshTokenResponse> => {
+  return apiClient.post<RefreshTokenResponse>('/api/auth/refresh', {}, { skipAuth: true, retryOnUnauthorized: false });
 };
 
-export const logoutApi = async (refreshToken?: string): Promise<void> => {
-  await apiClient.post('/auth/client/logout', refreshToken ? { refreshToken } : {});
+export const logoutApi = async (): Promise<void> => {
+  await apiClient.post('/api/auth/logout', {}, { retryOnUnauthorized: false });
 };
 
 export const getMeApi = async (): Promise<MeResponse> => {
-  return apiClient.get<MeResponse>('/auth/client/me');
+  return apiClient.get<MeResponse>('/api/auth/me');
 };

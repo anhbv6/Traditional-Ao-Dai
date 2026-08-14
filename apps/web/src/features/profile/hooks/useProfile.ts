@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { type TabId, type Address, type PaymentCard, type Order } from "../types/profile.types";
 import { initialAddresses, initialCards } from "../api/profile.api";
+import { useAuthStore } from "@/features/auth/store/authStore";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 // Coordinator Hook
 export function useProfile() {
@@ -15,18 +17,88 @@ export function useProfile() {
 
 // Personal Info Hook
 export function usePersonalInfo() {
-  const [fullName, setFullName] = useState("Nguyễn Thị An");
-  const [email, setEmail] = useState("an.nguyen@gmail.com");
-  const [phone, setPhone] = useState("0912345678");
-  const [gender, setGender] = useState("female");
-  const [dob, setDob] = useState("1998-10-20");
-  const [avatarUrl, setAvatarUrl] = useState("https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop");
+  const { user, setUser } = useAuthStore();
+  const queryClient = useQueryClient();
+
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [gender, setGender] = useState("other");
+  const [dob, setDob] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
+
+  // Sync form state with Zustand user store when user details load/change
+  useEffect(() => {
+    if (user) {
+      setFullName(user.name || "");
+      setEmail(user.email || "");
+      setPhone(user.phone || "");
+      setGender(user.gender ? user.gender.toLowerCase() : "other");
+      
+      if (user.birth) {
+        const birthDate = new Date(user.birth);
+        const yyyy = birthDate.getFullYear();
+        const mm = String(birthDate.getMonth() + 1).padStart(2, "0");
+        const dd = String(birthDate.getDate()).padStart(2, "0");
+        setDob(`${yyyy}-${mm}-${dd}`);
+      } else {
+        setDob("");
+      }
+      
+      setAvatarUrl(user.avatar || "");
+    }
+  }, [user]);
+
+  // React Query Mutation to update profile
+  const updateProfileMutation = useMutation({
+    mutationFn: async (payload: {
+      name?: string;
+      phone?: string;
+      avatar?: string;
+      dob?: string;
+      gender?: string;
+    }) => {
+      const res = await fetch("/api/user/profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.message || "Cập nhật thông tin thất bại");
+      }
+
+      const data = await res.json();
+      return data.data; // safeUser object returned
+    },
+    onSuccess: (updatedUser) => {
+      // 1. Direct update to Zustand Global State
+      setUser(updatedUser);
+
+      // 2. Direct update to React Query server state cache
+      queryClient.setQueryData(["me"], updatedUser);
+
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000);
+    },
+    onError: (error: any) => {
+      alert(error.message || "Có lỗi xảy ra trong quá trình cập nhật");
+    },
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setShowSuccess(true);
-    setTimeout(() => setShowSuccess(false), 3000);
+    updateProfileMutation.mutate({
+      name: fullName,
+      phone: phone || undefined,
+      avatar: avatarUrl || undefined,
+      dob: dob || undefined,
+      gender: gender.toUpperCase(),
+    });
   };
 
   return {
@@ -44,6 +116,7 @@ export function usePersonalInfo() {
     setAvatarUrl,
     showSuccess,
     handleSubmit,
+    isLoading: updateProfileMutation.isPending,
   };
 }
 

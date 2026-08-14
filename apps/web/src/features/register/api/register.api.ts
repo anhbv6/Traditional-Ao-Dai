@@ -14,7 +14,7 @@ export interface CheckAccountResponse {
  * Check if email or phone is already registered in the system.
  */
 export const checkAccountApi = async (params: { email?: string; phone?: string }): Promise<CheckAccountResponse> => {
-  return apiClient.get<CheckAccountResponse>('/auth/check-account', { params });
+  return apiClient.get<CheckAccountResponse>('/api/auth/check-account', { params, skipAuth: true, retryOnUnauthorized: false });
 };
 
 /**
@@ -53,16 +53,7 @@ export interface RegisterResponse {
   status: string;
   statusCode: number;
   message: string;
-  data: {
-    token: string;
-    user: {
-      id: string;
-      email: string;
-      name: string | null;
-      phone: string | null;
-      role: string;
-    };
-  };
+  data: null;
 }
 
 /**
@@ -75,7 +66,7 @@ export const registerApi = async (data: {
   email?: string;
   phone?: string;
 }): Promise<RegisterResponse> => {
-  return apiClient.post<RegisterResponse>('/auth/client/register', data);
+  return apiClient.post<RegisterResponse>('/api/auth/register', data, { skipAuth: true, retryOnUnauthorized: false });
 };
 
 

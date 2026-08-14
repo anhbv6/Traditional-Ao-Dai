@@ -7,6 +7,8 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
 import { ToastProvider } from "@/components/providers/ToastProvider";
+import { QueryProvider } from "@/components/providers/QueryProvider";
+import { AuthProvider } from "@/components/providers/AuthProvider";
 
 const lora = Lora({
   subsets: ["latin", "vietnamese"],
@@ -66,10 +68,14 @@ export default async function LocaleLayout({
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <NextIntlClientProvider messages={messages}>
-          <SmoothScrollProvider>
-            {children}
-            <ToastProvider />
-          </SmoothScrollProvider>
+          <QueryProvider>
+            <AuthProvider>
+              <SmoothScrollProvider>
+                {children}
+                <ToastProvider />
+              </SmoothScrollProvider>
+            </AuthProvider>
+          </QueryProvider>
         </NextIntlClientProvider>
       </body>
     </html>

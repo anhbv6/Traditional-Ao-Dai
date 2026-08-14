@@ -26,6 +26,7 @@ export function PersonalInfoTab() {
     setAvatarUrl,
     showSuccess,
     handleSubmit,
+    isLoading,
   } = usePersonalInfo();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -323,9 +324,10 @@ export function PersonalInfoTab() {
           <div className="pt-4 animate-fade-in flex flex-col sm:flex-row gap-3">
             <button
               type="submit"
-              className="w-full sm:w-auto inline-flex min-h-11 items-center justify-center rounded-lg bg-[#800020] px-8 text-xs font-semibold uppercase tracking-[1.5px] text-white transition-all hover:bg-[#800020]/90 focus:outline-none focus:ring-2 focus:ring-[#800020] focus:ring-offset-2 cursor-pointer shadow-sm hover:shadow-md duration-200"
+              disabled={isLoading}
+              className="w-full sm:w-auto inline-flex min-h-11 items-center justify-center rounded-lg bg-[#800020] px-8 text-xs font-semibold uppercase tracking-[1.5px] text-white transition-all hover:bg-[#800020]/90 focus:outline-none focus:ring-2 focus:ring-[#800020] focus:ring-offset-2 cursor-pointer shadow-sm hover:shadow-md duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {t("saveBtn")}
+              {isLoading ? "Đang lưu..." : t("saveBtn")}
             </button>
             <button
               type="button"

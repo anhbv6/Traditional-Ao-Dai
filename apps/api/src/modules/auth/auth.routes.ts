@@ -2,7 +2,7 @@ import { Router } from 'express'
 import * as adminAuthController from './admin/auth.controller'
 import * as clientAuthController from './client/auth.controller'
 import { validate } from '../../shared/middlewares/validate'
-import { loginSchema, registerSchema, checkAccountSchema, refreshTokenSchema, logoutSchema } from './auth.schema'
+import { loginSchema, registerSchema, checkAccountSchema } from './auth.schema'
 import { requireAuth } from '../../shared/middlewares/authGuard'
 
 const router = Router()
@@ -118,6 +118,7 @@ router.post('/admin/login', validate(loginSchema), adminAuthController.loginAdmi
  *         description: Invalid credentials
  */
 router.post('/client/login', validate(loginSchema), clientAuthController.loginClient)
+router.post('/login', validate(loginSchema), clientAuthController.loginClient)
 
 /**
  * @openapi
@@ -128,7 +129,8 @@ router.post('/client/login', validate(loginSchema), clientAuthController.loginCl
  *     tags:
  *       - Auth
  */
-router.post('/client/refresh-token', validate(refreshTokenSchema), clientAuthController.refreshClientToken)
+router.post('/client/refresh-token', clientAuthController.refreshClientToken)
+router.post('/refresh', clientAuthController.refreshClientToken)
 
 /**
  * @openapi
@@ -141,7 +143,8 @@ router.post('/client/refresh-token', validate(refreshTokenSchema), clientAuthCon
  *     security:
  *       - bearerAuth: []
  */
-router.post('/client/logout', requireAuth as any, validate(logoutSchema), clientAuthController.logoutClient)
+router.post('/client/logout', clientAuthController.logoutClient)
+router.post('/logout', clientAuthController.logoutClient)
 
 /**
  * @openapi
@@ -232,6 +235,7 @@ router.post('/client/register', validate(registerSchema), clientAuthController.r
  */
 router.get('/me', requireAuth as any, clientAuthController.getMe)
 router.get('/client/me', requireAuth as any, clientAuthController.getMe)
+router.put('/client/profile', requireAuth as any, clientAuthController.updateProfile)
 
 /**
  * @openapi

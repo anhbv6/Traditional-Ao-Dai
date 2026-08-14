@@ -10,7 +10,10 @@ import { errorHandler } from './shared/middlewares/errorHandler'
 const app = express()
 const PORT = env.PORT
 
-app.use(cors())
+app.use(cors({
+  origin: env.FRONTEND_URL,
+  credentials: true,
+}))
 app.use(express.json())
 
 /**

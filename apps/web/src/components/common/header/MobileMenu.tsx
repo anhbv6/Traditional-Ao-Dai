@@ -18,7 +18,7 @@ import { SearchBar } from './SearchBar';
 import { Logo } from './Logo';
 import type { NavItem } from './types';
 import { logoutApi } from '@/features/auth/api/auth.api';
-import { useCurrentUser } from '@/features/auth/hooks/useCurrentUser';
+import { useAuthStore } from '@/features/auth/store/authStore';
 import { clearBrowserAuthTokens } from '@/lib/api-client';
 
 type MobileMenuProps = {
@@ -48,7 +48,7 @@ export function MobileMenu({
   const [isPending, startTransition] = useTransition();
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const { isAuthenticated, user } = useCurrentUser();
+  const { isAuthenticated, user, logout: storeLogout } = useAuthStore();
   const userName = user?.name || user?.email || (isAuthenticated ? 'Account' : undefined);
 
   const handleSelectLanguage = (newLocale: string) => {
@@ -64,13 +64,13 @@ export function MobileMenu({
   const handleLogout = () => {
     setIsDrawerOpen(false);
     startTransition(async () => {
-      const refreshToken = localStorage.getItem('refreshToken') || undefined;
       try {
-        await logoutApi(refreshToken);
+        await logoutApi();
       } catch {
         // Local logout should still complete if the server session is already gone.
       } finally {
         clearBrowserAuthTokens();
+        storeLogout();
         router.push('/login');
         router.refresh();
       }

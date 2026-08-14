@@ -9,6 +9,21 @@ import * as z from 'zod';
 import { createRegisterSchema, type RegisterFormData } from '../types/register.types';
 import { mockCheckEmailApi, checkPhoneApi, registerApi } from '../api/register.api';
 import { showToast } from '@/components/ui/toast';
+import { HttpError } from '@/lib/api-client';
+
+function getErrorMessage(err: unknown, fallback: string) {
+  const payload = err instanceof HttpError ? err.payload : undefined;
+
+  if (payload && typeof payload === 'object' && 'message' in payload) {
+    return String(payload.message);
+  }
+
+  if (err instanceof Error) {
+    return err.message;
+  }
+
+  return fallback;
+}
 
 export function useRegister() {
   const t = useTranslations('Auth');
@@ -210,9 +225,9 @@ export function useRegister() {
         const successMsg = t(res.message) || t('registerSuccessEmail', { name: data.fullName });
         showToast.success(successMsg);
         router.push('/login');
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Registration failed:', err);
-        const apiMsg = err.response?.data?.message || err.message || 'Registration failed';
+        const apiMsg = getErrorMessage(err, 'Registration failed');
         if (apiMsg.toLowerCase().includes('email')) {
           setError('email', { message: apiMsg });
         } else if (apiMsg.toLowerCase().includes('số điện thoại') || apiMsg.toLowerCase().includes('phone')) {
@@ -255,9 +270,9 @@ export function useRegister() {
         showToast.success(successMsg);
         setIsOtpStep(false);
         router.push('/login');
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Registration failed:', err);
-        const apiMsg = err.response?.data?.message || err.message || 'Registration failed';
+        const apiMsg = getErrorMessage(err, 'Registration failed');
         setOtpError(apiMsg);
       } finally {
         setIsRegistering(false);

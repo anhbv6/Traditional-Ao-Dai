@@ -12,6 +12,7 @@ const envSchema = z.object({
   JWT_PUBLIC_KEY: z.string().min(1, 'JWT_PUBLIC_KEY is required'),
   JWT_EXPIRES_IN: z.string().min(1, 'JWT_EXPIRES_IN is required').default('15m'),
   JWT_REFRESH_EXPIRES_IN: z.string().min(1, 'JWT_REFRESH_EXPIRES_IN is required').default('7d'),
+  FRONTEND_URL: z.string().url().default('http://localhost:3000'),
 })
 
 const parsed = envSchema.safeParse(process.env)

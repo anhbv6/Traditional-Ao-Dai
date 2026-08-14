@@ -1,12 +1,14 @@
 import { z } from 'zod'
 
+const vietnamPhoneSchema = z.string().regex(/^(0|\+84)[35789][0-9]{8}$/, 'Invalid phone number format')
+
 /**
  * Validation schema for credentials login (email and password)
  */
 export const loginSchema = z.object({
   body: z.object({
-    email: z.string().min(1, 'Email hoặc Số điện thoại là bắt buộc'),
-    password: z.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
+    email: z.string().min(1, 'Email or phone number is required'),
+    password: z.string().min(6, 'Password must be at least 6 characters'),
   }),
 })
 
@@ -29,27 +31,27 @@ export const logoutSchema = z.object({
 export type LogoutInput = z.infer<typeof logoutSchema>
 
 const baseRegisterSchema = z.object({
-  password: z.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
-  name: z.string().min(2, 'Tên phải có ít nhất 2 ký tự').optional(),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+  name: z.string().min(2, 'Name must be at least 2 characters').optional(),
 })
 
 const emailRegisterSchema = baseRegisterSchema.extend({
   registerType: z.literal('email'),
-  email: z.string().email('Email không đúng định dạng'),
-  phone: z.string().regex(/^[0-9]{10,11}$/, 'Số điện thoại không đúng định dạng (10-11 số)').optional(),
+  email: z.string().email('Invalid email format'),
+  phone: vietnamPhoneSchema.optional(),
 })
 
 const phoneRegisterSchema = baseRegisterSchema.extend({
   registerType: z.literal('phone'),
-  phone: z.string().regex(/^[0-9]{10,11}$/, 'Số điện thoại không đúng định dạng (10-11 số)'),
-  email: z.string().email('Email không đúng định dạng').optional(),
+  phone: vietnamPhoneSchema,
+  email: z.string().email('Invalid email format').optional(),
 })
 
 export const registerSchema = z.object({
   body: z.discriminatedUnion('registerType', [
     emailRegisterSchema,
     phoneRegisterSchema,
-  ])
+  ]),
 })
 
 export type RegisterInput = z.infer<typeof registerSchema>
@@ -59,10 +61,9 @@ export type RegisterInput = z.infer<typeof registerSchema>
  */
 export const checkAccountSchema = z.object({
   query: z.object({
-    email: z.string().email('Email không đúng định dạng').optional(),
-    phone: z.string().regex(/^[0-9]{10,11}$/, 'Số điện thoại không đúng định dạng (10-11 số)').optional(),
+    email: z.string().email('Invalid email format').optional(),
+    phone: vietnamPhoneSchema.optional(),
   }),
 })
 
 export type CheckAccountInput = z.infer<typeof checkAccountSchema>
-

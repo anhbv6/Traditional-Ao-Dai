@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react';
 import { LogOut, UserRound } from 'lucide-react';
 import { Link, useRouter } from '@/i18n/routing';
 import { logoutApi } from '@/features/auth/api/auth.api';
-import { useCurrentUser } from '@/features/auth/hooks/useCurrentUser';
+import { useAuthStore } from '@/features/auth/store/authStore';
 import { clearBrowserAuthTokens } from '@/lib/api-client';
 
 type UserMenuProps = {
@@ -25,19 +25,19 @@ export function UserMenu({
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
-  const { isAuthenticated, user } = useCurrentUser();
+  const { isAuthenticated, user, logout: storeLogout } = useAuthStore();
   const userName = initialUserName || user?.name || user?.email || (isAuthenticated ? 'Account' : undefined);
 
   const handleLogout = () => {
     setIsOpen(false);
     startTransition(async () => {
-      const refreshToken = localStorage.getItem('refreshToken') || undefined;
       try {
-        await logoutApi(refreshToken);
+        await logoutApi();
       } catch {
         // Local logout should still complete if the server session is already gone.
       } finally {
         clearBrowserAuthTokens();
+        storeLogout();
         router.push('/login');
         router.refresh();
       }

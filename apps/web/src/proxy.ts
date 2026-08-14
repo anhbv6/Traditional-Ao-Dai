@@ -15,7 +15,7 @@ function isLoginPath(pathname: string) {
 
 export default function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const hasAuthToken = Boolean(request.cookies.get('accessToken')?.value || request.cookies.get('refreshToken')?.value);
+  const hasAuthToken = Boolean(request.cookies.get('refreshToken')?.value);
 
   if (hasAuthToken && isLoginPath(pathname)) {
     const locale = getLocaleFromPathname(pathname);

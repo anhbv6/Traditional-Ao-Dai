@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/routing';
-import { loginApi } from '../api/auth.api';
+import { getMeApi, loginApi } from '../api/auth.api';
+import { useAuthStore } from '../store/authStore';
 import { showToast } from '@/components/ui/toast';
-import { HttpError, setBrowserAuthTokens } from '@/lib/api-client';
+import { HttpError } from '@/lib/api-client';
 
 export function useLogin() {
   const t = useTranslations('Auth');
@@ -13,16 +14,14 @@ export function useLogin() {
   const login = async (emailOrPhone: string, password: string) => {
     setIsLoading(true);
     try {
-      const res = await loginApi({ email: emailOrPhone, password });
+      const res = await loginApi({ email: emailOrPhone.trim(), password });
 
-      setBrowserAuthTokens({
-        accessToken: res.data.accessToken,
-        refreshToken: res.data.refreshToken,
-        refreshTokenExpiresAt: res.data.refreshTokenExpiresAt,
-      });
+      const { setAccessToken, setAuthenticated, setLoading } = useAuthStore.getState();
+      setAccessToken(res.data.accessToken);
 
-      // Store basic user info
-      localStorage.setItem('userInfo', JSON.stringify(res.data.user));
+      const me = await getMeApi();
+      setAuthenticated(res.data.accessToken, me.data);
+      setLoading(false);
 
       // Display success message from translation or API response message
       const successMsg = t(res.message) || t('success');

@@ -1,4 +1,4 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+import { useAuthStore } from '@/features/auth/store/authStore';
 
 type CustomRequestInit = Omit<RequestInit, 'body'> & {
   body?: unknown;
@@ -17,74 +17,23 @@ export class HttpError extends Error {
   }
 }
 
-type TokenPair = {
-  accessToken: string;
-  refreshToken: string;
-  refreshTokenExpiresAt?: string;
-};
-
-type RefreshTokenPayload = {
-  data: TokenPair & {
-    user?: unknown;
-  };
-};
-
-const ACCESS_TOKEN_COOKIE_MAX_AGE = 60 * 15;
-const REFRESH_TOKEN_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
-
-const setCookie = (name: string, value: string, maxAge: number) => {
-  const secure = window.location.protocol === 'https:' ? '; Secure' : '';
-  document.cookie = `${name}=${value}; path=/; max-age=${maxAge}; SameSite=Lax${secure}`;
-};
-
-const secondsUntil = (dateValue?: string) => {
-  if (!dateValue) {
-    return REFRESH_TOKEN_COOKIE_MAX_AGE;
-  }
-
-  const expiresAt = new Date(dateValue).getTime();
-  if (Number.isNaN(expiresAt)) {
-    return REFRESH_TOKEN_COOKIE_MAX_AGE;
-  }
-
-  return Math.max(0, Math.floor((expiresAt - Date.now()) / 1000));
-};
-
 const clearBrowserAuth = () => {
-  localStorage.removeItem('accessToken');
-  localStorage.removeItem('refreshToken');
-  localStorage.removeItem('userInfo');
-  document.cookie = 'accessToken=; path=/; max-age=0; SameSite=Lax';
-  document.cookie = 'refreshToken=; path=/; max-age=0; SameSite=Lax';
-  window.dispatchEvent(new Event('auth-storage-change'));
+  useAuthStore.getState().logout();
 };
 
 export const clearBrowserAuthTokens = clearBrowserAuth;
 
-export const setBrowserAuthTokens = ({ accessToken, refreshToken, refreshTokenExpiresAt }: TokenPair) => {
-  localStorage.setItem('accessToken', accessToken);
-  localStorage.setItem('refreshToken', refreshToken);
-  setCookie('accessToken', accessToken, ACCESS_TOKEN_COOKIE_MAX_AGE);
-  setCookie('refreshToken', refreshToken, secondsUntil(refreshTokenExpiresAt));
-  window.dispatchEvent(new Event('auth-storage-change'));
-};
-
 const refreshBrowserToken = async (): Promise<string | undefined> => {
-  const refreshToken = localStorage.getItem('refreshToken');
-  if (!refreshToken) {
-    return undefined;
-  }
-
-  const res = await fetch(`${BASE_URL}/auth/client/refresh-token`, {
+  const res = await fetch('/api/auth/refresh', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ refreshToken }),
+    credentials: 'include',
   });
 
   const isJson = res.headers.get('content-type')?.includes('application/json');
-  const payload = (isJson ? await res.json() : await res.text()) as RefreshTokenPayload | string;
+  const payload = (isJson ? await res.json() : await res.text()) as { data?: { accessToken?: string } } | string;
 
   if (!res.ok) {
     clearBrowserAuth();
@@ -102,14 +51,14 @@ const refreshBrowserToken = async (): Promise<string | undefined> => {
     });
   }
 
-  const tokens = payload.data;
-  setBrowserAuthTokens(tokens);
-
-  if (payload.data?.user) {
-    localStorage.setItem('userInfo', JSON.stringify(payload.data.user));
+  const accessToken = payload.data?.accessToken;
+  if (!accessToken) {
+    clearBrowserAuth();
+    return undefined;
   }
 
-  return tokens.accessToken;
+  useAuthStore.getState().setAccessToken(accessToken);
+  return accessToken;
 };
 
 const request = async <ResponseData>(
@@ -147,16 +96,8 @@ const request = async <ResponseData>(
   let token: string | undefined;
   const isServer = typeof window === 'undefined';
 
-  if (!options?.skipAuth && isServer) {
-    try {
-      const { cookies } = await import('next/headers');
-      const cookieStore = await cookies();
-      token = cookieStore.get('accessToken')?.value;
-    } catch (e) {
-      console.warn('Failed to retrieve cookies in server context:', e);
-    }
-  } else if (!options?.skipAuth) {
-    token = localStorage.getItem('accessToken') || undefined;
+  if (!options?.skipAuth && !isServer) {
+    token = useAuthStore.getState().accessToken || undefined;
   }
 
   if (token) {
@@ -168,11 +109,12 @@ const request = async <ResponseData>(
 
   // Combine URLs
   const cleanUrl = url.startsWith('/') ? url : `/${url}`;
-  const fullUrl = `${BASE_URL}${cleanUrl}${queryString}`;
+  const fullUrl = `${cleanUrl}${queryString}`;
 
   const res = await fetch(fullUrl, {
     ...options,
     method,
+    credentials: 'include',
     headers: {
       ...headers,
       ...options?.headers,
