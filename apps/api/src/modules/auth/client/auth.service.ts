@@ -5,31 +5,9 @@ import { generateAccessToken, generateRefreshToken, JWTPayload, verifyToken } fr
 import { AppError } from '../../../shared/middlewares/errorHandler'
 import { env } from '../../../shared/config/env'
 import { LoginInput, RefreshTokenInput, RegisterInput } from '../auth.schema'
-
-interface SessionMeta {
-  deviceInfo?: string
-  ipAddress?: string
-}
-
-function durationToMs(duration: string): number {
-  const match = duration.trim().match(/^(\d+)(ms|s|m|h|d|w)?$/)
-  if (!match) {
-    throw new AppError(500, 'Invalid refresh token expiration config')
-  }
-
-  const value = Number(match[1])
-  const unit = match[2] ?? 'ms'
-  const multipliers: Record<string, number> = {
-    ms: 1,
-    s: 1000,
-    m: 60 * 1000,
-    h: 60 * 60 * 1000,
-    d: 24 * 60 * 60 * 1000,
-    w: 7 * 24 * 60 * 60 * 1000,
-  }
-
-  return value * multipliers[unit]
-}
+import { durationToMs } from '../../../shared/utils/time'
+import { normalizeVietnamPhone } from '../../../shared/utils/phone'
+import { CheckAccountResult, SessionMeta } from '../auth.types'
 
 function buildAuthTokens(user: { id: string; role: JWTPayload['role'] }, sessionId: string) {
   const payload = {
@@ -48,12 +26,59 @@ function hashToken(token: string) {
   return createHash('sha256').update(token).digest('hex')
 }
 
-function normalizeVietnamPhone(phone?: string | null) {
-  if (!phone) {
-    return phone
+
+/**
+ * Registers a new client (customer).
+ */
+export async function clientRegister(input: RegisterInput['body']) {
+  const { registerType, password, name } = input
+  let finalEmail: string | null = null
+  let finalPhone: string | null = null
+
+  if (registerType === 'email') {
+    const { email, phone } = input
+    finalEmail = email.trim().toLowerCase()
+    finalPhone = normalizeVietnamPhone(phone) || null
+  } else {
+    const { phone, email } = input
+    finalPhone = normalizeVietnamPhone(phone)!
+    finalEmail = email ? email.trim().toLowerCase() : null
   }
 
-  return phone.startsWith('+84') ? `0${phone.slice(3)}` : phone
+  // Check email conflict if provided
+  if (finalEmail) {
+    const existingEmailUser = await prisma.user.findUnique({
+      where: { email: finalEmail },
+    })
+    if (existingEmailUser) {
+      throw new AppError(400, 'EMAIL_ALREADY_EXISTS')
+    }
+  }
+
+  // Check phone conflict if provided
+  if (finalPhone) {
+    const existingPhone = await prisma.user.findUnique({
+      where: { phone: finalPhone },
+    })
+    if (existingPhone) {
+      throw new AppError(400, 'PHONE_ALREADY_EXISTS')
+    }
+  }
+
+  // Hash password
+  const hashedPassword = await hashPassword(password)
+
+  // Create client in DB
+  const user = await prisma.user.create({
+    data: {
+      email: finalEmail,
+      password: hashedPassword,
+      name: name || null,
+      phone: finalPhone,
+      role: 'CUSTOMER',
+    },
+  })
+  return user
 }
 
 /**
@@ -214,90 +239,6 @@ export async function logoutClientByRefreshToken(refreshToken: string) {
   })
 }
 
-/**
- * Registers a new client (customer).
- */
-export async function clientRegister(input: RegisterInput['body']) {
-  const { registerType, password, name } = input
-  let finalEmail = ''
-  let finalPhone: string | null = null
-
-  if (registerType === 'email') {
-    const { email, phone } = input
-    finalEmail = email.trim().toLowerCase()
-    finalPhone = normalizeVietnamPhone(phone) || null
-
-    // Check email conflict
-    const existingUser = await prisma.user.findUnique({
-      where: { email: finalEmail },
-    })
-    if (existingUser) {
-      throw new AppError(400, 'Email này đã được đăng ký sử dụng')
-    }
-  } else {
-    const { phone, email } = input
-    finalPhone = normalizeVietnamPhone(phone)!
-    finalEmail = email ? email.trim().toLowerCase() : `${finalPhone}@aodai.local`
-
-    // Check dummy email conflict
-    const existingEmailUser = await prisma.user.findUnique({
-      where: { email: finalEmail },
-    })
-    if (existingEmailUser) {
-      throw new AppError(400, 'Số điện thoại này đã được đăng ký sử dụng (mã định danh trùng lặp)')
-    }
-  }
-
-  // Check phone conflict if provided
-  if (finalPhone) {
-    const existingPhone = await prisma.user.findUnique({
-      where: { phone: finalPhone },
-    })
-    if (existingPhone) {
-      throw new AppError(400, 'Số điện thoại này đã được đăng ký sử dụng')
-    }
-  }
-
-  // Hash password
-  const hashedPassword = await hashPassword(password)
-
-  // Create client in DB
-  const user = await prisma.user.create({
-    data: {
-      email: finalEmail,
-      password: hashedPassword,
-      name: name || null,
-      phone: finalPhone,
-      role: 'CUSTOMER',
-    },
-  })
-  return user
-}
-
-/**
- * Retrieves a user by their unique database identifier.
- */
-export async function getUserById(id: string) {
-  const user = await prisma.user.findUnique({
-    where: { id },
-  })
-
-  if (!user || user.role !== 'CUSTOMER') {
-    throw new AppError(404, 'Không tìm thấy người dùng')
-  }
-
-  if (!user.isActive) {
-    throw new AppError(403, 'TÃ i khoáº£n nÃ y Ä‘Ã£ bá»‹ khÃ³a hoáº·c ngÆ°ng hoáº¡t Ä‘á»™ng')
-  }
-
-  const { password: _, ...safeUser } = user
-  return safeUser
-}
-
-interface CheckAccountResult {
-  available: boolean
-  reason: 'EMAIL_TAKEN' | 'PHONE_TAKEN' | 'AVAILABLE'
-}
 
 /**
  * Checks if a user already exists with the given email and/or phone.

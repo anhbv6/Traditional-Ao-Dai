@@ -9,6 +9,57 @@ const router = Router()
 
 /**
  * @openapi
+ * /api/auth/register:
+ *   post:
+ *     summary: Client Register
+ *     description: Register a new customer account.
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: newuser@aodai.vn
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 example: "123456"
+ *               name:
+ *                 type: string
+ *                 example: "Nguyen Van A"
+ *               phone:
+ *                 type: string
+ *                 example: "0987654321"
+ *     responses:
+ *       201:
+ *         description: Registration successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: Đăng ký tài khoản thành công
+ *       400:
+ *         description: Validation error or account already exists
+ */
+router.post('/register', validate(registerSchema), clientAuthController.registerClient)
+
+/**
+ * @openapi
  * /api/auth/admin/login:
  *   post:
  *     summary: Admin Login
@@ -145,57 +196,6 @@ router.post('/refresh', clientAuthController.refreshClientToken)
  */
 router.post('/client/logout', clientAuthController.logoutClient)
 router.post('/logout', clientAuthController.logoutClient)
-
-/**
- * @openapi
- * /api/auth/client/register:
- *   post:
- *     summary: Client Register
- *     description: Register a new customer account.
- *     tags:
- *       - Auth
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - email
- *               - password
- *             properties:
- *               email:
- *                 type: string
- *                 format: email
- *                 example: newuser@aodai.vn
- *               password:
- *                 type: string
- *                 format: password
- *                 example: "123456"
- *               name:
- *                 type: string
- *                 example: "Nguyen Van A"
- *               phone:
- *                 type: string
- *                 example: "0987654321"
- *     responses:
- *       201:
- *         description: Registration successful
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: string
- *                   example: success
- *                 message:
- *                   type: string
- *                   example: Đăng ký tài khoản thành công
- *       400:
- *         description: Validation error or account already exists
- */
-router.post('/client/register', validate(registerSchema), clientAuthController.registerClient)
 
 /**
  * @openapi

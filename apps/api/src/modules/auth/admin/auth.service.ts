@@ -43,19 +43,3 @@ export async function adminLogin(input: LoginInput['body']) {
     user: safeUser,
   }
 }
-
-/**
- * Retrieves a user by their unique database identifier.
- */
-export async function getUserById(id: string) {
-  const user = await prisma.user.findUnique({
-    where: { id },
-  })
-
-  if (!user) {
-    throw new AppError(404, 'Không tìm thấy người dùng')
-  }
-
-  const { password: _, ...safeUser } = user
-  return safeUser
-}

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'motion/react';
-import { Eye, EyeOff, ArrowRight, Smartphone, Mail, RefreshCw, CheckCircle2, Info } from 'lucide-react';
+import { Eye, EyeOff, ArrowRight, ArrowLeft, Smartphone, Mail, RefreshCw, CheckCircle2, Info } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { FormInput } from '@/components/shared/FormInput';
 import { Button } from '@/components/ui/button';
@@ -208,6 +208,90 @@ export function RegisterForm() {
     handleResendOtp,
     handleGoogleSignUp,
   } = useRegister();
+
+  const [otpArray, setOtpArray] = React.useState<string[]>(Array(6).fill(''));
+  const inputRefs = React.useRef<HTMLInputElement[]>([]);
+  const [timer, setTimer] = React.useState(60);
+  const [canResend, setCanResend] = React.useState(false);
+
+  React.useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isOtpStep && timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+    } else if (timer === 0) {
+      setCanResend(true);
+    }
+    return () => clearInterval(interval);
+  }, [timer, isOtpStep]);
+
+  React.useEffect(() => {
+    if (isOtpStep) {
+      setTimer(60);
+      setCanResend(false);
+      setOtpArray(Array(6).fill(''));
+      setOtpInput('');
+    }
+  }, [isOtpStep, setOtpInput]);
+
+  React.useEffect(() => {
+    setOtpInput(otpArray.join(''));
+  }, [otpArray, setOtpInput]);
+
+  const handleChange = (value: string, index: number) => {
+    if (value && !/^\d+$/.test(value)) return;
+
+    const newOtp = [...otpArray];
+    newOtp[index] = value.substring(value.length - 1);
+    setOtpArray(newOtp);
+
+    if (value && index < 5) {
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+    if (e.key === 'Backspace') {
+      if (!otpArray[index] && index > 0) {
+        const newOtp = [...otpArray];
+        newOtp[index - 1] = '';
+        setOtpArray(newOtp);
+        inputRefs.current[index - 1]?.focus();
+      } else {
+        const newOtp = [...otpArray];
+        newOtp[index] = '';
+        setOtpArray(newOtp);
+      }
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').substring(0, 6);
+    if (!pastedData) return;
+
+    const newOtp = [...otpArray];
+    for (let i = 0; i < 6; i++) {
+      if (pastedData[i]) {
+        newOtp[i] = pastedData[i];
+      }
+    }
+    setOtpArray(newOtp);
+
+    const focusIndex = Math.min(pastedData.length, 5);
+    inputRefs.current[focusIndex]?.focus();
+  };
+
+  const handleResend = () => {
+    if (!canResend) return;
+    setTimer(60);
+    setCanResend(false);
+    setOtpArray(Array(6).fill(''));
+    setOtpInput('');
+    inputRefs.current[0]?.focus();
+    handleResendOtp();
+  };
 
   const fullNameValue = watch('fullName') || '';
   const emailValue = watch('email') || '';
@@ -698,63 +782,83 @@ export function RegisterForm() {
             animate={{ opacity: 1, scale: 1 }}
             className="space-y-6"
           >
-            <div className="space-y-3 text-center">
-              <div className="mx-auto grid size-12 place-items-center rounded-full bg-[#800020]/5 text-[#800020]">
-                <Smartphone size={24} />
-              </div>
-              <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-semibold text-[#800020]">
+            {/* Header */}
+            <div className="space-y-3 text-center lg:text-left">
+              <h2 className="font-[family-name:var(--font-playfair)] text-3xl font-semibold leading-tight text-[var(--primary-color)] sm:text-4xl">
                 {t('otpTitle')}
               </h2>
-              <p className="font-[family-name:var(--font-lora)] text-xs text-[var(--text-light)] leading-relaxed">
-                {t('smsSent')}
+              <p className="font-[family-name:var(--font-lora)] text-sm text-[var(--text-light)] leading-relaxed">
+                {t('smsSent')}{' '}
+                <span className="font-semibold text-[var(--text-main)]">{phoneValue}</span>
               </p>
             </div>
 
-            <form onSubmit={handleVerifyOtp} className="space-y-5">
-              <FormInput
-                type="text"
-                required
-                maxLength={6}
-                placeholder={t('otpPlaceholder')}
-                value={otpInput}
-                onChange={(e) => setOtpInput(e.target.value.replace(/\D/g, ''))}
-                className="w-full text-center tracking-[8px] text-lg font-bold"
-                error={otpError}
-                errorPlacement="bottom"
-                label={t('otpCode')}
-                labelClassName="text-center w-full block"
-                containerClassName="space-y-2 text-center"
-              />
+            <form onSubmit={handleVerifyOtp} className="space-y-6">
+              {/* OTP Code Inputs */}
+              <div className="flex justify-between gap-1.5 sm:gap-3">
+                {otpArray.map((digit, idx) => (
+                  <input
+                    key={idx}
+                    type="text"
+                    maxLength={1}
+                    value={digit}
+                    ref={(el) => {
+                      if (el) inputRefs.current[idx] = el;
+                    }}
+                    onChange={(e) => handleChange(e.target.value, idx)}
+                    onKeyDown={(e) => handleKeyDown(e, idx)}
+                    onPaste={idx === 0 ? handlePaste : undefined}
+                    className="w-[calc((100%-1.25rem)/6)] max-w-14 aspect-square sm:h-16 text-center text-lg sm:text-xl font-semibold rounded-lg border border-[var(--border)] bg-background text-[var(--text-main)] shadow-none outline-none transition-all focus:border-[var(--primary-color)] focus:bg-white focus:ring-2 focus:ring-[var(--ring)]/30"
+                  />
+                ))}
+              </div>
 
-              <Button
-                type="submit"
-                disabled={isRegistering}
-                className="w-full h-12 bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/95 shadow-sm font-semibold tracking-wider text-xs uppercase rounded-lg cursor-pointer disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center gap-2"
-              >
-                {isRegistering ? (
-                  <RefreshCw size={14} className="animate-spin" />
-                ) : (
-                  t('verifyButton')
-                )}
-              </Button>
+              {otpError && (
+                <p className="text-center text-xs font-semibold text-rose-500 font-[family-name:var(--font-lora)] mt-2">
+                  {otpError}
+                </p>
+              )}
 
-              <div className="flex justify-between text-xs font-semibold font-[family-name:var(--font-lora)] px-1">
+              {/* Resend Action */}
+              <div className="flex items-center justify-between font-[family-name:var(--font-lora)] text-xs mt-4">
+                <span className="text-[var(--text-light)]">
+                  {timer > 0 ? t('resendTimer', { timer }) : t('noCodeReceived')}
+                </span>
                 <button
                   type="button"
-                  onClick={() => setIsOtpStep(false)}
-                  className="text-[var(--text-light)] hover:text-[#800020] transition-colors cursor-pointer outline-none border-none bg-transparent"
-                >
-                  {t('back')}
-                </button>
-                <button
-                  type="button"
-                  onClick={handleResendOtp}
-                  className="text-[#800020] hover:text-[#800020]/80 transition-colors cursor-pointer outline-none border-none bg-transparent"
+                  onClick={handleResend}
+                  disabled={!canResend}
+                  className={`font-semibold transition-colors ${
+                    canResend
+                      ? 'text-[var(--primary-color)] hover:text-[var(--accent-color)] underline underline-offset-4'
+                      : 'text-[var(--text-light)]/50 cursor-not-allowed'
+                  }`}
                 >
                   {t('resendOtp')}
                 </button>
               </div>
+
+              {/* Action Button */}
+              <Button
+                type="submit"
+                disabled={otpArray.join('').length < 6 || isRegistering}
+                className="w-full h-12 bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/95 shadow-sm transition-all hover:shadow duration-300 flex items-center justify-center gap-2 group/btn font-semibold tracking-wider text-xs uppercase rounded-lg disabled:opacity-50 disabled:pointer-events-none mt-6"
+              >
+                {isRegistering ? t('verifying') : t('verifyButton')}
+              </Button>
             </form>
+
+            {/* Back link */}
+            <p className="text-center font-[family-name:var(--font-lora)] text-xs text-[var(--text-light)] mt-6">
+              <button
+                type="button"
+                onClick={() => setIsOtpStep(false)}
+                className="inline-flex items-center gap-1.5 font-semibold text-[var(--primary-color)] hover:text-[var(--accent-color)] transition-colors group/back outline-none border-none bg-transparent cursor-pointer"
+              >
+                <ArrowLeft size={14} className="transition-transform group-hover/back:-translate-x-0.5" />
+                <span>{t('back')}</span>
+              </button>
+            </p>
           </motion.div>
         )}
       </motion.div>

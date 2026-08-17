@@ -1,8 +1,8 @@
 import { CookieOptions, Request, Response, NextFunction } from 'express'
 import * as authService from './auth.service'
+import * as userService from '../../user/user.service'
 import { AuthenticatedRequest } from '../../../shared/middlewares/authGuard'
 import { sendSuccess, sendError } from '../../../shared/utils/response'
-import { AppError } from '../../../shared/middlewares/errorHandler'
 
 const REFRESH_TOKEN_COOKIE = 'refreshToken'
 
@@ -160,7 +160,7 @@ export async function getMe(req: AuthenticatedRequest, res: Response, next: Next
       })
     }
 
-    const user = await authService.getUserById(userId)
+    const user = await userService.getUserById(userId)
     return sendSuccess(res, {
       data: user,
       message: 'GET_PROFILE_SUCCESS',

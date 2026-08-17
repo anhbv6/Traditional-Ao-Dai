@@ -19,12 +19,6 @@ enum Gender {
   OTHER
 }
 
-enum AuthProvider {
-  LOCAL
-  GOOGLE
-  FACEBOOK
-}
-
 enum MediaType {
   IMAGE
   VIDEO
@@ -46,7 +40,7 @@ enum PaymentStatus {
 
 model User {
   id                String          @id @default(uuid())
-  email             String          @unique
+  email             String?         @unique
   password          String?
   name              String?
   phone             String?         @unique
@@ -56,10 +50,9 @@ model User {
   role              Role            @default(CUSTOMER)
   isActive          Boolean         @default(true)
   isEmailVerified   Boolean         @default(false)
+  isPhoneVerified   Boolean         @default(false)
 
-  //social auth
-  provider          AuthProvider    @default(LOCAL)
-  providerId        String?         
+  socialAccounts    SocialAccount[]
 
   reviews           Review[]
   measurements      UserMeasurement[]
@@ -68,6 +61,19 @@ model User {
   sessions          UserSession[]
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
+}
+
+model SocialAccount {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider    String   // "GOOGLE", "FACEBOOK", etc.
+  providerId  String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([provider, providerId])
+  @@index([userId])
 }
 
 model UserSession {
