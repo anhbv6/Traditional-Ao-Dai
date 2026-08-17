@@ -27,7 +27,7 @@ async function handleAuthRequest(
     
     // Adapt specific paths if they differ from frontend API paths
     if (pathString === 'refresh') {
-      targetUrl = `${BASE_URL}/auth/client/refresh-token`;
+      targetUrl = `${BASE_URL}/auth/refresh-token`;
     } else if (pathString === 'me') {
       targetUrl = `${BASE_URL}/auth/client/me`;
     }
