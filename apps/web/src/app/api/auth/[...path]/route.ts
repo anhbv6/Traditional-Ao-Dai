@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3001/api';
 
 function copySetCookie(from: Response, to: NextResponse) {
   const setCookie = from.headers.get('set-cookie');
@@ -29,7 +29,7 @@ async function handleAuthRequest(
     if (pathString === 'refresh') {
       targetUrl = `${BASE_URL}/auth/refresh-token`;
     } else if (pathString === 'me') {
-      targetUrl = `${BASE_URL}/auth/client/me`;
+      targetUrl = `${BASE_URL}/auth/me`;
     }
 
     // 2. Set up headers

@@ -65,8 +65,36 @@ export const registerApi = async (data: {
   password?: string;
   email?: string;
   phone?: string;
+  code?: string;
 }): Promise<RegisterResponse> => {
   return apiClient.post<RegisterResponse>('/api/auth/register', data, { skipAuth: true, retryOnUnauthorized: false });
+};
+
+export interface SendOtpResponse {
+  status: string;
+  statusCode: number;
+  message: string;
+  data: {
+    success: boolean;
+    ttl: number;
+  } | null;
+}
+
+export const sendOtpApi = async (phone: string, purpose: 'REGISTER' | 'LOGIN' | 'RESET_PASSWORD'): Promise<SendOtpResponse> => {
+  return apiClient.post<SendOtpResponse>('/api/auth/otp/send', { phone, purpose }, { skipAuth: true, retryOnUnauthorized: false });
+};
+
+export interface VerifyOtpResponse {
+  status: string;
+  statusCode: number;
+  message: string;
+  data: {
+    isValid: boolean;
+  } | null;
+}
+
+export const verifyOtpApi = async (phone: string, purpose: 'REGISTER' | 'LOGIN' | 'RESET_PASSWORD', code: string): Promise<VerifyOtpResponse> => {
+  return apiClient.post<VerifyOtpResponse>('/api/auth/otp/verify', { phone, purpose, code }, { skipAuth: true, retryOnUnauthorized: false });
 };
 
 

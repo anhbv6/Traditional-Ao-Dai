@@ -4,10 +4,11 @@ import { comparePassword, hashPassword } from '../../../shared/utils/password'
 import { generateAccessToken, generateRefreshToken, JWTPayload, verifyToken } from '../../../shared/utils/jwt'
 import { AppError } from '../../../shared/middlewares/errorHandler'
 import { env } from '../../../shared/config/env'
-import { LoginInput, RefreshTokenInput, RegisterInput } from '../auth.schema'
+import { LoginInput, RefreshTokenInput, RegisterInput, OtpLoginInput } from '../auth.schema'
 import { durationToMs } from '../../../shared/utils/time'
 import { normalizeVietnamPhone } from '../../../shared/utils/phone'
 import { CheckAccountResult, SessionMeta } from '../auth.types'
+import { verifyOtp } from '../otp.service'
 
 function buildAuthTokens(user: { id: string; role: JWTPayload['role'] }, sessionId: string) {
   const payload = {
@@ -40,7 +41,10 @@ export async function clientRegister(input: RegisterInput['body']) {
     finalEmail = email.trim().toLowerCase()
     finalPhone = normalizeVietnamPhone(phone) || null
   } else {
-    const { phone, email } = input
+    const { phone, email, code } = input
+    // Verify OTP before register
+    await verifyOtp(phone, 'REGISTER', code)
+
     finalPhone = normalizeVietnamPhone(phone)!
     finalEmail = email ? email.trim().toLowerCase() : null
   }
@@ -76,6 +80,7 @@ export async function clientRegister(input: RegisterInput['body']) {
       name: name || null,
       phone: finalPhone,
       role: 'CUSTOMER',
+      isPhoneVerified: registerType === 'phone',
     },
   })
   return user
@@ -130,6 +135,68 @@ export async function clientLogin(input: LoginInput['body'], meta: SessionMeta =
   })
 
   // Return user info excluding password and include token
+  const { password: _, ...safeUser } = user
+  return {
+    ...tokens,
+    refreshTokenExpiresAt: refreshExpiresAt,
+    user: safeUser,
+  }
+}
+
+/**
+ * Logins a client using phone number and OTP code.
+ */
+export async function clientLoginWithOtp(input: OtpLoginInput['body'], meta: SessionMeta = {}) {
+  const { phone, code } = input
+
+  // Verify OTP
+  await verifyOtp(phone, 'LOGIN', code)
+
+  const normalizedPhone = normalizeVietnamPhone(phone)
+
+  // Find user by phone
+  const user = await prisma.user.findFirst({
+    where: { phone: normalizedPhone },
+  })
+
+  // Check user existence, verify they are a CUSTOMER
+  if (!user || user.role !== 'CUSTOMER') {
+    throw new AppError(400, 'Tài khoản chưa được đăng ký. Vui lòng đăng ký trước.')
+  }
+
+  if (!user.isActive) {
+    throw new AppError(403, 'Tài khoản này đã bị khóa hoặc vô hiệu hóa.')
+  }
+
+  // Update phone verified status if not already set
+  if (!user.isPhoneVerified) {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { isPhoneVerified: true },
+    })
+    user.isPhoneVerified = true
+  }
+
+  const refreshExpiresAt = new Date(Date.now() + durationToMs(env.JWT_REFRESH_EXPIRES_IN))
+  const session = await prisma.userSession.create({
+    data: {
+      userId: user.id,
+      refreshToken: '',
+      deviceInfo: meta.deviceInfo,
+      ipAddress: meta.ipAddress,
+      expiresAt: refreshExpiresAt,
+    },
+  })
+
+  const tokens = buildAuthTokens(user, session.id)
+
+  await prisma.userSession.update({
+    where: { id: session.id },
+    data: {
+      refreshToken: hashToken(tokens.refreshToken),
+    },
+  })
+
   const { password: _, ...safeUser } = user
   return {
     ...tokens,

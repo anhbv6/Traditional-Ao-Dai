@@ -7,7 +7,7 @@ import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { createRegisterSchema, type RegisterFormData } from '../types/register.types';
-import { mockCheckEmailApi, checkPhoneApi, registerApi } from '../api/register.api';
+import { mockCheckEmailApi, checkPhoneApi, registerApi, sendOtpApi } from '../api/register.api';
 import { showToast } from '@/components/ui/toast';
 import { HttpError } from '@/lib/api-client';
 
@@ -243,51 +243,63 @@ export function useRegister() {
         setError('phone', { message: phoneApiError || t('phoneTaken') });
         return;
       }
-      const randomOtp = Math.floor(100000 + Math.random() * 900000).toString();
-      setOtpSentCode(randomOtp);
-      setOtpError('');
-      setIsOtpStep(true);
-      
-      setTimeout(() => {
-        alert(t('smsOtpMessage', { otp: randomOtp }));
-      }, 500);
+      try {
+        setIsRegistering(true);
+        await sendOtpApi(data.phone, 'REGISTER');
+        setOtpError('');
+        setIsOtpStep(true);
+        showToast.success('Mã OTP đã được gửi đến số điện thoại của bạn.');
+      } catch (err: unknown) {
+        console.error('Failed to send OTP:', err);
+        const apiMsg = getErrorMessage(err, 'Gửi mã OTP thất bại');
+        setError('phone', { message: apiMsg });
+      } finally {
+        setIsRegistering(false);
+      }
     }
   };
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (otpInput === otpSentCode) {
-      setIsRegistering(true);
-      const data = watch();
-      try {
-        const res = await registerApi({
-          registerType: 'phone',
-          name: data.fullName,
-          password: data.password,
-          phone: data.phone,
-        });
-        const successMsg = t(res.message) || t('registerSuccessPhone');
-        showToast.success(successMsg);
-        setIsOtpStep(false);
-        router.push('/login');
-      } catch (err: unknown) {
-        console.error('Registration failed:', err);
-        const apiMsg = getErrorMessage(err, 'Registration failed');
-        setOtpError(apiMsg);
-      } finally {
-        setIsRegistering(false);
-      }
-    } else {
-      setOtpError(t('otpInvalid'));
+    const data = watch();
+    if (data.registerType !== 'phone') return;
+
+    setIsRegistering(true);
+    try {
+      const res = await registerApi({
+        registerType: 'phone',
+        name: data.fullName,
+        password: data.password,
+        phone: data.phone,
+        code: otpInput,
+      });
+      const successMsg = t(res.message) || t('registerSuccessPhone');
+      showToast.success(successMsg);
+      setIsOtpStep(false);
+      router.push('/login');
+    } catch (err: unknown) {
+      console.error('Registration failed:', err);
+      const apiMsg = getErrorMessage(err, 'Xác thực OTP thất bại');
+      setOtpError(apiMsg);
+    } finally {
+      setIsRegistering(false);
     }
   };
 
-  const handleResendOtp = () => {
-    const randomOtp = Math.floor(100000 + Math.random() * 900000).toString();
-    setOtpSentCode(randomOtp);
-    setOtpInput('');
-    setOtpError('');
-    alert(t('smsOtpResent', { otp: randomOtp }));
+  const handleResendOtp = async () => {
+    const data = watch();
+    if (data.registerType !== 'phone') return;
+
+    try {
+      await sendOtpApi(data.phone, 'REGISTER');
+      setOtpInput('');
+      setOtpError('');
+      showToast.success('Mã OTP đã được gửi lại.');
+    } catch (err: unknown) {
+      console.error('Failed to resend OTP:', err);
+      const apiMsg = getErrorMessage(err, 'Gửi lại mã OTP thất bại');
+      setOtpError(apiMsg);
+    }
   };
 
   const handleGoogleSignUp = () => {};

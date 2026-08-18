@@ -13,6 +13,10 @@ const envSchema = z.object({
   JWT_EXPIRES_IN: z.string().min(1, 'JWT_EXPIRES_IN is required').default('15m'),
   JWT_REFRESH_EXPIRES_IN: z.string().min(1, 'JWT_REFRESH_EXPIRES_IN is required').default('7d'),
   FRONTEND_URL: z.string().url().default('http://localhost:3000'),
+  REDIS_HOST: z.string().default('localhost'),
+  REDIS_PORT: z.string().transform((val) => parseInt(val, 10)).default(6379),
+  REDIS_PASSWORD: z.string().optional(),
+  OTP_TTL_SECONDS: z.string().transform((val) => parseInt(val, 10)).default(300),
 })
 
 const parsed = envSchema.safeParse(process.env)

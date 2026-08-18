@@ -1,6 +1,7 @@
 import { CookieOptions, Request, Response, NextFunction } from 'express'
 import * as authService from './auth.service'
 import * as userService from '../../user/user.service'
+import * as otpService from '../otp.service'
 import { AuthenticatedRequest } from '../../../shared/middlewares/authGuard'
 import { sendSuccess, sendError } from '../../../shared/utils/response'
 import { secondsUntil } from '../../../shared/utils/number'
@@ -202,6 +203,59 @@ export async function updateProfile(req: AuthenticatedRequest, res: Response, ne
     return sendSuccess(res, {
       data: updatedUser,
       message: 'UPDATE_PROFILE_SUCCESS',
+    })
+  } catch (error) {
+    return next(error)
+  }
+}
+
+/**
+ * Controller handler for sending OTP
+ */
+export async function sendOtp(req: Request, res: Response, next: NextFunction): Promise<any> {
+  try {
+    const { phone, purpose } = req.body
+    const result = await otpService.sendOtp(phone, purpose)
+    return sendSuccess(res, {
+      data: result,
+      message: 'OTP_SENT_SUCCESS',
+    })
+  } catch (error) {
+    return next(error)
+  }
+}
+
+/**
+ * Controller handler for verifying OTP
+ */
+export async function verifyOtp(req: Request, res: Response, next: NextFunction): Promise<any> {
+  try {
+    const { phone, purpose, code } = req.body
+    const isValid = await otpService.verifyOtp(phone, purpose, code)
+    return sendSuccess(res, {
+      data: { isValid },
+      message: 'OTP_VERIFIED_SUCCESS',
+    })
+  } catch (error) {
+    return next(error)
+  }
+}
+
+/**
+ * Controller handler for client login with OTP
+ */
+export async function loginWithOtp(req: Request, res: Response, next: NextFunction): Promise<any> {
+  try {
+    const result = await authService.clientLoginWithOtp(req.body, {
+      deviceInfo: req.headers['user-agent'],
+      ipAddress: getClientIp(req),
+    })
+    setRefreshTokenCookie(res, result.refreshToken, result.refreshTokenExpiresAt)
+    return sendSuccess(res, {
+      data: {
+        accessToken: result.accessToken,
+      },
+      message: 'LOGIN_SUCCESS',
     })
   } catch (error) {
     return next(error)

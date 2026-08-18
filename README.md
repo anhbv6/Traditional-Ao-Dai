@@ -25,16 +25,11 @@ learn-ecommerce-shop/
 │   │       ├── components/# Các UI component dùng chung toàn cục (Global UI)
 │   │       ├── features/  # Module nghiệp vụ tách biệt (Feature-based Architecture)
 │   │       │   └── products/ # Ví dụ: Module quản lý sản phẩm
-│   │       │       ├── components/ # React components riêng biệt cho feature
-│   │       │       ├── api/        # Logic gọi API/fetching liên quan
-│   │       │       ├── hooks/      # Custom hooks của riêng feature
-│   │       │       ├── data/       # Dữ liệu tĩnh hoặc cấu hình cục bộ
-│   │       │       ├── types/      # Các định nghĩa kiểu (TypeScript types)
-│   │       │       └── index.ts    # Public API của feature (nơi export component ra ngoài)
 │   │       ├── i18n/      # Cấu hình đa ngôn ngữ (Localization)
 │   │       ├── lib/       # Cấu hình các thư viện (như axios client, utils...)
 │   │       └── types/     # Định nghĩa kiểu dùng chung cho frontend
 │   └── api/               # ⚙️ Backend API (Express.js, TypeScript) - Modular Monolith
+│       ├── .env.example   # File mẫu cấu hình biến môi trường của API & DB
 │       └── src/
 │           ├── index.ts   # Entrypoint khởi chạy API server & gắn middleware toàn cục
 │           ├── routes.ts  # Bộ định tuyến trung tâm (central router)
@@ -47,7 +42,7 @@ learn-ecommerce-shop/
 │       │   └── schema.prisma # Định nghĩa cấu hình DB Schema (PostgreSQL)
 │       └── src/
 │           └── index.ts   # Khởi tạo Prisma Client instance dùng chung
-├── .env.example           # File mẫu biến môi trường ở thư mục gốc
+├── docker-compose.yml     # Khởi chạy dịch vụ phụ trợ (Redis) bằng Docker
 ├── package.json           # Các script chạy chung của toàn bộ workspace
 └── pnpm-workspace.yaml    # Khai báo các package trong workspace
 ```
@@ -61,10 +56,8 @@ Frontend nằm tại [`apps/web`](file:///E:/draftcode/learn-ecommerce-shop/apps
     *   `api/`: Các truy vấn API, query/mutation hooks phục vụ riêng cho dữ liệu của feature.
     *   `hooks/`: Các custom hooks chứa logic nghiệp vụ và state riêng biệt.
     *   `types/`: Định nghĩa kiểu dữ liệu TS cho riêng feature.
-    *   `data/`: Dữ liệu tĩnh hoặc cấu hình cục bộ.
     *   `index.ts`: Điểm xuất khẩu (export) duy nhất. Chỉ những gì được export ở đây mới có thể được import sử dụng ở bên ngoài module (tránh việc import sâu gây rối mã nguồn).
 *   **`app/[locale]/`**: Đóng vai trò là lớp Router (routing layer) và Layout. Lớp này chỉ import các features từ thư mục `features/` để lắp ráp thành một trang hoàn thiện, hạn chế viết trực tiếp logic nghiệp vụ hay UI lớn tại đây.
-*   **`components/` (ở ngoài cùng `src`)**: Chứa các component dùng chung cho toàn ứng dụng (ví dụ: `Header`, `Footer`, `Button` dùng chung, `TextField`, v.v.).
 
 ### ⚙️ Thiết kế Backend (Modular Monolith)
 
@@ -82,79 +75,132 @@ Backend API nằm tại [`apps/api`](file:///E:/draftcode/learn-ecommerce-shop/a
 
 ---
 
-## 🛠️ Công Nghệ & Thư Viện Sử Dụng
+## 🛠️ Chi Tiết Công Nghệ & Thư Viện Sử Dụng
 
-### Monorepo Tooling
-*   **PNPM Workspaces**: Trình quản lý package hiệu năng cao hỗ trợ cấu trúc Monorepo.
-
-### Frontend (`apps/web`)
-*   **Next.js 16 (App Router) & React 19**: Core framework dựng giao diện và tối ưu hóa SEO/SSR.
-*   **TypeScript (v5)**: Đảm bảo kiểm soát kiểu dữ liệu an toàn.
-*   **Tailwind CSS (v4) & PostCSS**: Thiết kế giao diện utility-first hiện đại.
-*   **Tailwind Merge & Class Variance Authority (CVA)**: Quản lý và tùy biến các class CSS dễ dàng.
-*   **Motion (Framer Motion 12)**: Thư viện tạo hiệu ứng chuyển động mượt mà.
-*   **Lenis Smooth Scroll**: Hiệu ứng cuộn trang mượt mà.
-*   **OGL (WebGL Library)**: Render hiệu ứng canvas 2D/3D hiệu năng cao.
-*   **DotLottie React & React UseAnimations**: Phát các animation Lottie và micro-interactions.
-*   **Next-intl**: Hỗ trợ đa ngôn ngữ (Localization/i18n).
-*   **Embla Carousel React**: Thư viện làm slider/carousel kéo vuốt mượt mà.
-*   **Base UI React & Vaul**: Các component nguyên bản (Primitives) và Drawer/Modal tiện lợi.
-*   **React Day Picker & Smastrom React Rating**: Component lịch và đánh giá sao (rating).
-*   **React Hot Toast**: Hiển thị thông báo (toast alerts) nhanh chóng.
+### 🖥️ Frontend Web (`apps/web`)
+*   **Next.js v16.2.10 (App Router) & React v19.2.4**: Framework chính để dựng giao diện, tối ưu hoá SEO và kết xuất phía máy chủ (SSR).
+*   **TypeScript**: Đảm bảo kiểm soát kiểu dữ liệu chặt chẽ và an toàn.
+*   **Tailwind CSS v4 & PostCSS**: Viết CSS nhanh chóng, tối ưu hóa giao diện responsive.
+*   **Zustand**: Quản lý trạng thái đăng nhập, giỏ hàng, thông tin phiên giao dịch.
+*   **Next-intl v4**: Thư viện xử lý bản địa hoá và dịch đa ngôn ngữ (English / Tiếng Việt).
+*   **Motion (Framer Motion 12) & Lenis**: Thiết lập hiệu ứng chuyển động chất lượng cao và cuộn trang mượt mà.
+*   **Embla Carousel React**: Thư viện làm slider/carousel kéo vuốt mượt mà trên cả desktop và mobile.
+*   **Base UI React & Vaul**: Cung cấp các component nguyên bản không có style (Primitives) và Drawer/Modal hiện đại.
+*   **React Day Picker**: Component lịch trực quan để người dùng chọn ngày tháng.
+*   **Smastrom React Rating**: Component đánh giá sao cho sản phẩm.
+*   **React Hot Toast**: Hiển thị thông báo (toast alerts) dạng pop-up nhanh chóng.
 *   **Date-fns**: Xử lý và định dạng thời gian.
 
-### Backend (`apps/api`)
-*   **Express.js**: Framework dựng API RESTful nhanh gọn.
-*   **TSX**: Chạy trực tiếp các file TypeScript trong môi trường phát triển.
-*   **@repo/db**: Thư viện kết nối database dùng chung trong monorepo.
+### ⚙️ Backend API (`apps/api`)
+*   **Express.js v4**: Bộ khung web server xử lý định tuyến (Routing) và API endpoints.
+*   **TSX & TypeScript**: Chạy trực tiếp các file TypeScript trong môi trường phát triển và bảo vệ kiểu dữ liệu.
+*   **Cors**: Middleware xử lý phân quyền chia sẻ tài nguyên nguồn gốc chéo (Cross-Origin Resource Sharing).
+*   **Dotenv & Dotenv-cli**: Đọc và nạp các cấu hình môi trường từ file `.env` động.
+*   **Bcryptjs**: Thư viện dùng để mã hoá (hash) mật khẩu của người dùng an toàn.
+*   **Zod**: Xác thực dữ liệu đầu vào (Request validation) trước khi xử lý.
+*   **Swagger UI Express**: Tự động sinh giao diện tài liệu hướng dẫn sử dụng API (API Specification).
 
-### Database (`packages/db`)
-*   **Prisma ORM**: Trình ánh xạ quan hệ đối tượng giúp thao tác database dễ dàng.
-*   **PostgreSQL**: Hệ quản trị cơ sở dữ liệu quan hệ mạnh mẽ.
+### 🗄️ Database & Caching Layer
+*   **PostgreSQL**: Hệ quản trị cơ sở dữ liệu quan hệ mạnh mẽ, tin cậy.
+*   **Prisma ORM v5**: Công cụ lập bản đồ quan hệ đối tượng giúp kết nối và thao tác database dễ dàng.
+*   **Redis v7**: Hệ thống lưu trữ dữ liệu trong bộ nhớ trong (In-memory cache) chạy độc lập qua Docker, phục vụ lưu cache mã OTP và giảm tải cho PostgreSQL.
+*   **Docker & Docker Compose**: Công cụ đóng gói container để chuẩn hoá môi trường chạy cơ sở dữ liệu phụ trợ (Redis).
 
 ---
 
-## 🛠️ Hướng Dẫn Cài Đặt & Khởi Chạy
+## 📦 Hướng Dẫn Cài Đặt Chung
 
 ### Điều kiện cần
 - Node.js >= 18.x
 - Cài đặt sẵn PNPM: `npm install -g pnpm`
-- Cơ sở dữ liệu PostgreSQL đang chạy
+- Đã cài đặt và khởi chạy **Docker Desktop** trên máy.
 
-### Các bước cài đặt
-
-1. **Clone repository và cài đặt thư viện**:
+### Các bước chuẩn bị chung
+1. **Clone repository về máy:**
    ```bash
    git clone <url-du-an>
    cd learn-ecommerce-shop
+   ```
+2. **Cài đặt dependencies toàn hệ thống:**
+   ```bash
    pnpm install
    ```
-
-2. **Cấu hình môi trường**:
-   Sao chép file `.env.example` thành `.env` tại thư mục gốc và cấu hình kết nối database của bạn:
+3. **Thiết lập file cấu hình môi trường:**
+   Sao chép file `.env.example` thành `.env` trong thư mục [`apps/api`](file:///E:/draftcode/learn-ecommerce-shop/apps/api):
    ```bash
-   cp .env.example .env
+   cp apps/api/.env.example apps/api/.env
    ```
-   *Chỉnh sửa file `.env`*:
-   ```env
-   DATABASE_URL="postgresql://username:password@localhost:5432/ecommerce?schema=public"
-   PORT=3001
-   ```
+   *Mở file `apps/api/.env` ra và điền các thông tin kết nối DB PostgreSQL và Redis của bạn.*
 
-3. **Khởi tạo Database**:
+---
+
+## 🚀 Hướng Dẫn Khởi Chạy Từng Phần
+
+Để quản lý dự án dễ dàng, bạn có thể khởi chạy từng dịch vụ riêng biệt theo thứ tự dưới đây:
+
+### 🧩 Phần 1: Khởi chạy dịch vụ phụ trợ (Redis)
+Dịch vụ Redis được đóng gói qua Docker. Tại thư mục gốc của dự án, hãy chạy:
+```bash
+docker compose up -d
+```
+*   **Kiểm tra trạng thái:** Dùng lệnh `docker compose ps` để đảm bảo container `shop-redis` đang chạy ở cổng `6379`.
+*   **Dừng dịch vụ:** Khi không sử dụng nữa, chạy `docker compose down`.
+
+---
+
+### 🗄️ Phần 2: Đồng bộ và Khởi tạo Cơ sở dữ liệu (PostgreSQL)
+Sau khi database PostgreSQL của bạn đã sẵn sàng hoạt động, hãy chạy các lệnh sau từ thư mục gốc:
+
+1. **Sinh mã Prisma Client:**
    ```bash
    pnpm db:generate
+   ```
+2. **Đồng bộ cấu hình bảng (Migration):**
+   ```bash
    pnpm db:migrate
    ```
-
-4. **Khởi chạy môi trường phát triển (Chạy song song cả FE và BE)**:
+3. **Khởi tạo dữ liệu mẫu (Seed) - Tạo tài khoản Admin mặc định:**
    ```bash
-   pnpm dev
+   pnpm --filter @repo/db seed
    ```
-   *   **Frontend Web**: [http://localhost:3000](http://localhost:3000)
-   *   **Backend API**: [http://localhost:3001](http://localhost:3001)
+   *Tài khoản Admin mặc định sẽ được tạo là `admin@gmail.com` với mật khẩu `123`.*
 
-### Các lệnh chạy riêng lẻ (nếu cần)
-*   **Chỉ chạy Web Frontend**: `pnpm --filter @repo/web dev`
-*   **Chỉ chạy Backend API**: `pnpm --filter @repo/api dev`
-*   **Tạo lại Prisma Client**: `pnpm --filter @repo/db generate`
+---
+
+### ⚙️ Phần 3: Khởi chạy Backend API Server
+Để chạy máy chủ API (Express.js), thực hiện lệnh sau tại thư mục gốc:
+```bash
+pnpm --filter @repo/api dev
+```
+*   **Địa chỉ API:** Chạy tại [http://localhost:3001](http://localhost:3001)
+*   **Tài liệu API (Swagger UI):** Xem trực quan cấu trúc và test các endpoint tại [http://localhost:3001/api-docs](http://localhost:3001/api-docs)
+
+---
+
+### 💻 Phần 4: Khởi chạy Frontend Web Client
+Để chạy ứng dụng giao diện Next.js, thực hiện lệnh sau tại thư mục gốc:
+```bash
+pnpm --filter @repo/web dev
+```
+*   **Địa chỉ Web:** Truy cập tại [http://localhost:3000](http://localhost:3000)
+
+---
+
+## ⚡ Mẹo chạy nhanh toàn bộ dự án
+Nếu bạn muốn chạy song song cả **Backend API** và **Frontend Web** cùng một lúc sau khi đã chuẩn bị xong cơ sở dữ liệu, chỉ cần chạy một lệnh duy nhất tại thư mục gốc:
+```bash
+pnpm dev
+```
+
+---
+
+## 🐳 Các lệnh quản lý Docker & Redis hữu ích khi Debug
+*   **Xem logs của container Redis:**
+    ```bash
+    docker compose logs -f redis
+    ```
+*   **Truy cập vào CLI của Redis để kiểm tra keys/OTP:**
+    ```bash
+    docker exec -it shop-redis redis-cli
+    ```
+    *Ví dụ gõ lệnh `keys *` để xem danh sách mã OTP đang lưu trong cache.*
