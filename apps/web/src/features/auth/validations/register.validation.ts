@@ -44,5 +44,3 @@ export function createRegisterSchema(t: RegisterTranslation) {
 }
 
 export const registerSchema = createRegisterSchema((key) => key);
-
-export type RegisterFormData = z.infer<typeof registerSchema>;

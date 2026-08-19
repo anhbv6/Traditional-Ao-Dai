@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/routing';
-import { getMeApi, loginApi, type AuthUser, sendOtpApi, loginWithOtpApi, loginWithGoogleApi } from '../api/auth.api';
+import { getMeApi, loginApi, sendOtpApi, loginWithOtpApi, loginWithGoogleApi } from '../api/auth.api';
+import { type AuthUser } from '../types/auth.types';
 import { useAuthStore } from '../store/authStore';
 import { showToast } from '@/components/ui/toast';
 import { HttpError } from '@/lib/api-client';

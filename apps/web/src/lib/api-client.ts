@@ -161,3 +161,17 @@ export const apiClient = {
   patch: <T>(url: string, body: unknown, options?: Omit<CustomRequestInit, 'body'>) =>
     request<T>('PATCH', url, { ...options, body }),
 };
+
+export function getErrorMessage(err: unknown, fallback: string): string {
+  const payload = err instanceof HttpError ? err.payload : undefined;
+
+  if (payload && typeof payload === 'object' && 'message' in payload) {
+    return String(payload.message);
+  }
+
+  if (err instanceof Error) {
+    return err.message;
+  }
+
+  return fallback;
+}

@@ -6,24 +6,12 @@ import { useRouter } from '@/i18n/routing';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { createRegisterSchema, type RegisterFormData } from '../types/register.types';
-import { mockCheckEmailApi, checkPhoneApi, registerApi, sendOtpApi } from '../api/register.api';
+import { type RegisterFormData } from '../types/register.types';
+import { createRegisterSchema } from '../validations/register.validation';
+import { registerApi, sendOtpApi, checkEmailApi, checkPhoneApi } from '../api/register.api';
 import { showToast } from '@/components/ui/toast';
-import { HttpError } from '@/lib/api-client';
-
-function getErrorMessage(err: unknown, fallback: string) {
-  const payload = err instanceof HttpError ? err.payload : undefined;
-
-  if (payload && typeof payload === 'object' && 'message' in payload) {
-    return String(payload.message);
-  }
-
-  if (err instanceof Error) {
-    return err.message;
-  }
-
-  return fallback;
-}
+import { HttpError, getErrorMessage } from '@/lib/api-client';
+import { withMinDelay } from '@/lib/utils';
 
 export function useRegister() {
   const t = useTranslations('Auth');
@@ -34,7 +22,6 @@ export function useRegister() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [isOtpStep, setIsOtpStep] = useState(false);
-  const [otpSentCode, setOtpSentCode] = useState('');
   const [otpInput, setOtpInput] = useState('');
   const [otpError, setOtpError] = useState('');
   
@@ -47,6 +34,7 @@ export function useRegister() {
   const [emailApiError, setEmailApiError] = useState('');
   const [phoneApiError, setPhoneApiError] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
+  const [otpSentOnce, setOtpSentOnce] = useState(false);
 
   const {
     register,
@@ -112,7 +100,7 @@ export function useRegister() {
 
     const delay = setTimeout(async () => {
       try {
-        const res = await mockCheckEmailApi(emailVal);
+        const res = await checkEmailApi(emailVal);
         if (!isActive) return;
 
         if (res.isTaken) {
@@ -216,12 +204,15 @@ export function useRegister() {
       }
       try {
         setIsRegistering(true);
-        const res = await registerApi({
-          registerType: 'email',
-          name: data.fullName,
-          password: data.password,
-          email: data.email,
-        });
+        const res = await withMinDelay(
+          registerApi({
+            registerType: 'email',
+            name: data.fullName,
+            password: data.password,
+            email: data.email,
+          }),
+          2000
+        );
         const successMsg = t(res.message) || t('registerSuccessEmail', { name: data.fullName });
         showToast.success(successMsg);
         router.push('/login');
@@ -245,14 +236,18 @@ export function useRegister() {
       }
       try {
         setIsRegistering(true);
-        await sendOtpApi(data.phone, 'REGISTER');
+        await withMinDelay(sendOtpApi(data.phone, 'REGISTER'), 2000);
         setOtpError('');
+        setOtpSentOnce(true);
         setIsOtpStep(true);
         showToast.success('Mã OTP đã được gửi đến số điện thoại của bạn.');
       } catch (err: unknown) {
         console.error('Failed to send OTP:', err);
         const apiMsg = getErrorMessage(err, 'Gửi mã OTP thất bại');
-        setError('phone', { message: apiMsg });
+        showToast.error(apiMsg);
+        if (apiMsg.toUpperCase().includes('WAIT 60 SECONDS')) {
+          setOtpSentOnce(true);
+        }
       } finally {
         setIsRegistering(false);
       }
@@ -264,15 +259,18 @@ export function useRegister() {
     const data = watch();
     if (data.registerType !== 'phone') return;
 
-    setIsRegistering(true);
     try {
-      const res = await registerApi({
-        registerType: 'phone',
-        name: data.fullName,
-        password: data.password,
-        phone: data.phone,
-        code: otpInput,
-      });
+      setIsRegistering(true);
+      const res = await withMinDelay(
+        registerApi({
+          registerType: 'phone',
+          name: data.fullName,
+          password: data.password,
+          phone: data.phone,
+          code: otpInput,
+        }),
+        2000
+      );
       const successMsg = t(res.message) || t('registerSuccessPhone');
       showToast.success(successMsg);
       setIsOtpStep(false);
@@ -335,5 +333,6 @@ export function useRegister() {
     handleVerifyOtp,
     handleResendOtp,
     handleGoogleSignUp,
+    otpSentOnce,
   };
 }

@@ -82,7 +82,7 @@ router.post('/register', validate(registerSchema), clientAuthController.register
  * /api/auth/login:
  *   post:
  *     summary: Client Login
- *     description: Authenticate customers using email or phone and password. Returns an access token, refresh token, and creates a user session.
+ *     description: Authenticate customers using email or phone and password. Returns an access token and sets a refresh token in an HTTP-only cookie.
  *     tags:
  *       - Auth
  *     requestBody:
@@ -105,7 +105,13 @@ router.post('/register', validate(registerSchema), clientAuthController.register
  *                 example: "123456"
  *     responses:
  *       200:
- *         description: Login successful
+ *         description: Login successful. Sets an HTTP-only cookie named `refreshToken`.
+ *         headers:
+ *           Set-Cookie:
+ *             schema:
+ *               type: string
+ *               example: refreshToken=abcde...; Path=/; HttpOnly; SameSite=Lax
+ *             description: Contains the refresh token for token rotation.
  *         content:
  *           application/json:
  *             schema:
@@ -123,12 +129,6 @@ router.post('/register', validate(registerSchema), clientAuthController.register
  *                     accessToken:
  *                       type: string
  *                       example: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
- *                     refreshToken:
- *                       type: string
- *                       example: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
- *                     refreshTokenExpiresAt:
- *                       type: string
- *                       format: date-time
  *       400:
  *         description: Validation error
  *       401:
@@ -277,8 +277,113 @@ router.post('/google', validate(googleLoginSchema), clientAuthController.loginWi
  */
 router.post('/forgot-password/email', validate(forgotPasswordEmailSchema), clientAuthController.forgotPasswordEmail)
 
+/**
+ * @openapi
+ * /api/auth/forgot-password/email/verify:
+ *   post:
+ *     summary: Verify Email Reset Code
+ *     description: Verify the 6-digit verification code sent to the client's email address. Returns a temporary reset token valid for resetting the password.
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - code
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: customer@aodai.vn
+ *               code:
+ *                 type: string
+ *                 example: "123456"
+ *     responses:
+ *       200:
+ *         description: Verification successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: RESET_CODE_VERIFIED
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     resetToken:
+ *                       type: string
+ *                       example: "abc123xyz456..."
+ *                     expiresIn:
+ *                       type: integer
+ *                       example: 3600
+ *       400:
+ *         description: Incorrect or expired verification code
+ *       404:
+ *         description: User with this email was not found
+ */
 router.post('/forgot-password/email/verify', validate(verifyResetPasswordEmailSchema), clientAuthController.verifyResetPasswordEmail)
 
+/**
+ * @openapi
+ * /api/auth/forgot-password/phone/verify:
+ *   post:
+ *     summary: Verify Phone Reset Code
+ *     description: Verify the 6-digit OTP code sent to the client's phone number. Returns a temporary reset token valid for resetting the password.
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - phone
+ *               - code
+ *             properties:
+ *               phone:
+ *                 type: string
+ *                 example: "0987654321"
+ *               code:
+ *                 type: string
+ *                 example: "123456"
+ *     responses:
+ *       200:
+ *         description: Verification successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: RESET_CODE_VERIFIED
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     resetToken:
+ *                       type: string
+ *                       example: "abc123xyz456..."
+ *                     expiresIn:
+ *                       type: integer
+ *                       example: 3600
+ *       400:
+ *         description: Incorrect or expired OTP code
+ *       404:
+ *         description: User with this phone number was not found
+ */
 router.post('/forgot-password/phone/verify', validate(verifyResetPasswordPhoneSchema), clientAuthController.verifyResetPasswordPhone)
 
 /**
@@ -386,9 +491,44 @@ router.post('/reset-password/phone', validate(resetPasswordPhoneSchema), clientA
  * /api/auth/refresh-token:
  *   post:
  *     summary: Refresh Client Token
- *     description: Rotate a valid refresh token and return a new access token and refresh token pair.
+ *     description: Rotates the refresh token (sent via cookies) and returns a new access token while updating the refresh token cookie.
  *     tags:
  *       - Auth
+ *     parameters:
+ *       - in: cookie
+ *         name: refreshToken
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The client refresh token
+ *     responses:
+ *       200:
+ *         description: Token refreshed successfully. Sets a new HTTP-only cookie named `refreshToken`.
+ *         headers:
+ *           Set-Cookie:
+ *             schema:
+ *               type: string
+ *               example: refreshToken=abcde...; Path=/; HttpOnly; SameSite=Lax
+ *             description: Contains the updated refresh token.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: REFRESH_TOKEN_SUCCESS
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     accessToken:
+ *                       type: string
+ *                       example: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
+ *       401:
+ *         description: Refresh token is missing, expired, or invalid
  */
 router.post('/refresh-token', clientAuthController.refreshToken)
 
@@ -427,7 +567,7 @@ router.post('/refresh-token', clientAuthController.refreshToken)
  *                   example: success
  *                 message:
  *                   type: string
- *                   example: Account availability checked successfully
+ *                   example: CHECK_ACCOUNT_SUCCESS
  *                 data:
  *                   type: object
  *                   properties:
@@ -437,8 +577,6 @@ router.post('/refresh-token', clientAuthController.refreshToken)
  *                     reason:
  *                       type: string
  *                       example: AVAILABLE
-
-
  *       400:
  *         description: Validation error or missing parameters
  */
@@ -487,17 +625,142 @@ router.get('/me', requireAuth as any, clientAuthController.getMe)
  * /api/auth/logout:
  *   post:
  *     summary: Client Logout
- *     description: Revoke the current customer session.
+ *     description: Revoke the current customer session by clearing the refresh token cookie.
  *     tags:
  *       - Auth
- *     security:
- *       - bearerAuth: []
+ *     parameters:
+ *       - in: cookie
+ *         name: refreshToken
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: The client refresh token cookie to revoke
+ *     responses:
+ *       200:
+ *         description: Logout successful. Clears the HTTP-only cookie named `refreshToken`.
+ *         headers:
+ *           Set-Cookie:
+ *             schema:
+ *               type: string
+ *               example: refreshToken=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; SameSite=Lax
+ *             description: Clears the refresh token cookie.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: LOGOUT_SUCCESS
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *                   example: null
  */
 router.post('/logout', clientAuthController.logout)
 
 
 
 
+/**
+ * @openapi
+ * /api/auth/client/profile:
+ *   put:
+ *     summary: Update Client Profile
+ *     description: Update the profile details of the currently authenticated customer.
+ *     tags:
+ *       - Auth
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Nguyen Van A
+ *               phone:
+ *                 type: string
+ *                 example: "0987654321"
+ *               avatar:
+ *                 type: string
+ *                 example: https://res.cloudinary.com/...
+ *               dob:
+ *                 type: string
+ *                 format: date
+ *                 example: "1995-12-31"
+ *               gender:
+ *                 type: string
+ *                 enum: [MALE, FEMALE, OTHER]
+ *                 example: MALE
+ *     responses:
+ *       200:
+ *         description: Profile updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: UPDATE_PROFILE_SUCCESS
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       example: clm1234567890
+ *                     email:
+ *                       type: string
+ *                       example: customer@aodai.vn
+ *                     name:
+ *                       type: string
+ *                       example: Nguyen Van A
+ *                     phone:
+ *                       type: string
+ *                       example: "0987654321"
+ *                     avatar:
+ *                       type: string
+ *                       example: https://res.cloudinary.com/...
+ *                     birth:
+ *                       type: string
+ *                       format: date-time
+ *                       example: "1995-12-31T00:00:00.000Z"
+ *                     gender:
+ *                       type: string
+ *                       example: MALE
+ *                     role:
+ *                       type: string
+ *                       example: CUSTOMER
+ *                     isActive:
+ *                       type: boolean
+ *                       example: true
+ *                     isEmailVerified:
+ *                       type: boolean
+ *                       example: false
+ *                     isPhoneVerified:
+ *                       type: boolean
+ *                       example: false
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                     updatedAt:
+ *                       type: string
+ *                       format: date-time
+ *       400:
+ *         description: Phone number already in use or invalid input
+ *       401:
+ *         description: Unauthorized - JWT token missing, invalid or expired
+ */
 router.put('/client/profile', requireAuth as any, clientAuthController.updateProfile)
 
 /**

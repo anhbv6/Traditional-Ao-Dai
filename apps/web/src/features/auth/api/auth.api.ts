@@ -1,52 +1,13 @@
 import { apiClient } from '@/lib/api-client';
-
-export interface AuthUser {
-  id: string;
-  email: string;
-  name: string | null;
-  phone: string | null;
-  avatar?: string | null;
-  birth?: string | null;
-  gender?: string;
-  role: string;
-  isActive: boolean;
-  isEmailVerified?: boolean;
-}
-
-export interface LoginResponse {
-  status: string;
-  statusCode: number;
-  message: string;
-  data: {
-    accessToken: string;
-  };
-}
-
-export type RefreshTokenResponse = LoginResponse;
-
-export interface MeResponse {
-  status: string;
-  statusCode: number;
-  message: string;
-  data: AuthUser;
-}
-
-type ApiMessageResponse<TData = null> = {
-  status: string;
-  statusCode: number;
-  message: string;
-  data: TData;
-};
-
-type OtpSendResponse = ApiMessageResponse<{
-  success: boolean;
-  ttl: number;
-}>;
-
-type ResetTokenResponse = ApiMessageResponse<{
-  resetToken: string;
-  expiresIn: number;
-}>;
+import {
+  LoginResponse,
+  RefreshTokenResponse,
+  MeResponse,
+  OtpSendResponse,
+  ResetTokenResponse,
+  ApiMessageResponse,
+  CheckAccountResponse,
+} from '../types/auth.types';
 
 /**
  * Sends a client credentials login request to the backend.
@@ -103,4 +64,8 @@ export const resetPasswordPhoneApi = async (data: { phone: string; code?: string
 
 export const resetPasswordEmailApi = async (data: { email: string; code?: string; resetToken?: string; password: string }): Promise<ApiMessageResponse> => {
   return apiClient.post<ApiMessageResponse>('/api/auth/reset-password/email', data, { skipAuth: true, retryOnUnauthorized: false });
+};
+
+export const checkAccountApi = async (params: { email?: string; phone?: string }): Promise<CheckAccountResponse> => {
+  return apiClient.get<CheckAccountResponse>('/api/auth/check-account', { params, skipAuth: true, retryOnUnauthorized: false });
 };
