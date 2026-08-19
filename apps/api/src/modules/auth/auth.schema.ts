@@ -87,3 +87,57 @@ export const googleLoginSchema = z.object({
 })
 
 export type GoogleLoginInput = z.infer<typeof googleLoginSchema>
+
+export const forgotPasswordEmailSchema = z.object({
+  body: z.object({
+    email: z.string().email('Invalid email format'),
+  }),
+})
+
+export type ForgotPasswordEmailInput = z.infer<typeof forgotPasswordEmailSchema>
+
+export const resetPasswordEmailSchema = z.object({
+  body: z.object({
+    email: z.string().email('Invalid email format'),
+    code: z.string().regex(/^\d{6}$/, 'Verification code must be exactly 6 digits').optional(),
+    resetToken: z.string().min(20, 'Reset token is invalid').optional(),
+    password: z.string().min(6, 'Password must be at least 6 characters'),
+  }).refine((data) => data.code || data.resetToken, {
+    message: 'Verification code or reset token is required',
+    path: ['code'],
+  }),
+})
+
+export type ResetPasswordEmailInput = z.infer<typeof resetPasswordEmailSchema>
+
+export const resetPasswordPhoneSchema = z.object({
+  body: z.object({
+    phone: vietnamPhoneSchema,
+    code: z.string().regex(/^\d{6}$/, 'OTP code must be exactly 6 digits').optional(),
+    resetToken: z.string().min(20, 'Reset token is invalid').optional(),
+    password: z.string().min(6, 'Password must be at least 6 characters'),
+  }).refine((data) => data.code || data.resetToken, {
+    message: 'OTP code or reset token is required',
+    path: ['code'],
+  }),
+})
+
+export type ResetPasswordPhoneInput = z.infer<typeof resetPasswordPhoneSchema>
+
+export const verifyResetPasswordEmailSchema = z.object({
+  body: z.object({
+    email: z.string().email('Invalid email format'),
+    code: z.string().regex(/^\d{6}$/, 'Verification code must be exactly 6 digits'),
+  }),
+})
+
+export type VerifyResetPasswordEmailInput = z.infer<typeof verifyResetPasswordEmailSchema>
+
+export const verifyResetPasswordPhoneSchema = z.object({
+  body: z.object({
+    phone: vietnamPhoneSchema,
+    code: z.string().regex(/^\d{6}$/, 'OTP code must be exactly 6 digits'),
+  }),
+})
+
+export type VerifyResetPasswordPhoneInput = z.infer<typeof verifyResetPasswordPhoneSchema>

@@ -4,12 +4,22 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { motion } from 'motion/react';
-import { Eye, EyeOff, CheckCircle2, ArrowRight } from 'lucide-react';
+import { Eye, EyeOff, CheckCircle2, ArrowRight, ArrowLeft } from 'lucide-react';
 import { Link, useRouter } from '@/i18n/routing';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { resetPasswordEmailApi, resetPasswordPhoneApi } from '../api/auth.api';
+import { HttpError } from '@/lib/api-client';
+import { showToast } from '@/components/ui/toast';
 
-export function ChangePasswordForm() {
+type ChangePasswordFormProps = {
+  forgotType?: 'email' | 'phone';
+  target?: string;
+  resetToken?: string;
+  onBack?: () => void;
+};
+
+export function ChangePasswordForm({ forgotType = 'email', target = '', resetToken = '', onBack }: ChangePasswordFormProps) {
   const t = useTranslations('Auth');
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
@@ -18,16 +28,36 @@ export function ChangePasswordForm() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!resetToken) {
+      showToast.error('Phiên xác thực đã hết hạn. Vui lòng xác thực lại mã.');
+      return;
+    }
     if (!password || password !== confirmPassword) return;
 
     setIsLoading(true);
-    // Simulate API delay
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      if (forgotType === 'email') {
+        await resetPasswordEmailApi({ email: target, resetToken, password });
+      } else {
+        await resetPasswordPhoneApi({ phone: target, resetToken, password });
+      }
+      showToast.success('Đặt lại mật khẩu thành công!');
       setIsSuccess(true);
-    }, 1200);
+    } catch (err: unknown) {
+      console.error(err);
+      const payload = err instanceof HttpError ? err.payload : undefined;
+      const apiMsg =
+        payload && typeof payload === 'object' && 'message' in payload
+          ? String(payload.message)
+          : err instanceof Error
+            ? err.message
+            : 'Đặt lại mật khẩu thất bại.';
+      showToast.error(apiMsg);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const containerVariants = {
@@ -117,7 +147,7 @@ export function ChangePasswordForm() {
             variants={itemVariants}
             className="font-[family-name:var(--font-lora)] text-sm text-[var(--text-light)] leading-relaxed"
           >
-            {t('changePasswordSubtitle')}
+            Mã xác thực cho <span className="font-semibold text-[var(--text-main)]">{target}</span> đã được xác nhận. Vui lòng nhập mật khẩu mới để đặt lại.
           </motion.p>
         </div>
 
@@ -182,12 +212,29 @@ export function ChangePasswordForm() {
           {/* Action Button */}
           <Button
             type="submit"
-            disabled={!password || password !== confirmPassword || isLoading}
-            className="w-full h-12 bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/95 shadow-sm transition-all hover:shadow duration-300 flex items-center justify-center gap-2 group/btn font-semibold tracking-wider text-xs uppercase rounded-lg disabled:opacity-50 disabled:pointer-events-none"
+            disabled={!resetToken || !password || password !== confirmPassword || isLoading}
+            className="w-full h-12 bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/95 shadow-sm transition-all hover:shadow duration-300 flex items-center justify-center gap-2 group/btn font-semibold tracking-wider text-xs uppercase rounded-lg disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
           >
             {isLoading ? t('updating') : t('resetButton')}
           </Button>
         </motion.form>
+
+        {/* Back Link */}
+        {onBack && (
+          <motion.p
+            variants={itemVariants}
+            className="text-center font-[family-name:var(--font-lora)] text-xs text-[var(--text-light)] pt-4"
+          >
+            <button
+              type="button"
+              onClick={onBack}
+              className="inline-flex items-center gap-1.5 font-semibold text-[var(--primary-color)] hover:text-[var(--accent-color)] transition-colors group/back cursor-pointer"
+            >
+              <ArrowLeft size={14} className="transition-transform group-hover/back:-translate-x-0.5" />
+              <span>Quay lại</span>
+            </button>
+          </motion.p>
+        )}
       </motion.div>
     </div>
   );

@@ -251,3 +251,75 @@ export async function updateProfile(req: AuthenticatedRequest, res: Response, ne
     return next(error)
   }
 }
+
+/**
+ * Controller handler for forgot password via Email
+ */
+export async function forgotPasswordEmail(req: Request, res: Response, next: NextFunction): Promise<any> {
+  try {
+    const result = await authService.sendForgotPasswordEmail(req.body)
+    return sendSuccess(res, {
+      message: 'VERIFICATION_CODE_SENT',
+    })
+  } catch (error) {
+    return next(error)
+  }
+}
+
+/**
+ * Controller handler for verifying Email reset code before password change
+ */
+export async function verifyResetPasswordEmail(req: Request, res: Response, next: NextFunction): Promise<any> {
+  try {
+    const result = await authService.verifyResetPasswordEmailCode(req.body)
+    return sendSuccess(res, {
+      data: result,
+      message: 'RESET_CODE_VERIFIED',
+    })
+  } catch (error) {
+    return next(error)
+  }
+}
+
+/**
+ * Controller handler for verifying SMS reset OTP before password change
+ */
+export async function verifyResetPasswordPhone(req: Request, res: Response, next: NextFunction): Promise<any> {
+  try {
+    const result = await authService.verifyResetPasswordPhoneCode(req.body)
+    return sendSuccess(res, {
+      data: result,
+      message: 'RESET_CODE_VERIFIED',
+    })
+  } catch (error) {
+    return next(error)
+  }
+}
+
+/**
+ * Controller handler for reset password via Email code
+ */
+export async function resetPasswordEmail(req: Request, res: Response, next: NextFunction): Promise<any> {
+  try {
+    await authService.resetPasswordByEmail(req.body)
+    return sendSuccess(res, {
+      message: 'PASSWORD_RESET_SUCCESS',
+    })
+  } catch (error) {
+    return next(error)
+  }
+}
+
+/**
+ * Controller handler for reset password via SMS OTP
+ */
+export async function resetPasswordPhone(req: Request, res: Response, next: NextFunction): Promise<any> {
+  try {
+    await authService.resetPasswordByPhone(req.body)
+    return sendSuccess(res, {
+      message: 'PASSWORD_RESET_SUCCESS',
+    })
+  } catch (error) {
+    return next(error)
+  }
+}

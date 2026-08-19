@@ -4,49 +4,59 @@ import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { motion } from 'motion/react';
-import { ArrowLeft, CheckCircle2 } from 'lucide-react';
-import { Link, useRouter } from '@/i18n/routing';
+import { ArrowLeft } from 'lucide-react';
+import { Link } from '@/i18n/routing';
 import { Button } from '@/components/ui/button';
+import { showToast } from '@/components/ui/toast';
+import { forgotPasswordEmailApi, sendOtpApi, verifyResetPasswordEmailApi, verifyResetPasswordPhoneApi } from '../api/auth.api';
+import { HttpError } from '@/lib/api-client';
 
 type VerifyOtpFormProps = {
-  email?: string;
-  onVerifySuccess: () => void;
+  forgotType?: 'email' | 'phone';
+  target?: string;
+  onVerifySuccess: (resetToken: string) => void;
+  onBack?: () => void;
 };
 
 export function VerifyOtpForm({
-  email = 'user@example.com',
+  forgotType = 'email',
+  target = 'user@example.com',
   onVerifySuccess,
+  onBack,
 }: VerifyOtpFormProps) {
   const t = useTranslations('Auth');
-  const router = useRouter();
   const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
   const [timer, setTimer] = useState(60);
-  const [canResend, setCanResend] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const inputRefs = useRef<HTMLInputElement[]>([]);
+  const canResend = timer === 0 && !isLoading;
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (timer > 0) {
-      interval = setInterval(() => {
-        setTimer((prev) => prev - 1);
-      }, 1000);
-    } else {
-      setCanResend(true);
+    if (timer <= 0) {
+      return;
     }
+
+    const interval = setInterval(() => {
+      setTimer((prev) => Math.max(prev - 1, 0));
+    }, 1000);
+
     return () => clearInterval(interval);
   }, [timer]);
 
+  // Focus first input box on mount
+  useEffect(() => {
+    setTimeout(() => {
+      inputRefs.current[0]?.focus();
+    }, 100);
+  }, []);
+
   const handleChange = (value: string, index: number) => {
-    // Only allow numbers
     if (value && !/^\d+$/.test(value)) return;
 
     const newOtp = [...otp];
-    // Take the last character entered (to allow replacing value)
     newOtp[index] = value.substring(value.length - 1);
     setOtp(newOtp);
 
-    // Auto-focus next input
     if (value && index < 5) {
       inputRefs.current[index + 1]?.focus();
     }
@@ -55,13 +65,11 @@ export function VerifyOtpForm({
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
     if (e.key === 'Backspace') {
       if (!otp[index] && index > 0) {
-        // Clear previous input and focus it
         const newOtp = [...otp];
         newOtp[index - 1] = '';
         setOtp(newOtp);
         inputRefs.current[index - 1]?.focus();
       } else {
-        // Clear current input
         const newOtp = [...otp];
         newOtp[index] = '';
         setOtp(newOtp);
@@ -82,32 +90,58 @@ export function VerifyOtpForm({
     }
     setOtp(newOtp);
 
-    // Focus last filled or next empty
     const focusIndex = Math.min(pastedData.length, 5);
     inputRefs.current[focusIndex]?.focus();
   };
 
-  const handleResend = () => {
-    if (!canResend) return;
-    setTimer(60);
-    setCanResend(false);
-    setOtp(Array(6).fill(''));
-    inputRefs.current[0]?.focus();
-    console.log('OTP Resent to:', email);
+  const getApiErrorMessage = (err: unknown, fallback: string) => {
+    const payload = err instanceof HttpError ? err.payload : undefined;
+    return payload && typeof payload === 'object' && 'message' in payload
+      ? String(payload.message)
+      : err instanceof Error
+        ? err.message
+        : fallback;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleResend = async () => {
+    if (!canResend) return;
+
+    try {
+      if (forgotType === 'email') {
+        await forgotPasswordEmailApi(target);
+      } else {
+        await sendOtpApi(target, 'RESET_PASSWORD');
+      }
+
+      setTimer(60);
+      setOtp(Array(6).fill(''));
+      inputRefs.current[0]?.focus();
+      showToast.success(t('otpSent') || 'Mã mới đã được gửi đi!');
+    } catch (err: unknown) {
+      console.error(err);
+      showToast.error(getApiErrorMessage(err, 'Không thể gửi lại mã. Vui lòng thử lại.'));
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const otpCode = otp.join('');
     if (otpCode.length < 6) return;
 
     setIsLoading(true);
-    // Simulate API delay
-    setTimeout(() => {
+    try {
+      const result = forgotType === 'email'
+        ? await verifyResetPasswordEmailApi({ email: target, code: otpCode })
+        : await verifyResetPasswordPhoneApi({ phone: target, code: otpCode });
+
+      showToast.success('Xác thực thành công!');
+      onVerifySuccess(result.data.resetToken);
+    } catch (err: unknown) {
+      console.error(err);
+      showToast.error(getApiErrorMessage(err, t('invalidOtp') || 'Mã xác thực không đúng hoặc đã hết hạn.'));
+    } finally {
       setIsLoading(false);
-      console.log('OTP Verified successfully:', otpCode);
-      onVerifySuccess();
-    }, 1000);
+    }
   };
 
   const containerVariants = {
@@ -131,7 +165,7 @@ export function VerifyOtpForm({
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="w-full max-w-[460px] space-y-6 sm:space-y-8 rounded-2xl p-6 sm:p-10 shadow-[0_8px_30px_rgb(42,37,37,0.02)]"
+        className="w-full max-w-[460px] space-y-6 sm:space-y-8 rounded-2xl p-6 sm:p-10 shadow-[0_8px_30px_rgb(42,37,37,0.02)] border border-[var(--border)]/40 bg-white"
       >
         {/* Mobile Logo */}
         <div className="flex justify-center lg:hidden">
@@ -143,6 +177,7 @@ export function VerifyOtpForm({
                 width={80}
                 height={80}
                 className="h-full w-full object-cover scale-125"
+                unoptimized
               />
             </div>
             <span className="font-[family-name:var(--font-playfair)] text-lg font-normal tracking-widest text-[var(--primary-color)] uppercase">
@@ -163,8 +198,10 @@ export function VerifyOtpForm({
             variants={itemVariants}
             className="font-[family-name:var(--font-lora)] text-sm text-[var(--text-light)] leading-relaxed"
           >
-            {t('otpSubtitle')}{' '}
-            <span className="font-semibold text-[var(--text-main)]">{email}</span>
+            {forgotType === 'email'
+              ? 'Chúng tôi đã gửi mã xác thực gồm 6 chữ số đến email: '
+              : 'Chúng tôi đã gửi mã OTP gồm 6 chữ số đến số điện thoại của bạn qua SMS: '}
+            <span className="font-semibold text-[var(--text-main)]">{target}</span>
           </motion.p>
         </div>
 
@@ -198,7 +235,7 @@ export function VerifyOtpForm({
               type="button"
               onClick={handleResend}
               disabled={!canResend}
-              className={`font-semibold transition-colors ${
+              className={`font-semibold transition-colors cursor-pointer ${
                 canResend
                   ? 'text-[var(--primary-color)] hover:text-[var(--accent-color)] underline underline-offset-4'
                   : 'text-[var(--text-light)]/50 cursor-not-allowed'
@@ -212,25 +249,28 @@ export function VerifyOtpForm({
           <Button
             type="submit"
             disabled={otp.join('').length < 6 || isLoading}
-            className="w-full h-12 bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/95 shadow-sm transition-all hover:shadow duration-300 flex items-center justify-center gap-2 group/btn font-semibold tracking-wider text-xs uppercase rounded-lg disabled:opacity-50 disabled:pointer-events-none"
+            className="w-full h-12 bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/95 shadow-sm transition-all hover:shadow duration-300 flex items-center justify-center gap-2 group/btn font-semibold tracking-wider text-xs uppercase rounded-lg disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
           >
             {isLoading ? t('verifying') : t('verifyButton')}
           </Button>
         </motion.form>
 
-        {/* Back to Login */}
-        <motion.p
-          variants={itemVariants}
-          className="text-center font-[family-name:var(--font-lora)] text-xs text-[var(--text-light)]"
-        >
-          <Link
-            href="/forgot"
-            className="inline-flex items-center gap-1.5 font-semibold text-[var(--primary-color)] hover:text-[var(--accent-color)] transition-colors group/back"
+        {/* Back Button */}
+        {onBack && (
+          <motion.p
+            variants={itemVariants}
+            className="text-center font-[family-name:var(--font-lora)] text-xs text-[var(--text-light)]"
           >
-            <ArrowLeft size={14} className="transition-transform group-hover/back:-translate-x-0.5" />
-            <span>{t('backToEmail')}</span>
-          </Link>
-        </motion.p>
+            <button
+              type="button"
+              onClick={onBack}
+              className="inline-flex items-center gap-1.5 font-semibold text-[var(--primary-color)] hover:text-[var(--accent-color)] transition-colors group/back cursor-pointer"
+            >
+              <ArrowLeft size={14} className="transition-transform group-hover/back:-translate-x-0.5" />
+              <span>{t('back')}</span>
+            </button>
+          </motion.p>
+        )}
       </motion.div>
     </div>
   );

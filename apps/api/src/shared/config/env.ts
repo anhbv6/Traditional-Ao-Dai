@@ -18,6 +18,11 @@ const envSchema = z.object({
   REDIS_PASSWORD: z.string().optional(),
   OTP_TTL_SECONDS: z.string().transform((val) => parseInt(val, 10)).default(300),
   GOOGLE_CLIENT_ID: z.string().min(1, 'GOOGLE_CLIENT_ID is required'),
+  SMTP_HOST: z.string().optional(),
+  SMTP_PORT: z.string().transform((val) => parseInt(val, 10)).optional(),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASS: z.string().optional(),
+  SMTP_FROM: z.string().default('noreply@aodai.vn'),
 })
 
 const parsed = envSchema.safeParse(process.env)

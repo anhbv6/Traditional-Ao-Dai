@@ -2,7 +2,18 @@ import { Router } from 'express'
 import * as adminAuthController from './admin/auth.controller'
 import * as clientAuthController from './client/auth.controller'
 import { validate } from '../../shared/middlewares/validate'
-import { loginSchema, registerSchema, checkAccountSchema, otpLoginSchema, googleLoginSchema } from './auth.schema'
+import {
+  loginSchema,
+  registerSchema,
+  checkAccountSchema,
+  otpLoginSchema,
+  googleLoginSchema,
+  forgotPasswordEmailSchema,
+  resetPasswordEmailSchema,
+  resetPasswordPhoneSchema,
+  verifyResetPasswordEmailSchema,
+  verifyResetPasswordPhoneSchema,
+} from './auth.schema'
 import { requireAuth } from '../../shared/middlewares/authGuard'
 
 const router = Router()
@@ -223,6 +234,151 @@ router.post('/login/otp', validate(otpLoginSchema), clientAuthController.loginWi
  *         description: Forbidden - Account locked or de-activated
  */
 router.post('/google', validate(googleLoginSchema), clientAuthController.loginWithGoogle)
+
+/**
+ * @openapi
+ * /api/auth/forgot-password/email:
+ *   post:
+ *     summary: Request verification code to email
+ *     description: Send a 6-digit password reset verification code to client's email.
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: customer@aodai.vn
+ *     responses:
+ *       200:
+ *         description: Verification code sent successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: VERIFICATION_CODE_SENT
+ *       404:
+ *         description: Email not found
+ *       429:
+ *         description: Cooldown active
+ */
+router.post('/forgot-password/email', validate(forgotPasswordEmailSchema), clientAuthController.forgotPasswordEmail)
+
+router.post('/forgot-password/email/verify', validate(verifyResetPasswordEmailSchema), clientAuthController.verifyResetPasswordEmail)
+
+router.post('/forgot-password/phone/verify', validate(verifyResetPasswordPhoneSchema), clientAuthController.verifyResetPasswordPhone)
+
+/**
+ * @openapi
+ * /api/auth/reset-password/email:
+ *   post:
+ *     summary: Reset password with email code
+ *     description: Verify email code and set a new password. Invalidate all existing sessions.
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - code
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: customer@aodai.vn
+ *               code:
+ *                 type: string
+ *                 example: "123456"
+ *               password:
+ *                 type: string
+ *                 example: "newpassword123"
+ *     responses:
+ *       200:
+ *         description: Password reset successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: PASSWORD_RESET_SUCCESS
+ *       400:
+ *         description: Incorrect or expired verification code
+ *       404:
+ *         description: User not found
+ */
+router.post('/reset-password/email', validate(resetPasswordEmailSchema), clientAuthController.resetPasswordEmail)
+
+/**
+ * @openapi
+ * /api/auth/reset-password/phone:
+ *   post:
+ *     summary: Reset password with SMS OTP
+ *     description: Verify SMS OTP code and set a new password. Invalidate all existing sessions.
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - phone
+ *               - code
+ *               - password
+ *             properties:
+ *               phone:
+ *                 type: string
+ *                 example: "0987654321"
+ *               code:
+ *                 type: string
+ *                 example: "123456"
+ *               password:
+ *                 type: string
+ *                 example: "newpassword123"
+ *     responses:
+ *       200:
+ *         description: Password reset successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: PASSWORD_RESET_SUCCESS
+ *       400:
+ *         description: Incorrect or expired OTP code
+ *       404:
+ *         description: User not found
+ */
+router.post('/reset-password/phone', validate(resetPasswordPhoneSchema), clientAuthController.resetPasswordPhone)
 
 
 /**

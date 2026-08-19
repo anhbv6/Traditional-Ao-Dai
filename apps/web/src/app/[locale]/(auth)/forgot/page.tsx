@@ -1,35 +1,57 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from '@/i18n/routing';
 import { AuthImageBanner } from '@/features/auth/components/AuthImageBanner';
 import { ForgotForm } from '@/features/auth/components/ForgotForm';
 import { VerifyOtpForm } from '@/features/auth/components/VerifyOtpForm';
+import { ChangePasswordForm } from '@/features/auth/components/ChangePasswordForm';
 
 export default function ForgotPage() {
-  const router = useRouter();
-  const [step, setStep] = useState<'forgot' | 'verify'>('forgot');
-  const [email, setEmail] = useState('');
+  const [step, setStep] = useState<'forgot' | 'verify' | 'reset'>('forgot');
+  const [forgotType, setForgotType] = useState<'email' | 'phone'>('email');
+  const [target, setTarget] = useState('');
+  const [resetToken, setResetToken] = useState('');
 
-  const handleForgotSubmit = (submittedEmail: string) => {
-    setEmail(submittedEmail);
-    // Add a tiny delay to allow forgot form submit animation to finish
+  const handleForgotSubmit = (submittedTarget: string, type: 'email' | 'phone') => {
+    setTarget(submittedTarget);
+    setForgotType(type);
+    setResetToken('');
     setTimeout(() => {
       setStep('verify');
-    }, 600);
+    }, 400);
   };
 
-  const handleVerifySuccess = () => {
-    router.push('/changePassword');
+  const handleBackToForgot = () => {
+    setStep('forgot');
+    setResetToken('');
+  };
+
+  const handleVerifySuccess = (verifiedResetToken: string) => {
+    setResetToken(verifiedResetToken);
+    setStep('reset');
   };
 
   return (
     <div className="grid min-h-screen w-full lg:grid-cols-2">
       <AuthImageBanner />
-      {step === 'forgot' ? (
+      {step === 'forgot' && (
         <ForgotForm onSubmitSuccess={handleForgotSubmit} />
-      ) : (
-        <VerifyOtpForm email={email} onVerifySuccess={handleVerifySuccess} />
+      )}
+      {step === 'verify' && (
+        <VerifyOtpForm
+          forgotType={forgotType}
+          target={target}
+          onVerifySuccess={handleVerifySuccess}
+          onBack={handleBackToForgot}
+        />
+      )}
+      {step === 'reset' && (
+        <ChangePasswordForm
+          forgotType={forgotType}
+          target={target}
+          resetToken={resetToken}
+          onBack={handleBackToForgot}
+        />
       )}
     </div>
   );

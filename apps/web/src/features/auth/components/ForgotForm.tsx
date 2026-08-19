@@ -4,26 +4,73 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { motion } from 'motion/react';
-import { ArrowLeft, Send } from 'lucide-react';
+import { ArrowLeft, Send, Loader2 } from 'lucide-react';
 import { Link } from '@/i18n/routing';
-import { Input } from '@/components/ui/input';
+import { FormInput } from '@/components/shared/FormInput';
 import { Button } from '@/components/ui/button';
+import { showToast } from '@/components/ui/toast';
+import { forgotPasswordEmailApi, sendOtpApi } from '../api/auth.api';
+import { HttpError } from '@/lib/api-client';
 
 type ForgotFormProps = {
-  onSubmitSuccess?: (email: string) => void;
+  onSubmitSuccess?: (target: string, type: 'email' | 'phone') => void;
 };
 
 export function ForgotForm({ onSubmitSuccess }: ForgotFormProps) {
   const t = useTranslations('Auth');
-  const [email, setEmail] = useState('');
-  const [submitted, setSubmitted] = useState(false);
+  const [identifier, setIdentifier] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Requesting password reset for:', email);
-    setSubmitted(true);
-    if (onSubmitSuccess) {
-      onSubmitSuccess(email);
+    const cleanVal = identifier.trim();
+
+    if (!cleanVal) {
+      showToast.error('Vui lòng nhập email hoặc số điện thoại.');
+      return;
+    }
+
+    const isEmail = cleanVal.includes('@');
+    const type = isEmail ? 'email' : 'phone';
+
+    if (isEmail) {
+      if (!cleanVal.includes('.') || cleanVal.length < 5) {
+        showToast.error(t('invalidEmail') || 'Email không hợp lệ.');
+        return;
+      }
+    } else {
+      const phoneRegex = /^(0|\+84)[3|5|7|8|9][0-9]{8}$/;
+      if (!phoneRegex.test(cleanVal)) {
+        showToast.error(t('invalidPhone') || 'Số điện thoại không hợp lệ.');
+        return;
+      }
+    }
+
+    setIsLoading(true);
+    try {
+      if (isEmail) {
+        await forgotPasswordEmailApi(cleanVal);
+        showToast.success(t('emailCodeSent') || 'Đã gửi mã xác nhận qua email!');
+      } else {
+        await sendOtpApi(cleanVal, 'RESET_PASSWORD');
+        showToast.success(t('phoneOtpSent') || 'Đã gửi mã OTP khôi phục mật khẩu!');
+      }
+
+      if (onSubmitSuccess) {
+        onSubmitSuccess(cleanVal, type);
+      }
+    } catch (err: unknown) {
+      console.error(err);
+      const payload = err instanceof HttpError ? err.payload : undefined;
+      const apiMsg =
+        payload && typeof payload === 'object' && 'message' in payload
+          ? String(payload.message)
+          : err instanceof Error
+            ? err.message
+            : 'Có lỗi xảy ra, vui lòng thử lại.';
+      showToast.error(apiMsg);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -48,7 +95,7 @@ export function ForgotForm({ onSubmitSuccess }: ForgotFormProps) {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="w-full max-w-[460px] space-y-6 sm:space-y-8 rounded-2xl p-6 sm:p-10 shadow-[0_8px_30px_rgb(42,37,37,0.02)]"
+        className="w-full max-w-[460px] space-y-6 sm:space-y-8 rounded-2xl p-6 sm:p-10 shadow-[0_8px_30px_rgb(42,37,37,0.02)] border border-[var(--border)]/40 bg-white"
       >
         {/* Mobile Logo */}
         <div className="flex justify-center lg:hidden">
@@ -60,6 +107,7 @@ export function ForgotForm({ onSubmitSuccess }: ForgotFormProps) {
                 width={80}
                 height={80}
                 className="h-full w-full object-cover scale-125"
+                unoptimized
               />
             </div>
             <span className="font-[family-name:var(--font-playfair)] text-lg font-normal tracking-widest text-[var(--primary-color)] uppercase">
@@ -80,51 +128,38 @@ export function ForgotForm({ onSubmitSuccess }: ForgotFormProps) {
             variants={itemVariants}
             className="font-[family-name:var(--font-lora)] text-sm text-[var(--text-light)] leading-relaxed"
           >
-            {submitted ? t('resetLinkSent') : t('forgotSubtitle')}
+            Nhập email hoặc số điện thoại của bạn để nhận mã xác thực đặt lại mật khẩu.
           </motion.p>
         </div>
 
-        {/* Form / Success State */}
-        {!submitted ? (
-          <motion.form variants={itemVariants} onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <label
-                htmlFor="email"
-                className="block font-[family-name:var(--font-lora)] text-xs font-semibold uppercase tracking-wider text-[var(--text-main)]"
-              >
-                {t('emailAddress')}
-              </label>
-              <Input
-                id="email"
-                type="email"
-                required
-                placeholder="example@aodai.vn"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full border-[var(--border)] focus:border-[var(--primary-color)]"
-              />
-            </div>
+        {/* Input Form */}
+        <motion.form variants={itemVariants} onSubmit={handleSubmit} className="space-y-6">
+          <FormInput
+            id="identifier"
+            type="text"
+            required
+            label="Email hoặc Số điện thoại"
+            placeholder="example@aodai.vn hoặc 0987654321"
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
+          />
 
-            {/* Action Button */}
-            <Button
-              type="submit"
-              className="w-full h-12 bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/95 shadow-sm transition-all hover:shadow duration-300 flex items-center justify-center gap-2 group/btn font-semibold tracking-wider text-xs uppercase rounded-lg"
-            >
-              <span>{t('sendLink')}</span>
-              <Send size={14} className="transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
-            </Button>
-          </motion.form>
-        ) : (
-          <motion.div variants={itemVariants} className="pt-2">
-            <Button
-              onClick={() => setSubmitted(false)}
-              variant="outline"
-              className="w-full h-12 border-[var(--border)] hover:bg-[var(--bg-secondary)] font-[family-name:var(--font-lora)] text-sm rounded-lg"
-            >
-              {t('resendEmail')}
-            </Button>
-          </motion.div>
-        )}
+          {/* Action Button */}
+          <Button
+            type="submit"
+            disabled={isLoading}
+            className="w-full h-12 bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/95 shadow-sm transition-all hover:shadow duration-300 flex items-center justify-center gap-2 group/btn font-semibold tracking-wider text-xs uppercase rounded-lg disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          >
+            {isLoading ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <>
+                <span>Gửi mã xác nhận</span>
+                <Send size={14} className="transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
+              </>
+            )}
+          </Button>
+        </motion.form>
 
         {/* Back to Login Link */}
         <motion.p

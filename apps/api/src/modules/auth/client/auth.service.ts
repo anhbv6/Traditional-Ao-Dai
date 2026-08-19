@@ -1,15 +1,28 @@
 import { prisma } from '@repo/db'
-import { createHash } from 'crypto'
+import { createHash, randomBytes } from 'crypto'
 import { OAuth2Client } from 'google-auth-library'
 import { comparePassword, hashPassword } from '../../../shared/utils/password'
 import { generateAccessToken, generateRefreshToken, JWTPayload, verifyToken } from '../../../shared/utils/jwt'
 import { AppError } from '../../../shared/middlewares/errorHandler'
 import { env } from '../../../shared/config/env'
-import { LoginInput, RefreshTokenInput, RegisterInput, OtpLoginInput, GoogleLoginInput } from '../auth.schema'
+import {
+  LoginInput,
+  RefreshTokenInput,
+  RegisterInput,
+  OtpLoginInput,
+  GoogleLoginInput,
+  ForgotPasswordEmailInput,
+  ResetPasswordEmailInput,
+  ResetPasswordPhoneInput,
+  VerifyResetPasswordEmailInput,
+  VerifyResetPasswordPhoneInput,
+} from '../auth.schema'
 import { durationToMs } from '../../../shared/utils/time'
 import { normalizeVietnamPhone } from '../../../shared/utils/phone'
 import { CheckAccountResult, SessionMeta } from '../auth.types'
-import { verifyOtp } from '../../otp/otp.service'
+import { verifyOtp, generateOtp } from '../../otp/otp.service'
+import { mailProvider } from '../../../shared/utils/mail'
+import { redis } from '../../../shared/utils/redis'
 
 function buildAuthTokens(user: { id: string; role: JWTPayload['role'] }, sessionId: string) {
   const payload = {
@@ -26,6 +39,35 @@ function buildAuthTokens(user: { id: string; role: JWTPayload['role'] }, session
 
 function hashToken(token: string) {
   return createHash('sha256').update(token).digest('hex')
+}
+
+const RESET_TOKEN_TTL_SECONDS = 600
+
+function createResetToken() {
+  return randomBytes(32).toString('hex')
+}
+
+function resetTokenKey(type: 'email' | 'phone', token: string) {
+  return `password-reset:${type}:${token}`
+}
+
+async function storeResetToken(type: 'email' | 'phone', target: string) {
+  const resetToken = createResetToken()
+  await redis.set(resetTokenKey(type, resetToken), target, 'EX', RESET_TOKEN_TTL_SECONDS)
+  return {
+    resetToken,
+    expiresIn: RESET_TOKEN_TTL_SECONDS,
+  }
+}
+
+async function consumeResetToken(type: 'email' | 'phone', token: string, expectedTarget: string) {
+  const key = resetTokenKey(type, token)
+  const storedTarget = await redis.get(key)
+  if (!storedTarget || storedTarget !== expectedTarget) {
+    throw new AppError(400, 'Password reset session has expired or is invalid. Please request a new code.')
+  }
+
+  await redis.del(key)
 }
 
 
@@ -480,6 +522,207 @@ export async function clientLoginWithGoogle(credential: string, meta: SessionMet
     if (error instanceof AppError) throw error
     throw new AppError(400, `Google authentication failed: ${error.message}`)
   }
+}
+
+/**
+ * Sends a 6-digit verification code to the customer's email for password reset
+ */
+export async function sendForgotPasswordEmail(input: ForgotPasswordEmailInput['body']): Promise<{ success: boolean; message: string }> {
+  const email = input.email.trim().toLowerCase()
+
+  // Find user
+  const user = await prisma.user.findFirst({
+    where: { email, role: 'CUSTOMER' },
+  })
+
+  if (!user) {
+    throw new AppError(404, 'User with this email was not found.')
+  }
+
+  // Check cooldown
+  const cooldownKey = `email:cooldown:RESET_PASSWORD:${email}`
+  const hasCooldown = await redis.get(cooldownKey)
+  if (hasCooldown) {
+    throw new AppError(429, 'Please wait 60 seconds before requesting a new code.')
+  }
+
+  // Generate 6-digit code
+  const code = generateOtp(6)
+  const ttl = 600 // 10 minutes
+
+  // Save to Redis
+  const resetKey = `email:reset:${email}`
+  await redis.set(resetKey, code, 'EX', ttl)
+
+  // Save cooldown (60 seconds)
+  await redis.set(cooldownKey, '1', 'EX', 60)
+
+  // Send Email
+  const subject = 'Reset Password Verification Code'
+  const text = `Your verification code to reset your password is: ${code}. Valid for 10 minutes.`
+  const html = `
+    <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+      <h2>Password Reset Request</h2>
+      <p>You requested to reset your password for your Traditional Ao Dai account. Use the verification code below:</p>
+      <div style="background: #f4f4f4; padding: 15px; text-align: center; font-size: 24px; font-weight: bold; letter-spacing: 5px; margin: 20px 0; border-radius: 5px;">
+        ${code}
+      </div>
+      <p>This code is valid for 10 minutes. If you did not make this request, you can safely ignore this email.</p>
+    </div>
+  `
+
+  await mailProvider.sendMail({ to: email, subject, text, html })
+
+  return { success: true, message: 'VERIFICATION_CODE_SENT' }
+}
+
+export async function verifyResetPasswordEmailCode(input: VerifyResetPasswordEmailInput['body']) {
+  const email = input.email.trim().toLowerCase()
+  const { code } = input
+
+  const resetKey = `email:reset:${email}`
+  const savedCode = await redis.get(resetKey)
+
+  if (!savedCode) {
+    throw new AppError(400, 'Verification code has expired or does not exist. Please request a new one.')
+  }
+
+  if (savedCode !== code) {
+    throw new AppError(400, 'Incorrect verification code. Please try again.')
+  }
+
+  const user = await prisma.user.findFirst({
+    where: { email, role: 'CUSTOMER' },
+  })
+
+  if (!user) {
+    throw new AppError(404, 'User with this email was not found.')
+  }
+
+  await redis.del(resetKey)
+  await redis.del(`email:cooldown:RESET_PASSWORD:${email}`)
+
+  return storeResetToken('email', email)
+}
+
+export async function verifyResetPasswordPhoneCode(input: VerifyResetPasswordPhoneInput['body']) {
+  const normalizedPhone = normalizeVietnamPhone(input.phone)
+  if (!normalizedPhone) {
+    throw new AppError(400, 'Invalid phone number.')
+  }
+
+  await verifyOtp(normalizedPhone, 'RESET_PASSWORD', input.code)
+
+  const user = await prisma.user.findFirst({
+    where: { phone: normalizedPhone, role: 'CUSTOMER' },
+  })
+
+  if (!user) {
+    throw new AppError(404, 'User with this phone number was not found.')
+  }
+
+  return storeResetToken('phone', normalizedPhone)
+}
+
+/**
+ * Resets user password using the verification code sent to their email
+ */
+export async function resetPasswordByEmail(input: ResetPasswordEmailInput['body']): Promise<{ success: boolean }> {
+  const email = input.email.trim().toLowerCase()
+  const { code, password, resetToken } = input
+
+  if (resetToken) {
+    await consumeResetToken('email', resetToken, email)
+  } else if (code) {
+    const resetKey = `email:reset:${email}`
+    const savedCode = await redis.get(resetKey)
+
+    if (!savedCode) {
+      throw new AppError(400, 'Verification code has expired or does not exist. Please request a new one.')
+    }
+
+    if (savedCode !== code) {
+      throw new AppError(400, 'Incorrect verification code. Please try again.')
+    }
+
+    await redis.del(resetKey)
+  } else {
+    throw new AppError(400, 'Verification code or reset token is required.')
+  }
+
+  // Find user
+  const user = await prisma.user.findFirst({
+    where: { email, role: 'CUSTOMER' },
+  })
+
+  if (!user) {
+    throw new AppError(404, 'User with this email was not found.')
+  }
+
+  // Hash new password
+  const hashedPassword = await hashPassword(password)
+
+  // Update password and invalidate all sessions (for security)
+  await prisma.$transaction([
+    prisma.user.update({
+      where: { id: user.id },
+      data: { password: hashedPassword },
+    }),
+    prisma.userSession.deleteMany({
+      where: { userId: user.id },
+    }),
+  ])
+
+  // Remove cooldown
+  const cooldownKey = `email:cooldown:RESET_PASSWORD:${email}`
+  await redis.del(cooldownKey)
+
+  return { success: true }
+}
+
+/**
+ * Resets user password using the SMS OTP verified code
+ */
+export async function resetPasswordByPhone(input: ResetPasswordPhoneInput['body']): Promise<{ success: boolean }> {
+  const { phone, code, password, resetToken } = input
+
+  const normalizedPhone = normalizeVietnamPhone(phone)
+  if (!normalizedPhone) {
+    throw new AppError(400, 'Invalid phone number.')
+  }
+
+  if (resetToken) {
+    await consumeResetToken('phone', resetToken, normalizedPhone)
+  } else if (code) {
+    await verifyOtp(normalizedPhone, 'RESET_PASSWORD', code)
+  } else {
+    throw new AppError(400, 'OTP code or reset token is required.')
+  }
+
+  // Find user
+  const user = await prisma.user.findFirst({
+    where: { phone: normalizedPhone, role: 'CUSTOMER' },
+  })
+
+  if (!user) {
+    throw new AppError(404, 'User with this phone number was not found.')
+  }
+
+  // Hash new password
+  const hashedPassword = await hashPassword(password)
+
+  // Update password and invalidate all sessions (for security)
+  await prisma.$transaction([
+    prisma.user.update({
+      where: { id: user.id },
+      data: { password: hashedPassword },
+    }),
+    prisma.userSession.deleteMany({
+      where: { userId: user.id },
+    }),
+  ])
+
+  return { success: true }
 }
 
 

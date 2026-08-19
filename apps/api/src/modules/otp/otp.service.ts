@@ -1,3 +1,4 @@
+import { prisma } from '@repo/db'
 import { redis } from '../../shared/utils/redis'
 import { smsProvider } from '../../shared/utils/sms'
 import { env } from '../../shared/config/env'
@@ -17,6 +18,15 @@ export async function sendOtp(phone: string, purpose: string): Promise<{ success
   const normalizedPhone = normalizeVietnamPhone(phone)
   if (!normalizedPhone) {
     throw new AppError(400, 'Invalid phone number.')
+  }
+
+  if (purpose === 'RESET_PASSWORD' || purpose === 'LOGIN') {
+    const user = await prisma.user.findFirst({
+      where: { phone: normalizedPhone, role: 'CUSTOMER' },
+    })
+    if (!user) {
+      throw new AppError(404, 'User with this phone number was not found.')
+    }
   }
 
   const cooldownKey = `otp:cooldown:${purpose}:${normalizedPhone}`
