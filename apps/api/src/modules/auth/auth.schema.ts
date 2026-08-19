@@ -69,24 +69,7 @@ export const checkAccountSchema = z.object({
 
 export type CheckAccountInput = z.infer<typeof checkAccountSchema>
 
-export const sendOtpSchema = z.object({
-  body: z.object({
-    phone: vietnamPhoneSchema,
-    purpose: z.enum(['REGISTER', 'LOGIN', 'RESET_PASSWORD']),
-  }),
-})
 
-export type SendOtpInput = z.infer<typeof sendOtpSchema>
-
-export const verifyOtpSchema = z.object({
-  body: z.object({
-    phone: vietnamPhoneSchema,
-    purpose: z.enum(['REGISTER', 'LOGIN', 'RESET_PASSWORD']),
-    code: z.string().regex(/^\d{6}$/, 'OTP code must be exactly 6 digits'),
-  }),
-})
-
-export type VerifyOtpInput = z.infer<typeof verifyOtpSchema>
 
 export const otpLoginSchema = z.object({
   body: z.object({
@@ -96,3 +79,11 @@ export const otpLoginSchema = z.object({
 })
 
 export type OtpLoginInput = z.infer<typeof otpLoginSchema>
+
+export const googleLoginSchema = z.object({
+  body: z.object({
+    credential: z.string().min(1, 'Google credential token is required'),
+  }),
+})
+
+export type GoogleLoginInput = z.infer<typeof googleLoginSchema>

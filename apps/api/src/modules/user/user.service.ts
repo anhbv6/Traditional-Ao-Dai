@@ -7,11 +7,11 @@ export async function getUserById(id: string) {
   })
 
   if (!user || user.role !== 'CUSTOMER') {
-    throw new AppError(404, 'Không tìm thấy người dùng')
+    throw new AppError(404, 'User not found.')
   }
 
   if (!user.isActive) {
-    throw new AppError(403, 'TÃ i khoáº£n nÃ y Ä‘Ã£ bá»‹ khÃ³a hoáº·c ngÆ°ng hoáº¡t Ä‘á»™ng')
+    throw new AppError(403, 'This account has been locked or deactivated.')
   }
 
   const { password: _, ...safeUser } = user

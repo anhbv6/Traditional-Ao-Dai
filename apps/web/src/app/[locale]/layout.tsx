@@ -9,6 +9,7 @@ import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvide
 import { ToastProvider } from "@/components/providers/ToastProvider";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import { AuthProvider } from "@/components/providers/AuthProvider";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 const lora = Lora({
   subsets: ["latin", "vietnamese"],
@@ -69,12 +70,14 @@ export default async function LocaleLayout({
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <NextIntlClientProvider messages={messages}>
           <QueryProvider>
-            <AuthProvider>
-              <SmoothScrollProvider>
-                {children}
-                <ToastProvider />
-              </SmoothScrollProvider>
-            </AuthProvider>
+            <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""}>
+              <AuthProvider>
+                <SmoothScrollProvider>
+                  {children}
+                  <ToastProvider />
+                </SmoothScrollProvider>
+              </AuthProvider>
+            </GoogleOAuthProvider>
           </QueryProvider>
         </NextIntlClientProvider>
       </body>

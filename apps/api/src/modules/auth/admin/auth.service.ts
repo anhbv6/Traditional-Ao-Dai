@@ -17,17 +17,17 @@ export async function adminLogin(input: LoginInput['body']) {
 
   // Check user existence, verify they are an ADMIN, and ensure active status
   if (!user || user.role !== 'ADMIN') {
-    throw new AppError(401, 'Tài khoản không tồn tại hoặc không có quyền truy cập Admin')
+    throw new AppError(401, 'Account does not exist or does not have administrative access.')
   }
 
   if (!user.isActive) {
-    throw new AppError(403, 'Tài khoản này đã bị khóa hoặc ngưng hoạt động')
+    throw new AppError(403, 'This account has been locked or deactivated.')
   }
 
   // Verify password
   const isPasswordMatch = await comparePassword(password, user.password || '')
   if (!isPasswordMatch) {
-    throw new AppError(401, 'Mật khẩu không chính xác')
+    throw new AppError(401, 'Incorrect password.')
   }
 
   // Generate JWT token containing key user claims

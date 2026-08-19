@@ -82,7 +82,7 @@ async function handleAuthRequest(
     const nextResponse = NextResponse.json(responseData, { status: response.status });
 
     // 5. Handle cookies setting on successful login / refresh
-    if (response.ok && (pathString === 'login' || pathString === 'refresh')) {
+    if (response.ok && (pathString === 'login' || pathString === 'login/otp' || pathString === 'google' || pathString === 'refresh')) {
       copySetCookie(response, nextResponse);
     }
 

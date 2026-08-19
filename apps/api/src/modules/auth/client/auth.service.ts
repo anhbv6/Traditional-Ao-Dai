@@ -1,14 +1,15 @@
 import { prisma } from '@repo/db'
 import { createHash } from 'crypto'
+import { OAuth2Client } from 'google-auth-library'
 import { comparePassword, hashPassword } from '../../../shared/utils/password'
 import { generateAccessToken, generateRefreshToken, JWTPayload, verifyToken } from '../../../shared/utils/jwt'
 import { AppError } from '../../../shared/middlewares/errorHandler'
 import { env } from '../../../shared/config/env'
-import { LoginInput, RefreshTokenInput, RegisterInput, OtpLoginInput } from '../auth.schema'
+import { LoginInput, RefreshTokenInput, RegisterInput, OtpLoginInput, GoogleLoginInput } from '../auth.schema'
 import { durationToMs } from '../../../shared/utils/time'
 import { normalizeVietnamPhone } from '../../../shared/utils/phone'
 import { CheckAccountResult, SessionMeta } from '../auth.types'
-import { verifyOtp } from '../otp.service'
+import { verifyOtp } from '../../otp/otp.service'
 
 function buildAuthTokens(user: { id: string; role: JWTPayload['role'] }, sessionId: string) {
   const payload = {
@@ -161,11 +162,11 @@ export async function clientLoginWithOtp(input: OtpLoginInput['body'], meta: Ses
 
   // Check user existence, verify they are a CUSTOMER
   if (!user || user.role !== 'CUSTOMER') {
-    throw new AppError(400, 'Tài khoản chưa được đăng ký. Vui lòng đăng ký trước.')
+    throw new AppError(400, 'Account is not registered. Please register first.')
   }
 
   if (!user.isActive) {
-    throw new AppError(403, 'Tài khoản này đã bị khóa hoặc vô hiệu hóa.')
+    throw new AppError(403, 'This account has been locked or deactivated.')
   }
 
   // Update phone verified status if not already set
@@ -306,7 +307,6 @@ export async function logoutClientByRefreshToken(refreshToken: string) {
   })
 }
 
-
 /**
  * Checks if a user already exists with the given email and/or phone.
  */
@@ -358,7 +358,7 @@ export async function updateUserProfile(
         },
       })
       if (existingPhoneUser) {
-        throw new AppError(400, 'Số điện thoại này đã được đăng ký sử dụng bởi tài khoản khác')
+        throw new AppError(400, 'This phone number is already registered by another account.')
       }
     }
     updateData.phone = data.phone || null
@@ -390,6 +390,96 @@ export async function updateUserProfile(
 
   const { password: _, ...safeUser } = updatedUser
   return safeUser
+}
+
+const googleClient = new OAuth2Client(env.GOOGLE_CLIENT_ID)
+
+export async function clientLoginWithGoogle(credential: string, meta: SessionMeta) {
+  try {
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: env.GOOGLE_CLIENT_ID,
+    })
+    const payload = ticket.getPayload()
+    if (!payload || !payload.email) {
+      throw new AppError(400, 'Invalid Google ID token payload.')
+    }
+
+    const email = payload.email.trim().toLowerCase()
+    const name = payload.name || null
+    const avatar = payload.picture || null
+
+    // Check if user already exists
+    let user = await prisma.user.findUnique({
+      where: { email },
+    })
+
+    if (!user) {
+      // Create user
+      user = await prisma.user.create({
+        data: {
+          email,
+          name,
+          avatar,
+          role: 'CUSTOMER',
+          isActive: true,
+          isEmailVerified: true,
+        },
+      })
+    } else {
+      // User exists, check if active
+      if (!user.isActive) {
+        throw new AppError(403, 'This account has been locked or deactivated.')
+      }
+
+      // Ensure they are customer
+      if (user.role !== 'CUSTOMER') {
+        throw new AppError(403, 'Access denied: insufficient permissions.')
+      }
+
+      // Optionally update name and avatar if not set
+      if (!user.name || !user.avatar) {
+        user = await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            name: user.name || name,
+            avatar: user.avatar || avatar,
+          },
+        })
+      }
+    }
+
+    // Create session & tokens
+    const refreshExpiresAt = new Date(Date.now() + durationToMs(env.JWT_REFRESH_EXPIRES_IN))
+    const session = await prisma.userSession.create({
+      data: {
+        userId: user.id,
+        refreshToken: '',
+        deviceInfo: meta.deviceInfo || null,
+        ipAddress: meta.ipAddress || null,
+        expiresAt: refreshExpiresAt,
+      },
+    })
+
+    const tokens = buildAuthTokens(user, session.id)
+
+    await prisma.userSession.update({
+      where: { id: session.id },
+      data: {
+        refreshToken: hashToken(tokens.refreshToken),
+      },
+    })
+
+    return {
+      user,
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+      refreshTokenExpiresAt: refreshExpiresAt,
+    }
+  } catch (error: any) {
+    if (error instanceof AppError) throw error
+    throw new AppError(400, `Google authentication failed: ${error.message}`)
+  }
 }
 
 

@@ -10,6 +10,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 import { useRegister } from '../hooks/useRegister';
 import { Logo } from '@/components/common/header/Logo';
+import { GoogleLogin } from '@react-oauth/google';
+import { useLogin } from '../../auth/hooks/useLogin';
+import { showToast } from '@/components/ui/toast';
 import type { RegisterFormData } from '../types/register.types';
 import type { FieldErrors } from 'react-hook-form';
 
@@ -208,6 +211,8 @@ export function RegisterForm() {
     handleResendOtp,
     handleGoogleSignUp,
   } = useRegister();
+
+  const { loginWithGoogle } = useLogin();
 
   const [otpArray, setOtpArray] = React.useState<string[]>(Array(6).fill(''));
   const inputRefs = React.useRef<HTMLInputElement[]>([]);
@@ -733,32 +738,21 @@ export function RegisterForm() {
               </div>
 
               {/* Google Sign-Up Button */}
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleGoogleSignUp}
-                className="w-full h-12 bg-white text-zinc-700 border border-zinc-300 hover:bg-zinc-50 hover:border-zinc-400 shadow-sm flex items-center justify-center gap-3 font-semibold tracking-wider text-xs uppercase rounded-lg transition-all cursor-pointer"
-              >
-                <svg className="h-4 w-4" viewBox="0 0 24 24">
-                  <path
-                    fill="#4285F4"
-                    d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v3.9h6.6c-.28 1.48-1.12 2.73-2.38 3.58v3h3.84c2.25-2.07 3.53-5.1 3.53-8.6c.01-.27-.03-.54-.05-.81Z"
-                  />
-                  <path
-                    fill="#34A853"
-                    d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.84-3c-1.07.72-2.45 1.16-4.09 1.16c-3.14 0-5.8-2.11-6.75-4.96H1.41v3.1c2 3.97 6.09 6.5 10.59 6.5Z"
-                  />
-                  <path
-                    fill="#FBBC05"
-                    d="M5.25 14.29c-.25-.72-.38-1.49-.38-2.29c0-.8.13-1.57.38-2.29V6.6H1.41C.51 8.38 0 10.38 0 12.5s.51 4.12 1.41 5.9l3.84-3.11Z"
-                  />
-                  <path
-                    fill="#EA4335"
-                    d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.08 15.24 0 12 0C7.5 0 3.41 2.53 1.41 6.5l3.84 3.1c.95-2.85 3.61-4.85 6.75-4.85Z"
-                  />
-                </svg>
-                <span>{t('continueWithGoogle')}</span>
-              </Button>
+              <div className="w-full flex justify-center">
+                <GoogleLogin
+                  onSuccess={(credentialResponse) => {
+                    if (credentialResponse.credential) {
+                      loginWithGoogle(credentialResponse.credential);
+                    }
+                  }}
+                  onError={() => {
+                    showToast.error(t('googleLoginFailed') || 'Đăng nhập Google thất bại');
+                  }}
+                  theme="outline"
+                  size="large"
+                  width="380"
+                />
+              </div>
             </motion.form>
 
             {/* Footer Link */}

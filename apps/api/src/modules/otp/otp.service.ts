@@ -16,7 +16,7 @@ export function generateOtp(length = 6): string {
 export async function sendOtp(phone: string, purpose: string): Promise<{ success: boolean; ttl: number }> {
   const normalizedPhone = normalizeVietnamPhone(phone)
   if (!normalizedPhone) {
-    throw new AppError(400, 'Số điện thoại không hợp lệ.')
+    throw new AppError(400, 'Invalid phone number.')
   }
 
   const cooldownKey = `otp:cooldown:${purpose}:${normalizedPhone}`
@@ -25,7 +25,7 @@ export async function sendOtp(phone: string, purpose: string): Promise<{ success
   // Check cooldown
   const hasCooldown = await redis.get(cooldownKey)
   if (hasCooldown) {
-    throw new AppError(429, 'Vui lòng đợi 60 giây trước khi yêu cầu mã OTP mới.')
+    throw new AppError(429, 'Please wait 60 seconds before requesting a new OTP.')
   }
 
   // Generate OTP code
@@ -39,7 +39,7 @@ export async function sendOtp(phone: string, purpose: string): Promise<{ success
   await redis.set(cooldownKey, '1', 'EX', 60)
 
   // Send via SMS provider
-  const message = `Mã OTP của bạn là: ${code}. Mã có hiệu lực trong ${Math.floor(ttl / 60)} phút.`
+  const message = `Your AODAI OTP code is: ${code}. Valid for ${Math.floor(ttl / 60)} minutes.`
   await smsProvider.sendSms(normalizedPhone, message)
 
   return { success: true, ttl }
@@ -48,7 +48,7 @@ export async function sendOtp(phone: string, purpose: string): Promise<{ success
 export async function verifyOtp(phone: string, purpose: string, code: string): Promise<boolean> {
   const normalizedPhone = normalizeVietnamPhone(phone)
   if (!normalizedPhone) {
-    throw new AppError(400, 'Số điện thoại không hợp lệ.')
+    throw new AppError(400, 'Invalid phone number.')
   }
 
   const otpKey = `otp:${purpose}:${normalizedPhone}`
@@ -56,11 +56,11 @@ export async function verifyOtp(phone: string, purpose: string, code: string): P
   // Retrieve code from Redis
   const savedCode = await redis.get(otpKey)
   if (!savedCode) {
-    throw new AppError(400, 'Mã OTP đã hết hạn hoặc không tồn tại. Vui lòng gửi lại mã mới.')
+    throw new AppError(400, 'OTP code has expired or does not exist. Please request a new one.')
   }
 
   if (savedCode !== code) {
-    throw new AppError(400, 'Mã OTP không chính xác. Vui lòng thử lại.')
+    throw new AppError(400, 'Incorrect OTP code. Please try again.')
   }
 
   // OTP verified successfully, delete it to prevent reuse
