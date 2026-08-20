@@ -1,83 +1,22 @@
 "use client";
 
-import React, { useState } from "react";
-import { useTranslations, useLocale } from "next-intl";
-import { Container } from "@/components/ui/container";
-import { Breadcrumbs } from "@/components/common/Breadcrumbs";
+import React from "react";
 import { ShoppingCart, Trash2, Heart, ArrowRight, Sparkles } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
-import { showToast } from "@/components/ui/toast";
-
-interface WishlistItem {
-  id: string;
-  name: { vi: string; en: string };
-  price: string;
-  image: string;
-  stockStatus: "in_stock" | "custom" | "out_of_stock";
-  category: { vi: string; en: string };
-}
-
-const initialWishlistItems: WishlistItem[] = [
-  {
-    id: "prod-1",
-    name: { vi: "Áo Dài Gấm Song Hỷ", en: "Song Hy Brocade Ao Dai" },
-    price: "1.890.000 ₫",
-    image: "https://cdn.pixabay.com/photo/2021/04/16/07/22/ao-dai-6182834_640.jpg",
-    stockStatus: "in_stock",
-    category: { vi: "Áo Dài Gấm Cao Cấp", en: "Premium Brocade" },
-  },
-  {
-    id: "prod-2",
-    name: { vi: "Áo Dài Tơ Tằm Cổ Điển", en: "Classic Mulberry Silk Ao Dai" },
-    price: "2.450.000 ₫",
-    image: "https://cdn.pixabay.com/photo/2022/07/15/03/42/vietnamese-woman-7322247_640.jpg",
-    stockStatus: "custom",
-    category: { vi: "Áo Dài Lụa Tơ Tằm", en: "Mulberry Silk" },
-  },
-  {
-    id: "prod-3",
-    name: { vi: "Áo Dài Nhung Đỏ Quý Phái", en: "Noble Red Velvet Ao Dai" },
-    price: "3.200.000 ₫",
-    image: "https://cdn.pixabay.com/photo/2015/08/13/18/43/vietnam-887413_640.jpg",
-    stockStatus: "in_stock",
-    category: { vi: "Áo Dài Nhung Hoàng Gia", en: "Imperial Velvet" },
-  },
-  {
-    id: "prod-4",
-    name: { vi: "Áo Dài Cách Tân Hoa Đào", en: "Modern Peach Blossom Ao Dai" },
-    price: "1.290.000 ₫",
-    image: "https://cdn.pixabay.com/photo/2020/02/05/08/18/girl-4820464_640.jpg",
-    stockStatus: "out_of_stock",
-    category: { vi: "Áo Dài Cách Tân", en: "Modern Reform" },
-  },
-];
+import { useWishlist } from "../hooks/useWishlist";
+import { type WishlistItem } from "../types/wishlist.types";
 
 export function WishlistExperience() {
-  const t = useTranslations("WishlistPage");
-  const locale = useLocale() as "vi" | "en";
-  const [items, setItems] = useState<WishlistItem[]>(initialWishlistItems);
-
-  const handleRemove = (id: string) => {
-    const item = items.find((item) => item.id === id);
-    setItems((prev) => prev.filter((item) => item.id !== id));
-    if (item) {
-      showToast.success(t("toast.removed"), item.name[locale]);
-    } else {
-      showToast.success(t("toast.removed"));
-    }
-  };
-
-  const handleClearAll = () => {
-    setItems([]);
-    showToast.success(t("toast.cleared"));
-  };
-
-  const handleAddToCart = (item: WishlistItem) => {
-    if (item.stockStatus === "out_of_stock") return;
-    showToast.success(t("toast.addedToCart"), item.name[locale]);
-  };
+  const {
+    t,
+    locale,
+    items,
+    handleRemove,
+    handleClearAll,
+    handleAddToCart,
+  } = useWishlist();
 
   const getStatusBadge = (status: WishlistItem["stockStatus"]) => {
     switch (status) {
@@ -103,9 +42,7 @@ export function WishlistExperience() {
   };
 
   return (
-    <Container as="section" className="py-12 bg-[#FAF7F5] min-h-screen overflow-x-hidden relative">
-      <Breadcrumbs />
-
+    <div>
       {/* Header */}
       <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[#E2D9D2]/60 pb-8">
         <div>
@@ -253,6 +190,6 @@ export function WishlistExperience() {
           </div>
         )}
       </AnimatePresence>
-    </Container>
+    </div>
   );
 }

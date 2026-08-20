@@ -1,12 +1,13 @@
+import React from 'react';
 import { Container } from '@/components/ui/container';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
-import { CartPageClient } from '@/features/cart/components/CartPageClient';
+import { CartExperience } from '@/features/cart';
 
 export default function CartPage() {
   return (
     <Container as="section" className="py-12">
       <Breadcrumbs />
-      <CartPageClient />
+      <CartExperience />
     </Container>
   );
 }

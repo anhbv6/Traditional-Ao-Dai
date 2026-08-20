@@ -11,8 +11,6 @@ import {
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
-import { Breadcrumbs } from '@/components/common/Breadcrumbs';
-import { Container } from '@/components/ui/container';
 import { ContactInfoItem } from './ContactInfoItem';
 import { ContactForm } from './ContactForm';
 import { faqKeys } from '../types/contact.types';
@@ -21,8 +19,7 @@ export function ContactExperience() {
   const t = useTranslations('ContactPage');
 
   return (
-    <Container as="section" className="py-8 sm:py-12">
-      <Breadcrumbs />
+    <div>
       <section className="mt-4 mb-8 text-center max-w-3xl mx-auto flex flex-col items-center">
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-[family-name:var(--font-playfair)] text-[var(--primary-color)] leading-tight">
           {t('title')}
@@ -90,6 +87,6 @@ export function ContactExperience() {
           ))}
         </div>
       </section>
-    </Container>
+    </div>
   );
 }

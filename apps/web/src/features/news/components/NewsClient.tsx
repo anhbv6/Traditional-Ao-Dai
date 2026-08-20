@@ -27,8 +27,7 @@ export function NewsClient() {
   } = useNews();
 
   return (
-    <Container as="div" className="py-8 sm:py-12">
-      <Breadcrumbs />
+    <div>
 
       {/* Top Banner / Title */}
       <section className="mt-4 mb-8 text-center max-w-3xl mx-auto flex flex-col items-center">
@@ -325,6 +324,6 @@ export function NewsClient() {
           </p>
         </div>
       )}
-    </Container>
+    </div>
   );
 }

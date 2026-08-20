@@ -1,8 +1,6 @@
 "use client";
 
 import React from "react";
-import { Container } from "@/components/ui/container";
-import { Breadcrumbs } from "@/components/common/Breadcrumbs";
 import { Search, ChevronDown, HelpCircle } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
@@ -24,9 +22,7 @@ export function FaqsExperience() {
   } = useFaqs();
 
   return (
-    <Container as="section" className="py-12 bg-[#FAF7F5] min-h-screen overflow-x-hidden">
-      <Breadcrumbs />
-
+    <div>
       {/* Header */}
       <div className="text-center max-w-3xl mx-auto mb-12">
         <h1 className="font-[family-name:var(--font-playfair)] text-3xl font-bold text-[#800020] sm:text-4xl">
@@ -122,10 +118,10 @@ export function FaqsExperience() {
                   <div
                     key={faq.id}
                     className={cn(
-                       "overflow-hidden rounded-xl border transition-all duration-300 shadow-sm",
-                       isOpen
-                         ? "border-[#800020]/30 bg-white"
-                         : "border-[#E2D9D2]/70 bg-white hover:border-[#800020]/20"
+                      "overflow-hidden rounded-xl border transition-all duration-300 shadow-sm",
+                      isOpen
+                        ? "border-[#800020]/30 bg-white"
+                        : "border-[#E2D9D2]/70 bg-white hover:border-[#800020]/20"
                     )}
                   >
                     {/* Trigger button */}
@@ -167,6 +163,6 @@ export function FaqsExperience() {
           )}
         </main>
       </div>
-    </Container>
+    </div>
   );
 }

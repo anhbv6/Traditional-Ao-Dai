@@ -1,7 +1,5 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
-import { Breadcrumbs } from '@/components/common/Breadcrumbs';
-import { Container } from '@/components/ui/container';
 import { ProductDetailClient } from './ProductDetailClient';
 import { mockDetailProducts, productCatalog, type DisplayProduct, type RelatedProductItem } from '../types/products.types';
 
@@ -129,17 +127,13 @@ export function ProductDetail({ slug, locale }: ProductDetailProps) {
       related: locale === 'vi' ? 'Sản phẩm liên quan' : 'Related Products',
     };
   }
-
   return (
-    <Container as="section" className="py-10 sm:py-12">
-      <Breadcrumbs lastLabel={displayProduct.name} />
-      <ProductDetailClient
-        product={displayProduct}
-        locale={locale}
-        galleryImages={galleryImages}
-        relatedProducts={relatedProducts}
-        customMeasurementFields={customMeasurementFields}
-      />
-    </Container>
+    <ProductDetailClient
+      product={displayProduct}
+      locale={locale}
+      galleryImages={galleryImages}
+      relatedProducts={relatedProducts}
+      customMeasurementFields={customMeasurementFields}
+    />
   );
 }

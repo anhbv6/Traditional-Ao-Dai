@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { Container } from "@/components/ui/container";
 import { type MockArticle } from "../types/news.types";
 import { useNewsDetail } from "../hooks/useNewsDetail";
 import { NewsHeader } from "./detail/NewsHeader";
@@ -18,7 +17,7 @@ export function NewsDetail({ article, similarArticles }: NewsDetailProps) {
   const loc = locale === "vi" ? "vi" : "en";
 
   return (
-    <Container as="article" className="max-w-4xl py-8 sm:py-12">
+    <>
       <NewsHeader
         article={article}
         authorName={authorName}
@@ -32,6 +31,6 @@ export function NewsDetail({ article, similarArticles }: NewsDetailProps) {
         similarArticles={similarArticles}
         loc={loc}
       />
-    </Container>
+    </>
   );
 }

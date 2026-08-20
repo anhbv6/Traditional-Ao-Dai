@@ -1,5 +1,7 @@
 import React from 'react';
 import { ProductDetail, mockDetailProducts, productCatalog } from '@/features/products';
+import { Container } from '@/components/ui/container';
+import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 
 type Locale = 'vi' | 'en';
 
@@ -42,5 +44,19 @@ export async function generateMetadata({ params }: DetailProductsProps) {
 
 export default async function DetailProductsPage({ params }: DetailProductsProps) {
   const { locale, slug } = await params;
-  return <ProductDetail slug={slug} locale={locale} />;
+
+  let productName = '';
+  if (slug in mockDetailProducts) {
+    productName = mockDetailProducts[slug].name;
+  } else {
+    const product = productCatalog.find((item) => item.id === decodeURIComponent(slug));
+    if (product) productName = product.name[locale];
+  }
+
+  return (
+    <Container as="section" className="py-10 sm:py-12">
+      <Breadcrumbs lastLabel={productName} />
+      <ProductDetail slug={slug} locale={locale} />
+    </Container>
+  );
 }

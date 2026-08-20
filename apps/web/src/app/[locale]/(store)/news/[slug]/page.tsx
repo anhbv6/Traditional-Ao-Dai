@@ -43,6 +43,10 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
   const similarArticles = mockArticles
     .filter((item) => item.id !== article.id)
     .slice(0, 3);
-
-  return <NewsDetail article={article} similarArticles={similarArticles} />;
+  return (
+    <Container as="article" className="max-w-4xl py-8 sm:py-12">
+      <Breadcrumbs />
+      <NewsDetail article={article} similarArticles={similarArticles} />
+    </Container>
+  );
 }

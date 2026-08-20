@@ -3,8 +3,6 @@
 import React, { useState } from "react";
 import { useTranslations } from "next-intl";
 import { User, ShoppingBag, MapPin, CreditCard, Shield, Settings, LogOut, Plus } from "lucide-react";
-import { Container } from "@/components/ui/container";
-import { Breadcrumbs } from "@/components/common/Breadcrumbs";
 import { cn } from "@/lib/utils";
 
 import { PersonalInfoTab } from "./PersonalInfoTab";
@@ -68,9 +66,7 @@ export function ProfileExperience() {
   };
 
   return (
-    <Container as="section" className="py-12 bg-[#FAF7F5] min-h-screen overflow-x-hidden">
-      <Breadcrumbs />
-
+    <div>
       {/* Header */}
       <div className=" sm:mb-10 ">
         <h1 className="font-[family-name:var(--font-playfair)] text-3xl font-bold text-[#800020] sm:text-4xl">
@@ -200,6 +196,6 @@ export function ProfileExperience() {
           {renderTabContent()}
         </main>
       </div>
-    </Container>
+    </div>
   );
 }
