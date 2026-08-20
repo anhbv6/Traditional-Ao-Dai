@@ -37,6 +37,7 @@ export async function requireAuth(req: AuthenticatedRequest, res: Response, next
         where: {
           id: decoded.sessionId,
           userId: decoded.userId,
+          isRevoked: false,
           expiresAt: {
             gt: new Date(),
           },

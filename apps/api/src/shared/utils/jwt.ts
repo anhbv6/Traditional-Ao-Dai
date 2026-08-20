@@ -6,7 +6,9 @@ export interface JWTPayload {
   userId: string
   role: Role
   sessionId?: string
+  familyId?: string
   tokenType?: 'access' | 'refresh'
+  rememberMe?: boolean
 }
 
 // Decode base64 keys
@@ -24,8 +26,8 @@ export function generateAccessToken(payload: Omit<JWTPayload, 'tokenType'>): str
   return generateToken({ ...payload, tokenType: 'access' }, env.JWT_EXPIRES_IN)
 }
 
-export function generateRefreshToken(payload: Omit<JWTPayload, 'tokenType'>): string {
-  return generateToken({ ...payload, tokenType: 'refresh' }, env.JWT_REFRESH_EXPIRES_IN)
+export function generateRefreshToken(payload: Omit<JWTPayload, 'tokenType'>, expiresIn: string = env.JWT_REFRESH_EXPIRES_IN): string {
+  return generateToken({ ...payload, tokenType: 'refresh' }, expiresIn)
 }
 
 /**

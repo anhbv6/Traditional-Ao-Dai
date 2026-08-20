@@ -3,7 +3,8 @@
 import React, { useEffect } from 'react';
 import { useAuthStore } from '@/features/auth/store/authStore';
 import { getMeApi, refreshTokenApi } from '@/features/auth/api/auth.api';
-import { usePathname } from '@/i18n/routing';
+import { usePathname, useRouter } from '@/i18n/routing';
+import { HttpError } from '@/lib/api-client';
 
 const PUBLIC_AUTH_ROUTES = new Set([
   '/login',
@@ -16,16 +17,12 @@ const PUBLIC_AUTH_ROUTES = new Set([
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { setAccessToken, setAuthenticated, logout } = useAuthStore();
   const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     let isMounted = true;
 
     async function initAuth() {
-      if (PUBLIC_AUTH_ROUTES.has(pathname)) {
-        logout();
-        return;
-      }
-
       try {
         const refreshData = await refreshTokenApi();
         const { accessToken } = refreshData.data;
@@ -38,12 +35,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
           if (!isMounted) return;
           setAuthenticated(accessToken, me.data);
+
+          if (PUBLIC_AUTH_ROUTES.has(pathname)) {
+            router.replace('/');
+          }
         } else {
           if (!isMounted) return;
           logout();
         }
       } catch (error) {
-        console.error('Authentication initialization failed:', error);
+        if (!(error instanceof HttpError && error.status === 401)) {
+          console.error('Authentication initialization failed:', error);
+        }
         if (isMounted) {
           logout();
         }
@@ -55,7 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       isMounted = false;
     };
-  }, [pathname, setAccessToken, setAuthenticated, logout]);
+  }, [pathname, router, setAccessToken, setAuthenticated, logout]);
 
   return <>{children}</>;
 }

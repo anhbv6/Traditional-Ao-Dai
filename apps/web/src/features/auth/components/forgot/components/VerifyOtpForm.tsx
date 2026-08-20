@@ -1,16 +1,18 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { motion } from 'motion/react';
 import { ArrowLeft } from 'lucide-react';
-import { Link } from '@/i18n/routing';
 import { Button } from '@/components/ui/button';
 import { showToast } from '@/components/ui/toast';
 import { HttpError } from '@/lib/api-client';
-import { forgotPasswordEmailApi, verifyResetPasswordEmailApi, verifyResetPasswordPhoneApi } from '../../api/forgot.api';
-import { sendOtpApi } from '../../api/auth.api';
+import { forgotPasswordEmailApi, verifyResetPasswordEmailApi, verifyResetPasswordPhoneApi } from '../../../api/forgot.api';
+import { sendOtpApi } from '../../../api/auth.api';
+
+// Shared Components
+import { AuthHeader } from '../../AuthHeader';
+import { LoadingOverlay } from '@/components/shared/LoadingOverlay';
 
 type VerifyOtpFormProps = {
   forgotType?: 'email' | 'phone';
@@ -120,7 +122,7 @@ export function VerifyOtpForm({
       showToast.success(t('otpSent') || 'Mã mới đã được gửi đi!');
     } catch (err: unknown) {
       console.error(err);
-      showToast.error(getApiErrorMessage(err, 'Không thể gửi lại mã. Vui lòng thử lại.'));
+      showToast.error(getApiErrorMessage(err, t('resendOtpError')));
     }
   };
 
@@ -135,7 +137,7 @@ export function VerifyOtpForm({
         ? await verifyResetPasswordEmailApi({ email: target, code: otpCode })
         : await verifyResetPasswordPhoneApi({ phone: target, code: otpCode });
 
-      showToast.success('Xác thực thành công!');
+      showToast.success(t('otpVerifySuccess'));
       onVerifySuccess(result.data.resetToken);
     } catch (err: unknown) {
       console.error(err);
@@ -160,51 +162,25 @@ export function VerifyOtpForm({
     visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.25, 1, 0.5, 1] as const } },
   };
 
+  const dynamicSubtitle =
+    forgotType === 'email'
+      ? t('forgotEmailOtpSubtitle', { target })
+      : t('forgotPhoneOtpSubtitle', { target });
+
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-[var(--bg-main)] px-3.5 py-6 sm:px-8 sm:py-12 lg:px-16">
+    <div className="flex min-h-screen w-full items-center justify-center bg-[var(--bg-main)] px-3.5 py-6 sm:px-8 sm:py-12 lg:px-16 relative">
+      <LoadingOverlay visible={isLoading} messageKey="verifying" />
       <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="w-full max-w-[440px] space-y-5 sm:space-y-8 rounded-2xl p-5 sm:p-10 shadow-[0_8px_30px_rgb(42,37,37,0.02)] border border-[var(--border)]/40 bg-white"
+        className="w-full max-w-[560px] space-y-5 sm:space-y-8 rounded-2xl p-5 sm:p-10"
       >
-        {/* Mobile Logo */}
-        <div className="flex justify-center lg:hidden">
-          <Link href="/" className="flex flex-col items-center gap-1.5">
-            <div className="relative h-9 w-9 overflow-hidden rounded-md flex items-center justify-center">
-              <Image
-                src="/logoPage.png"
-                alt="AODAI logo"
-                width={70}
-                height={70}
-                className="h-full w-full object-cover scale-125"
-                unoptimized
-              />
-            </div>
-            <span className="font-[family-name:var(--font-playfair)] text-base font-normal tracking-widest text-[var(--primary-color)] uppercase">
-              AODAI
-            </span>
-          </Link>
-        </div>
-
-        {/* Header */}
-        <div className="space-y-2 text-center lg:text-left">
-          <motion.h2
-            variants={itemVariants}
-            className="font-[family-name:var(--font-playfair)] text-2xl font-semibold leading-tight text-[var(--primary-color)] sm:text-4xl"
-          >
-            {t('otpTitle')}
-          </motion.h2>
-          <motion.p
-            variants={itemVariants}
-            className="font-[family-name:var(--font-lora)] text-xs sm:text-sm text-[var(--text-light)] leading-relaxed"
-          >
-            {forgotType === 'email'
-              ? 'Chúng tôi đã gửi mã xác thực gồm 6 chữ số đến email: '
-              : 'Chúng tôi đã gửi mã OTP gồm 6 chữ số đến số điện thoại của bạn qua SMS: '}
-            <span className="font-semibold text-[var(--text-main)]">{target}</span>
-          </motion.p>
-        </div>
+        <AuthHeader
+          title={t('otpTitle')}
+          subtitle={dynamicSubtitle}
+          itemVariants={itemVariants}
+        />
 
         {/* Form */}
         <motion.form variants={itemVariants} onSubmit={handleSubmit} className="space-y-5">
@@ -276,3 +252,4 @@ export function VerifyOtpForm({
     </div>
   );
 }
+export default VerifyOtpForm;

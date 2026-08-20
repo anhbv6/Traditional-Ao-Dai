@@ -281,6 +281,7 @@ export function useRegister() {
       console.error('Registration failed:', err);
       const apiMsg = getErrorMessage(err, 'Xác thực OTP thất bại');
       setOtpError(apiMsg);
+      showToast.error(apiMsg);
     } finally {
       setIsRegistering(false);
     }

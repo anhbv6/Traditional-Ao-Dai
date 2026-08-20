@@ -1,5 +1,6 @@
 export * from "./api/home.api";
 export * from "./components/HeroBanner";
+export * from "./components/HomeVideoBanner";
 export * from "./components/BestSellers";
 export * from "./components/FeaturedCollections";
 export * from "./components/PromoteFeedBack";

@@ -2,7 +2,6 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Logo } from '@/components/common/header/Logo';
 import { type RegisterFormData } from '../../types/register.types';
 import { useRegister } from '../../hooks/useRegister';
 import { RegisterFormStep } from './components/RegisterFormStep';
@@ -113,15 +112,8 @@ export function RegisterForm() {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="w-full max-w-[440px] space-y-5 sm:space-y-8 rounded-2xl p-5 sm:p-10"
+        className="w-full max-w-[560px] space-y-5 sm:space-y-8 rounded-2xl p-5 sm:p-10"
       >
-        {/* Mobile Logo */}
-        {!isOtpStep && (
-          <div className="flex justify-center lg:hidden">
-            <Logo textLogo />
-          </div>
-        )}
-
         {!isOtpStep ? (
           <RegisterFormStep
             t={t}
@@ -169,3 +161,4 @@ export function RegisterForm() {
     </div>
   );
 }
+export default RegisterForm;

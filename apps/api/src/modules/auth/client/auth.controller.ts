@@ -37,18 +37,23 @@ function getCookie(req: Request, name: string): string | undefined {
   return decodeURIComponent(rawCookie.slice(prefix.length))
 }
 
-function refreshCookieOptions(expiresAt: Date): CookieOptions {
-  return {
+function refreshCookieOptions(rememberMe: boolean, expiresAt: Date): CookieOptions {
+  const options: CookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     path: '/',
-    maxAge: secondsUntil(expiresAt) * 1000,
   }
+
+  if (rememberMe) {
+    options.maxAge = secondsUntil(expiresAt) * 1000
+  }
+
+  return options
 }
 
-function setRefreshTokenCookie(res: Response, refreshToken: string, expiresAt: Date) {
-  res.cookie(REFRESH_TOKEN_COOKIE, refreshToken, refreshCookieOptions(expiresAt))
+function setRefreshTokenCookie(res: Response, refreshToken: string, rememberMe: boolean, expiresAt: Date) {
+  res.cookie(REFRESH_TOKEN_COOKIE, refreshToken, refreshCookieOptions(rememberMe, expiresAt))
 }
 
 function clearRefreshTokenCookie(res: Response) {
@@ -85,7 +90,7 @@ export async function login(req: Request, res: Response, next: NextFunction): Pr
       deviceInfo: req.headers['user-agent'],
       ipAddress: getClientIp(req),
     })
-    setRefreshTokenCookie(res, result.refreshToken, result.refreshTokenExpiresAt)
+    setRefreshTokenCookie(res, result.refreshToken, result.rememberMe, result.refreshTokenExpiresAt)
     return sendSuccess(res, {
       data: {
         accessToken: result.accessToken,
@@ -112,7 +117,9 @@ export async function refreshToken(req: Request, res: Response, next: NextFuncti
     }
 
     const result = await authService.refreshClientToken({ refreshToken })
-    setRefreshTokenCookie(res, result.refreshToken, result.refreshTokenExpiresAt)
+    if (result.refreshToken) {
+      setRefreshTokenCookie(res, result.refreshToken, result.rememberMe, result.refreshTokenExpiresAt)
+    }
     return sendSuccess(res, {
       data: {
         accessToken: result.accessToken,
@@ -195,7 +202,7 @@ export async function loginWithOtp(req: Request, res: Response, next: NextFuncti
       deviceInfo: req.headers['user-agent'],
       ipAddress: getClientIp(req),
     })
-    setRefreshTokenCookie(res, result.refreshToken, result.refreshTokenExpiresAt)
+    setRefreshTokenCookie(res, result.refreshToken, result.rememberMe, result.refreshTokenExpiresAt)
     return sendSuccess(res, {
       data: {
         accessToken: result.accessToken,
@@ -217,7 +224,7 @@ export async function loginWithGoogle(req: Request, res: Response, next: NextFun
       deviceInfo: req.headers['user-agent'],
       ipAddress: getClientIp(req),
     })
-    setRefreshTokenCookie(res, result.refreshToken, result.refreshTokenExpiresAt)
+    setRefreshTokenCookie(res, result.refreshToken, result.rememberMe, result.refreshTokenExpiresAt)
     return sendSuccess(res, {
       data: {
         accessToken: result.accessToken,

@@ -80,13 +80,16 @@ model UserSession {
   id           String   @id @default(uuid())
   userId       String
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  refreshToken String   @db.Text
+  refreshToken String   @unique @db.Text
+  familyId     String
+  isRevoked    Boolean  @default(false)
   deviceInfo   String?  // Trình duyệt / OS của thiết bị
   ipAddress    String?  // IP truy cập
   expiresAt    DateTime // Thời gian hết hạn của Refresh Token
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   @@index([userId])
+  @@index([familyId])
 }
 
 model UserMeasurement {

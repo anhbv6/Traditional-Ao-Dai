@@ -4,9 +4,6 @@ import {
   RefreshTokenResponse,
   MeResponse,
   OtpSendResponse,
-  ResetTokenResponse,
-  ApiMessageResponse,
-  CheckAccountResponse,
 } from '../types/auth.types';
 
 /**
@@ -15,12 +12,17 @@ import {
 export const loginApi = async (data: {
   email: string;
   password: string;
+  rememberMe: boolean;
 }): Promise<LoginResponse> => {
   return apiClient.post<LoginResponse>('/api/auth/login', data, { skipAuth: true, retryOnUnauthorized: false });
 };
 
 export const refreshTokenApi = async (): Promise<RefreshTokenResponse> => {
-  return apiClient.post<RefreshTokenResponse>('/api/auth/refresh', {}, { skipAuth: true, retryOnUnauthorized: false });
+  return apiClient.post<RefreshTokenResponse>('/api/auth/refresh', {}, {
+    skipAuth: true,
+    retryOnUnauthorized: false,
+    redirectOnUnauthorized: false,
+  });
 };
 
 export const logoutApi = async (): Promise<void> => {

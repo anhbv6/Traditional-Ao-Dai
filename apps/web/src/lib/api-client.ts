@@ -4,6 +4,7 @@ type CustomRequestInit = Omit<RequestInit, 'body'> & {
   body?: unknown;
   params?: Record<string, string | number | boolean>;
   retryOnUnauthorized?: boolean;
+  redirectOnUnauthorized?: boolean;
   skipAuth?: boolean;
 };
 
@@ -23,6 +24,29 @@ const clearBrowserAuth = () => {
 
 export const clearBrowserAuthTokens = clearBrowserAuth;
 
+const getLoginPath = () => {
+  if (typeof window === 'undefined') {
+    return '/login';
+  }
+
+  const locale = window.location.pathname.split('/')[1];
+  return locale === 'vi' || locale === 'en' ? `/${locale}/login` : '/login';
+};
+
+const redirectToLoginAfterSessionExpired = () => {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  const loginPath = getLoginPath();
+  if (window.location.pathname === loginPath) {
+    return;
+  }
+
+  window.sessionStorage.setItem('auth:session-expired', 'true');
+  window.location.assign(loginPath);
+};
+
 const refreshBrowserToken = async (): Promise<string | undefined> => {
   const res = await fetch('/api/auth/refresh', {
     method: 'POST',
@@ -37,6 +61,7 @@ const refreshBrowserToken = async (): Promise<string | undefined> => {
 
   if (!res.ok) {
     clearBrowserAuth();
+    redirectToLoginAfterSessionExpired();
     throw new HttpError({
       status: res.status,
       payload,
@@ -45,6 +70,7 @@ const refreshBrowserToken = async (): Promise<string | undefined> => {
 
   if (typeof payload === 'string') {
     clearBrowserAuth();
+    redirectToLoginAfterSessionExpired();
     throw new HttpError({
       status: res.status,
       payload,
@@ -54,6 +80,7 @@ const refreshBrowserToken = async (): Promise<string | undefined> => {
   const accessToken = payload.data?.accessToken;
   if (!accessToken) {
     clearBrowserAuth();
+    redirectToLoginAfterSessionExpired();
     return undefined;
   }
 
@@ -140,6 +167,16 @@ const request = async <ResponseData>(
   }
 
   if (!res.ok) {
+    if (
+      res.status === 401 &&
+      !isServer &&
+      cleanUrl === '/api/auth/refresh' &&
+      options?.redirectOnUnauthorized !== false
+    ) {
+      clearBrowserAuth();
+      redirectToLoginAfterSessionExpired();
+    }
+
     throw new HttpError({
       status: res.status,
       payload,
@@ -165,8 +202,15 @@ export const apiClient = {
 export function getErrorMessage(err: unknown, fallback: string): string {
   const payload = err instanceof HttpError ? err.payload : undefined;
 
-  if (payload && typeof payload === 'object' && 'message' in payload) {
-    return String(payload.message);
+  if (payload && typeof payload === 'object') {
+    if ('errors' in payload && Array.isArray(payload.errors) && payload.errors.length > 0) {
+      return payload.errors
+        .map((e: any) => e.message || 'Lỗi không xác định')
+        .join(', ');
+    }
+    if ('message' in payload) {
+      return String(payload.message);
+    }
   }
 
   if (err instanceof Error) {

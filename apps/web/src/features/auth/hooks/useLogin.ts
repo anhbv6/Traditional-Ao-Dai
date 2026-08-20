@@ -2,10 +2,29 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/routing';
 import { getMeApi, loginApi, sendOtpApi, loginWithOtpApi, loginWithGoogleApi } from '../api/auth.api';
-import { type AuthUser } from '../types/auth.types';
 import { useAuthStore } from '../store/authStore';
 import { showToast } from '@/components/ui/toast';
 import { HttpError } from '@/lib/api-client';
+
+function extractErrorMessage(err: unknown, defaultMsg: string): string {
+  if (err instanceof HttpError) {
+    const payload = err.payload;
+    if (payload && typeof payload === 'object') {
+      if ('errors' in payload && Array.isArray(payload.errors) && payload.errors.length > 0) {
+        return payload.errors
+          .map((e: any) => e.message || 'Lỗi không xác định')
+          .join(', ');
+      }
+      if ('message' in payload) {
+        return String(payload.message);
+      }
+    }
+  }
+  if (err instanceof Error) {
+    return err.message;
+  }
+  return defaultMsg;
+}
 
 export function useLogin() {
   const t = useTranslations('Auth');
@@ -18,10 +37,10 @@ export function useLogin() {
   const [otpInput, setOtpInput] = useState('');
   const [otpError, setOtpError] = useState('');
 
-  const login = async (emailOrPhone: string, password: string) => {
+  const login = async (emailOrPhone: string, password: string, rememberMe: boolean) => {
     setIsLoading(true);
     try {
-      const res = await loginApi({ email: emailOrPhone.trim(), password });
+      const res = await loginApi({ email: emailOrPhone.trim(), password, rememberMe });
 
       const { setAccessToken, setAuthenticated, setLoading } = useAuthStore.getState();
       setAccessToken(res.data.accessToken);
@@ -37,13 +56,7 @@ export function useLogin() {
       router.refresh();
     } catch (err: unknown) {
       console.error('Login failed:', err);
-      const payload = err instanceof HttpError ? err.payload : undefined;
-      const apiMsg =
-        payload && typeof payload === 'object' && 'message' in payload
-          ? String(payload.message)
-          : err instanceof Error
-            ? err.message
-            : 'Login failed';
+      const apiMsg = extractErrorMessage(err, 'Đăng nhập thất bại');
       showToast.error(apiMsg);
     } finally {
       setIsLoading(false);
@@ -65,13 +78,7 @@ export function useLogin() {
       showToast.success(t('otpSent') || 'Đã gửi OTP qua SMS!');
     } catch (err: unknown) {
       console.error(err);
-      const payload = err instanceof HttpError ? err.payload : undefined;
-      const apiMsg =
-        payload && typeof payload === 'object' && 'message' in payload
-          ? String(payload.message)
-          : err instanceof Error
-            ? err.message
-            : 'Gửi OTP thất bại';
+      const apiMsg = extractErrorMessage(err, 'Gửi OTP thất bại');
       showToast.error(apiMsg);
     } finally {
       setIsLoading(false);
@@ -95,13 +102,7 @@ export function useLogin() {
       router.refresh();
     } catch (err: unknown) {
       console.error(err);
-      const payload = err instanceof HttpError ? err.payload : undefined;
-      const apiMsg =
-        payload && typeof payload === 'object' && 'message' in payload
-          ? String(payload.message)
-          : err instanceof Error
-            ? err.message
-            : 'Đăng nhập thất bại';
+      const apiMsg = extractErrorMessage(err, 'Đăng nhập thất bại');
       setOtpError(apiMsg);
       showToast.error(apiMsg);
     } finally {
@@ -126,13 +127,7 @@ export function useLogin() {
       router.refresh();
     } catch (err: unknown) {
       console.error('Google login failed:', err);
-      const payload = err instanceof HttpError ? err.payload : undefined;
-      const apiMsg =
-        payload && typeof payload === 'object' && 'message' in payload
-          ? String(payload.message)
-          : err instanceof Error
-            ? err.message
-            : 'Đăng nhập Google thất bại';
+      const apiMsg = extractErrorMessage(err, 'Đăng nhập Google thất bại');
       showToast.error(apiMsg);
     } finally {
       setIsLoading(false);

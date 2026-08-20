@@ -9,6 +9,7 @@ export const loginSchema = z.object({
   body: z.object({
     email: z.string().min(1, 'Email or phone number is required'),
     password: z.string().min(6, 'Password must be at least 6 characters'),
+    rememberMe: z.boolean().optional().default(false),
   }),
 })
 

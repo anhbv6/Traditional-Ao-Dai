@@ -1,16 +1,19 @@
 'use client';
 
 import React, { useState } from 'react';
-import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { motion } from 'motion/react';
 import { Eye, EyeOff, CheckCircle2, ArrowRight, ArrowLeft } from 'lucide-react';
-import { Link, useRouter } from '@/i18n/routing';
+import { useRouter } from '@/i18n/routing';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { HttpError } from '@/lib/api-client';
 import { showToast } from '@/components/ui/toast';
-import { resetPasswordEmailApi, resetPasswordPhoneApi } from '../../api/forgot.api';
+import { resetPasswordEmailApi, resetPasswordPhoneApi } from '../../../api/forgot.api';
+
+// Shared Components
+import { AuthHeader } from '../../AuthHeader';
+import { LoadingOverlay } from '@/components/shared/LoadingOverlay';
 
 type ChangePasswordFormProps = {
   forgotType?: 'email' | 'phone';
@@ -31,7 +34,7 @@ export function ChangePasswordForm({ forgotType = 'email', target = '', resetTok
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!resetToken) {
-      showToast.error('Phiên xác thực đã hết hạn. Vui lòng xác thực lại mã.');
+      showToast.error(t('forgotSessionExpired'));
       return;
     }
     if (!password || password !== confirmPassword) return;
@@ -43,7 +46,7 @@ export function ChangePasswordForm({ forgotType = 'email', target = '', resetTok
       } else {
         await resetPasswordPhoneApi({ phone: target, resetToken, password });
       }
-      showToast.success('Đặt lại mật khẩu thành công!');
+      showToast.success(t('resetPasswordSuccess'));
       setIsSuccess(true);
     } catch (err: unknown) {
       console.error(err);
@@ -53,7 +56,7 @@ export function ChangePasswordForm({ forgotType = 'email', target = '', resetTok
           ? String(payload.message)
           : err instanceof Error
             ? err.message
-            : 'Đặt lại mật khẩu thất bại.';
+            : t('resetPasswordError');
       showToast.error(apiMsg);
     } finally {
       setIsLoading(false);
@@ -82,7 +85,7 @@ export function ChangePasswordForm({ forgotType = 'email', target = '', resetTok
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
-          className="w-full max-w-[440px] text-center space-y-5 rounded-2xl p-5 sm:p-10 shadow-[0_8px_30px_rgb(42,37,37,0.02)]"
+          className="w-full max-w-[560px] text-center space-y-5 rounded-2xl p-5 sm:p-10"
         >
           <div className="flex justify-center">
             <div className="rounded-full bg-emerald-50 p-2.5 text-emerald-600 dark:bg-emerald-950/20 dark:text-emerald-400">
@@ -109,47 +112,22 @@ export function ChangePasswordForm({ forgotType = 'email', target = '', resetTok
     );
   }
 
+  const dynamicSubtitle = t('resetPasswordSubtitle', { target });
+
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-[var(--bg-main)] px-3.5 py-6 sm:px-8 sm:py-12 lg:px-16">
+    <div className="flex min-h-screen w-full items-center justify-center bg-[var(--bg-main)] px-3.5 py-6 sm:px-8 sm:py-12 lg:px-16 relative">
+      <LoadingOverlay visible={isLoading} messageKey="updating" />
       <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="w-full max-w-[440px] space-y-5 sm:space-y-8 rounded-2xl p-5 sm:p-10 shadow-[0_8px_30px_rgb(42,37,37,0.02)]"
+        className="w-full max-w-[560px] space-y-5 sm:space-y-8 rounded-2xl p-5 sm:p-10"
       >
-        {/* Mobile Logo */}
-        <div className="flex justify-center lg:hidden">
-          <Link href="/" className="flex flex-col items-center gap-1.5">
-            <div className="relative h-9 w-9 overflow-hidden rounded-md flex items-center justify-center">
-              <Image
-                src="/logoPage.png"
-                alt="AODAI logo"
-                width={70}
-                height={70}
-                className="h-full w-full object-cover scale-125"
-              />
-            </div>
-            <span className="font-[family-name:var(--font-playfair)] text-base font-normal tracking-widest text-[var(--primary-color)] uppercase">
-              AODAI
-            </span>
-          </Link>
-        </div>
-
-        {/* Header */}
-        <div className="space-y-2 text-center lg:text-left">
-          <motion.h2
-            variants={itemVariants}
-            className="font-[family-name:var(--font-playfair)] text-2xl font-semibold leading-tight text-[var(--primary-color)] sm:text-4xl"
-          >
-            {t('changePasswordTitle')}
-          </motion.h2>
-          <motion.p
-            variants={itemVariants}
-            className="font-[family-name:var(--font-lora)] text-xs sm:text-sm text-[var(--text-light)] leading-relaxed"
-          >
-            Mã xác thực cho <span className="font-semibold text-[var(--text-main)]">{target}</span> đã được xác nhận. Vui lòng nhập mật khẩu mới để đặt lại.
-          </motion.p>
-        </div>
+        <AuthHeader
+          title={t('changePasswordTitle')}
+          subtitle={dynamicSubtitle}
+          itemVariants={itemVariants}
+        />
 
         {/* Form */}
         <motion.form variants={itemVariants} onSubmit={handleSubmit} className="space-y-5">
@@ -167,7 +145,7 @@ export function ChangePasswordForm({ forgotType = 'email', target = '', resetTok
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   required
-                  placeholder="••••••••••••"
+                  placeholder={t('passwordPlaceholder')}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full pr-10 border-[var(--border)] focus:border-[var(--primary-color)]"
@@ -175,7 +153,7 @@ export function ChangePasswordForm({ forgotType = 'email', target = '', resetTok
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-light)] hover:text-[var(--text-main)] transition-colors focus:outline-none"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-light)] hover:text-[var(--text-main)] transition-colors focus:outline-none cursor-pointer"
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
@@ -194,7 +172,7 @@ export function ChangePasswordForm({ forgotType = 'email', target = '', resetTok
                 id="confirmPassword"
                 type={showPassword ? 'text' : 'password'}
                 required
-                placeholder="••••••••••••"
+                placeholder={t('confirmPasswordPlaceholder')}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className={`w-full border-[var(--border)] focus:border-[var(--primary-color)] ${
@@ -239,3 +217,4 @@ export function ChangePasswordForm({ forgotType = 'email', target = '', resetTok
     </div>
   );
 }
+export default ChangePasswordForm;

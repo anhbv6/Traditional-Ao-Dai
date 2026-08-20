@@ -44,6 +44,10 @@ const router = Router()
  *                 type: string
  *                 format: password
  *                 example: "123456"
+ *               rememberMe:
+ *                 type: boolean
+ *                 description: If true, refresh token cookie persists for 7 days and rotates on refresh. If false, cookie is session-only and JWT expires after 24 hours.
+ *                 example: true
  *               name:
  *                 type: string
  *                 example: "Nguyen Van A"
@@ -491,7 +495,7 @@ router.post('/reset-password/phone', validate(resetPasswordPhoneSchema), clientA
  * /api/auth/refresh-token:
  *   post:
  *     summary: Refresh Client Token
- *     description: Rotates the refresh token (sent via cookies) and returns a new access token while updating the refresh token cookie.
+ *     description: Returns a new access token from the refresh token cookie. Remember-me sessions rotate the refresh token and reset the 7-day cookie maxAge; session-only logins keep the same browser session cookie until the 24-hour JWT expires or the browser session ends.
  *     tags:
  *       - Auth
  *     parameters:

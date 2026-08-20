@@ -7,11 +7,15 @@ import { motion } from 'motion/react';
 type AuthImageBannerProps = {
   quote?: string;
   author?: string;
+  imageSrc?: string;
+  imagePosition?: string;
 };
 
 export function AuthImageBanner({
   quote,
   author,
+  imageSrc = "/login_banner.jpg",
+  imagePosition = "center center",
 }: AuthImageBannerProps) {
   const t = useTranslations('Auth');
   const displayQuote = quote || t('bannerQuote');
@@ -30,12 +34,14 @@ export function AuthImageBanner({
         className="relative h-full w-full"
       >
         <Image
-          src="/login_banner.jpg"
+          src={imageSrc}
           alt="Premium Ao Dai Banner"
           fill
           priority
-          sizes="(max-width: 1024px) 0vw, 50vw"
+          unoptimized
+          sizes="(max-width: 1024px) 0vw, 40vw"
           className="object-cover object-center brightness-[0.88]"
+          style={{ objectPosition: imagePosition }}
         />
       </motion.div>
 

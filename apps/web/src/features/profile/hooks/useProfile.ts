@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { type TabId, type Address, type PaymentCard, type Order } from "../types/profile.types";
 import { initialAddresses, initialCards } from "../api/profile.api";
 import { useAuthStore } from "@/features/auth/store/authStore";
+import { type AuthUser } from "@/features/auth/types/auth.types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiClient } from "@/lib/api-client";
 
 // Coordinator Hook
 export function useProfile() {
@@ -15,40 +17,38 @@ export function useProfile() {
   };
 }
 
+function getPersonalInfoFormValues(user: AuthUser | null) {
+  const birthDate = user?.birth ? new Date(user.birth) : undefined;
+
+  return {
+    fullName: user?.name || "",
+    email: user?.email || "",
+    phone: user?.phone || "",
+    gender: user?.gender ? user.gender.toLowerCase() : "other",
+    dob: birthDate
+      ? [
+          birthDate.getFullYear(),
+          String(birthDate.getMonth() + 1).padStart(2, "0"),
+          String(birthDate.getDate()).padStart(2, "0"),
+        ].join("-")
+      : "",
+    avatarUrl: user?.avatar || "",
+  };
+}
+
 // Personal Info Hook
 export function usePersonalInfo() {
   const { user, setUser } = useAuthStore();
   const queryClient = useQueryClient();
+  const initialFormValues = getPersonalInfoFormValues(user);
 
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [gender, setGender] = useState("other");
-  const [dob, setDob] = useState("");
-  const [avatarUrl, setAvatarUrl] = useState("");
+  const [fullName, setFullName] = useState(initialFormValues.fullName);
+  const [email, setEmail] = useState(initialFormValues.email);
+  const [phone, setPhone] = useState(initialFormValues.phone);
+  const [gender, setGender] = useState(initialFormValues.gender);
+  const [dob, setDob] = useState(initialFormValues.dob);
+  const [avatarUrl, setAvatarUrl] = useState(initialFormValues.avatarUrl);
   const [showSuccess, setShowSuccess] = useState(false);
-
-  // Sync form state with Zustand user store when user details load/change
-  useEffect(() => {
-    if (user) {
-      setFullName(user.name || "");
-      setEmail(user.email || "");
-      setPhone(user.phone || "");
-      setGender(user.gender ? user.gender.toLowerCase() : "other");
-      
-      if (user.birth) {
-        const birthDate = new Date(user.birth);
-        const yyyy = birthDate.getFullYear();
-        const mm = String(birthDate.getMonth() + 1).padStart(2, "0");
-        const dd = String(birthDate.getDate()).padStart(2, "0");
-        setDob(`${yyyy}-${mm}-${dd}`);
-      } else {
-        setDob("");
-      }
-      
-      setAvatarUrl(user.avatar || "");
-    }
-  }, [user]);
 
   // React Query Mutation to update profile
   const updateProfileMutation = useMutation({
@@ -59,20 +59,7 @@ export function usePersonalInfo() {
       dob?: string;
       gender?: string;
     }) => {
-      const res = await fetch("/api/user/profile", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.message || "Cập nhật thông tin thất bại");
-      }
-
-      const data = await res.json();
+      const data = await apiClient.put<{ data: AuthUser }>("/api/user/profile", payload);
       return data.data; // safeUser object returned
     },
     onSuccess: (updatedUser) => {
@@ -85,8 +72,9 @@ export function usePersonalInfo() {
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
     },
-    onError: (error: any) => {
-      alert(error.message || "Có lỗi xảy ra trong quá trình cập nhật");
+    onError: (error: unknown) => {
+      const message = error instanceof Error ? error.message : "Có lỗi xảy ra trong quá trình cập nhật";
+      alert(message);
     },
   });
 

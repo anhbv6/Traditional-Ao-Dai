@@ -78,129 +78,189 @@ Backend API nằm tại [`apps/api`](file:///E:/draftcode/learn-ecommerce-shop/a
 ## 🛠️ Chi Tiết Công Nghệ & Thư Viện Sử Dụng
 
 ### 🖥️ Frontend Web (`apps/web`)
-*   **Next.js v16.2.10 (App Router) & React v19.2.4**: Framework chính để dựng giao diện, tối ưu hoá SEO và kết xuất phía máy chủ (SSR).
-*   **TypeScript**: Đảm bảo kiểm soát kiểu dữ liệu chặt chẽ và an toàn.
-*   **Tailwind CSS v4 & PostCSS**: Viết CSS nhanh chóng, tối ưu hóa giao diện responsive.
-*   **Zustand**: Quản lý trạng thái đăng nhập, giỏ hàng, thông tin phiên giao dịch.
-*   **Next-intl v4**: Thư viện xử lý bản địa hoá và dịch đa ngôn ngữ (English / Tiếng Việt).
-*   **Motion (Framer Motion 12) & Lenis**: Thiết lập hiệu ứng chuyển động chất lượng cao và cuộn trang mượt mà.
-*   **Embla Carousel React**: Thư viện làm slider/carousel kéo vuốt mượt mà trên cả desktop và mobile.
-*   **Base UI React & Vaul**: Cung cấp các component nguyên bản không có style (Primitives) và Drawer/Modal hiện đại.
-*   **React Day Picker**: Component lịch trực quan để người dùng chọn ngày tháng.
-*   **Smastrom React Rating**: Component đánh giá sao cho sản phẩm.
-*   **React Hot Toast**: Hiển thị thông báo (toast alerts) dạng pop-up nhanh chóng.
-*   **Date-fns**: Xử lý và định dạng thời gian.
+
+*   **Bộ Khung Cốt Lõi (Core Framework):**
+    *   **Next.js (v16.2.10) (App Router):** Tận dụng Server Components (RSC) để tối ưu hóa SEO và hiệu năng hiển thị.
+    *   **React (v19.2.4):** Phiên bản React mới nhất với nhiều cải tiến về Concurrent Features và hooks.
+    *   **TypeScript (v5):** Đảm bảo an toàn kiểu dữ liệu, giảm thiểu lỗi runtime.
+*   **Thiết Kế Giao Diện & CSS:**
+    *   **Tailwind CSS (v4) & PostCSS:** Engine CSS utility-first biên dịch siêu nhanh và tối ưu hóa CSS bundle.
+    *   **Tailwind Merge & Class Variance Authority (CVA):** Giúp ghép nối các class Tailwind thông minh và định nghĩa các biến thể component linh hoạt.
+*   **Quản Lý Trạng Thái & Fetch Dữ Liệu:**
+    *   **TanStack React Query (v5.101.4):** Quản lý Server State, cơ chế tự động caching, re-validation, và tối ưu hóa đồng bộ dữ liệu với Backend.
+    *   **Zustand (v5.0.15):** Quản lý Client State toàn cục cực kỳ gọn nhẹ và hiệu năng cao.
+*   **Xử Lý Form & Validate Dữ Liệu:**
+    *   **React Hook Form (v7.85.0):** Tối ưu hóa hiệu năng nhập liệu của Form, giảm số lần re-render.
+    *   **Zod (v4.4.3):** Schema validation mạnh mẽ ở cả client và server.
+    *   **@hookform/resolvers:** Cầu nối liên kết schema Zod vào React Hook Form để trả lỗi trực quan.
+*   **Hiệu Ứng & Animation:**
+    *   **Motion (Framer Motion 12):** Thư viện chuẩn để phát triển chuyển động, chuyển trang và hover mượt mà.
+    *   **Lenis Smooth Scroll:** Mang lại trải nghiệm cuộn trang mượt mà (smooth scrolling).
+    *   **OGL (v1.0.11):** Thư viện WebGL siêu nhẹ để vẽ các hiệu ứng tương tác 3D/Canvas phức tạp.
+    *   **DotLottie React & React UseAnimations:** Render các animation vector Lottie chất lượng cao và các biểu tượng tương tác chuyển động nhỏ (micro-animations).
+*   **Các UI Component & Primitives:**
+    *   **Base UI React (v1.6.0):** Các component thô không style (headless components) giúp tùy biến giao diện linh hoạt.
+    *   **Vaul (v1.1.2):** Hỗ trợ làm Drawer kéo vuốt (Bottom Sheet) mượt mà trên mobile.
+    *   **Embla Carousel (v8.6.0):** Slider kéo vuốt đa năng.
+    *   **React Day Picker (v10.0.1):** Lịch chọn ngày phục vụ đặt lịch may đo hoặc hẹn giờ giao nhận.
+    *   **React Rating:** Hệ thống hiển thị và bình chọn số sao sản phẩm.
+    *   **Lucide React & React Icons:** Bộ sưu tập icon đa dạng, tối ưu SVG.
+*   **Đa Ngôn Ngữ & Tiện Ích Khác:**
+    *   **Next-intl (v4.13.2):** Hỗ trợ chuyển đổi ngôn ngữ (i18n) mượt mà dựa trên routing.
+    *   **Date-fns (v4.4.0):** Xử lý định dạng ngày tháng hiển thị đơn hàng, đánh giá.
+    *   **React Hot Toast:** Hệ thống thông báo (Toaster alerts) đẹp mắt.
+*   **Bảo Mật:**
+    *   **@marsidev/react-turnstile:** Tích hợp Cloudflare Turnstile chống spam form đăng ký/đăng nhập.
+    *   **@react-oauth/google:** Đăng nhập trực tiếp bằng tài khoản Google phía client.
 
 ### ⚙️ Backend API (`apps/api`)
-*   **Express.js v4**: Bộ khung web server xử lý định tuyến (Routing) và API endpoints.
-*   **TSX & TypeScript**: Chạy trực tiếp các file TypeScript trong môi trường phát triển và bảo vệ kiểu dữ liệu.
-*   **Cors**: Middleware xử lý phân quyền chia sẻ tài nguyên nguồn gốc chéo (Cross-Origin Resource Sharing).
-*   **Dotenv & Dotenv-cli**: Đọc và nạp các cấu hình môi trường từ file `.env` động.
-*   **Bcryptjs**: Thư viện dùng để mã hoá (hash) mật khẩu của người dùng an toàn.
-*   **Zod**: Xác thực dữ liệu đầu vào (Request validation) trước khi xử lý.
-*   **Swagger UI Express**: Tự động sinh giao diện tài liệu hướng dẫn sử dụng API (API Specification).
 
-### 🗄️ Database & Caching Layer
-*   **PostgreSQL**: Hệ quản trị cơ sở dữ liệu quan hệ mạnh mẽ, tin cậy.
-*   **Prisma ORM v5**: Công cụ lập bản đồ quan hệ đối tượng giúp kết nối và thao tác database dễ dàng.
-*   **Redis v7**: Hệ thống lưu trữ dữ liệu trong bộ nhớ trong (In-memory cache) chạy độc lập qua Docker, phục vụ lưu cache mã OTP và giảm tải cho PostgreSQL.
-*   **Docker & Docker Compose**: Công cụ đóng gói container để chuẩn hoá môi trường chạy cơ sở dữ liệu phụ trợ (Redis).
+*   **Bộ Khung API Server:**
+    *   **Express.js (v4.22.2):** Framework phổ biến để xây dựng RESTful API Server.
+    *   **TSX (v4.7.1) & TS-Node-Dev (v2.0.0):** Trình biên dịch chạy code TypeScript trực tiếp, hỗ trợ Hot-Reload cực nhanh khi phát triển.
+    *   **TypeScript (v5.9.3):** Đảm bảo tính nhất quán của dữ liệu từ Database lên API.
+*   **Xác Thực & Bảo Mật:**
+    *   **JSONWebToken (JWT) (v9.0.3):** Xử lý mã hóa và giải mã Access Token & Refresh Token phục vụ đăng nhập bảo mật.
+    *   **Bcryptjs (v3.0.3):** Mã hoá một chiều mật khẩu trước khi lưu trữ vào Database.
+    *   **Google Auth Library (v11.0.2):** Thư viện chính thức xác thực OAuth2 token từ Google trên server.
+*   **Giao Tiếp Dịch Vụ & Database:**
+    *   **IoRedis (v6.0.0):** Kết nối đến máy chủ Redis để quản lý session và lưu trữ OTP.
+    *   **Nodemailer (v9.0.5):** Gửi email chứa mã xác thực OTP hoặc hóa đơn mua hàng.
+    *   **Cors (v2.8.6):** Middleware kiểm soát chính sách chia sẻ tài nguyên nguồn gốc chéo an toàn.
+*   **Xác Thực Đầu Vào & Tài Liệu:**
+    *   **Zod (v4.4.3):** Middleware kiểm tra kiểu dữ liệu đầu vào của các API request.
+    *   **Swagger JSDoc & Swagger UI Express:** Tự động biên dịch comment JSDoc thành file đặc tả OpenAPI và hiển thị thành giao diện Web UI chuyên nghiệp tại route `/api-docs`.
+
+### 🗄️ Database Layer (`packages/db`)
+
+*   **Prisma ORM (v5.12.0):** Bộ công cụ ORM thế hệ mới giúp thao tác dữ liệu qua các hàm TypeScript cực kỳ an toàn mà không cần viết SQL thuần.
+*   **PostgreSQL:** Hệ quản trị cơ sở dữ liệu quan hệ mạnh mẽ lưu giữ mọi thông tin nghiệp vụ.
+*   **Dotenv-cli:** Giúp nạp động file môi trường phục vụ cho các câu lệnh migrate và generate của Prisma.
 
 ---
 
-## 📦 Hướng Dẫn Cài Đặt Chung
+## 📦 Hướng Dẫn Cài Đặt Chung Chi Tiết
 
-### Điều kiện cần
-- Node.js >= 18.x
-- Cài đặt sẵn PNPM: `npm install -g pnpm`
-- Đã cài đặt và khởi chạy **Docker Desktop** trên máy.
+Vui lòng chuẩn bị sẵn các môi trường sau trước khi cài đặt:
+- **Node.js** phiên bản từ `18.x` trở lên.
+- **PNPM** cài đặt toàn cục: `npm install -g pnpm`.
+- **Docker Desktop** (dành cho chạy Redis và các dịch vụ phụ trợ).
+- Một cơ sở dữ liệu **PostgreSQL** (chạy local hoặc cloud).
 
-### Các bước chuẩn bị chung
-1. **Clone repository về máy:**
+### Các bước cài đặt:
+
+1. **Tải mã nguồn về máy cục bộ:**
    ```bash
-   git clone <url-du-an>
+   git clone <url-kho-chua-cua-ban>
    cd learn-ecommerce-shop
    ```
-2. **Cài đặt dependencies toàn hệ thống:**
+
+2. **Cài đặt toàn bộ dependencies trong monorepo:**
+   Sử dụng PNPM để cài đặt đồng thời thư viện cho cả root, web, api và db:
    ```bash
    pnpm install
    ```
-3. **Thiết lập file cấu hình môi trường:**
-   Sao chép file `.env.example` thành `.env` trong thư mục [`apps/api`](file:///E:/draftcode/learn-ecommerce-shop/apps/api):
+
+3. **Cấu hình các biến môi trường:**
+   Sao chép file cấu hình mẫu `.env.example` thành file cấu hình chính thức `.env` đặt bên trong thư mục [`apps/api`](file:///E:/draftcode/learn-ecommerce-shop/apps/api):
    ```bash
    cp apps/api/.env.example apps/api/.env
    ```
-   *Mở file `apps/api/.env` ra và điền các thông tin kết nối DB PostgreSQL và Redis của bạn.*
+
+4. **Khai báo thông số trong file `apps/api/.env`:**
+   Mở file [`apps/api/.env`](file:///E:/draftcode/learn-ecommerce-shop/apps/api/.env) và điền đầy đủ các thông số sau:
+   ```env
+   PORT=3001
+   NODE_ENV=development
+   
+   # Kết nối CSDL PostgreSQL (Hãy thay thế bằng thông tin của bạn)
+   DATABASE_URL="postgresql://postgres:postgres@localhost:5432/ecommerce?schema=public"
+   
+   # Cấu hình khóa bảo mật JWT (Dạng chuỗi Base64 hoặc ký tự bảo mật)
+   JWT_PRIVATE_KEY="chuỗi_private_key_của_bạn"
+   JWT_PUBLIC_KEY="chuỗi_public_key_của_bạn"
+   JWT_EXPIRES_IN="15m"
+   JWT_REFRESH_EXPIRES_IN="7d"
+   
+   # URL Frontend để cấu hình CORS
+   FRONTEND_URL="http://localhost:3000"
+
+   # Cấu hình kết nối tới Redis
+   REDIS_HOST=localhost
+   REDIS_PORT=6379
+   REDIS_PASSWORD=
+   OTP_TTL_SECONDS=300
+   ```
 
 ---
 
-## 🚀 Hướng Dẫn Khởi Chạy Từng Phần
+## 🚀 Hướng Dẫn Khởi Chạy Từng Phần & Câu Lệnh Chi Tiết
 
-Để quản lý dự án dễ dàng, bạn có thể khởi chạy từng dịch vụ riêng biệt theo thứ tự dưới đây:
+**⚠️ QUAN TRỌNG:** Để dự án không bị lỗi kết nối, bạn **bắt buộc** phải khởi chạy các dịch vụ theo đúng thứ tự 4 bước sau:
 
-### 🧩 Phần 1: Khởi chạy dịch vụ phụ trợ (Redis)
-Dịch vụ Redis được đóng gói qua Docker. Tại thư mục gốc của dự án, hãy chạy:
+### Step 1: Khởi chạy dịch vụ phụ trợ (Redis Container)
+Chạy dịch vụ Redis trên máy ảo Docker thông qua Docker Compose ở thư mục gốc:
 ```bash
 docker compose up -d
 ```
-*   **Kiểm tra trạng thái:** Dùng lệnh `docker compose ps` để đảm bảo container `shop-redis` đang chạy ở cổng `6379`.
-*   **Dừng dịch vụ:** Khi không sử dụng nữa, chạy `docker compose down`.
+*   **Giải thích:** Lệnh này tải ảnh `redis:7-alpine` và khởi động một Redis server chạy ngầm ở cổng `6379`. Dùng làm kho chứa tạm mã OTP gửi đến điện thoại/email khách hàng.
+*   **Các lệnh bổ trợ hữu ích:**
+    *   *Dừng dịch vụ:* `docker compose down`
+    *   *Xem nhật ký hoạt động (Logs):* `docker compose logs -f redis`
+    *   *Kiểm tra dữ liệu bên trong:* `docker exec -it shop-redis redis-cli` (gõ `keys *` để xem toàn bộ dữ liệu đang cache).
 
----
+### Step 2: Khởi tạo và Đồng bộ hóa Cơ sở dữ liệu (PostgreSQL & Prisma)
+Khi database PostgreSQL của bạn đã được bật, chạy các lệnh sau từ thư mục gốc của monorepo:
 
-### 🗄️ Phần 2: Đồng bộ và Khởi tạo Cơ sở dữ liệu (PostgreSQL)
-Sau khi database PostgreSQL của bạn đã sẵn sàng hoạt động, hãy chạy các lệnh sau từ thư mục gốc:
-
-1. **Sinh mã Prisma Client:**
+1. **Khởi tạo mã nguồn Prisma Client (TypeScript Types):**
    ```bash
    pnpm db:generate
    ```
-2. **Đồng bộ cấu hình bảng (Migration):**
+   *   **Tác dụng:** Lệnh này đọc file `schema.prisma` và tự động biên dịch thành các kiểu dữ liệu TypeScript tương ứng cho ứng dụng sử dụng.
+
+2. **Chạy Migration để tạo cấu trúc bảng:**
    ```bash
    pnpm db:migrate
    ```
-3. **Khởi tạo dữ liệu mẫu (Seed) - Tạo tài khoản Admin mặc định:**
+   *   **Tác dụng:** Đồng bộ các bảng như `User`, `Product`, `Order`... vào database PostgreSQL local của bạn.
+
+3. **Khởi tạo dữ liệu mẫu (Seeding):**
    ```bash
    pnpm --filter @repo/db seed
    ```
-   *Tài khoản Admin mặc định sẽ được tạo là `admin@gmail.com` với mật khẩu `123`.*
+   *   **Tác dụng:** Thực thi file `seed.ts` để tạo tài khoản Admin mặc định đăng nhập hệ thống: **Email:** `admin@gmail.com` / **Mật khẩu:** `123`.
 
----
-
-### ⚙️ Phần 3: Khởi chạy Backend API Server
-Để chạy máy chủ API (Express.js), thực hiện lệnh sau tại thư mục gốc:
+### Step 3: Khởi chạy Backend API Server (Express.js)
+Để bắt đầu chạy server API, thực thi câu lệnh sau tại thư mục gốc:
 ```bash
 pnpm --filter @repo/api dev
 ```
-*   **Địa chỉ API:** Chạy tại [http://localhost:3001](http://localhost:3001)
-*   **Tài liệu API (Swagger UI):** Xem trực quan cấu trúc và test các endpoint tại [http://localhost:3001/api-docs](http://localhost:3001/api-docs)
+*   **Giải thích:** Lệnh này chạy server bằng công cụ `tsx` để theo dõi và cập nhật trực tiếp thay đổi trong thư mục `apps/api`.
+*   **Đầu ra:**
+    *   API chạy tại địa chỉ: [http://localhost:3001](http://localhost:3001)
+    *   Giao diện tài liệu Swagger API: [http://localhost:3001/api-docs](http://localhost:3001/api-docs) (Nơi bạn có thể test trực tiếp các API đăng nhập, lấy sản phẩm).
 
----
-
-### 💻 Phần 4: Khởi chạy Frontend Web Client
-Để chạy ứng dụng giao diện Next.js, thực hiện lệnh sau tại thư mục gốc:
+### Step 4: Khởi chạy Frontend Web Storefront (Next.js)
+Để chạy giao diện website Next.js, thực thi câu lệnh sau tại thư mục gốc:
 ```bash
 pnpm --filter @repo/web dev
 ```
-*   **Địa chỉ Web:** Truy cập tại [http://localhost:3000](http://localhost:3000)
+*   **Giải thích:** Khởi chạy máy chủ phát triển Next.js.
+*   **Đầu ra:**
+    *   Truy cập giao diện Web tại địa chỉ: [http://localhost:3000](http://localhost:3000) (Hệ thống sẽ tự nhận diện ngôn ngữ và điều hướng về `/vi` hoặc `/en`).
 
 ---
 
-## ⚡ Mẹo chạy nhanh toàn bộ dự án
-Nếu bạn muốn chạy song song cả **Backend API** và **Frontend Web** cùng một lúc sau khi đã chuẩn bị xong cơ sở dữ liệu, chỉ cần chạy một lệnh duy nhất tại thư mục gốc:
-```bash
-pnpm dev
-```
+## ⚡ Lệnh Chạy Toàn Bộ Dự Án Song Song (Cách Nhanh Nhất)
 
----
+Sau khi bạn đã hoàn thành việc setup Database ở lần đầu, ở những lần chạy sau, bạn chỉ cần thực hiện 2 lệnh siêu nhanh sau để mở dự án:
 
-## 🐳 Các lệnh quản lý Docker & Redis hữu ích khi Debug
-*   **Xem logs của container Redis:**
-    ```bash
-    docker compose logs -f redis
-    ```
-*   **Truy cập vào CLI của Redis để kiểm tra keys/OTP:**
-    ```bash
-    docker exec -it shop-redis redis-cli
-    ```
-    *Ví dụ gõ lệnh `keys *` để xem danh sách mã OTP đang lưu trong cache.*
+1. **Bật Redis:**
+   ```bash
+   docker compose up -d
+   ```
+2. **Khởi chạy đồng thời cả FE Web & BE API:**
+   ```bash
+   pnpm dev
+   ```
+   *Lệnh này sẽ tự động chạy song song hai câu lệnh ở Step 3 và Step 4 mà không cần bạn phải mở nhiều cửa sổ terminal khác nhau.*

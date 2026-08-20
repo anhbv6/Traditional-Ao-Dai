@@ -1,5 +1,5 @@
 import { prisma } from '@repo/db'
-import { createHash, randomBytes } from 'crypto'
+import { createHash, randomBytes, randomUUID } from 'crypto'
 import { OAuth2Client } from 'google-auth-library'
 import { comparePassword, hashPassword } from '../../../shared/utils/password'
 import { generateAccessToken, generateRefreshToken, JWTPayload, verifyToken } from '../../../shared/utils/jwt'
@@ -24,21 +24,80 @@ import { verifyOtp, generateOtp } from '../../otp/otp.service'
 import { mailProvider } from '../../../shared/utils/mail'
 import { redis } from '../../../shared/utils/redis'
 
-function buildAuthTokens(user: { id: string; role: JWTPayload['role'] }, sessionId: string) {
+const SESSION_REFRESH_EXPIRES_IN = '24h'
+const REMEMBER_REFRESH_EXPIRES_IN = '7d'
+
+function getRefreshTokenPolicy(rememberMe: boolean) {
+  const expiresIn = rememberMe ? REMEMBER_REFRESH_EXPIRES_IN : SESSION_REFRESH_EXPIRES_IN
+
+  return {
+    expiresIn,
+    expiresAt: new Date(Date.now() + durationToMs(expiresIn)),
+    rememberMe,
+  }
+}
+
+function buildAuthTokens(
+  user: { id: string; role: JWTPayload['role'] },
+  sessionId: string,
+  options: { familyId: string; refreshExpiresIn: string; rememberMe: boolean }
+) {
   const payload = {
     userId: user.id,
     role: user.role,
     sessionId,
+    familyId: options.familyId,
+    rememberMe: options.rememberMe,
   }
 
   return {
     accessToken: generateAccessToken(payload),
-    refreshToken: generateRefreshToken(payload),
+    refreshToken: generateRefreshToken(payload, options.refreshExpiresIn),
   }
 }
 
 function hashToken(token: string) {
   return createHash('sha256').update(token).digest('hex')
+}
+
+async function createClientSession(
+  user: { id: string; role: JWTPayload['role'] },
+  meta: SessionMeta,
+  rememberMe: boolean
+) {
+  const refreshPolicy = getRefreshTokenPolicy(rememberMe)
+  const sessionId = randomUUID()
+  const familyId = sessionId
+  const tokens = buildAuthTokens(user, sessionId, {
+    familyId,
+    refreshExpiresIn: refreshPolicy.expiresIn,
+    rememberMe,
+  })
+
+  await prisma.userSession.create({
+    data: {
+      id: sessionId,
+      userId: user.id,
+      refreshToken: hashToken(tokens.refreshToken),
+      familyId,
+      deviceInfo: meta.deviceInfo,
+      ipAddress: meta.ipAddress,
+      expiresAt: refreshPolicy.expiresAt,
+    },
+  })
+
+  return {
+    ...tokens,
+    refreshTokenExpiresAt: refreshPolicy.expiresAt,
+    rememberMe,
+  }
+}
+
+async function revokeRefreshTokenFamily(familyId: string) {
+  await prisma.userSession.updateMany({
+    where: { familyId },
+    data: { isRevoked: true },
+  })
 }
 
 const RESET_TOKEN_TTL_SECONDS = 600
@@ -135,6 +194,7 @@ export async function clientRegister(input: RegisterInput['body']) {
 export async function clientLogin(input: LoginInput['body'], meta: SessionMeta = {}) {
   const emailOrPhone = input.email.trim()
   const password = input.password
+  const rememberMe = input.rememberMe ?? false
 
   // Find user by email or phone depending on input format
   const isEmail = emailOrPhone.includes('@')
@@ -157,31 +217,12 @@ export async function clientLogin(input: LoginInput['body'], meta: SessionMeta =
     throw new AppError(401, 'Incorrect password.')
   }
 
-  const refreshExpiresAt = new Date(Date.now() + durationToMs(env.JWT_REFRESH_EXPIRES_IN))
-  const session = await prisma.userSession.create({
-    data: {
-      userId: user.id,
-      refreshToken: '',
-      deviceInfo: meta.deviceInfo,
-      ipAddress: meta.ipAddress,
-      expiresAt: refreshExpiresAt,
-    },
-  })
-
-  const tokens = buildAuthTokens(user, session.id)
-
-  await prisma.userSession.update({
-    where: { id: session.id },
-    data: {
-      refreshToken: hashToken(tokens.refreshToken),
-    },
-  })
+  const tokens = await createClientSession(user, meta, rememberMe)
 
   // Return user info excluding password and include token
   const { password: _, ...safeUser } = user
   return {
     ...tokens,
-    refreshTokenExpiresAt: refreshExpiresAt,
     user: safeUser,
   }
 }
@@ -220,30 +261,11 @@ export async function clientLoginWithOtp(input: OtpLoginInput['body'], meta: Ses
     user.isPhoneVerified = true
   }
 
-  const refreshExpiresAt = new Date(Date.now() + durationToMs(env.JWT_REFRESH_EXPIRES_IN))
-  const session = await prisma.userSession.create({
-    data: {
-      userId: user.id,
-      refreshToken: '',
-      deviceInfo: meta.deviceInfo,
-      ipAddress: meta.ipAddress,
-      expiresAt: refreshExpiresAt,
-    },
-  })
-
-  const tokens = buildAuthTokens(user, session.id)
-
-  await prisma.userSession.update({
-    where: { id: session.id },
-    data: {
-      refreshToken: hashToken(tokens.refreshToken),
-    },
-  })
+  const tokens = await createClientSession(user, meta, false)
 
   const { password: _, ...safeUser } = user
   return {
     ...tokens,
-    refreshTokenExpiresAt: refreshExpiresAt,
     user: safeUser,
   }
 }
@@ -260,43 +282,81 @@ export async function refreshClientToken(input: RefreshTokenInput['body']) {
     throw new AppError(401, 'Invalid or expired refresh token')
   }
 
-  if (decoded.tokenType !== 'refresh' || !decoded.sessionId) {
+  if (decoded.tokenType !== 'refresh' || !decoded.sessionId || !decoded.familyId) {
     throw new AppError(401, 'Invalid refresh token type')
   }
 
-  const session = await prisma.userSession.findFirst({
+  const currentRefreshTokenHash = hashToken(input.refreshToken)
+  const session = await prisma.userSession.findUnique({
     where: {
-      id: decoded.sessionId,
-      userId: decoded.userId,
-      refreshToken: hashToken(input.refreshToken),
-      expiresAt: {
-        gt: new Date(),
-      },
+      refreshToken: currentRefreshTokenHash,
     },
     include: {
       user: true,
     },
   })
 
-  if (!session || !session.user.isActive || session.user.role !== 'CUSTOMER') {
+  if (!session) {
+    await revokeRefreshTokenFamily(decoded.familyId)
+    throw new AppError(401, 'Refresh token has been reused. Session family revoked.')
+  }
+
+  if (
+    session.id !== decoded.sessionId ||
+    session.familyId !== decoded.familyId ||
+    session.userId !== decoded.userId ||
+    session.isRevoked ||
+    session.expiresAt <= new Date() ||
+    !session.user.isActive ||
+    session.user.role !== 'CUSTOMER'
+  ) {
     throw new AppError(401, 'Session expired or revoked')
   }
 
-  const refreshExpiresAt = new Date(Date.now() + durationToMs(env.JWT_REFRESH_EXPIRES_IN))
-  const tokens = buildAuthTokens(session.user, session.id)
+  const rememberMe = decoded.rememberMe === true
+
+  if (!rememberMe) {
+    const tokens = {
+      accessToken: generateAccessToken({
+        userId: session.user.id,
+        role: session.user.role,
+        sessionId: session.id,
+        familyId: session.familyId,
+        rememberMe,
+      }),
+    }
+
+    const { password: _, ...safeUser } = session.user
+    return {
+      ...tokens,
+      refreshToken: undefined,
+      refreshTokenExpiresAt: session.expiresAt,
+      rememberMe,
+      user: safeUser,
+    }
+  }
+
+  const refreshPolicy = getRefreshTokenPolicy(true)
+  const tokens = buildAuthTokens(session.user, session.id, {
+    familyId: session.familyId,
+    refreshExpiresIn: refreshPolicy.expiresIn,
+    rememberMe,
+  })
 
   await prisma.userSession.update({
     where: { id: session.id },
     data: {
       refreshToken: hashToken(tokens.refreshToken),
-      expiresAt: refreshExpiresAt,
+      expiresAt: refreshPolicy.expiresAt,
+      isRevoked: false,
     },
   })
 
   const { password: _, ...safeUser } = session.user
   return {
     ...tokens,
-    refreshTokenExpiresAt: refreshExpiresAt,
+    refreshTokenExpiresAt: refreshPolicy.expiresAt,
+    rememberMe,
     user: safeUser,
   }
 }
@@ -491,32 +551,14 @@ export async function clientLoginWithGoogle(credential: string, meta: SessionMet
       }
     }
 
-    // Create session & tokens
-    const refreshExpiresAt = new Date(Date.now() + durationToMs(env.JWT_REFRESH_EXPIRES_IN))
-    const session = await prisma.userSession.create({
-      data: {
-        userId: user.id,
-        refreshToken: '',
-        deviceInfo: meta.deviceInfo || null,
-        ipAddress: meta.ipAddress || null,
-        expiresAt: refreshExpiresAt,
-      },
-    })
-
-    const tokens = buildAuthTokens(user, session.id)
-
-    await prisma.userSession.update({
-      where: { id: session.id },
-      data: {
-        refreshToken: hashToken(tokens.refreshToken),
-      },
-    })
+    const tokens = await createClientSession(user, meta, false)
 
     return {
       user,
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
-      refreshTokenExpiresAt: refreshExpiresAt,
+      refreshTokenExpiresAt: tokens.refreshTokenExpiresAt,
+      rememberMe: tokens.rememberMe,
     }
   } catch (error: any) {
     if (error instanceof AppError) throw error

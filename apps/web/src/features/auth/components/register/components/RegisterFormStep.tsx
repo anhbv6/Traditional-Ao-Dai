@@ -13,6 +13,7 @@ import type { UseFormHandleSubmit, UseFormRegister, UseFormSetValue, UseFormWatc
 import type { RegisterFormData } from '../../../types/register.types';
 import { cn } from '@/lib/utils';
 import { GoogleAuthButton } from '../../GoogleAuthButton';
+import { AuthHeader } from '../../AuthHeader';
 
 export interface RegisterFormStepProps {
   t: (key: string, values?: Record<string, string | number | Date>) => string;
@@ -204,20 +205,11 @@ export function RegisterFormStep({
   return (
     <>
       {/* Header */}
-      <div className="space-y-2 text-center lg:text-left">
-        <motion.h2
-          variants={itemVariants}
-          className="font-[family-name:var(--font-playfair)] text-2xl font-semibold leading-tight text-[var(--primary-color)] sm:text-4xl"
-        >
-          {t('signupTitle')}
-        </motion.h2>
-        <motion.p
-          variants={itemVariants}
-          className="font-[family-name:var(--font-lora)] text-xs sm:text-sm text-[var(--text-light)]"
-        >
-          {t('signupSubtitle')}
-        </motion.p>
-      </div>
+      <AuthHeader
+        title={t('signupTitle')}
+        subtitle={t('signupSubtitle')}
+        itemVariants={itemVariants}
+      />
 
       {/* Form */}
       <motion.form
@@ -394,7 +386,7 @@ export function RegisterFormStep({
             type={showPassword ? 'text' : 'password'}
             label={t('confirmPassword')}
             tooltip={confirmPasswordTooltip}
-            placeholder={t('passwordPlaceholder')}
+            placeholder={t('confirmPasswordPlaceholder')}
             isInvalid={hasConfirmPasswordError}
             error={errors.confirmPassword?.message}
             isSuccess={isConfirmPasswordSuccess}
@@ -419,7 +411,7 @@ export function RegisterFormStep({
               htmlFor="agreeTerms"
               className="cursor-pointer text-[var(--text-light)] hover:text-[var(--text-main)] transition-colors select-none leading-relaxed font-medium flex items-center gap-1"
             >
-              <span>{t('agreeTerms')}</span>
+              <span className='text-nowrap'>{t('agreeTerms')}</span>
               <InlineValidationTooltip
                 id="agreeTerms"
                 content={
