@@ -8,10 +8,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { type RegisterFormData } from '../types/register.types';
 import { createRegisterSchema } from '../validations/register.validation';
-import { registerApi, sendOtpApi, checkEmailApi, checkPhoneApi } from '../api/register.api';
 import { showToast } from '@/components/ui/toast';
-import { HttpError, getErrorMessage } from '@/lib/api-client';
+import { getErrorMessage } from '@/lib/api-client';
 import { withMinDelay } from '@/lib/utils';
+import { checkEmailApi, checkPhoneApi, registerApi } from '../api/register.api';
+import { getMeApi, loginWithGoogleApi, sendOtpApi } from '../api/auth.api';
+import { useAuthStore } from '../store/authStore';
 
 export function useRegister() {
   const t = useTranslations('Auth');
@@ -300,7 +302,28 @@ export function useRegister() {
     }
   };
 
-  const handleGoogleSignUp = () => {};
+  const handleGoogleSignUp = async (credential: string) => {
+    try {
+      setIsRegistering(true);
+      const res = await loginWithGoogleApi(credential);
+
+      const { setAccessToken, setAuthenticated, setLoading } = useAuthStore.getState();
+      setAccessToken(res.data.accessToken);
+
+      const me = await getMeApi();
+      setAuthenticated(res.data.accessToken, me.data);
+      setLoading(false);
+
+      showToast.success(t('success') || 'Đăng nhập thành công!');
+      router.push('/');
+      router.refresh();
+    } catch (err: unknown) {
+      console.error('Google sign up failed:', err);
+      showToast.error(getErrorMessage(err, 'Đăng nhập Google thất bại'));
+    } finally {
+      setIsRegistering(false);
+    }
+  };
 
   return {
     t,

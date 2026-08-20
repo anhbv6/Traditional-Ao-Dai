@@ -274,7 +274,7 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
                 <label
                   htmlFor={id}
                   className={cn(
-                    'block font-[family-name:var(--font-lora)] text-xs font-semibold uppercase tracking-wider text-[var(--text-main)]',
+                    'block font-[family-name:var(--font-lora)] text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[var(--text-main)]',
                     labelClassName
                   )}
                 >

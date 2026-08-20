@@ -2,9 +2,9 @@
 
 import React, { useState } from 'react';
 import { AuthImageBanner } from '@/features/auth/components/AuthImageBanner';
-import { ForgotForm } from '@/features/auth/components/ForgotForm';
-import { VerifyOtpForm } from '@/features/auth/components/VerifyOtpForm';
-import { ChangePasswordForm } from '@/features/auth/components/ChangePasswordForm';
+import { ForgotForm } from '@/features/auth/components/forgot/ForgotForm';
+import { VerifyOtpForm } from '@/features/auth/components/forgot/VerifyOtpForm';
+import { ChangePasswordForm } from '@/features/auth/components/forgot/ChangePasswordForm';
 
 export default function ForgotPage() {
   const [step, setStep] = useState<'forgot' | 'verify' | 'reset'>('forgot');

@@ -1,22 +1,23 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Eye, EyeOff, ArrowRight, Smartphone, Mail, RefreshCw, CheckCircle2 } from 'lucide-react';
+import type { Variants } from 'motion/react';
+import { Eye, EyeOff, ArrowRight, Smartphone, Mail, RefreshCw, CheckCircle2, XCircle } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { FormInput } from '@/components/shared/FormInput';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { GoogleLogin } from '@react-oauth/google';
 import { showToast } from '@/components/ui/toast';
 import { InlineValidationTooltip } from './InlineValidationTooltip';
 import { TooltipChecklist } from './TooltipChecklist';
-import type { UseFormRegister, UseFormSetValue, UseFormWatch, FieldErrors } from 'react-hook-form';
+import type { UseFormHandleSubmit, UseFormRegister, UseFormSetValue, UseFormWatch, FieldErrors } from 'react-hook-form';
 import type { RegisterFormData } from '../../../types/register.types';
 import { cn } from '@/lib/utils';
+import { GoogleAuthButton } from '../../GoogleAuthButton';
 
 export interface RegisterFormStepProps {
-  t: (key: string, values?: any) => string;
+  t: (key: string, values?: Record<string, string | number | Date>) => string;
   register: UseFormRegister<RegisterFormData>;
-  handleSubmit: any;
+  handleSubmit: UseFormHandleSubmit<RegisterFormData>;
   errors: FieldErrors<RegisterFormData>;
   watch: UseFormWatch<RegisterFormData>;
   setValue: UseFormSetValue<RegisterFormData>;
@@ -36,7 +37,7 @@ export interface RegisterFormStepProps {
   validationTooltipSignal: number;
   validationTooltipTarget: string | undefined;
   loginWithGoogle: (credential: string) => void;
-  itemVariants: any;
+  itemVariants: Variants;
   setIsOtpStep: (val: boolean) => void;
   otpSentOnce: boolean;
 }
@@ -203,16 +204,16 @@ export function RegisterFormStep({
   return (
     <>
       {/* Header */}
-      <div className="space-y-3 text-center lg:text-left">
+      <div className="space-y-2 text-center lg:text-left">
         <motion.h2
           variants={itemVariants}
-          className="font-[family-name:var(--font-playfair)] text-3xl font-semibold leading-tight text-[var(--primary-color)] sm:text-4xl"
+          className="font-[family-name:var(--font-playfair)] text-2xl font-semibold leading-tight text-[var(--primary-color)] sm:text-4xl"
         >
           {t('signupTitle')}
         </motion.h2>
         <motion.p
           variants={itemVariants}
-          className="font-[family-name:var(--font-lora)] text-sm text-[var(--text-light)]"
+          className="font-[family-name:var(--font-lora)] text-xs sm:text-sm text-[var(--text-light)]"
         >
           {t('signupSubtitle')}
         </motion.p>
@@ -264,6 +265,9 @@ export function RegisterFormStep({
                   {!isCheckingEmail && emailCheckResult === 'available' && (
                     <CheckCircle2 size={15} className="text-green-600" />
                   )}
+                  {!isCheckingEmail && emailCheckResult === 'taken' && (
+                    <XCircle size={15} className="text-red-500" />
+                  )}
                   <button
                     type="button"
                     onClick={() => {
@@ -278,13 +282,6 @@ export function RegisterFormStep({
                     <Smartphone size={16} />
                   </button>
                 </div>
-              }
-              helperText={
-                isCheckingEmail ? (
-                  <span className="flex items-center gap-1 font-semibold text-gray-500">
-                    {t('emailChecking')}
-                  </span>
-                ) : undefined
               }
               {...register('email')}
             />
@@ -321,6 +318,9 @@ export function RegisterFormStep({
                     {!isCheckingPhone && phoneCheckResult === 'available' && (
                       <CheckCircle2 size={15} className="text-green-600" />
                     )}
+                    {!isCheckingPhone && phoneCheckResult === 'taken' && (
+                      <XCircle size={15} className="text-red-500" />
+                    )}
                     <button
                       type="button"
                       onClick={() => {
@@ -335,13 +335,6 @@ export function RegisterFormStep({
                       <Mail size={16} />
                     </button>
                   </div>
-                }
-                helperText={
-                  isCheckingPhone ? (
-                    <span className="flex items-center gap-1 font-semibold text-gray-500">
-                      {t('phoneChecking')}
-                    </span>
-                  ) : undefined
                 }
                 {...register('phone')}
               />
@@ -447,20 +440,20 @@ export function RegisterFormStep({
           type="submit"
           data-tooltip-submit="true"
           disabled={isRegistering || isCheckingEmail || isCheckingPhone}
-          className="w-full h-12 bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/95 shadow-sm transition-all hover:shadow duration-300 flex items-center justify-center gap-2 group/btn font-semibold tracking-wider text-xs uppercase rounded-lg mt-2 cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
+          className="w-full h-10 sm:h-11 bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/95 shadow-sm transition-all hover:shadow duration-300 flex items-center justify-center gap-2 group/btn font-semibold tracking-wider text-[11px] sm:text-xs uppercase rounded-lg mt-2 cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
         >
           {isRegistering ? (
             <RefreshCw size={14} className="animate-spin" />
           ) : (
             <>
               <span>{t('signin')}</span>
-              <ArrowRight size={14} className="transition-transform group-hover/btn:translate-x-1" />
+              <ArrowRight size={13} className="transition-transform group-hover/btn:translate-x-1" />
             </>
           )}
         </Button>
 
         {/* Divider */}
-        <div className="relative flex py-2 items-center">
+        <div className="relative flex py-1.5 sm:py-2.5 items-center">
           <div className="flex-grow border-t border-[var(--border)]"></div>
           <span className="flex-shrink mx-4 text-[var(--text-light)] text-[10px] font-bold uppercase tracking-widest">
             {t('orContinueWith')}
@@ -470,18 +463,11 @@ export function RegisterFormStep({
 
         {/* Google Sign-Up Button */}
         <div className="w-full flex justify-center">
-          <GoogleLogin
-            onSuccess={(credentialResponse) => {
-              if (credentialResponse.credential) {
-                loginWithGoogle(credentialResponse.credential);
-              }
-            }}
-            onError={() => {
-              showToast.error(t('googleLoginFailed') || 'Đăng nhập Google thất bại');
-            }}
-            theme="outline"
-            size="large"
-            width="380"
+          <GoogleAuthButton
+            label={t('continueWithGoogle')}
+            onCredential={loginWithGoogle}
+            onError={() => showToast.error(t('googleLoginFailed') || 'Đăng nhập Google thất bại')}
+            disabled={isRegistering}
           />
         </div>
       </motion.form>
@@ -489,7 +475,7 @@ export function RegisterFormStep({
       {/* Footer Link */}
       <motion.p
         variants={itemVariants}
-        className="text-center font-[family-name:var(--font-lora)] text-xs text-[var(--text-light)]"
+        className="text-center font-[family-name:var(--font-lora)] text-[11px] sm:text-xs text-[var(--text-light)]"
       >
         {t('alreadyHaveAccount')}{' '}
         <Link

@@ -45,20 +45,11 @@ export function RegisterForm() {
     otpSentOnce,
   } = useRegister();
 
-  // OTP Verification States & Refs
-  const [otpArray, setOtpArray] = useState<string[]>(Array(6).fill(''));
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-
   // Timer states for Resending OTP
   const [timer, setTimer] = useState(0);
   const [canResend, setCanResend] = useState(true);
 
   const phoneValue = watch('phone') || '';
-
-  // Synchronize 6-digit array into hook's OTP input string
-  useEffect(() => {
-    setOtpInput(otpArray.join(''));
-  }, [otpArray, setOtpInput]);
 
   // Handle countdown timer for Resend OTP
   useEffect(() => {
@@ -72,62 +63,20 @@ export function RegisterForm() {
     return () => clearInterval(interval);
   }, [timer]);
 
-  // Auto-focus first input when OTP step opens
+  // Trigger actions when OTP step opens
   useEffect(() => {
     if (isOtpStep) {
-      setTimeout(() => {
-        inputRefs.current[0]?.focus();
-      }, 100);
       setTimer(60); // 60s cooldown
       setCanResend(false);
-      setOtpArray(Array(6).fill(''));
+      setOtpInput('');
     }
-  }, [isOtpStep]);
-
-  const handleChange = (val: string, idx: number) => {
-    // Only accept numeric digits
-    if (!/^\d*$/.test(val)) return;
-
-    const newOtp = [...otpArray];
-    newOtp[idx] = val.slice(-1);
-    setOtpArray(newOtp);
-
-    // Auto-focus next input
-    if (val && idx < 5) {
-      inputRefs.current[idx + 1]?.focus();
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent, idx: number) => {
-    if (e.key === 'Backspace') {
-      const newOtp = [...otpArray];
-      if (!otpArray[idx] && idx > 0) {
-        // Clear previous input and focus it
-        newOtp[idx - 1] = '';
-        setOtpArray(newOtp);
-        inputRefs.current[idx - 1]?.focus();
-      } else {
-        // Clear current input
-        newOtp[idx] = '';
-        setOtpArray(newOtp);
-      }
-    }
-  };
-
-  const handlePaste = (e: React.ClipboardEvent) => {
-    e.preventDefault();
-    const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
-    if (pastedData.length === 6) {
-      setOtpArray(pastedData.split(''));
-      inputRefs.current[5]?.focus();
-    }
-  };
+  }, [isOtpStep, setOtpInput]);
 
   const handleResend = async () => {
     await handleResendOtp();
     setTimer(60);
     setCanResend(false);
-    setOtpArray(Array(6).fill(''));
+    setOtpInput('');
   };
 
   const containerVariants = {
@@ -154,7 +103,7 @@ export function RegisterForm() {
   };
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-[var(--bg-main)] px-4 py-8 sm:px-8 sm:py-12 lg:px-16 relative">
+    <div className="flex min-h-screen w-full items-center justify-center bg-[var(--bg-main)] px-3.5 py-6 sm:px-8 sm:py-12 lg:px-16 relative">
       <LoadingOverlay
         visible={isRegistering}
         messageKey={isOtpStep ? 'verifying' : 'updating'}
@@ -164,7 +113,7 @@ export function RegisterForm() {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="w-full max-w-[460px] space-y-6 sm:space-y-8 rounded-2xl p-6 sm:p-10"
+        className="w-full max-w-[440px] space-y-5 sm:space-y-8 rounded-2xl p-5 sm:p-10"
       >
         {/* Mobile Logo */}
         {!isOtpStep && (
@@ -204,17 +153,14 @@ export function RegisterForm() {
         ) : (
           <RegisterOtpStep
             phoneValue={phoneValue}
-            otpArray={otpArray}
-            inputRefs={inputRefs}
+            otpValue={otpInput}
+            setOtpValue={setOtpInput}
             otpError={otpError}
             timer={timer}
             canResend={canResend}
             isRegistering={isRegistering}
             t={t}
             handleVerifyOtp={handleVerifyOtp}
-            handleChange={handleChange}
-            handleKeyDown={handleKeyDown}
-            handlePaste={handlePaste}
             handleResend={handleResend}
             setIsOtpStep={setIsOtpStep}
           />

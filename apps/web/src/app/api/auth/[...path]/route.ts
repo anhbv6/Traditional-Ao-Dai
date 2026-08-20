@@ -50,8 +50,8 @@ async function handleAuthRequest(
       headers['Cookie'] = `refreshToken=${encodeURIComponent(refreshToken)}`;
     }
 
-    // Forward user-agent and real IP for login requests
-    if (pathString === 'login') {
+    // Forward user-agent and real IP for session-creating requests
+    if (pathString === 'login' || pathString === 'login/otp' || pathString === 'google') {
       const userAgent = request.headers.get('user-agent');
       if (userAgent) headers['user-agent'] = userAgent;
 
@@ -60,7 +60,7 @@ async function handleAuthRequest(
     }
 
     // 3. Read body for non-GET/HEAD methods
-    let body: any = undefined;
+    let body: string | undefined;
     if (method !== 'GET' && method !== 'HEAD') {
       try {
         body = await request.text();

@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
-import toast from "react-hot-toast";
+import { showToast as toast } from "@/components/ui/toast";
 
 export function AdminLoginForm() {
   const router = useRouter();

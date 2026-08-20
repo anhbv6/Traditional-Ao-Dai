@@ -15,7 +15,6 @@ export function useLogin() {
   // OTP Login States
   const [isOtpMode, setIsOtpMode] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
-  const [otpSentCode, setOtpSentCode] = useState('');
   const [otpInput, setOtpInput] = useState('');
   const [otpError, setOtpError] = useState('');
 

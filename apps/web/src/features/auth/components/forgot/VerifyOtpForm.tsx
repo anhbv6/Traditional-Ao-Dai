@@ -8,8 +8,9 @@ import { ArrowLeft } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { Button } from '@/components/ui/button';
 import { showToast } from '@/components/ui/toast';
-import { forgotPasswordEmailApi, sendOtpApi, verifyResetPasswordEmailApi, verifyResetPasswordPhoneApi } from '../api/auth.api';
 import { HttpError } from '@/lib/api-client';
+import { forgotPasswordEmailApi, verifyResetPasswordEmailApi, verifyResetPasswordPhoneApi } from '../../api/forgot.api';
+import { sendOtpApi } from '../../api/auth.api';
 
 type VerifyOtpFormProps = {
   forgotType?: 'email' | 'phone';
@@ -160,43 +161,43 @@ export function VerifyOtpForm({
   };
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-[var(--bg-main)] px-4 py-8 sm:px-8 sm:py-12 lg:px-16">
+    <div className="flex min-h-screen w-full items-center justify-center bg-[var(--bg-main)] px-3.5 py-6 sm:px-8 sm:py-12 lg:px-16">
       <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="w-full max-w-[460px] space-y-6 sm:space-y-8 rounded-2xl p-6 sm:p-10 shadow-[0_8px_30px_rgb(42,37,37,0.02)] border border-[var(--border)]/40 bg-white"
+        className="w-full max-w-[440px] space-y-5 sm:space-y-8 rounded-2xl p-5 sm:p-10 shadow-[0_8px_30px_rgb(42,37,37,0.02)] border border-[var(--border)]/40 bg-white"
       >
         {/* Mobile Logo */}
         <div className="flex justify-center lg:hidden">
-          <Link href="/" className="flex flex-col items-center gap-2">
-            <div className="relative h-10 w-10 overflow-hidden rounded-md flex items-center justify-center">
+          <Link href="/" className="flex flex-col items-center gap-1.5">
+            <div className="relative h-9 w-9 overflow-hidden rounded-md flex items-center justify-center">
               <Image
                 src="/logoPage.png"
                 alt="AODAI logo"
-                width={80}
-                height={80}
+                width={70}
+                height={70}
                 className="h-full w-full object-cover scale-125"
                 unoptimized
               />
             </div>
-            <span className="font-[family-name:var(--font-playfair)] text-lg font-normal tracking-widest text-[var(--primary-color)] uppercase">
+            <span className="font-[family-name:var(--font-playfair)] text-base font-normal tracking-widest text-[var(--primary-color)] uppercase">
               AODAI
             </span>
           </Link>
         </div>
 
         {/* Header */}
-        <div className="space-y-3 text-center lg:text-left">
+        <div className="space-y-2 text-center lg:text-left">
           <motion.h2
             variants={itemVariants}
-            className="font-[family-name:var(--font-playfair)] text-3xl font-semibold leading-tight text-[var(--primary-color)] sm:text-4xl"
+            className="font-[family-name:var(--font-playfair)] text-2xl font-semibold leading-tight text-[var(--primary-color)] sm:text-4xl"
           >
             {t('otpTitle')}
           </motion.h2>
           <motion.p
             variants={itemVariants}
-            className="font-[family-name:var(--font-lora)] text-sm text-[var(--text-light)] leading-relaxed"
+            className="font-[family-name:var(--font-lora)] text-xs sm:text-sm text-[var(--text-light)] leading-relaxed"
           >
             {forgotType === 'email'
               ? 'Chúng tôi đã gửi mã xác thực gồm 6 chữ số đến email: '
@@ -206,7 +207,7 @@ export function VerifyOtpForm({
         </div>
 
         {/* Form */}
-        <motion.form variants={itemVariants} onSubmit={handleSubmit} className="space-y-6">
+        <motion.form variants={itemVariants} onSubmit={handleSubmit} className="space-y-5">
           {/* OTP Code Inputs */}
           <div className="flex justify-between gap-1.5 sm:gap-3">
             {otp.map((digit, idx) => (
@@ -227,7 +228,7 @@ export function VerifyOtpForm({
           </div>
 
           {/* Resend Action */}
-          <div className="flex items-center justify-between font-[family-name:var(--font-lora)] text-xs">
+          <div className="flex items-center justify-between font-[family-name:var(--font-lora)] text-[11px] sm:text-xs">
             <span className="text-[var(--text-light)]">
               {timer > 0 ? t('resendTimer', { timer }) : t('noCodeReceived')}
             </span>
@@ -249,7 +250,7 @@ export function VerifyOtpForm({
           <Button
             type="submit"
             disabled={otp.join('').length < 6 || isLoading}
-            className="w-full h-12 bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/95 shadow-sm transition-all hover:shadow duration-300 flex items-center justify-center gap-2 group/btn font-semibold tracking-wider text-xs uppercase rounded-lg disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
+            className="w-full h-10 sm:h-11 bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/95 shadow-sm transition-all hover:shadow duration-300 flex items-center justify-center gap-2 group/btn font-semibold tracking-wider text-[11px] sm:text-xs uppercase rounded-lg disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
           >
             {isLoading ? t('verifying') : t('verifyButton')}
           </Button>
@@ -259,14 +260,14 @@ export function VerifyOtpForm({
         {onBack && (
           <motion.p
             variants={itemVariants}
-            className="text-center font-[family-name:var(--font-lora)] text-xs text-[var(--text-light)]"
+            className="text-center font-[family-name:var(--font-lora)] text-[11px] sm:text-xs text-[var(--text-light)]"
           >
             <button
               type="button"
               onClick={onBack}
               className="inline-flex items-center gap-1.5 font-semibold text-[var(--primary-color)] hover:text-[var(--accent-color)] transition-colors group/back cursor-pointer"
             >
-              <ArrowLeft size={14} className="transition-transform group-hover/back:-translate-x-0.5" />
+              <ArrowLeft size={13} className="transition-transform group-hover/back:-translate-x-0.5" />
               <span>{t('back')}</span>
             </button>
           </motion.p>

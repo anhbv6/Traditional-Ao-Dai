@@ -37,7 +37,7 @@ const geistSans = Geist({
 
 export const metadata: Metadata = {
   title: "Traditional Ao Dai",
-  description: "Áo dài truyền thống Việt Nam",
+  description: "Ao Dai Viet Nam Shop",
 };
 
 export function generateStaticParams() {

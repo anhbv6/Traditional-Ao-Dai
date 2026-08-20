@@ -1,6 +1,6 @@
 import React from 'react';
 import { AuthImageBanner } from '@/features/auth/components/AuthImageBanner';
-import { LoginForm } from '@/features/auth/components/LoginForm';
+import { LoginForm } from '@/features/auth/components/login/LoginForm';
 
 export default function LoginPage() {
   return (

@@ -9,10 +9,10 @@ import { Link } from '@/i18n/routing';
 import { FormInput } from '@/components/shared/FormInput';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { useLogin } from '../hooks/useLogin';
 import { cn } from '@/lib/utils';
-import { GoogleLogin } from '@react-oauth/google';
 import { showToast } from '@/components/ui/toast';
+import { useLogin } from '../../hooks/useLogin';
+import { GoogleAuthButton } from '../GoogleAuthButton';
 
 export function LoginForm() {
   const t = useTranslations('Auth');
@@ -105,10 +105,6 @@ export function LoginForm() {
     }
   };
 
-  const handleGoogleLogin = () => {
-    console.log('Logging in with Google');
-  };
-
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -136,43 +132,43 @@ export function LoginForm() {
   );
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-[var(--bg-main)] px-4 py-8 sm:px-8 sm:py-12 lg:px-16">
+    <div className="flex min-h-screen w-full items-center justify-center bg-[var(--bg-main)] px-3.5 py-6 sm:px-8 sm:py-12 lg:px-16">
       <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="w-full max-w-[460px] space-y-6 sm:space-y-8 rounded-2xl p-6 sm:p-10"
+        className="w-full max-w-[440px] space-y-5 sm:space-y-8 rounded-2xl p-5 sm:p-10"
       >
         {/* Mobile Logo */}
         <div className="flex justify-center lg:hidden">
-          <Link href="/" className="flex flex-col items-center gap-2">
-            <div className="relative h-10 w-10 overflow-hidden rounded-md flex items-center justify-center">
+          <Link href="/" className="flex flex-col items-center gap-1.5">
+            <div className="relative h-9 w-9 overflow-hidden rounded-md flex items-center justify-center">
               <Image
                 src="/logoPage.png"
                 alt="AODAI logo"
-                width={80}
-                height={80}
+                width={70}
+                height={70}
                 className="h-full w-full object-cover scale-125"
                 unoptimized
               />
             </div>
-            <span className="font-[family-name:var(--font-playfair)] text-lg font-normal tracking-widest text-[var(--primary-color)] uppercase">
+            <span className="font-[family-name:var(--font-playfair)] text-base font-normal tracking-widest text-[var(--primary-color)] uppercase">
               AODAI
             </span>
           </Link>
         </div>
 
         {/* Header */}
-        <div className="space-y-3 text-center lg:text-left">
+        <div className="space-y-2 text-center lg:text-left">
           <motion.h2
             variants={itemVariants}
-            className="font-[family-name:var(--font-playfair)] text-3xl font-semibold leading-tight text-[var(--primary-color)] sm:text-4xl"
+            className="font-[family-name:var(--font-playfair)] text-2xl font-semibold leading-tight text-[var(--primary-color)] sm:text-4xl"
           >
             {t('welcomeBack')}
           </motion.h2>
           <motion.p
             variants={itemVariants}
-            className="font-[family-name:var(--font-lora)] text-sm text-[var(--text-light)]"
+            className="font-[family-name:var(--font-lora)] text-xs sm:text-sm text-[var(--text-light)]"
           >
             {t('pleaseLogin')}
           </motion.p>
@@ -184,33 +180,33 @@ export function LoginForm() {
             type="button"
             onClick={() => setIsOtpMode(false)}
             className={cn(
-              "flex-1 pb-3 text-xs font-bold uppercase tracking-wider border-b-2 text-center transition-all cursor-pointer flex items-center justify-center gap-1.5",
+              "flex-1 pb-2.5 text-[10px] sm:text-xs font-bold uppercase tracking-wide sm:tracking-wider border-b-2 text-center transition-all cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5",
               !isOtpMode
                 ? "border-[#800020] text-[#800020] font-bold"
                 : "border-transparent text-[var(--text-light)] hover:text-[var(--text-main)]"
             )}
           >
-            <Key size={13} />
+            <Key size={12} className="sm:size-[13px]" />
             <span>{t('loginWithPassword')}</span>
           </button>
           <button
             type="button"
             onClick={() => setIsOtpMode(true)}
             className={cn(
-              "flex-1 pb-3 text-xs font-bold uppercase tracking-wider border-b-2 text-center transition-all cursor-pointer flex items-center justify-center gap-1.5",
+              "flex-1 pb-2.5 text-[10px] sm:text-xs font-bold uppercase tracking-wide sm:tracking-wider border-b-2 text-center transition-all cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5",
               isOtpMode
                 ? "border-[#800020] text-[#800020] font-bold"
                 : "border-transparent text-[var(--text-light)] hover:text-[var(--text-main)]"
             )}
           >
-            <Smartphone size={13} />
+            <Smartphone size={12} className="sm:size-[13px]" />
             <span>{t('loginWithOtp')}</span>
           </button>
         </motion.div>
 
         {/* Form */}
-        <motion.form variants={itemVariants} onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-5">
+        <motion.form variants={itemVariants} onSubmit={handleSubmit} className="space-y-5">
+          <div className="space-y-4">
             {!isOtpMode ? (
               <>
                 {/* Email or Phone Field */}
@@ -260,7 +256,7 @@ export function LoginForm() {
                     animate={{ opacity: 1, y: 0 }}
                     className="space-y-3"
                   >
-                    <label className="block font-[family-name:var(--font-lora)] text-xs font-semibold uppercase tracking-wider text-[var(--text-main)]">
+                    <label className="block font-[family-name:var(--font-lora)] text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[var(--text-main)]">
                       {t('otpCode')}
                     </label>
                     <div className="flex justify-between gap-1.5 sm:gap-3">
@@ -293,7 +289,7 @@ export function LoginForm() {
 
           {/* Remember Me & Forgot Password - Only for Password Login */}
           {!isOtpMode && (
-            <div className="flex items-center justify-between font-[family-name:var(--font-lora)] text-xs">
+            <div className="flex items-center justify-between font-[family-name:var(--font-lora)] text-[11px] sm:text-xs">
               <div className="flex items-center gap-2">
                 <Checkbox
                   id="remember"
@@ -320,20 +316,20 @@ export function LoginForm() {
           <Button
             type="submit"
             disabled={isLoading || (isOtpMode && !otpSent) || (isOtpMode && otpDigits.join('').length < 6)}
-            className="w-full h-12 bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/95 shadow-sm transition-all hover:shadow duration-300 flex items-center justify-center gap-2 group/btn font-semibold tracking-wider text-xs uppercase rounded-lg disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="w-full h-10 sm:h-11 bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/95 shadow-sm transition-all hover:shadow duration-300 flex items-center justify-center gap-2 group/btn font-semibold tracking-wider text-[11px] sm:text-xs uppercase rounded-lg disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {isLoading ? (
-              <Loader2 size={16} className="animate-spin" />
+              <Loader2 size={15} className="animate-spin" />
             ) : (
               <>
                 <span>{isOtpMode ? t('verifyAndLogin') : t('login')}</span>
-                <ArrowRight size={14} className="transition-transform group-hover/btn:translate-x-1" />
+                <ArrowRight size={13} className="transition-transform group-hover/btn:translate-x-1" />
               </>
             )}
           </Button>
 
           {/* Divider */}
-          <div className="relative flex py-2 items-center">
+          <div className="relative flex py-1.5 sm:py-2.5 items-center">
             <div className="flex-grow border-t border-[var(--border)]"></div>
             <span className="flex-shrink mx-4 text-[var(--text-light)] text-[10px] font-bold uppercase tracking-widest">
               {t('orContinueWith')}
@@ -343,27 +339,20 @@ export function LoginForm() {
 
           {/* Google Login Button */}
           <div className="w-full flex justify-center">
-            <GoogleLogin
-              onSuccess={(credentialResponse) => {
-                if (credentialResponse.credential) {
-                  loginWithGoogle(credentialResponse.credential);
-                }
-              }}
-              onError={() => {
-                showToast.error(t('googleLoginFailed') || 'Đăng nhập Google thất bại');
-              }}
-              theme="outline"
-              size="large"
-              width="380"
+            <GoogleAuthButton
+              label={t('continueWithGoogle')}
+              onCredential={loginWithGoogle}
+              onError={() => showToast.error(t('googleLoginFailed') || 'Đăng nhập Google thất bại')}
+              disabled={isLoading}
             />
           </div>
         </motion.form>
 
         {/* Footer Links */}
-        <div className="space-y-3.5 text-center">
+        <div className="space-y-2.5 text-center">
           <motion.p
             variants={itemVariants}
-            className="font-[family-name:var(--font-lora)] text-xs text-[var(--text-light)]"
+            className="font-[family-name:var(--font-lora)] text-[11px] sm:text-xs text-[var(--text-light)]"
           >
             {t('dontHaveAccount')}{' '}
             <Link
@@ -375,7 +364,7 @@ export function LoginForm() {
           </motion.p>
           <motion.p
             variants={itemVariants}
-            className="font-[family-name:var(--font-lora)] text-xs"
+            className="font-[family-name:var(--font-lora)] text-[11px] sm:text-xs"
           >
             <Link
               href="/"

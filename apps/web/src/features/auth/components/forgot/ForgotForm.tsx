@@ -9,8 +9,9 @@ import { Link } from '@/i18n/routing';
 import { FormInput } from '@/components/shared/FormInput';
 import { Button } from '@/components/ui/button';
 import { showToast } from '@/components/ui/toast';
-import { forgotPasswordEmailApi, sendOtpApi } from '../api/auth.api';
 import { HttpError } from '@/lib/api-client';
+import { forgotPasswordEmailApi } from '../../api/forgot.api';
+import { sendOtpApi } from '../../api/auth.api';
 
 type ForgotFormProps = {
   onSubmitSuccess?: (target: string, type: 'email' | 'phone') => void;
@@ -90,50 +91,50 @@ export function ForgotForm({ onSubmitSuccess }: ForgotFormProps) {
   };
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-[var(--bg-main)] px-4 py-8 sm:px-8 sm:py-12 lg:px-16">
+    <div className="flex min-h-screen w-full items-center justify-center bg-[var(--bg-main)] px-3.5 py-6 sm:px-8 sm:py-12 lg:px-16">
       <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="w-full max-w-[460px] space-y-6 sm:space-y-8 rounded-2xl p-6 sm:p-10 shadow-[0_8px_30px_rgb(42,37,37,0.02)] border border-[var(--border)]/40 bg-white"
+        className="w-full max-w-[440px] space-y-5 sm:space-y-8 rounded-2xl p-5 sm:p-10 shadow-[0_8px_30px_rgb(42,37,37,0.02)] border border-[var(--border)]/40 bg-white"
       >
         {/* Mobile Logo */}
         <div className="flex justify-center lg:hidden">
-          <Link href="/" className="flex flex-col items-center gap-2">
-            <div className="relative h-10 w-10 overflow-hidden rounded-md flex items-center justify-center">
+          <Link href="/" className="flex flex-col items-center gap-1.5">
+            <div className="relative h-9 w-9 overflow-hidden rounded-md flex items-center justify-center">
               <Image
                 src="/logoPage.png"
                 alt="AODAI logo"
-                width={80}
-                height={80}
+                width={70}
+                height={70}
                 className="h-full w-full object-cover scale-125"
                 unoptimized
               />
             </div>
-            <span className="font-[family-name:var(--font-playfair)] text-lg font-normal tracking-widest text-[var(--primary-color)] uppercase">
+            <span className="font-[family-name:var(--font-playfair)] text-base font-normal tracking-widest text-[var(--primary-color)] uppercase">
               AODAI
             </span>
           </Link>
         </div>
 
         {/* Header */}
-        <div className="space-y-3 text-center lg:text-left">
+        <div className="space-y-2 text-center lg:text-left">
           <motion.h2
             variants={itemVariants}
-            className="font-[family-name:var(--font-playfair)] text-3xl font-semibold leading-tight text-[var(--primary-color)] sm:text-4xl"
+            className="font-[family-name:var(--font-playfair)] text-2xl font-semibold leading-tight text-[var(--primary-color)] sm:text-4xl"
           >
             {t('forgotTitle')}
           </motion.h2>
           <motion.p
             variants={itemVariants}
-            className="font-[family-name:var(--font-lora)] text-sm text-[var(--text-light)] leading-relaxed"
+            className="font-[family-name:var(--font-lora)] text-xs sm:text-sm text-[var(--text-light)] leading-relaxed"
           >
             Nhập email hoặc số điện thoại của bạn để nhận mã xác thực đặt lại mật khẩu.
           </motion.p>
         </div>
 
         {/* Input Form */}
-        <motion.form variants={itemVariants} onSubmit={handleSubmit} className="space-y-6">
+        <motion.form variants={itemVariants} onSubmit={handleSubmit} className="space-y-5">
           <FormInput
             id="identifier"
             type="text"
@@ -148,14 +149,14 @@ export function ForgotForm({ onSubmitSuccess }: ForgotFormProps) {
           <Button
             type="submit"
             disabled={isLoading}
-            className="w-full h-12 bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/95 shadow-sm transition-all hover:shadow duration-300 flex items-center justify-center gap-2 group/btn font-semibold tracking-wider text-xs uppercase rounded-lg disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="w-full h-10 sm:h-11 bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/95 shadow-sm transition-all hover:shadow duration-300 flex items-center justify-center gap-2 group/btn font-semibold tracking-wider text-[11px] sm:text-xs uppercase rounded-lg disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {isLoading ? (
-              <Loader2 size={16} className="animate-spin" />
+              <Loader2 size={15} className="animate-spin" />
             ) : (
               <>
                 <span>Gửi mã xác nhận</span>
-                <Send size={14} className="transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
+                <Send size={13} className="transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
               </>
             )}
           </Button>
@@ -164,13 +165,13 @@ export function ForgotForm({ onSubmitSuccess }: ForgotFormProps) {
         {/* Back to Login Link */}
         <motion.p
           variants={itemVariants}
-          className="text-center font-[family-name:var(--font-lora)] text-xs text-[var(--text-light)]"
+          className="text-center font-[family-name:var(--font-lora)] text-[11px] sm:text-xs text-[var(--text-light)]"
         >
           <Link
             href="/login"
             className="inline-flex items-center gap-1.5 font-semibold text-[var(--primary-color)] hover:text-[var(--accent-color)] transition-colors group/back"
           >
-            <ArrowLeft size={14} className="transition-transform group-hover/back:-translate-x-0.5" />
+            <ArrowLeft size={13} className="transition-transform group-hover/back:-translate-x-0.5" />
             <span>{t('backToLogin')}</span>
           </Link>
         </motion.p>

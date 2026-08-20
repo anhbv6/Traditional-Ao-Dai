@@ -8,9 +8,9 @@ import { Eye, EyeOff, CheckCircle2, ArrowRight, ArrowLeft } from 'lucide-react';
 import { Link, useRouter } from '@/i18n/routing';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { resetPasswordEmailApi, resetPasswordPhoneApi } from '../api/auth.api';
 import { HttpError } from '@/lib/api-client';
 import { showToast } from '@/components/ui/toast';
+import { resetPasswordEmailApi, resetPasswordPhoneApi } from '../../api/forgot.api';
 
 type ChangePasswordFormProps = {
   forgotType?: 'email' | 'phone';
@@ -77,32 +77,32 @@ export function ChangePasswordForm({ forgotType = 'email', target = '', resetTok
 
   if (isSuccess) {
     return (
-      <div className="flex min-h-screen w-full items-center justify-center bg-[var(--bg-main)] px-4 py-8 sm:px-8 sm:py-12 lg:px-16">
+      <div className="flex min-h-screen w-full items-center justify-center bg-[var(--bg-main)] px-3.5 py-6 sm:px-8 sm:py-12 lg:px-16">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
-          className="w-full max-w-[460px] text-center space-y-6 rounded-2xl p-6 sm:p-10 shadow-[0_8px_30px_rgb(42,37,37,0.02)]"
+          className="w-full max-w-[440px] text-center space-y-5 rounded-2xl p-5 sm:p-10 shadow-[0_8px_30px_rgb(42,37,37,0.02)]"
         >
           <div className="flex justify-center">
-            <div className="rounded-full bg-emerald-50 p-3 text-emerald-600 dark:bg-emerald-950/20 dark:text-emerald-400">
-              <CheckCircle2 size={48} className="stroke-[1.5]" />
+            <div className="rounded-full bg-emerald-50 p-2.5 text-emerald-600 dark:bg-emerald-950/20 dark:text-emerald-400">
+              <CheckCircle2 size={40} className="stroke-[1.5]" />
             </div>
           </div>
           <div className="space-y-2">
-            <h2 className="font-[family-name:var(--font-playfair)] text-3xl font-semibold text-[var(--primary-color)]">
+            <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-semibold text-[var(--primary-color)]">
               {t('success')}
             </h2>
-            <p className="font-[family-name:var(--font-lora)] text-sm text-[var(--text-light)]">
+            <p className="font-[family-name:var(--font-lora)] text-xs sm:text-sm text-[var(--text-light)]">
               {t('passwordUpdated')}
             </p>
           </div>
           <Button
             onClick={() => router.push('/login')}
-            className="w-full h-12 bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/95 shadow-sm transition-all duration-300 flex items-center justify-center gap-2 group/btn font-semibold tracking-wider text-xs uppercase rounded-lg"
+            className="w-full h-10 sm:h-11 bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/95 shadow-sm transition-all duration-300 flex items-center justify-center gap-2 group/btn font-semibold tracking-wider text-[11px] sm:text-xs uppercase rounded-lg"
           >
             <span>{t('loginNow')}</span>
-            <ArrowRight size={14} className="transition-transform group-hover/btn:translate-x-1" />
+            <ArrowRight size={13} className="transition-transform group-hover/btn:translate-x-1" />
           </Button>
         </motion.div>
       </div>
@@ -110,55 +110,55 @@ export function ChangePasswordForm({ forgotType = 'email', target = '', resetTok
   }
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-[var(--bg-main)] px-4 py-8 sm:px-8 sm:py-12 lg:px-16">
+    <div className="flex min-h-screen w-full items-center justify-center bg-[var(--bg-main)] px-3.5 py-6 sm:px-8 sm:py-12 lg:px-16">
       <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="w-full max-w-[460px] space-y-6 sm:space-y-8 rounded-2xl p-6 sm:p-10 shadow-[0_8px_30px_rgb(42,37,37,0.02)]"
+        className="w-full max-w-[440px] space-y-5 sm:space-y-8 rounded-2xl p-5 sm:p-10 shadow-[0_8px_30px_rgb(42,37,37,0.02)]"
       >
         {/* Mobile Logo */}
         <div className="flex justify-center lg:hidden">
-          <Link href="/" className="flex flex-col items-center gap-2">
-            <div className="relative h-10 w-10 overflow-hidden rounded-md flex items-center justify-center">
+          <Link href="/" className="flex flex-col items-center gap-1.5">
+            <div className="relative h-9 w-9 overflow-hidden rounded-md flex items-center justify-center">
               <Image
                 src="/logoPage.png"
                 alt="AODAI logo"
-                width={80}
-                height={80}
+                width={70}
+                height={70}
                 className="h-full w-full object-cover scale-125"
               />
             </div>
-            <span className="font-[family-name:var(--font-playfair)] text-lg font-normal tracking-widest text-[var(--primary-color)] uppercase">
+            <span className="font-[family-name:var(--font-playfair)] text-base font-normal tracking-widest text-[var(--primary-color)] uppercase">
               AODAI
             </span>
           </Link>
         </div>
 
         {/* Header */}
-        <div className="space-y-3 text-center lg:text-left">
+        <div className="space-y-2 text-center lg:text-left">
           <motion.h2
             variants={itemVariants}
-            className="font-[family-name:var(--font-playfair)] text-3xl font-semibold leading-tight text-[var(--primary-color)] sm:text-4xl"
+            className="font-[family-name:var(--font-playfair)] text-2xl font-semibold leading-tight text-[var(--primary-color)] sm:text-4xl"
           >
             {t('changePasswordTitle')}
           </motion.h2>
           <motion.p
             variants={itemVariants}
-            className="font-[family-name:var(--font-lora)] text-sm text-[var(--text-light)] leading-relaxed"
+            className="font-[family-name:var(--font-lora)] text-xs sm:text-sm text-[var(--text-light)] leading-relaxed"
           >
             Mã xác thực cho <span className="font-semibold text-[var(--text-main)]">{target}</span> đã được xác nhận. Vui lòng nhập mật khẩu mới để đặt lại.
           </motion.p>
         </div>
 
         {/* Form */}
-        <motion.form variants={itemVariants} onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-5">
+        <motion.form variants={itemVariants} onSubmit={handleSubmit} className="space-y-5">
+          <div className="space-y-4">
             {/* New Password */}
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <label
                 htmlFor="password"
-                className="block font-[family-name:var(--font-lora)] text-xs font-semibold uppercase tracking-wider text-[var(--text-main)]"
+                className="block font-[family-name:var(--font-lora)] text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[var(--text-main)]"
               >
                 {t('newPassword')}
               </label>
@@ -183,10 +183,10 @@ export function ChangePasswordForm({ forgotType = 'email', target = '', resetTok
             </div>
 
             {/* Confirm Password */}
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <label
                 htmlFor="confirmPassword"
-                className="block font-[family-name:var(--font-lora)] text-xs font-semibold uppercase tracking-wider text-[var(--text-main)]"
+                className="block font-[family-name:var(--font-lora)] text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[var(--text-main)]"
               >
                 {t('confirmNewPassword')}
               </label>
@@ -213,7 +213,7 @@ export function ChangePasswordForm({ forgotType = 'email', target = '', resetTok
           <Button
             type="submit"
             disabled={!resetToken || !password || password !== confirmPassword || isLoading}
-            className="w-full h-12 bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/95 shadow-sm transition-all hover:shadow duration-300 flex items-center justify-center gap-2 group/btn font-semibold tracking-wider text-xs uppercase rounded-lg disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
+            className="w-full h-10 sm:h-11 bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/95 shadow-sm transition-all hover:shadow duration-300 flex items-center justify-center gap-2 group/btn font-semibold tracking-wider text-[11px] sm:text-xs uppercase rounded-lg disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
           >
             {isLoading ? t('updating') : t('resetButton')}
           </Button>
@@ -223,14 +223,14 @@ export function ChangePasswordForm({ forgotType = 'email', target = '', resetTok
         {onBack && (
           <motion.p
             variants={itemVariants}
-            className="text-center font-[family-name:var(--font-lora)] text-xs text-[var(--text-light)] pt-4"
+            className="text-center font-[family-name:var(--font-lora)] text-[11px] sm:text-xs text-[var(--text-light)] pt-3"
           >
             <button
               type="button"
               onClick={onBack}
               className="inline-flex items-center gap-1.5 font-semibold text-[var(--primary-color)] hover:text-[var(--accent-color)] transition-colors group/back cursor-pointer"
             >
-              <ArrowLeft size={14} className="transition-transform group-hover/back:-translate-x-0.5" />
+              <ArrowLeft size={13} className="transition-transform group-hover/back:-translate-x-0.5" />
               <span>Quay lại</span>
             </button>
           </motion.p>

@@ -1,6 +1,5 @@
 import { apiClient } from '@/lib/api-client';
-import { checkAccountApi } from './auth.api';
-import { RegisterResponse, SendOtpResponse, VerifyOtpResponse } from '../types/auth.types';
+import { CheckAccountResponse, RegisterResponse, SendOtpResponse, VerifyOtpResponse } from '../types/auth.types';
 
 /**
  * Registers a new customer account.
@@ -14,13 +13,6 @@ export const registerApi = async (data: {
   code?: string;
 }): Promise<RegisterResponse> => {
   return apiClient.post<RegisterResponse>('/api/auth/register', data, { skipAuth: true, retryOnUnauthorized: false });
-};
-
-/**
- * Sends an OTP to the given phone number.
- */
-export const sendOtpApi = async (phone: string, purpose: 'REGISTER' | 'LOGIN' | 'RESET_PASSWORD'): Promise<SendOtpResponse> => {
-  return apiClient.post<SendOtpResponse>('/api/auth/otp/send', { phone, purpose }, { skipAuth: true, retryOnUnauthorized: false });
 };
 
 /**
@@ -60,4 +52,9 @@ export const checkPhoneApi = async (phone: string): Promise<{ isTaken: boolean; 
     console.error('Failed to check phone availability via API:', error);
     return { isTaken: false };
   }
+};
+
+
+export const checkAccountApi = async (params: { email?: string; phone?: string }): Promise<CheckAccountResponse> => {
+  return apiClient.get<CheckAccountResponse>('/api/auth/check-account', { params, skipAuth: true, retryOnUnauthorized: false });
 };
