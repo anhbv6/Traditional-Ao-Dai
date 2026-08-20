@@ -18,7 +18,7 @@ export async function PUT(request: NextRequest) {
 
     const body = await request.json();
 
-    const response = await fetch(`${BASE_URL}/auth/client/profile`, {
+    const response = await fetch(`${BASE_URL}/user/profile`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

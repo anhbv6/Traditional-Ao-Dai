@@ -9,6 +9,11 @@ export interface AuthUser {
   role: string;
   isActive: boolean;
   isEmailVerified?: boolean;
+  socialAccounts?: Array<{
+    id: string;
+    provider: string;
+    providerId: string;
+  }>;
 }
 
 export interface LoginResponse {

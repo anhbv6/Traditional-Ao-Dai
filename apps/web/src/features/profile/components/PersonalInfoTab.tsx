@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { User, Mail, Phone, Calendar as CalendarIcon, Sparkles, Camera } from "lucide-react";
 import { usePersonalInfo } from "../hooks/useProfile";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 
@@ -96,7 +96,7 @@ export function PersonalInfoTab() {
 
   const formatLocalDate = (dateStr: string) => {
     const date = getLocalDate(dateStr);
-    if (!date) return t("selectDate");
+    if (!date) return isEditing ? t("selectDate") : "-";
     const yyyy = date.getFullYear();
     const mm = String(date.getMonth() + 1).padStart(2, "0");
     const dd = String(date.getDate()).padStart(2, "0");
@@ -127,8 +127,16 @@ export function PersonalInfoTab() {
           <div className="relative group">
             <Avatar 
               size="xl" 
-              onClick={() => setIsModalOpen(true)}
-              className="size-24 border-2 border-[#E2D9D2] hover:border-[#800020] transition-all duration-300 cursor-pointer shadow-sm hover:shadow-md"
+              onClick={() => {
+                if (avatarUrl) {
+                  setIsModalOpen(true);
+                }
+              }}
+              className={`size-24 border-2 border-[#E2D9D2] transition-all duration-300 shadow-sm ${
+                avatarUrl 
+                  ? "hover:border-[#800020] cursor-pointer hover:shadow-md" 
+                  : "cursor-default"
+              }`}
             >
               <AvatarImage src={avatarUrl} alt={fullName} className="object-cover" />
               <AvatarFallback className="bg-[#FAF7F5] text-[#800020] font-bold text-2xl uppercase">
@@ -160,10 +168,10 @@ export function PersonalInfoTab() {
 
           <div className="flex-1 text-center sm:text-left space-y-1">
             <h3 className="text-lg font-bold text-[#2A2525] font-[family-name:var(--font-playfair)]">
-              {fullName || "Người dùng"}
+              {fullName || "-"}
             </h3>
             <p className="text-xs text-[#706565]">
-              {email || "Chưa cập nhật email"}
+              {email || "-"}
             </p>
           </div>
 
@@ -211,7 +219,7 @@ export function PersonalInfoTab() {
               <User className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#706565]/60" />
               <input
                 type="text"
-                value={fullName}
+                value={isEditing ? fullName : (fullName || "-")}
                 onChange={(e) => setFullName(e.target.value)}
                 required
                 disabled={!isEditing}
@@ -229,9 +237,8 @@ export function PersonalInfoTab() {
               <Mail className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#706565]/60" />
               <input
                 type="email"
-                value={email}
+                value={isEditing ? email : (email || "-")}
                 onChange={(e) => setEmail(e.target.value)}
-                required
                 disabled={!isEditing}
                 className="w-full rounded-lg border border-[#E2D9D2] bg-white py-3 pl-11 pr-4 text-sm text-[#2A2525] outline-none transition-all duration-300 focus:border-[#800020] focus:ring-1 focus:ring-[#800020] hover:border-[#800020]/30 disabled:bg-[#F3ECE7]/10 disabled:border-[#E2D9D2]/40 disabled:text-[#706565]/80 disabled:cursor-not-allowed"
               />
@@ -247,7 +254,7 @@ export function PersonalInfoTab() {
               <Phone className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#706565]/60" />
               <input
                 type="tel"
-                value={phone}
+                value={isEditing ? phone : (phone || "-")}
                 onChange={(e) => setPhone(e.target.value)}
                 required
                 disabled={!isEditing}

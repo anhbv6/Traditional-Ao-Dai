@@ -5,7 +5,7 @@ import { type TabId, type Address, type PaymentCard, type Order } from "../types
 import { initialAddresses, initialCards } from "../api/profile.api";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { type AuthUser } from "@/features/auth/types/auth.types";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api-client";
 
 // Coordinator Hook
@@ -378,8 +378,74 @@ export function useOrderHistory() {
   };
 }
 
+// Helper to parse User-Agent
+function parseUserAgent(ua: string) {
+  if (!ua) return { device: 'Thiết bị không rõ', browser: 'Trình duyệt không rõ' };
+  
+  let os = 'Unknown OS';
+  let browser = 'Unknown Browser';
+  let device = 'Máy tính';
+
+  if (ua.includes('Windows')) {
+    os = 'Windows';
+    device = 'Windows PC';
+  } else if (ua.includes('Macintosh') || ua.includes('Mac OS X')) {
+    os = 'macOS';
+    device = 'MacBook';
+  } else if (ua.includes('iPhone')) {
+    os = 'iOS';
+    device = 'iPhone';
+  } else if (ua.includes('iPad')) {
+    os = 'iOS';
+    device = 'iPad';
+  } else if (ua.includes('Android')) {
+    os = 'Android';
+    device = 'Android Phone';
+  } else if (ua.includes('Linux')) {
+    os = 'Linux';
+    device = 'Linux PC';
+  }
+
+  if (ua.includes('Edg/')) {
+    browser = `Edge (${os})`;
+  } else if (ua.includes('Chrome/') || ua.includes('CriOS/')) {
+    browser = `Chrome (${os})`;
+  } else if (ua.includes('Firefox/') || ua.includes('FxiOS/')) {
+    browser = `Firefox (${os})`;
+  } else if (ua.includes('Safari/') && ua.includes('Version/')) {
+    browser = `Safari (${os})`;
+  } else if (ua.includes('Opera/') || ua.includes('OPR/')) {
+    browser = `Opera (${os})`;
+  } else {
+    browser = `Trình duyệt (${os})`;
+  }
+
+  return { device, browser };
+}
+
+// Helper to format relative time
+function formatRelativeTime(dateStr: string, isCurrent: boolean) {
+  if (isCurrent) return 'Đang hoạt động';
+  const date = new Date(dateStr);
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${hours}:${minutes}, ${day}/${month}/${year}`;
+}
+
+interface RawSession {
+  id: string;
+  device: string;
+  ip: string;
+  createdAt: string;
+  isCurrent: boolean;
+}
+
 // Security Hook
 export function useSecurity() {
+  const { user, setUser } = useAuthStore();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -395,27 +461,46 @@ export function useSecurity() {
   const [otpCode, setOtpCode] = useState("");
   const [showSuccess2fa, setShowSuccess2fa] = useState(false);
 
-  // Mock sessions
-  const [sessions, setSessions] = useState([
-    {
-      id: "sess-1",
-      device: "MacBook Pro 14\"",
-      browser: "Chrome (macOS)",
-      ip: "14.161.22.84",
-      location: "Hà Nội, VN",
-      time: "Đang hoạt động",
-      isCurrent: true,
+  // Fetch active login sessions
+  const { data: rawSessions = [], refetch: refetchSessions } = useQuery({
+    queryKey: ["userSessions"],
+    queryFn: async () => {
+      const response = await apiClient.get<{ data: RawSession[] }>("/api/user/sessions");
+      return response.data || [];
     },
-    {
-      id: "sess-2",
-      device: "iPhone 15 Pro",
-      browser: "Safari (iOS)",
-      ip: "115.79.42.109",
-      location: "TP. Hồ Chí Minh, VN",
-      time: "2 giờ trước",
-      isCurrent: false,
+  });
+
+  // Map backend session data to frontend structure
+  const sessions = rawSessions.map((sess: RawSession) => {
+    const { device, browser } = parseUserAgent(sess.device);
+    return {
+      id: sess.id,
+      device: device,
+      browser: browser,
+      ip: sess.ip,
+      location: "Việt Nam",
+      time: formatRelativeTime(sess.createdAt, sess.isCurrent),
+      isCurrent: sess.isCurrent,
+    };
+  });
+
+  // Password change mutation
+  const changePasswordMutation = useMutation({
+    mutationFn: async (payload: { currentPassword?: string; newPassword: string }) => {
+      return apiClient.post("/api/user/change-password", payload);
     },
-  ]);
+    onSuccess: () => {
+      setShowSuccessPass(true);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setTimeout(() => setShowSuccessPass(false), 3000);
+    },
+    onError: (error: unknown) => {
+      const message = error instanceof Error ? error.message : "Có lỗi xảy ra khi đổi mật khẩu";
+      alert(message);
+    },
+  });
 
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -423,11 +508,10 @@ export function useSecurity() {
       alert("Mật khẩu xác nhận không khớp.");
       return;
     }
-    setShowSuccessPass(true);
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
-    setTimeout(() => setShowSuccessPass(false), 3000);
+    changePasswordMutation.mutate({
+      currentPassword: currentPassword || undefined,
+      newPassword,
+    });
   };
 
   const handle2faToggle = () => {
@@ -451,8 +535,80 @@ export function useSecurity() {
     }
   };
 
+  // Revoke session mutation
+  const revokeSessionMutation = useMutation({
+    mutationFn: async (sessionId: string) => {
+      return apiClient.delete(`/api/user/session/${sessionId}`);
+    },
+    onSuccess: () => {
+      refetchSessions();
+    },
+    onError: (error: unknown) => {
+      const message = error instanceof Error ? error.message : "Có lỗi xảy ra khi hủy phiên đăng nhập";
+      alert(message);
+    },
+  });
+
   const handleRevokeSession = (id: string) => {
-    setSessions((prev) => prev.filter((s) => s.id !== id));
+    if (confirm("Bạn có chắc chắn muốn đăng xuất khỏi thiết bị này không?")) {
+      revokeSessionMutation.mutate(id);
+    }
+  };
+
+  const isGoogleLinked = !!user?.socialAccounts?.some(
+    (sa) => sa.provider === "GOOGLE"
+  );
+  
+  const googleProviderId = user?.socialAccounts?.find(
+    (sa) => sa.provider === "GOOGLE"
+  )?.providerId || null;
+
+  // Link Google Account mutation
+  const linkGoogleMutation = useMutation({
+    mutationFn: async (credential: string) => {
+      return apiClient.post("/api/user/link", { credential });
+    },
+    onSuccess: async () => {
+      const response = await apiClient.get<{ data: AuthUser }>("/api/auth/me");
+      if (response.data) {
+        setUser(response.data);
+      }
+      alert("Liên kết tài khoản Google thành công!");
+    },
+    onError: (error: unknown) => {
+      const message = error instanceof Error ? error.message : "Có lỗi xảy ra khi liên kết tài khoản";
+      alert(message);
+    },
+  });
+
+  // Unlink Google Account mutation
+  const unlinkGoogleMutation = useMutation({
+    mutationFn: async (providerId: string) => {
+      return apiClient.delete(`/api/user/unlink/${providerId}`);
+    },
+    onSuccess: async () => {
+      const response = await apiClient.get<{ data: AuthUser }>("/api/auth/me");
+      if (response.data) {
+        setUser(response.data);
+      }
+      alert("Hủy liên kết tài khoản Google thành công!");
+    },
+    onError: (error: unknown) => {
+      const message = error instanceof Error ? error.message : "Có lỗi xảy ra khi hủy liên kết";
+      alert(message);
+    },
+  });
+
+  const handleLinkGoogle = (credential: string) => {
+    linkGoogleMutation.mutate(credential);
+  };
+
+  const handleUnlinkGoogle = () => {
+    if (googleProviderId) {
+      if (confirm("Bạn có chắc chắn muốn hủy liên kết với tài khoản Google này không?")) {
+        unlinkGoogleMutation.mutate(googleProviderId);
+      }
+    }
   };
 
   return {
@@ -480,6 +636,10 @@ export function useSecurity() {
     showSuccess2fa,
     sessions,
     handleRevokeSession,
+    isGoogleLinked,
+    handleLinkGoogle,
+    handleUnlinkGoogle,
+    isLinking: linkGoogleMutation.isPending || unlinkGoogleMutation.isPending,
   };
 }
 

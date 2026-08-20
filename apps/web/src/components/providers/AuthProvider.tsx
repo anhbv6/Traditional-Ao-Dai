@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useAuthStore } from '@/features/auth/store/authStore';
 import { getMeApi, refreshTokenApi } from '@/features/auth/api/auth.api';
 import { usePathname, useRouter } from '@/i18n/routing';
@@ -18,8 +18,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { setAccessToken, setAuthenticated, logout } = useAuthStore();
   const pathname = usePathname();
   const router = useRouter();
+  const isInitialized = useRef(false);
 
   useEffect(() => {
+    if (isInitialized.current) return;
+    isInitialized.current = true;
+
     let isMounted = true;
 
     async function initAuth() {

@@ -6,6 +6,7 @@ import { Lock, Eye, EyeOff, Shield, ShieldAlert, Sparkles, Smartphone, LogOut, L
 import { useSecurity } from "../hooks/useProfile";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
+import { GoogleAuthButton } from "../../auth/components/GoogleAuthButton";
 
 export function SecurityTab() {
   const t = useTranslations("ProfilePage.security");
@@ -35,6 +36,10 @@ export function SecurityTab() {
     showSuccess2fa,
     sessions,
     handleRevokeSession,
+    isGoogleLinked,
+    handleLinkGoogle,
+    handleUnlinkGoogle,
+    isLinking,
   } = useSecurity();
 
   const getDeviceIcon = (device: string) => {
@@ -175,6 +180,71 @@ export function SecurityTab() {
             <p className="font-medium">{t("twoFactor.success")}</p>
           </div>
         )}
+
+        {/* Google Account Linking */}
+        <div className="mt-6 flex flex-col md:flex-row md:items-center justify-between gap-6 p-5 rounded-xl border border-[#E2D9D2]/60 bg-[#FAF7F5]/30">
+          <div className="flex gap-4">
+            <div className="grid size-12 place-items-center rounded-xl bg-white border border-[#800020]/10 text-[#800020] shrink-0">
+              <svg className="size-6" viewBox="0 0 24 24">
+                <path
+                  fill="#EA4335"
+                  d="M5.266 9.765A7.077 7.077 0 0 1 12 4.909c1.69 0 3.218.6 4.418 1.582L19.91 3C17.782 1.145 15.055 0 12 0 7.336 0 3.33 2.69 1.345 6.618l3.921 3.147z"
+                />
+                <path
+                  fill="#4285F4"
+                  d="M23.49 12.273c0-.818-.073-1.609-.209-2.373H12v4.509h6.464a5.53 5.53 0 0 1-2.4 3.636l3.818 2.964c2.236-2.064 3.618-5.1 3.618-8.736z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 24c3.245 0 5.973-1.073 7.964-2.927l-3.818-2.964c-1.055.709-2.409 1.127-4.145 1.127-3.2 0-5.91-2.155-6.873-5.055L1.209 17.273C3.2 21.2 7.236 24 12 24z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M5.127 14.182A7.16 7.16 0 0 1 4.727 12c0-.764.127-1.5.364-2.182L1.209 6.618A11.956 11.956 0 0 0 0 12c0 1.927.455 3.755 1.255 5.4l3.872-3.218z"
+                />
+              </svg>
+            </div>
+            <div className="space-y-1">
+              <h3 className="font-semibold text-[#2A2525] text-sm sm:text-base flex items-center gap-2">
+                Liên kết tài khoản Google
+                <span
+                  className={`inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                    isGoogleLinked
+                      ? "bg-green-50 text-green-700 border border-green-200"
+                      : "bg-amber-50 text-amber-700 border border-amber-200"
+                  }`}
+                >
+                  {isGoogleLinked ? "Đã liên kết" : "Chưa liên kết"}
+                </span>
+              </h3>
+              <p className="text-xs text-[#706565]">
+                Liên kết với tài khoản Google để đăng nhập nhanh chóng bằng 1-click.
+              </p>
+            </div>
+          </div>
+
+          <div className="shrink-0 flex items-center justify-end min-w-[140px] w-full sm:w-auto">
+            {isGoogleLinked ? (
+              <button
+                type="button"
+                onClick={handleUnlinkGoogle}
+                disabled={isLinking}
+                className="w-full sm:w-auto inline-flex min-h-10 items-center justify-center rounded-lg px-5 text-xs font-semibold uppercase tracking-wider border border-rose-200 bg-white text-rose-600 hover:bg-rose-50 disabled:opacity-50 cursor-pointer"
+              >
+                Hủy liên kết
+              </button>
+            ) : (
+              <div className="w-full sm:w-auto relative [&_iframe]:hidden">
+                <GoogleAuthButton
+                  label="Liên kết Google"
+                  onCredential={handleLinkGoogle}
+                  onError={() => alert("Hệ thống xác thực Google gặp sự cố. Vui lòng thử lại sau.")}
+                  className="!shadow-none !border-[#800020]/25 hover:!border-[#800020]/55"
+                />
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Change Password Form (Dropdown/Accordion style) */}

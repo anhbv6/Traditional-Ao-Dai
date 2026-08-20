@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react';
 import { useRouter } from '@/i18n/routing';
 import { useAuthStore } from '@/features/auth/store/authStore';
+import { LoadingOverlay } from '@/components/shared/LoadingOverlay';
 
 type ProtectedRouteProps = {
   children: React.ReactNode;
@@ -24,17 +25,7 @@ export function ProtectedRoute({ children, adminOnly = false }: ProtectedRoutePr
   }, [isLoading, isAuthenticated, user, adminOnly, router]);
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background select-none">
-        <div className="flex flex-col items-center gap-4">
-          {/* Loading Spinner */}
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-[#800020] border-t-transparent" />
-          <p className="text-sm font-semibold tracking-wider text-[#800020] uppercase font-[family-name:var(--font-playfair)]">
-            Đang xác thực...
-          </p>
-        </div>
-      </div>
-    );
+    return <LoadingOverlay visible={true} />;
   }
 
   if (!isAuthenticated) {
