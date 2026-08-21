@@ -1,13 +1,35 @@
 export interface Address {
   id: string;
-  name: string;
-  phone: string;
-  province: string;
-  district: string;
-  ward: string;
-  detail: string;
+  receiverName: string;
+  receiverPhone: string;
+  addressLine: string;
+  provinceCode?: string | null;
+  provinceName?: string | null;
+  districtCode?: string | null;
+  districtName?: string | null;
+  wardCode?: string | null;
+  wardName?: string | null;
+  postalCode?: string | null;
+  label?: string | null;
   isDefault: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
+
+export type AddressPayload = {
+  receiverName: string;
+  receiverPhone: string;
+  addressLine: string;
+  provinceCode?: string | null;
+  provinceName: string;
+  districtCode?: string | null;
+  districtName: string;
+  wardCode?: string | null;
+  wardName: string;
+  postalCode?: string | null;
+  label?: string | null;
+  isDefault?: boolean;
+};
 
 export interface PaymentCard {
   id: string;

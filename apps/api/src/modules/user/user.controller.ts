@@ -108,3 +108,94 @@ export async function revokeSession(req: AuthenticatedRequest, res: Response, ne
     return next(error)
   }
 }
+
+// ─── Address Controllers ────────────────────────────────────────────────────────
+
+/**
+ * Get list of user addresses
+ */
+export async function getAddresses(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  try {
+    const userId = req.user!.userId
+    const addresses = await userService.getUserAddresses(userId)
+    return sendSuccess(res, {
+      statusCode: 200,
+      message: 'GET_ADDRESSES_SUCCESS',
+      data: addresses,
+    })
+  } catch (error) {
+    return next(error)
+  }
+}
+
+/**
+ * Create a new address
+ */
+export async function createAddress(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  try {
+    const userId = req.user!.userId
+    const newAddress = await userService.createUserAddress(userId, req.body)
+    return sendSuccess(res, {
+      statusCode: 201,
+      message: 'CREATE_ADDRESS_SUCCESS',
+      data: newAddress,
+    })
+  } catch (error) {
+    return next(error)
+  }
+}
+
+/**
+ * Update an existing address
+ */
+export async function updateAddress(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  try {
+    const userId = req.user!.userId
+    const addressId = req.params.id
+    const updatedAddress = await userService.updateUserAddress(userId, addressId, req.body)
+    return sendSuccess(res, {
+      statusCode: 200,
+      message: 'UPDATE_ADDRESS_SUCCESS',
+      data: updatedAddress,
+    })
+  } catch (error) {
+    return next(error)
+  }
+}
+
+/**
+ * Set an address as default
+ */
+export async function setDefaultAddress(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  try {
+    const userId = req.user!.userId
+    const addressId = req.params.id
+    const updatedAddress = await userService.setDefaultAddress(userId, addressId)
+    return sendSuccess(res, {
+      statusCode: 200,
+      message: 'SET_DEFAULT_ADDRESS_SUCCESS',
+      data: updatedAddress,
+    })
+  } catch (error) {
+    return next(error)
+  }
+}
+
+/**
+ * Delete an address
+ */
+export async function deleteAddress(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  try {
+    const userId = req.user!.userId
+    const addressId = req.params.id
+    await userService.deleteUserAddress(userId, addressId)
+    return sendSuccess(res, {
+      statusCode: 200,
+      message: 'DELETE_ADDRESS_SUCCESS',
+      data: null,
+    })
+  } catch (error) {
+    return next(error)
+  }
+}
+

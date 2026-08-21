@@ -3,6 +3,7 @@ import { AppError } from '../../shared/middlewares/errorHandler'
 import { hashPassword, comparePassword } from '../../shared/utils/password'
 import { OAuth2Client } from 'google-auth-library'
 import { env } from '../../shared/config/env'
+import { normalizeVietnamPhone } from '../../shared/utils/phone'
 
 const googleClient = new OAuth2Client(env.GOOGLE_CLIENT_ID)
 
@@ -286,5 +287,220 @@ export async function revokeUserSession(userId: string, sessionId: string) {
   await prisma.userSession.update({
     where: { id: sessionId },
     data: { isRevoked: true },
+  })
+}
+
+// ─── Address Service ────────────────────────────────────────────────────────────
+
+/**
+ * Get all addresses of a user
+ */
+export async function getUserAddresses(userId: string) {
+  return prisma.userAddress.findMany({
+    where: { userId },
+    orderBy: [
+      { isDefault: 'desc' },
+      { createdAt: 'desc' },
+    ],
+  })
+}
+
+/**
+ * Create a new address for a user
+ */
+export async function createUserAddress(
+  userId: string,
+  payload: {
+    receiverName: string
+    receiverPhone: string
+    addressLine: string
+    provinceCode?: string | null
+    provinceName?: string | null
+    districtCode?: string | null
+    districtName?: string | null
+    wardCode?: string | null
+    wardName?: string | null
+    postalCode?: string | null
+    label?: string | null
+    isDefault?: boolean
+  }
+) {
+  // 1. Max 10 addresses limit
+  const count = await prisma.userAddress.count({ where: { userId } })
+  if (count >= 10) {
+    throw new AppError(400, 'MAX_ADDRESS_LIMIT_REACHED')
+  }
+
+  // If first address, it must be default
+  const isDefault = count === 0 ? true : !!payload.isDefault
+
+  return prisma.$transaction(async (tx) => {
+    // If setting as default, unset others first
+    if (isDefault) {
+      await tx.userAddress.updateMany({
+        where: { userId, isDefault: true },
+        data: { isDefault: false },
+      })
+    }
+
+    return tx.userAddress.create({
+      data: {
+        userId,
+        receiverName: payload.receiverName,
+        receiverPhone: normalizeVietnamPhone(payload.receiverPhone)!,
+        addressLine: payload.addressLine,
+        provinceCode: payload.provinceCode,
+        provinceName: payload.provinceName,
+        districtCode: payload.districtCode,
+        districtName: payload.districtName,
+        wardCode: payload.wardCode,
+        wardName: payload.wardName,
+        postalCode: payload.postalCode,
+        label: payload.label,
+        isDefault,
+      },
+    })
+  })
+}
+
+/**
+ * Update an existing address of a user
+ */
+export async function updateUserAddress(
+  userId: string,
+  addressId: string,
+  payload: {
+    receiverName?: string
+    receiverPhone?: string
+    addressLine?: string
+    provinceCode?: string | null
+    provinceName?: string | null
+    districtCode?: string | null
+    districtName?: string | null
+    wardCode?: string | null
+    wardName?: string | null
+    postalCode?: string | null
+    label?: string | null
+    isDefault?: boolean
+  }
+) {
+  // Find target address
+  const target = await prisma.userAddress.findFirst({
+    where: { id: addressId, userId },
+  })
+
+  if (!target) {
+    throw new AppError(404, 'ADDRESS_NOT_FOUND')
+  }
+
+  // Handle default logic. A user should always have one default address while any address remains.
+  let isDefault = payload.isDefault !== undefined ? payload.isDefault : target.isDefault
+
+  // If the current default is unset without another default available, keep it as default.
+  if (!isDefault && target.isDefault) {
+    const otherDefaultCount = await prisma.userAddress.count({
+      where: {
+        userId,
+        id: { not: addressId },
+        isDefault: true,
+      },
+    })
+    if (otherDefaultCount === 0) {
+      isDefault = true
+    }
+  }
+
+  return prisma.$transaction(async (tx) => {
+    if (isDefault && !target.isDefault) {
+      // Unset previous defaults
+      await tx.userAddress.updateMany({
+        where: { userId, isDefault: true },
+        data: { isDefault: false },
+      })
+    }
+
+    return tx.userAddress.update({
+      where: { id: addressId },
+      data: {
+        receiverName: payload.receiverName,
+        receiverPhone: payload.receiverPhone !== undefined ? normalizeVietnamPhone(payload.receiverPhone)! : undefined,
+        addressLine: payload.addressLine,
+        provinceCode: payload.provinceCode,
+        provinceName: payload.provinceName,
+        districtCode: payload.districtCode,
+        districtName: payload.districtName,
+        wardCode: payload.wardCode,
+        wardName: payload.wardName,
+        postalCode: payload.postalCode,
+        label: payload.label,
+        isDefault,
+      },
+    })
+  })
+}
+
+/**
+ * Set an address as default
+ */
+export async function setDefaultAddress(userId: string, addressId: string) {
+  const target = await prisma.userAddress.findFirst({
+    where: { id: addressId, userId },
+  })
+
+  if (!target) {
+    throw new AppError(404, 'ADDRESS_NOT_FOUND')
+  }
+
+  if (target.isDefault) {
+    return target
+  }
+
+  return prisma.$transaction(async (tx) => {
+    // Unset all other defaults
+    await tx.userAddress.updateMany({
+      where: { userId, isDefault: true },
+      data: { isDefault: false },
+    })
+
+    // Set this one as default
+    return tx.userAddress.update({
+      where: { id: addressId },
+      data: { isDefault: true },
+    })
+  })
+}
+
+/**
+ * Delete an address
+ */
+export async function deleteUserAddress(userId: string, addressId: string) {
+  const target = await prisma.userAddress.findFirst({
+    where: { id: addressId, userId },
+  })
+
+  if (!target) {
+    throw new AppError(404, 'ADDRESS_NOT_FOUND')
+  }
+
+  return prisma.$transaction(async (tx) => {
+    // Delete target address
+    await tx.userAddress.delete({
+      where: { id: addressId },
+    })
+
+    // If it was default, find another one to make default
+    if (target.isDefault) {
+      const nextDefault = await tx.userAddress.findFirst({
+        where: { userId },
+        orderBy: { createdAt: 'desc' },
+      })
+
+      if (nextDefault) {
+        await tx.userAddress.update({
+          where: { id: nextDefault.id },
+          data: { isDefault: true },
+        })
+      }
+    }
   })
 }

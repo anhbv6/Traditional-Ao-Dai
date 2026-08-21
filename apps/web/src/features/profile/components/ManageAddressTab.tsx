@@ -6,11 +6,19 @@ import { MapPin, Phone, User, Plus, Trash2, Edit2, Check } from "lucide-react";
 import { useManageAddress } from "../hooks/useProfile";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 export function ManageAddressTab() {
   const t = useTranslations("ProfilePage.address");
   const {
     addresses,
+    isLoading,
     isEditing,
     setIsEditing,
     editingAddress,
@@ -18,14 +26,16 @@ export function ManageAddressTab() {
     setFormName,
     formPhone,
     setFormPhone,
-    formProvince,
-    setFormProvince,
-    formDistrict,
-    setFormDistrict,
-    formWard,
-    setFormWard,
-    formDetail,
-    setFormDetail,
+    formProvinceName,
+    setFormProvinceName,
+    formDistrictName,
+    setFormDistrictName,
+    formWardName,
+    setFormWardName,
+    formAddressLine,
+    setFormAddressLine,
+    formLabel,
+    setFormLabel,
     formIsDefault,
     setFormIsDefault,
     handleStartAdd,
@@ -33,6 +43,7 @@ export function ManageAddressTab() {
     handleDelete,
     handleSetDefault,
     handleSubmit,
+    isMutating,
   } = useManageAddress();
 
   return (
@@ -55,7 +66,12 @@ export function ManageAddressTab() {
         </button>
       </div>
 
-      {addresses.length === 0 ? (
+      {isLoading ? (
+        <div className="my-16 flex flex-col items-center justify-center text-center animate-fade-in">
+          <span className="w-8 h-8 rounded-full border-2 border-[#800020] border-t-transparent animate-spin" />
+          <p className="mt-4 text-[#706565] font-medium">Đang tải danh sách địa chỉ...</p>
+        </div>
+      ) : addresses.length === 0 ? (
         <div className="my-16 flex flex-col items-center justify-center text-center animate-fade-in">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#FAF7F5] text-[#706565]/40 border border-[#E2D9D2]/30">
             <MapPin size={28} />
@@ -78,25 +94,35 @@ export function ManageAddressTab() {
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-1.5 font-[family-name:var(--font-playfair)] text-base font-semibold text-[#800020] min-w-0">
                     <User size={15} className="shrink-0" />
-                    <span className="truncate">{addr.name}</span>
+                    <span className="truncate">{addr.receiverName}</span>
                   </div>
-                  {addr.isDefault && (
-                    <span className="inline-flex items-center gap-1 rounded bg-[#800020]/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#800020] shrink-0">
-                      <Check size={11} />
-                      {t("default")}
-                    </span>
-                  )}
+                  <div className="flex gap-1.5 items-center shrink-0">
+                    {addr.label && (
+                      <span className="inline-flex items-center rounded bg-gray-100 px-2 py-0.5 text-[10px] font-semibold text-[#706565]">
+                        {addr.label}
+                      </span>
+                    )}
+                    {addr.isDefault && (
+                      <span className="inline-flex items-center gap-1 rounded bg-[#800020]/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#800020]">
+                        <Check size={11} />
+                        {t("default")}
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 <div className="mt-3 space-y-2 text-sm text-[#706565]">
                   <p className="flex items-center gap-2">
                     <Phone size={14} className="opacity-60 shrink-0" />
-                    {addr.phone}
+                    {addr.receiverPhone}
                   </p>
                   <p className="flex items-start gap-2 leading-relaxed">
                     <MapPin size={14} className="mt-0.5 opacity-60 shrink-0" />
                     <span>
-                      {addr.detail}, {addr.ward}, {addr.district}, {addr.province}
+                      {addr.addressLine}
+                      {addr.wardName ? `, ${addr.wardName}` : ""}
+                      {addr.districtName ? `, ${addr.districtName}` : ""}
+                      {addr.provinceName ? `, ${addr.provinceName}` : ""}
                     </span>
                   </p>
                 </div>
@@ -137,27 +163,25 @@ export function ManageAddressTab() {
         </div>
       )}
 
-      {/* Modal Dialog Form */}
-      {isEditing && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm animate-fade-in">
-          <div className="w-full max-w-[92%] sm:max-w-[420px] max-h-[85vh] flex flex-col overflow-hidden rounded-2xl border border-[#800020]/10 bg-white shadow-xl animate-scale-up">
-            {/* Header */}
-            <div className="border-b border-[#E2D9D2]/60 bg-[#FAF7F5] px-4 py-3 flex items-center justify-between shrink-0">
-              <h3 className="font-[family-name:var(--font-playfair)] text-sm sm:text-base font-bold text-[#800020]">
-                {editingAddress ? t("editTitle") : t("addBtn")}
-              </h3>
-              <button
-                type="button"
-                onClick={() => setIsEditing(false)}
-                className="rounded-lg p-1 text-[#706565] hover:bg-[#E2D9D2]/40 transition-colors cursor-pointer text-xs"
-              >
-                ✕
-              </button>
-            </div>
+      {/* Address Form Dialog */}
+      <Dialog open={isEditing} onOpenChange={setIsEditing}>
+        <DialogContent
+          className="max-w-[80%] sm:max-w-[420px] max-h-[85vh] overflow-hidden gap-0 p-0"
+          showCloseButton={true}
+        >
+          <DialogHeader className="border-b border-[#E2D9D2]/60 bg-[#FAF7F5] px-5 py-4">
+            <DialogTitle className="font-[family-name:var(--font-playfair)] text-sm sm:text-base font-bold text-[#800020]">
+              {editingAddress ? t("editTitle") : t("addBtn")}
+            </DialogTitle>
+            <DialogDescription className="text-[11px] text-[#706565]">
+              {t("subtitle")}
+            </DialogDescription>
+          </DialogHeader>
 
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 space-y-4">
-              <div className="flex flex-col gap-3.5">
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-5 space-y-4">
+            <div className="flex flex-col gap-3.5">
+              <div className="flex flex-row items-center gap-4">
                 {/* Receiver Name */}
                 <div className="space-y-1.5">
                   <label className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[#706565]">
@@ -193,103 +217,122 @@ export function ManageAddressTab() {
                     />
                   </div>
                 </div>
-
-                {/* Province */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[#706565]">
-                    {t("form.province")}
-                  </label>
-                  <Input
-                    type="text"
-                    required
-                    value={formProvince}
-                    onChange={(e) => setFormProvince(e.target.value)}
-                    placeholder={t("form.placeholderProvince")}
-                    className="h-10 text-xs"
-                  />
-                </div>
-
-                {/* District */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[#706565]">
-                    {t("form.district")}
-                  </label>
-                  <Input
-                    type="text"
-                    required
-                    value={formDistrict}
-                    onChange={(e) => setFormDistrict(e.target.value)}
-                    placeholder={t("form.placeholderDistrict")}
-                    className="h-10 text-xs"
-                  />
-                </div>
-
-                {/* Ward */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[#706565]">
-                    {t("form.ward")}
-                  </label>
-                  <Input
-                    type="text"
-                    required
-                    value={formWard}
-                    onChange={(e) => setFormWard(e.target.value)}
-                    placeholder={t("form.placeholderWard")}
-                    className="h-10 text-xs"
-                  />
-                </div>
-
-                {/* Detail Address */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[#706565]">
-                    {t("form.detail")}
-                  </label>
-                  <Input
-                    type="text"
-                    required
-                    value={formDetail}
-                    onChange={(e) => setFormDetail(e.target.value)}
-                    placeholder={t("form.placeholderDetail")}
-                    className="h-10 text-xs"
-                  />
-                </div>
               </div>
 
-              {/* Set Default */}
-              <div className="flex items-center gap-2 pt-1">
-                <Checkbox
-                  id="isDefault"
-                  checked={formIsDefault}
-                  onCheckedChange={(checked) => setFormIsDefault(!!checked)}
-                />
-                <label
-                  htmlFor="isDefault"
-                  className="cursor-pointer text-xs text-[#706565] select-none"
-                >
-                  {t("form.isDefault")}
+              {/* Province */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[#706565]">
+                  {t("form.province")}
                 </label>
+                <Input
+                  type="text"
+                  required
+                  value={formProvinceName}
+                  onChange={(e) => setFormProvinceName(e.target.value)}
+                  placeholder={t("form.placeholderProvince")}
+                  className="h-10 text-xs"
+                />
               </div>
 
-              {/* Form Actions */}
-              <div className="flex flex-col sm:flex-row justify-end gap-2.5 pt-3 border-t border-[#E2D9D2]/40 mt-4 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => setIsEditing(false)}
-                  className="w-full sm:w-auto inline-flex h-9 items-center justify-center rounded-lg border border-[#E2D9D2] bg-white px-5 text-[11px] font-semibold uppercase tracking-[0.5px] text-[#706565] transition-all hover:bg-gray-50 cursor-pointer active:scale-95 duration-200"
-                >
-                  {t("form.cancelBtn")}
-                </button>
-                <button
-                  type="submit"
-                  className="w-full sm:w-auto inline-flex h-9 items-center justify-center rounded-lg bg-[#800020] px-5 text-[11px] font-semibold uppercase tracking-[0.5px] text-white transition-all hover:bg-[#800020]/95 cursor-pointer active:scale-95 duration-200"
-                >
-                  {t("form.submitBtn")}
-                </button>
+              {/* District */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[#706565]">
+                  {t("form.district")}
+                </label>
+                <Input
+                  type="text"
+                  required
+                  value={formDistrictName}
+                  onChange={(e) => setFormDistrictName(e.target.value)}
+                  placeholder={t("form.placeholderDistrict")}
+                  className="h-10 text-xs"
+                />
               </div>
-            </form>
-          </div>
-        </div>
-      )}
+
+              {/* Ward */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[#706565]">
+                  {t("form.ward")}
+                </label>
+                <Input
+                  type="text"
+                  required
+                  value={formWardName}
+                  onChange={(e) => setFormWardName(e.target.value)}
+                  placeholder={t("form.placeholderWard")}
+                  className="h-10 text-xs"
+                />
+              </div>
+
+              {/* Detail Address */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[#706565]">
+                  {t("form.detail")}
+                </label>
+                <Input
+                  type="text"
+                  required
+                  value={formAddressLine}
+                  onChange={(e) => setFormAddressLine(e.target.value)}
+                  placeholder={t("form.placeholderDetail")}
+                  className="h-10 text-xs"
+                />
+              </div>
+
+              {/* Address Label */}
+              <div className="space-y-1.5">
+                <label className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[#706565]">
+                  {t("form.label")}
+                </label>
+                <Input
+                  type="text"
+                  value={formLabel}
+                  onChange={(e) => setFormLabel(e.target.value)}
+                  placeholder={t("form.placeholderLabel")}
+                  className="h-10 text-xs"
+                />
+              </div>
+            </div>
+
+            {/* Set Default */}
+            <div className="flex items-center gap-2 pt-1">
+              <Checkbox
+                id="isDefault"
+                checked={formIsDefault}
+                onCheckedChange={(checked) => setFormIsDefault(!!checked)}
+              />
+              <label
+                htmlFor="isDefault"
+                className="cursor-pointer text-xs text-[#706565] select-none"
+              >
+                {t("form.isDefault")}
+              </label>
+            </div>
+
+            {/* Form Actions */}
+            <div className="flex flex-col sm:flex-row justify-end gap-2.5 pt-3 border-t border-[#E2D9D2]/40 mt-4 shrink-0">
+              <button
+                type="button"
+                onClick={() => setIsEditing(false)}
+                className="w-full sm:w-auto inline-flex h-9 items-center justify-center rounded-lg border border-[#E2D9D2] bg-white px-5 text-[11px] font-semibold uppercase tracking-[0.5px] text-[#706565] transition-all hover:bg-gray-50 cursor-pointer active:scale-95 duration-200"
+              >
+                {t("form.cancelBtn")}
+              </button>
+              <button
+                type="submit"
+                disabled={isMutating}
+                className="w-full sm:w-auto inline-flex h-9 items-center justify-center rounded-lg bg-[#800020] px-5 text-[11px] font-semibold uppercase tracking-[0.5px] text-white transition-all hover:bg-[#800020]/95 cursor-pointer active:scale-95 duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isMutating ? (
+                  <span className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                ) : (
+                  t("form.submitBtn")
+                )}
+              </button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -115,7 +115,7 @@ export function ProfileExperience() {
           </nav>
  
           {/* Mobile Floating Action Button (FAB) Menu */}
-          <div className="lg:hidden fixed bottom-6 left-6 z-50">
+          <div className="lg:hidden fixed bottom-7 left-5 z-50">
             {/* Overlay Backdrop to click outside and close */}
             {isMobileMenuOpen && (
               <div 

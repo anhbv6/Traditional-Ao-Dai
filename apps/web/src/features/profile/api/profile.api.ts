@@ -1,27 +1,4 @@
-import { type Address, type PaymentCard, type Order } from "../types/profile.types";
-
-export const initialAddresses: Address[] = [
-  {
-    id: "addr-1",
-    name: "Nguyễn Thị An",
-    phone: "0912345678",
-    province: "Hà Nội",
-    district: "Ba Đình",
-    ward: "Trúc Bạch",
-    detail: "Số 15, Ngách 12/4, Ngõ Trúc Lạc",
-    isDefault: true,
-  },
-  {
-    id: "addr-2",
-    name: "Trần Văn Bình",
-    phone: "0987654321",
-    province: "Hồ Chí Minh",
-    district: "Quận 1",
-    ward: "Bến Nghé",
-    detail: "Đường Đồng Khởi, Tòa nhà Metropolitan, Lầu 8",
-    isDefault: false,
-  },
-];
+import { type PaymentCard, type Order } from "../types/profile.types";
 
 export const initialCards: PaymentCard[] = [
   {

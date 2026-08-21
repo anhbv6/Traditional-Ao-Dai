@@ -5,6 +5,7 @@ import path from "path";
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const nextConfig: NextConfig = {
+  devIndicators: false,
   allowedDevOrigins: ["192.168.1.98"],
   images: {
     remotePatterns: [

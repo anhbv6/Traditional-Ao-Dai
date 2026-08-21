@@ -8,6 +8,9 @@ import {
   linkGoogleSchema,
   unlinkGoogleSchema,
   deleteSessionSchema,
+  createAddressSchema,
+  updateAddressSchema,
+  addressIdParamsSchema,
 } from './user.schema'
 
 const router = Router()
@@ -202,5 +205,214 @@ router.get('/sessions', userController.getSessions)
  *         description: Session not found
  */
 router.delete('/session/:sessionId', validate(deleteSessionSchema), userController.revokeSession)
+
+// ─── Address Routes (/api/user/addresses) ───────────────────────────────────────
+
+/**
+ * @openapi
+ * /api/user/addresses:
+ *   get:
+ *     summary: Get User Addresses
+ *     description: Get all addresses of the authenticated user.
+ *     tags:
+ *       - User
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Addresses retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/ApiSuccess'
+ *                 - type: object
+ *                   properties:
+ *                     message:
+ *                       type: string
+ *                       example: GET_ADDRESSES_SUCCESS
+ *                     data:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/UserAddress'
+ *       401:
+ *         description: Unauthorized
+ */
+router.get('/addresses', userController.getAddresses)
+
+/**
+ * @openapi
+ * /api/user/addresses:
+ *   post:
+ *     summary: Create Address
+ *     description: Create a new address for the authenticated user (limit 10).
+ *     tags:
+ *       - User
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/CreateUserAddressRequest'
+ *     responses:
+ *       201:
+ *         description: Address created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/ApiSuccess'
+ *                 - type: object
+ *                   properties:
+ *                     message:
+ *                       type: string
+ *                       example: CREATE_ADDRESS_SUCCESS
+ *                     data:
+ *                       $ref: '#/components/schemas/UserAddress'
+ *       400:
+ *         description: Validation error or max address limit reached
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiError'
+ *       401:
+ *         description: Unauthorized
+ */
+router.post('/addresses', validate(createAddressSchema), userController.createAddress)
+
+/**
+ * @openapi
+ * /api/user/addresses/{id}/default:
+ *   patch:
+ *     summary: Set Default Address
+ *     description: Set an address as the default address.
+ *     tags:
+ *       - User
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: Address ID
+ *     responses:
+ *       200:
+ *         description: Default address set successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/ApiSuccess'
+ *                 - type: object
+ *                   properties:
+ *                     message:
+ *                       type: string
+ *                       example: SET_DEFAULT_ADDRESS_SUCCESS
+ *                     data:
+ *                       $ref: '#/components/schemas/UserAddress'
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Address not found
+ */
+router.patch('/addresses/:id/default', validate(addressIdParamsSchema), userController.setDefaultAddress)
+
+/**
+ * @openapi
+ * /api/user/addresses/{id}:
+ *   patch:
+ *     summary: Update Address
+ *     description: Update an existing address of the authenticated user.
+ *     tags:
+ *       - User
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: Address ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UpdateUserAddressRequest'
+ *     responses:
+ *       200:
+ *         description: Address updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/ApiSuccess'
+ *                 - type: object
+ *                   properties:
+ *                     message:
+ *                       type: string
+ *                       example: UPDATE_ADDRESS_SUCCESS
+ *                     data:
+ *                       $ref: '#/components/schemas/UserAddress'
+ *       400:
+ *         description: Validation error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiError'
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Address not found
+ */
+router.patch('/addresses/:id', validate(updateAddressSchema), userController.updateAddress)
+
+/**
+ * @openapi
+ * /api/user/addresses/{id}:
+ *   delete:
+ *     summary: Delete Address
+ *     description: Delete an address of the authenticated user.
+ *     tags:
+ *       - User
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: Address ID
+ *     responses:
+ *       200:
+ *         description: Address deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/ApiSuccess'
+ *                 - type: object
+ *                   properties:
+ *                     message:
+ *                       type: string
+ *                       example: DELETE_ADDRESS_SUCCESS
+ *                     data:
+ *                       nullable: true
+ *                       example: null
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Address not found
+ */
+router.delete('/addresses/:id', validate(addressIdParamsSchema), userController.deleteAddress)
 
 export default router

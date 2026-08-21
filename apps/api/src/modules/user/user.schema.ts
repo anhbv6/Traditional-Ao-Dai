@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+const vietnamPhoneSchema = z.string().trim().regex(/^(0|\+84)[35789][0-9]{8}$/, 'RECEIVER_PHONE_INVALID')
+
 export const updateProfileSchema = z.object({
   body: z.object({
     name: z.string().min(1, 'Tên không được để trống').optional(),
@@ -33,5 +35,50 @@ export const unlinkGoogleSchema = z.object({
 export const deleteSessionSchema = z.object({
   params: z.object({
     sessionId: z.string().min(1, 'sessionId là bắt buộc'),
+  }),
+})
+
+// ─── Address Schemas ────────────────────────────────────────────────────────────
+
+export const createAddressSchema = z.object({
+  body: z.object({
+    receiverName: z.string().trim().min(1, 'RECEIVER_NAME_REQUIRED'),
+    receiverPhone: vietnamPhoneSchema,
+    addressLine: z.string().trim().min(1, 'ADDRESS_LINE_REQUIRED'),
+    provinceCode: z.string().trim().optional().nullable(),
+    provinceName: z.string().trim().min(1, 'PROVINCE_NAME_REQUIRED'),
+    districtCode: z.string().trim().optional().nullable(),
+    districtName: z.string().trim().min(1, 'DISTRICT_NAME_REQUIRED'),
+    wardCode: z.string().trim().optional().nullable(),
+    wardName: z.string().trim().min(1, 'WARD_NAME_REQUIRED'),
+    postalCode: z.string().trim().optional().nullable(),
+    label: z.string().trim().optional().nullable(),
+    isDefault: z.boolean().optional(),
+  }),
+})
+
+export const updateAddressSchema = z.object({
+  params: z.object({
+    id: z.string().uuid('ADDRESS_ID_INVALID'),
+  }),
+  body: z.object({
+    receiverName: z.string().trim().min(1, 'RECEIVER_NAME_REQUIRED').optional(),
+    receiverPhone: vietnamPhoneSchema.optional(),
+    addressLine: z.string().trim().min(1, 'ADDRESS_LINE_REQUIRED').optional(),
+    provinceCode: z.string().trim().optional().nullable(),
+    provinceName: z.string().trim().min(1, 'PROVINCE_NAME_REQUIRED').optional(),
+    districtCode: z.string().trim().optional().nullable(),
+    districtName: z.string().trim().min(1, 'DISTRICT_NAME_REQUIRED').optional(),
+    wardCode: z.string().trim().optional().nullable(),
+    wardName: z.string().trim().min(1, 'WARD_NAME_REQUIRED').optional(),
+    postalCode: z.string().trim().optional().nullable(),
+    label: z.string().trim().optional().nullable(),
+    isDefault: z.boolean().optional(),
+  }),
+})
+
+export const addressIdParamsSchema = z.object({
+  params: z.object({
+    id: z.string().uuid('ADDRESS_ID_INVALID'),
   }),
 })

@@ -65,15 +65,17 @@
       "district": "Quận/Huyện",
       "ward": "Phường/Xã",
       "detail": "Địa chỉ chi tiết (Số nhà, đường...)",
+      "label": "Nhãn địa chỉ",
       "isDefault": "Đặt làm địa chỉ mặc định",
       "cancelBtn": "Hủy",
       "submitBtn": "Lưu địa chỉ",
-      "placeholderName": "Ví dụ: Nguyễn Văn A",
-      "placeholderPhone": "Ví dụ: 0912345678",
-      "placeholderProvince": "Ví dụ: Hà Nội",
-      "placeholderDistrict": "Ví dụ: Ba Đình",
-      "placeholderWard": "Ví dụ: Trúc Bạch",
-      "placeholderDetail": "Ví dụ: Số 15, ngõ 12, đường Trúc Lạc..."
+      "placeholderName": "Vui lòng nhập tên người nhận",
+      "placeholderPhone": "Vui lòng nhập số điện thoại nhận hàng",
+      "placeholderProvince": "Vui lòng nhập tỉnh/thành phố",
+      "placeholderDistrict": "Vui lòng nhập quận/huyện",
+      "placeholderWard": "Vui lòng nhập phường/xã",
+      "placeholderDetail": "Vui lòng nhập địa chỉ chi tiết",
+      "placeholderLabel": "Vui lòng nhập nhãn địa chỉ"
     }
   },
   "payment": {

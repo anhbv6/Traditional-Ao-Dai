@@ -65,15 +65,17 @@
       "district": "District",
       "ward": "Ward",
       "detail": "Detail Address (House No, Street...)",
+      "label": "Address Label",
       "isDefault": "Set as default address",
       "cancelBtn": "Cancel",
       "submitBtn": "Save Address",
-      "placeholderName": "e.g. John Doe",
-      "placeholderPhone": "e.g. 0912345678",
-      "placeholderProvince": "e.g. Hanoi",
-      "placeholderDistrict": "e.g. Ba Dinh",
-      "placeholderWard": "e.g. Truc Bach",
-      "placeholderDetail": "e.g. No. 15, Lane 12, Truc Lac St..."
+      "placeholderName": "Please enter receiver name",
+      "placeholderPhone": "Please enter receiver phone number",
+      "placeholderProvince": "Please enter province/city",
+      "placeholderDistrict": "Please enter district",
+      "placeholderWard": "Please enter ward",
+      "placeholderDetail": "Please enter detail address",
+      "placeholderLabel": "Please enter address label"
     }
   },
   "payment": {
