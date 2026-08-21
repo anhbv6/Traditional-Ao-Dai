@@ -76,6 +76,14 @@ export function RegisterFormStep({
   const phoneValue = watch('phone') || '';
   const passwordValue = watch('password') || '';
   const confirmPasswordValue = watch('confirmPassword') || '';
+  const agreeTermsValue = watch('agreeTerms') || false;
+
+  const isFormIncomplete =
+    !fullNameValue.trim() ||
+    (registerType === 'email' ? !emailValue.trim() : !phoneValue.trim()) ||
+    !passwordValue ||
+    !confirmPasswordValue ||
+    !agreeTermsValue;
 
   // Full Name validations
   const fnRequired = fullNameValue.trim().length > 0;
@@ -431,7 +439,7 @@ export function RegisterFormStep({
         <Button
           type="submit"
           data-tooltip-submit="true"
-          disabled={isRegistering || isCheckingEmail || isCheckingPhone}
+          disabled={isRegistering || isCheckingEmail || isCheckingPhone || isFormIncomplete}
           className="w-full h-10 sm:h-11 bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/95 shadow-sm transition-all hover:shadow duration-300 flex items-center justify-center gap-2 group/btn font-semibold tracking-wider text-[11px] sm:text-xs uppercase rounded-lg mt-2 cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
         >
           {isRegistering ? (

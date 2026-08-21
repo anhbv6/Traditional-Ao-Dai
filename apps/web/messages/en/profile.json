@@ -26,7 +26,10 @@
     "previewAvatar": "Profile picture",
     "selectDate": "Select date",
     "changeInfoBtn": "Change info",
-    "cancelBtn": "Cancel"
+    "cancelBtn": "Cancel",
+    "avatarUrlInvalid": "Failed to retrieve a valid avatar URL.",
+    "avatarUploadFailed": "Avatar upload failed. Please try again.",
+    "updateError": "An error occurred while updating your profile"
   },
   "orders": {
     "title": "Order History",

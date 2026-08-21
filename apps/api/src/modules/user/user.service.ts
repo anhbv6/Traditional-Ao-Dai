@@ -16,11 +16,11 @@ export async function getUserById(id: string) {
   })
 
   if (!user || user.role !== 'CUSTOMER') {
-    throw new AppError(404, 'Không tìm thấy người dùng.')
+    throw new AppError(404, 'USER_NOT_FOUND')
   }
 
   if (!user.isActive) {
-    throw new AppError(403, 'Tài khoản đã bị khóa hoặc ngừng hoạt động.')
+    throw new AppError(403, 'ACCOUNT_DEACTIVATED')
   }
 
   const { password: _, ...safeUser } = user
@@ -34,6 +34,7 @@ export async function updateUserProfile(
   userId: string,
   payload: {
     name?: string;
+    email?: string | null;
     phone?: string | null;
     avatar?: string | null;
     dob?: string | null;
@@ -42,15 +43,34 @@ export async function updateUserProfile(
 ) {
   const user = await prisma.user.findUnique({ where: { id: userId } })
   if (!user || user.role !== 'CUSTOMER') {
-    throw new AppError(404, 'Không tìm thấy người dùng.')
+    throw new AppError(404, 'USER_NOT_FOUND')
   }
   if (!user.isActive) {
-    throw new AppError(403, 'Tài khoản đã bị khóa hoặc ngừng hoạt động.')
+    throw new AppError(403, 'ACCOUNT_DEACTIVATED')
   }
 
   const updateData: any = {}
   if (payload.name !== undefined) updateData.name = payload.name
   if (payload.avatar !== undefined) updateData.avatar = payload.avatar
+  if (payload.email !== undefined) {
+    const trimmedEmail = payload.email?.trim().toLowerCase() || null
+    if (trimmedEmail) {
+      const existingUser = await prisma.user.findFirst({
+        where: {
+          email: trimmedEmail,
+          id: { not: userId },
+        },
+      })
+      if (existingUser) {
+        throw new AppError(400, 'EMAIL_ALREADY_EXISTS')
+      }
+      updateData.email = trimmedEmail
+      updateData.isEmailVerified = true
+    } else {
+      updateData.email = null
+      updateData.isEmailVerified = false
+    }
+  }
   if (payload.dob !== undefined) {
     updateData.birth = payload.dob ? new Date(payload.dob) : null
   }
@@ -59,7 +79,7 @@ export async function updateUserProfile(
     if (['MALE', 'FEMALE', 'OTHER'].includes(upperGender)) {
       updateData.gender = upperGender
     } else {
-      throw new AppError(400, 'Giới tính không hợp lệ.')
+      throw new AppError(400, 'GENDER_INVALID')
     }
   }
 
@@ -73,7 +93,7 @@ export async function updateUserProfile(
         },
       })
       if (existingUser) {
-        throw new AppError(400, 'Số điện thoại đã được sử dụng bởi tài khoản khác.')
+        throw new AppError(400, 'PHONE_ALREADY_EXISTS')
       }
       updateData.phone = trimmedPhone
       updateData.isPhoneVerified = true
@@ -105,19 +125,19 @@ export async function changeUserPassword(
 ) {
   const user = await prisma.user.findUnique({ where: { id: userId } })
   if (!user || user.role !== 'CUSTOMER') {
-    throw new AppError(404, 'Không tìm thấy người dùng.')
+    throw new AppError(404, 'USER_NOT_FOUND')
   }
   if (!user.isActive) {
-    throw new AppError(403, 'Tài khoản đã bị khóa hoặc ngừng hoạt động.')
+    throw new AppError(403, 'ACCOUNT_DEACTIVATED')
   }
 
   if (user.password) {
     if (!payload.currentPassword) {
-      throw new AppError(400, 'Vui lòng cung cấp mật khẩu hiện tại.')
+      throw new AppError(400, 'CURRENT_PASSWORD_REQUIRED')
     }
     const isMatch = await comparePassword(payload.currentPassword, user.password)
     if (!isMatch) {
-      throw new AppError(400, 'Mật khẩu hiện tại không chính xác.')
+      throw new AppError(400, 'CURRENT_PASSWORD_INCORRECT')
     }
   }
 
@@ -135,10 +155,10 @@ export async function changeUserPassword(
 export async function linkGoogleAccount(userId: string, credential: string) {
   const user = await prisma.user.findUnique({ where: { id: userId } })
   if (!user || user.role !== 'CUSTOMER') {
-    throw new AppError(404, 'Không tìm thấy người dùng.')
+    throw new AppError(404, 'USER_NOT_FOUND')
   }
   if (!user.isActive) {
-    throw new AppError(403, 'Tài khoản đã bị khóa hoặc ngừng hoạt động.')
+    throw new AppError(403, 'ACCOUNT_DEACTIVATED')
   }
 
   let payload;
@@ -149,11 +169,11 @@ export async function linkGoogleAccount(userId: string, credential: string) {
     })
     payload = ticket.getPayload()
   } catch (error: any) {
-    throw new AppError(400, `Xác thực Google thất bại: ${error.message}`)
+    throw new AppError(400, 'GOOGLE_AUTH_FAILED')
   }
 
   if (!payload || !payload.sub) {
-    throw new AppError(400, 'Token Google không hợp lệ.')
+    throw new AppError(400, 'GOOGLE_TOKEN_INVALID')
   }
 
   const providerId = payload.sub
@@ -171,7 +191,7 @@ export async function linkGoogleAccount(userId: string, credential: string) {
     if (existingLink.userId === userId) {
       return
     } else {
-      throw new AppError(400, 'Tài khoản Google này đã được liên kết với một tài khoản khác.')
+      throw new AppError(400, 'GOOGLE_ALREADY_LINKED')
     }
   }
 
@@ -193,10 +213,10 @@ export async function unlinkGoogleAccount(userId: string, providerId: string) {
     include: { socialAccounts: true },
   })
   if (!user || user.role !== 'CUSTOMER') {
-    throw new AppError(404, 'Không tìm thấy người dùng.')
+    throw new AppError(404, 'USER_NOT_FOUND')
   }
   if (!user.isActive) {
-    throw new AppError(403, 'Tài khoản đã bị khóa hoặc ngừng hoạt động.')
+    throw new AppError(403, 'ACCOUNT_DEACTIVATED')
   }
 
   const targetLink = user.socialAccounts.find(
@@ -204,7 +224,7 @@ export async function unlinkGoogleAccount(userId: string, providerId: string) {
   )
 
   if (!targetLink) {
-    throw new AppError(404, 'Không tìm thấy liên kết Google tương ứng.')
+    throw new AppError(404, 'SOCIAL_ACCOUNT_NOT_FOUND')
   }
 
   const hasPassword = !!user.password
@@ -213,7 +233,7 @@ export async function unlinkGoogleAccount(userId: string, providerId: string) {
   if (!hasPassword && otherSocialCount === 0) {
     throw new AppError(
       400,
-      'Bạn phải thiết lập mật khẩu hoặc liên kết tài khoản khác trước khi hủy liên kết Google.'
+      'CANNOT_UNLINK_ONLY_SIGNIN_METHOD'
     )
   }
 
@@ -260,7 +280,7 @@ export async function revokeUserSession(userId: string, sessionId: string) {
   })
 
   if (!session) {
-    throw new AppError(404, 'Không tìm thấy phiên đăng nhập hoặc phiên đã hết hạn.')
+    throw new AppError(404, 'SESSION_NOT_FOUND')
   }
 
   await prisma.userSession.update({

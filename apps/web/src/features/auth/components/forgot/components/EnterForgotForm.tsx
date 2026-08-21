@@ -129,7 +129,7 @@ export function EnterForgotForm({
           {/* Action Button */}
           <Button
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || !identifier.trim()}
             className="w-full h-10 sm:h-11 bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/95 shadow-sm transition-all hover:shadow duration-300 flex items-center justify-center gap-2 group/btn font-semibold tracking-wider text-[11px] sm:text-xs uppercase rounded-lg disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {isLoading ? (

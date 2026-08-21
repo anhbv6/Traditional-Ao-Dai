@@ -82,7 +82,7 @@ export function ProfileExperience() {
         {/* Sidebar / Left Menu */}
         <aside className="space-y-2 w-full overflow-hidden">
           {/* Desktop Navigation */}
-          <nav className="hidden lg:block space-y-1.5 rounded-2xl border border-[#800020]/10 bg-white p-3 shadow-sm">
+          <nav className="hidden lg:block space-y-1.5 p-3">
             {tabList.map((tab) => {
               const Icon = tab.icon;
               return (
@@ -90,13 +90,13 @@ export function ProfileExperience() {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={cn(
-                    "cursor-pointer flex w-full items-center gap-3.5 rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-300",
+                    "cursor-pointer flex w-full items-center gap-3.5 rounded-xl py-3 text-sm font-semibold transition-all duration-300 border-l-4 pl-3",
                     activeTab === tab.id
-                      ? "bg-[#800020] text-white shadow-sm"
-                      : "text-[#706565] hover:bg-[#FAF7F5] hover:text-[#800020]"
+                      ? "bg-[#800020]/5 text-[#800020] border-[#800020]"
+                      : "text-[#706565] hover:bg-[#FAF7F5] hover:text-[#800020] border-transparent"
                   )}
                 >
-                  <Icon size={18} className={cn("shrink-0", activeTab === tab.id ? "text-white" : "text-[#706565]/80")} />
+                  <Icon size={18} className={cn("shrink-0", activeTab === tab.id ? "text-[#800020]" : "text-[#706565]/80")} />
                   <span>{tab.label}</span>
                 </button>
               );
@@ -173,7 +173,7 @@ export function ProfileExperience() {
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className={cn(
-                "relative z-50 flex size-10 items-center justify-center rounded-full bg-[#800020] text-white shadow-xl hover:bg-[#800020]/90 transition-all duration-300 active:scale-90 cursor-pointer border border-[#800020]/20",
+                "relative z-50 flex size-8 items-center justify-center rounded-full bg-[#800020] text-white shadow-xl hover:bg-[#800020]/90 transition-all duration-300 active:scale-90 cursor-pointer border border-[#800020]/20",
                 isMobileMenuOpen && "rotate-45"
               )}
               aria-label="Toggle profile menu"

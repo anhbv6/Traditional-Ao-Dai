@@ -26,7 +26,10 @@
     "previewAvatar": "Ảnh đại diện",
     "selectDate": "Chọn ngày",
     "changeInfoBtn": "Thay đổi thông tin",
-    "cancelBtn": "Hủy bỏ"
+    "cancelBtn": "Hủy bỏ",
+    "avatarUrlInvalid": "Không nhận được URL ảnh đại diện hợp lệ.",
+    "avatarUploadFailed": "Tải ảnh đại diện lên thất bại. Vui lòng thử lại.",
+    "updateError": "Có lỗi xảy ra trong quá trình cập nhật"
   },
   "orders": {
     "title": "Lịch sử đơn hàng",

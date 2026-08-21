@@ -7,7 +7,7 @@ import { Breadcrumbs } from "@/components/common/Breadcrumbs";
 export default function ProfilePage() {
   return (
     <ProtectedRoute>
-      <Container as="section" className="py-12 bg-[#FAF7F5] min-h-screen">
+      <Container as="section" className="bg-[#FAF7F5] min-h-screen">
         <Breadcrumbs />
         <ProfileExperience />
       </Container>

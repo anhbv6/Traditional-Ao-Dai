@@ -123,7 +123,7 @@ async function consumeResetToken(type: 'email' | 'phone', token: string, expecte
   const key = resetTokenKey(type, token)
   const storedTarget = await redis.get(key)
   if (!storedTarget || storedTarget !== expectedTarget) {
-    throw new AppError(400, 'Password reset session has expired or is invalid. Please request a new code.')
+    throw new AppError(400, 'RESET_TOKEN_INVALID')
   }
 
   await redis.del(key)
@@ -204,17 +204,17 @@ export async function clientLogin(input: LoginInput['body'], meta: SessionMeta =
 
   // Check user existence, verify they are a CUSTOMER
   if (!user || user.role !== 'CUSTOMER') {
-    throw new AppError(401, 'Account does not exist or is not a customer account.')
+    throw new AppError(401, 'USER_NOT_FOUND')
   }
 
   if (!user.isActive) {
-    throw new AppError(403, 'This account has been locked or deactivated.')
+    throw new AppError(403, 'ACCOUNT_DEACTIVATED')
   }
 
   // Verify password
   const isPasswordMatch = await comparePassword(password, user.password || '')
   if (!isPasswordMatch) {
-    throw new AppError(401, 'Incorrect password.')
+    throw new AppError(401, 'INCORRECT_PASSWORD')
   }
 
   const tokens = await createClientSession(user, meta, rememberMe)
@@ -245,11 +245,11 @@ export async function clientLoginWithOtp(input: OtpLoginInput['body'], meta: Ses
 
   // Check user existence, verify they are a CUSTOMER
   if (!user || user.role !== 'CUSTOMER') {
-    throw new AppError(400, 'Account is not registered. Please register first.')
+    throw new AppError(400, 'ACCOUNT_NOT_REGISTERED')
   }
 
   if (!user.isActive) {
-    throw new AppError(403, 'This account has been locked or deactivated.')
+    throw new AppError(403, 'ACCOUNT_DEACTIVATED')
   }
 
   // Update phone verified status if not already set
@@ -279,11 +279,11 @@ export async function refreshClientToken(input: RefreshTokenInput['body']) {
   try {
     decoded = verifyToken(input.refreshToken)
   } catch (error) {
-    throw new AppError(401, 'Invalid or expired refresh token')
+    throw new AppError(401, 'INVALID_REFRESH_TOKEN')
   }
 
   if (decoded.tokenType !== 'refresh' || !decoded.sessionId || !decoded.familyId) {
-    throw new AppError(401, 'Invalid refresh token type')
+    throw new AppError(401, 'INVALID_REFRESH_TOKEN_TYPE')
   }
 
   const currentRefreshTokenHash = hashToken(input.refreshToken)
@@ -298,7 +298,7 @@ export async function refreshClientToken(input: RefreshTokenInput['body']) {
 
   if (!session) {
     await revokeRefreshTokenFamily(decoded.familyId)
-    throw new AppError(401, 'Refresh token has been reused. Session family revoked.')
+    throw new AppError(401, 'REFRESH_TOKEN_REUSED')
   }
 
   if (
@@ -310,7 +310,7 @@ export async function refreshClientToken(input: RefreshTokenInput['body']) {
     !session.user.isActive ||
     session.user.role !== 'CUSTOMER'
   ) {
-    throw new AppError(401, 'Session expired or revoked')
+    throw new AppError(401, 'SESSION_EXPIRED_OR_REVOKED')
   }
 
   const rememberMe = decoded.rememberMe === true
@@ -376,7 +376,7 @@ export async function logoutClient(userId: string, sessionId?: string, refreshTo
   }
 
   if (!refreshToken) {
-    throw new AppError(400, 'Refresh token or authenticated session is required')
+    throw new AppError(400, 'REFRESH_TOKEN_REQUIRED')
   }
 
   await prisma.userSession.deleteMany({
@@ -414,7 +414,7 @@ export async function logoutClientByRefreshToken(refreshToken: string) {
  */
 export async function checkAccountAvailability(email?: string, phone?: string): Promise<CheckAccountResult> {
   if (!email && !phone) {
-    throw new AppError(400, 'At least email or phone number must be provided for verification')
+    throw new AppError(400, 'EMAIL_OR_PHONE_REQUIRED')
   }
 
   if (email) {
@@ -437,63 +437,6 @@ export async function checkAccountAvailability(email?: string, phone?: string): 
   }
 }
 
-/**
- * Updates user profile details in the database.
- */
-export async function updateUserProfile(
-  id: string,
-  data: { name?: string; phone?: string; avatar?: string; dob?: string; gender?: string }
-) {
-  const updateData: any = {}
-
-  if (data.name !== undefined) {
-    updateData.name = data.name
-  }
-
-  if (data.phone !== undefined) {
-    // Check if phone number is already in use by another user
-    if (data.phone) {
-      const existingPhoneUser = await prisma.user.findFirst({
-        where: {
-          phone: data.phone,
-          NOT: { id },
-        },
-      })
-      if (existingPhoneUser) {
-        throw new AppError(400, 'This phone number is already registered by another account.')
-      }
-    }
-    updateData.phone = data.phone || null
-  }
-
-  if (data.avatar !== undefined) {
-    updateData.avatar = data.avatar
-  }
-
-  if (data.dob !== undefined) {
-    updateData.birth = data.dob ? new Date(data.dob) : null
-  }
-
-  if (data.gender !== undefined) {
-    const genderUpper = String(data.gender).toUpperCase()
-    if (genderUpper === 'MALE') {
-      updateData.gender = 'MALE'
-    } else if (genderUpper === 'FEMALE') {
-      updateData.gender = 'FEMALE'
-    } else {
-      updateData.gender = 'OTHER'
-    }
-  }
-
-  const updatedUser = await prisma.user.update({
-    where: { id },
-    data: updateData,
-  })
-
-  const { password: _, ...safeUser } = updatedUser
-  return safeUser
-}
-
 const googleClient = new OAuth2Client(env.GOOGLE_CLIENT_ID)
 
 export async function clientLoginWithGoogle(credential: string, meta: SessionMeta) {
@@ -504,7 +447,7 @@ export async function clientLoginWithGoogle(credential: string, meta: SessionMet
     })
     const payload = ticket.getPayload()
     if (!payload || !payload.email) {
-      throw new AppError(400, 'Invalid Google ID token payload.')
+      throw new AppError(400, 'INVALID_GOOGLE_TOKEN')
     }
 
     const email = payload.email.trim().toLowerCase()
@@ -531,12 +474,12 @@ export async function clientLoginWithGoogle(credential: string, meta: SessionMet
     } else {
       // User exists, check if active
       if (!user.isActive) {
-        throw new AppError(403, 'This account has been locked or deactivated.')
+        throw new AppError(403, 'ACCOUNT_DEACTIVATED')
       }
 
       // Ensure they are customer
       if (user.role !== 'CUSTOMER') {
-        throw new AppError(403, 'Access denied: insufficient permissions.')
+        throw new AppError(403, 'INSUFFICIENT_PERMISSIONS')
       }
 
       // Optionally update name and avatar if not set
@@ -562,7 +505,7 @@ export async function clientLoginWithGoogle(credential: string, meta: SessionMet
     }
   } catch (error: any) {
     if (error instanceof AppError) throw error
-    throw new AppError(400, `Google authentication failed: ${error.message}`)
+    throw new AppError(400, 'GOOGLE_AUTH_FAILED')
   }
 }
 
@@ -578,14 +521,14 @@ export async function sendForgotPasswordEmail(input: ForgotPasswordEmailInput['b
   })
 
   if (!user) {
-    throw new AppError(404, 'User with this email was not found.')
+    throw new AppError(404, 'USER_NOT_FOUND')
   }
 
   // Check cooldown
   const cooldownKey = `email:cooldown:RESET_PASSWORD:${email}`
   const hasCooldown = await redis.get(cooldownKey)
   if (hasCooldown) {
-    throw new AppError(429, 'Please wait 60 seconds before requesting a new code.')
+    throw new AppError(429, 'COOLDOWN_ACTIVE')
   }
 
   // Generate 6-digit code
@@ -626,11 +569,11 @@ export async function verifyResetPasswordEmailCode(input: VerifyResetPasswordEma
   const savedCode = await redis.get(resetKey)
 
   if (!savedCode) {
-    throw new AppError(400, 'Verification code has expired or does not exist. Please request a new one.')
+    throw new AppError(400, 'VERIFICATION_CODE_EXPIRED_OR_INVALID')
   }
 
   if (savedCode !== code) {
-    throw new AppError(400, 'Incorrect verification code. Please try again.')
+    throw new AppError(400, 'INCORRECT_VERIFICATION_CODE')
   }
 
   const user = await prisma.user.findFirst({
@@ -638,7 +581,7 @@ export async function verifyResetPasswordEmailCode(input: VerifyResetPasswordEma
   })
 
   if (!user) {
-    throw new AppError(404, 'User with this email was not found.')
+    throw new AppError(404, 'USER_NOT_FOUND')
   }
 
   await redis.del(resetKey)
@@ -650,7 +593,7 @@ export async function verifyResetPasswordEmailCode(input: VerifyResetPasswordEma
 export async function verifyResetPasswordPhoneCode(input: VerifyResetPasswordPhoneInput['body']) {
   const normalizedPhone = normalizeVietnamPhone(input.phone)
   if (!normalizedPhone) {
-    throw new AppError(400, 'Invalid phone number.')
+    throw new AppError(400, 'INVALID_PHONE_NUMBER')
   }
 
   await verifyOtp(normalizedPhone, 'RESET_PASSWORD', input.code)
@@ -660,7 +603,7 @@ export async function verifyResetPasswordPhoneCode(input: VerifyResetPasswordPho
   })
 
   if (!user) {
-    throw new AppError(404, 'User with this phone number was not found.')
+    throw new AppError(404, 'USER_NOT_FOUND')
   }
 
   return storeResetToken('phone', normalizedPhone)
@@ -680,16 +623,16 @@ export async function resetPasswordByEmail(input: ResetPasswordEmailInput['body'
     const savedCode = await redis.get(resetKey)
 
     if (!savedCode) {
-      throw new AppError(400, 'Verification code has expired or does not exist. Please request a new one.')
+      throw new AppError(400, 'VERIFICATION_CODE_EXPIRED_OR_INVALID')
     }
 
     if (savedCode !== code) {
-      throw new AppError(400, 'Incorrect verification code. Please try again.')
+      throw new AppError(400, 'INCORRECT_VERIFICATION_CODE')
     }
 
     await redis.del(resetKey)
   } else {
-    throw new AppError(400, 'Verification code or reset token is required.')
+    throw new AppError(400, 'VERIFICATION_CODE_OR_RESET_TOKEN_REQUIRED')
   }
 
   // Find user
@@ -698,7 +641,7 @@ export async function resetPasswordByEmail(input: ResetPasswordEmailInput['body'
   })
 
   if (!user) {
-    throw new AppError(404, 'User with this email was not found.')
+    throw new AppError(404, 'USER_NOT_FOUND')
   }
 
   // Hash new password
@@ -730,7 +673,7 @@ export async function resetPasswordByPhone(input: ResetPasswordPhoneInput['body'
 
   const normalizedPhone = normalizeVietnamPhone(phone)
   if (!normalizedPhone) {
-    throw new AppError(400, 'Invalid phone number.')
+    throw new AppError(400, 'INVALID_PHONE_NUMBER')
   }
 
   if (resetToken) {
@@ -738,7 +681,7 @@ export async function resetPasswordByPhone(input: ResetPasswordPhoneInput['body'
   } else if (code) {
     await verifyOtp(normalizedPhone, 'RESET_PASSWORD', code)
   } else {
-    throw new AppError(400, 'OTP code or reset token is required.')
+    throw new AppError(400, 'OTP_CODE_OR_RESET_TOKEN_REQUIRED')
   }
 
   // Find user
@@ -747,7 +690,7 @@ export async function resetPasswordByPhone(input: ResetPasswordPhoneInput['body'
   })
 
   if (!user) {
-    throw new AppError(404, 'User with this phone number was not found.')
+    throw new AppError(404, 'USER_NOT_FOUND')
   }
 
   // Hash new password

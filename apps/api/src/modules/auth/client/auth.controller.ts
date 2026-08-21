@@ -237,29 +237,6 @@ export async function loginWithGoogle(req: Request, res: Response, next: NextFun
 }
 
 /**
- * Controller handler to update logged in user profile
- */
-export async function updateProfile(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<any> {
-  try {
-    const userId = req.user?.userId
-    if (!userId) {
-      return sendError(res, {
-        statusCode: 401,
-        message: 'UNAUTHORIZED',
-      })
-    }
-
-    const updatedUser = await authService.updateUserProfile(userId, req.body)
-    return sendSuccess(res, {
-      data: updatedUser,
-      message: 'UPDATE_PROFILE_SUCCESS',
-    })
-  } catch (error) {
-    return next(error)
-  }
-}
-
-/**
  * Controller handler for forgot password via Email
  */
 export async function forgotPasswordEmail(req: Request, res: Response, next: NextFunction): Promise<any> {

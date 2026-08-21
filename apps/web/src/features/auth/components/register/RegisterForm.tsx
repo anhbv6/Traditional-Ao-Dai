@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/set-state-in-effect */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import React, { useRef, useState, useEffect } from 'react';
@@ -8,9 +10,57 @@ import { RegisterFormStep } from './components/RegisterFormStep';
 import { RegisterOtpStep } from './components/RegisterOtpStep';
 import { LoadingOverlay } from '@/components/shared/LoadingOverlay';
 
+import { Volume2, VolumeOff } from 'lucide-react';
+
 export function RegisterForm() {
   const [validationTooltipSignal, setValidationTooltipSignal] = useState(0);
   const [validationTooltipTarget, setValidationTooltipTarget] = useState<string>();
+
+  // Audio Player states and refs
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  useEffect(() => {
+    // Instantiate Audio
+    const audio = new Audio('/thanh_tan.mp3');
+    audio.loop = true;
+    audioRef.current = audio;
+
+    // Autoplay when mounting (navigating from Login to Register)
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          setIsPlaying(true);
+        })
+        .catch((error) => {
+          console.log('Autoplay was prevented by browser policy:', error);
+          setIsPlaying(false);
+        });
+    }
+
+    return () => {
+      audio.pause();
+      audioRef.current = null;
+    };
+  }, []);
+
+  const togglePlay = () => {
+    if (!audioRef.current) return;
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      audioRef.current
+        .play()
+        .then(() => {
+          setIsPlaying(true);
+        })
+        .catch((err) => {
+          console.error('Failed to play audio:', err);
+        });
+    }
+  };
 
   const {
     t,
@@ -158,6 +208,19 @@ export function RegisterForm() {
           />
         )}
       </motion.div>
+
+      {/* Floating Audio Toggle Button */}
+      <button
+        onClick={togglePlay}
+        className="fixed bottom-6 right-6 z-50 flex size-10 items-center justify-center rounded-full bg-[#800020] text-white shadow-lg border border-[#800020]/20 hover:scale-110 active:scale-95 transition-all duration-300 cursor-pointer"
+        aria-label="Toggle music"
+      >
+        {isPlaying ? (
+          <Volume2 className="size-5 animate-pulse" />
+        ) : (
+          <VolumeOff className="size-5" />
+        )}
+      </button>
     </div>
   );
 }
