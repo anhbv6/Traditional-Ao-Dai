@@ -52,12 +52,19 @@
     "title": "Manage Address",
     "subtitle": "Add or modify your shipping addresses.",
     "empty": "You have no saved shipping addresses.",
+    "loading": "Loading shipping addresses...",
     "addBtn": "Add New Address",
     "editTitle": "Edit Address",
     "default": "Default",
     "edit": "Edit",
     "delete": "Delete",
     "setAsDefault": "Set as default",
+    "deleteDialog": {
+      "title": "Confirm Delete Address",
+      "subtitle": "This action cannot be undone once confirmed",
+      "message": "Are you sure you want to delete this shipping address from your saved list?",
+      "confirmBtn": "Delete Address"
+    },
     "form": {
       "receiverName": "Receiver Name",
       "receiverPhone": "Receiver Phone",
@@ -69,13 +76,15 @@
       "isDefault": "Set as default address",
       "cancelBtn": "Cancel",
       "submitBtn": "Save Address",
+      "loading": "Loading...",
       "placeholderName": "Please enter receiver name",
       "placeholderPhone": "Please enter receiver phone number",
       "placeholderProvince": "Please enter province/city",
       "placeholderDistrict": "Please enter district",
       "placeholderWard": "Please enter ward",
       "placeholderDetail": "Please enter detail address",
-      "placeholderLabel": "Please enter address label"
+      "placeholderLabel": "Please enter address label",
+      "previewTitle": "Address Preview"
     }
   },
   "payment": {

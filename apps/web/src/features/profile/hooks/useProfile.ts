@@ -17,3 +17,4 @@ export * from "./useManagePayment";
 export * from "./useSetting";
 export * from "./useOrderHistory";
 export * from "./useSecurity";
+export * from "./useVietnamAddress";

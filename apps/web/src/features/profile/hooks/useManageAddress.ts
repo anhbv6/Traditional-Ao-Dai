@@ -92,9 +92,7 @@ export function useManageAddress() {
   };
 
   const handleDelete = (id: string) => {
-    if (confirm("Bạn có chắc chắn muốn xóa địa chỉ này không?")) {
-      deleteAddressMutation.mutate(id);
-    }
+    deleteAddressMutation.mutate(id);
   };
 
   const handleSetDefault = (id: string) => {

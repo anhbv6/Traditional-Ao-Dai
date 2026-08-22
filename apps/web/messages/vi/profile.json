@@ -52,12 +52,19 @@
     "title": "Sổ địa chỉ",
     "subtitle": "Thêm hoặc chỉnh sửa địa chỉ nhận hàng của bạn.",
     "empty": "Bạn chưa có địa chỉ nhận hàng nào.",
+    "loading": "Đang tải danh sách địa chỉ...",
     "addBtn": "Thêm địa chỉ mới",
     "editTitle": "Chỉnh sửa địa chỉ",
     "default": "Mặc định",
     "edit": "Chỉnh sửa",
     "delete": "Xóa",
     "setAsDefault": "Đặt làm mặc định",
+    "deleteDialog": {
+      "title": "Xác nhận xóa địa chỉ",
+      "subtitle": "Hành động này không thể hoàn tác sau khi thực hiện",
+      "message": "Bạn có chắc chắn muốn xóa địa chỉ giao hàng này khỏi danh sách đã lưu không?",
+      "confirmBtn": "Xóa địa chỉ"
+    },
     "form": {
       "receiverName": "Tên người nhận",
       "receiverPhone": "Số điện thoại nhận hàng",
@@ -69,13 +76,15 @@
       "isDefault": "Đặt làm địa chỉ mặc định",
       "cancelBtn": "Hủy",
       "submitBtn": "Lưu địa chỉ",
+      "loading": "Đang tải...",
       "placeholderName": "Vui lòng nhập tên người nhận",
       "placeholderPhone": "Vui lòng nhập số điện thoại nhận hàng",
       "placeholderProvince": "Vui lòng nhập tỉnh/thành phố",
       "placeholderDistrict": "Vui lòng nhập quận/huyện",
       "placeholderWard": "Vui lòng nhập phường/xã",
       "placeholderDetail": "Vui lòng nhập địa chỉ chi tiết",
-      "placeholderLabel": "Vui lòng nhập nhãn địa chỉ"
+      "placeholderLabel": "Vui lòng nhập nhãn địa chỉ",
+      "previewTitle": "Xem trước địa chỉ"
     }
   },
   "payment": {
