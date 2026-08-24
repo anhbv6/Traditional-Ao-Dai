@@ -5,12 +5,12 @@ import { useTranslations } from "next-intl";
 import { User, ShoppingBag, MapPin, CreditCard, Shield, Settings, LogOut, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-import { PersonalInfoTab } from "./PersonalInfoTab";
-import { OrderHistoryTab } from "./OrderHistoryTab";
-import { ManageAddressTab } from "./ManageAddressTab";
-import { ManagePaymentTab } from "./ManagePaymentTab";
-import { SecurityTab } from "./SecurityTab";
-import { SettingTab } from "./SettingTab";
+import { PersonalInfoTab } from "./personal-info";
+import { OrderHistoryTab } from "./order-history";
+import { ManageAddressTab } from "./manage-address";
+import { ManagePaymentTab } from "./manage-payment";
+import { SecurityTab } from "./security";
+import { SettingTab } from "./setting";
 import { useProfile } from "../hooks/useProfile";
 import { useRouter } from "@/i18n/routing";
 import { useAuthStore } from "@/features/auth/store/authStore";
@@ -68,7 +68,7 @@ export function ProfileExperience() {
   return (
     <div>
       {/* Header */}
-      <div className=" sm:mb-10 ">
+      <div className="hidden sm:mb-10 sm:block">
         <h1 className="font-[family-name:var(--font-playfair)] text-3xl font-bold text-[#800020] sm:text-4xl">
           {t("title")}
         </h1>

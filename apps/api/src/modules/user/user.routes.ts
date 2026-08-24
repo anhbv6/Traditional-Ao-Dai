@@ -54,9 +54,9 @@ router.use(requireAuth)
  *                 example: OTHER
  *     responses:
  *       200:
- *         description: Profile updated successfully
+ *         description: UPDATE_PROFILE_SUCCESS
  *       400:
- *         description: Validation error or phone number already in use
+ *         description: VALIDATION_ERROR, EMAIL_ALREADY_EXISTS, PHONE_ALREADY_EXISTS, or GENDER_INVALID
  *       401:
  *         description: Unauthorized
  */
@@ -91,9 +91,9 @@ router.put('/profile', validate(updateProfileSchema), userController.updateProfi
  *                 example: "newpassword123"
  *     responses:
  *       200:
- *         description: Password changed successfully
+ *         description: CHANGE_PASSWORD_SUCCESS
  *       400:
- *         description: Validation error or incorrect current password
+ *         description: VALIDATION_ERROR, CURRENT_PASSWORD_REQUIRED, or CURRENT_PASSWORD_INCORRECT
  *       401:
  *         description: Unauthorized
  */
@@ -124,9 +124,9 @@ router.post('/change-password', validate(changePasswordSchema), userController.c
  *                 example: "eyJhbGciOiJSUzI1NiIs..."
  *     responses:
  *       200:
- *         description: Google account linked successfully
+ *         description: LINK_ACCOUNT_SUCCESS
  *       400:
- *         description: Validation error or Google account already linked to another user
+ *         description: VALIDATION_ERROR, GOOGLE_AUTH_FAILED, GOOGLE_TOKEN_INVALID, or GOOGLE_ALREADY_LINKED
  *       401:
  *         description: Unauthorized
  */
@@ -151,13 +151,13 @@ router.post('/link', validate(linkGoogleSchema), userController.linkAccount)
  *         description: Google providerId (Google account subject sub ID)
  *     responses:
  *       200:
- *         description: Google account unlinked successfully
+ *         description: UNLINK_ACCOUNT_SUCCESS
  *       400:
- *         description: Cannot unlink if user has no password and no other social accounts
+ *         description: CANNOT_UNLINK_ONLY_SIGNIN_METHOD
  *       401:
  *         description: Unauthorized
  *       404:
- *         description: Link not found
+ *         description: SOCIAL_ACCOUNT_NOT_FOUND
  */
 router.delete('/unlink/:providerId', validate(unlinkGoogleSchema), userController.unlinkAccount)
 
@@ -173,7 +173,7 @@ router.delete('/unlink/:providerId', validate(unlinkGoogleSchema), userControlle
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: List of sessions retrieved successfully
+ *         description: GET_SESSIONS_SUCCESS
  *       401:
  *         description: Unauthorized
  */
@@ -198,11 +198,11 @@ router.get('/sessions', userController.getSessions)
  *         description: Session ID to revoke
  *     responses:
  *       200:
- *         description: Session revoked successfully
+ *         description: REVOKE_SESSION_SUCCESS
  *       401:
  *         description: Unauthorized
  *       404:
- *         description: Session not found
+ *         description: SESSION_NOT_FOUND
  */
 router.delete('/session/:sessionId', validate(deleteSessionSchema), userController.revokeSession)
 
@@ -220,7 +220,7 @@ router.delete('/session/:sessionId', validate(deleteSessionSchema), userControll
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Addresses retrieved successfully
+ *         description: GET_ADDRESSES_SUCCESS
  *         content:
  *           application/json:
  *             schema:
@@ -258,7 +258,7 @@ router.get('/addresses', userController.getAddresses)
  *             $ref: '#/components/schemas/CreateUserAddressRequest'
  *     responses:
  *       201:
- *         description: Address created successfully
+ *         description: CREATE_ADDRESS_SUCCESS
  *         content:
  *           application/json:
  *             schema:
@@ -272,7 +272,7 @@ router.get('/addresses', userController.getAddresses)
  *                     data:
  *                       $ref: '#/components/schemas/UserAddress'
  *       400:
- *         description: Validation error or max address limit reached
+ *         description: VALIDATION_ERROR or MAX_ADDRESS_LIMIT_REACHED
  *         content:
  *           application/json:
  *             schema:
@@ -302,7 +302,7 @@ router.post('/addresses', validate(createAddressSchema), userController.createAd
  *         description: Address ID
  *     responses:
  *       200:
- *         description: Default address set successfully
+ *         description: SET_DEFAULT_ADDRESS_SUCCESS
  *         content:
  *           application/json:
  *             schema:
@@ -318,7 +318,7 @@ router.post('/addresses', validate(createAddressSchema), userController.createAd
  *       401:
  *         description: Unauthorized
  *       404:
- *         description: Address not found
+ *         description: ADDRESS_NOT_FOUND
  */
 router.patch('/addresses/:id/default', validate(addressIdParamsSchema), userController.setDefaultAddress)
 
@@ -348,7 +348,7 @@ router.patch('/addresses/:id/default', validate(addressIdParamsSchema), userCont
  *             $ref: '#/components/schemas/UpdateUserAddressRequest'
  *     responses:
  *       200:
- *         description: Address updated successfully
+ *         description: UPDATE_ADDRESS_SUCCESS
  *         content:
  *           application/json:
  *             schema:
@@ -362,7 +362,7 @@ router.patch('/addresses/:id/default', validate(addressIdParamsSchema), userCont
  *                     data:
  *                       $ref: '#/components/schemas/UserAddress'
  *       400:
- *         description: Validation error
+ *         description: VALIDATION_ERROR
  *         content:
  *           application/json:
  *             schema:
@@ -370,7 +370,7 @@ router.patch('/addresses/:id/default', validate(addressIdParamsSchema), userCont
  *       401:
  *         description: Unauthorized
  *       404:
- *         description: Address not found
+ *         description: ADDRESS_NOT_FOUND
  */
 router.patch('/addresses/:id', validate(updateAddressSchema), userController.updateAddress)
 
@@ -394,7 +394,7 @@ router.patch('/addresses/:id', validate(updateAddressSchema), userController.upd
  *         description: Address ID
  *     responses:
  *       200:
- *         description: Address deleted successfully
+ *         description: DELETE_ADDRESS_SUCCESS
  *         content:
  *           application/json:
  *             schema:
@@ -411,7 +411,7 @@ router.patch('/addresses/:id', validate(updateAddressSchema), userController.upd
  *       401:
  *         description: Unauthorized
  *       404:
- *         description: Address not found
+ *         description: ADDRESS_NOT_FOUND
  */
 router.delete('/addresses/:id', validate(addressIdParamsSchema), userController.deleteAddress)
 

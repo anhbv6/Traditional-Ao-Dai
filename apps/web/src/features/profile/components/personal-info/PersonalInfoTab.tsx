@@ -3,7 +3,7 @@
 import React, { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { User, Mail, Phone, Calendar as CalendarIcon, Camera, Smile } from "lucide-react";
-import { usePersonalInfo } from "../hooks/useProfile";
+import { usePersonalInfo } from "../../hooks/useProfile";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -151,15 +151,6 @@ export function PersonalInfoTab() {
 
   return (
     <div className="rounded-2xl border border-[#800020]/10 bg-white p-4 shadow-sm sm:p-8">
-      {/* <div>
-        <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-[#800020]">
-          {t("title")}
-        </h2>
-        <p className="mt-1 text-sm text-[#706565]">
-          {t("subtitle")}
-        </p>
-      </div> */}
-
       <form onSubmit={onSaveSubmit} className="space-y-6">
         {/* Avatar Section */}
         <div className="flex flex-col sm:flex-row items-center gap-4 pb-4 sm:gap-6 sm:pb-6 border-b border-[#800020]/10">

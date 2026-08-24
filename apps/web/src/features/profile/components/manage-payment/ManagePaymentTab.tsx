@@ -3,8 +3,8 @@
 import React from "react";
 import { useTranslations } from "next-intl";
 import { CreditCard, Plus, Trash2, Check, Sparkles } from "lucide-react";
-import { useManagePayment } from "../hooks/useProfile";
-import { type PaymentCard } from "../types/profile.types";
+import { useManagePayment } from "../../hooks/useProfile";
+import { type PaymentCard } from "../../types/profile.types";
 import { Input } from "@/components/ui/input";
 
 export function ManagePaymentTab() {

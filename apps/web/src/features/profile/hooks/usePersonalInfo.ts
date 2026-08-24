@@ -6,9 +6,10 @@ import React, { useState, useEffect } from "react";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { type AuthUser } from "@/features/auth/types/auth.types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiClient } from "@/lib/api-client";
+import { apiClient, getErrorMessage } from "@/lib/api-client";
 import { showToast as toast } from "@/components/ui/toast";
 import { useTranslations } from "next-intl";
+import { translateProfileResponse } from "../utils/translateProfileResponse";
 
 function getPersonalInfoFormValues(user: AuthUser | null) {
   const birthDate = user?.birth ? new Date(user.birth) : undefined;
@@ -33,6 +34,7 @@ export function usePersonalInfo() {
   const { user, setUser } = useAuthStore();
   const queryClient = useQueryClient();
   const t = useTranslations("ProfilePage.personal");
+  const tProfile = useTranslations("ProfilePage");
   const initialFormValues = getPersonalInfoFormValues(user);
 
   const [fullName, setFullName] = useState(initialFormValues.fullName);
@@ -71,8 +73,8 @@ export function usePersonalInfo() {
       toast.success(t("successMsg"));
     },
     onError: (error: unknown) => {
-      const message = error instanceof Error ? error.message : t("updateError");
-      toast.error(message);
+      const message = getErrorMessage(error, t("updateError"));
+      toast.error(translateProfileResponse(tProfile, message, t("updateError")));
     },
   });
 

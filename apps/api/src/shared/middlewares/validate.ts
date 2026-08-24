@@ -22,7 +22,7 @@ export const validate = (schema: ZodObject<any, any>) => {
         return res.status(400).json({
           status: 'error',
           statusCode: 400,
-          message: 'Validation error',
+          message: 'VALIDATION_ERROR',
           errors: error.issues.map((err: any) => ({
             field: err.path.slice(1).join('.'), // e.g., 'body.email' -> 'email'
             message: err.message,

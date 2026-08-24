@@ -3,10 +3,10 @@
 import React from "react";
 import { useTranslations } from "next-intl";
 import { Lock, Eye, EyeOff, Shield, ShieldAlert, Sparkles, Smartphone, LogOut, Laptop, Monitor, ChevronDown } from "lucide-react";
-import { useSecurity } from "../hooks/useProfile";
+import { useSecurity } from "../../hooks/useProfile";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
-import { GoogleAuthButton } from "../../auth/components/GoogleAuthButton";
+import { GoogleAuthButton } from "@/features/auth/components/GoogleAuthButton";
 
 export function SecurityTab() {
   const t = useTranslations("ProfilePage.security");

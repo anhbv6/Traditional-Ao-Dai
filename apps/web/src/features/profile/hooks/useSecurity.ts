@@ -4,8 +4,10 @@ import React, { useState } from "react";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { type AuthUser } from "@/features/auth/types/auth.types";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { apiClient } from "@/lib/api-client";
+import { apiClient, getErrorMessage } from "@/lib/api-client";
 import { showToast as toast } from "@/components/ui/toast";
+import { useTranslations } from "next-intl";
+import { translateProfileResponse } from "../utils/translateProfileResponse";
 
 // Helper to parse User-Agent
 function parseUserAgent(ua: string) {
@@ -73,6 +75,7 @@ interface RawSession {
 }
 
 export function useSecurity() {
+  const t = useTranslations("ProfilePage");
   const { user, setUser } = useAuthStore();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -126,8 +129,9 @@ export function useSecurity() {
       setTimeout(() => setShowSuccessPass(false), 3000);
     },
     onError: (error: unknown) => {
-      const message = error instanceof Error ? error.message : "Có lỗi xảy ra khi đổi mật khẩu";
-      toast.error(message);
+      const fallback = "Có lỗi xảy ra khi đổi mật khẩu";
+      const message = getErrorMessage(error, fallback);
+      toast.error(translateProfileResponse(t, message, fallback));
     },
   });
 
@@ -175,8 +179,9 @@ export function useSecurity() {
       toast.success("Đã đăng xuất thiết bị thành công!");
     },
     onError: (error: unknown) => {
-      const message = error instanceof Error ? error.message : "Có lỗi xảy ra khi hủy phiên đăng nhập";
-      toast.error(message);
+      const fallback = "Có lỗi xảy ra khi hủy phiên đăng nhập";
+      const message = getErrorMessage(error, fallback);
+      toast.error(translateProfileResponse(t, message, fallback));
     },
   });
 
@@ -207,8 +212,9 @@ export function useSecurity() {
       toast.success("Liên kết tài khoản Google thành công!");
     },
     onError: (error: unknown) => {
-      const message = error instanceof Error ? error.message : "Có lỗi xảy ra khi liên kết tài khoản";
-      toast.error(message);
+      const fallback = "Có lỗi xảy ra khi liên kết tài khoản";
+      const message = getErrorMessage(error, fallback);
+      toast.error(translateProfileResponse(t, message, fallback));
     },
   });
 
@@ -225,8 +231,9 @@ export function useSecurity() {
       toast.success("Hủy liên kết tài khoản Google thành công!");
     },
     onError: (error: unknown) => {
-      const message = error instanceof Error ? error.message : "Có lỗi xảy ra khi hủy liên kết";
-      toast.error(message);
+      const fallback = "Có lỗi xảy ra khi hủy liên kết";
+      const message = getErrorMessage(error, fallback);
+      toast.error(translateProfileResponse(t, message, fallback));
     },
   });
 
