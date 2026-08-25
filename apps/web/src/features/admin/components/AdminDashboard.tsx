@@ -12,12 +12,8 @@ import {
   Activity,
   ChevronRight,
   AlertTriangle,
-  Layers,
-  ChevronDown,
   User,
-  MapPin,
   CheckCircle2,
-  Calendar,
   X,
   CreditCard
 } from "lucide-react";

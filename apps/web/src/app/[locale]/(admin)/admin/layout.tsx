@@ -1,8 +1,8 @@
 "use client";
 
 import React, { ReactNode } from "react";
-import { useTranslations, useLocale } from "next-intl";
-import { Shield, LayoutDashboard, LogOut, Globe, User } from "lucide-react";
+import { useLocale } from "next-intl";
+import { Shield, Globe, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ProtectedRoute } from "@/components/providers/ProtectedRoute";

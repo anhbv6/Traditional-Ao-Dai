@@ -1,6 +1,11 @@
-import React from "react";
-import { AdminDashboard } from "@/components/admin/AdminDashboard";
+import { redirect } from "next/navigation";
 
-export default function DashBoardPage() {
-  return <AdminDashboard />;
+export default async function AdminPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+
+  redirect(`/${locale}/admin/login`);
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
@@ -8,10 +9,10 @@ import { showToast as toast } from "@/components/ui/toast";
 
 export function AdminLoginForm() {
   const router = useRouter();
+  const locale = useLocale();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const validateEmail = (val: string) => {
@@ -37,8 +38,7 @@ export function AdminLoginForm() {
     setTimeout(() => {
       setIsLoading(false);
       toast.success("Đăng nhập quản trị viên thành công!");
-      // Redirect to admin dashboard page
-      router.push("/vi/admin");
+      router.push(`/${locale}/admin/dashboard`);
     }, 1500);
   };
 
