@@ -18,6 +18,18 @@ import {
 
 const ADDRESS_QUERY_KEY = ["userAddresses"] as const;
 
+type ApiMessageResponse = {
+  message?: string;
+};
+
+const getResponseMessage = (response: unknown, fallbackKey: string) => {
+  if (response && typeof response === "object" && "message" in response) {
+    return String((response as ApiMessageResponse).message);
+  }
+
+  return fallbackKey;
+};
+
 function useRefreshAddresses() {
   const queryClient = useQueryClient();
   return () => queryClient.invalidateQueries({ queryKey: ADDRESS_QUERY_KEY });
@@ -40,12 +52,14 @@ export function useManageAddress() {
 
   const setDefaultAddressMutation = useMutation({
     mutationFn: setDefaultAddressApi,
-    onSuccess: () => {
+    onSuccess: (response) => {
       refreshAddresses();
-      toast.success("Đã đặt làm địa chỉ mặc định!");
+      const fallback = t("responses.SET_DEFAULT_ADDRESS_SUCCESS");
+      const message = getResponseMessage(response, "SET_DEFAULT_ADDRESS_SUCCESS");
+      toast.success(translateProfileResponse(t, message, fallback));
     },
     onError: (error: unknown) => {
-      const fallback = "Không thể đặt địa chỉ mặc định";
+      const fallback = t("responses.SET_DEFAULT_ADDRESS_ERROR");
       const message = getErrorMessage(error, fallback);
       toast.error(translateProfileResponse(t, message, fallback));
     },
@@ -111,27 +125,31 @@ export function useAddressForm() {
 
   const createAddressMutation = useMutation({
     mutationFn: createAddressApi,
-    onSuccess: () => {
+    onSuccess: (response) => {
       refreshAddresses();
-      toast.success("Thêm địa chỉ thành công!");
+      const fallback = t("responses.CREATE_ADDRESS_SUCCESS");
+      const message = getResponseMessage(response, "CREATE_ADDRESS_SUCCESS");
+      toast.success(translateProfileResponse(t, message, fallback));
       closeForm();
     },
     onError: (error: unknown) => {
-      const fallback = "Không thể thêm địa chỉ";
-      const message = getErrorMessage(error, "Không thể thêm địa chỉ");
+      const fallback = t("responses.CREATE_ADDRESS_ERROR");
+      const message = getErrorMessage(error, fallback);
       toast.error(translateProfileResponse(t, message, fallback));
     },
   });
 
   const updateAddressMutation = useMutation({
     mutationFn: updateAddressApi,
-    onSuccess: () => {
+    onSuccess: (response) => {
       refreshAddresses();
-      toast.success("Cập nhật địa chỉ thành công!");
+      const fallback = t("responses.UPDATE_ADDRESS_SUCCESS");
+      const message = getResponseMessage(response, "UPDATE_ADDRESS_SUCCESS");
+      toast.success(translateProfileResponse(t, message, fallback));
       closeForm();
     },
     onError: (error: unknown) => {
-      const fallback = "Không thể cập nhật địa chỉ";
+      const fallback = t("responses.UPDATE_ADDRESS_ERROR");
       const message = getErrorMessage(error, fallback);
       toast.error(translateProfileResponse(t, message, fallback));
     },
@@ -183,12 +201,14 @@ export function useDeleteAddress() {
   const refreshAddresses = useRefreshAddresses();
   const deleteAddressMutation = useMutation({
     mutationFn: deleteAddressApi,
-    onSuccess: () => {
+    onSuccess: (response) => {
       refreshAddresses();
-      toast.success("Đã xóa địa chỉ thành công!");
+      const fallback = t("responses.DELETE_ADDRESS_SUCCESS");
+      const message = getResponseMessage(response, "DELETE_ADDRESS_SUCCESS");
+      toast.success(translateProfileResponse(t, message, fallback));
     },
     onError: (error: unknown) => {
-      const fallback = "Không thể xóa địa chỉ";
+      const fallback = t("responses.DELETE_ADDRESS_ERROR");
       const message = getErrorMessage(error, fallback);
       toast.error(translateProfileResponse(t, message, fallback));
     },

@@ -11,9 +11,13 @@
     "REVOKE_SESSION_SUCCESS": "Device logged out successfully!",
     "GET_ADDRESSES_SUCCESS": "Addresses loaded successfully.",
     "CREATE_ADDRESS_SUCCESS": "Address added successfully!",
+    "CREATE_ADDRESS_ERROR": "Could not add address.",
     "UPDATE_ADDRESS_SUCCESS": "Address updated successfully!",
+    "UPDATE_ADDRESS_ERROR": "Could not update address.",
     "SET_DEFAULT_ADDRESS_SUCCESS": "Default address updated successfully!",
+    "SET_DEFAULT_ADDRESS_ERROR": "Could not set default address.",
     "DELETE_ADDRESS_SUCCESS": "Address deleted successfully!",
+    "DELETE_ADDRESS_ERROR": "Could not delete address.",
     "USER_NOT_FOUND": "User not found.",
     "ACCOUNT_DEACTIVATED": "This account has been deactivated.",
     "EMAIL_ALREADY_EXISTS": "This email is already in use.",
@@ -51,6 +55,12 @@
     "payment": "Manage Payment",
     "security": "Account Security",
     "setting": "Account Settings"
+  },
+  "logoutDialog": {
+    "title": "Confirm Logout",
+    "message": "Are you sure you want to log out of this account?",
+    "confirmBtn": "Log Out",
+    "cancelBtn": "Cancel"
   },
   "personal": {
     "title": "Personal Information",

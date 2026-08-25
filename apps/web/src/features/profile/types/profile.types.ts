@@ -1,3 +1,21 @@
+import { type AuthUser } from "@/features/auth/types/auth.types";
+
+export type ProfilePayload = {
+  name?: string;
+  email?: string | null;
+  phone?: string | null;
+  avatar?: string | null;
+  dob?: string | null;
+  gender?: string;
+};
+
+export type UpdateProfileResponse = {
+  status: string;
+  statusCode: number;
+  message: string;
+  data: AuthUser;
+};
+
 export interface Address {
   id: string;
   receiverName: string;

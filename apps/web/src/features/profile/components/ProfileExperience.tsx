@@ -16,15 +16,20 @@ import { useRouter } from "@/i18n/routing";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { logoutApi } from "@/features/auth/api/auth.api";
 import { clearBrowserAuthTokens } from "@/lib/api-client";
+import { ConfirmDialog } from "@/components/shared";
 
 export function ProfileExperience() {
   const t = useTranslations("ProfilePage");
+  const tCommon = useTranslations("Common");
   const { activeTab, setActiveTab } = useProfile();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const router = useRouter();
   const logoutStore = useAuthStore((state) => state.logout);
 
   const handleLogout = async () => {
+    setIsLoggingOut(true);
     try {
       await logoutApi();
     } catch {
@@ -34,6 +39,7 @@ export function ProfileExperience() {
       logoutStore();
       router.push("/login");
       router.refresh();
+      setIsLoggingOut(false);
     }
   };
 
@@ -105,11 +111,11 @@ export function ProfileExperience() {
             {/* Logout Button */}
             <div className="border-t border-[#E2D9D2]/40 mt-3 pt-2">
               <button
-                onClick={handleLogout}
-                className="flex w-full items-center gap-3.5 rounded-xl px-4 py-3 text-sm font-semibold text-rose-600 hover:bg-rose-50 transition-all duration-300"
+                onClick={() => setOpenConfirm(true)}
+                className="cursor-pointer flex w-full items-center gap-3.5 rounded-xl px-4 py-3 text-sm font-semibold text-rose-600 hover:bg-rose-50 transition-all duration-300"
               >
                 <LogOut size={18} className="shrink-0" />
-                <span>Đăng xuất</span>
+                <span>{tCommon("logout")}</span>
               </button>
             </div>
           </nav>
@@ -160,12 +166,12 @@ export function ProfileExperience() {
               <button
                 onClick={() => {
                   setIsMobileMenuOpen(false);
-                  void handleLogout();
+                  setOpenConfirm(true);
                 }}
                 className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white border border-rose-100 text-rose-600 shadow-md text-xs font-semibold whitespace-nowrap transition-all duration-300 active:scale-95 cursor-pointer w-fit min-w-[180px]"
               >
                 <LogOut size={16} className="shrink-0 text-rose-500" />
-                <span>Đăng xuất</span>
+                <span>{tCommon("logout")}</span>
               </button>
             </div>
 
@@ -196,6 +202,18 @@ export function ProfileExperience() {
           {renderTabContent()}
         </main>
       </div>
+      <ConfirmDialog
+        open={openConfirm}
+        onOpenChange={setOpenConfirm}
+        confirmVariant="destructive"
+        title={t("logoutDialog.title")}
+        description={t("logoutDialog.message")}
+        confirmText={t("logoutDialog.confirmBtn")}
+        cancelText={t("logoutDialog.cancelBtn")}
+        isLoading={isLoggingOut}
+        customTitle={"text-lg sm:text-2xl"}
+        onConfirm={handleLogout}
+      />
     </div>
   );
 }

@@ -34,6 +34,9 @@ export function PersonalInfoTab() {
     setDob,
     avatarUrl,
     setAvatarUrl,
+    isEditing,
+    handleStartEdit,
+    handleCancelEdit,
     handleSubmit,
     isLoading,
     user,
@@ -41,42 +44,14 @@ export function PersonalInfoTab() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
-  const initialValuesRef = useRef({
-    fullName: "",
-    email: "",
-    phone: "",
-    dob: "",
-    gender: "",
-    avatarUrl: "",
-  });
-
-  const handleStartEdit = () => {
-    initialValuesRef.current = {
-      fullName,
-      email,
-      phone,
-      dob,
-      gender,
-      avatarUrl,
-    };
-    setIsEditing(true);
-  };
-
-  const handleCancelEdit = () => {
-    setFullName(initialValuesRef.current.fullName);
-    setEmail(initialValuesRef.current.email);
-    setPhone(initialValuesRef.current.phone);
-    setDob(initialValuesRef.current.dob);
-    setGender(initialValuesRef.current.gender);
-    setAvatarUrl(initialValuesRef.current.avatarUrl);
+  const handleCancel = () => {
+    handleCancelEdit();
     setSelectedFile(null);
     setAvatarPreview(null);
-    setIsEditing(false);
   };
 
   const onSaveSubmit = async (e: React.FormEvent) => {
@@ -108,7 +83,6 @@ export function PersonalInfoTab() {
     handleSubmit(e, finalAvatarUrl);
     setSelectedFile(null);
     setAvatarPreview(null);
-    setIsEditing(false);
   };
 
   const triggerFileSelect = () => {
@@ -412,7 +386,7 @@ export function PersonalInfoTab() {
             </button>
             <button
               type="button"
-              onClick={handleCancelEdit}
+              onClick={handleCancel}
               disabled={isLoading || isUploadingAvatar}
               className="w-full sm:w-auto inline-flex h-9 sm:h-11 items-center justify-center rounded-lg border border-[#E2D9D2] bg-white px-6 sm:px-8 text-xs font-semibold uppercase tracking-[1.5px] text-gray-700 transition-all hover:bg-gray-50 cursor-pointer shadow-sm hover:shadow-md duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >

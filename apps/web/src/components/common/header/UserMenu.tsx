@@ -1,11 +1,14 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 import { LogOut, UserRound } from 'lucide-react';
 import { Link, useRouter } from '@/i18n/routing';
 import { logoutApi } from '@/features/auth/api/auth.api';
 import { useAuthStore } from '@/features/auth/store/authStore';
 import { clearBrowserAuthTokens } from '@/lib/api-client';
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { ConfirmDialog, Dropdown } from "@/components/shared";
+import { useTranslations } from 'next-intl';
 
 type UserMenuProps = {
   loginLabel?: string;
@@ -15,6 +18,13 @@ type UserMenuProps = {
   userName?: string;
 };
 
+function getUserInitials(name?: string) {
+  if (!name?.trim()) return null;
+
+  const [firstWord, secondWord] = name.trim().split(/\s+/);
+  return `${firstWord?.[0] || ""}${secondWord?.[0] || ""}`.toUpperCase();
+}
+
 export function UserMenu({
   loginLabel = 'Login',
   profileLabel = 'Profile',
@@ -22,16 +32,19 @@ export function UserMenu({
   logoutLabel = 'Logout',
   userName: initialUserName,
 }: UserMenuProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const { isAuthenticated, user, logout: storeLogout } = useAuthStore();
   const userName = initialUserName || user?.name || user?.email || (isAuthenticated ? 'Account' : undefined);
-
-  const handleLogout = () => {
-    setIsOpen(false);
-    startTransition(async () => {
-      try {
+  const avatarUrl = user?.avatar || undefined;
+  const avatarLabel = userName || profileLabel;
+  const avatarFallback = getUserInitials(user?.name || user?.email || userName);
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const t = useTranslations("ProfilePage");
+  
+  const handleLogout = async () => {
+    setIsLoggingOut(true)
+    try {
         await logoutApi();
       } catch {
         // Local logout should still complete if the server session is already gone.
@@ -40,8 +53,8 @@ export function UserMenu({
         storeLogout();
         router.push('/login');
         router.refresh();
+        setIsLoggingOut(false)
       }
-    });
   };
 
   if (!userName) {
@@ -56,35 +69,76 @@ export function UserMenu({
   }
 
   return (
-    <div className="relative hidden sm:block">
-      <button
-        type="button"
-        onClick={() => setIsOpen((current) => !current)}
-        className="grid h-11 w-11 place-items-center text-primary transition-opacity hover:opacity-75"
-        aria-expanded={isOpen}
-        aria-label={profileLabel}
-      >
-        <UserRound size={22} strokeWidth={1.5} aria-hidden="true" />
-      </button>
-      {isOpen ? (
-        <div className="absolute right-0 top-12 w-44 border border-secondary bg-background p-2 shadow-lg">
-          <Link href="/profile" className="block px-3 py-2 text-sm font-semibold text-foreground hover:text-primary">
-            {profileLabel}
-          </Link>
-          <Link href="/profile/orders" className="block px-3 py-2 text-sm font-semibold text-foreground hover:text-primary">
-            {ordersLabel}
-          </Link>
+    <>
+      <Dropdown
+        className="hidden sm:block"
+        contentClassName="w-44"
+        align="end"
+        trigger={({ open, toggle }) => (
           <button
             type="button"
-            onClick={handleLogout}
-            disabled={isPending}
-            className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm font-semibold text-foreground hover:text-primary disabled:opacity-60"
+            onClick={toggle}
+            className="grid h-11 w-11 place-items-center rounded-full text-primary transition-opacity hover:opacity-75 outline-none cursor-pointer"
+            aria-expanded={open}
+            aria-label={profileLabel}
           >
-            <LogOut size={15} strokeWidth={1.6} />
-            {logoutLabel}
+            <Avatar size="lg" className="border border-[#E2D9D2] shadow-sm">
+              {avatarUrl && (
+                <AvatarImage
+                  src={avatarUrl}
+                  alt={avatarLabel}
+                  className="object-cover"
+                />
+              )}
+              <AvatarFallback className="bg-[#FAF7F5] text-xs font-bold uppercase text-[#800020]">
+                {avatarFallback || <UserRound size={18} strokeWidth={1.6} aria-hidden="true" />}
+              </AvatarFallback>
+            </Avatar>
           </button>
-        </div>
-      ) : null}
-    </div>
+        )}
+      >
+        {({ close }) => (
+          <>
+            <Link
+              href="/profile"
+              onClick={close}
+              className="relative z-10 block rounded-lg px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-[#FAF7F5] hover:text-primary"
+            >
+              {profileLabel}
+            </Link>
+            <Link
+              href="/profile/orders"
+              onClick={close}
+              className="relative z-10 block rounded-lg px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-[#FAF7F5] hover:text-primary"
+            >
+              {ordersLabel}
+            </Link>
+            <button
+              type="button"
+              onClick={() => {
+                close();
+                setOpenConfirm(true);
+              }}
+              className="relative z-10 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-semibold text-rose-600 transition-colors hover:bg-rose-50 disabled:opacity-60 cursor-pointer"
+            >
+              <LogOut size={15} strokeWidth={1.6} />
+              {logoutLabel}
+            </button>
+          </>
+        )}
+      </Dropdown>
+      <ConfirmDialog
+        open={openConfirm}
+        onOpenChange={setOpenConfirm}
+        confirmVariant="destructive"
+        title={t("logoutDialog.title")}
+        description={t("logoutDialog.message")}
+        confirmText={t("logoutDialog.confirmBtn")}
+        cancelText={t("logoutDialog.cancelBtn")}
+        isLoading={isLoggingOut}
+        customTitle={"text-lg sm:text-2xl"}
+        onConfirm={handleLogout}
+      />
+    </>
   );
 }

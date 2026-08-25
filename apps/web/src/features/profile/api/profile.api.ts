@@ -1,4 +1,14 @@
-import { type PaymentCard, type Order } from "../types/profile.types";
+import {
+  type PaymentCard,
+  type Order,
+  type ProfilePayload,
+  type UpdateProfileResponse,
+} from "../types/profile.types";
+import { apiClient } from "@/lib/api-client";
+
+export const updateProfileApi = (payload: ProfilePayload): Promise<UpdateProfileResponse> => {
+  return apiClient.put<UpdateProfileResponse>("/api/user/profile", payload);
+};
 
 export const initialCards: PaymentCard[] = [
   {

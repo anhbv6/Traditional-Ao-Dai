@@ -11,9 +11,13 @@
     "REVOKE_SESSION_SUCCESS": "Đã đăng xuất thiết bị thành công!",
     "GET_ADDRESSES_SUCCESS": "Lấy danh sách địa chỉ thành công.",
     "CREATE_ADDRESS_SUCCESS": "Thêm địa chỉ thành công!",
+    "CREATE_ADDRESS_ERROR": "Không thể thêm địa chỉ.",
     "UPDATE_ADDRESS_SUCCESS": "Cập nhật địa chỉ thành công!",
+    "UPDATE_ADDRESS_ERROR": "Không thể cập nhật địa chỉ.",
     "SET_DEFAULT_ADDRESS_SUCCESS": "Đã đặt làm địa chỉ mặc định!",
+    "SET_DEFAULT_ADDRESS_ERROR": "Không thể đặt địa chỉ mặc định.",
     "DELETE_ADDRESS_SUCCESS": "Đã xóa địa chỉ thành công!",
+    "DELETE_ADDRESS_ERROR": "Không thể xóa địa chỉ.",
     "USER_NOT_FOUND": "Không tìm thấy người dùng.",
     "ACCOUNT_DEACTIVATED": "Tài khoản đã bị vô hiệu hóa.",
     "EMAIL_ALREADY_EXISTS": "Email này đã được sử dụng.",
@@ -51,6 +55,12 @@
     "payment": "Phương thức thanh toán",
     "security": "Bảo mật tài khoản",
     "setting": "Cài đặt tài khoản"
+  },
+  "logoutDialog": {
+    "title": "Xác nhận đăng xuất",
+    "message": "Bạn có chắc chắn muốn đăng xuất khỏi tài khoản này không?",
+    "confirmBtn": "Đăng xuất",
+    "cancelBtn": "Hủy"
   },
   "personal": {
     "title": "Thông tin cá nhân",
