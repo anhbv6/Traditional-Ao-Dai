@@ -1,4 +1,27 @@
 {
+  "login": {
+    "title": "Đăng Nhập Quản Trị",
+    "subtitle": "Hệ thống quản lý bán hàng & xưởng may đo",
+    "emailLabel": "Email quản trị viên",
+    "emailPlaceholder": "Vui lòng nhập địa chỉ email",
+    "passwordLabel": "Mật khẩu",
+    "passwordPlaceholder": "Vui lòng nhập mật khẩu",
+    "forgotPassword": "Quên mật khẩu?",
+    "forgotPasswordNotice": "Vui lòng liên hệ Quản trị viên cấp cao để cấp lại mật khẩu.",
+    "rememberMe": "Ghi nhớ đăng nhập",
+    "submit": "Đăng nhập hệ thống",
+    "submitting": "Đang xác thực...",
+    "backToStore": "Quay trở lại cửa hàng",
+    "securityBadge": "Bảo mật kết nối SSL 256-bit • Dành riêng cho Quản trị viên",
+    "emailRequired": "Email không được để trống",
+    "invalidEmail": "Vui lòng nhập địa chỉ email hợp lệ!",
+    "passwordRequired": "Mật khẩu không được để trống",
+    "passwordMin": "Mật khẩu phải chứa ít nhất 6 ký tự!",
+    "loginSuccess": "Đăng nhập quản trị viên thành công!",
+    "loginError": "Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin!",
+    "showPassword": "Hiện mật khẩu",
+    "hidePassword": "Ẩn mật khẩu"
+  },
   "title": "Bảng quản trị AODAI",
   "subtitle": "Tổng quan hoạt động kinh doanh, tiến độ may đo và tình trạng kho vật liệu.",
   "filters": {

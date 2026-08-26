@@ -1,4 +1,27 @@
 {
+  "login": {
+    "title": "Admin Portal Login",
+    "subtitle": "Management portal for orders & tailoring atelier",
+    "emailLabel": "Admin Email",
+    "emailPlaceholder": "Please enter your email address",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Please enter your password",
+    "forgotPassword": "Forgot password?",
+    "forgotPasswordNotice": "Please contact Super Admin to reset password.",
+    "rememberMe": "Remember me",
+    "submit": "Log in to portal",
+    "submitting": "Authenticating...",
+    "backToStore": "Storefront",
+    "securityBadge": "256-bit SSL encryption • Authorized Personnel Only",
+    "emailRequired": "Email is required",
+    "invalidEmail": "Please enter a valid email address!",
+    "passwordRequired": "Password is required",
+    "passwordMin": "Password must be at least 6 characters!",
+    "loginSuccess": "Admin login successful!",
+    "loginError": "Login failed. Please check your credentials!",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
+  },
   "title": "AODAI Admin Dashboard",
   "subtitle": "Overview of sales activities, tailoring progress, and material stock levels.",
   "filters": {

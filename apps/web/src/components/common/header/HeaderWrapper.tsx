@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { AdminQuickBar } from './AdminQuickBar';
 
 type HeaderWrapperProps = {
   children: ReactNode;
@@ -13,6 +14,7 @@ export function HeaderWrapper({ children, sticky = false }: HeaderWrapperProps) 
         sticky ? 'sticky top-0 z-50' : '',
       ].join(' ')}
     >
+      <AdminQuickBar />
       {children}
     </div>
   );

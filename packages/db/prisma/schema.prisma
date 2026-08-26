@@ -13,6 +13,12 @@ enum Role {
   ADMIN
 }
 
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 enum Gender {
   MALE
   FEMALE
@@ -58,6 +64,11 @@ model User {
   measurements      UserMeasurement[]
   orders            Order[]
   addresses         UserAddress[]
+
+  staffPermission    StaffPermission?
+  requestedApprovals ApprovalRequest[] @relation("RequestedBy")
+  reviewedApprovals  ApprovalRequest[] @relation("ReviewedBy")
+  createdOrders      Order[]           @relation("CreatedByStaff")
 
   sessions          UserSession[]
   createdAt         DateTime        @default(now())
@@ -211,6 +222,9 @@ model Order {
   userId          String?
   user            User?         @relation(fields: [userId], references: [id])
 
+  createdById     String?
+  createdBy       User?         @relation("CreatedByStaff", fields: [createdById], references: [id])
+
   // Thông tin người nhận (Khách không cần đăng nhập vẫn mua được)
   customerName    String
   customerEmail   String
@@ -289,4 +303,39 @@ model UserAddress {
 
   @@index([userId])
   @@index([userId, createdAt])
+}
+
+model StaffPermission {
+  id                 String   @id @default(uuid())
+  userId             String   @unique
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  canManageOrders    Boolean  @default(true)  // Quyền tạo đơn, xem đơn
+  canUpdateTailoring Boolean  @default(true)  // Cập nhật tiến độ may đo (cắt, may, ủi)
+  canManageInventory Boolean  @default(false) // Quản lý kho vải & sản phẩm
+  canViewReports     Boolean  @default(false) // Xem báo cáo doanh thu tài chính
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model ApprovalRequest {
+  id            String         @id @default(uuid())
+  actionType    String         // "CANCEL_ORDER", "SPECIAL_DISCOUNT", "PRICE_OVERRIDE", "REFUND"
+  description   String         // Lý do yêu cầu duyệt
+  payload       Json           // Dữ liệu chi tiết dạng JSON
+  status        ApprovalStatus @default(PENDING)
+
+  requestedById String
+  requestedBy   User           @relation("RequestedBy", fields: [requestedById], references: [id])
+
+  reviewedById  String?
+  reviewedBy    User?          @relation("ReviewedBy", fields: [reviewedById], references: [id])
+  rejectReason  String?        // Lý do Admin từ chối
+
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([status])
+  @@index([requestedById])
 }
