@@ -8,7 +8,7 @@ import {
   updateStaffPermissionAction,
   toggleStaffActiveAction,
   type StaffPermissionInput,
-} from "@/actions/admin/staff.actions";
+} from "../../server";
 
 export function AdminStaffManagement() {
   const [staffList, setStaffList] = useState<any[]>([]);

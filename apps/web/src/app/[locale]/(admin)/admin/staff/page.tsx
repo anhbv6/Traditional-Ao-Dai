@@ -1,4 +1,4 @@
-import { AdminStaffManagement } from "@/features/admin/staff/components/AdminStaffManagement";
+import { AdminStaffManagement } from "@/features/admin";
 
 export default function AdminStaffPage() {
   return (

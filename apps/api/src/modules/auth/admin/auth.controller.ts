@@ -1,11 +1,10 @@
 import { Request, Response, NextFunction } from 'express'
 import * as authService from './auth.service'
-import * as userService from '../../user/user.service'
 import { AuthenticatedRequest } from '../../../shared/middlewares/authGuard'
-import { sendSuccess, sendError } from '../../../shared/utils/response'
+import { sendSuccess } from '../../../shared/utils/response'
 
 /**
- * Controller handler for Admin Login
+ * Controller handler for Admin and Staff Login
  */
 export async function loginAdmin(req: Request, res: Response, next: NextFunction): Promise<any> {
   try {
@@ -20,22 +19,15 @@ export async function loginAdmin(req: Request, res: Response, next: NextFunction
 }
 
 /**
- * Controller handler to fetch logged in user profile (me)
+ * Controller handler for Admin and Staff Logout
  */
-export async function getMe(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<any> {
+export async function logoutAdmin(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<any> {
   try {
     const userId = req.user?.userId
-    if (!userId) {
-      return sendError(res, {
-        statusCode: 401,
-        message: 'UNAUTHORIZED',
-      })
-    }
-
-    const user = await userService.getUserById(userId)
+    await authService.adminLogout(userId)
     return sendSuccess(res, {
-      data: user,
-      message: 'GET_PROFILE_SUCCESS',
+      data: null,
+      message: 'ADMIN_LOGOUT_SUCCESS',
     })
   } catch (error) {
     return next(error)

@@ -709,15 +709,61 @@ router.post('/logout', clientAuthController.logout)
  *                 data:
  *                   type: object
  *                   properties:
- *                     token:
+ *                     accessToken:
  *                       type: string
  *                       example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *                     user:
+ *                       type: object
+ *                       properties:
+ *                         id:
+ *                           type: string
+ *                         email:
+ *                           type: string
+ *                         name:
+ *                           type: string
+ *                         role:
+ *                           type: string
+ *                           enum: [ADMIN, STAFF]
+ *                         staffPermission:
+ *                           type: object
+ *                           nullable: true
  *       400:
  *         description: Validation error
  *       401:
  *         description: Invalid credentials
  */
 router.post('/admin/login', validate(loginSchema), adminAuthController.loginAdmin)
+
+/**
+ * @openapi
+ * /api/auth/admin/logout:
+ *   post:
+ *     summary: Admin & Staff Logout
+ *     description: Revoke session and log out the authenticated administrative user.
+ *     tags:
+ *       - Auth
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Logout successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: ADMIN_LOGOUT_SUCCESS
+ *                 data:
+ *                   type: object
+ *                   nullable: true
+ *                   example: null
+ */
+router.post('/admin/logout', requireAuth, adminAuthController.logoutAdmin)
 
 
 export default router

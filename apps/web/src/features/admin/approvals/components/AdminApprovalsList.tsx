@@ -7,7 +7,7 @@ import { useAuthStore } from "@/features/auth/store/authStore";
 import {
   getApprovalRequestsAction,
   reviewApprovalRequestAction,
-} from "@/actions/admin/approval.actions";
+} from "../../server";
 
 export function AdminApprovalsList() {
   const { user } = useAuthStore();

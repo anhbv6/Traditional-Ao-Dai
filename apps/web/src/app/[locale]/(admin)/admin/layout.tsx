@@ -2,11 +2,12 @@
 
 import React, { ReactNode } from "react";
 import { useLocale } from "next-intl";
-import { Shield, Globe, User, LayoutDashboard, UserCheck, Users } from "lucide-react";
-import { Link } from "@/i18n/routing";
+import { Shield, Globe, User, LayoutDashboard, UserCheck, Users, LogOut } from "lucide-react";
+import { Link, useRouter } from "@/i18n/routing";
 import { usePathname } from "next/navigation";
 import { ProtectedRoute } from "@/components/providers/ProtectedRoute";
 import { useAuthStore } from "@/features/auth/store/authStore";
+import { adminLogoutApi } from "@/features/admin";
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -14,8 +15,9 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const currentLocale = useLocale();
+  const router = useRouter();
   const pathname = usePathname();
-  const { user } = useAuthStore();
+  const { user, logout } = useAuthStore();
   const isLoginPage = pathname?.includes("/admin/login");
 
   if (isLoginPage) {
@@ -118,6 +120,23 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   </span>
                 </div>
               </div>
+              <span className="h-4 w-px bg-[#E4E4E7]" />
+              <button
+                onClick={async () => {
+                  try {
+                    await adminLogoutApi();
+                  } catch (e) {
+                    console.warn("Logout API error:", e);
+                  }
+                  logout();
+                  router.push("/admin/login");
+                }}
+                className="inline-flex items-center gap-1 text-zinc-500 hover:text-rose-600 transition-colors p-1.5 rounded-lg hover:bg-rose-50 cursor-pointer"
+                title="Đăng xuất"
+              >
+                <LogOut size={15} />
+                <span className="hidden sm:inline">Đăng xuất</span>
+              </button>
             </div>
           </div>
         </header>

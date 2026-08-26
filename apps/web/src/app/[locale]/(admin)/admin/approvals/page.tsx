@@ -1,4 +1,4 @@
-import { AdminApprovalsList } from "@/features/admin/approvals/components/AdminApprovalsList";
+import { AdminApprovalsList } from "@/features/admin";
 
 export default function AdminApprovalsPage() {
   return (
