@@ -1,5 +1,7 @@
 import { useAuthStore } from '@/features/auth/store/authStore';
 
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3001/api';
+
 type CustomRequestInit = Omit<RequestInit, 'body'> & {
   body?: unknown;
   params?: Record<string, string | number | boolean>;
@@ -47,8 +49,33 @@ const redirectToLoginAfterSessionExpired = () => {
   window.location.assign(loginPath);
 };
 
+function buildFullUrl(url: string, queryString: string): string {
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return `${url}${queryString}`;
+  }
+
+  // Chuẩn hóa đường dẫn: loại bỏ tiền tố /api trùng lặp với BASE_URL
+  let path = url;
+  if (path.startsWith('/api/')) {
+    path = path.slice(4);
+  } else if (path === '/api') {
+    path = '';
+  } else if (!path.startsWith('/')) {
+    path = `/${path}`;
+  }
+
+  // Tương thích các endpoint đặc biệt
+  if (path === '/auth/refresh') {
+    path = '/auth/refresh-token';
+  }
+
+  const base = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL;
+  return `${base}${path}${queryString}`;
+}
+
 const refreshBrowserToken = async (): Promise<string | undefined> => {
-  const res = await fetch('/api/auth/refresh', {
+  const refreshUrl = buildFullUrl('/auth/refresh-token', '');
+  const res = await fetch(refreshUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -57,7 +84,9 @@ const refreshBrowserToken = async (): Promise<string | undefined> => {
   });
 
   const isJson = res.headers.get('content-type')?.includes('application/json');
-  const payload = (isJson ? await res.json() : await res.text()) as { data?: { accessToken?: string } } | string;
+  const payload = (isJson ? await res.json() : await res.text()) as
+    | { data?: { accessToken?: string } }
+    | string;
 
   if (!res.ok) {
     clearBrowserAuth();
@@ -101,13 +130,13 @@ const request = async <ResponseData>(
   if (options?.body) {
     if (options.body instanceof FormData) {
       body = options.body;
-      headers = {}; // Let browser set boundary automatically for FormData
+      headers = {}; // Trình duyệt tự set Content-Type và boundary cho FormData
     } else {
       body = JSON.stringify(options.body);
     }
   }
 
-  // Handle Query Parameters
+  // Xử lý Query Parameters
   let queryString = '';
   if (options?.params) {
     const searchParams = new URLSearchParams();
@@ -119,7 +148,7 @@ const request = async <ResponseData>(
     queryString = `?${searchParams.toString()}`;
   }
 
-  // Dynamic Token Retrieval based on Environment (Server vs Client)
+  // Đính kèm Bearer Token từ Zustand Store
   let token: string | undefined;
   const isServer = typeof window === 'undefined';
 
@@ -134,9 +163,7 @@ const request = async <ResponseData>(
     };
   }
 
-  // Combine URLs
-  const cleanUrl = url.startsWith('/') ? url : `/${url}`;
-  const fullUrl = `${cleanUrl}${queryString}`;
+  const fullUrl = buildFullUrl(url, queryString);
 
   const res = await fetch(fullUrl, {
     ...options,
@@ -152,31 +179,26 @@ const request = async <ResponseData>(
   const isJson = res.headers.get('content-type')?.includes('application/json');
   const payload = (isJson ? await res.json() : await res.text()) as unknown;
 
+  // Tự động làm mới Access Token khi token hết hạn (401)
   if (!res.ok && res.status === 401 && !isServer && options?.retryOnUnauthorized !== false) {
-    const nextAccessToken = await refreshBrowserToken();
-    if (nextAccessToken) {
-      return request<ResponseData>(method, url, {
-        ...options,
-        retryOnUnauthorized: false,
-        headers: {
-          ...options?.headers,
-          Authorization: `Bearer ${nextAccessToken}`,
-        },
-      });
+    try {
+      const nextAccessToken = await refreshBrowserToken();
+      if (nextAccessToken) {
+        return request<ResponseData>(method, url, {
+          ...options,
+          retryOnUnauthorized: false,
+          headers: {
+            ...options?.headers,
+            Authorization: `Bearer ${nextAccessToken}`,
+          },
+        });
+      }
+    } catch {
+      // Refresh token failed, rơi xuống xử lý lỗi bên dưới
     }
   }
 
   if (!res.ok) {
-    if (
-      res.status === 401 &&
-      !isServer &&
-      cleanUrl === '/api/auth/refresh' &&
-      options?.redirectOnUnauthorized !== false
-    ) {
-      clearBrowserAuth();
-      redirectToLoginAfterSessionExpired();
-    }
-
     throw new HttpError({
       status: res.status,
       payload,

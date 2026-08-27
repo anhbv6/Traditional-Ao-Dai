@@ -26,6 +26,10 @@ export const refreshTokenApi = async (): Promise<RefreshTokenResponse> => {
 };
 
 export const logoutApi = async (): Promise<void> => {
+  if (typeof document !== 'undefined') {
+    document.cookie = 'user_logged_in=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
+    document.cookie = 'auth_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
+  }
   await apiClient.post('/api/auth/logout', {}, { retryOnUnauthorized: false });
 };
 

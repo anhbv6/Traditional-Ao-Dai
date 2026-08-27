@@ -7,22 +7,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ==========================================
+// ENUMS
+// ==========================================
+
 enum Role {
   CUSTOMER
   STAFF
   ADMIN
-}
-
-enum ApprovalStatus {
-  PENDING
-  APPROVED
-  REJECTED
-}
-
-enum Gender {
-  MALE
-  FEMALE
-  OTHER
 }
 
 enum MediaType {
@@ -31,58 +23,106 @@ enum MediaType {
 }
 
 enum OrderStatus {
-  PENDING
-  PROCESSING
-  SHIPPING
-  DELIVERED
-  CANCELLED
+  PENDING           // Chờ thanh toán / xác nhận
+  CONFIRMED         // Đã xác nhận thông tin & số đo
+  IN_PRODUCTION     // Đang trong quá trình may đo (đối với hàng Custom)
+  READY_TO_SHIP     // Đã đóng gói xong
+  SHIPPING          // Đang giao hàng
+  DELIVERED         // Đã nhận hàng thành công
+  CANCELLED         // Đã hủy
+  REFUNDED          // Đã hoàn tiền
+}
+
+enum TailoringStatus {
+  NOT_APPLICABLE    // Hàng may sẵn
+  WAITING_FABRIC    // Chờ xuất kho vải
+  FABRIC_CUTTING    // Đang cắt vải
+  SEWING            // Đang may ráp
+  EMBROIDERY_BEADING// Đang thêu / đính kết hoa văn
+  FITTING_IRONING   // Kiểm tra form dáng & ủi phẳng
+  COMPLETED         // May hoàn tất, chuyển sang đóng gói
 }
 
 enum PaymentStatus {
   UNPAID
+  PARTIALLY_PAID    // Đặt cọc (thường áp dụng cho đơn may đo giá trị lớn)
   PAID
   REFUNDED
 }
 
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED_AMOUNT
+}
+
+// ==========================================
+// USER & AUTHENTICATION
+// ==========================================
+
 model User {
-  id                String          @id @default(uuid())
-  email             String?         @unique
+  id                String            @id @default(uuid())
+  email             String?           @unique
   password          String?
   name              String?
-  phone             String?         @unique
+  phone             String?           @unique
   avatar            String?
   birth             DateTime?
-  gender            Gender          @default(OTHER)
-  role              Role            @default(CUSTOMER)
-  isActive          Boolean         @default(true)
-  isEmailVerified   Boolean         @default(false)
-  isPhoneVerified   Boolean         @default(false)
+  gender            Int               @default(2) // 0: MALE, 1: FEMALE, 2: OTHER
+  role              Role              @default(CUSTOMER)
+  isActive          Boolean           @default(true)
+  isEmailVerified   Boolean           @default(false)
+  isPhoneVerified   Boolean           @default(false)
 
   socialAccounts    SocialAccount[]
-
-  reviews           Review[]
-  measurements      UserMeasurement[]
-  orders            Order[]
+  sessions          UserSession[]
+  tokens            AuthToken[]
   addresses         UserAddress[]
+  measurements      UserMeasurement[]
+  reviews           Review[]
+  orders            Order[]           @relation("CustomerOrders")
+  createdOrders     Order[]           @relation("StaffCreatedOrders")
+  assignedTasks     TailoringLog[]    @relation("TailorStaff")
 
-  staffPermission    StaffPermission?
+  cart              Cart?
+  staffPermission   StaffPermission?
   requestedApprovals ApprovalRequest[] @relation("RequestedBy")
   reviewedApprovals  ApprovalRequest[] @relation("ReviewedBy")
-  createdOrders      Order[]           @relation("CreatedByStaff")
+  articles          Article[]         @relation("AuthorArticles")
 
-  sessions          UserSession[]
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  @@index([role])
+  @@index([email])
+  @@index([phone])
+}
+
+model AuthToken {
+  id        String    @id @default(uuid())
+  token     String    @unique
+  type      String    // "VERIFY_EMAIL", "RESET_PASSWORD", "PHONE_OTP"
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+
+  @@index([token, type])
 }
 
 model SocialAccount {
-  id          String   @id @default(uuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  provider    String   // "GOOGLE", "FACEBOOK", etc.
-  providerId  String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider   String   // "GOOGLE", "FACEBOOK", "APPLE"
+  providerId String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@unique([provider, providerId])
   @@index([userId])
@@ -95,204 +135,29 @@ model UserSession {
   refreshToken String   @unique @db.Text
   familyId     String
   isRevoked    Boolean  @default(false)
-  deviceInfo   String?  // Trình duyệt / OS của thiết bị
-  ipAddress    String?  // IP truy cập
-  expiresAt    DateTime // Thời gian hết hạn của Refresh Token
+  deviceInfo   String?
+  ipAddress    String?
+  expiresAt    DateTime
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
   @@index([userId])
   @@index([familyId])
 }
 
-model UserMeasurement {
-  id          String   @id @default(uuid())
-  profileName String   
-  isDefault   Boolean  @default(false)
-
-  // Các chỉ số đo may Áo Dài chuẩn (đơn vị cm)
-  height      Float?   // Chiều cao
-  weight      Float?   // Cân nặng
-  bust        Float?   // Vòng ngực
-  waist       Float?   // Vòng eo
-  hips        Float?   // Vòng mông
-  shoulder    Float?   // Rộng vai
-  armLength   Float?   // Dài tay
-  shirtLength Float?   // Dài áo
-  pantsLength Float?   // Dài quần
-  note        String?  // Ghi chú thêm (VD: Dáng hơi khom, vai lệch...)
-
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
-model Review {
-  id          String   @id @default(uuid())
-  rating      Int      @default(5) // Số sao đánh giá từ 1 - 5
-  comment     String?  @db.Text    // Nội dung bình luận
-  media       ReviewMedia[]
-  isApproved  Boolean  @default(true) // Duyệt hiển thị (để ẩn nếu có từ ngữ thô tục)
-
-  // Liên kết với User
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  // Liên kết với Product
-  productId   String
-  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-
-  // Phản hồi từ phía Shop/Admin (nếu có)
-  reply       String?  @db.Text
-  repliedAt   DateTime?
-
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
-model ReviewMedia {
-  id           String    @id @default(uuid())
-  type         MediaType @default(IMAGE)
-  url          String    // URL gốc của ảnh/video trên Cloudinary/AWS S3
-  thumbnailUrl String?   // Ảnh xem trước của video (giúp FE render nhanh hơn)
-
-  reviewId     String
-  review       Review    @relation(fields: [reviewId], references: [id], onDelete: Cascade)
-
-  createdAt    DateTime  @default(now())
-}
-
-model Category {
-  id          String    @id @default(uuid())
-  name        String
-  slug        String    @unique
-  description String?
-  
-  products    Product[]
-  
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-}
-
-model Product {
-  id          String           @id @default(uuid())
-  name        String
-  slug        String           @unique
-  description String?          @db.Text
-  material    String?
-  basePrice   Float            // Giá niêm yết cơ bản
-  images      String[]         // Mảng chứa các URL ảnh
-  reviews     Review[]
-  soldCount   Int              @default(0)
-  isCustomFit Boolean          @default(true) // Có cho phép nhập số đo riêng để may không
-  isActive    Boolean          @default(true) // Bật/Tắt hiển thị sản phẩm
-
-  categoryId  String
-  category    Category         @relation(fields: [categoryId], references: [id])
-
-  variants    ProductVariant[]
-  orderItems  OrderItem[]
-
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-}
-
-model ProductVariant {
-  id        String   @id @default(uuid())
-  sku       String   @unique // Mã quản lý kho (VD: AD-TRANG-S)
-  size      String   // S, M, L, XL, XXL
-  color     String?  // Trắng, Đỏ, Hồng, Vàng
-  price     Float?   // Nhập nếu giá size này khác giá basePrice
-  stock     Int      @default(0) // Số lượng tồn kho sẵn có
-
-  productId String
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-
-  orderItems OrderItem[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Order {
-  id              String        @id @default(uuid())
-  orderNumber     String        @unique // Mã đơn AD-2026-XXXX
-
-  userId          String?
-  user            User?         @relation(fields: [userId], references: [id])
-
-  createdById     String?
-  createdBy       User?         @relation("CreatedByStaff", fields: [createdById], references: [id])
-
-  // Thông tin người nhận (Khách không cần đăng nhập vẫn mua được)
-  customerName    String
-  customerEmail   String
-  customerPhone   String
-  shippingAddress String
-  note            String?       // Ghi chú giao hàng
-
-  totalAmount     Float
-  orderStatus     OrderStatus   @default(PENDING)
-  paymentStatus   PaymentStatus @default(UNPAID)
-  paymentMethod   String        // COD, VNPAY, MOMO, ZALOPAY
-
-  items           OrderItem[]
-
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-}
-
-model OrderItem {
-  id          String   @id @default(uuid())
-  quantity    Int
-  price       Float    // Giá tại thời điểm mua (Tránh bị đổi giá sau này)
-
-  orderId     String
-  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-
-  productId   String
-  product     Product  @relation(fields: [productId], references: [id])
-
-  variantId   String?
-  variant     ProductVariant? @relation(fields: [variantId], references: [id])
-
-  // Nếu khách đặt may Áo Dài theo số đo riêng
-  isCustomFit Boolean  @default(false)
-  
-  // Lưu snapshot số đo tại thời điểm đặt đơn (Độc lập với hồ sơ UserMeasurement)
-  height      Float?
-  weight      Float?
-  bust        Float?
-  waist       Float?
-  hips        Float?
-  shoulder    Float?
-  armLength   Float?
-  shirtLength Float?
-  pantsLength Float?
-  customNote  String?
-}
-
 model UserAddress {
   id            String   @id @default(uuid())
-
   receiverName  String
   receiverPhone String
-
   addressLine   String
-
   provinceCode  String?
   provinceName  String?
-
   districtCode  String?
   districtName  String?
-
   wardCode      String?
   wardName      String?
-
   postalCode    String?
-
-  label         String? // Nhà riêng, Công ty...
+  label         String?  // Nhà riêng, Công ty...
   isDefault     Boolean  @default(false)
 
   userId        String
@@ -302,18 +167,324 @@ model UserAddress {
   updatedAt     DateTime @updatedAt
 
   @@index([userId])
-  @@index([userId, createdAt])
 }
+
+// Hồ sơ số đo may Áo Dài cá nhân
+model UserMeasurement {
+  id          String   @id @default(uuid())
+  profileName String   // VD: "Số đo của Mai", "Số đo của Mẹ"
+  isDefault   Boolean  @default(false)
+
+  // Thông số Áo Dài chuẩn (cm / kg)
+  height      Float?
+  weight      Float?
+  bust        Float?   // Vòng ngực
+  waist       Float?   // Vòng eo
+  hips        Float?   // Vòng mông
+  shoulder    Float?   // Rộng vai
+  armLength   Float?   // Dài tay
+  armpit      Float?   // Vòng nách
+  neck        Float?   // Vòng cổ
+  shirtLength Float?   // Dài áo
+  pantsLength Float?   // Dài quần
+  thigh       Float?   // Vòng đùi (cho quần ống suông/truyền thống)
+  note        String?  // Ghi chú form dáng (gù, vai xuôi...)
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+}
+
+// ==========================================
+// CATALOG: SẢN PHẨM & BIẾN THỂ
+// ==========================================
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String
+  slug        String    @unique
+  description String?
+  image       String?
+  parentId    String?
+  parent      Category? @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children    Category[]@relation("CategoryHierarchy")
+
+  products    Product[]
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Product {
+  id          String           @id @default(uuid())
+  name        String
+  slug        String           @unique
+  description String?          @db.Text
+  material    String?          // Lụa tơ tằm, Voan, Gấm, Nhung...
+  basePrice   Decimal          @db.Decimal(12, 2)
+  images      String[]
+  soldCount   Int              @default(0)
+  isCustomFit Boolean          @default(true) // Cho phép đặt may theo số đo riêng
+  isActive    Boolean          @default(true)
+  isFeatured  Boolean          @default(false)
+
+  categoryId  String
+  category    Category         @relation(fields: [categoryId], references: [id])
+
+  variants    ProductVariant[]
+  reviews     Review[]
+  orderItems  OrderItem[]
+  cartItems   CartItem[]
+
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([categoryId])
+  @@index([slug])
+  @@index([isActive, isFeatured])
+}
+
+model ProductVariant {
+  id        String      @id @default(uuid())
+  sku       String      @unique
+  size      String      // S, M, L, XL, XXL, FREE_SIZE
+  color     String?
+  price     Decimal?    @db.Decimal(12, 2) // Null nếu dùng basePrice của Product
+  stock     Int         @default(0)
+
+  productId String
+  product   Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  orderItems OrderItem[]
+  cartItems  CartItem[]
+
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@index([productId])
+  @@index([sku])
+}
+
+// ==========================================
+// GIỎ HÀNG (CART)
+// ==========================================
+
+model Cart {
+  id        String     @id @default(uuid())
+  userId    String?    @unique
+  user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model CartItem {
+  id          String          @id @default(uuid())
+  cartId      String
+  cart        Cart            @relation(fields: [cartId], references: [id], onDelete: Cascade)
+
+  productId   String
+  product     Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  variantId   String?
+  variant     ProductVariant? @relation(fields: [variantId], references: [id])
+
+  quantity    Int             @default(1)
+  isCustomFit Boolean         @default(false)
+  customData  Json?           // Lưu tạm snapshot số đo trước khi chuyển thành OrderItem
+
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([cartId])
+}
+
+// ==========================================
+// ĐƠN HÀNG, MAY ĐO & THANH TOÁN
+// ==========================================
+
+model Voucher {
+  id           String       @id @default(uuid())
+  code         String       @unique
+  description  String?
+  discountType DiscountType @default(PERCENTAGE)
+  value        Decimal      @db.Decimal(12, 2) // % giảm hoặc số tiền cố định
+  minOrderValue Decimal?    @db.Decimal(12, 2)
+  maxDiscount  Decimal?     @db.Decimal(12, 2)
+  usageLimit   Int?
+  usedCount    Int          @default(0)
+  startDate    DateTime
+  endDate      DateTime
+  isActive     Boolean      @default(true)
+
+  orders       Order[]
+
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+
+model Order {
+  id              String         @id @default(uuid())
+  orderNumber     String         @unique // Format: AD-YYYYMMDD-XXXX
+
+  userId          String?
+  user            User?          @relation("CustomerOrders", fields: [userId], references: [id])
+
+  createdById     String?
+  createdBy       User?          @relation("StaffCreatedOrders", fields: [createdById], references: [id])
+
+  // Người nhận
+  customerName    String
+  customerEmail   String
+  customerPhone   String
+  shippingAddress String
+  note            String?
+
+  // Tài chính
+  subTotal        Decimal        @db.Decimal(12, 2)
+  discountAmount  Decimal        @default(0) @db.Decimal(12, 2)
+  shippingFee     Decimal        @default(0) @db.Decimal(12, 2)
+  totalAmount     Decimal        @db.Decimal(12, 2)
+
+  voucherId       String?
+  voucher         Voucher?       @relation(fields: [voucherId], references: [id])
+
+  // Trạng thái
+  orderStatus     OrderStatus    @default(PENDING)
+  paymentStatus   PaymentStatus  @default(UNPAID)
+  paymentMethod   String         // COD, VNPAY, MOMO, BANK_TRANSFER
+
+  items           OrderItem[]
+  tailoringLogs   TailoringLog[]
+
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([orderNumber])
+  @@index([userId])
+  @@index([orderStatus])
+}
+
+model OrderItem {
+  id            String          @id @default(uuid())
+  orderId       String
+  order         Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  productId     String
+  product       Product         @relation(fields: [productId], references: [id])
+
+  variantId     String?
+  variant       ProductVariant? @relation(fields: [variantId], references: [id])
+
+  // Snapshot thông tin sản phẩm tại thời điểm mua
+  productName   String
+  variantName   String?
+  sku           String?
+  quantity      Int
+  unitPrice     Decimal         @db.Decimal(12, 2)
+  totalPrice    Decimal         @db.Decimal(12, 2)
+
+  // Tiến độ may đo riêng cho từng chiếc áo
+  isCustomFit     Boolean         @default(false)
+  tailoringStatus TailoringStatus @default(NOT_APPLICABLE)
+  tailoringLogs   TailoringLog[]
+
+  // Snapshot số đo áo dài
+  height        Float?
+  weight        Float?
+  bust          Float?
+  waist         Float?
+  hips          Float?
+  shoulder      Float?
+  armLength     Float?
+  armpit        Float?
+  neck          Float?
+  shirtLength   Float?
+  pantsLength   Float?
+  thigh         Float?
+  customNote    String?
+
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+// Nhật ký tiến độ may đo thủ công
+model TailoringLog {
+  id          String          @id @default(uuid())
+  orderId     String
+  order       Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  orderItemId String?
+  orderItem   OrderItem?      @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+
+  status      TailoringStatus
+  note        String?
+  staffId     String
+  staff       User            @relation("TailorStaff", fields: [staffId], references: [id])
+  createdAt   DateTime        @default(now())
+
+  @@index([orderId])
+  @@index([orderItemId])
+}
+
+// ==========================================
+// ĐÁNH GIÁ (REVIEWS)
+// ==========================================
+
+model Review {
+  id          String        @id @default(uuid())
+  rating      Int           @default(5)
+  comment     String?       @db.Text
+  isApproved  Boolean       @default(true)
+  media       ReviewMedia[]
+
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  productId   String
+  product     Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  reply       String?       @db.Text
+  repliedAt   DateTime?
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([productId])
+  @@index([userId])
+}
+
+model ReviewMedia {
+  id           String    @id @default(uuid())
+  type         MediaType @default(IMAGE)
+  url          String
+  thumbnailUrl String?
+  reviewId     String
+  review       Review    @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  createdAt    DateTime  @default(now())
+}
+
+// ==========================================
+// PHÂN QUYỀN & PHÊ DUYỆT (STAFF & ADMIN)
+// ==========================================
 
 model StaffPermission {
   id                 String   @id @default(uuid())
   userId             String   @unique
   user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  canManageOrders    Boolean  @default(true)  // Quyền tạo đơn, xem đơn
-  canUpdateTailoring Boolean  @default(true)  // Cập nhật tiến độ may đo (cắt, may, ủi)
-  canManageInventory Boolean  @default(false) // Quản lý kho vải & sản phẩm
-  canViewReports     Boolean  @default(false) // Xem báo cáo doanh thu tài chính
+  canManageOrders    Boolean  @default(true)
+  canUpdateTailoring Boolean  @default(true)
+  canManageInventory Boolean  @default(false)
+  canManageContent   Boolean  @default(false) // Quản lý bài viết tin tức, FAQ
+  canViewReports     Boolean  @default(false)
 
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
@@ -321,9 +492,9 @@ model StaffPermission {
 
 model ApprovalRequest {
   id            String         @id @default(uuid())
-  actionType    String         // "CANCEL_ORDER", "SPECIAL_DISCOUNT", "PRICE_OVERRIDE", "REFUND"
-  description   String         // Lý do yêu cầu duyệt
-  payload       Json           // Dữ liệu chi tiết dạng JSON
+  actionType    String         // "CANCEL_ORDER", "MANUAL_DISCOUNT", "PRICE_OVERRIDE", "REFUND"
+  description   String
+  payload       Json
   status        ApprovalStatus @default(PENDING)
 
   requestedById String
@@ -331,11 +502,48 @@ model ApprovalRequest {
 
   reviewedById  String?
   reviewedBy    User?          @relation("ReviewedBy", fields: [reviewedById], references: [id])
-  rejectReason  String?        // Lý do Admin từ chối
+  rejectReason  String?
 
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
 
   @@index([status])
   @@index([requestedById])
+}
+
+// ==========================================
+// NỘI DUNG CMS: TIN TỨC & FAQ
+// ==========================================
+
+model Article {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  excerpt     String?
+  content     String   @db.Text
+  thumbnail   String?
+  isPublished Boolean  @default(false)
+
+  authorId    String
+  author      User     @relation("AuthorArticles", fields: [authorId], references: [id])
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([slug])
+  @@index([isPublished])
+}
+
+model Faq {
+  id        String   @id @default(uuid())
+  question  String
+  answer    String   @db.Text
+  category  String?  // "Hướng dẫn đo áo dài", "Vận chuyển", "Chính sách đổi trả"
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
 }

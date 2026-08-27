@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { AdminStaffManagement } from "@/features/admin";
 
 export default function AdminStaffPage() {

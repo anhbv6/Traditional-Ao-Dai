@@ -37,7 +37,8 @@ export interface CreateStaffOrderInput {
 export async function createStaffOrderAction(input: CreateStaffOrderInput) {
   try {
     const orderNumber = `AD-${Date.now().toString().slice(-6)}`;
-    const totalAmount = input.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const subTotal = input.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const totalAmount = subTotal;
 
     const order = await prisma.order.create({
       data: {
@@ -48,6 +49,9 @@ export async function createStaffOrderAction(input: CreateStaffOrderInput) {
         customerPhone: input.customerPhone,
         shippingAddress: input.shippingAddress,
         note: input.note,
+        subTotal,
+        discountAmount: 0,
+        shippingFee: 0,
         totalAmount,
         orderStatus: "PENDING",
         paymentStatus: "UNPAID",
@@ -56,8 +60,10 @@ export async function createStaffOrderAction(input: CreateStaffOrderInput) {
           create: input.items.map((item) => ({
             productId: item.productId,
             variantId: item.variantId,
+            productName: "Áo Dài Truyền Thống",
             quantity: item.quantity,
-            price: item.price,
+            unitPrice: item.price,
+            totalPrice: item.price * item.quantity,
             isCustomFit: Boolean(item.isCustomFit),
             height: item.measurements?.height,
             weight: item.measurements?.weight,

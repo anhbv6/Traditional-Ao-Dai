@@ -139,6 +139,11 @@ export function useAdminLogin() {
       setAuthenticated(token, adminUser);
       setLoading(false);
 
+      // Lưu cookie cho Next.js Server Middleware (Proxy) nhận diện bảo vệ route
+      const maxAge = formData.rememberMe ? 7 * 86400 : 86400;
+      document.cookie = `admin_token=${token}; path=/; max-age=${maxAge}; SameSite=Lax`;
+      document.cookie = `auth_role=${adminUser.role}; path=/; max-age=${maxAge}; SameSite=Lax`;
+
       showToast.success(t("loginSuccess"));
 
       setTimeout(() => {

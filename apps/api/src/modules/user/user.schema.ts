@@ -9,7 +9,12 @@ export const updateProfileSchema = z.object({
     phone: z.string().optional().nullable(),
     avatar: z.string().optional().nullable(),
     dob: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'DOB_INVALID').or(z.string().length(0)).optional().nullable(),
-    gender: z.enum(['MALE', 'FEMALE', 'OTHER', 'male', 'female', 'other']).optional(),
+    gender: z.union([
+      z.literal(0),
+      z.literal(1),
+      z.literal(2),
+      z.enum(['0', '1', '2', 'MALE', 'FEMALE', 'OTHER', 'male', 'female', 'other']),
+    ]).optional(),
   }),
 })
 

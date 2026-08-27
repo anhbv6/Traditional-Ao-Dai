@@ -49,6 +49,11 @@ export function useLogin() {
       setAuthenticated(res.data.accessToken, me.data);
       setLoading(false);
 
+      // Lưu cookie cho Next.js Server Middleware (Proxy) nhận diện
+      const maxAge = rememberMe ? 7 * 86400 : 86400;
+      document.cookie = `user_logged_in=true; path=/; max-age=${maxAge}; SameSite=Lax`;
+      document.cookie = `auth_role=${me.data?.role || 'CUSTOMER'}; path=/; max-age=${maxAge}; SameSite=Lax`;
+
       const successMsg = t(res.message) || t('success');
       showToast.success(successMsg);
 
@@ -97,6 +102,9 @@ export function useLogin() {
       setAuthenticated(res.data.accessToken, me.data);
       setLoading(false);
 
+      document.cookie = `user_logged_in=true; path=/; max-age=${7 * 86400}; SameSite=Lax`;
+      document.cookie = `auth_role=${me.data?.role || 'CUSTOMER'}; path=/; max-age=${7 * 86400}; SameSite=Lax`;
+
       showToast.success(t('success') || 'Đăng nhập thành công!');
       router.push('/');
       router.refresh();
@@ -121,6 +129,9 @@ export function useLogin() {
       const me = await getMeApi();
       setAuthenticated(res.data.accessToken, me.data);
       setLoading(false);
+
+      document.cookie = `user_logged_in=true; path=/; max-age=${7 * 86400}; SameSite=Lax`;
+      document.cookie = `auth_role=${me.data?.role || 'CUSTOMER'}; path=/; max-age=${7 * 86400}; SameSite=Lax`;
 
       showToast.success(t('success') || 'Đăng nhập thành công!');
       router.push('/');

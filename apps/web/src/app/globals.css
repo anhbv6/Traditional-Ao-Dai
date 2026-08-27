@@ -34,6 +34,11 @@
   --color-input: var(--bg-main);
   --color-destructive: var(--destructive);
   --radius-md: 8px;
+
+  --font-lora: var(--font-lora), 'Lora', Georgia, serif;
+  --font-playfair: var(--font-playfair), 'Playfair Display', Georgia, serif;
+  --font-dancing: var(--font-dancing), 'Dancing Script', cursive;
+  --font-geist: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
 }
 
 /* Modern CSS Reset - Bọc trong @layer base để không đè các utility class margin (mt-*, mb-*, mx-*, m-*) của Tailwind */

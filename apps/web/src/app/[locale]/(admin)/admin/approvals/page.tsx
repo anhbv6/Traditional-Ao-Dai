@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { AdminApprovalsList } from "@/features/admin";
 
 export default function AdminApprovalsPage() {

@@ -1,13 +1,20 @@
 "use client";
 
 import React, { ReactNode } from "react";
+import { Geist } from "next/font/google";
 import { useLocale } from "next-intl";
 import { Shield, Globe, User, LayoutDashboard, UserCheck, Users, LogOut } from "lucide-react";
 import { Link, useRouter } from "@/i18n/routing";
 import { usePathname } from "next/navigation";
-import { ProtectedRoute } from "@/components/providers/ProtectedRoute";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { adminLogoutApi } from "@/features/admin";
+
+const geistSans = Geist({
+  subsets: ["latin"],
+  variable: "--font-geist-sans",
+  display: "swap",
+  fallback: ["system-ui", "-apple-system", "sans-serif"],
+});
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -22,7 +29,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   if (isLoginPage) {
     return (
-      <div className="min-h-screen flex flex-col font-[family-name:var(--font-geist-sans)] text-[#09090B] antialiased">
+      <div className={`${geistSans.variable} min-h-screen flex flex-col font-geist text-[#09090B] antialiased`}>
         {children}
       </div>
     );
@@ -56,8 +63,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   ];
 
   return (
-    <ProtectedRoute adminOnly>
-      <div className="min-h-screen bg-[#FAFAFA] flex flex-col font-[family-name:var(--font-geist-sans)] text-[#09090B] antialiased">
+    <div className={`${geistSans.variable} min-h-screen bg-[#FAFAFA] flex flex-col font-geist text-[#09090B] antialiased`}>
         {/* Admin Header */}
         <header className="bg-white border-b border-[#E4E4E7] sticky top-0 z-40 select-none">
           <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12 h-16 flex items-center justify-between">
@@ -128,6 +134,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   } catch (e) {
                     console.warn("Logout API error:", e);
                   }
+                  document.cookie = "admin_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax";
+                  document.cookie = "auth_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax";
                   logout();
                   router.push("/admin/login");
                 }}
@@ -165,6 +173,5 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         {/* Admin Content Area */}
         <main className="flex-1 flex flex-col">{children}</main>
       </div>
-    </ProtectedRoute>
   );
 }

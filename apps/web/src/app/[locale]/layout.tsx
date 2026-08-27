@@ -1,44 +1,37 @@
 import type { Metadata, Viewport } from "next";
+import { Dancing_Script, Lora, Playfair_Display } from "next/font/google";
+import "../globals.css";
+import { hasLocale, NextIntlClientProvider } from "next-intl";
+import { getMessages, setRequestLocale } from "next-intl/server";
+import { notFound } from "next/navigation";
+import { routing } from "@/i18n/routing";
+import { AppProviders } from "@/components/providers/AppProviders";
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
 };
-import { Dancing_Script, Lora, Playfair_Display, Geist } from "next/font/google";
-import "../globals.css";
-import { hasLocale, NextIntlClientProvider } from "next-intl";
-import { getMessages, setRequestLocale } from "next-intl/server";
-import { notFound } from "next/navigation";
-import { routing } from "@/i18n/routing";
-import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
-import { ToastProvider } from "@/components/providers/ToastProvider";
-import { QueryProvider } from "@/components/providers/QueryProvider";
-import { AuthProvider } from "@/components/providers/AuthProvider";
-import { GoogleOAuthProvider } from "@react-oauth/google";
 
 const lora = Lora({
   subsets: ["latin", "vietnamese"],
   variable: "--font-lora",
   display: "swap",
+  fallback: ["Georgia", "Times New Roman", "serif"],
 });
 
 const playfair = Playfair_Display({
   subsets: ["latin", "vietnamese"],
   variable: "--font-playfair",
   display: "swap",
+  fallback: ["Georgia", "serif"],
 });
 
 const dancingScript = Dancing_Script({
   subsets: ["latin", "vietnamese"],
   variable: "--font-dancing",
   display: "swap",
-});
-
-const geistSans = Geist({
-  subsets: ["latin"],
-  variable: "--font-geist-sans",
-  display: "swap",
+  fallback: ["cursive"],
 });
 
 export const metadata: Metadata = {
@@ -70,21 +63,14 @@ export default async function LocaleLayout({
   return (
     <html
       lang={locale}
-      className={`${lora.variable} ${playfair.variable} ${dancingScript.variable} ${geistSans.variable} h-full antialiased`}
+      className={`${lora.variable} ${playfair.variable} ${dancingScript.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <NextIntlClientProvider messages={messages}>
-          <QueryProvider>
-            <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""}>
-              <AuthProvider>
-                <SmoothScrollProvider>
-                  {children}
-                  <ToastProvider />
-                </SmoothScrollProvider>
-              </AuthProvider>
-            </GoogleOAuthProvider>
-          </QueryProvider>
+          <AppProviders>
+            {children}
+          </AppProviders>
         </NextIntlClientProvider>
       </body>
     </html>

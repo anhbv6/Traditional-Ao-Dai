@@ -13,10 +13,10 @@ const googleClient = new OAuth2Client(env.GOOGLE_CLIENT_ID)
 export async function getUserById(id: string) {
   const user = await prisma.user.findUnique({
     where: { id },
-    include: { socialAccounts: true },
+    include: { socialAccounts: true, staffPermission: true },
   })
 
-  if (!user || user.role !== 'CUSTOMER') {
+  if (!user) {
     throw new AppError(404, 'USER_NOT_FOUND')
   }
 
@@ -76,9 +76,18 @@ export async function updateUserProfile(
     updateData.birth = payload.dob ? new Date(payload.dob) : null
   }
   if (payload.gender !== undefined) {
-    const upperGender = payload.gender.toUpperCase()
-    if (['MALE', 'FEMALE', 'OTHER'].includes(upperGender)) {
-      updateData.gender = upperGender
+    let genderVal: number | null = null
+    if (typeof payload.gender === 'number') {
+      if ([0, 1, 2].includes(payload.gender)) genderVal = payload.gender
+    } else if (typeof payload.gender === 'string') {
+      const g = payload.gender.trim().toUpperCase()
+      if (g === '0' || g === 'MALE') genderVal = 0
+      else if (g === '1' || g === 'FEMALE') genderVal = 1
+      else if (g === '2' || g === 'OTHER') genderVal = 2
+    }
+
+    if (genderVal !== null) {
+      updateData.gender = genderVal
     } else {
       throw new AppError(400, 'GENDER_INVALID')
     }
