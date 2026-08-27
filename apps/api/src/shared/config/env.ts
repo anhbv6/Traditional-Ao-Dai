@@ -1,25 +1,25 @@
 import dotenv from 'dotenv'
 import { z } from 'zod'
 
-// Ensure env files are loaded
+// Tự động nạp các biến môi trường từ .env
 dotenv.config()
 
 const envSchema = z.object({
-  PORT: z.string().transform((val) => parseInt(val, 10)).default(3001),
+  PORT: z.coerce.number().default(3001),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-  DATABASE_URL: z.string().url(),
+  DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
   JWT_PRIVATE_KEY: z.string().min(1, 'JWT_PRIVATE_KEY is required'),
   JWT_PUBLIC_KEY: z.string().min(1, 'JWT_PUBLIC_KEY is required'),
-  JWT_EXPIRES_IN: z.string().min(1, 'JWT_EXPIRES_IN is required').default('15m'),
-  JWT_REFRESH_EXPIRES_IN: z.string().min(1, 'JWT_REFRESH_EXPIRES_IN is required').default('7d'),
-  FRONTEND_URL: z.string().url().default('http://localhost:3000'),
+  JWT_EXPIRES_IN: z.string().default('15m'),
+  JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
+  FRONTEND_URL: z.string().default('http://localhost:3000'),
   REDIS_HOST: z.string().default('localhost'),
-  REDIS_PORT: z.string().transform((val) => parseInt(val, 10)).default(6379),
+  REDIS_PORT: z.coerce.number().default(6379),
   REDIS_PASSWORD: z.string().optional(),
-  OTP_TTL_SECONDS: z.string().transform((val) => parseInt(val, 10)).default(300),
+  OTP_TTL_SECONDS: z.coerce.number().default(300),
   GOOGLE_CLIENT_ID: z.string().min(1, 'GOOGLE_CLIENT_ID is required'),
   SMTP_HOST: z.string().optional(),
-  SMTP_PORT: z.string().transform((val) => parseInt(val, 10)).optional(),
+  SMTP_PORT: z.coerce.number().optional(),
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),
   SMTP_FROM: z.string().default('noreply@aodai.vn'),

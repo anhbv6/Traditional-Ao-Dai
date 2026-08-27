@@ -58,13 +58,18 @@ export function usePersonalInfo() {
 
   const handleSubmit = (e: React.FormEvent, overrideAvatarUrl?: string) => {
     e.preventDefault();
+    let genderNumeric = 2;
+    if (form.gender === "male" || form.gender === "0") genderNumeric = 0;
+    else if (form.gender === "female" || form.gender === "1") genderNumeric = 1;
+    else genderNumeric = 2;
+
     updateProfileMutation.mutate({
       name: form.fullName,
       email: form.email || undefined,
       phone: form.phone || undefined,
       avatar: overrideAvatarUrl !== undefined ? overrideAvatarUrl : (form.avatarUrl || undefined),
       dob: form.dob || undefined,
-      gender: form.gender.toUpperCase(),
+      gender: genderNumeric,
     });
   };
 

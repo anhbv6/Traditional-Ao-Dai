@@ -6,7 +6,7 @@ export type ProfilePayload = {
   phone?: string | null;
   avatar?: string | null;
   dob?: string | null;
-  gender?: string;
+  gender?: number | string;
 };
 
 export type UpdateProfileResponse = {

@@ -25,11 +25,20 @@ interface PersonalInfoUIState extends PersonalInfoFormValues {
 const getPersonalInfoFormValues = (user: AuthUser | null): PersonalInfoFormValues => {
   const birthDate = user?.birth ? new Date(user.birth) : undefined;
 
+  let genderValue = "other";
+  if (user?.gender === 0 || user?.gender === "0" || user?.gender === "MALE" || user?.gender === "male") {
+    genderValue = "male";
+  } else if (user?.gender === 1 || user?.gender === "1" || user?.gender === "FEMALE" || user?.gender === "female") {
+    genderValue = "female";
+  } else {
+    genderValue = "other";
+  }
+
   return {
     fullName: user?.name || "",
     email: user?.email || "",
     phone: user?.phone || "",
-    gender: user?.gender ? user.gender.toLowerCase() : "other",
+    gender: genderValue,
     dob: birthDate
       ? [
           birthDate.getFullYear(),

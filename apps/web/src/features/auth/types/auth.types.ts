@@ -5,7 +5,7 @@ export interface AuthUser {
   phone: string | null;
   avatar?: string | null;
   birth?: string | null;
-  gender?: string;
+  gender?: number | string;
   role: string;
   isActive: boolean;
   isEmailVerified?: boolean;

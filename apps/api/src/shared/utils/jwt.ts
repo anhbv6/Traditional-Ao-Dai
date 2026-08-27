@@ -11,9 +11,33 @@ export interface JWTPayload {
   rememberMe?: boolean
 }
 
-// Decode base64 keys
-const privateKey = Buffer.from(env.JWT_PRIVATE_KEY, 'base64').toString('utf8')
-const publicKey = Buffer.from(env.JWT_PUBLIC_KEY, 'base64').toString('utf8')
+/**
+ * Hàm giải mã và chuẩn hóa khóa RSA PEM từ chuỗi môi trường:
+ * - Hỗ trợ cả chuỗi Base64 hoặc chuỗi PEM trực tiếp
+ * - Tự động thay thế chuỗi ký tự "\n" thành ký tự xuống dòng thật '\n'
+ */
+function parseJwtKey(rawKey: string): string {
+  let key = rawKey.trim()
+
+  // Nếu chuỗi không chứa header PEM, thử decode từ Base64
+  if (!key.includes('-----BEGIN')) {
+    try {
+      const decoded = Buffer.from(key, 'base64').toString('utf8')
+      if (decoded.includes('-----BEGIN')) {
+        key = decoded
+      }
+    } catch {
+      // Giữ nguyên chuỗi gốc nếu decode thất bại
+    }
+  }
+
+  // Chuyển đổi ký tự escape \n thành xuống dòng thực tế
+  return key.replace(/\\n/g, '\n')
+}
+
+// Khởi tạo cặp khóa RSA đã được làm sạch
+const privateKey = parseJwtKey(env.JWT_PRIVATE_KEY)
+const publicKey = parseJwtKey(env.JWT_PUBLIC_KEY)
 
 /**
  * Generates a JWT token for a given user payload.

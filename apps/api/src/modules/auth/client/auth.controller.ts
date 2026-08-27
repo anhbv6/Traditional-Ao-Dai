@@ -22,6 +22,10 @@ function getClientIp(req: Request): string | undefined {
 }
 
 function getCookie(req: Request, name: string): string | undefined {
+  if (req.cookies && typeof req.cookies[name] === 'string') {
+    return req.cookies[name]
+  }
+
   const cookieHeader = req.headers.cookie
   if (!cookieHeader) {
     return undefined

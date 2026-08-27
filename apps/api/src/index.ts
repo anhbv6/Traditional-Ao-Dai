@@ -1,5 +1,6 @@
 import express from 'express'
 import cors from 'cors'
+import cookieParser from 'cookie-parser'
 import swaggerUi from 'swagger-ui-express'
 import { swaggerSpec } from './shared/config/swagger'
 import { env } from './shared/config/env'
@@ -10,11 +11,35 @@ import { errorHandler } from './shared/middlewares/errorHandler'
 const app = express()
 const PORT = env.PORT
 
-app.use(cors({
-  origin: env.FRONTEND_URL,
-  credentials: true,
-}))
+// 1. Trust Proxy: Nhận diện đúng IP Client thật và giao thức HTTPS khi deploy sau Nginx/Vercel/Cloudflare
+app.set('trust proxy', 1)
+
+// 2. Whitelist CORS chặt chẽ và bảo mật
+const allowedOrigins = [
+  env.FRONTEND_URL,
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+  'http://localhost:3002',
+  'http://127.0.0.1:3002',
+]
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Cho phép requests không có origin (như curl, mobile apps, server-to-server) hoặc thuộc whitelist
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true)
+      }
+      return callback(new Error('Blocked by CORS policy'))
+    },
+    credentials: true,
+  })
+)
+
+// 3. Body parsers & Cookie parser
 app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+app.use(cookieParser())
 
 /**
  * @openapi

@@ -1,6 +1,6 @@
 import { useAuthStore } from '@/features/auth/store/authStore';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3001/api';
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
 type CustomRequestInit = Omit<RequestInit, 'body'> & {
   body?: unknown;
@@ -20,21 +20,77 @@ export class HttpError extends Error {
   }
 }
 
+/**
+ * Xóa trạng thái đăng nhập trên trình duyệt
+ */
 const clearBrowserAuth = () => {
   useAuthStore.getState().logout();
+  if (typeof document !== 'undefined') {
+    document.cookie = 'user_logged_in=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
+    document.cookie = 'admin_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
+    document.cookie = 'auth_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
+  }
 };
 
 export const clearBrowserAuthTokens = clearBrowserAuth;
 
-const getLoginPath = () => {
+/**
+ * Kiểm tra xem người dùng có từng có phiên đăng nhập hay không
+ */
+const hasActiveAuthSession = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  const hasToken = Boolean(useAuthStore.getState().accessToken);
+  const cookies = document.cookie || '';
+  const hasUserCookie = cookies.includes('user_logged_in=') || cookies.includes('refreshToken=');
+  const hasAdminCookie = cookies.includes('admin_token=');
+  return hasToken || hasUserCookie || hasAdminCookie;
+};
+
+/**
+ * Kiểm tra xem đường dẫn hiện tại có phải là trang yêu cầu bắt buộc đăng nhập không
+ */
+const isCurrentRouteProtected = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  const pathname = window.location.pathname;
+  const segments = pathname.split('/').filter(Boolean);
+  const first = segments[0];
+  const isLocale = first === 'vi' || first === 'en';
+  const pathWithoutLocale = isLocale ? `/${segments.slice(1).join('/')}` : pathname;
+
+  return (
+    pathWithoutLocale === '/admin' ||
+    pathWithoutLocale.startsWith('/admin/') ||
+    pathWithoutLocale === '/profile' ||
+    pathWithoutLocale.startsWith('/profile/')
+  );
+};
+
+/**
+ * Xác định trang Login tương ứng theo ngữ cảnh (Admin vs Customer)
+ */
+const getLoginPath = (): string => {
   if (typeof window === 'undefined') {
     return '/login';
   }
 
-  const locale = window.location.pathname.split('/')[1];
-  return locale === 'vi' || locale === 'en' ? `/${locale}/login` : '/login';
+  const pathname = window.location.pathname;
+  const segments = pathname.split('/').filter(Boolean);
+  const first = segments[0];
+  const locale = first === 'vi' || first === 'en' ? first : 'vi';
+  const pathWithoutLocale = first === 'vi' || first === 'en' ? `/${segments.slice(1).join('/')}` : pathname;
+
+  // Nếu đang ở khu vực quản trị Admin -> Chuyển về /admin/login
+  if (pathWithoutLocale === '/admin' || pathWithoutLocale.startsWith('/admin/')) {
+    return `/${locale}/admin/login`;
+  }
+
+  // Khách hàng thông thường -> Chuyển về /login
+  return `/${locale}/login`;
 };
 
+/**
+ * Chuyển hướng khi hết hạn phiên đăng nhập (Chỉ chuyển hướng khi thực sự cần thiết)
+ */
 const redirectToLoginAfterSessionExpired = () => {
   if (typeof window === 'undefined') {
     return;
@@ -45,17 +101,27 @@ const redirectToLoginAfterSessionExpired = () => {
     return;
   }
 
-  window.sessionStorage.setItem('auth:session-expired', 'true');
-  window.location.assign(loginPath);
+  // CHỈ chuyển hướng nếu người dùng đang ở trang bảo vệ HOẶC trước đó đã từng có phiên đăng nhập
+  // Không làm gián đoạn trải nghiệm của khách vãng lai đang xem hàng công khai
+  if (isCurrentRouteProtected() || hasActiveAuthSession()) {
+    window.sessionStorage.setItem('auth:session-expired', 'true');
+    window.location.assign(loginPath);
+  }
 };
 
+/**
+ * Chuẩn hóa URL gọi trực tiếp tới Backend REST API
+ */
 function buildFullUrl(url: string, queryString: string): string {
   if (url.startsWith('http://') || url.startsWith('https://')) {
     return `${url}${queryString}`;
   }
 
+  // Tách query params có sẵn trong URL nếu có (ví dụ: '/api/upload?folder=general')
+  const [cleanUrl, inlineQuery] = url.split('?');
+
   // Chuẩn hóa đường dẫn: loại bỏ tiền tố /api trùng lặp với BASE_URL
-  let path = url;
+  let path = cleanUrl;
   if (path.startsWith('/api/')) {
     path = path.slice(4);
   } else if (path === '/api') {
@@ -70,53 +136,87 @@ function buildFullUrl(url: string, queryString: string): string {
   }
 
   const base = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL;
-  return `${base}${path}${queryString}`;
+
+  // Ghép nối query strings nếu có
+  let finalQuery = '';
+  if (inlineQuery && queryString) {
+    finalQuery = `?${inlineQuery}&${queryString.replace(/^\?/, '')}`;
+  } else if (inlineQuery) {
+    finalQuery = `?${inlineQuery}`;
+  } else if (queryString) {
+    finalQuery = queryString.startsWith('?') ? queryString : `?${queryString}`;
+  }
+
+  return `${base}${path}${finalQuery}`;
 }
 
+// Biến lưu giữ Promise refresh token đơn nhất (Single-Flight Mutex chống Race Condition)
+let refreshTokenPromise: Promise<string | undefined> | null = null;
+
+/**
+ * Hàm làm mới Access Token bằng Refresh Token (Được bảo vệ bằng Mutex Promise)
+ */
 const refreshBrowserToken = async (): Promise<string | undefined> => {
-  const refreshUrl = buildFullUrl('/auth/refresh-token', '');
-  const res = await fetch(refreshUrl, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-  });
-
-  const isJson = res.headers.get('content-type')?.includes('application/json');
-  const payload = (isJson ? await res.json() : await res.text()) as
-    | { data?: { accessToken?: string } }
-    | string;
-
-  if (!res.ok) {
-    clearBrowserAuth();
-    redirectToLoginAfterSessionExpired();
-    throw new HttpError({
-      status: res.status,
-      payload,
-    });
+  // Nếu đang có một request refresh token khác chạy dở dang, cùng chờ kết quả chung
+  if (refreshTokenPromise) {
+    return refreshTokenPromise;
   }
 
-  if (typeof payload === 'string') {
-    clearBrowserAuth();
-    redirectToLoginAfterSessionExpired();
-    throw new HttpError({
-      status: res.status,
-      payload,
-    });
-  }
+  refreshTokenPromise = (async () => {
+    try {
+      const refreshUrl = buildFullUrl('/auth/refresh-token', '');
+      const res = await fetch(refreshUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
 
-  const accessToken = payload.data?.accessToken;
-  if (!accessToken) {
-    clearBrowserAuth();
-    redirectToLoginAfterSessionExpired();
-    return undefined;
-  }
+      const isJson = res.headers.get('content-type')?.includes('application/json');
+      const payload = (isJson ? await res.json() : await res.text()) as
+        | { data?: { accessToken?: string } }
+        | string;
 
-  useAuthStore.getState().setAccessToken(accessToken);
-  return accessToken;
+      if (!res.ok) {
+        clearBrowserAuth();
+        redirectToLoginAfterSessionExpired();
+        throw new HttpError({
+          status: res.status,
+          payload,
+        });
+      }
+
+      if (typeof payload === 'string') {
+        clearBrowserAuth();
+        redirectToLoginAfterSessionExpired();
+        throw new HttpError({
+          status: res.status,
+          payload,
+        });
+      }
+
+      const accessToken = payload.data?.accessToken;
+      if (!accessToken) {
+        clearBrowserAuth();
+        redirectToLoginAfterSessionExpired();
+        return undefined;
+      }
+
+      useAuthStore.getState().setAccessToken(accessToken);
+      return accessToken;
+    } finally {
+      // Giải phóng lock sau khi hoàn tất
+      refreshTokenPromise = null;
+    }
+  })();
+
+  return refreshTokenPromise;
 };
 
+/**
+ * Hàm gửi HTTP Request tổng quát
+ */
 const request = async <ResponseData>(
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
   url: string,
@@ -179,8 +279,14 @@ const request = async <ResponseData>(
   const isJson = res.headers.get('content-type')?.includes('application/json');
   const payload = (isJson ? await res.json() : await res.text()) as unknown;
 
-  // Tự động làm mới Access Token khi token hết hạn (401)
-  if (!res.ok && res.status === 401 && !isServer && options?.retryOnUnauthorized !== false) {
+  // Tự động làm mới Access Token khi gặp 401 (Chỉ retry nếu có phiên hoặc chưa bị cấm retry)
+  if (
+    !res.ok &&
+    res.status === 401 &&
+    !isServer &&
+    options?.retryOnUnauthorized !== false &&
+    hasActiveAuthSession()
+  ) {
     try {
       const nextAccessToken = await refreshBrowserToken();
       if (nextAccessToken) {
@@ -194,7 +300,7 @@ const request = async <ResponseData>(
         });
       }
     } catch {
-      // Refresh token failed, rơi xuống xử lý lỗi bên dưới
+      // Refresh token failed -> Rơi xuống throw HttpError bên dưới
     }
   }
 
