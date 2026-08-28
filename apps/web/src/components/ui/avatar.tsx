@@ -28,13 +28,19 @@ function Avatar({
 
 function AvatarImage({
   className,
+  src,
   ...props
 }: Omit<AvatarPrimitive.Image.Props, "className"> & {
   className?: string
 }) {
+  if (!src || (typeof src === "string" && !src.trim())) {
+    return null
+  }
+
   return (
     <AvatarPrimitive.Image
       data-slot="avatar-image"
+      src={src}
       className={cn(
         "aspect-square size-full rounded-full object-cover [image-rendering:-webkit-optimize-contrast]",
         className

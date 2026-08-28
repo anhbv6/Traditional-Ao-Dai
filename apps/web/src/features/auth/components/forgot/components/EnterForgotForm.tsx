@@ -11,6 +11,7 @@ import { showToast } from '@/components/ui/toast';
 import { HttpError } from '@/lib/api-client';
 import { forgotPasswordEmailApi } from '../../../api/forgot.api';
 import { sendOtpApi } from '../../../api/auth.api';
+import { translateAuthResponse } from '../../../utils/translateAuthResponse';
 
 // Shared Components
 import { AuthHeader } from '../../AuthHeader';
@@ -72,12 +73,13 @@ export function EnterForgotForm({
     } catch (err: unknown) {
       console.error(err);
       const payload = err instanceof HttpError ? err.payload : undefined;
-      const apiMsg =
+      const rawMsg =
         payload && typeof payload === 'object' && 'message' in payload
           ? String(payload.message)
           : err instanceof Error
             ? err.message
             : 'Có lỗi xảy ra, vui lòng thử lại.';
+      const apiMsg = translateAuthResponse(t, rawMsg, 'Có lỗi xảy ra, vui lòng thử lại.');
       showToast.error(apiMsg);
     } finally {
       setIsLoading(false);

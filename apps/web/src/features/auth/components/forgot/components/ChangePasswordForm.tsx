@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { HttpError } from '@/lib/api-client';
 import { showToast } from '@/components/ui/toast';
 import { resetPasswordEmailApi, resetPasswordPhoneApi } from '../../../api/forgot.api';
+import { translateAuthResponse } from '../../../utils/translateAuthResponse';
 
 // Shared Components
 import { AuthHeader } from '../../AuthHeader';
@@ -51,12 +52,13 @@ export function ChangePasswordForm({ forgotType = 'email', target = '', resetTok
     } catch (err: unknown) {
       console.error(err);
       const payload = err instanceof HttpError ? err.payload : undefined;
-      const apiMsg =
+      const rawMsg =
         payload && typeof payload === 'object' && 'message' in payload
           ? String(payload.message)
           : err instanceof Error
             ? err.message
             : t('resetPasswordError');
+      const apiMsg = translateAuthResponse(t, rawMsg, t('resetPasswordError'));
       showToast.error(apiMsg);
     } finally {
       setIsLoading(false);

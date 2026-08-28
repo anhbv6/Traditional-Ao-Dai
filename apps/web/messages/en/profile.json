@@ -46,7 +46,10 @@
     "PROVINCE_NAME_REQUIRED": "Please select province/city.",
     "DISTRICT_NAME_REQUIRED": "Please select district.",
     "WARD_NAME_REQUIRED": "Please select ward.",
-    "ADDRESS_ID_INVALID": "Invalid address ID."
+    "ADDRESS_ID_INVALID": "Invalid address ID.",
+    "UPLOAD_SUCCESS": "Image uploaded successfully!",
+    "IMAGE_FILE_REQUIRED": "Image file is required.",
+    "ONLY_IMAGE_FILES_ALLOWED": "Only image files are allowed."
   },
   "tabs": {
     "personal": "Personal Information",

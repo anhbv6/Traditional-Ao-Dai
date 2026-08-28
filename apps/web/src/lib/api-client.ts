@@ -21,9 +21,34 @@ export class HttpError extends Error {
 }
 
 /**
- * Xóa trạng thái đăng nhập trên trình duyệt
+ * Xóa trạng thái đăng nhập Khách hàng trên trình duyệt
  */
-const clearBrowserAuth = () => {
+export const clearCustomerAuth = () => {
+  useAuthStore.getState().logout();
+  if (typeof document !== 'undefined') {
+    document.cookie = 'user_logged_in=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
+    const roleMatch = document.cookie.match(/auth_role=([^;]+)/);
+    if (roleMatch && decodeURIComponent(roleMatch[1]) === 'CUSTOMER') {
+      document.cookie = 'auth_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
+    }
+  }
+};
+
+/**
+ * Xóa trạng thái đăng nhập Quản trị viên (Admin/Staff) trên trình duyệt
+ */
+export const clearAdminAuth = () => {
+  useAuthStore.getState().logout();
+  if (typeof document !== 'undefined') {
+    document.cookie = 'admin_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
+    document.cookie = 'auth_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
+  }
+};
+
+/**
+ * Xóa toàn bộ trạng thái đăng nhập trên trình duyệt
+ */
+export const clearBrowserAuth = () => {
   useAuthStore.getState().logout();
   if (typeof document !== 'undefined') {
     document.cookie = 'user_logged_in=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
@@ -153,10 +178,7 @@ function buildFullUrl(url: string, queryString: string): string {
 // Biến lưu giữ Promise refresh token đơn nhất (Single-Flight Mutex chống Race Condition)
 let refreshTokenPromise: Promise<string | undefined> | null = null;
 
-/**
- * Hàm làm mới Access Token bằng Refresh Token (Được bảo vệ bằng Mutex Promise)
- */
-const refreshBrowserToken = async (): Promise<string | undefined> => {
+export const refreshBrowserToken = async (): Promise<string | undefined> => {
   // Nếu đang có một request refresh token khác chạy dở dang, cùng chờ kết quả chung
   if (refreshTokenPromise) {
     return refreshTokenPromise;
@@ -179,7 +201,7 @@ const refreshBrowserToken = async (): Promise<string | undefined> => {
         | string;
 
       if (!res.ok) {
-        clearBrowserAuth();
+        clearCustomerAuth();
         redirectToLoginAfterSessionExpired();
         throw new HttpError({
           status: res.status,
@@ -188,7 +210,7 @@ const refreshBrowserToken = async (): Promise<string | undefined> => {
       }
 
       if (typeof payload === 'string') {
-        clearBrowserAuth();
+        clearCustomerAuth();
         redirectToLoginAfterSessionExpired();
         throw new HttpError({
           status: res.status,
@@ -198,7 +220,7 @@ const refreshBrowserToken = async (): Promise<string | undefined> => {
 
       const accessToken = payload.data?.accessToken;
       if (!accessToken) {
-        clearBrowserAuth();
+        clearCustomerAuth();
         redirectToLoginAfterSessionExpired();
         return undefined;
       }

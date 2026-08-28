@@ -1,6 +1,6 @@
 import { prisma } from '@repo/db'
 import { comparePassword } from '../../../shared/utils/password'
-import { generateAccessToken } from '../../../shared/utils/jwt'
+import { generateAccessToken, generateToken } from '../../../shared/utils/jwt'
 import { AppError } from '../../../shared/middlewares/errorHandler'
 import { LoginInput } from '../auth.schema'
 
@@ -8,7 +8,7 @@ import { LoginInput } from '../auth.schema'
  * Validates admin and staff credentials and generates a JWT access token.
  */
 export async function adminLogin(input: LoginInput['body']) {
-  const { email, password } = input
+  const { email, password, rememberMe } = input
 
   // Find user by email
   const user = await prisma.user.findUnique({
@@ -34,10 +34,17 @@ export async function adminLogin(input: LoginInput['body']) {
   }
 
   // Generate JWT token containing key user claims
-  const token = generateAccessToken({
-    userId: user.id,
-    role: user.role,
-  })
+  // Nếu rememberMe = true: token tồn tại 7 ngày; nếu false: 1 ngày
+  const tokenExpiresIn = rememberMe ? '7d' : '1d'
+  const token = generateToken(
+    {
+      userId: user.id,
+      role: user.role,
+      tokenType: 'access',
+      rememberMe: Boolean(rememberMe),
+    },
+    tokenExpiresIn
+  )
 
   // Return user info excluding password and include token
   const { password: _, ...safeUser } = user

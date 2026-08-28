@@ -16,8 +16,14 @@ export function translateProfileResponse(
   }
 
   try {
-    return t(`responses.${message}`);
+    const resKey = `responses.${message}`;
+    const translated = t(resKey);
+    if (translated && translated !== resKey) {
+      return translated;
+    }
   } catch {
     return fallback;
   }
+
+  return fallback;
 }

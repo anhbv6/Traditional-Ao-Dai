@@ -22,14 +22,18 @@ export function GoogleAuthButton({
   className,
 }: GoogleAuthButtonProps) {
   const containerRef = React.useRef<HTMLDivElement>(null);
-  const [buttonWidth, setButtonWidth] = React.useState("380");
+  const [buttonWidth, setButtonWidth] = React.useState("400");
 
   React.useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
     const updateWidth = () => {
-      setButtonWidth(String(Math.max(200, Math.round(container.getBoundingClientRect().width))));
+      const currentWidth = container.getBoundingClientRect().width;
+      if (!currentWidth) return;
+      // Google Identity Services giới hạn width trong khoảng 200px - 400px
+      const clampedWidth = String(Math.min(400, Math.max(200, Math.round(currentWidth))));
+      setButtonWidth((prev) => (prev !== clampedWidth ? clampedWidth : prev));
     };
 
     updateWidth();
@@ -52,7 +56,7 @@ export function GoogleAuthButton({
       </Button>
 
       {!disabled && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center opacity-0">
+        <div className="absolute inset-0 z-10 flex items-center justify-center opacity-0 overflow-hidden">
           <GoogleLogin
             onSuccess={(credentialResponse) => {
               if (credentialResponse.credential) {

@@ -28,6 +28,7 @@ export default function proxy(request: NextRequest) {
   const userLoggedIn =
     request.cookies.get('user_logged_in')?.value ||
     request.cookies.get('refreshToken')?.value;
+  const authRole = request.cookies.get('auth_role')?.value;
 
   // 3. Bảo vệ khu vực Admin (/admin, /admin/dashboard, /admin/staff...)
   if (pathWithoutLocale === '/admin' || pathWithoutLocale.startsWith('/admin/')) {
@@ -42,9 +43,30 @@ export default function proxy(request: NextRequest) {
       return intlMiddleware(request);
     }
 
+    // Nếu tài khoản hiện tại là Khách hàng (CUSTOMER) mà cố truy cập vào admin -> chuyển sang 403 Forbidden
+    if (authRole === 'CUSTOMER' && !adminToken) {
+      return NextResponse.redirect(
+        new URL(`/${currentLocale}/403`, request.url)
+      );
+    }
+
     if (!adminToken) {
       return NextResponse.redirect(
         new URL(`/${currentLocale}/admin/login`, request.url)
+      );
+    }
+
+    // Kiểm tra quyền Super Admin đối với các route đặc thù (Nhân sự & Voucher)
+    const isSuperAdminRoute =
+      pathWithoutLocale === '/admin/staff' ||
+      pathWithoutLocale.startsWith('/admin/staff/') ||
+      pathWithoutLocale === '/admin/vouchers' ||
+      pathWithoutLocale.startsWith('/admin/vouchers/');
+
+    if (isSuperAdminRoute && authRole === 'STAFF') {
+      // Nhân viên Staff không có quyền vào Nhân sự & Voucher -> redirect về dashboard
+      return NextResponse.redirect(
+        new URL(`/${currentLocale}/admin/dashboard`, request.url)
       );
     }
 
@@ -53,7 +75,7 @@ export default function proxy(request: NextRequest) {
 
   // 4. Bảo vệ trang cá nhân người dùng (/profile, /profile/orders...)
   if (pathWithoutLocale === '/profile' || pathWithoutLocale.startsWith('/profile/')) {
-    if (!userLoggedIn) {
+    if (!userLoggedIn && !adminToken) {
       const loginUrl = new URL(`/${currentLocale}/login`, request.url);
       loginUrl.searchParams.set('redirect', pathname);
       return NextResponse.redirect(loginUrl);

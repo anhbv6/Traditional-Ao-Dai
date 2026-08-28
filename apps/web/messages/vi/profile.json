@@ -46,7 +46,10 @@
     "PROVINCE_NAME_REQUIRED": "Vui lòng chọn tỉnh/thành phố.",
     "DISTRICT_NAME_REQUIRED": "Vui lòng chọn quận/huyện.",
     "WARD_NAME_REQUIRED": "Vui lòng chọn phường/xã.",
-    "ADDRESS_ID_INVALID": "Mã địa chỉ không hợp lệ."
+    "ADDRESS_ID_INVALID": "Mã địa chỉ không hợp lệ.",
+    "UPLOAD_SUCCESS": "Tải lên hình ảnh thành công!",
+    "IMAGE_FILE_REQUIRED": "Vui lòng chọn tệp hình ảnh để tải lên.",
+    "ONLY_IMAGE_FILES_ALLOWED": "Chỉ chấp nhận tệp có định dạng hình ảnh."
   },
   "tabs": {
     "personal": "Thông tin cá nhân",

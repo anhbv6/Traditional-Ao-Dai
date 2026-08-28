@@ -261,7 +261,8 @@ export async function clientLoginWithOtp(input: OtpLoginInput['body'], meta: Ses
     user.isPhoneVerified = true
   }
 
-  const tokens = await createClientSession(user, meta, false)
+  const rememberMe = input.rememberMe ?? false
+  const tokens = await createClientSession(user, meta, rememberMe)
 
   const { password: _, ...safeUser } = user
   return {
@@ -439,7 +440,7 @@ export async function checkAccountAvailability(email?: string, phone?: string): 
 
 const googleClient = new OAuth2Client(env.GOOGLE_CLIENT_ID)
 
-export async function clientLoginWithGoogle(credential: string, meta: SessionMeta) {
+export async function clientLoginWithGoogle(credential: string, meta: SessionMeta, rememberMe: boolean = true) {
   try {
     const ticket = await googleClient.verifyIdToken({
       idToken: credential,
@@ -494,7 +495,7 @@ export async function clientLoginWithGoogle(credential: string, meta: SessionMet
       }
     }
 
-    const tokens = await createClientSession(user, meta, false)
+    const tokens = await createClientSession(user, meta, rememberMe)
 
     return {
       user,

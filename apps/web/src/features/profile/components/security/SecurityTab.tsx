@@ -234,7 +234,7 @@ export function SecurityTab() {
                 Hủy liên kết
               </button>
             ) : (
-              <div className="w-full sm:w-auto relative [&_iframe]:hidden">
+              <div className="w-full sm:w-auto relative">
                 <GoogleAuthButton
                   label="Liên kết Google"
                   onCredential={handleLinkGoogle}

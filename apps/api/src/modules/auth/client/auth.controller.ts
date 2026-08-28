@@ -223,11 +223,15 @@ export async function loginWithOtp(req: Request, res: Response, next: NextFuncti
  */
 export async function loginWithGoogle(req: Request, res: Response, next: NextFunction): Promise<any> {
   try {
-    const { credential } = req.body
-    const result = await authService.clientLoginWithGoogle(credential, {
-      deviceInfo: req.headers['user-agent'],
-      ipAddress: getClientIp(req),
-    })
+    const { credential, rememberMe = true } = req.body
+    const result = await authService.clientLoginWithGoogle(
+      credential,
+      {
+        deviceInfo: req.headers['user-agent'],
+        ipAddress: getClientIp(req),
+      },
+      rememberMe
+    )
     setRefreshTokenCookie(res, result.refreshToken, result.rememberMe, result.refreshTokenExpiresAt)
     return sendSuccess(res, {
       data: {

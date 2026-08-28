@@ -121,7 +121,7 @@ export function PersonalInfoTab() {
     return `${dd}/${mm}/${yyyy}`;
   };
 
-  const displayAvatar = avatarPreview || avatarUrl;
+  const displayAvatar = (avatarPreview || avatarUrl || "").trim();
 
   return (
     <div className="rounded-2xl border border-[#800020]/10 bg-white p-4 shadow-sm sm:p-8">
@@ -142,7 +142,9 @@ export function PersonalInfoTab() {
                   : "cursor-default"
               }`}
             >
-              <AvatarImage src={displayAvatar} alt={fullName} className="object-cover" />
+              {displayAvatar ? (
+                <AvatarImage src={displayAvatar} alt={fullName} className="object-cover" />
+              ) : null}
               <AvatarFallback className="bg-[#FAF7F5] text-[#800020] font-bold text-xl sm:text-2xl uppercase">
                 {fullName ? fullName.slice(0, 2) : "US"}
               </AvatarFallback>
@@ -203,13 +205,13 @@ export function PersonalInfoTab() {
         {/* Modal Popup to view full-size avatar */}
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
           <DialogContent className="max-w-[280px] sm:max-w-[360px] !p-0 overflow-hidden rounded-2xl shadow-2xl !border-none">
-            {displayAvatar && (
+            {displayAvatar ? (
               <img 
                 src={displayAvatar} 
                 alt={fullName} 
                 className="w-full aspect-square object-cover block" 
               />
-            )}
+            ) : null}
           </DialogContent>
         </Dialog>
 

@@ -76,6 +76,7 @@ export const otpLoginSchema = z.object({
   body: z.object({
     phone: vietnamPhoneSchema,
     code: z.string().regex(/^\d{6}$/, 'OTP code must be exactly 6 digits'),
+    rememberMe: z.boolean().optional().default(false),
   }),
 })
 
@@ -84,6 +85,7 @@ export type OtpLoginInput = z.infer<typeof otpLoginSchema>
 export const googleLoginSchema = z.object({
   body: z.object({
     credential: z.string().min(1, 'Google credential token is required'),
+    rememberMe: z.boolean().optional().default(true),
   }),
 })
 

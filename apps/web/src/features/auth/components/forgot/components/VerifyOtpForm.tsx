@@ -9,6 +9,7 @@ import { showToast } from '@/components/ui/toast';
 import { HttpError } from '@/lib/api-client';
 import { forgotPasswordEmailApi, verifyResetPasswordEmailApi, verifyResetPasswordPhoneApi } from '../../../api/forgot.api';
 import { sendOtpApi } from '../../../api/auth.api';
+import { translateAuthResponse } from '../../../utils/translateAuthResponse';
 
 // Shared Components
 import { AuthHeader } from '../../AuthHeader';
@@ -99,11 +100,13 @@ export function VerifyOtpForm({
 
   const getApiErrorMessage = (err: unknown, fallback: string) => {
     const payload = err instanceof HttpError ? err.payload : undefined;
-    return payload && typeof payload === 'object' && 'message' in payload
-      ? String(payload.message)
-      : err instanceof Error
-        ? err.message
-        : fallback;
+    const rawMsg =
+      payload && typeof payload === 'object' && 'message' in payload
+        ? String(payload.message)
+        : err instanceof Error
+          ? err.message
+          : fallback;
+    return translateAuthResponse(t, rawMsg, fallback);
   };
 
   const handleResend = async () => {

@@ -14,6 +14,7 @@ import { withMinDelay } from '@/lib/utils';
 import { checkEmailApi, checkPhoneApi, registerApi } from '../api/register.api';
 import { getMeApi, loginWithGoogleApi, sendOtpApi } from '../api/auth.api';
 import { useAuthStore } from '../store/authStore';
+import { translateAuthResponse } from '../utils/translateAuthResponse';
 
 export function useRegister() {
   const t = useTranslations('Auth');
@@ -215,15 +216,16 @@ export function useRegister() {
           }),
           2000
         );
-        const successMsg = t(res.message) || t('registerSuccessEmail', { name: data.fullName });
+        const successMsg = translateAuthResponse(t, res.message, t('registerSuccessEmail', { name: data.fullName }));
         showToast.success(successMsg);
         router.push('/login');
       } catch (err: unknown) {
         console.error('Registration failed:', err);
-        const apiMsg = getErrorMessage(err, 'Registration failed');
-        if (apiMsg.toLowerCase().includes('email')) {
+        const rawMsg = getErrorMessage(err, 'REGISTRATION_FAILED');
+        const apiMsg = translateAuthResponse(t, rawMsg, 'Đăng ký tài khoản thất bại');
+        if (rawMsg === 'EMAIL_ALREADY_EXISTS' || rawMsg.toLowerCase().includes('email')) {
           setError('email', { message: apiMsg });
-        } else if (apiMsg.toLowerCase().includes('số điện thoại') || apiMsg.toLowerCase().includes('phone')) {
+        } else if (rawMsg === 'PHONE_ALREADY_EXISTS' || rawMsg === 'INVALID_PHONE_NUMBER' || rawMsg.toLowerCase().includes('phone')) {
           setError('phone', { message: apiMsg });
         } else {
           showToast.error(apiMsg);
@@ -242,12 +244,13 @@ export function useRegister() {
         setOtpError('');
         setOtpSentOnce(true);
         setIsOtpStep(true);
-        showToast.success('Mã OTP đã được gửi đến số điện thoại của bạn.');
+        showToast.success(t('otpSent') || 'Mã OTP đã được gửi đến số điện thoại của bạn.');
       } catch (err: unknown) {
         console.error('Failed to send OTP:', err);
-        const apiMsg = getErrorMessage(err, 'Gửi mã OTP thất bại');
+        const rawMsg = getErrorMessage(err, 'OTP_SEND_FAILED');
+        const apiMsg = translateAuthResponse(t, rawMsg, 'Gửi mã OTP thất bại');
         showToast.error(apiMsg);
-        if (apiMsg.toUpperCase().includes('WAIT 60 SECONDS')) {
+        if (rawMsg === 'OTP_COOLDOWN_ACTIVE' || rawMsg === 'COOLDOWN_ACTIVE') {
           setOtpSentOnce(true);
         }
       } finally {
@@ -273,13 +276,14 @@ export function useRegister() {
         }),
         2000
       );
-      const successMsg = t(res.message) || t('registerSuccessPhone');
+      const successMsg = translateAuthResponse(t, res.message, t('registerSuccessPhone'));
       showToast.success(successMsg);
       setIsOtpStep(false);
       router.push('/login');
     } catch (err: unknown) {
       console.error('Registration failed:', err);
-      const apiMsg = getErrorMessage(err, 'Xác thực OTP thất bại');
+      const rawMsg = getErrorMessage(err, 'OTP_VERIFICATION_FAILED');
+      const apiMsg = translateAuthResponse(t, rawMsg, 'Xác thực OTP thất bại');
       setOtpError(apiMsg);
       showToast.error(apiMsg);
     } finally {
@@ -295,10 +299,11 @@ export function useRegister() {
       await sendOtpApi(data.phone, 'REGISTER');
       setOtpInput('');
       setOtpError('');
-      showToast.success('Mã OTP đã được gửi lại.');
+      showToast.success(t('otpSent') || 'Mã OTP đã được gửi lại.');
     } catch (err: unknown) {
       console.error('Failed to resend OTP:', err);
-      const apiMsg = getErrorMessage(err, 'Gửi lại mã OTP thất bại');
+      const rawMsg = getErrorMessage(err, 'OTP_RESEND_FAILED');
+      const apiMsg = translateAuthResponse(t, rawMsg, 'Gửi lại mã OTP thất bại');
       setOtpError(apiMsg);
     }
   };
@@ -315,12 +320,19 @@ export function useRegister() {
       setAuthenticated(res.data.accessToken, me.data);
       setLoading(false);
 
-      showToast.success(t('success') || 'Đăng nhập thành công!');
+      // Lưu cookie cho Next.js Server Middleware (Proxy) nhận diện
+      document.cookie = `user_logged_in=true; path=/; max-age=${7 * 86400}; SameSite=Lax`;
+      document.cookie = `auth_role=${me.data?.role || 'CUSTOMER'}; path=/; max-age=${7 * 86400}; SameSite=Lax`;
+
+      const successMsg = translateAuthResponse(t, res.message, t('LOGIN_SUCCESS') || t('success'));
+      showToast.success(successMsg);
       router.push('/');
       router.refresh();
     } catch (err: unknown) {
-      console.error('Google sign up failed:', err);
-      showToast.error(getErrorMessage(err, 'Đăng nhập Google thất bại'));
+      console.error('Google signup failed:', err);
+      const rawMsg = getErrorMessage(err, 'GOOGLE_AUTH_FAILED');
+      const apiMsg = translateAuthResponse(t, rawMsg, 'Đăng nhập Google thất bại');
+      showToast.error(apiMsg);
     } finally {
       setIsRegistering(false);
     }

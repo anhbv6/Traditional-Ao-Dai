@@ -20,7 +20,13 @@
     "loginSuccess": "Admin login successful!",
     "loginError": "Login failed. Please check your credentials!",
     "showPassword": "Show password",
-    "hidePassword": "Hide password"
+    "hidePassword": "Hide password",
+    "ADMIN_UNAUTHORIZED": "Unauthorized access to admin portal.",
+    "INCORRECT_PASSWORD": "Incorrect password.",
+    "ACCOUNT_DEACTIVATED": "Admin account has been deactivated or locked.",
+    "USER_NOT_FOUND": "Admin account not found in system.",
+    "ADMIN_LOGIN_SUCCESS": "Admin login successful!",
+    "ADMIN_LOGOUT_SUCCESS": "Admin logout successful!"
   },
   "title": "AODAI Admin Dashboard",
   "subtitle": "Overview of sales activities, tailoring progress, and material stock levels.",

@@ -116,6 +116,7 @@ export function useAdminLogin() {
         const res = await adminLoginApi({
           email: formData.email.trim(),
           password: formData.password,
+          rememberMe: formData.rememberMe,
         });
 
         if (res?.data) {
@@ -124,13 +125,15 @@ export function useAdminLogin() {
             adminUser = {
               ...adminUser,
               ...res.data.user,
-              role: "ADMIN",
+              role: (res.data.user.role as any) || "STAFF",
             };
           }
         }
       } catch (apiErr) {
-        // Fallback for offline demo mode if API server is not running
-        console.warn("API login fallback engaged:", apiErr);
+        if (apiErr instanceof HttpError) {
+          throw apiErr;
+        }
+        console.warn("API login offline fallback engaged:", apiErr);
       }
 
       // Zustand v5 State Management update
@@ -140,9 +143,15 @@ export function useAdminLogin() {
       setLoading(false);
 
       // Lưu cookie cho Next.js Server Middleware (Proxy) nhận diện bảo vệ route
-      const maxAge = formData.rememberMe ? 7 * 86400 : 86400;
-      document.cookie = `admin_token=${token}; path=/; max-age=${maxAge}; SameSite=Lax`;
-      document.cookie = `auth_role=${adminUser.role}; path=/; max-age=${maxAge}; SameSite=Lax`;
+      if (formData.rememberMe) {
+        const maxAge = 7 * 86400;
+        document.cookie = `admin_token=${token}; path=/; max-age=${maxAge}; SameSite=Lax`;
+        document.cookie = `auth_role=${adminUser.role}; path=/; max-age=${maxAge}; SameSite=Lax`;
+      } else {
+        // Session Cookie: Tự động hết hạn khi đóng trình duyệt
+        document.cookie = `admin_token=${token}; path=/; SameSite=Lax`;
+        document.cookie = `auth_role=${adminUser.role}; path=/; SameSite=Lax`;
+      }
 
       showToast.success(t("loginSuccess"));
 
@@ -152,7 +161,10 @@ export function useAdminLogin() {
       }, 500);
     } catch (err: unknown) {
       console.error("Admin login error:", err);
-      const errorMsg = extractErrorMessage(err, t("loginError"));
+      const rawMsg = extractErrorMessage(err, "loginError");
+      const errorMsg = t.has(rawMsg as any)
+        ? t(rawMsg as any)
+        : rawMsg;
       showToast.error(errorMsg);
     } finally {
       setIsLoading(false);

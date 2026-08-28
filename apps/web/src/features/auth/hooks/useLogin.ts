@@ -5,6 +5,7 @@ import { getMeApi, loginApi, sendOtpApi, loginWithOtpApi, loginWithGoogleApi } f
 import { useAuthStore } from '../store/authStore';
 import { showToast } from '@/components/ui/toast';
 import { HttpError } from '@/lib/api-client';
+import { translateAuthResponse } from '../utils/translateAuthResponse';
 
 function extractErrorMessage(err: unknown, defaultMsg: string): string {
   if (err instanceof HttpError) {
@@ -12,7 +13,7 @@ function extractErrorMessage(err: unknown, defaultMsg: string): string {
     if (payload && typeof payload === 'object') {
       if ('errors' in payload && Array.isArray(payload.errors) && payload.errors.length > 0) {
         return payload.errors
-          .map((e: any) => e.message || 'Lỗi không xác định')
+          .map((e: any) => e.message || defaultMsg)
           .join(', ');
       }
       if ('message' in payload) {
@@ -50,18 +51,20 @@ export function useLogin() {
       setLoading(false);
 
       // Lưu cookie cho Next.js Server Middleware (Proxy) nhận diện
-      const maxAge = rememberMe ? 7 * 86400 : 86400;
-      document.cookie = `user_logged_in=true; path=/; max-age=${maxAge}; SameSite=Lax`;
-      document.cookie = `auth_role=${me.data?.role || 'CUSTOMER'}; path=/; max-age=${maxAge}; SameSite=Lax`;
+      // Nếu rememberMe=true: lưu 7 ngày; nếu false: session cookie (tự xóa khi tắt trình duyệt, khớp với BE)
+      const maxAgeAttr = rememberMe ? `; max-age=${7 * 86400}` : '';
+      document.cookie = `user_logged_in=true; path=/${maxAgeAttr}; SameSite=Lax`;
+      document.cookie = `auth_role=${me.data?.role || 'CUSTOMER'}; path=/${maxAgeAttr}; SameSite=Lax`;
 
-      const successMsg = t(res.message) || t('success');
+      const successMsg = translateAuthResponse(t, res.message, t('LOGIN_SUCCESS') || t('success'));
       showToast.success(successMsg);
 
       router.push('/');
       router.refresh();
     } catch (err: unknown) {
       console.error('Login failed:', err);
-      const apiMsg = extractErrorMessage(err, 'Đăng nhập thất bại');
+      const rawMsg = extractErrorMessage(err, 'LOGIN_FAILED');
+      const apiMsg = translateAuthResponse(t, rawMsg, 'Đăng nhập thất bại');
       showToast.error(apiMsg);
     } finally {
       setIsLoading(false);
@@ -83,17 +86,18 @@ export function useLogin() {
       showToast.success(t('otpSent') || 'Đã gửi OTP qua SMS!');
     } catch (err: unknown) {
       console.error(err);
-      const apiMsg = extractErrorMessage(err, 'Gửi OTP thất bại');
+      const rawMsg = extractErrorMessage(err, 'OTP_SEND_FAILED');
+      const apiMsg = translateAuthResponse(t, rawMsg, 'Gửi OTP thất bại');
       showToast.error(apiMsg);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const loginWithOtp = async (phone: string) => {
+  const loginWithOtp = async (phone: string, rememberMe: boolean = true) => {
     setIsLoading(true);
     try {
-      const res = await loginWithOtpApi({ phone, code: otpInput });
+      const res = await loginWithOtpApi({ phone, code: otpInput, rememberMe });
 
       const { setAccessToken, setAuthenticated, setLoading } = useAuthStore.getState();
       setAccessToken(res.data.accessToken);
@@ -102,15 +106,18 @@ export function useLogin() {
       setAuthenticated(res.data.accessToken, me.data);
       setLoading(false);
 
-      document.cookie = `user_logged_in=true; path=/; max-age=${7 * 86400}; SameSite=Lax`;
-      document.cookie = `auth_role=${me.data?.role || 'CUSTOMER'}; path=/; max-age=${7 * 86400}; SameSite=Lax`;
+      const maxAgeAttr = rememberMe ? `; max-age=${7 * 86400}` : '';
+      document.cookie = `user_logged_in=true; path=/${maxAgeAttr}; SameSite=Lax`;
+      document.cookie = `auth_role=${me.data?.role || 'CUSTOMER'}; path=/${maxAgeAttr}; SameSite=Lax`;
 
-      showToast.success(t('success') || 'Đăng nhập thành công!');
+      const successMsg = translateAuthResponse(t, res.message, t('LOGIN_SUCCESS') || t('success'));
+      showToast.success(successMsg);
       router.push('/');
       router.refresh();
     } catch (err: unknown) {
       console.error(err);
-      const apiMsg = extractErrorMessage(err, 'Đăng nhập thất bại');
+      const rawMsg = extractErrorMessage(err, 'LOGIN_FAILED');
+      const apiMsg = translateAuthResponse(t, rawMsg, 'Đăng nhập thất bại');
       setOtpError(apiMsg);
       showToast.error(apiMsg);
     } finally {
@@ -118,10 +125,10 @@ export function useLogin() {
     }
   };
 
-  const loginWithGoogle = async (credential: string) => {
+  const loginWithGoogle = async (credential: string, rememberMe: boolean = true) => {
     setIsLoading(true);
     try {
-      const res = await loginWithGoogleApi(credential);
+      const res = await loginWithGoogleApi(credential, rememberMe);
 
       const { setAccessToken, setAuthenticated, setLoading } = useAuthStore.getState();
       setAccessToken(res.data.accessToken);
@@ -130,15 +137,18 @@ export function useLogin() {
       setAuthenticated(res.data.accessToken, me.data);
       setLoading(false);
 
-      document.cookie = `user_logged_in=true; path=/; max-age=${7 * 86400}; SameSite=Lax`;
-      document.cookie = `auth_role=${me.data?.role || 'CUSTOMER'}; path=/; max-age=${7 * 86400}; SameSite=Lax`;
+      const maxAgeAttr = rememberMe ? `; max-age=${7 * 86400}` : '';
+      document.cookie = `user_logged_in=true; path=/${maxAgeAttr}; SameSite=Lax`;
+      document.cookie = `auth_role=${me.data?.role || 'CUSTOMER'}; path=/${maxAgeAttr}; SameSite=Lax`;
 
-      showToast.success(t('success') || 'Đăng nhập thành công!');
+      const successMsg = translateAuthResponse(t, res.message, t('LOGIN_SUCCESS') || t('success'));
+      showToast.success(successMsg);
       router.push('/');
       router.refresh();
     } catch (err: unknown) {
       console.error('Google login failed:', err);
-      const apiMsg = extractErrorMessage(err, 'Đăng nhập Google thất bại');
+      const rawMsg = extractErrorMessage(err, 'GOOGLE_AUTH_FAILED');
+      const apiMsg = translateAuthResponse(t, rawMsg, 'Đăng nhập Google thất bại');
       showToast.error(apiMsg);
     } finally {
       setIsLoading(false);

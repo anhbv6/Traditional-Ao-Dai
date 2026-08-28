@@ -18,7 +18,7 @@ export const loginApi = async (data: {
 };
 
 export const refreshTokenApi = async (): Promise<RefreshTokenResponse> => {
-  return apiClient.post<RefreshTokenResponse>('/api/auth/refresh', {}, {
+  return apiClient.post<RefreshTokenResponse>('/api/auth/refresh-token', {}, {
     skipAuth: true,
     retryOnUnauthorized: false,
     redirectOnUnauthorized: false,
@@ -44,10 +44,11 @@ export const sendOtpApi = async (phone: string, purpose: 'REGISTER' | 'LOGIN' | 
 export const loginWithOtpApi = async (data: {
   phone: string;
   code: string;
+  rememberMe?: boolean;
 }): Promise<LoginResponse> => {
   return apiClient.post<LoginResponse>('/api/auth/login/otp', data, { skipAuth: true, retryOnUnauthorized: false });
 };
 
-export const loginWithGoogleApi = async (credential: string): Promise<LoginResponse> => {
-  return apiClient.post<LoginResponse>('/api/auth/google', { credential }, { skipAuth: true, retryOnUnauthorized: false });
+export const loginWithGoogleApi = async (credential: string, rememberMe: boolean = true): Promise<LoginResponse> => {
+  return apiClient.post<LoginResponse>('/api/auth/google', { credential, rememberMe }, { skipAuth: true, retryOnUnauthorized: false });
 };

@@ -20,7 +20,13 @@
     "loginSuccess": "Đăng nhập quản trị viên thành công!",
     "loginError": "Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin!",
     "showPassword": "Hiện mật khẩu",
-    "hidePassword": "Ẩn mật khẩu"
+    "hidePassword": "Ẩn mật khẩu",
+    "ADMIN_UNAUTHORIZED": "Tài khoản không có quyền truy cập trang quản trị.",
+    "INCORRECT_PASSWORD": "Mật khẩu không chính xác.",
+    "ACCOUNT_DEACTIVATED": "Tài khoản quản trị đã bị vô hiệu hóa hoặc khóa.",
+    "USER_NOT_FOUND": "Tài khoản quản trị không tồn tại trong hệ thống.",
+    "ADMIN_LOGIN_SUCCESS": "Đăng nhập quản trị viên thành công!",
+    "ADMIN_LOGOUT_SUCCESS": "Đăng xuất quản trị viên thành công!"
   },
   "title": "Bảng quản trị AODAI",
   "subtitle": "Tổng quan hoạt động kinh doanh, tiến độ may đo và tình trạng kho vật liệu.",
