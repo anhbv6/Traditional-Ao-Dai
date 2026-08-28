@@ -1,23 +1,31 @@
 "use server";
 
-import { prisma, type ApprovalStatus } from "@repo/db";
+import { prisma } from "../../server/db.server";
+import { type ApprovalStatus } from "@repo/db";
+import { type CreateApprovalInput, type ReviewApprovalInput } from "../types/approval.types";
+import { getApprovalRequestsQuery } from "../queries/approval.queries";
 
-export interface CreateApprovalInput {
-  actionType: "CANCEL_ORDER" | "SPECIAL_DISCOUNT" | "PRICE_OVERRIDE" | "REFUND";
-  description: string;
-  payload: Record<string, unknown>;
-  requestedById: string;
-}
-
-export interface ReviewApprovalInput {
-  requestId: string;
-  status: "APPROVED" | "REJECTED";
-  reviewedById: string;
-  rejectReason?: string;
+/**
+ * Server Action: Lấy danh sách yêu cầu phê duyệt
+ */
+export async function getApprovalRequestsAction(statusFilter?: ApprovalStatus) {
+  try {
+    const data = await getApprovalRequestsQuery(statusFilter);
+    return {
+      success: true,
+      data,
+    };
+  } catch (error: any) {
+    console.error("Lỗi Action getApprovalRequestsAction:", error);
+    return {
+      success: false,
+      error: error?.message || "Không thể tải danh sách phê duyệt từ cơ sở dữ liệu.",
+    };
+  }
 }
 
 /**
- * Nhân viên tạo yêu cầu gửi lên Admin phê duyệt
+ * Server Action: Nhân viên tạo yêu cầu gửi lên Admin phê duyệt
  */
 export async function createApprovalRequestAction(input: CreateApprovalInput) {
   try {
@@ -41,7 +49,7 @@ export async function createApprovalRequestAction(input: CreateApprovalInput) {
       data: request,
     };
   } catch (error) {
-    console.error("Lỗi khi tạo yêu cầu phê duyệt:", error);
+    console.error("Lỗi Action createApprovalRequestAction:", error);
     return {
       success: false,
       error: "Không thể tạo yêu cầu phê duyệt.",
@@ -50,40 +58,7 @@ export async function createApprovalRequestAction(input: CreateApprovalInput) {
 }
 
 /**
- * Lấy danh sách yêu cầu phê duyệt (dành cho Admin & Staff)
- */
-export async function getApprovalRequestsAction(statusFilter?: ApprovalStatus) {
-  try {
-    const requests = await prisma.approvalRequest.findMany({
-      where: statusFilter ? { status: statusFilter } : undefined,
-      include: {
-        requestedBy: {
-          select: { id: true, name: true, email: true },
-        },
-        reviewedBy: {
-          select: { id: true, name: true, email: true },
-        },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-
-    return {
-      success: true,
-      data: requests,
-    };
-  } catch (error) {
-    console.error("Lỗi khi tải danh sách phê duyệt:", error);
-    return {
-      success: false,
-      error: "Không thể tải danh sách phê duyệt từ cơ sở dữ liệu.",
-    };
-  }
-}
-
-/**
- * Admin phê duyệt hoặc từ chối yêu cầu của Staff
+ * Server Action: Admin phê duyệt hoặc từ chối yêu cầu của Staff
  */
 export async function reviewApprovalRequestAction(input: ReviewApprovalInput) {
   try {
@@ -139,7 +114,7 @@ export async function reviewApprovalRequestAction(input: ReviewApprovalInput) {
       data: updated,
     };
   } catch (error) {
-    console.error("Lỗi khi xử lý phê duyệt:", error);
+    console.error("Lỗi Action reviewApprovalRequestAction:", error);
     return {
       success: false,
       error: "Không thể xử lý phê duyệt yêu cầu.",

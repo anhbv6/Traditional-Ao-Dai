@@ -1,3 +1,5 @@
+import { type OrderStatus as DbOrderStatus } from "@repo/db";
+
 export type FilterType = "today" | "week" | "month";
 
 export type OrderStatus =
@@ -49,4 +51,38 @@ export interface PieDataItem {
   name: string;
   value: number;
   color: string;
+}
+
+export interface CreateStaffOrderInput {
+  staffId: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  shippingAddress: string;
+  note?: string;
+  paymentMethod: "COD" | "VNPAY" | "MOMO" | "ZALOPAY" | "CASH_AT_STORE";
+  items: Array<{
+    productId: string;
+    variantId?: string;
+    quantity: number;
+    price: number;
+    isCustomFit?: boolean;
+    measurements?: {
+      height?: number;
+      weight?: number;
+      bust?: number;
+      waist?: number;
+      hips?: number;
+      shoulder?: number;
+      armLength?: number;
+      shirtLength?: number;
+      pantsLength?: number;
+      customNote?: string;
+    };
+  }>;
+}
+
+export interface UpdateOrderStatusInput {
+  orderId: string;
+  status: DbOrderStatus;
 }

@@ -7,11 +7,12 @@ import { useAuthStore } from "@/features/auth/store/authStore";
 import {
   getApprovalRequestsAction,
   reviewApprovalRequestAction,
-} from "../../server";
+} from "../actions";
+import { type ApprovalRequestItem } from "../types";
 
 export function AdminApprovalsList() {
   const { user } = useAuthStore();
-  const [requests, setRequests] = useState<any[]>([]);
+  const [requests, setRequests] = useState<ApprovalRequestItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [rejectingId, setRejectingId] = useState<string | null>(null);
@@ -23,7 +24,7 @@ export function AdminApprovalsList() {
     const filter = statusFilter === "ALL" ? undefined : (statusFilter as any);
     const res = await getApprovalRequestsAction(filter);
     if (res.success && res.data) {
-      setRequests(res.data);
+      setRequests(res.data as ApprovalRequestItem[]);
     } else {
       showToast.error("Không thể tải danh sách phê duyệt.");
     }

@@ -1,17 +1,17 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Users, Shield, Check, RefreshCw, Lock, Unlock, Sliders } from "lucide-react";
+import { Users, Shield, RefreshCw, Lock, Unlock } from "lucide-react";
 import { showToast } from "@/components/ui/toast";
 import {
   getStaffListAction,
   updateStaffPermissionAction,
   toggleStaffActiveAction,
-  type StaffPermissionInput,
-} from "../../server";
+} from "../actions";
+import { type StaffPermissionInput, type StaffMemberItem } from "../types";
 
 export function AdminStaffManagement() {
-  const [staffList, setStaffList] = useState<any[]>([]);
+  const [staffList, setStaffList] = useState<StaffMemberItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
@@ -19,7 +19,7 @@ export function AdminStaffManagement() {
     setIsLoading(true);
     const res = await getStaffListAction();
     if (res.success && res.data) {
-      setStaffList(res.data);
+      setStaffList(res.data as StaffMemberItem[]);
     } else {
       showToast.error("Không thể tải danh sách nhân viên.");
     }
@@ -54,7 +54,7 @@ export function AdminStaffManagement() {
       // Cập nhật state local
       setStaffList((prev) =>
         prev.map((s) =>
-          s.id === staffId ? { ...s, staffPermission: { ...s.staffPermission, ...newPerms } } : s
+          s.id === staffId ? { ...s, staffPermission: { ...s.staffPermission, ...newPerms } as any } : s
         )
       );
     } else {

@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { prisma, Role } from '@repo/db'
+import { Role } from '@repo/db'
 import { verifyToken, JWTPayload } from '../utils/jwt'
 import { AppError } from './errorHandler'
 
@@ -34,46 +34,38 @@ function extractToken(req: Request): string | undefined {
 }
 
 /**
- * Middleware bắt buộc phải có JWT Token hợp lệ (Dành cho Profile, Đổi mật khẩu, Admin...)
+ * Middleware bắt buộc phải có JWT Token hợp lệ (Stateless, 0ms DB Overhead):
+ * - Xác thực chữ ký và hạn sử dụng Access Token tức thì trong RAM bằng RSA Public Key
+ * - Phân biệt chính xác giữa lỗi hết hạn Token (401) và lỗi hệ thống (500)
  */
-export async function requireAuth(
+export function requireAuth(
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
-): Promise<void> {
+): void {
   const token = extractToken(req)
 
   if (!token) {
-    return next(new AppError(401, 'Authentication token required'))
+    return next(new AppError(401, 'AUTHENTICATION_TOKEN_REQUIRED'))
   }
 
   try {
     const decoded = verifyToken(token)
+
     if (decoded.tokenType && decoded.tokenType !== 'access') {
-      return next(new AppError(401, 'Invalid authentication token type'))
-    }
-
-    if (decoded.sessionId) {
-      const session = await prisma.userSession.findFirst({
-        where: {
-          id: decoded.sessionId,
-          userId: decoded.userId,
-          isRevoked: false,
-          expiresAt: {
-            gt: new Date(),
-          },
-        },
-      })
-
-      if (!session) {
-        return next(new AppError(401, 'Session expired or revoked'))
-      }
+      return next(new AppError(401, 'INVALID_TOKEN_TYPE'))
     }
 
     req.user = decoded
     return next()
-  } catch (error) {
-    return next(new AppError(401, 'Invalid or expired authentication token'))
+  } catch (error: any) {
+    if (error.name === 'TokenExpiredError') {
+      return next(new AppError(401, 'TOKEN_EXPIRED'))
+    }
+    if (error.name === 'JsonWebTokenError') {
+      return next(new AppError(401, 'INVALID_TOKEN'))
+    }
+    return next(error)
   }
 }
 
@@ -81,13 +73,13 @@ export async function requireAuth(
  * Middleware xác thực tùy chọn (Optional Auth):
  * - Nếu có token hợp lệ -> gán req.user (Khách đã đăng nhập)
  * - Nếu không có token hoặc token không hợp lệ -> cho qua với req.user = undefined (Khách vãng lai)
- * Dùng cho các endpoint: Xem sản phẩm, Giỏ hàng, Áp mã voucher, Đặt hàng không cần login...
+ * Dùng cho các endpoint công khai nhưng có thể cá nhân hóa: Xem sản phẩm, Giỏ hàng, Áp mã voucher, Đặt hàng...
  */
-export async function optionalAuth(
+export function optionalAuth(
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
-): Promise<void> {
+): void {
   const token = extractToken(req)
 
   if (!token) {
@@ -98,26 +90,12 @@ export async function optionalAuth(
   try {
     const decoded = verifyToken(token)
     if (decoded.tokenType === 'access') {
-      if (decoded.sessionId) {
-        const session = await prisma.userSession.findFirst({
-          where: {
-            id: decoded.sessionId,
-            userId: decoded.userId,
-            isRevoked: false,
-            expiresAt: {
-              gt: new Date(),
-            },
-          },
-        })
-        if (session) {
-          req.user = decoded
-        }
-      } else {
-        req.user = decoded
-      }
+      req.user = decoded
+    } else {
+      req.user = undefined
     }
   } catch {
-    // Không ném lỗi 401, tiếp tục xử lý với vai trò khách vãng lai
+    // Token không hợp lệ hoặc hết hạn -> tiếp tục với vai trò khách vãng lai
     req.user = undefined
   }
 
@@ -130,11 +108,11 @@ export async function optionalAuth(
 export function requireRoles(roles: Role[]) {
   return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
     if (!req.user) {
-      return next(new AppError(401, 'Authentication required'))
+      return next(new AppError(401, 'AUTHENTICATION_REQUIRED'))
     }
 
     if (!roles.includes(req.user.role)) {
-      return next(new AppError(403, 'Access denied: insufficient permissions'))
+      return next(new AppError(403, 'INSUFFICIENT_PERMISSIONS'))
     }
 
     return next()

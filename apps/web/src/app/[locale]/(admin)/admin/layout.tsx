@@ -7,7 +7,7 @@ import { Shield, Globe, User, LayoutDashboard, UserCheck, Users, LogOut } from "
 import { Link, useRouter } from "@/i18n/routing";
 import { usePathname } from "next/navigation";
 import { useAuthStore } from "@/features/auth/store/authStore";
-import { adminLogoutApi } from "@/features/admin";
+import { adminLogoutApi } from "@/features/admin/login";
 
 const geistSans = Geist({
   subsets: ["latin"],
