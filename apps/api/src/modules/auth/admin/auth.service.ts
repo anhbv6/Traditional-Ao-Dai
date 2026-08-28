@@ -20,17 +20,17 @@ export async function adminLogin(input: LoginInput['body']) {
 
   // Check user existence, verify they are an ADMIN or STAFF, and ensure active status
   if (!user || (user.role !== 'ADMIN' && user.role !== 'STAFF')) {
-    throw new AppError(401, 'Account does not exist or does not have administrative access.')
+    throw new AppError(401, 'ADMIN_UNAUTHORIZED')
   }
 
   if (!user.isActive) {
-    throw new AppError(403, 'This account has been locked or deactivated.')
+    throw new AppError(403, 'ACCOUNT_DEACTIVATED')
   }
 
   // Verify password
   const isPasswordMatch = await comparePassword(password, user.password || '')
   if (!isPasswordMatch) {
-    throw new AppError(401, 'Incorrect password.')
+    throw new AppError(401, 'INCORRECT_PASSWORD')
   }
 
   // Generate JWT token containing key user claims

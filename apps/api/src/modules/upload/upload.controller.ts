@@ -1,36 +1,25 @@
-import { Request, Response, NextFunction } from 'express';
-import { uploadToCloudinary } from '../../shared/utils/cloudinary';
+import { Request, Response, NextFunction } from 'express'
+import * as uploadService from './upload.service'
+import { sendSuccess } from '../../shared/utils/response'
 
-export const uploadSingleImage = async (
+/**
+ * Controller handler for uploading a single image
+ */
+export async function uploadSingleImage(
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<any> {
   try {
-    if (!req.file) {
-      return res.status(400).json({
-        status: 'error',
-        statusCode: 400,
-        message: 'IMAGE_FILE_REQUIRED',
-      });
-    }
+    const folder = (req.query.folder as string) || 'general'
+    const result = await uploadService.uploadImage(req.file, folder)
 
-    // Determine target folder based on request query or default to 'general'
-    const folder = (req.query.folder as string) || 'general';
-
-    // Upload to Cloudinary using the utility
-    const result = await uploadToCloudinary(req.file.buffer, folder);
-
-    return res.status(200).json({
-      status: 'success',
+    return sendSuccess(res, {
       statusCode: 200,
-      message: 'Image uploaded successfully',
-      data: {
-        url: result.secure_url,
-        publicId: result.public_id,
-      },
-    });
+      message: 'UPLOAD_SUCCESS',
+      data: result,
+    })
   } catch (error) {
-    next(error);
+    return next(error)
   }
-};
+}

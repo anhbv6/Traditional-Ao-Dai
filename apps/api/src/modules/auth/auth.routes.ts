@@ -489,7 +489,6 @@ router.post('/reset-password/email', validate(resetPasswordEmailSchema), clientA
  */
 router.post('/reset-password/phone', validate(resetPasswordPhoneSchema), clientAuthController.resetPasswordPhone)
 
-
 /**
  * @openapi
  * /api/auth/refresh-token:

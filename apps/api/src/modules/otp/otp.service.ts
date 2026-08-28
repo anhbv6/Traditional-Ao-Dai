@@ -17,7 +17,7 @@ export function generateOtp(length = 6): string {
 export async function sendOtp(phone: string, purpose: string): Promise<{ success: boolean; ttl: number }> {
   const normalizedPhone = normalizeVietnamPhone(phone)
   if (!normalizedPhone) {
-    throw new AppError(400, 'Invalid phone number.')
+    throw new AppError(400, 'INVALID_PHONE_NUMBER')
   }
 
   if (purpose === 'RESET_PASSWORD' || purpose === 'LOGIN') {
@@ -25,7 +25,7 @@ export async function sendOtp(phone: string, purpose: string): Promise<{ success
       where: { phone: normalizedPhone, role: 'CUSTOMER' },
     })
     if (!user) {
-      throw new AppError(404, 'User with this phone number was not found.')
+      throw new AppError(404, 'USER_NOT_FOUND')
     }
   }
 
@@ -35,7 +35,7 @@ export async function sendOtp(phone: string, purpose: string): Promise<{ success
   // Check cooldown
   const hasCooldown = await redis.get(cooldownKey)
   if (hasCooldown) {
-    throw new AppError(429, 'Please wait 60 seconds before requesting a new OTP.')
+    throw new AppError(429, 'OTP_COOLDOWN_ACTIVE')
   }
 
   // Generate OTP code
@@ -58,7 +58,7 @@ export async function sendOtp(phone: string, purpose: string): Promise<{ success
 export async function verifyOtp(phone: string, purpose: string, code: string): Promise<boolean> {
   const normalizedPhone = normalizeVietnamPhone(phone)
   if (!normalizedPhone) {
-    throw new AppError(400, 'Invalid phone number.')
+    throw new AppError(400, 'INVALID_PHONE_NUMBER')
   }
 
   const otpKey = `otp:${purpose}:${normalizedPhone}`
@@ -66,11 +66,11 @@ export async function verifyOtp(phone: string, purpose: string, code: string): P
   // Retrieve code from Redis
   const savedCode = await redis.get(otpKey)
   if (!savedCode) {
-    throw new AppError(400, 'OTP code has expired or does not exist. Please request a new one.')
+    throw new AppError(400, 'OTP_EXPIRED_OR_NOT_FOUND')
   }
 
   if (savedCode !== code) {
-    throw new AppError(400, 'Incorrect OTP code. Please try again.')
+    throw new AppError(400, 'OTP_INCORRECT')
   }
 
   // OTP verified successfully, delete it to prevent reuse
