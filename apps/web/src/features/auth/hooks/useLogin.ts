@@ -4,28 +4,7 @@ import { useRouter } from '@/i18n/routing';
 import { getMeApi, loginApi, sendOtpApi, loginWithOtpApi, loginWithGoogleApi } from '../api/auth.api';
 import { useAuthStore } from '../store/authStore';
 import { showToast } from '@/components/ui/toast';
-import { HttpError } from '@/lib/api-client';
-import { translateAuthResponse } from '../utils/translateAuthResponse';
-
-function extractErrorMessage(err: unknown, defaultMsg: string): string {
-  if (err instanceof HttpError) {
-    const payload = err.payload;
-    if (payload && typeof payload === 'object') {
-      if ('errors' in payload && Array.isArray(payload.errors) && payload.errors.length > 0) {
-        return payload.errors
-          .map((e: any) => e.message || defaultMsg)
-          .join(', ');
-      }
-      if ('message' in payload) {
-        return String(payload.message);
-      }
-    }
-  }
-  if (err instanceof Error) {
-    return err.message;
-  }
-  return defaultMsg;
-}
+import { notifyError, notifySuccess } from '@/lib/messages';
 
 export function useLogin() {
   const t = useTranslations('Auth');
@@ -56,16 +35,13 @@ export function useLogin() {
       document.cookie = `user_logged_in=true; path=/${maxAgeAttr}; SameSite=Lax`;
       document.cookie = `auth_role=${me.data?.role || 'CUSTOMER'}; path=/${maxAgeAttr}; SameSite=Lax`;
 
-      const successMsg = translateAuthResponse(t, res.message, t('LOGIN_SUCCESS') || t('success'));
-      showToast.success(successMsg);
+      notifySuccess(res.message, t('LOGIN_SUCCESS') || t('success'), t);
 
       router.push('/');
       router.refresh();
     } catch (err: unknown) {
       console.error('Login failed:', err);
-      const rawMsg = extractErrorMessage(err, 'LOGIN_FAILED');
-      const apiMsg = translateAuthResponse(t, rawMsg, 'Đăng nhập thất bại');
-      showToast.error(apiMsg);
+      notifyError(err, 'LOGIN_FAILED', t);
     } finally {
       setIsLoading(false);
     }
@@ -83,12 +59,10 @@ export function useLogin() {
       await sendOtpApi(phone, 'LOGIN');
       setOtpSent(true);
       setOtpError('');
-      showToast.success(t('otpSent') || 'Đã gửi OTP qua SMS!');
+      notifySuccess(t('otpSent') || 'Đã gửi OTP qua SMS!');
     } catch (err: unknown) {
       console.error(err);
-      const rawMsg = extractErrorMessage(err, 'OTP_SEND_FAILED');
-      const apiMsg = translateAuthResponse(t, rawMsg, 'Gửi OTP thất bại');
-      showToast.error(apiMsg);
+      notifyError(err, 'OTP_SEND_FAILED', t);
     } finally {
       setIsLoading(false);
     }
@@ -110,16 +84,13 @@ export function useLogin() {
       document.cookie = `user_logged_in=true; path=/${maxAgeAttr}; SameSite=Lax`;
       document.cookie = `auth_role=${me.data?.role || 'CUSTOMER'}; path=/${maxAgeAttr}; SameSite=Lax`;
 
-      const successMsg = translateAuthResponse(t, res.message, t('LOGIN_SUCCESS') || t('success'));
-      showToast.success(successMsg);
+      notifySuccess(res.message, t('LOGIN_SUCCESS') || t('success'), t);
       router.push('/');
       router.refresh();
     } catch (err: unknown) {
       console.error(err);
-      const rawMsg = extractErrorMessage(err, 'LOGIN_FAILED');
-      const apiMsg = translateAuthResponse(t, rawMsg, 'Đăng nhập thất bại');
+      const apiMsg = notifyError(err, 'LOGIN_FAILED', t);
       setOtpError(apiMsg);
-      showToast.error(apiMsg);
     } finally {
       setIsLoading(false);
     }
@@ -141,15 +112,12 @@ export function useLogin() {
       document.cookie = `user_logged_in=true; path=/${maxAgeAttr}; SameSite=Lax`;
       document.cookie = `auth_role=${me.data?.role || 'CUSTOMER'}; path=/${maxAgeAttr}; SameSite=Lax`;
 
-      const successMsg = translateAuthResponse(t, res.message, t('LOGIN_SUCCESS') || t('success'));
-      showToast.success(successMsg);
+      notifySuccess(res.message, t('LOGIN_SUCCESS') || t('success'), t);
       router.push('/');
       router.refresh();
     } catch (err: unknown) {
       console.error('Google login failed:', err);
-      const rawMsg = extractErrorMessage(err, 'GOOGLE_AUTH_FAILED');
-      const apiMsg = translateAuthResponse(t, rawMsg, 'Đăng nhập Google thất bại');
-      showToast.error(apiMsg);
+      notifyError(err, 'GOOGLE_AUTH_FAILED', t);
     } finally {
       setIsLoading(false);
     }

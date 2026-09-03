@@ -18,7 +18,16 @@ import { optionKeys } from "../types/contact.types";
 
 export function ContactForm() {
   const t = useTranslations("ContactPage");
+  const tCommon = useTranslations("Common");
   const { formData, isSubmitting, isSuccess, error, handleChange, handleSubmit } = useContact();
+
+  const errorMessage = error
+    ? t.has(error as any)
+      ? t(error as any)
+      : tCommon.has(`errors.${error}` as any)
+        ? tCommon(`errors.${error}` as any)
+        : error
+    : null;
 
   return (
     <div className="border border-[var(--border)] bg-[var(--bg-main)] p-4 sm:p-6 lg:p-7">
@@ -38,9 +47,9 @@ export function ContactForm() {
         </div>
       )}
 
-      {error && (
+      {errorMessage && (
         <div className="mb-4 rounded-md bg-red-50 border border-red-200 p-4 text-red-800 text-sm font-semibold">
-          {error}
+          {errorMessage}
         </div>
       )}
 

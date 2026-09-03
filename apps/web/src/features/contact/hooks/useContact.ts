@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { resolveErrorMessage } from "@/lib/messages";
 import { sendContactMessage } from "../api/contact.api";
 
 export function useContact() {
@@ -32,8 +33,8 @@ export function useContact() {
       } else {
         setError(response.message || "Something went wrong.");
       }
-    } catch (err: any) {
-      setError(err.message || "Failed to send message.");
+    } catch (err: unknown) {
+      setError(resolveErrorMessage(err, "sendError"));
     } finally {
       setIsSubmitting(false);
     }

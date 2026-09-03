@@ -35,7 +35,7 @@ export function AdminProfileDialog({
   open,
   onOpenChange,
 }: AdminProfileDialogProps) {
-  const { user, setUser } = useAuthStore();
+  const { user, setUser, isAdmin } = useAuthStore();
   const [activeTab, setActiveTab] = useState<"info" | "security">("info");
 
   // Info tab form state
@@ -110,6 +110,11 @@ export function AdminProfileDialog({
 
       if (res.data) {
         setUser(res.data);
+        if (typeof window !== "undefined") {
+          try {
+            localStorage.setItem("admin_user", JSON.stringify(res.data));
+          } catch {}
+        }
       }
       showToast.success("Cập nhật hồ sơ tài khoản thành công!");
       onOpenChange(false);
@@ -328,7 +333,7 @@ export function AdminProfileDialog({
                 <div className="flex items-center gap-2 p-2 rounded-lg bg-zinc-50 border border-zinc-200 text-xs">
                   <ShieldCheck size={16} className="text-zinc-700" />
                   <span className="font-semibold text-zinc-900">
-                    {user?.role === "ADMIN" ? "Quản trị viên tối cao (Super Admin)" : "Nhân viên vận hành (Staff)"}
+                    {isAdmin ? "Quản trị viên tối cao (Super Admin)" : "Nhân viên vận hành (Staff)"}
                   </span>
                 </div>
               </div>

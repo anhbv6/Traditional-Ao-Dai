@@ -6,13 +6,11 @@ import { Link } from '@/i18n/routing';
 import { useAuthStore } from '@/features/auth/store/authStore';
 
 export function AdminQuickBar() {
-  const { user, isAuthenticated } = useAuthStore();
+  const { user, isAuthenticated, isAdmin, isAdminOrStaff } = useAuthStore();
 
-  if (!isAuthenticated || !user || (user.role !== 'ADMIN' && user.role !== 'STAFF')) {
+  if (!isAuthenticated || !user || !isAdminOrStaff) {
     return null;
   }
-
-  const isSuperAdmin = user.role === 'ADMIN';
 
   return (
     <div className="w-full bg-[#18181B] text-white py-1.5 px-4 sm:px-8 flex items-center justify-between text-[11px] sm:text-xs z-50 border-b border-zinc-800 select-none">
@@ -23,7 +21,7 @@ export function AdminQuickBar() {
         <span className="text-zinc-300">
           Đang duyệt với tư cách{' '}
           <strong className="text-white font-semibold">
-            {isSuperAdmin ? 'Quản trị viên' : 'Nhân viên (Staff)'}
+            {isAdmin ? 'Quản trị viên' : 'Nhân viên (Staff)'}
           </strong>{' '}
           ({user.name || user.email})
         </span>

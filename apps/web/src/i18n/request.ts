@@ -23,7 +23,8 @@ export default getRequestConfig(async ({requestLocale}) => {
       profile,
       faqs,
       wishlist,
-      admin
+      admin,
+      errors
     ] = await Promise.all([
       import(`../../messages/${locale}/about.json`).then(m => m.default),
       import(`../../messages/${locale}/auth.json`).then(m => m.default),
@@ -39,25 +40,51 @@ export default getRequestConfig(async ({requestLocale}) => {
       import(`../../messages/${locale}/faqs.json`).then(m => m.default),
       import(`../../messages/${locale}/wishlist.json`).then(m => m.default),
       import(`../../messages/${locale}/admin.json`).then(m => m.default),
+      import(`../../messages/${locale}/errors.json`).then(m => m.default),
     ]);
 
     return {
         locale,
         messages: {
             AboutPage: about,
-            Auth: auth,
+            Auth: {
+              ...auth,
+              responses: {
+                ...errors,
+                ...(auth.responses || {})
+              }
+            },
             Breadcrumbs: breadcrumbs,
-            Common: common,
+            Common: {
+              ...common,
+              errors: {
+                ...errors,
+                ...(common.errors || {})
+              }
+            },
             ContactPage: contact,
             Footer: footer,
             HomePage: home,
             NewsPage: news,
             Product: product,
             ProductsPage: products,
-            ProfilePage: profile,
+            ProfilePage: {
+              ...profile,
+              responses: {
+                ...errors,
+                ...(profile.responses || {})
+              }
+            },
             FaqsPage: faqs,
             WishlistPage: wishlist,
-            AdminPage: admin,
+            AdminPage: {
+              ...admin,
+              login: {
+                ...errors,
+                ...(admin.login || {})
+              }
+            },
+            Errors: errors,
         }
     };
 });

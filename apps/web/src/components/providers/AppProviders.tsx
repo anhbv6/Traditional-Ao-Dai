@@ -79,7 +79,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
       })
   );
 
-  const { isAuthenticated, user, setAccessToken, setAuthenticated, setLoading, logout } = useAuthStore();
+  const { isAuthenticated, user, isCustomer, setAccessToken, setAuthenticated, setLoading, logout } = useAuthStore();
   const isInitialized = useRef(false);
   const isSyncing = useRef(false);
 
@@ -107,9 +107,9 @@ export function AppProviders({ children }: { children: ReactNode }) {
     // 2. Chuyển từ admin/login về storefront và phiên Customer trong cookie chưa được nạp vào Zustand
     const needCustomerRestore = !isAdminPath && !isAuthenticated && hasCustomerSession;
     // 3. Chuyển từ storefront vào admin và cần nạp lại phiên Admin
-    const needAdminRestore = isAdminPath && (!isAuthenticated || user?.role === 'CUSTOMER') && hasAdminToken;
+    const needAdminRestore = isAdminPath && (!isAuthenticated || isCustomer) && hasAdminToken;
     // 4. Admin vừa đăng xuất, quay lại storefront và phiên Customer vẫn còn hiệu lực
-    const needSwitchToCustomer = !isAdminPath && user?.role !== 'CUSTOMER' && !hasAdminToken && hasCustomerSession;
+    const needSwitchToCustomer = !isAdminPath && !isCustomer && !hasAdminToken && hasCustomerSession;
 
     const shouldSync = !isInitialized.current || needCustomerRestore || needAdminRestore || needSwitchToCustomer;
 
@@ -124,32 +124,33 @@ export function AppProviders({ children }: { children: ReactNode }) {
 
     async function initAuth() {
       try {
-        // 1. Phục hồi phiên làm việc cho Quản trị viên (Admin / Staff)
+        // 1. Phục hồi phiên làm việc cho Quản trị viên (Admin / Staff) - Tuyệt đối không gọi api /me theo quy ước dự án
         if (hasAdminToken && (isAdminPath || !hasCustomerSession)) {
           const match = cookies.match(/admin_token=([^;]+)/);
           const adminToken = match ? decodeURIComponent(match[1]) : null;
 
           if (adminToken) {
             setAccessToken(adminToken);
-            try {
-              const me = await getMeApi();
-              if (isMounted && me?.data) {
-                setAuthenticated(adminToken, me.data);
-                return;
-              }
-            } catch {
-              // Token Admin đã hết hạn (401)
-              if (isAdminPath && isMounted) {
-                clearAdminAuth();
-                logout();
+            if (typeof window !== 'undefined') {
+              try {
+                const cachedAdmin = localStorage.getItem('admin_user');
+                if (cachedAdmin) {
+                  const parsedUser = JSON.parse(cachedAdmin);
+                  if (isMounted && parsedUser) {
+                    setAuthenticated(adminToken, parsedUser);
+                    return;
+                  }
+                }
+              } catch (err) {
+                console.warn('Lỗi khôi phục admin_user từ localStorage:', err);
               }
             }
           }
           if (isAdminPath) return;
         }
 
-        // 2. Phục hồi phiên làm việc cho Khách hàng (Customer) qua Refresh Token
-        if (hasCustomerSession) {
+        // 2. Phục hồi phiên làm việc cho Khách hàng (Customer) qua Refresh Token (Chỉ chạy ở Storefront)
+        if (!isAdminPath && hasCustomerSession) {
           const accessToken = await refreshBrowserToken();
 
           if (accessToken) {
@@ -185,7 +186,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
     return () => {
       isMounted = false;
     };
-  }, [pathname, isAuthenticated, user?.role, setAccessToken, setAuthenticated, setLoading, logout]);
+  }, [pathname, isAuthenticated, isCustomer, setAccessToken, setAuthenticated, setLoading, logout]);
 
   const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || 'placeholder-id';
 

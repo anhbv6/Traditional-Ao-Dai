@@ -17,6 +17,7 @@ import { useAuthStore } from "@/features/auth/store/authStore";
 import { logoutApi } from "@/features/auth/api/auth.api";
 import { clearBrowserAuthTokens } from "@/lib/api-client";
 import { ConfirmDialog } from "@/components/shared";
+import { isUserAdminOrStaff } from "@/features/auth/utils/authRoles";
 
 export function ProfileExperience() {
   const t = useTranslations("ProfilePage");
@@ -26,7 +27,10 @@ export function ProfileExperience() {
   const [openConfirm, setOpenConfirm] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const router = useRouter();
+  const user = useAuthStore((state) => state.user);
+  const isAdminOrStaff = useAuthStore((state) => state.isAdminOrStaff);
   const logoutStore = useAuthStore((state) => state.logout);
+  const isAdmin = isAdminOrStaff || isUserAdminOrStaff(user);
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -108,16 +112,18 @@ export function ProfileExperience() {
               );
             })}
 
-            {/* Logout Button */}
-            <div className="border-t border-[#E2D9D2]/40 mt-3 pt-2">
-              <button
-                onClick={() => setOpenConfirm(true)}
-                className="cursor-pointer flex w-full items-center gap-3.5 rounded-xl px-4 py-3 text-sm font-semibold text-rose-600 hover:bg-rose-50 transition-all duration-300"
-              >
-                <LogOut size={18} className="shrink-0" />
-                <span>{tCommon("logout")}</span>
-              </button>
-            </div>
+            {/* Logout Button (ẩn nếu là Quản trị viên truy cập trang client) */}
+            {!isAdmin && (
+              <div className="border-t border-[#E2D9D2]/40 mt-3 pt-2">
+                <button
+                  onClick={() => setOpenConfirm(true)}
+                  className="cursor-pointer flex w-full items-center gap-3.5 rounded-xl px-4 py-3 text-sm font-semibold text-rose-600 hover:bg-rose-50 transition-all duration-300"
+                >
+                  <LogOut size={18} className="shrink-0" />
+                  <span>{tCommon("logout")}</span>
+                </button>
+              </div>
+            )}
           </nav>
  
           {/* Mobile Floating Action Button (FAB) Menu */}
@@ -162,17 +168,19 @@ export function ProfileExperience() {
                 );
               })}
               
-              {/* Logout Option in FAB */}
-              <button
-                onClick={() => {
-                  setIsMobileMenuOpen(false);
-                  setOpenConfirm(true);
-                }}
-                className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white border border-rose-100 text-rose-600 shadow-md text-xs font-semibold whitespace-nowrap transition-all duration-300 active:scale-95 cursor-pointer w-fit min-w-[180px]"
-              >
-                <LogOut size={16} className="shrink-0 text-rose-500" />
-                <span>{tCommon("logout")}</span>
-              </button>
+              {/* Logout Option in FAB (ẩn nếu là Quản trị viên truy cập trang client) */}
+              {!isAdmin && (
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    setOpenConfirm(true);
+                  }}
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white border border-rose-100 text-rose-600 shadow-md text-xs font-semibold whitespace-nowrap transition-all duration-300 active:scale-95 cursor-pointer w-fit min-w-[180px]"
+                >
+                  <LogOut size={16} className="shrink-0 text-rose-500" />
+                  <span>{tCommon("logout")}</span>
+                </button>
+              )}
             </div>
 
             {/* Main Trigger FAB Button */}

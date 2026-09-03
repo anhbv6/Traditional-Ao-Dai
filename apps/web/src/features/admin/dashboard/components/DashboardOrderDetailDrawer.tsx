@@ -1,10 +1,12 @@
 import React from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X, User, Scissors, CreditCard } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 import { type OrderItem, type OrderStatus } from "../types/dashboard.types";
 
 interface DashboardOrderDetailDrawerProps {
   selectedOrder: OrderItem | null;
+  isUpdating?: boolean;
   onClose: () => void;
   onUpdateStatus: (orderId: string, status: OrderStatus) => void;
   labels: {
@@ -12,12 +14,24 @@ interface DashboardOrderDetailDrawerProps {
     updateStatus: string;
     customerInfo: string;
     tailorSpecs: string;
+    orderedProducts?: string;
+    totalRevenue?: string;
+    fullName?: string;
+    phone?: string;
+    address?: string;
+    height?: string;
+    weight?: string;
+    bust?: string;
+    waist?: string;
+    hips?: string;
+    customMade?: string;
     statusLabels: Record<OrderStatus, string>;
   };
 }
 
 export function DashboardOrderDetailDrawer({
   selectedOrder,
+  isUpdating,
   onClose,
   onUpdateStatus,
   labels,
@@ -51,7 +65,7 @@ export function DashboardOrderDetailDrawer({
                     {labels.detailTitle}
                   </h3>
                   <p className="text-xs text-[#71717A] mt-0.5 font-mono">
-                    Đơn hàng #{selectedOrder.id} • {selectedOrder.date}
+                    #{selectedOrder.id} • {selectedOrder.date}
                   </p>
                 </div>
                 <button
@@ -66,16 +80,25 @@ export function DashboardOrderDetailDrawer({
               <div className="flex-1 overflow-y-auto p-6 space-y-6">
                 {/* Status update widget */}
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase tracking-[0.5px] text-[#71717A]">
-                    {labels.updateStatus}
-                  </label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-[10px] font-bold uppercase tracking-[0.5px] text-[#71717A]">
+                      {labels.updateStatus}
+                    </label>
+                    {isUpdating && (
+                      <div className="flex items-center gap-1.5 text-xs text-zinc-500 font-medium">
+                        <Spinner className="size-3" />
+                        <span>Đang lưu...</span>
+                      </div>
+                    )}
+                  </div>
                   <div className="relative">
                     <select
                       value={selectedOrder.status}
+                      disabled={isUpdating}
                       onChange={(e) =>
                         onUpdateStatus(selectedOrder.id, e.target.value as OrderStatus)
                       }
-                      className="w-full rounded-lg border border-[#E4E4E7] bg-white px-4 py-3 text-sm font-semibold text-[#09090B] outline-none shadow-sm focus:border-[#09090B] focus:ring-1 focus:ring-[#09090B] cursor-pointer"
+                      className="w-full rounded-lg border border-[#E4E4E7] bg-white px-4 py-3 text-sm font-semibold text-[#09090B] outline-none shadow-sm focus:border-[#09090B] focus:ring-1 focus:ring-[#09090B] cursor-pointer disabled:opacity-60"
                     >
                       {(["pending_approval", "cutting_fabric", "sewing_job", "completed", "shipping"] as OrderStatus[]).map(
                         (status) => (
@@ -96,15 +119,15 @@ export function DashboardOrderDetailDrawer({
                   </h4>
                   <div className="text-xs space-y-1.5 text-[#09090B]">
                     <p className="flex justify-between">
-                      <span className="text-[#71717A]">Họ tên:</span>
+                      <span className="text-[#71717A]">{labels.fullName || "Họ tên:"}</span>
                       <span className="font-semibold">{selectedOrder.customer}</span>
                     </p>
                     <p className="flex justify-between">
-                      <span className="text-[#71717A]">SĐT:</span>
+                      <span className="text-[#71717A]">{labels.phone || "SĐT:"}</span>
                       <span className="font-semibold font-mono">{selectedOrder.phone}</span>
                     </p>
                     <p className="flex justify-between gap-4">
-                      <span className="text-[#71717A] shrink-0">Địa chỉ:</span>
+                      <span className="text-[#71717A] shrink-0">{labels.address || "Địa chỉ:"}</span>
                       <span className="font-semibold text-right leading-relaxed">{selectedOrder.address}</span>
                     </p>
                   </div>
@@ -119,23 +142,23 @@ export function DashboardOrderDetailDrawer({
                     </h4>
                     <div className="grid grid-cols-2 gap-3.5 text-xs text-[#09090B]">
                       <p className="flex justify-between border-b border-[#E4E4E7] pb-1">
-                        <span className="text-[#71717A]">Chiều cao:</span>
+                        <span className="text-[#71717A]">{labels.height || "Chiều cao:"}</span>
                         <span className="font-semibold font-mono">{selectedOrder.measurements.height}</span>
                       </p>
                       <p className="flex justify-between border-b border-[#E4E4E7] pb-1">
-                        <span className="text-[#71717A]">Cân nặng:</span>
+                        <span className="text-[#71717A]">{labels.weight || "Cân nặng:"}</span>
                         <span className="font-semibold font-mono">{selectedOrder.measurements.weight}</span>
                       </p>
                       <p className="flex justify-between border-b border-[#E4E4E7] pb-1">
-                        <span className="text-[#71717A]">Vòng ngực:</span>
+                        <span className="text-[#71717A]">{labels.bust || "Vòng ngực:"}</span>
                         <span className="font-semibold font-mono">{selectedOrder.measurements.bust}</span>
                       </p>
                       <p className="flex justify-between border-b border-[#E4E4E7] pb-1">
-                        <span className="text-[#71717A]">Vòng eo:</span>
+                        <span className="text-[#71717A]">{labels.waist || "Vòng eo:"}</span>
                         <span className="font-semibold font-mono">{selectedOrder.measurements.waist}</span>
                       </p>
                       <p className="flex justify-between border-b border-[#E4E4E7] pb-1 col-span-2">
-                        <span className="text-[#71717A]">Vòng hông:</span>
+                        <span className="text-[#71717A]">{labels.hips || "Vòng hông:"}</span>
                         <span className="font-semibold font-mono">{selectedOrder.measurements.hips}</span>
                       </p>
                     </div>
@@ -145,7 +168,7 @@ export function DashboardOrderDetailDrawer({
                 {/* Order items */}
                 <div className="space-y-3">
                   <label className="text-[10px] font-bold uppercase tracking-[0.5px] text-[#71717A]">
-                    Sản phẩm đặt mua
+                    {labels.orderedProducts || "Sản phẩm đặt mua"}
                   </label>
                   <div className="space-y-3">
                     {selectedOrder.items.map((item, index) => (
@@ -156,7 +179,7 @@ export function DashboardOrderDetailDrawer({
                         <div>
                           <p className="text-[#09090B] font-semibold">{item.name}</p>
                           <p className="text-[#71717A] text-[10px] mt-0.5">
-                            {item.size ? `Size: ${item.size}` : "May đo riêng"} x {item.quantity}
+                            {item.size ? `Size: ${item.size}` : labels.customMade || "May đo riêng"} x {item.quantity}
                           </p>
                         </div>
                         <span className="font-bold font-mono">{item.price}</span>
@@ -170,7 +193,7 @@ export function DashboardOrderDetailDrawer({
               <div className="border-t border-[#E4E4E7] bg-[#FAFAFA] p-6 flex justify-between items-center shrink-0">
                 <div className="flex items-center gap-1.5 font-semibold text-xs text-[#71717A]">
                   <CreditCard size={14} />
-                  <span>Tổng tiền thu</span>
+                  <span>{labels.totalRevenue || "Tổng tiền thu"}</span>
                 </div>
                 <span className="text-xl font-bold text-[#09090B] font-mono">
                   {selectedOrder.total}

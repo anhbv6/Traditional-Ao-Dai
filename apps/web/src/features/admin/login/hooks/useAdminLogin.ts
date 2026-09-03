@@ -3,37 +3,12 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/routing";
-import { showToast } from "@/components/ui/toast";
+import { notifyError, notifySuccess } from "@/lib/messages";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { type AuthUser } from "@/features/auth/types/auth.types";
 import { HttpError } from "@/lib/api-client";
 import { adminLoginApi } from "../api/adminLogin.api";
 import { adminLoginSchema, type AdminLoginFormValues } from "../validations/adminLogin.validation";
-
-interface ApiErrorPayload {
-  errors?: Array<{ message?: string }>;
-  message?: string;
-}
-
-function extractErrorMessage(err: unknown, defaultMsg: string): string {
-  if (err instanceof HttpError) {
-    const payload = err.payload as ApiErrorPayload | undefined;
-    if (payload && typeof payload === "object") {
-      if (Array.isArray(payload.errors) && payload.errors.length > 0) {
-        return payload.errors
-          .map((e) => e.message || defaultMsg)
-          .join(", ");
-      }
-      if (payload.message) {
-        return String(payload.message);
-      }
-    }
-  }
-  if (err instanceof Error) {
-    return err.message;
-  }
-  return defaultMsg;
-}
 
 export function useAdminLogin() {
   const t = useTranslations("AdminPage.login");
@@ -41,7 +16,7 @@ export function useAdminLogin() {
   const [formData, setFormData] = useState<AdminLoginFormValues>({
     email: "",
     password: "",
-    rememberMe: true,
+    rememberMe: false,
   });
   const [errors, setErrors] = useState<Partial<Record<keyof AdminLoginFormValues, string>>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -64,16 +39,6 @@ export function useAdminLogin() {
     setFormData((prev) => ({ ...prev, rememberMe }));
   };
 
-  const handleQuickFill = () => {
-    setFormData({
-      email: "admin@aodai.vn",
-      password: "admin",
-      rememberMe: true,
-    });
-    setErrors({});
-    showToast.success(t("loginSuccess"));
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -93,7 +58,7 @@ export function useAdminLogin() {
 
       const firstError = Object.values(fieldErrors)[0];
       if (firstError) {
-        showToast.error(firstError);
+        notifyError(firstError);
       }
       return;
     }
@@ -102,45 +67,44 @@ export function useAdminLogin() {
     setErrors({});
 
     try {
-      let token = "admin-session-token-" + Date.now();
-      let adminUser: AuthUser = {
-        id: "admin-master-id",
+      const res = await adminLoginApi({
         email: formData.email.trim(),
-        name: "Quản Trị Viên",
-        phone: "0988888888",
-        role: "ADMIN",
-        isActive: true,
-      };
+        password: formData.password,
+        rememberMe: formData.rememberMe,
+      });
 
-      try {
-        const res = await adminLoginApi({
-          email: formData.email.trim(),
-          password: formData.password,
-          rememberMe: formData.rememberMe,
-        });
+      const responseData = res?.data || (res as any);
+      const token = responseData?.token || responseData?.accessToken;
+      const rawUser = responseData?.user;
 
-        if (res?.data) {
-          token = res.data.token || res.data.accessToken || token;
-          if (res.data.user) {
-            adminUser = {
-              ...adminUser,
-              ...res.data.user,
-              role: (res.data.user.role as any) || "STAFF",
-            };
-          }
-        }
-      } catch (apiErr) {
-        if (apiErr instanceof HttpError) {
-          throw apiErr;
-        }
-        console.warn("API login offline fallback engaged:", apiErr);
+      if (!token || !rawUser) {
+        throw new Error("Không nhận được token hoặc thông tin người dùng từ máy chủ.");
       }
+
+      const adminUser: AuthUser = {
+        id: rawUser.id,
+        email: rawUser.email,
+        name: rawUser.name || "Quản trị viên",
+        phone: rawUser.phone || "",
+        avatar: rawUser.avatar || null,
+        role: rawUser.role || "ADMIN",
+        isActive: rawUser.isActive ?? true,
+      };
 
       // Zustand v5 State Management update
       const { setAccessToken, setAuthenticated, setLoading } = useAuthStore.getState();
       setAccessToken(token);
       setAuthenticated(token, adminUser);
       setLoading(false);
+
+      // Lưu trữ user vào localStorage để header/layout admin không bị mất thông tin khi reload (do admin không có api /me)
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("admin_user", JSON.stringify(adminUser));
+        } catch (storageErr) {
+          console.warn("Không thể lưu admin_user vào localStorage:", storageErr);
+        }
+      }
 
       // Lưu cookie cho Next.js Server Middleware (Proxy) nhận diện bảo vệ route
       if (formData.rememberMe) {
@@ -153,7 +117,7 @@ export function useAdminLogin() {
         document.cookie = `auth_role=${adminUser.role}; path=/; SameSite=Lax`;
       }
 
-      showToast.success(t("loginSuccess"));
+      notifySuccess(t("loginSuccess"));
 
       setTimeout(() => {
         router.push("/admin/dashboard");
@@ -161,11 +125,7 @@ export function useAdminLogin() {
       }, 500);
     } catch (err: unknown) {
       console.error("Admin login error:", err);
-      const rawMsg = extractErrorMessage(err, "loginError");
-      const errorMsg = t.has(rawMsg as any)
-        ? t(rawMsg as any)
-        : rawMsg;
-      showToast.error(errorMsg);
+      notifyError(err, "loginError", t);
     } finally {
       setIsLoading(false);
     }
@@ -181,7 +141,6 @@ export function useAdminLogin() {
     errors,
     isLoading,
     t,
-    handleQuickFill,
     handleSubmit,
   };
 }

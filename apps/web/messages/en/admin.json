@@ -28,6 +28,38 @@
     "ADMIN_LOGIN_SUCCESS": "Admin login successful!",
     "ADMIN_LOGOUT_SUCCESS": "Admin logout successful!"
   },
+  "header": {
+    "systemTitle": "AODAI Admin",
+    "systemSubtitle": "Management System",
+    "viewStore": "View Storefront",
+    "defaultAdminName": "Administrator",
+    "superAdminRole": "Super Admin",
+    "staffRole": "Staff Member",
+    "editProfile": "Edit Account Profile",
+    "backToStore": "Back to Storefront",
+    "logout": "Sign Out",
+    "loggingOut": "Signing out..."
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "orders": "Orders",
+    "tailoring": "Tailoring Atelier",
+    "products": "Products",
+    "inventory": "Inventory",
+    "customers": "Customers",
+    "approvals": "Approvals",
+    "staff": "Staff",
+    "vouchers": "Vouchers",
+    "cms": "CMS & FAQs"
+  },
+  "accessDenied": {
+    "title": "Access Restricted",
+    "description": "This page requires Super Admin privileges. Your account currently has the Staff role.",
+    "backToDashboard": "Back to Dashboard"
+  },
+  "loading": {
+    "text": "Loading admin data..."
+  },
   "title": "AODAI Admin Dashboard",
   "subtitle": "Overview of sales activities, tailoring progress, and material stock levels.",
   "filters": {
@@ -41,9 +73,18 @@
     "pending": "Pending Orders",
     "ratio": "Order Type Ratio",
     "ratioCustom": "Custom Tailor",
-    "ratioReady": "Ready-to-wear"
+    "ratioReady": "Ready-to-wear",
+    "comparedToBefore": "vs previous period",
+    "urgentTailor": "Urgent tailoring required"
+  },
+  "chart": {
+    "title": "Best-selling Ao Dai Collections",
+    "subtitle": "Revenue share distribution by fabric line.",
+    "overview": "Overview"
   },
   "alerts": {
+    "title": "Operations & Fabric Stock Alerts",
+    "subtitle": "Materials and garments requiring urgent replenishment.",
     "tailoring": "Bespoke Tailoring Progress",
     "lowStock": "Low Stock Products (< 5 Qty)",
     "lowFabrics": "Low Stock Fabrics & Materials",
@@ -56,20 +97,44 @@
       "finishing": "Pressing & Finishing"
     }
   },
+  "tailoring": {
+    "title": "Bespoke Tailoring Workflow Monitor",
+    "subtitle": "Hand-cut patterns, stitching, and finishing by artisan tailors.",
+    "measurementsText": "Measurements",
+    "bust": "Bust",
+    "waist": "Waist",
+    "detailAction": "Detail"
+  },
   "orders": {
     "title": "Recent Activity & Live Orders",
+    "liveBadge": "Live",
     "orderId": "Order ID",
     "customer": "Customer",
     "type": "Type",
     "total": "Total",
     "status": "Status",
     "action": "Action",
+    "actionDetail": "Detail",
     "typeCustom": "Custom Tailored",
     "typeReady": "Ready-to-wear",
     "detailTitle": "Order Processing Detail",
     "updateStatus": "Update Status",
     "customerInfo": "Customer Details",
     "tailorSpecs": "Customer Tailoring Measurements",
+    "orderedProducts": "Ordered Products",
+    "totalRevenue": "Total Revenue Collected",
+    "fullName": "Full Name:",
+    "phone": "Phone:",
+    "address": "Address:",
+    "height": "Height:",
+    "weight": "Weight:",
+    "bust": "Bust:",
+    "waist": "Waist:",
+    "hips": "Hips:",
+    "customMade": "Custom Tailored",
+    "noOrders": "No orders found in the system.",
+    "updateSuccess": "Order #{id} status updated successfully!",
+    "updateError": "Failed to update order status.",
     "statusLabels": {
       "pending_approval": "Pending Approval",
       "cutting_fabric": "Cutting Fabric",

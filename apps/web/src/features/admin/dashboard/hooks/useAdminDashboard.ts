@@ -1,124 +1,33 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useTranslations } from "next-intl";
+import { notifySuccess, notifyError } from "@/lib/messages";
 import {
   type FilterType,
   type OrderItem,
   type OrderStatus,
   type StatItem,
   type PieDataItem,
+  mapPrismaOrderToOrderItem,
+  mapUiStatusToDbStatus,
 } from "../types/dashboard.types";
+import {
+  getDashboardStatsAction,
+  getAdminOrdersAction,
+  updateOrderStatusAction,
+} from "../actions/dashboard.actions";
 
-const mockStats: Record<FilterType, StatItem> = {
-  today: {
-    revenue: "12.890.000 ₫",
-    revenueDiff: "+18.4%",
-    orders: 6,
-    ordersDiff: "+2 đơn",
-    pending: 3,
-    customRatio: 80,
-  },
-  week: {
-    revenue: "94.500.000 ₫",
-    revenueDiff: "+12.2%",
-    orders: 48,
-    ordersDiff: "+10 đơn",
-    pending: 12,
-    customRatio: 68,
-  },
-  month: {
-    revenue: "389.200.000 ₫",
-    revenueDiff: "+15.6%",
-    orders: 196,
-    ordersDiff: "+24 đơn",
-    pending: 18,
-    customRatio: 62,
-  },
+const defaultStats: StatItem = {
+  revenue: "0 ₫",
+  revenueDiff: "0%",
+  orders: 0,
+  ordersDiff: "0 đơn",
+  pending: 0,
+  customRatio: 0,
 };
 
-const initialOrders: OrderItem[] = [
-  {
-    id: "AD-10901",
-    customer: "Nguyễn Thị Thảo",
-    type: "custom",
-    total: "3.780.000 ₫",
-    status: "cutting_fabric",
-    date: "14:32 Hôm nay",
-    phone: "0912 345 678",
-    address: "15 Trúc Bạch, Ba Đình, Hà Nội",
-    items: [{ name: "Áo Dài Gấm Song Hỷ", price: "1.890.000 ₫", quantity: 2 }],
-    measurements: {
-      height: "162 cm",
-      weight: "50 kg",
-      bust: "84 cm",
-      waist: "64 cm",
-      hips: "89 cm",
-      neckToWaist: "36 cm",
-    },
-  },
-  {
-    id: "AD-10902",
-    customer: "Trần Văn Bình",
-    type: "ready",
-    total: "2.450.000 ₫",
-    status: "pending_approval",
-    date: "12:15 Hôm nay",
-    phone: "0987 654 321",
-    address: "Tòa nhà Metropolitan, Quận 1, TP. HCM",
-    items: [{ name: "Áo Dài Tơ Tằm Cổ Điển", price: "2.450.000 ₫", quantity: 1, size: "M" }],
-  },
-  {
-    id: "AD-10895",
-    customer: "Phạm Minh Thư",
-    type: "custom",
-    total: "6.400.000 ₫",
-    status: "sewing_job",
-    date: "Hôm qua",
-    phone: "0909 112 233",
-    address: "48 Hàng Bạc, Hoàn Kiếm, Hà Nội",
-    items: [{ name: "Áo Dài Nhung Đỏ Quý Phái", price: "3.200.000 ₫", quantity: 2 }],
-    measurements: {
-      height: "158 cm",
-      weight: "48 kg",
-      bust: "82 cm",
-      waist: "62 cm",
-      hips: "88 cm",
-      neckToWaist: "35 cm",
-    },
-  },
-  {
-    id: "AD-10892",
-    customer: "Lê Hoài Nam",
-    type: "ready",
-    total: "1.290.000 ₫",
-    status: "completed",
-    date: "2 ngày trước",
-    phone: "0915 556 677",
-    address: "244 Lê Lợi, Quận Hải Châu, Đà Nẵng",
-    items: [{ name: "Áo Dài Cách Tân Hoa Đào", price: "1.290.000 ₫", quantity: 1, size: "L" }],
-  },
-  {
-    id: "AD-10887",
-    customer: "Hoàng Ngân Hà",
-    type: "custom",
-    total: "3.200.000 ₫",
-    status: "shipping",
-    date: "3 ngày trước",
-    phone: "0934 998 877",
-    address: "Ngõ 19 Láng Hạ, Đống Đa, Hà Nội",
-    items: [{ name: "Áo Dài Nhung Đỏ Quý Phái", price: "3.200.000 ₫", quantity: 1 }],
-    measurements: {
-      height: "165 cm",
-      weight: "52 kg",
-      bust: "86 cm",
-      waist: "66 cm",
-      hips: "92 cm",
-      neckToWaist: "37 cm",
-    },
-  },
-];
-
-const pieData: PieDataItem[] = [
+const defaultPieData: PieDataItem[] = [
   { name: "Áo Dài Gấm Song Hỷ", value: 38, color: "#09090B" },
   { name: "Áo Dài Tơ Tằm Cổ Điển", value: 25, color: "#27272A" },
   { name: "Áo Dài Nhung Đỏ", value: 22, color: "#71717A" },
@@ -126,26 +35,116 @@ const pieData: PieDataItem[] = [
 ];
 
 export function useAdminDashboard() {
+  const t = useTranslations("AdminPage");
   const [filter, setFilter] = useState<FilterType>("week");
-  const [orders, setOrders] = useState<OrderItem[]>(initialOrders);
+  const [stats, setStats] = useState<StatItem>(defaultStats);
+  const [orders, setOrders] = useState<OrderItem[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<OrderItem | null>(null);
-  const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const [pieData, setPieData] = useState<PieDataItem[]>(defaultPieData);
 
-  const stats = useMemo(() => mockStats[filter], [filter]);
+  const [isLoadingStats, setIsLoadingStats] = useState<boolean>(true);
+  const [isLoadingOrders, setIsLoadingOrders] = useState<boolean>(true);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState<boolean>(false);
 
-  const showToast = (msg: string) => {
-    setToastMsg(msg);
-    setTimeout(() => setToastMsg(null), 3000);
-  };
+  // 1. Tải số liệu thống kê Dashboard trực tiếp từ DB qua Prisma Server Action
+  const fetchStats = useCallback(async (currentFilter: FilterType) => {
+    setIsLoadingStats(true);
+    try {
+      const res = await getDashboardStatsAction(currentFilter);
+      if (res.success && res.data) {
+        setStats(res.data);
+      }
+    } catch (err) {
+      console.error("Lỗi tải thống kê dashboard:", err);
+    } finally {
+      setIsLoadingStats(false);
+    }
+  }, []);
 
-  const handleUpdateStatus = (orderId: string, nextStatus: OrderStatus) => {
+  // 2. Tải danh sách đơn hàng quản trị trực tiếp từ DB qua Prisma Server Action
+  const fetchOrders = useCallback(async () => {
+    setIsLoadingOrders(true);
+    try {
+      const res = await getAdminOrdersAction();
+      if (res.success && Array.isArray(res.data)) {
+        const mappedOrders = res.data.map(mapPrismaOrderToOrderItem);
+        setOrders(mappedOrders);
+
+        // Tính toán phân bổ sản phẩm thực tế cho biểu đồ nếu có đơn
+        const productCounts: Record<string, number> = {};
+        let totalCount = 0;
+        res.data.forEach((o: any) => {
+          (o.items || []).forEach((item: any) => {
+            const pName = item.productName || item.product?.name || "Áo Dài";
+            productCounts[pName] = (productCounts[pName] || 0) + (item.quantity || 1);
+            totalCount += item.quantity || 1;
+          });
+        });
+
+        if (totalCount > 0) {
+          const colors = ["#09090B", "#27272A", "#71717A", "#E4E4E7", "#A1A1AA"];
+          const computedPie: PieDataItem[] = Object.entries(productCounts)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 4)
+            .map(([name, count], idx) => ({
+              name,
+              value: Math.round((count / totalCount) * 100),
+              color: colors[idx % colors.length] || "#09090B",
+            }));
+          if (computedPie.length > 0) {
+            setPieData(computedPie);
+          }
+        }
+      }
+    } catch (err) {
+      console.error("Lỗi tải danh sách đơn hàng:", err);
+    } finally {
+      setIsLoadingOrders(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchStats(filter);
+  }, [filter, fetchStats]);
+
+  useEffect(() => {
+    fetchOrders();
+  }, [fetchOrders]);
+
+  // 3. Cập nhật trạng thái đơn hàng trực tiếp xuống DB qua Prisma Server Action
+  const handleUpdateStatus = async (orderId: string, nextStatus: OrderStatus) => {
+    const targetOrder = orders.find((o) => o.id === orderId);
+    const dbOrderId = targetOrder?.rawId || orderId;
+    const dbStatus = mapUiStatusToDbStatus(nextStatus);
+
+    // Cập nhật giao diện ngay lập tức (Optimistic UI)
+    const prevOrders = [...orders];
     setOrders((prev) =>
       prev.map((order) => (order.id === orderId ? { ...order, status: nextStatus } : order))
     );
     if (selectedOrder && selectedOrder.id === orderId) {
       setSelectedOrder((prev) => (prev ? { ...prev, status: nextStatus } : null));
     }
-    showToast(`Đã chuyển đơn hàng ${orderId} sang trạng thái mới thành công!`);
+
+    setIsUpdatingStatus(true);
+    try {
+      const res = await updateOrderStatusAction(dbOrderId, dbStatus);
+      if (!res.success) {
+        // Rollback nếu thất bại
+        setOrders(prevOrders);
+        notifyError(res.error || t("orders.updateError"));
+        return;
+      }
+
+      notifySuccess(t("orders.updateSuccess", { id: orderId }));
+      // Tải lại thống kê để cập nhật số đơn chờ xử lý
+      fetchStats(filter);
+    } catch (err) {
+      setOrders(prevOrders);
+      notifyError(err, t("orders.updateError"));
+    } finally {
+      setIsUpdatingStatus(false);
+    }
   };
 
   const getStatusColor = (status: OrderStatus) => {
@@ -169,11 +168,14 @@ export function useAdminDashboard() {
     orders,
     selectedOrder,
     setSelectedOrder,
-    toastMsg,
     stats,
     pieData,
-    showToast,
+    isLoadingStats,
+    isLoadingOrders,
+    isUpdatingStatus,
     handleUpdateStatus,
     getStatusColor,
+    refreshOrders: fetchOrders,
+    refreshStats: () => fetchStats(filter),
   };
 }

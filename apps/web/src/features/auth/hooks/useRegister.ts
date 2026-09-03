@@ -9,12 +9,12 @@ import * as z from 'zod';
 import { type RegisterFormData } from '../types/register.types';
 import { createRegisterSchema } from '../validations/register.validation';
 import { showToast } from '@/components/ui/toast';
-import { getErrorMessage } from '@/lib/api-client';
+import { extractErrorMessage } from '@/lib/api-client';
+import { notifyError, notifySuccess, resolveErrorMessage } from '@/lib/messages';
 import { withMinDelay } from '@/lib/utils';
 import { checkEmailApi, checkPhoneApi, registerApi } from '../api/register.api';
 import { getMeApi, loginWithGoogleApi, sendOtpApi } from '../api/auth.api';
 import { useAuthStore } from '../store/authStore';
-import { translateAuthResponse } from '../utils/translateAuthResponse';
 
 export function useRegister() {
   const t = useTranslations('Auth');
@@ -216,13 +216,13 @@ export function useRegister() {
           }),
           2000
         );
-        const successMsg = translateAuthResponse(t, res.message, t('registerSuccessEmail', { name: data.fullName }));
-        showToast.success(successMsg);
+        const successMsg = resolveErrorMessage(res.message, t('registerSuccessEmail', { name: data.fullName }), t);
+        notifySuccess(successMsg);
         router.push('/login');
       } catch (err: unknown) {
         console.error('Registration failed:', err);
-        const rawMsg = getErrorMessage(err, 'REGISTRATION_FAILED');
-        const apiMsg = translateAuthResponse(t, rawMsg, 'Đăng ký tài khoản thất bại');
+        const apiMsg = resolveErrorMessage(err, 'REGISTRATION_FAILED', t);
+        const rawMsg = extractErrorMessage(err, 'REGISTRATION_FAILED');
         if (rawMsg === 'EMAIL_ALREADY_EXISTS' || rawMsg.toLowerCase().includes('email')) {
           setError('email', { message: apiMsg });
         } else if (rawMsg === 'PHONE_ALREADY_EXISTS' || rawMsg === 'INVALID_PHONE_NUMBER' || rawMsg.toLowerCase().includes('phone')) {
@@ -244,12 +244,11 @@ export function useRegister() {
         setOtpError('');
         setOtpSentOnce(true);
         setIsOtpStep(true);
-        showToast.success(t('otpSent') || 'Mã OTP đã được gửi đến số điện thoại của bạn.');
+        notifySuccess(t('otpSent') || 'Mã OTP đã được gửi đến số điện thoại của bạn.');
       } catch (err: unknown) {
         console.error('Failed to send OTP:', err);
-        const rawMsg = getErrorMessage(err, 'OTP_SEND_FAILED');
-        const apiMsg = translateAuthResponse(t, rawMsg, 'Gửi mã OTP thất bại');
-        showToast.error(apiMsg);
+        const rawMsg = extractErrorMessage(err, 'OTP_SEND_FAILED');
+        notifyError(err, 'OTP_SEND_FAILED', t);
         if (rawMsg === 'OTP_COOLDOWN_ACTIVE' || rawMsg === 'COOLDOWN_ACTIVE') {
           setOtpSentOnce(true);
         }
@@ -276,16 +275,13 @@ export function useRegister() {
         }),
         2000
       );
-      const successMsg = translateAuthResponse(t, res.message, t('registerSuccessPhone'));
-      showToast.success(successMsg);
+      notifySuccess(res.message, t('registerSuccessPhone'), t);
       setIsOtpStep(false);
       router.push('/login');
     } catch (err: unknown) {
       console.error('Registration failed:', err);
-      const rawMsg = getErrorMessage(err, 'OTP_VERIFICATION_FAILED');
-      const apiMsg = translateAuthResponse(t, rawMsg, 'Xác thực OTP thất bại');
+      const apiMsg = notifyError(err, 'OTP_VERIFICATION_FAILED', t);
       setOtpError(apiMsg);
-      showToast.error(apiMsg);
     } finally {
       setIsRegistering(false);
     }
@@ -299,11 +295,10 @@ export function useRegister() {
       await sendOtpApi(data.phone, 'REGISTER');
       setOtpInput('');
       setOtpError('');
-      showToast.success(t('otpSent') || 'Mã OTP đã được gửi lại.');
+      notifySuccess(t('otpSent') || 'Mã OTP đã được gửi lại.');
     } catch (err: unknown) {
       console.error('Failed to resend OTP:', err);
-      const rawMsg = getErrorMessage(err, 'OTP_RESEND_FAILED');
-      const apiMsg = translateAuthResponse(t, rawMsg, 'Gửi lại mã OTP thất bại');
+      const apiMsg = resolveErrorMessage(err, 'OTP_RESEND_FAILED', t);
       setOtpError(apiMsg);
     }
   };
@@ -324,15 +319,12 @@ export function useRegister() {
       document.cookie = `user_logged_in=true; path=/; max-age=${7 * 86400}; SameSite=Lax`;
       document.cookie = `auth_role=${me.data?.role || 'CUSTOMER'}; path=/; max-age=${7 * 86400}; SameSite=Lax`;
 
-      const successMsg = translateAuthResponse(t, res.message, t('LOGIN_SUCCESS') || t('success'));
-      showToast.success(successMsg);
+      notifySuccess(res.message, t('LOGIN_SUCCESS') || t('success'), t);
       router.push('/');
       router.refresh();
     } catch (err: unknown) {
       console.error('Google signup failed:', err);
-      const rawMsg = getErrorMessage(err, 'GOOGLE_AUTH_FAILED');
-      const apiMsg = translateAuthResponse(t, rawMsg, 'Đăng nhập Google thất bại');
-      showToast.error(apiMsg);
+      notifyError(err, 'GOOGLE_AUTH_FAILED', t);
     } finally {
       setIsRegistering(false);
     }

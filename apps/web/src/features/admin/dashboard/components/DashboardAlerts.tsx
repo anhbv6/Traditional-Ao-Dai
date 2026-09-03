@@ -4,17 +4,24 @@ import { AlertTriangle } from "lucide-react";
 interface DashboardAlertsProps {
   tLowFabrics: string;
   tLowStock: string;
+  title?: string;
+  subtitle?: string;
 }
 
-export function DashboardAlerts({ tLowFabrics, tLowStock }: DashboardAlertsProps) {
+export function DashboardAlerts({
+  tLowFabrics,
+  tLowStock,
+  title = "Cảnh báo Vận hành & Kho vải",
+  subtitle = "Vật liệu và sản phẩm cần bổ sung khẩn cấp.",
+}: DashboardAlertsProps) {
   return (
     <div className="rounded-xl border border-[#E4E4E7] bg-white p-6 shadow-xs flex flex-col justify-between">
       <div>
         <h3 className="text-lg font-semibold text-[#09090B] flex items-center gap-2">
           <AlertTriangle size={18} className="text-[#09090B]" />
-          Cảnh báo Vận hành & Kho vải
+          {title}
         </h3>
-        <p className="text-xs text-[#71717A] mt-0.5">Vật liệu và sản phẩm cần bổ sung khẩn cấp.</p>
+        <p className="text-xs text-[#71717A] mt-0.5">{subtitle}</p>
       </div>
 
       <div className="space-y-4 mt-6 overflow-y-auto max-h-[220px] scrollbar-thin">

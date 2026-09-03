@@ -10,6 +10,8 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ConfirmDialog, Dropdown } from "@/components/shared";
 import { useTranslations } from 'next-intl';
 
+import { isUserAdminOrStaff } from '@/features/auth/utils/authRoles';
+
 type UserMenuProps = {
   loginLabel?: string;
   profileLabel?: string;
@@ -33,7 +35,7 @@ export function UserMenu({
   userName: initialUserName,
 }: UserMenuProps) {
   const router = useRouter();
-  const { isAuthenticated, user, logout: storeLogout } = useAuthStore();
+  const { isAuthenticated, user, isAdminOrStaff, logout: storeLogout } = useAuthStore();
   const userName = initialUserName || user?.name || user?.email || (isAuthenticated ? 'Account' : undefined);
   const avatarUrl = user?.avatar || undefined;
   const avatarLabel = userName || profileLabel;
@@ -42,6 +44,8 @@ export function UserMenu({
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const t = useTranslations("ProfilePage");
   
+  const isAdmin = isAdminOrStaff || isUserAdminOrStaff(user);
+
   const handleLogout = async () => {
     setIsLoggingOut(true)
     try {
@@ -113,17 +117,27 @@ export function UserMenu({
             >
               {ordersLabel}
             </Link>
-            <button
-              type="button"
-              onClick={() => {
-                close();
-                setOpenConfirm(true);
-              }}
-              className="relative z-10 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-semibold text-rose-600 transition-colors hover:bg-rose-50 disabled:opacity-60 cursor-pointer"
-            >
-              <LogOut size={15} strokeWidth={1.6} />
-              {logoutLabel}
-            </button>
+            {isAdmin ? (
+              <Link
+                href="/admin/dashboard"
+                onClick={close}
+                className="relative z-10 block rounded-lg px-3 py-2 text-sm font-semibold text-[#800020] transition-colors hover:bg-[#FAF7F5]"
+              >
+                Về trang quản trị
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  close();
+                  setOpenConfirm(true);
+                }}
+                className="relative z-10 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-semibold text-rose-600 transition-colors hover:bg-rose-50 disabled:opacity-60 cursor-pointer"
+              >
+                <LogOut size={15} strokeWidth={1.6} />
+                {logoutLabel}
+              </button>
+            )}
           </>
         )}
       </Dropdown>

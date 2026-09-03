@@ -28,6 +28,38 @@
     "ADMIN_LOGIN_SUCCESS": "Đăng nhập quản trị viên thành công!",
     "ADMIN_LOGOUT_SUCCESS": "Đăng xuất quản trị viên thành công!"
   },
+  "header": {
+    "systemTitle": "AODAI Admin",
+    "systemSubtitle": "Hệ thống quản lý",
+    "viewStore": "Xem cửa hàng",
+    "defaultAdminName": "Quản trị viên",
+    "superAdminRole": "Super Admin",
+    "staffRole": "Nhân viên (Staff)",
+    "editProfile": "Sửa hồ sơ tài khoản",
+    "backToStore": "Về trang cửa hàng",
+    "logout": "Đăng xuất",
+    "loggingOut": "Đang đăng xuất..."
+  },
+  "nav": {
+    "dashboard": "Tổng quan",
+    "orders": "Đơn hàng",
+    "tailoring": "Xưởng may đo",
+    "products": "Sản phẩm",
+    "inventory": "Tồn kho",
+    "customers": "Khách hàng",
+    "approvals": "Phê duyệt",
+    "staff": "Nhân sự",
+    "vouchers": "Voucher",
+    "cms": "Nội dung & FAQ"
+  },
+  "accessDenied": {
+    "title": "Truy Cập Bị Giới Hạn",
+    "description": "Trang này yêu cầu quyền Quản trị viên tối cao (Super Admin). Tài khoản của bạn hiện có vai trò Nhân viên (Staff).",
+    "backToDashboard": "Về Bảng Điều Khiển"
+  },
+  "loading": {
+    "text": "Đang tải dữ liệu quản trị..."
+  },
   "title": "Bảng quản trị AODAI",
   "subtitle": "Tổng quan hoạt động kinh doanh, tiến độ may đo và tình trạng kho vật liệu.",
   "filters": {
@@ -41,9 +73,18 @@
     "pending": "Đơn hàng chờ xử lý",
     "ratio": "Tỷ lệ Đơn hàng",
     "ratioCustom": "May đo",
-    "ratioReady": "May sẵn"
+    "ratioReady": "May sẵn",
+    "comparedToBefore": "so với trước",
+    "urgentTailor": "Cần hoàn thiện may đo gấp"
+  },
+  "chart": {
+    "title": "Phân tích Bộ sưu tập Áo Dài bán chạy",
+    "subtitle": "Tỷ lệ đóng góp doanh thu theo từng dòng chất liệu.",
+    "overview": "Tổng quan"
   },
   "alerts": {
+    "title": "Cảnh báo Vận hành & Kho vải",
+    "subtitle": "Vật liệu và sản phẩm cần bổ sung khẩn cấp.",
     "tailoring": "Tiến độ May đo",
     "lowStock": "Sản phẩm sắp hết hàng (< 5 SP)",
     "lowFabrics": "Vật liệu / Kho vải sắp hết",
@@ -56,20 +97,44 @@
       "finishing": "Hoàn thiện & Ủi phẳng"
     }
   },
+  "tailoring": {
+    "title": "Theo dõi Tiến độ May đo (Bespoke Workflow)",
+    "subtitle": "Tiến độ cắt rập, ráp khâu thủ công của thợ may nghệ nhân.",
+    "measurementsText": "Số đo",
+    "bust": "Ngực",
+    "waist": "Eo",
+    "detailAction": "Chi tiết"
+  },
   "orders": {
     "title": "Hoạt động & Đơn hàng mới nhất",
+    "liveBadge": "Trực tiếp",
     "orderId": "Mã đơn",
     "customer": "Khách hàng",
     "type": "Loại đơn",
     "total": "Tổng tiền",
     "status": "Trạng thái",
     "action": "Xử lý",
+    "actionDetail": "Chi tiết",
     "typeCustom": "Đặt may đo",
     "typeReady": "Mua sẵn",
     "detailTitle": "Chi tiết xử lý đơn hàng",
     "updateStatus": "Cập nhật trạng thái",
     "customerInfo": "Thông tin khách hàng",
     "tailorSpecs": "Số đo may đo của khách",
+    "orderedProducts": "Sản phẩm đặt mua",
+    "totalRevenue": "Tổng tiền thu",
+    "fullName": "Họ tên:",
+    "phone": "SĐT:",
+    "address": "Địa chỉ:",
+    "height": "Chiều cao:",
+    "weight": "Cân nặng:",
+    "bust": "Vòng ngực:",
+    "waist": "Vòng eo:",
+    "hips": "Vòng hông:",
+    "customMade": "May đo riêng",
+    "noOrders": "Chưa có đơn hàng nào trong hệ thống.",
+    "updateSuccess": "Đã chuyển đơn hàng {id} sang trạng thái mới thành công!",
+    "updateError": "Không thể cập nhật trạng thái đơn hàng.",
     "statusLabels": {
       "pending_approval": "Chờ duyệt",
       "cutting_fabric": "Đang cắt vải",

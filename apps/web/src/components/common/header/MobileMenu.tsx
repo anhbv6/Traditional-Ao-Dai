@@ -20,6 +20,7 @@ import type { NavItem } from './types';
 import { logoutApi } from '@/features/auth/api/auth.api';
 import { useAuthStore } from '@/features/auth/store/authStore';
 import { clearBrowserAuthTokens } from '@/lib/api-client';
+import { isUserAdminOrStaff } from '@/features/auth/utils/authRoles';
 
 type MobileMenuProps = {
   items: NavItem[];
@@ -48,7 +49,8 @@ export function MobileMenu({
   const [isPending, startTransition] = useTransition();
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const { isAuthenticated, user, logout: storeLogout } = useAuthStore();
+  const { isAuthenticated, user, isAdminOrStaff, logout: storeLogout } = useAuthStore();
+  const isAdmin = isAdminOrStaff || isUserAdminOrStaff(user);
   const userName = user?.name || user?.email || (isAuthenticated ? 'Account' : undefined);
 
   const handleSelectLanguage = (newLocale: string) => {
@@ -183,22 +185,24 @@ export function MobileMenu({
                 <>
                   <DrawerClose asChild>
                     <Link
-                      href="/profile"
+                      href={isAdmin ? "/admin/dashboard" : "/profile"}
                       className="flex min-h-12 items-center justify-center gap-2 rounded-md bg-primary px-4 text-xs font-semibold uppercase tracking-wider text-white transition-colors hover:bg-[#111018]"
                     >
                       <UserRound size={16} strokeWidth={1.5} />
-                      {profileLabel}
+                      {isAdmin ? "Về trang quản trị" : profileLabel}
                     </Link>
                   </DrawerClose>
-                  <button
-                    type="button"
-                    onClick={handleLogout}
-                    disabled={isPending}
-                    className="flex min-h-12 items-center justify-center gap-2 rounded-md border border-secondary px-4 text-xs font-semibold uppercase tracking-wider text-foreground transition-colors hover:text-primary disabled:opacity-60"
-                  >
-                    <LogOut size={16} strokeWidth={1.5} />
-                    {logoutLabel}
-                  </button>
+                  {!isAdmin && (
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      disabled={isPending}
+                      className="flex min-h-12 items-center justify-center gap-2 rounded-md border border-secondary px-4 text-xs font-semibold uppercase tracking-wider text-foreground transition-colors hover:text-primary disabled:opacity-60"
+                    >
+                      <LogOut size={16} strokeWidth={1.5} />
+                      {logoutLabel}
+                    </button>
+                  )}
                 </>
               ) : (
                 <DrawerClose asChild>

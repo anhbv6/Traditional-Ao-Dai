@@ -1,0 +1,16 @@
+{
+  "DEFAULT_ERROR": "An unexpected error occurred. Please try again later.",
+  "NETWORK_ERROR": "Unable to connect to the server. Please check your network connection.",
+  "REQUEST_TIMEOUT": "The request timed out or was cancelled.",
+  "HTTP_400": "Invalid request. Please check your information (400).",
+  "HTTP_401": "Your session has expired or is invalid (401).",
+  "HTTP_403": "You do not have permission to perform this action (403).",
+  "HTTP_404": "Requested resource not found (404).",
+  "HTTP_409": "Data already exists or a conflict occurred (409).",
+  "HTTP_422": "Submitted data format is invalid (422).",
+  "HTTP_429": "Too many requests. Please try again in a few minutes (429).",
+  "HTTP_500": "Internal server error. Please try again later (500).",
+  "HTTP_502": "Server is temporarily unreachable (502).",
+  "HTTP_503": "Service is temporarily unavailable or overloaded (503).",
+  "HTTP_504": "Gateway timeout. Server response timed out (504)."
+}

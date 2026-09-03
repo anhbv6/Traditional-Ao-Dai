@@ -6,10 +6,9 @@ import { motion } from 'motion/react';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { showToast } from '@/components/ui/toast';
-import { HttpError } from '@/lib/api-client';
+import { notifyError, notifySuccess } from '@/lib/messages';
 import { forgotPasswordEmailApi, verifyResetPasswordEmailApi, verifyResetPasswordPhoneApi } from '../../../api/forgot.api';
 import { sendOtpApi } from '../../../api/auth.api';
-import { translateAuthResponse } from '../../../utils/translateAuthResponse';
 
 // Shared Components
 import { AuthHeader } from '../../AuthHeader';
@@ -98,17 +97,6 @@ export function VerifyOtpForm({
     inputRefs.current[focusIndex]?.focus();
   };
 
-  const getApiErrorMessage = (err: unknown, fallback: string) => {
-    const payload = err instanceof HttpError ? err.payload : undefined;
-    const rawMsg =
-      payload && typeof payload === 'object' && 'message' in payload
-        ? String(payload.message)
-        : err instanceof Error
-          ? err.message
-          : fallback;
-    return translateAuthResponse(t, rawMsg, fallback);
-  };
-
   const handleResend = async () => {
     if (!canResend) return;
 
@@ -122,10 +110,10 @@ export function VerifyOtpForm({
       setTimer(60);
       setOtp(Array(6).fill(''));
       inputRefs.current[0]?.focus();
-      showToast.success(t('otpSent') || 'Mã mới đã được gửi đi!');
+      notifySuccess(t('otpSent') || 'Mã mới đã được gửi đi!');
     } catch (err: unknown) {
       console.error(err);
-      showToast.error(getApiErrorMessage(err, t('resendOtpError')));
+      notifyError(err, 'resendOtpError', t);
     }
   };
 
@@ -140,11 +128,11 @@ export function VerifyOtpForm({
         ? await verifyResetPasswordEmailApi({ email: target, code: otpCode })
         : await verifyResetPasswordPhoneApi({ phone: target, code: otpCode });
 
-      showToast.success(t('otpVerifySuccess'));
+      notifySuccess(t('otpVerifySuccess'));
       onVerifySuccess(result.data.resetToken);
     } catch (err: unknown) {
       console.error(err);
-      showToast.error(getApiErrorMessage(err, t('invalidOtp') || 'Mã xác thực không đúng hoặc đã hết hạn.'));
+      notifyError(err, 'invalidOtp', t);
     } finally {
       setIsLoading(false);
     }

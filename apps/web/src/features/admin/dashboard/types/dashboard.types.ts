@@ -36,6 +36,7 @@ export interface OrderItemProduct {
 
 export interface OrderItem {
   id: string;
+  rawId?: string;
   customer: string;
   type: "custom" | "ready";
   total: string;
@@ -85,4 +86,91 @@ export interface CreateStaffOrderInput {
 export interface UpdateOrderStatusInput {
   orderId: string;
   status: DbOrderStatus;
+}
+
+/**
+ * Chuyển đổi trạng thái đơn hàng từ Prisma DB sang UI
+ */
+export function mapDbStatusToUiStatus(status: DbOrderStatus): OrderStatus {
+  switch (status) {
+    case "PENDING":
+      return "pending_approval";
+    case "CONFIRMED":
+      return "cutting_fabric";
+    case "IN_PRODUCTION":
+      return "sewing_job";
+    case "READY_TO_SHIP":
+    case "SHIPPING":
+      return "shipping";
+    case "DELIVERED":
+      return "completed";
+    default:
+      return "pending_approval";
+  }
+}
+
+/**
+ * Chuyển đổi trạng thái đơn hàng từ UI sang Prisma DB
+ */
+export function mapUiStatusToDbStatus(status: OrderStatus): DbOrderStatus {
+  switch (status) {
+    case "pending_approval":
+      return "PENDING";
+    case "cutting_fabric":
+      return "CONFIRMED";
+    case "sewing_job":
+      return "IN_PRODUCTION";
+    case "shipping":
+      return "SHIPPING";
+    case "completed":
+      return "DELIVERED";
+    default:
+      return "PENDING";
+  }
+}
+
+/**
+ * Chuyển đổi dữ liệu đơn hàng từ Prisma DB sang OrderItem cho giao diện Dashboard
+ */
+export function mapPrismaOrderToOrderItem(order: any): OrderItem {
+  const isCustom = order.items?.some((i: any) => i.isCustomFit) ?? false;
+  const customItem = order.items?.find((i: any) => i.isCustomFit && (i.height || i.bust || i.waist));
+
+  const measurements: Measurement | undefined = customItem
+    ? {
+        height: customItem.height ? `${customItem.height} cm` : "—",
+        weight: customItem.weight ? `${customItem.weight} kg` : "—",
+        bust: customItem.bust ? `${customItem.bust} cm` : "—",
+        waist: customItem.waist ? `${customItem.waist} cm` : "—",
+        hips: customItem.hips ? `${customItem.hips} cm` : "—",
+        neckToWaist: customItem.shirtLength ? `${customItem.shirtLength} cm` : "—",
+      }
+    : undefined;
+
+  let dateStr = "—";
+  if (order.createdAt) {
+    try {
+      const d = new Date(order.createdAt);
+      dateStr = `${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")} ${d.toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit" })}`;
+    } catch {}
+  }
+
+  return {
+    id: order.orderNumber || order.id,
+    rawId: order.id,
+    customer: order.customerName || order.createdBy?.name || "Khách hàng",
+    type: isCustom ? "custom" : "ready",
+    total: `${Number(order.totalAmount || 0).toLocaleString("vi-VN")} ₫`,
+    status: mapDbStatusToUiStatus(order.orderStatus),
+    date: dateStr,
+    phone: order.customerPhone || "—",
+    address: order.shippingAddress || "—",
+    items: (order.items || []).map((item: any) => ({
+      name: item.productName || item.product?.name || "Áo Dài",
+      price: `${Number(item.totalPrice || item.unitPrice || 0).toLocaleString("vi-VN")} ₫`,
+      quantity: item.quantity || 1,
+      size: item.isCustomFit ? undefined : "M",
+    })),
+    measurements,
+  };
 }

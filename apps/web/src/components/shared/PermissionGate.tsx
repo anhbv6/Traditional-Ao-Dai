@@ -22,12 +22,12 @@ export function PermissionGate({
   fallback = null,
   children,
 }: PermissionGateProps) {
-  const { user } = useAuthStore();
+  const { user, isAdmin, isStaff } = useAuthStore();
 
   if (!user) return <>{fallback}</>;
 
   // ADMIN luôn có toàn quyền
-  if (user.role === 'ADMIN') {
+  if (isAdmin) {
     return <>{children}</>;
   }
 
@@ -37,7 +37,7 @@ export function PermissionGate({
   }
 
   // Nếu là STAFF và cần kiểm tra quyền cụ thể
-  if (user.role === 'STAFF') {
+  if (isStaff) {
     if (!permission) return <>{children}</>;
 
     // Kiểm tra quyền từ user info nếu có

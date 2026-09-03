@@ -43,6 +43,37 @@ export async function checkAuthAdmin(
       };
     }
 
+    // Truy xuất thông tin user thật trực tiếp từ DB qua Prisma dựa vào userId trong JWT token
+    if (adminToken) {
+      try {
+        const parts = adminToken.split(".");
+        if (parts.length === 3) {
+          const payload = JSON.parse(Buffer.from(parts[1], "base64").toString("utf-8"));
+          if (payload?.userId) {
+            const found = await prisma.user.findUnique({
+              where: { id: payload.userId },
+              select: { id: true, email: true, name: true, role: true, isActive: true },
+            });
+            if (found) {
+              if (!found.isActive) {
+                return {
+                  isAuthenticated: false,
+                  user: null,
+                  error: "Tài khoản đã bị vô hiệu hóa.",
+                };
+              }
+              return {
+                isAuthenticated: true,
+                user: found,
+              };
+            }
+          }
+        }
+      } catch (decodeErr) {
+        console.warn("Không thể giải mã token admin:", decodeErr);
+      }
+    }
+
     return {
       isAuthenticated: true,
       user: {

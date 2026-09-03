@@ -19,6 +19,7 @@
   "requestType": "Request type",
   "message": "Message",
   "submit": "Send request",
+  "sendError": "Failed to send consultation request. Please try again later.",
   "namePlaceholder": "Enter your full name",
   "contactPlaceholder": "Enter your phone number or email",
   "messagePlaceholder": "Tell us about your preferred design, fitting schedule, or custom request.",

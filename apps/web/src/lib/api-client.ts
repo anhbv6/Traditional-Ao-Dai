@@ -349,23 +349,252 @@ export const apiClient = {
     request<T>('PATCH', url, { ...options, body }),
 };
 
-export function getErrorMessage(err: unknown, fallback: string): string {
-  const payload = err instanceof HttpError ? err.payload : undefined;
+/**
+ * Bộ mã khóa lỗi chuẩn hóa cho toàn bộ hệ thống (i18n Error Keys)
+ */
+export const ERROR_KEYS = {
+  DEFAULT_ERROR: 'DEFAULT_ERROR',
+  NETWORK_ERROR: 'NETWORK_ERROR',
+  REQUEST_TIMEOUT: 'REQUEST_TIMEOUT',
+  HTTP_400: 'HTTP_400',
+  HTTP_401: 'HTTP_401',
+  HTTP_403: 'HTTP_403',
+  HTTP_404: 'HTTP_404',
+  HTTP_409: 'HTTP_409',
+  HTTP_422: 'HTTP_422',
+  HTTP_429: 'HTTP_429',
+  HTTP_500: 'HTTP_500',
+  HTTP_502: 'HTTP_502',
+  HTTP_503: 'HTTP_503',
+  HTTP_504: 'HTTP_504',
+} as const;
 
-  if (payload && typeof payload === 'object') {
-    if ('errors' in payload && Array.isArray(payload.errors) && payload.errors.length > 0) {
-      return payload.errors
-        .map((e: any) => e.message || 'Lỗi không xác định')
-        .join(', ');
+export type ErrorKey = (typeof ERROR_KEYS)[keyof typeof ERROR_KEYS];
+
+/**
+ * Trích xuất mã khóa lỗi i18n hoặc thông báo lỗi từ nhiều định dạng lỗi khác nhau:
+ * - HttpError từ API Backend (payload: message, errors mảng hoặc object, error_description, error, detail)
+ * - Lỗi kết nối mạng (AbortError -> REQUEST_TIMEOUT, Failed to fetch -> NETWORK_ERROR)
+ * - Mã HTTP Status Code khi không có payload chi tiết -> HTTP_400..HTTP_504
+ * - Error thông thường trong JavaScript
+ * - String hoặc Plain Object lỗi
+ */
+export function extractErrorMessage(
+  err: unknown,
+  fallback: string = ERROR_KEYS.DEFAULT_ERROR
+): string {
+  // 1. err rỗng / falsy
+  if (!err) {
+    return fallback;
+  }
+
+  // 2. err là string
+  if (typeof err === 'string') {
+    const trimmed = err.trim();
+    return trimmed.length > 0 ? trimmed : fallback;
+  }
+
+  // 3. err là HttpError hoặc đối tượng có payload / status
+  if (err instanceof HttpError || (typeof err === 'object' && err !== null && ('payload' in err || 'status' in err))) {
+    const httpErr = err as { status?: number; payload?: unknown };
+    let payload = httpErr.payload;
+
+    // Nếu payload là string JSON, thử parse
+    if (typeof payload === 'string') {
+      const trimmedPayload = payload.trim();
+      if (trimmedPayload.startsWith('{') || trimmedPayload.startsWith('[')) {
+        try {
+          payload = JSON.parse(trimmedPayload);
+        } catch {
+          // Bỏ qua nếu parse thất bại
+        }
+      } else if (!trimmedPayload.toLowerCase().startsWith('<!doctype') && !trimmedPayload.toLowerCase().startsWith('<html')) {
+        // Không phải trang HTML báo lỗi server thì trả về chuỗi text
+        if (trimmedPayload.length > 0) {
+          return trimmedPayload;
+        }
+      }
     }
-    if ('message' in payload) {
-      return String(payload.message);
+
+    if (payload && typeof payload === 'object') {
+      const p = payload as Record<string, any>;
+
+      // 3.1. payload.errors là mảng (ví dụ Zod issues hoặc Express validator)
+      if (Array.isArray(p.errors) && p.errors.length > 0) {
+        const errorStrings = p.errors
+          .map((item: any) => {
+            if (typeof item === 'string') return item.trim();
+            if (item && typeof item === 'object') {
+              return item.message || item.msg || item.error || '';
+            }
+            return '';
+          })
+          .filter(Boolean);
+
+        if (errorStrings.length > 0) {
+          return errorStrings.join(', ');
+        }
+      }
+
+      // 3.2. payload.errors là object/dictionary (ví dụ { email: 'Email required', password: ['Min 6 chars'] })
+      if (p.errors && typeof p.errors === 'object' && !Array.isArray(p.errors)) {
+        const fieldErrors = Object.values(p.errors)
+          .flatMap((val: any) => (Array.isArray(val) ? val : [val]))
+          .map((v: any) => (typeof v === 'string' ? v.trim() : (v?.message || '')))
+          .filter(Boolean);
+
+        if (fieldErrors.length > 0) {
+          return fieldErrors.join(', ');
+        }
+      }
+
+      // 3.3. payload.message (chuỗi hoặc mảng chuỗi)
+      if (typeof p.message === 'string' && p.message.trim().length > 0) {
+        return p.message.trim();
+      }
+      if (Array.isArray(p.message) && p.message.length > 0) {
+        const msgs = p.message.map((m: any) => (typeof m === 'string' ? m.trim() : String(m))).filter(Boolean);
+        if (msgs.length > 0) {
+          return msgs.join(', ');
+        }
+      }
+
+      // 3.4. payload.error_description (OAuth2 chuẩn)
+      if (typeof p.error_description === 'string' && p.error_description.trim().length > 0) {
+        return p.error_description.trim();
+      }
+
+      // 3.5. payload.error (chuỗi hoặc object)
+      if (typeof p.error === 'string' && p.error.trim().length > 0) {
+        return p.error.trim();
+      }
+      if (p.error && typeof p.error === 'object' && typeof p.error.message === 'string') {
+        return p.error.message.trim();
+      }
+
+      // 3.6. payload.detail hoặc payload.details (RFC 7807 Problem Details)
+      if (typeof p.detail === 'string' && p.detail.trim().length > 0) {
+        return p.detail.trim();
+      }
+      if (typeof p.details === 'string' && p.details.trim().length > 0) {
+        return p.details.trim();
+      }
+      if (Array.isArray(p.details) && p.details.length > 0) {
+        const detailMsgs = p.details
+          .map((d: any) => (typeof d === 'string' ? d.trim() : (d?.message || '')))
+          .filter(Boolean);
+        if (detailMsgs.length > 0) {
+          return detailMsgs.join(', ');
+        }
+      }
+
+      // 3.7. payload.data bọc lồng
+      if (p.data && typeof p.data === 'object') {
+        if (typeof p.data.message === 'string' && p.data.message.trim().length > 0) {
+          return p.data.message.trim();
+        }
+        if (typeof p.data.error === 'string' && p.data.error.trim().length > 0) {
+          return p.data.error.trim();
+        }
+      }
+    }
+
+    // 3.8. Nếu không có message trong payload nhưng có HTTP Status code:
+    // Trả về i18n key chuẩn để client dịch theo ngôn ngữ tương ứng
+    const isCustomFallback =
+      fallback !== ERROR_KEYS.DEFAULT_ERROR &&
+      fallback !== 'Đã có lỗi xảy ra, vui lòng thử lại sau.';
+
+    if (httpErr.status && !isCustomFallback) {
+      switch (httpErr.status) {
+        case 400:
+          return ERROR_KEYS.HTTP_400;
+        case 401:
+          return ERROR_KEYS.HTTP_401;
+        case 403:
+          return ERROR_KEYS.HTTP_403;
+        case 404:
+          return ERROR_KEYS.HTTP_404;
+        case 409:
+          return ERROR_KEYS.HTTP_409;
+        case 422:
+          return ERROR_KEYS.HTTP_422;
+        case 429:
+          return ERROR_KEYS.HTTP_429;
+        case 500:
+          return ERROR_KEYS.HTTP_500;
+        case 502:
+          return ERROR_KEYS.HTTP_502;
+        case 503:
+          return ERROR_KEYS.HTTP_503;
+        case 504:
+          return ERROR_KEYS.HTTP_504;
+        default:
+          return `HTTP_${httpErr.status}`;
+      }
     }
   }
 
+  // 4. Axios-like error (err.response?.data)
+  if (typeof err === 'object' && err !== null && 'response' in err) {
+    const axiosData = (err as any).response?.data;
+    if (axiosData) {
+      const axiosMsg = extractErrorMessage(axiosData, fallback);
+      if (axiosMsg && axiosMsg !== fallback) {
+        return axiosMsg;
+      }
+    }
+  }
+
+  // 5. JavaScript Error chuẩn
   if (err instanceof Error) {
-    return err.message;
+    // 5.1. Bắt lỗi mạng & Timeout -> Trả về mã i18n key
+    if (err.name === 'AbortError') {
+      return ERROR_KEYS.REQUEST_TIMEOUT;
+    }
+    const lowerMsg = err.message.toLowerCase();
+    if (
+      lowerMsg === 'failed to fetch' ||
+      lowerMsg.includes('networkerror') ||
+      lowerMsg.includes('network request failed') ||
+      lowerMsg.includes('err_connection_refused')
+    ) {
+      return ERROR_KEYS.NETWORK_ERROR;
+    }
+
+    // 5.2. Không trả về các chuỗi kỹ thuật vô nghĩa với người dùng
+    if (
+      err.message &&
+      !err.message.startsWith('HTTP Error:') &&
+      err.message !== '[object Object]' &&
+      err.message.trim().length > 0
+    ) {
+      return err.message.trim();
+    }
+  }
+
+  // 6. Plain Object có message / error / msg
+  if (typeof err === 'object' && err !== null) {
+    const obj = err as Record<string, any>;
+    if (typeof obj.message === 'string' && obj.message.trim().length > 0) {
+      return obj.message.trim();
+    }
+    if (typeof obj.error === 'string' && obj.error.trim().length > 0) {
+      return obj.error.trim();
+    }
+    if (typeof obj.msg === 'string' && obj.msg.trim().length > 0) {
+      return obj.msg.trim();
+    }
+    if (typeof obj.detail === 'string' && obj.detail.trim().length > 0) {
+      return obj.detail.trim();
+    }
   }
 
   return fallback;
 }
+
+/**
+ * Alias của extractErrorMessage để đảm bảo tương thích ngược 100%
+ */
+export const getErrorMessage = extractErrorMessage;
+

@@ -19,6 +19,7 @@
   "requestType": "Loại nhu cầu",
   "message": "Nội dung lời nhắn",
   "submit": "Gửi yêu cầu tư vấn",
+  "sendError": "Gửi yêu cầu tư vấn thất bại. Vui lòng thử lại sau.",
   "namePlaceholder": "Nhập họ và tên",
   "contactPlaceholder": "Nhập số điện thoại hoặc email",
   "messagePlaceholder": "Bạn cần tư vấn mẫu áo, lịch thử đồ hay may đo riêng?",

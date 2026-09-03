@@ -45,7 +45,7 @@ export function AdminLoginFormFields({
         required
         autoComplete="email"
         containerClassName="space-y-1.5"
-        labelClassName="text-xs font-semibold text-zinc-700 tracking-normal font-sans"
+        labelClassName="text-xs font-semibold text-zinc-700 tracking-normal font-sans !normal-case"
         className="w-full bg-white/80 hover:bg-white focus:bg-white border-zinc-200/80 rounded-xl text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 shadow-2xs font-normal"
       />
 
@@ -67,7 +67,7 @@ export function AdminLoginFormFields({
         required
         autoComplete="current-password"
         containerClassName="space-y-1.5"
-        labelClassName="text-xs font-semibold text-zinc-700 tracking-normal font-sans"
+        labelClassName="text-xs font-semibold text-zinc-700 tracking-normal font-sans !normal-case"
         className="w-full bg-white/80 hover:bg-white focus:bg-white border-zinc-200/80 rounded-xl text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 shadow-2xs font-normal"
       />
 

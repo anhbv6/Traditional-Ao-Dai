@@ -21,9 +21,11 @@ export function AdminDashboard() {
     orders,
     selectedOrder,
     setSelectedOrder,
-    toastMsg,
     stats,
     pieData,
+    isLoadingStats,
+    isLoadingOrders,
+    isUpdatingStatus,
     handleUpdateStatus,
     getStatusColor,
   } = useAdminDashboard();
@@ -38,7 +40,7 @@ export function AdminDashboard() {
         subtitle={t("subtitle")}
         filter={filter}
         setFilter={setFilter}
-        toastMsg={toastMsg}
+        isLoading={isLoadingStats}
         filterLabels={{
           today: t("filters.today"),
           week: t("filters.week"),
@@ -49,18 +51,28 @@ export function AdminDashboard() {
       {/* Stats Cards Section */}
       <DashboardStatsGrid
         stats={stats}
+        isLoading={isLoadingStats}
         tRevenue={t("stats.revenue")}
         tOrders={t("stats.orders")}
         tPending={t("stats.pending")}
         tRatio={t("stats.ratio")}
         tRatioCustom={t("stats.ratioCustom")}
         tRatioReady={t("stats.ratioReady")}
+        tComparedToBefore={t("stats.comparedToBefore")}
+        tUrgentTailor={t("stats.urgentTailor")}
       />
 
       {/* Grid: Charts & In-depth Analytics + Warnings */}
       <div className="grid gap-6 lg:grid-cols-3 mb-10 w-full max-w-full">
-        <DashboardDonutChart pieData={pieData} />
+        <DashboardDonutChart
+          pieData={pieData}
+          title={t("chart.title")}
+          subtitle={t("chart.subtitle")}
+          tOverview={t("chart.overview")}
+        />
         <DashboardAlerts
+          title={t("alerts.title")}
+          subtitle={t("alerts.subtitle")}
           tLowFabrics={t("alerts.lowFabrics")}
           tLowStock={t("alerts.lowStock")}
         />
@@ -70,6 +82,12 @@ export function AdminDashboard() {
       <DashboardTailoringMonitor
         orders={orders}
         onSelectOrder={setSelectedOrder}
+        title={t("tailoring.title")}
+        subtitle={t("tailoring.subtitle")}
+        tMeasurements={t("tailoring.measurementsText")}
+        tBust={t("tailoring.bust")}
+        tWaist={t("tailoring.waist")}
+        tDetail={t("tailoring.detailAction")}
         stepLabels={{
           measuring: t("alerts.tailorStep.measuring"),
           cutting: t("alerts.tailorStep.cutting"),
@@ -82,17 +100,21 @@ export function AdminDashboard() {
       {/* Latest Orders Area */}
       <DashboardOrdersTable
         orders={orders}
+        isLoading={isLoadingOrders}
         onSelectOrder={setSelectedOrder}
         getStatusColor={getStatusColor}
         labels={{
           title: t("orders.title"),
+          liveBadge: t("orders.liveBadge"),
           orderId: t("orders.orderId"),
           customer: t("orders.customer"),
           type: t("orders.type"),
           total: t("orders.total"),
           status: t("orders.status"),
+          actionDetail: t("orders.actionDetail"),
           typeCustom: t("orders.typeCustom"),
           typeReady: t("orders.typeReady"),
+          noOrders: t("orders.noOrders"),
           statusLabels: {
             pending_approval: t("orders.statusLabels.pending_approval"),
             cutting_fabric: t("orders.statusLabels.cutting_fabric"),
@@ -106,6 +128,7 @@ export function AdminDashboard() {
       {/* Detailed Order Handler Drawer Panel */}
       <DashboardOrderDetailDrawer
         selectedOrder={selectedOrder}
+        isUpdating={isUpdatingStatus}
         onClose={() => setSelectedOrder(null)}
         onUpdateStatus={handleUpdateStatus}
         labels={{
@@ -113,6 +136,17 @@ export function AdminDashboard() {
           updateStatus: t("orders.updateStatus"),
           customerInfo: t("orders.customerInfo"),
           tailorSpecs: t("orders.tailorSpecs"),
+          orderedProducts: t("orders.orderedProducts"),
+          totalRevenue: t("orders.totalRevenue"),
+          fullName: t("orders.fullName"),
+          phone: t("orders.phone"),
+          address: t("orders.address"),
+          height: t("orders.height"),
+          weight: t("orders.weight"),
+          bust: t("orders.bust"),
+          waist: t("orders.waist"),
+          hips: t("orders.hips"),
+          customMade: t("orders.customMade"),
           statusLabels: {
             pending_approval: t("orders.statusLabels.pending_approval"),
             cutting_fabric: t("orders.statusLabels.cutting_fabric"),
