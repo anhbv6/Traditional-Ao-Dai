@@ -14,3 +14,6 @@ echo ""
 cat public.pem | base64 -w 0
 echo ""
 
+
+
+> 📌 Sau khi tạo khóa: đặt cả `JWT_PRIVATE_KEY` và `JWT_PUBLIC_KEY` vào `apps/api/.env`, đồng thời **chỉ** sao chép `JWT_PUBLIC_KEY` sang `apps/web/.env` (web dùng public key để xác minh phiên quản trị ở server). Không bao giờ đặt private key ở web.

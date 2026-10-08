@@ -4,7 +4,7 @@ import React, { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { ReactLenis } from "lenis/react";
 import "lenis/dist/lenis.css";
-import ClickSpark from "@/components/ClickSpark";
+import ClickSpark from "@/components/effects/ClickSpark";
 
 interface SmoothScrollProviderProps {
   children: ReactNode;

@@ -1,3 +1,4 @@
+import { type Prisma } from "@repo/db";
 import { prisma } from "../../server/db.server";
 import { type AdminOrderItem, type OrderFilterParams } from "../types/orders.types";
 
@@ -9,7 +10,7 @@ export async function getAdminOrdersListQuery(
   params?: OrderFilterParams
 ): Promise<AdminOrderItem[]> {
   try {
-    const whereCondition: any = {};
+    const whereCondition: Prisma.OrderWhereInput = {};
 
     if (params?.status && params.status !== "ALL") {
       whereCondition.orderStatus = params.status;

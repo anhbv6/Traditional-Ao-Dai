@@ -3,7 +3,7 @@
 import React from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { SectionHeading } from './SectionHeading';
-import Carousel from '@/components/Carousel';
+import Carousel from '@/components/effects/Carousel';
 import { mockArticles, NewsCard } from '@/features/news';
 
 export function ArticleNews() {

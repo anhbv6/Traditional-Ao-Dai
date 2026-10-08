@@ -22,10 +22,10 @@ export function ContactForm() {
   const { formData, isSubmitting, isSuccess, error, handleChange, handleSubmit } = useContact();
 
   const errorMessage = error
-    ? t.has(error as any)
-      ? t(error as any)
-      : tCommon.has(`errors.${error}` as any)
-        ? tCommon(`errors.${error}` as any)
+    ? t.has(error as Parameters<typeof t.has>[0])
+      ? t(error as Parameters<typeof t>[0])
+      : tCommon.has(`errors.${error}` as Parameters<typeof tCommon.has>[0])
+        ? tCommon(`errors.${error}` as Parameters<typeof tCommon>[0])
         : error
     : null;
 

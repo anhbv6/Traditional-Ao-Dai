@@ -1,16 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { VIETNAM_PHONE_REGEX, emailSchema } from "@repo/shared";
+import { calculateCartTotals, useCartHydrated, useCartStore } from "@/features/cart";
 import { useTranslations } from "next-intl";
-import { type CartItem, type ShippingData, type PaymentData } from "../types/checkout.types";
+import { type ShippingData, type PaymentData } from "../types/checkout.types";
 
 export function useCheckout() {
   const t = useTranslations("Common");
 
   // Checkout flow step: 1, 2, 3, or 4 (4 = Success screen)
   const [step, setStep] = useState(1);
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const cartItems = useCartStore((state) => state.items);
+  const discount = useCartStore((state) => state.discount);
+  const isLoaded = useCartHydrated();
   const [orderId, setOrderId] = useState("");
 
   // Step 1: Shipping Info state
@@ -36,31 +39,18 @@ export function useCheckout() {
   });
   const [paymentErrors, setPaymentErrors] = useState<Partial<PaymentData>>({});
 
-  // Load from localStorage on mount
-  useEffect(() => {
-    const stored = localStorage.getItem("cart_items");
-    if (stored) {
-      try {
-        setCartItems(JSON.parse(stored));
-      } catch (err) {
-        console.error("Failed to parse cart items for checkout", err);
-      }
-    }
-    setIsLoaded(true);
-  }, []);
-
   // Validate step 1
   const validateShipping = (): boolean => {
     const errors: Partial<ShippingData> = {};
-    if (!shipping.fullName.trim()) errors.fullName = "Vui lòng nhập họ và tên";
-    if (!shipping.phone.trim()) errors.phone = "Vui lòng nhập số điện thoại";
-    else if (!/^[0-9]{9,11}$/.test(shipping.phone.trim())) errors.phone = "Số điện thoại không hợp lệ (9-11 số)";
-    if (!shipping.email.trim()) errors.email = "Vui lòng nhập email";
-    else if (!/\S+@\S+\.\S+/.test(shipping.email)) errors.email = "Email không hợp lệ";
-    if (!shipping.address.trim()) errors.address = "Vui lòng nhập địa chỉ giao hàng";
-    if (!shipping.province.trim()) errors.province = "Vui lòng nhập Tỉnh/Thành phố";
-    if (!shipping.district.trim()) errors.district = "Vui lòng nhập Quận/Huyện";
-    if (!shipping.ward.trim()) errors.ward = "Vui lòng nhập Phường/Xã";
+    if (!shipping.fullName.trim()) errors.fullName = t("checkoutErrors.fullNameRequired");
+    if (!shipping.phone.trim()) errors.phone = t("checkoutErrors.phoneRequired");
+    else if (!VIETNAM_PHONE_REGEX.test(shipping.phone.trim())) errors.phone = t("checkoutErrors.phoneInvalid");
+    if (!shipping.email.trim()) errors.email = t("checkoutErrors.emailRequired");
+    else if (!emailSchema.safeParse(shipping.email).success) errors.email = t("checkoutErrors.emailInvalid");
+    if (!shipping.address.trim()) errors.address = t("checkoutErrors.addressRequired");
+    if (!shipping.province.trim()) errors.province = t("checkoutErrors.provinceRequired");
+    if (!shipping.district.trim()) errors.district = t("checkoutErrors.districtRequired");
+    if (!shipping.ward.trim()) errors.ward = t("checkoutErrors.wardRequired");
 
     setShippingErrors(errors);
     return Object.keys(errors).length === 0;
@@ -70,12 +60,12 @@ export function useCheckout() {
   const validatePayment = (): boolean => {
     const errors: Partial<PaymentData> = {};
     if (payment.method === "card") {
-      if (!payment.cardHolder.trim()) errors.cardHolder = "Vui lòng nhập tên chủ thẻ";
-      if (!payment.cardNumber.trim()) errors.cardNumber = "Vui lòng nhập số thẻ";
-      else if (payment.cardNumber.replace(/\s/g, "").length < 15) errors.cardNumber = "Số thẻ không hợp lệ";
-      if (!payment.cardExpiry.trim()) errors.cardExpiry = "Vui lòng nhập ngày hết hạn (MM/YY)";
-      if (!payment.cardCvv.trim()) errors.cardCvv = "Vui lòng nhập mã CVV";
-      else if (payment.cardCvv.length < 3) errors.cardCvv = "CVV không hợp lệ";
+      if (!payment.cardHolder.trim()) errors.cardHolder = t("checkoutErrors.cardHolderRequired");
+      if (!payment.cardNumber.trim()) errors.cardNumber = t("checkoutErrors.cardNumberRequired");
+      else if (payment.cardNumber.replace(/\s/g, "").length < 15) errors.cardNumber = t("checkoutErrors.cardNumberInvalid");
+      if (!payment.cardExpiry.trim()) errors.cardExpiry = t("checkoutErrors.cardExpiryRequired");
+      if (!payment.cardCvv.trim()) errors.cardCvv = t("checkoutErrors.cardCvvRequired");
+      else if (payment.cardCvv.length < 3) errors.cardCvv = t("checkoutErrors.cardCvvInvalid");
     }
     setPaymentErrors(errors);
     return Object.keys(errors).length === 0;
@@ -100,22 +90,16 @@ export function useCheckout() {
     const randomId = `AD${Math.floor(100000 + Math.random() * 900000)}`;
     setOrderId(randomId);
 
-    // Clear cart
-    localStorage.removeItem("cart_items");
-    setCartItems([]);
-
-    // Notify Header Cart Icon to update count
-    window.dispatchEvent(new Event("cart-updated"));
+    // Xóa giỏ hàng (mini-cart ở header tự cập nhật vì dùng chung store)
+    useCartStore.getState().clear();
 
     // Move to success step
     setStep(4);
   };
 
   // Cost calculations
-  const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-  const shippingCost = (subtotal > 150 || subtotal === 0) ? 0 : 10;
-  const tax = subtotal * 0.08;
-  const total = subtotal + shippingCost + tax;
+  // Dùng chung công thức với trang giỏ hàng (Backend sẽ tính lại khi có API đặt hàng)
+  const { subtotal, shippingCost, total } = calculateCartTotals(cartItems, discount);
 
   return {
     t,
@@ -135,7 +119,6 @@ export function useCheckout() {
     handlePlaceOrder,
     subtotal,
     shippingCost,
-    tax,
     total,
   };
 }

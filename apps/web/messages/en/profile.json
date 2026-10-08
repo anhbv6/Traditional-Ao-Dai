@@ -85,7 +85,27 @@
     "cancelBtn": "Cancel",
     "avatarUrlInvalid": "Failed to retrieve a valid avatar URL.",
     "avatarUploadFailed": "Avatar upload failed. Please try again.",
-    "updateError": "An error occurred while updating your profile"
+    "updateError": "An error occurred while updating your profile",
+    "verifyEmailTitle": "Verify email",
+    "verifyPhoneTitle": "Verify phone number",
+    "verifyEmailDesc": "Enter the email you want to use. We will send a 6-digit verification code to it.",
+    "verifyPhoneDesc": "Enter the phone number you want to use. We will send a 6-digit OTP via SMS.",
+    "enterCodeDesc": "Enter the 6-digit code sent to {target}.",
+    "changeTarget": "Use a different one",
+    "resendCode": "Resend code",
+    "resendIn": "Resend in {seconds}s",
+    "sendCodeBtn": "Send code",
+    "sendingCode": "Sending...",
+    "verifying": "Verifying...",
+    "confirmBtn": "Confirm",
+    "addBtn": "Add",
+    "changeBtn": "Change",
+    "verifyBtn": "Verify",
+    "verified": "Verified",
+    "unverified": "Unverified",
+    "verifyError": "Unable to verify. Please try again.",
+    "codeSent": "Verification code sent.",
+    "verifySuccess": "Verified successfully!"
   },
   "orders": {
     "title": "Order History",
@@ -216,6 +236,18 @@
       "subtitle": "Manage active sessions and browsers currently logged into your account.",
       "revokeBtn": "Log Out Device",
       "revokeAll": "Log Out All Other Devices"
+    },
+    "toasts": {
+      "passwordChangeSuccess": "Password changed! Other devices have been signed out.",
+      "passwordChangeError": "An error occurred while changing your password.",
+      "passwordMismatch": "Password confirmation does not match.",
+      "otpInvalid": "Invalid OTP code.",
+      "revokeSuccess": "Device signed out successfully!",
+      "revokeError": "An error occurred while revoking the session.",
+      "linkGoogleSuccess": "Google account linked successfully!",
+      "linkGoogleError": "An error occurred while linking your Google account.",
+      "unlinkGoogleSuccess": "Google account unlinked successfully!",
+      "unlinkGoogleError": "An error occurred while unlinking your Google account."
     }
   }
 }

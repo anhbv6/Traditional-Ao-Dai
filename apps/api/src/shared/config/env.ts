@@ -14,6 +14,10 @@ const envSchema = z.object({
   JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
   
   FRONTEND_URL: z.string().default('http://localhost:3000'),
+
+  // Số proxy tin cậy đứng trước API và có NỐI IP client vào X-Forwarded-For (nginx/Cloudflare...).
+  // Next.js rewrites KHÔNG nối IP nên không tính. Sai số này -> rate-limit theo IP có thể bị giả mạo.
+  TRUST_PROXY: z.coerce.number().int().min(0).default(1),
   
   REDIS_HOST: z.string().default('localhost'),
   REDIS_PORT: z.coerce.number().default(6379),

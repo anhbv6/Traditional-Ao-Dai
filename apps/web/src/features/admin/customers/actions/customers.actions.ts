@@ -1,17 +1,26 @@
 "use server";
 
 import { prisma } from "../../server/db.server";
+import { authorizeAdminAction } from "../../server/adminAuth.server";
 import { revalidatePath } from "next/cache";
 
 /**
  * Server Action: Khóa hoặc mở khóa tài khoản khách hàng
  */
 export async function toggleCustomerActiveAction(userId: string, isActive: boolean) {
+  const auth = await authorizeAdminAction({ role: "ADMIN" });
+  if (!auth.success) return auth;
+
   try {
-    const updated = await prisma.user.update({
-      where: { id: userId, role: "CUSTOMER" },
-      data: { isActive },
-    });
+    const [updated] = await prisma.$transaction([
+      prisma.user.update({
+        where: { id: userId, role: "CUSTOMER" },
+        data: { isActive },
+        select: { id: true, isActive: true },
+      }),
+      // Khóa tài khoản -> thu hồi mọi phiên (refresh token) của khách hàng
+      ...(isActive ? [] : [prisma.userSession.deleteMany({ where: { userId } })]),
+    ]);
 
     revalidatePath("/admin/customers");
 
@@ -19,11 +28,11 @@ export async function toggleCustomerActiveAction(userId: string, isActive: boole
       success: true,
       data: updated,
     };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Lỗi toggleCustomerActiveAction:", error);
     return {
       success: false,
-      error: error?.message || "Không thể cập nhật trạng thái khách hàng.",
+      error: "CUSTOMER_UPDATE_FAILED",
     };
   }
 }

@@ -1,5 +1,5 @@
 import { apiClient } from '@/lib/api-client';
-import { CheckAccountResponse, RegisterResponse, SendOtpResponse, VerifyOtpResponse } from '../types/auth.types';
+import { CheckAccountResponse, RegisterResponse} from '../types/auth.types';
 
 /**
  * Registers a new customer account.
@@ -13,13 +13,6 @@ export const registerApi = async (data: {
   code?: string;
 }): Promise<RegisterResponse> => {
   return apiClient.post<RegisterResponse>('/api/auth/register', data, { skipAuth: true, retryOnUnauthorized: false });
-};
-
-/**
- * Verifies an OTP code.
- */
-export const verifyOtpApi = async (phone: string, purpose: 'REGISTER' | 'LOGIN' | 'RESET_PASSWORD', code: string): Promise<VerifyOtpResponse> => {
-  return apiClient.post<VerifyOtpResponse>('/api/auth/otp/verify', { phone, purpose, code }, { skipAuth: true, retryOnUnauthorized: false });
 };
 
 /**

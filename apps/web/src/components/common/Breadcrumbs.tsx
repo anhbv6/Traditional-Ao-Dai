@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { type ComponentProps } from "react";
 import { usePathname, Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import {
@@ -65,7 +65,7 @@ export function Breadcrumbs({ lastLabel, className = "" }: BreadcrumbsProps) {
                   </BreadcrumbPage>
                 ) : (
                   <BreadcrumbLink 
-                    render={<Link href={href as any} />}
+                    render={<Link href={href as ComponentProps<typeof Link>["href"]} />}
                     className="text-[#706565] transition-colors hover:text-[#800020]"
                   >
                     {label}

@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { notifySuccess, notifyError } from "@/lib/messages";
+import { notifySuccess } from "@/lib/messages";
+import { useNotify } from "@/hooks/useNotify";
 import {
   type FilterType,
   type OrderItem,
@@ -17,6 +19,7 @@ import {
   getAdminOrdersAction,
   updateOrderStatusAction,
 } from "../actions/dashboard.actions";
+import { type AdminDashboardOrder } from "../queries/dashboard.queries";
 
 const defaultStats: StatItem = {
   revenue: "0 ₫",
@@ -34,94 +37,78 @@ const defaultPieData: PieDataItem[] = [
   { name: "Áo Dài Cách Tân", value: 15, color: "#E4E4E7" },
 ];
 
+const DASHBOARD_ORDERS_KEY = ["admin", "dashboard", "orders"] as const;
+const PIE_COLORS = ["#09090B", "#27272A", "#71717A", "#E4E4E7", "#A1A1AA"];
+
+/**
+ * Tính phân bổ sản phẩm cho biểu đồ tròn từ danh sách đơn hàng (hàm thuần)
+ */
+function buildPieData(rawOrders: AdminDashboardOrder[]): PieDataItem[] {
+  const productCounts: Record<string, number> = {};
+  let totalCount = 0;
+  rawOrders.forEach((order) => {
+    order.items.forEach((item) => {
+      const productName = item.productName || item.product?.name || "Áo Dài";
+      productCounts[productName] = (productCounts[productName] || 0) + (item.quantity || 1);
+      totalCount += item.quantity || 1;
+    });
+  });
+
+  if (totalCount === 0) return defaultPieData;
+
+  return Object.entries(productCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 4)
+    .map(([name, count], idx) => ({
+      name,
+      value: Math.round((count / totalCount) * 100),
+      color: PIE_COLORS[idx % PIE_COLORS.length],
+    }));
+}
+
 export function useAdminDashboard() {
   const t = useTranslations("AdminPage");
+  const queryClient = useQueryClient();
+  const notify = useNotify();
   const [filter, setFilter] = useState<FilterType>("week");
-  const [stats, setStats] = useState<StatItem>(defaultStats);
-  const [orders, setOrders] = useState<OrderItem[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<OrderItem | null>(null);
-  const [pieData, setPieData] = useState<PieDataItem[]>(defaultPieData);
-
-  const [isLoadingStats, setIsLoadingStats] = useState<boolean>(true);
-  const [isLoadingOrders, setIsLoadingOrders] = useState<boolean>(true);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState<boolean>(false);
 
-  // 1. Tải số liệu thống kê Dashboard trực tiếp từ DB qua Prisma Server Action
-  const fetchStats = useCallback(async (currentFilter: FilterType) => {
-    setIsLoadingStats(true);
-    try {
-      const res = await getDashboardStatsAction(currentFilter);
-      if (res.success && res.data) {
-        setStats(res.data);
-      }
-    } catch (err) {
-      console.error("Lỗi tải thống kê dashboard:", err);
-    } finally {
-      setIsLoadingStats(false);
-    }
-  }, []);
+  // 1. Số liệu thống kê (Server Action -> Prisma), cache theo bộ lọc thời gian
+  const statsQuery = useQuery({
+    queryKey: ["admin", "dashboard", "stats", filter],
+    queryFn: async () => {
+      const res = await getDashboardStatsAction(filter);
+      return res.success && res.data ? res.data : defaultStats;
+    },
+  });
 
-  // 2. Tải danh sách đơn hàng quản trị trực tiếp từ DB qua Prisma Server Action
-  const fetchOrders = useCallback(async () => {
-    setIsLoadingOrders(true);
-    try {
+  // 2. Danh sách đơn hàng + phân bổ sản phẩm cho biểu đồ
+  const ordersQuery = useQuery({
+    queryKey: DASHBOARD_ORDERS_KEY,
+    queryFn: async () => {
       const res = await getAdminOrdersAction();
-      if (res.success && Array.isArray(res.data)) {
-        const mappedOrders = res.data.map(mapPrismaOrderToOrderItem);
-        setOrders(mappedOrders);
-
-        // Tính toán phân bổ sản phẩm thực tế cho biểu đồ nếu có đơn
-        const productCounts: Record<string, number> = {};
-        let totalCount = 0;
-        res.data.forEach((o: any) => {
-          (o.items || []).forEach((item: any) => {
-            const pName = item.productName || item.product?.name || "Áo Dài";
-            productCounts[pName] = (productCounts[pName] || 0) + (item.quantity || 1);
-            totalCount += item.quantity || 1;
-          });
-        });
-
-        if (totalCount > 0) {
-          const colors = ["#09090B", "#27272A", "#71717A", "#E4E4E7", "#A1A1AA"];
-          const computedPie: PieDataItem[] = Object.entries(productCounts)
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 4)
-            .map(([name, count], idx) => ({
-              name,
-              value: Math.round((count / totalCount) * 100),
-              color: colors[idx % colors.length] || "#09090B",
-            }));
-          if (computedPie.length > 0) {
-            setPieData(computedPie);
-          }
-        }
+      if (!res.success || !Array.isArray(res.data)) {
+        return { orders: [] as OrderItem[], pieData: defaultPieData };
       }
-    } catch (err) {
-      console.error("Lỗi tải danh sách đơn hàng:", err);
-    } finally {
-      setIsLoadingOrders(false);
-    }
-  }, []);
+      return { orders: res.data.map(mapPrismaOrderToOrderItem), pieData: buildPieData(res.data) };
+    },
+  });
 
-  useEffect(() => {
-    fetchStats(filter);
-  }, [filter, fetchStats]);
+  const orders = ordersQuery.data?.orders ?? [];
+  const setOrders = (updater: (prev: OrderItem[]) => OrderItem[]) =>
+    queryClient.setQueryData<{ orders: OrderItem[]; pieData: PieDataItem[] }>(DASHBOARD_ORDERS_KEY, (prev) =>
+      prev ? { ...prev, orders: updater(prev.orders) } : prev
+    );
 
-  useEffect(() => {
-    fetchOrders();
-  }, [fetchOrders]);
-
-  // 3. Cập nhật trạng thái đơn hàng trực tiếp xuống DB qua Prisma Server Action
+  // 3. Cập nhật trạng thái đơn hàng (Optimistic UI, rollback khi lỗi)
   const handleUpdateStatus = async (orderId: string, nextStatus: OrderStatus) => {
     const targetOrder = orders.find((o) => o.id === orderId);
     const dbOrderId = targetOrder?.rawId || orderId;
     const dbStatus = mapUiStatusToDbStatus(nextStatus);
 
-    // Cập nhật giao diện ngay lập tức (Optimistic UI)
     const prevOrders = [...orders];
-    setOrders((prev) =>
-      prev.map((order) => (order.id === orderId ? { ...order, status: nextStatus } : order))
-    );
+    setOrders((prev) => prev.map((order) => (order.id === orderId ? { ...order, status: nextStatus } : order)));
     if (selectedOrder && selectedOrder.id === orderId) {
       setSelectedOrder((prev) => (prev ? { ...prev, status: nextStatus } : null));
     }
@@ -130,18 +117,17 @@ export function useAdminDashboard() {
     try {
       const res = await updateOrderStatusAction(dbOrderId, dbStatus);
       if (!res.success) {
-        // Rollback nếu thất bại
-        setOrders(prevOrders);
-        notifyError(res.error || t("orders.updateError"));
+        setOrders(() => prevOrders);
+        notify.error(res.error, "ORDER_STATUS_UPDATE_FAILED");
         return;
       }
 
       notifySuccess(t("orders.updateSuccess", { id: orderId }));
       // Tải lại thống kê để cập nhật số đơn chờ xử lý
-      fetchStats(filter);
+      void queryClient.invalidateQueries({ queryKey: ["admin", "dashboard", "stats"] });
     } catch (err) {
-      setOrders(prevOrders);
-      notifyError(err, t("orders.updateError"));
+      setOrders(() => prevOrders);
+      notify.error(err, "ORDER_STATUS_UPDATE_FAILED");
     } finally {
       setIsUpdatingStatus(false);
     }
@@ -168,14 +154,14 @@ export function useAdminDashboard() {
     orders,
     selectedOrder,
     setSelectedOrder,
-    stats,
-    pieData,
-    isLoadingStats,
-    isLoadingOrders,
+    stats: statsQuery.data ?? defaultStats,
+    pieData: ordersQuery.data?.pieData ?? defaultPieData,
+    isLoadingStats: statsQuery.isFetching,
+    isLoadingOrders: ordersQuery.isFetching,
     isUpdatingStatus,
     handleUpdateStatus,
     getStatusColor,
-    refreshOrders: fetchOrders,
-    refreshStats: () => fetchStats(filter),
+    refreshOrders: () => void ordersQuery.refetch(),
+    refreshStats: () => void statsQuery.refetch(),
   };
 }

@@ -2,12 +2,10 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { Calendar, Clock, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 
-import { Container } from '@/components/ui/container';
-import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 import { useNews } from '../hooks/useNews';
 import { categoryKeys, getAuthor } from '../types/news.types';
 

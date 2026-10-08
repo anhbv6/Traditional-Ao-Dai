@@ -3,7 +3,7 @@
 import React, { useState, useTransition } from "react";
 import { type TailoringItemData, type TailoringStatus } from "../types/tailoring.types";
 import { updateTailoringStatusAction } from "../actions/tailoring.actions";
-import { useAuthStore } from "@/features/auth/store/authStore";
+import { useAdminSession } from "../../session";
 import {
   Scissors,
   Layers,
@@ -13,17 +13,18 @@ import {
   Ruler,
   User,
   Phone,
-  FileText,
+  
   Printer,
   ChevronRight,
   XCircle,
+  type LucideIcon,
 } from "lucide-react";
 
 interface TailoringBoardProps {
   initialItems: TailoringItemData[];
 }
 
-const tailoringSteps: { status: TailoringStatus; label: string; icon: any; color: string }[] = [
+const tailoringSteps: { status: TailoringStatus; label: string; icon: LucideIcon; color: string }[] = [
   { status: "WAITING_FABRIC", label: "Chờ xuất vải", icon: Clock, color: "text-amber-600 bg-amber-50 border-amber-200" },
   { status: "FABRIC_CUTTING", label: "Đang cắt rập", icon: Scissors, color: "text-blue-600 bg-blue-50 border-blue-200" },
   { status: "SEWING", label: "May ráp tà & cổ", icon: Layers, color: "text-purple-600 bg-purple-50 border-purple-200" },
@@ -37,7 +38,7 @@ export function TailoringBoard({ initialItems }: TailoringBoardProps) {
   const [selectedItem, setSelectedItem] = useState<TailoringItemData | null>(null);
   const [filterStep, setFilterStep] = useState<string>("ALL");
   const [noteText, setNoteText] = useState("");
-  const { user } = useAuthStore();
+  const { user } = useAdminSession({ force: true });
   const [isPending, startTransition] = useTransition();
 
   const filteredItems = items.filter((item) => {

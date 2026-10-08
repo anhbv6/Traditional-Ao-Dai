@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "../../server/db.server";
+import { authorizeAdminAction } from "../../server/adminAuth.server";
 import { type OrderStatus, type PaymentStatus } from "../types/orders.types";
 import { revalidatePath } from "next/cache";
 
@@ -8,6 +9,9 @@ import { revalidatePath } from "next/cache";
  * Server Action: Cập nhật trạng thái đơn hàng (OrderStatus)
  */
 export async function updateOrderStatusAction(orderId: string, status: OrderStatus) {
+  const auth = await authorizeAdminAction({ permission: "canManageOrders" });
+  if (!auth.success) return auth;
+
   try {
     const updated = await prisma.order.update({
       where: { id: orderId },
@@ -21,11 +25,11 @@ export async function updateOrderStatusAction(orderId: string, status: OrderStat
       success: true,
       data: updated,
     };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Lỗi updateOrderStatusAction:", error);
     return {
       success: false,
-      error: error?.message || "Không thể cập nhật trạng thái đơn hàng.",
+      error: "ORDER_STATUS_UPDATE_FAILED",
     };
   }
 }
@@ -34,6 +38,9 @@ export async function updateOrderStatusAction(orderId: string, status: OrderStat
  * Server Action: Cập nhật trạng thái thanh toán (PaymentStatus)
  */
 export async function updatePaymentStatusAction(orderId: string, paymentStatus: PaymentStatus) {
+  const auth = await authorizeAdminAction({ permission: "canManageOrders" });
+  if (!auth.success) return auth;
+
   try {
     const updated = await prisma.order.update({
       where: { id: orderId },
@@ -47,11 +54,11 @@ export async function updatePaymentStatusAction(orderId: string, paymentStatus: 
       success: true,
       data: updated,
     };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Lỗi updatePaymentStatusAction:", error);
     return {
       success: false,
-      error: error?.message || "Không thể cập nhật trạng thái thanh toán.",
+      error: "PAYMENT_STATUS_UPDATE_FAILED",
     };
   }
 }
@@ -64,8 +71,11 @@ export async function requestOrderApprovalAction(params: {
   actionType: "CANCEL_ORDER" | "REFUND" | "MANUAL_DISCOUNT";
   description: string;
   requestedById: string;
-  payload?: any;
+  payload?: Record<string, unknown>;
 }) {
+  const auth = await authorizeAdminAction();
+  if (!auth.success) return auth;
+
   try {
     const approval = await prisma.approvalRequest.create({
       data: {
@@ -75,7 +85,7 @@ export async function requestOrderApprovalAction(params: {
           orderId: params.orderId,
           ...(params.payload || {}),
         },
-        requestedById: params.requestedById,
+        requestedById: auth.user.id,
       },
     });
 
@@ -85,11 +95,11 @@ export async function requestOrderApprovalAction(params: {
       success: true,
       data: approval,
     };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Lỗi requestOrderApprovalAction:", error);
     return {
       success: false,
-      error: error?.message || "Không thể gửi yêu cầu phê duyệt.",
+      error: "APPROVAL_CREATE_FAILED",
     };
   }
 }

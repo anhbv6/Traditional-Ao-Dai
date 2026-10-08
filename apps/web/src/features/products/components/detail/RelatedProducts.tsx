@@ -1,7 +1,7 @@
 'use client';
 
 import { ProductCard } from '@/features/products';
-import { RelatedProductItem } from '../ProductDetailClient';
+import { RelatedProductItem } from '../../types/products.types';
 
 interface RelatedProductsProps {
   relatedProducts: RelatedProductItem[];

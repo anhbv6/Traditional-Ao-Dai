@@ -142,5 +142,21 @@
       "completed": "Hoàn thành",
       "shipping": "Đang giao"
     }
+  },
+  "toasts": {
+    "approveSuccess": "Đã phê duyệt yêu cầu thành công!",
+    "rejectSuccess": "Đã từ chối yêu cầu thành công!",
+    "rejectReasonRequired": "Vui lòng nhập lý do từ chối.",
+    "avatarTooLarge": "Kích thước ảnh không được vượt quá 5MB.",
+    "avatarUploadSuccess": "Tải ảnh đại diện lên thành công!",
+    "avatarUploadError": "Tải ảnh thất bại. Vui lòng thử lại!",
+    "nameRequired": "Vui lòng nhập họ và tên.",
+    "profileUpdateSuccess": "Cập nhật hồ sơ tài khoản thành công!",
+    "newPasswordRequired": "Vui lòng nhập mật khẩu mới.",
+    "passwordMismatch": "Mật khẩu xác nhận không trùng khớp.",
+    "passwordChangeSuccess": "Đổi mật khẩu thành công! Các phiên đăng nhập khác đã bị đăng xuất.",
+    "permissionUpdateSuccess": "Đã cập nhật phân quyền nhân viên!",
+    "staffUnlocked": "Đã mở khóa tài khoản nhân viên!",
+    "staffLocked": "Đã khóa tài khoản nhân viên!"
   }
 }

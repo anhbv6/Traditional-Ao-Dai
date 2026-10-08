@@ -5,7 +5,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { ShoppingBag, Eye, Calendar as CalendarIcon } from "lucide-react";
 import Image from "next/image";
 import { useOrderHistory } from "../../hooks/useProfile";
-import { mockOrders } from "../../api/profile.api";
+import { mockOrders } from "../../data/mockProfile";
 import { type Order } from "../../types/profile.types";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";

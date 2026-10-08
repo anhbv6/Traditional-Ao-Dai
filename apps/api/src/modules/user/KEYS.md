@@ -42,3 +42,26 @@ Tài liệu tổng hợp các mã phản hồi (`message` key) của Module User
 | `SESSION_NOT_FOUND` | 404 | Không tìm thấy phiên đăng nhập | Session not found | Mã phiên làm việc cần thu hồi không tồn tại / Session ID to revoke not found |
 | `MAX_ADDRESS_LIMIT_REACHED` | 400 | Đã đạt số lượng địa chỉ tối đa (Tối đa 10) | Maximum address limit reached (10) | Mỗi người dùng chỉ được lưu tối đa 10 địa chỉ / Maximum 10 shipping addresses allowed |
 | `ADDRESS_NOT_FOUND` | 404 | Không tìm thấy địa chỉ | Address not found | Mã địa chỉ không tồn tại hoặc không thuộc quyền sở hữu / Address ID not found or unauthorized |
+
+---
+
+## Cập nhật bảo mật (Security Update)
+
+| KEY | HTTP Status | Tiếng Việt (Vietnamese) | English Meaning | Ngữ cảnh sử dụng / Description |
+| :--- | :---: | :--- | :--- | :--- |
+| `EMAIL_CHANGE_REQUIRES_VERIFICATION` | 400 | Đổi email cần xác minh | Email change requires verification | `PUT /user/profile` gửi email khác email hiện tại -> dùng `/user/email/verification` |
+| `PHONE_CHANGE_REQUIRES_VERIFICATION` | 400 | Đổi SĐT cần xác minh | Phone change requires verification | `PUT /user/profile` gửi SĐT khác SĐT hiện tại -> dùng `/user/phone/verification` |
+| `CANNOT_REMOVE_LAST_IDENTIFIER` | 400 | Không thể xóa thông tin đăng nhập cuối cùng | Cannot remove last identifier | Xóa email khi không còn SĐT đã xác minh (hoặc ngược lại) |
+| `EMAIL_ALREADY_VERIFIED` | 400 | Email đã được xác minh | Email already verified | Yêu cầu mã cho chính email hiện tại đã xác minh |
+| `PHONE_ALREADY_VERIFIED` | 400 | SĐT đã được xác minh | Phone already verified | Yêu cầu OTP cho chính SĐT hiện tại đã xác minh |
+| `EMAIL_VERIFIED_SUCCESS` | 200 | Xác minh email thành công | Email verified | `POST /user/email/verification/confirm` |
+| `PHONE_VERIFIED_SUCCESS` | 200 | Xác minh SĐT thành công | Phone verified | `POST /user/phone/verification/confirm` |
+| `GOOGLE_PROVIDER_ALREADY_LINKED` | 400 | Đã liên kết một Google khác | Another Google account already linked | Mỗi tài khoản chỉ liên kết một tài khoản Google |
+| `GOOGLE_EMAIL_NOT_VERIFIED` | 400 | Email Google chưa xác minh | Google email not verified | Liên kết Google yêu cầu Google đã xác minh email |
+| `VERIFICATION_CODE_INVALID` | 400 | Mã phải gồm 6 chữ số | Invalid code format | Validation mã xác minh |
+| `PASSWORD_MAX_LENGTH` | 400 | Mật khẩu tối đa 72 ký tự | Password too long | `POST /user/change-password` |
+
+### Hành vi thay đổi
+- `POST /user/change-password` đăng xuất mọi phiên khác (giữ phiên hiện tại).
+- Xác minh SĐT thành công: nếu tài khoản khác đang giữ SĐT đó ở trạng thái **chưa xác minh**, SĐT được chuyển sang tài khoản vừa chứng minh sở hữu.
+- Liên kết Google có email trùng email tài khoản -> đánh dấu `isEmailVerified = true`.

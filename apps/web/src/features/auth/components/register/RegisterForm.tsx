@@ -4,7 +4,6 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { type RegisterFormData } from '../../types/register.types';
 import { useRegister } from '../../hooks/useRegister';
 import { RegisterFormStep } from './components/RegisterFormStep';
 import { RegisterOtpStep } from './components/RegisterOtpStep';
@@ -64,7 +63,6 @@ export function RegisterForm() {
 
   const {
     t,
-    router,
     showPassword,
     setShowPassword,
     isOtpStep,
@@ -72,7 +70,6 @@ export function RegisterForm() {
     otpInput,
     setOtpInput,
     otpError,
-    setOtpError,
     isCheckingEmail,
     emailCheckResult,
     emailApiError,

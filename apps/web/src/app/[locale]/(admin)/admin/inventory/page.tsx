@@ -1,10 +1,13 @@
 import React from "react";
 import { getAdminInventoryQuery, InventoryList } from "@/features/admin/inventory";
 import { Boxes } from "lucide-react";
+import { requireAdminPage } from "@/features/admin/server/adminAuth.server";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminInventoryPage() {
+  await requireAdminPage();
+
   const variants = await getAdminInventoryQuery();
 
   return (

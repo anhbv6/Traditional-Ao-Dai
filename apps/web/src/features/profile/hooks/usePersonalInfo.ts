@@ -1,13 +1,12 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { useAuthStore } from "@/features/auth/store/authStore";
+import { useAuthStore } from "@/features/auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useShallow } from "zustand/react/shallow";
-import { getErrorMessage } from "@/lib/api-client";
+import { getErrorMessage, translateMessage } from "@/lib/messages";
 import { showToast as toast } from "@/components/ui/toast";
 import { useTranslations } from "next-intl";
-import { translateProfileResponse } from "../utils/translateProfileResponse";
 import { updateProfileApi } from "../api/profile.api";
 import { usePersonalInfoStore } from "../store/personalInfoStore";
 
@@ -48,11 +47,11 @@ export function usePersonalInfo() {
       queryClient.setQueryData(["me"], updatedUser);
       loadUserIntoForm(updatedUser);
       form.setIsEditing(false);
-      toast.success(translateProfileResponse(tProfile, response.message, t("successMsg")));
+      toast.success(translateMessage(response.message, t("successMsg"), tProfile));
     },
     onError: (error: unknown) => {
       const message = getErrorMessage(error, t("updateError"));
-      toast.error(translateProfileResponse(tProfile, message, t("updateError")));
+      toast.error(translateMessage(message, t("updateError"), tProfile));
     },
   });
 
@@ -65,8 +64,7 @@ export function usePersonalInfo() {
 
     updateProfileMutation.mutate({
       name: form.fullName,
-      email: form.email || undefined,
-      phone: form.phone || undefined,
+      // Email & SĐT không gửi ở đây: đổi qua luồng xác minh mã (useContactVerification)
       avatar: overrideAvatarUrl !== undefined ? overrideAvatarUrl : (form.avatarUrl || undefined),
       dob: form.dob || undefined,
       gender: genderNumeric,

@@ -19,6 +19,6 @@ export const adminLogoutApi = async (): Promise<{ status: string; message?: stri
   return apiClient.post<{ status: string; message?: string }>(
     "/api/auth/admin/logout",
     {},
-    { retryOnUnauthorized: false }
+    { skipAuth: true, retryOnUnauthorized: false }
   );
 };

@@ -1,127 +1,56 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { type CartItem, type ActiveDiscount } from "../types/cart.types";
+import { useCartHydrated, useCartStore } from "../store/cartStore";
+import { calculateCartTotals, findDemoDiscount } from "../utils/pricing";
 
 export function useCart() {
   const t = useTranslations("Common");
+  const isLoaded = useCartHydrated();
+  const cartItems = useCartStore((state) => state.items);
+  const activeDiscount = useCartStore((state) => state.discount);
+  const { updateQuantity, removeItem, applyDiscount } = useCartStore.getState();
 
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  // Promo code state
+  // Promo code form state
   const [promoCode, setPromoCode] = useState("");
-  const [activeDiscount, setActiveDiscount] = useState<ActiveDiscount | null>(null);
   const [promoError, setPromoError] = useState<string | null>(null);
   const [promoSuccess, setPromoSuccess] = useState<string | null>(null);
 
-  // Load from localStorage on mount
-  useEffect(() => {
-    const stored = localStorage.getItem("cart_items");
-    if (stored) {
-      try {
-        setCartItems(JSON.parse(stored));
-      } catch (err) {
-        console.error("Failed to parse cart items on cart page", err);
-      }
-    }
-    setIsLoaded(true);
-  }, []);
-
-  // Sync to localStorage and notify other components when cartItems state changes
-  const updateCart = (newItems: CartItem[]) => {
-    setCartItems(newItems);
-    localStorage.setItem("cart_items", JSON.stringify(newItems));
-    window.dispatchEvent(new Event("cart-updated"));
+  const handleQuantityChange = (id: string, delta: number) => {
+    const item = cartItems.find((cartItem) => cartItem.id === id);
+    if (item) updateQuantity(id, item.quantity + delta);
   };
 
-  // Quantity handlers
-  const handleQuantityChange = (id: number, delta: number) => {
-    const updated = cartItems.map(item => {
-      if (item.id === id) {
-        const newQty = Math.max(1, item.quantity + delta);
-        return { ...item, quantity: newQty };
-      }
-      return item;
-    });
-    updateCart(updated);
+  const handleQuantityInput = (id: string, value: string) => {
+    updateQuantity(id, parseInt(value.replace(/\D/g, ""), 10) || 1);
   };
 
-  const handleQuantityInput = (id: number, value: string) => {
-    const parsed = parseInt(value.replace(/\D/g, "")) || 1;
-    const updated = cartItems.map(item => {
-      if (item.id === id) {
-        return { ...item, quantity: Math.max(1, parsed) };
-      }
-      return item;
-    });
-    updateCart(updated);
-  };
-
-  // Remove item handler
-  const handleRemoveItem = (id: number) => {
-    const updated = cartItems.filter(item => item.id !== id);
-    updateCart(updated);
-  };
-
-  // Promo code apply handler
   const handleApplyPromo = (e: React.FormEvent) => {
     e.preventDefault();
     setPromoError(null);
     setPromoSuccess(null);
 
-    const cleanCode = promoCode.trim().toUpperCase();
-    if (!cleanCode) {
-      setPromoError("Vui lòng nhập mã giảm giá");
+    if (!promoCode.trim()) {
+      setPromoError(t("cartMessages.promoRequired"));
       return;
     }
 
-    if (cleanCode === "GIAM10" || cleanCode === "DISCOUNT10") {
-      setActiveDiscount({
-        code: cleanCode,
-        type: "percentage",
-        value: 10, // 10% off
-      });
-      setPromoSuccess("Áp dụng mã giảm giá 10% thành công!");
-    } else if (cleanCode === "FREESHIP") {
-      setActiveDiscount({
-        code: cleanCode,
-        type: "freeship",
-        value: 100, // free shipping
-      });
-      setPromoSuccess("Áp dụng mã miễn phí vận chuyển thành công!");
-    } else {
-      setPromoError("Mã giảm giá không hợp lệ hoặc đã hết hạn");
+    const discount = findDemoDiscount(promoCode);
+    if (!discount) {
+      setPromoError(t("cartMessages.promoInvalid"));
+      return;
     }
+
+    applyDiscount(discount);
+    setPromoSuccess(
+      discount.type === "percentage"
+        ? t("cartMessages.promoPercentApplied", { value: discount.value })
+        : t("cartMessages.promoFreeshipApplied")
+    );
   };
 
-  // Calculations
-  const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-
-  // Calculate discount amount
-  let discountAmount = 0;
-  let isFreeShipping = false;
-
-  if (activeDiscount) {
-    if (activeDiscount.type === "percentage") {
-      discountAmount = subtotal * (activeDiscount.value / 100);
-    } else if (activeDiscount.type === "freeship") {
-      isFreeShipping = true;
-    }
-  }
-
-  // Shipping cost: free if subtotal > $150 or if free shipping code is applied
-  const shippingThreshold = 150;
-  const standardShipping = 10;
-  const shippingCost = (subtotal > shippingThreshold || isFreeShipping || subtotal === 0) ? 0 : standardShipping;
-
-  // Tax calculation (8% VAT on subtotal after discount)
-  const taxableAmount = Math.max(0, subtotal - discountAmount);
-  const tax = taxableAmount * 0.08;
-
-  // Total
-  const total = taxableAmount + shippingCost + tax;
+  const totals = calculateCartTotals(cartItems, activeDiscount);
 
   return {
     t,
@@ -134,13 +63,12 @@ export function useCart() {
     promoSuccess,
     handleQuantityChange,
     handleQuantityInput,
-    handleRemoveItem,
+    handleRemoveItem: removeItem,
     handleApplyPromo,
-    subtotal,
-    discountAmount,
-    shippingThreshold,
-    shippingCost,
-    tax,
-    total,
+    subtotal: totals.subtotal,
+    discountAmount: totals.discountAmount,
+    shippingThreshold: totals.freeShippingThreshold,
+    shippingCost: totals.shippingCost,
+    total: totals.total,
   };
 }

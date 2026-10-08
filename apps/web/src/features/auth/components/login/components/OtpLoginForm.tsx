@@ -23,7 +23,6 @@ export function OtpLoginForm({
   otpSent,
   otpDigits,
   inputRefs,
-  otpError,
   handleOtpDigitChange,
   handleOtpDigitKeyDown,
   handleOtpDigitPaste,

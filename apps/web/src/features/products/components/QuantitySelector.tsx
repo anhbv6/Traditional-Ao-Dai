@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Minus, Plus } from 'lucide-react';
-import Counter from '@/components/Counter';
+import Counter from '@/components/effects/Counter';
 
 export default function QuantitySelector() {
   const [quantity, setQuantity] = useState(1);

@@ -1,7 +1,22 @@
+import { twMerge } from 'tailwind-merge';
+
 type ClassValue = string | number | false | null | undefined;
 
+/**
+ * Ghép class và gộp các class Tailwind xung đột (class đứng sau ghi đè class đứng trước, ví dụ `px-2 px-4` -> `px-4`)
+ */
 export function cn(...inputs: ClassValue[]) {
-  return inputs.filter(Boolean).join(' ');
+  return twMerge(inputs.filter(Boolean).join(' '));
+}
+
+/**
+ * Chuẩn hóa `className` của Base UI (chuỗi hoặc hàm nhận state của component) về chuỗi
+ */
+export function resolveClassName<T>(
+  className: string | ((state: T) => string | undefined) | undefined,
+  state: T
+): string | undefined {
+  return typeof className === 'function' ? className(state) : className;
 }
 
 /**

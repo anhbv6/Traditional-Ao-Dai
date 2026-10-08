@@ -1,11 +1,19 @@
 import { z } from 'zod'
+import {
+  VIETNAM_PHONE_REGEX,
+  emailSchema,
+  newPasswordSchema,
+  verificationCodeSchema,
+  vietnamPhoneSchema as contactPhoneSchema,
+} from '@repo/shared'
 
-const vietnamPhoneSchema = z.string().trim().regex(/^(0|\+84)[35789][0-9]{8}$/, 'RECEIVER_PHONE_INVALID')
+/** SĐT người nhận hàng: dùng mã lỗi riêng để FE hiển thị đúng ngữ cảnh form địa chỉ */
+const vietnamPhoneSchema = z.string().trim().regex(VIETNAM_PHONE_REGEX, 'RECEIVER_PHONE_INVALID')
 
 export const updateProfileSchema = z.object({
   body: z.object({
     name: z.string().min(1, 'NAME_REQUIRED').optional(),
-    email: z.string().email('EMAIL_INVALID').optional().nullable(),
+    email: emailSchema.optional().nullable(),
     phone: z.string().optional().nullable(),
     avatar: z.string().optional().nullable(),
     dob: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'DOB_INVALID').or(z.string().length(0)).optional().nullable(),
@@ -21,7 +29,7 @@ export const updateProfileSchema = z.object({
 export const changePasswordSchema = z.object({
   body: z.object({
     currentPassword: z.string().optional(),
-    newPassword: z.string().min(6, 'NEW_PASSWORD_MIN_LENGTH'),
+    newPassword: newPasswordSchema,
   }),
 })
 
@@ -40,6 +48,34 @@ export const unlinkGoogleSchema = z.object({
 export const deleteSessionSchema = z.object({
   params: z.object({
     sessionId: z.string().min(1, 'SESSION_ID_REQUIRED'),
+  }),
+})
+
+// ─── Contact Verification Schemas ───────────────────────────────────────────────
+
+export const requestEmailVerificationSchema = z.object({
+  body: z.object({
+    email: emailSchema,
+  }),
+})
+
+export const confirmEmailVerificationSchema = z.object({
+  body: z.object({
+    email: emailSchema,
+    code: verificationCodeSchema,
+  }),
+})
+
+export const requestPhoneVerificationSchema = z.object({
+  body: z.object({
+    phone: contactPhoneSchema,
+  }),
+})
+
+export const confirmPhoneVerificationSchema = z.object({
+  body: z.object({
+    phone: contactPhoneSchema,
+    code: verificationCodeSchema,
   }),
 })
 

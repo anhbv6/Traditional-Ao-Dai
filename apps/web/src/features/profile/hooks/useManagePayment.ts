@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { type PaymentCard } from "../types/profile.types";
-import { initialCards } from "../api/profile.api";
+import { initialCards } from "../data/mockProfile";
 
 export function useManagePayment() {
   const [cards, setCards] = useState<PaymentCard[]>(initialCards);

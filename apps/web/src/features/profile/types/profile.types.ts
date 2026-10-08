@@ -1,4 +1,4 @@
-import { type AuthUser } from "@/features/auth/types/auth.types";
+import { type AuthUser } from "@/features/auth";
 
 export type ProfilePayload = {
   name?: string;

@@ -8,7 +8,7 @@ import '@smastrom/react-rating/style.css';
 
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { DisplayProduct } from '../ProductDetailClient';
+import { DisplayProduct } from '../../types/products.types';
 
 interface ProductTabsProps {
   product: DisplayProduct;

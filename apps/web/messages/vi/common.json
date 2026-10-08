@@ -18,5 +18,29 @@
   "orders": "Đơn hàng",
   "switchLang": "English",
   "previous": "Trước",
-  "next": "Sau"
+  "next": "Sau",
+  "continueShopping": "Tiếp tục mua sắm",
+  "cartMessages": {
+    "promoRequired": "Vui lòng nhập mã giảm giá",
+    "promoInvalid": "Mã giảm giá không hợp lệ hoặc đã hết hạn",
+    "promoPercentApplied": "Áp dụng mã giảm giá {value}% thành công!",
+    "promoFreeshipApplied": "Áp dụng mã miễn phí vận chuyển thành công!"
+  },
+  "checkoutErrors": {
+    "fullNameRequired": "Vui lòng nhập họ và tên",
+    "phoneRequired": "Vui lòng nhập số điện thoại",
+    "phoneInvalid": "Số điện thoại không hợp lệ",
+    "emailRequired": "Vui lòng nhập email",
+    "emailInvalid": "Email không hợp lệ",
+    "addressRequired": "Vui lòng nhập địa chỉ giao hàng",
+    "provinceRequired": "Vui lòng nhập Tỉnh/Thành phố",
+    "districtRequired": "Vui lòng nhập Quận/Huyện",
+    "wardRequired": "Vui lòng nhập Phường/Xã",
+    "cardHolderRequired": "Vui lòng nhập tên chủ thẻ",
+    "cardNumberRequired": "Vui lòng nhập số thẻ",
+    "cardNumberInvalid": "Số thẻ không hợp lệ",
+    "cardExpiryRequired": "Vui lòng nhập ngày hết hạn (MM/YY)",
+    "cardCvvRequired": "Vui lòng nhập mã CVV",
+    "cardCvvInvalid": "CVV không hợp lệ"
+  }
 }

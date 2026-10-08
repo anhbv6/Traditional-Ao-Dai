@@ -56,7 +56,7 @@ Trên server production, bạn **không** nên chạy lệnh tạo migration m�
 
 *   **Chạy từ thư mục gốc:**
     ```bash
-    pnpm --filter @repo/db migrate:deploy
+    pnpm db:deploy
     ```
     *Lệnh này sẽ chỉ đọc các file SQL migration có sẵn trong thư mục `prisma/migrations` và áp dụng chúng vào database production một cách an toàn.*
 
@@ -86,12 +86,25 @@ pnpm --filter @repo/db migrate:dev --name add_discount_to_product
 3. Chạy file SQL này để cập nhật database local của bạn.
 4. Tự động chạy `prisma generate` để cập nhật TypeScript types mới nhất cho Prisma Client.
 
+> ⚠️ **Windows:** nếu `pnpm dev` đang chạy, bước generate sẽ lỗi `EPERM` (file engine bị khóa). Dừng dev server rồi chạy `pnpm db:generate`.
+>
+> 🤖 **Môi trường không interactive (CI, AI agent):** `migrate dev` sẽ từ chối chạy. Sinh SQL bằng
+> `prisma migrate diff --from-schema-datasource prisma/schema.prisma --to-schema-datamodel prisma/schema.prisma --script`
+> vào thư mục `prisma/migrations/<timestamp>_<ten>/migration.sql`, xem lại SQL rồi áp dụng bằng `pnpm db:deploy`.
+
+### Quy ước schema
+*   `id String @id @default(uuid())`, luôn có `createdAt` / `updatedAt @updatedAt`, khóa ngoại tường minh + `@@index`.
+*   **Tiền:** `Decimal @db.Decimal(12, 2)`; khi trả ra khỏi tầng dữ liệu chuyển sang số nguyên VND bằng `toVnd()` của `@repo/shared`.
+*   **Nội dung đa ngôn ngữ:** cột gốc là tiếng Việt (bắt buộc), cột hậu tố `En` là tiếng Anh (nullable) — ví dụ `name` / `nameEn`, `description` / `descriptionEn`. Đọc bằng `pickLocalized(entity, 'name', locale)`.
+*   **Không sửa/xóa migration đã áp dụng** — luôn tạo migration mới.
+*   Quy chuẩn đầy đủ: [`docs/PROJECT_RULES.md` §9](../../docs/PROJECT_RULES.md#9-database-packagesdb).
+
 ---
 
 ## 🔄 Cách cập nhật & Khởi tạo dữ liệu (Seeding & Studio)
 
 ### 1. Khởi tạo dữ liệu mẫu (Seeding)
-Dự án có sẵn một file script seeder tại [`packages/db/prisma/seed.ts`](file:///e:/draftcode/learn-ecommerce-shop/packages/db/prisma/seed.ts) giúp tạo tài khoản Admin mặc định (`admin@gmail.com` / `123`) để đăng nhập hệ thống quản trị.
+Dự án có sẵn một file script seeder tại [`packages/db/prisma/seed.ts`](file:///e:/draftcode/learn-ecommerce-shop/packages/db/prisma/seed.ts) giúp tạo tài khoản Admin mặc định (`admin@gmail.com` / `admin123`, có thể đổi qua `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`) để đăng nhập hệ thống quản trị.
 
 *   Để chạy seeder khởi tạo dữ liệu mẫu, dùng lệnh:
     ```bash
@@ -126,8 +139,9 @@ Nếu bạn muốn thêm/sửa/xóa trực tiếp dữ liệu trong bảng một
 | Lệnh | Chức năng |
 | :--- | :--- |
 | `pnpm db:generate` | Tạo lại Prisma Client TypeScript types |
-| `pnpm db:migrate` | Chạy migration cho môi trường local dev |
-| `pnpm --filter @repo/db migrate:deploy` | Áp dụng các migrations đã có lên Production database |
-| `pnpm --filter @repo/db db:push` | Đẩy nhanh cấu trúc schema lên DB mà không tạo file migration (Dành cho dev thử nghiệm nhanh) |
-| `pnpm --filter @repo/db seed` | Chạy seed khởi tạo tài khoản Admin và dữ liệu mặc định |
-| `pnpm --filter @repo/db studio` | Mở giao diện Web quản trị dữ liệu trực quan |
+| `pnpm db:migrate --name <ten>` | Tạo + áp dụng migration cho môi trường local dev |
+| `pnpm db:deploy` | Áp dụng các migrations đã có (production / CI) |
+| `pnpm --filter @repo/db db:push` | Đẩy nhanh schema lên DB không tạo migration (chỉ prototyping) |
+| `pnpm db:seed` | Chạy seed khởi tạo tài khoản Admin và dữ liệu mặc định |
+| `pnpm db:studio` | Mở giao diện Web quản trị dữ liệu trực quan |
+| `pnpm --filter @repo/db typecheck` | Kiểm tra type của package |

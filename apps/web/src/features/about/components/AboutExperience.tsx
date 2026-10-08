@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { useRef } from "react";
 import { useTranslations } from "next-intl";
 import { ArrowRight, CheckCircle2, HeartHandshake, Ruler, Scissors, Sparkles } from "lucide-react";
 import { useAbout } from "../hooks/useAbout";

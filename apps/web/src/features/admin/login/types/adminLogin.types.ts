@@ -1,31 +1,11 @@
 export { type AdminLoginFormValues } from "../validations/adminLogin.validation";
 
-export interface AdminUserPayload {
-  id: string;
-  email: string;
-  name: string;
-  phone?: string | null;
-  avatar?: string | null;
-  birth?: string | null;
-  gender?: number | null;
-  role: "ADMIN" | "STAFF";
-  isActive: boolean;
-  isEmailVerified?: boolean;
-  isPhoneVerified?: boolean;
-  createdAt?: string;
-  updatedAt?: string;
-  staffPermission?: any;
-}
+import { type ApiSuccess } from "@repo/shared";
+import { type AdminSessionUser } from "../../server/adminAuth.server";
 
+/** Token nằm trong cookie httpOnly, body chỉ trả thông tin người dùng */
 export interface AdminLoginResponseData {
-  token: string;
-  accessToken: string;
-  user: AdminUserPayload;
+  user: AdminSessionUser;
 }
 
-export interface AdminLoginApiResponse {
-  status: "success" | "error" | string;
-  statusCode?: number;
-  message?: string;
-  data: AdminLoginResponseData;
-}
+export type AdminLoginApiResponse = ApiSuccess<AdminLoginResponseData> & { data: AdminLoginResponseData };

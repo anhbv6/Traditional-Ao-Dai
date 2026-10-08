@@ -1,3 +1,4 @@
+import { type Prisma } from "@repo/db";
 import { prisma } from "../../server/db.server";
 import { type AdminCustomerItem } from "../types/customers.types";
 
@@ -6,7 +7,7 @@ import { type AdminCustomerItem } from "../types/customers.types";
  */
 export async function getAdminCustomersQuery(search?: string): Promise<AdminCustomerItem[]> {
   try {
-    const whereCondition: any = {
+    const whereCondition: Prisma.UserWhereInput = {
       role: "CUSTOMER",
     };
 

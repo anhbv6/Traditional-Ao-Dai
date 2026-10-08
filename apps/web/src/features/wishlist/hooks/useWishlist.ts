@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { type WishlistItem } from "../types/wishlist.types";
-import { initialWishlistItems } from "../api/wishlist.api";
+import { initialWishlistItems } from "../data/mockWishlist";
 import { showToast } from "@/components/ui/toast";
 
 export function useWishlist() {

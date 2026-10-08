@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "../../server/db.server";
+import { authorizeAdminAction } from "../../server/adminAuth.server";
 import { type TailoringStatus } from "../types/tailoring.types";
 import { revalidatePath } from "next/cache";
 
@@ -14,6 +15,9 @@ export async function updateTailoringStatusAction(params: {
   staffId: string;
   note?: string;
 }) {
+  const auth = await authorizeAdminAction({ permission: "canUpdateTailoring" });
+  if (!auth.success) return auth;
+
   try {
     const [updatedItem, log] = await prisma.$transaction([
       prisma.orderItem.update({
@@ -25,7 +29,7 @@ export async function updateTailoringStatusAction(params: {
           orderId: params.orderId,
           orderItemId: params.orderItemId,
           status: params.status,
-          staffId: params.staffId,
+          staffId: auth.user.id,
           note: params.note,
         },
       }),
@@ -39,11 +43,11 @@ export async function updateTailoringStatusAction(params: {
       success: true,
       data: { updatedItem, log },
     };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Lỗi updateTailoringStatusAction:", error);
     return {
       success: false,
-      error: error?.message || "Không thể cập nhật tiến độ may đo.",
+      error: "TAILORING_UPDATE_FAILED",
     };
   }
 }

@@ -1,70 +1,104 @@
 import { prisma } from '@repo/db'
+import { randomBytes, randomUUID } from 'crypto'
 import { comparePassword } from '../../../shared/utils/password'
-import { generateAccessToken, generateToken } from '../../../shared/utils/jwt'
+import { generateToken, verifyToken } from '../../../shared/utils/jwt'
 import { AppError } from '../../../shared/middlewares/errorHandler'
+import { durationToMs } from '../../../shared/utils/time'
+import { cleanupUserSessions, hashToken } from '../../../shared/utils/session'
 import { LoginInput } from '../auth.schema'
+import { SessionMeta } from '../auth.types'
 
 /**
- * Validates admin and staff credentials and generates a JWT access token.
+ * Admin / Staff login.
+ * - Mỗi lần đăng nhập tạo một UserSession; token mang sessionId để có thể thu hồi (đăng xuất, khóa tài khoản)
+ * - Không phân biệt "sai tài khoản" và "sai mật khẩu" để tránh dò email quản trị
  */
-export async function adminLogin(input: LoginInput['body']) {
-  const { email, password, rememberMe } = input
+export async function adminLogin(input: LoginInput['body'], meta: SessionMeta = {}) {
+  const email = input.email.trim().toLowerCase()
+  const { password, rememberMe } = input
 
-  // Find user by email
-  const user = await prisma.user.findUnique({
-    where: { email },
+  const user = await prisma.user.findFirst({
+    where: { email: { equals: email, mode: 'insensitive' } },
     include: {
       staffPermission: true,
     },
   })
 
-  // Check user existence, verify they are an ADMIN or STAFF, and ensure active status
-  if (!user || (user.role !== 'ADMIN' && user.role !== 'STAFF')) {
-    throw new AppError(401, 'ADMIN_UNAUTHORIZED')
+  const isPasswordMatch =
+    !!user &&
+    (user.role === 'ADMIN' || user.role === 'STAFF') &&
+    !!user.password &&
+    (await comparePassword(password, user.password))
+
+  if (!user || !isPasswordMatch) {
+    throw new AppError(401, 'INVALID_CREDENTIALS')
   }
 
   if (!user.isActive) {
     throw new AppError(403, 'ACCOUNT_DEACTIVATED')
   }
 
-  // Verify password
-  const isPasswordMatch = await comparePassword(password, user.password || '')
-  if (!isPasswordMatch) {
-    throw new AppError(401, 'INCORRECT_PASSWORD')
-  }
-
-  // Generate JWT token containing key user claims
-  // Nếu rememberMe = true: token tồn tại 7 ngày; nếu false: 1 ngày
+  // Nếu rememberMe = true: phiên tồn tại 7 ngày; nếu false: 1 ngày
   const tokenExpiresIn = rememberMe ? '7d' : '1d'
+  const expiresAt = new Date(Date.now() + durationToMs(tokenExpiresIn))
+  const sessionId = randomUUID()
+
+  await cleanupUserSessions(user.id)
+
+  await prisma.userSession.create({
+    data: {
+      id: sessionId,
+      userId: user.id,
+      // Admin không dùng refresh token: lưu hash của một chuỗi ngẫu nhiên để thỏa ràng buộc unique
+      refreshToken: hashToken(randomBytes(32).toString('hex')),
+      familyId: sessionId,
+      deviceInfo: meta.deviceInfo,
+      ipAddress: meta.ipAddress,
+      expiresAt,
+    },
+  })
+
   const token = generateToken(
     {
       userId: user.id,
       role: user.role,
+      sessionId,
       tokenType: 'access',
       rememberMe: Boolean(rememberMe),
     },
     tokenExpiresIn
   )
 
-  // Return user info excluding password and include token
   const { password: _, ...safeUser } = user
+
+  // Token chỉ được đặt vào cookie httpOnly ở controller, không trả về body cho JavaScript đọc
   return {
     token,
-    accessToken: token,
+    expiresAt,
+    rememberMe: Boolean(rememberMe),
     user: safeUser,
   }
 }
 
 /**
- * Revokes session and handles admin/staff logout
+ * Admin / Staff logout: thu hồi đúng phiên của token (nếu token còn hợp lệ).
+ * Không ném lỗi khi token hỏng/hết hạn — controller vẫn luôn xóa cookie.
  */
-export async function adminLogout(userId?: string) {
-  if (userId) {
-    // Invalidate any active user sessions if applicable
-    await prisma.userSession.updateMany({
-      where: { userId, isRevoked: false },
-      data: { isRevoked: true },
-    }).catch(() => null)
+export async function adminLogout(token?: string) {
+  if (!token) {
+    return { success: true }
   }
+
+  try {
+    const decoded = verifyToken(token)
+    if (decoded.sessionId) {
+      await prisma.userSession.deleteMany({
+        where: { id: decoded.sessionId, userId: decoded.userId },
+      })
+    }
+  } catch {
+    // Token không hợp lệ hoặc đã hết hạn -> phiên tương ứng cũng đã vô hiệu
+  }
+
   return { success: true }
 }

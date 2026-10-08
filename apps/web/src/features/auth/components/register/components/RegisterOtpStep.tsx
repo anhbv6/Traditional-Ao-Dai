@@ -2,7 +2,6 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { InlineValidationTooltip } from './InlineValidationTooltip';
 import { OtpInput } from '@/components/shared/OtpInput';
 
 export interface RegisterOtpStepProps {
@@ -13,7 +12,7 @@ export interface RegisterOtpStepProps {
   timer: number;
   canResend: boolean;
   isRegistering: boolean;
-  t: (key: string, values?: any) => string;
+  t: (key: string, values?: Record<string, string | number>) => string;
   handleVerifyOtp: (e: React.FormEvent) => void;
   handleResend: () => void;
   setIsOtpStep: (val: boolean) => void;

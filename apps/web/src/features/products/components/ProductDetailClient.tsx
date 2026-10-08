@@ -6,54 +6,12 @@ import ProductInfo from './detail/ProductInfo';
 import ProductTabs from './detail/ProductTabs';
 import RelatedProducts from './detail/RelatedProducts';
 import { useProductDetail } from '../hooks/useProductDetail';
-
-export interface DisplayColor {
-  name: string;
-  hex: string;
-  imageSrc?: string;
-}
-
-export interface DisplayProduct {
-  id: string;
-  name: string;
-  description: string;
-  price: string;
-  originalPrice?: string;
-  imageSrc: string;
-  hoverImageSrc: string;
-  imageAlt: string;
-  category: string;
-  purchaseType: string;
-  material: string;
-  sizes: string[];
-  colors: DisplayColor[];
-  longDescription: string;
-  secondaryDescription: string;
-  rating: string;
-  reviewCount: string;
-  stock: string;
-  sku: string;
-  related: string;
-}
-
-export interface RelatedProductItem {
-  id: string;
-  imageSrc: string;
-  hoverImageSrc: string;
-  imageAlt: string;
-  name: string;
-  description: string;
-  price: string;
-  originalPrice?: string;
-  colors: DisplayColor[];
-  sizes: string[];
-  material: string;
-  purchaseType: string;
-}
+import { type DisplayProduct, type RelatedProductItem } from '../types/products.types';
+import { type Locale } from '@repo/shared';
 
 interface ProductDetailClientProps {
   product: DisplayProduct;
-  locale: 'vi' | 'en';
+  locale: Locale;
   galleryImages: string[];
   relatedProducts: RelatedProductItem[];
   customMeasurementFields?: Array<{ field_key: string; label: string; placeholder: string; required: boolean }>;

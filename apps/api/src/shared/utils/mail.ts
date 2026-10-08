@@ -60,3 +60,30 @@ class MailProvider {
 }
 
 export const mailProvider = new MailProvider()
+
+/**
+ * Gửi email chứa mã xác minh 6 số (đặt lại mật khẩu, xác minh email...)
+ */
+export async function sendVerificationCodeEmail(options: {
+  to: string
+  subject: string
+  heading: string
+  intro: string
+  code: string
+  ttlMinutes: number
+}): Promise<boolean> {
+  const { to, subject, heading, intro, code, ttlMinutes } = options
+  const text = `${intro} Your verification code is: ${code}. Valid for ${ttlMinutes} minutes.`
+  const html = `
+    <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+      <h2>${heading}</h2>
+      <p>${intro}</p>
+      <div style="background: #f4f4f4; padding: 15px; text-align: center; font-size: 24px; font-weight: bold; letter-spacing: 5px; margin: 20px 0; border-radius: 5px;">
+        ${code}
+      </div>
+      <p>This code is valid for ${ttlMinutes} minutes. If you did not make this request, you can safely ignore this email.</p>
+    </div>
+  `
+
+  return mailProvider.sendMail({ to, subject, text, html })
+}

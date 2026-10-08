@@ -1,103 +1,37 @@
-import {
-  type PaymentCard,
-  type Order,
-  type ProfilePayload,
-  type UpdateProfileResponse,
-} from "../types/profile.types";
+import { type ProfilePayload, type UpdateProfileResponse } from "../types/profile.types";
 import { apiClient } from "@/lib/api-client";
 
 export const updateProfileApi = (payload: ProfilePayload): Promise<UpdateProfileResponse> => {
   return apiClient.put<UpdateProfileResponse>("/api/user/profile", payload);
 };
 
-export const initialCards: PaymentCard[] = [
-  {
-    id: "card-1",
-    holder: "NGUYEN THI AN",
-    number: "•••• •••• •••• 4532",
-    expiry: "12/28",
-    type: "visa",
-    isDefault: true,
-  },
-  {
-    id: "card-2",
-    holder: "NGUYEN THI AN",
-    number: "•••• •••• •••• 8890",
-    expiry: "08/30",
-    type: "mastercard",
-    isDefault: false,
-  },
-];
+type SendCodeResponse = { status: string; statusCode: number; message: string; data: { ttl: number } };
 
-export const mockOrders: Order[] = [
-  {
-    id: "AD-99905",
-    date: "2026-08-03",
-    status: "pending",
-    total: "1.590.000 ₫",
-    items: [
-      {
-        name: { vi: "Áo Dài Phượng Hoàng", en: "Phoenix Ao Dai" },
-        price: "1.590.000 ₫",
-        quantity: 1,
-        image: "https://cdn.pixabay.com/photo/2021/11/14/06/17/ao-dai-6792949_640.jpg",
-      },
-    ],
-  },
-  {
-    id: "AD-99890",
-    date: "2026-08-01",
-    status: "processing",
-    total: "2.100.000 ₫",
-    items: [
-      {
-        name: { vi: "Áo Dài Thêu Hoa Sen", en: "Lotus Embroidered Ao Dai" },
-        price: "2.100.000 ₫",
-        quantity: 1,
-        image: "https://cdn.pixabay.com/photo/2016/11/19/11/33/girl-1838779_640.jpg",
-      },
-    ],
-  },
-  {
-    id: "AD-99823",
-    date: "2026-07-28",
-    status: "delivered",
-    total: "3.780.000 ₫",
-    items: [
-      {
-        name: { vi: "Áo Dài Gấm Song Hỷ", en: "Song Hy Brocade Ao Dai" },
-        price: "1.890.000 ₫",
-        quantity: 2,
-        image: "https://cdn.pixabay.com/photo/2021/04/16/07/22/ao-dai-6182834_640.jpg",
-      },
-    ],
-  },
-  {
-    id: "AD-99120",
-    date: "2026-07-15",
-    status: "shipped",
-    total: "2.450.000 ₫",
-    items: [
-      {
-        name: { vi: "Áo Dài Tơ Tằm Cổ Điển", en: "Classic Mulberry Silk Ao Dai" },
-        price: "2.450.000 ₫",
-        quantity: 1,
-        image: "https://cdn.pixabay.com/photo/2022/07/15/03/42/vietnamese-woman-7322247_640.jpg",
-      },
-    ],
-  },
-  {
-    id: "AD-98002",
-    date: "2026-06-30",
-    status: "cancelled",
-    total: "1.290.000 ₫",
-    items: [
-      {
-        name: { vi: "Áo Dài Cách Tân Hoa Đào", en: "Modern Peach Blossom Ao Dai" },
-        price: "1.290.000 ₫",
-        quantity: 1,
-        image: "https://cdn.pixabay.com/photo/2020/02/05/08/18/girl-4820464_640.jpg",
-      },
-    ],
-  },
-];
+/**
+ * Gửi mã xác minh tới email (email mới muốn đổi sang hoặc email hiện tại chưa xác minh)
+ */
+export const requestEmailVerificationApi = (email: string): Promise<SendCodeResponse> => {
+  return apiClient.post<SendCodeResponse>("/api/user/email/verification", { email });
+};
+
+/**
+ * Xác nhận mã email -> trả về thông tin người dùng đã cập nhật
+ */
+export const confirmEmailVerificationApi = (email: string, code: string): Promise<UpdateProfileResponse> => {
+  return apiClient.post<UpdateProfileResponse>("/api/user/email/verification/confirm", { email, code });
+};
+
+/**
+ * Gửi OTP tới SĐT (SĐT mới muốn đổi sang hoặc SĐT hiện tại chưa xác minh)
+ */
+export const requestPhoneVerificationApi = (phone: string): Promise<SendCodeResponse> => {
+  return apiClient.post<SendCodeResponse>("/api/user/phone/verification", { phone });
+};
+
+/**
+ * Xác nhận OTP SĐT -> trả về thông tin người dùng đã cập nhật
+ */
+export const confirmPhoneVerificationApi = (phone: string, code: string): Promise<UpdateProfileResponse> => {
+  return apiClient.post<UpdateProfileResponse>("/api/user/phone/verification/confirm", { phone, code });
+};
+

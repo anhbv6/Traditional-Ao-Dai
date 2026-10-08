@@ -8,8 +8,8 @@ import UseAnimations from 'react-useanimations';
 import heart from 'react-useanimations/lib/heart';
 
 import { Button } from '@/components/ui/button';
-import Counter from '@/components/Counter';
-import { DisplayProduct } from '../ProductDetailClient';
+import Counter from '@/components/effects/Counter';
+import { DisplayProduct } from '../../types/products.types';
 
 interface ProductInfoProps {
   product: DisplayProduct;
@@ -36,7 +36,6 @@ const ratingStyles = {
 
 export default function ProductInfo({
   product,
-  locale,
   customMeasurementFields = [],
   selectedColor,
   onColorSelect,

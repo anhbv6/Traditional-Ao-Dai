@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
-import { Role } from '@repo/db'
+import { prisma, Role } from '@repo/db'
+import { AUTH_COOKIES } from '@repo/shared'
 import { verifyToken, JWTPayload } from '../utils/jwt'
 import { AppError } from './errorHandler'
 
@@ -11,7 +12,10 @@ export interface AuthenticatedRequest extends Request {
 }
 
 /**
- * Helper trích xuất Access Token từ Header Authorization hoặc Cookie
+ * Trích xuất Access Token:
+ * 1. Header `Authorization: Bearer` (khách hàng — access token giữ trong bộ nhớ FE)
+ * 2. Cookie httpOnly `admin_token` (Admin/Staff) — chỉ chấp nhận vì cookie này do server đặt với SameSite=Strict,
+ *    trình duyệt không gửi kèm trong request cross-site nên không bị CSRF. Không đọc bất kỳ cookie nào khác.
  */
 function extractToken(req: Request): string | undefined {
   const authHeader = req.headers.authorization
@@ -20,29 +24,67 @@ function extractToken(req: Request): string | undefined {
     if (token) return token
   }
 
-  // Fallback đọc từ Cookie (nếu có)
-  if (req.cookies) {
-    if (typeof req.cookies.accessToken === 'string' && req.cookies.accessToken) {
-      return req.cookies.accessToken
-    }
-    if (typeof req.cookies.admin_token === 'string' && req.cookies.admin_token) {
-      return req.cookies.admin_token
-    }
+  const adminToken = req.cookies?.[AUTH_COOKIES.adminToken]
+  if (typeof adminToken === 'string' && adminToken) {
+    return adminToken
   }
 
   return undefined
 }
 
 /**
- * Middleware bắt buộc phải có JWT Token hợp lệ (Stateless, 0ms DB Overhead):
- * - Xác thực chữ ký và hạn sử dụng Access Token tức thì trong RAM bằng RSA Public Key
+ * Xác thực token và trả về payload hợp lệ:
+ * - Khách hàng (CUSTOMER): stateless, chỉ kiểm tra chữ ký + hạn dùng (access token sống 15 phút)
+ * - Quản trị (ADMIN/STAFF): token sống tới 7 ngày nên bắt buộc gắn với UserSession còn hiệu lực,
+ *   tài khoản còn hoạt động và vai trò khớp DB -> đăng xuất / khóa tài khoản có hiệu lực ngay lập tức
+ */
+async function resolveAccessToken(token: string): Promise<JWTPayload> {
+  const decoded = verifyToken(token)
+
+  if (decoded.tokenType && decoded.tokenType !== 'access') {
+    throw new AppError(401, 'INVALID_TOKEN_TYPE')
+  }
+
+  if (decoded.role !== 'CUSTOMER') {
+    if (!decoded.sessionId) {
+      throw new AppError(401, 'SESSION_EXPIRED_OR_REVOKED')
+    }
+
+    const session = await prisma.userSession.findUnique({
+      where: { id: decoded.sessionId },
+      select: {
+        userId: true,
+        isRevoked: true,
+        expiresAt: true,
+        user: { select: { isActive: true, role: true } },
+      },
+    })
+
+    if (
+      !session ||
+      session.userId !== decoded.userId ||
+      session.isRevoked ||
+      session.expiresAt <= new Date() ||
+      !session.user.isActive ||
+      session.user.role !== decoded.role
+    ) {
+      throw new AppError(401, 'SESSION_EXPIRED_OR_REVOKED')
+    }
+  }
+
+  return decoded
+}
+
+/**
+ * Middleware bắt buộc phải có JWT Token hợp lệ:
+ * - Xác thực chữ ký và hạn sử dụng Access Token bằng RSA Public Key
  * - Phân biệt chính xác giữa lỗi hết hạn Token (401) và lỗi hệ thống (500)
  */
-export function requireAuth(
+export async function requireAuth(
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
-): void {
+): Promise<void> {
   const token = extractToken(req)
 
   if (!token) {
@@ -50,13 +92,7 @@ export function requireAuth(
   }
 
   try {
-    const decoded = verifyToken(token)
-
-    if (decoded.tokenType && decoded.tokenType !== 'access') {
-      return next(new AppError(401, 'INVALID_TOKEN_TYPE'))
-    }
-
-    req.user = decoded
+    req.user = await resolveAccessToken(token)
     return next()
   } catch (error: any) {
     if (error.name === 'TokenExpiredError') {
@@ -75,28 +111,21 @@ export function requireAuth(
  * - Nếu không có token hoặc token không hợp lệ -> cho qua với req.user = undefined (Khách vãng lai)
  * Dùng cho các endpoint công khai nhưng có thể cá nhân hóa: Xem sản phẩm, Giỏ hàng, Áp mã voucher, Đặt hàng...
  */
-export function optionalAuth(
+export async function optionalAuth(
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
-): void {
+): Promise<void> {
   const token = extractToken(req)
+  req.user = undefined
 
-  if (!token) {
-    req.user = undefined
-    return next()
-  }
-
-  try {
-    const decoded = verifyToken(token)
-    if (decoded.tokenType === 'access') {
-      req.user = decoded
-    } else {
+  if (token) {
+    try {
+      req.user = await resolveAccessToken(token)
+    } catch {
+      // Token không hợp lệ, hết hạn hoặc phiên đã bị thu hồi -> tiếp tục với vai trò khách vãng lai
       req.user = undefined
     }
-  } catch {
-    // Token không hợp lệ hoặc hết hạn -> tiếp tục với vai trò khách vãng lai
-    req.user = undefined
   }
 
   return next()

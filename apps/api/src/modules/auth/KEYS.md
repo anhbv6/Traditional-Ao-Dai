@@ -49,3 +49,50 @@ Tài liệu tổng hợp các mã phản hồi (`message` key) của Module Auth
 | `VERIFICATION_CODE_OR_RESET_TOKEN_REQUIRED` | 400 | Yêu cầu cung cấp mã xác minh hoặc Reset Token | Code or reset token is required | Thiếu tham số xác thực khi đặt lại mật khẩu qua email / Missing code or reset token |
 | `OTP_CODE_OR_RESET_TOKEN_REQUIRED` | 400 | Yêu cầu cung cấp mã OTP hoặc Reset Token | OTP code or reset token is required | Thiếu tham số xác thực khi đặt lại mật khẩu qua SĐT / Missing OTP code or reset token |
 | `UNAUTHORIZED` | 401 | Chưa xác thực hoặc không có quyền | Unauthorized access | Thiếu access token hoặc token không hợp lệ / Missing or invalid access token |
+
+---
+
+## Cập nhật bảo mật (Security Update)
+
+### Mã mới / thay đổi hành vi
+
+| KEY | HTTP Status | Tiếng Việt (Vietnamese) | English Meaning | Ngữ cảnh sử dụng / Description |
+| :--- | :---: | :--- | :--- | :--- |
+| `INVALID_CREDENTIALS` | 401 | Tài khoản hoặc mật khẩu không chính xác | Invalid credentials | Thay cho `USER_NOT_FOUND` / `INCORRECT_PASSWORD` (khách) và `ADMIN_UNAUTHORIZED` (admin) để chống dò tài khoản |
+| `TOO_MANY_REQUESTS` | 429 | Thao tác quá nhanh | Too many requests | Vượt rate-limit (login 20/15p/IP + 10/15p/tài khoản; admin 10/15p/IP + 5/15p/tài khoản; register 10/giờ/IP; check-account 30/5p/IP...). Header `Retry-After` kèm số giây |
+| `PHONE_NOT_VERIFIED` | 400 | SĐT chưa được xác minh | Phone not verified | Đăng nhập OTP / đặt lại mật khẩu qua SĐT chỉ dành cho SĐT đã xác minh |
+| `VERIFICATION_TOO_MANY_ATTEMPTS` | 429 | Nhập sai mã quá nhiều lần | Too many attempts | Sai 5 lần mã email bị hủy, phải yêu cầu mã mới |
+| `EMAIL_DAILY_LIMIT_REACHED` | 429 | Vượt hạn mức email trong ngày | Daily email limit reached | Tối đa 10 email mã xác minh / địa chỉ / ngày |
+| `GOOGLE_TOKEN_INVALID` | 400 | Thông tin Google không hợp lệ | Invalid Google token | ID Token thiếu `sub` hoặc `email` |
+| `GOOGLE_EMAIL_NOT_VERIFIED` | 400 | Email Google chưa xác minh | Google email not verified | Payload Google có `email_verified !== true` |
+| `GOOGLE_EMAIL_ACCOUNT_UNVERIFIED` | 409 | Email đã có tài khoản chưa xác minh | Email belongs to an unverified account | Chặn tự động liên kết (chống chiếm trước tài khoản). Đăng nhập bằng mật khẩu/quên mật khẩu rồi liên kết Google trong hồ sơ |
+| `GOOGLE_ACCOUNT_MISMATCH` | 409 | Tài khoản đã liên kết Google khác | Linked to another Google account | Email trùng nhưng tài khoản đã liên kết một Google `sub` khác |
+| `SESSION_EXPIRED_OR_REVOKED` | 401 | Phiên hết hạn hoặc đã bị thu hồi | Session expired or revoked | Refresh token hoặc token Admin/Staff gắn với phiên không còn hiệu lực |
+| `PASSWORD_MAX_LENGTH` | 400 | Mật khẩu tối đa 72 ký tự | Password too long | bcrypt chỉ dùng 72 byte đầu |
+
+### Hành vi thay đổi
+- `POST /auth/forgot-password/email` luôn trả `VERIFICATION_CODE_SENT` dù email có tồn tại hay không.
+- Đăng nhập Google tra cứu `SocialAccount(GOOGLE, sub)` trước; chỉ tự liên kết qua email khi email tài khoản **đã xác minh**.
+- Đặt lại mật khẩu qua email thành công -> đánh dấu `isEmailVerified = true`.
+- Token Admin/Staff mang `sessionId`; `POST /auth/admin/logout` thu hồi phiên ngay lập tức.
+- Refresh token bị xoay vòng có khoảng ân hạn 30 giây (nhiều tab refresh cùng lúc không bị đăng xuất).
+- API chỉ nhận access token qua header `Authorization: Bearer` (không đọc từ cookie — chống CSRF).
+- Đăng ký bằng email không còn nhận trường `phone`.
+
+---
+
+## Mô hình cookie phiên (Session Cookies)
+
+Web và API chạy cùng origin (Next.js rewrites `/api/*`), mọi cookie dưới đây **chỉ do Backend đặt/xóa** (`shared/utils/authCookies.ts`):
+
+| Cookie | httpOnly | SameSite | Đặt khi | Mục đích |
+| :--- | :---: | :---: | :--- | :--- |
+| `refreshToken` | ✅ | Lax | Đăng nhập khách hàng (mật khẩu / OTP / Google), refresh | Làm mới access token |
+| `has_session` | ❌ | Lax | Cùng lúc với `refreshToken` | Cờ cho FE biết có nên gọi refresh (không chứa bí mật) |
+| `admin_token` | ✅ | Strict | `POST /auth/admin/login` | Access token Admin/Staff (gắn `UserSession`) |
+| `admin_session` | ❌ | Strict | Cùng lúc với `admin_token` | Vai trò để hiển thị UI — KHÔNG dùng phân quyền |
+
+- `POST /auth/admin/login` **không trả token trong body**, chỉ trả `data.user`.
+- `POST /auth/admin/logout` không yêu cầu header Bearer: đọc `admin_token` từ cookie, thu hồi phiên và luôn xóa cookie.
+- Refresh thất bại → Backend xóa `refreshToken` + `has_session`.
+

@@ -12,6 +12,7 @@ export function useProfile() {
 }
 
 export * from "./usePersonalInfo";
+export * from "./useContactVerification";
 export * from "./useManageAddress";
 export * from "./useManagePayment";
 export * from "./useSetting";

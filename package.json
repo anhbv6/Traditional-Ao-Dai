@@ -7,10 +7,19 @@
     "build": "pnpm --filter \"*\" build",
     "start": "pnpm --filter \"*\" start",
     "lint": "pnpm --filter \"*\" lint",
+    "typecheck": "pnpm --filter \"*\" typecheck",
+    "check": "pnpm typecheck && pnpm lint",
     "db:generate": "pnpm --filter @repo/db generate",
-    "db:migrate": "pnpm --filter @repo/db migrate:dev"
+    "db:migrate": "pnpm --filter @repo/db migrate:dev",
+    "db:deploy": "pnpm --filter @repo/db migrate:deploy",
+    "db:seed": "pnpm --filter @repo/db seed",
+    "db:studio": "pnpm --filter @repo/db studio"
   },
   "devDependencies": {
     "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=22.18.0",
+    "pnpm": ">=9"
   }
 }

@@ -1,10 +1,13 @@
 import React from "react";
 import { getTailoringItemsQuery, TailoringBoard } from "@/features/admin/tailoring";
 import { Scissors } from "lucide-react";
+import { requireAdminPage } from "@/features/admin/server/adminAuth.server";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminTailoringPage() {
+  await requireAdminPage();
+
   const tailoringItems = await getTailoringItemsQuery();
 
   return (

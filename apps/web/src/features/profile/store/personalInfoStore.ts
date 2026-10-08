@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { type AuthUser } from "@/features/auth/types/auth.types";
+import { type AuthUser } from "@/features/auth";
 
 type PersonalInfoFormValues = {
   fullName: string;

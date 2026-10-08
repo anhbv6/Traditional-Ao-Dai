@@ -18,5 +18,29 @@
   "orders": "Orders",
   "switchLang": "Tiếng Việt",
   "previous": "Previous",
-  "next": "Next"
+  "next": "Next",
+  "continueShopping": "Continue shopping",
+  "cartMessages": {
+    "promoRequired": "Please enter a promo code",
+    "promoInvalid": "The promo code is invalid or has expired",
+    "promoPercentApplied": "{value}% discount applied!",
+    "promoFreeshipApplied": "Free shipping code applied!"
+  },
+  "checkoutErrors": {
+    "fullNameRequired": "Please enter your full name",
+    "phoneRequired": "Please enter your phone number",
+    "phoneInvalid": "Invalid phone number",
+    "emailRequired": "Please enter your email",
+    "emailInvalid": "Invalid email",
+    "addressRequired": "Please enter your shipping address",
+    "provinceRequired": "Please enter your province/city",
+    "districtRequired": "Please enter your district",
+    "wardRequired": "Please enter your ward",
+    "cardHolderRequired": "Please enter the card holder name",
+    "cardNumberRequired": "Please enter the card number",
+    "cardNumberInvalid": "Invalid card number",
+    "cardExpiryRequired": "Please enter the expiry date (MM/YY)",
+    "cardCvvRequired": "Please enter the CVV",
+    "cardCvvInvalid": "Invalid CVV"
+  }
 }

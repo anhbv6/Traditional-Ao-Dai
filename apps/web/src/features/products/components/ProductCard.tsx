@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Heart, ShoppingBag } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
+import { parseVndString, useCartStore } from '@/features/cart';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 export type ProductColorSwatch = {
@@ -22,7 +23,12 @@ type ProductCardProps = {
   imageAlt?: string;
   name?: string;
   description?: string;
+  /** Giá đã định dạng để hiển thị */
   price?: string;
+  /** Giá số nguyên VND dùng cho giỏ hàng (bắt buộc khi có dữ liệu thật từ API) */
+  priceValue?: number;
+  /** Slug sản phẩm — khóa nhận diện trong giỏ hàng */
+  slug?: string;
   originalPrice?: string;
   // badge?: string;
   colorSwatches?: ProductColorSwatch[];
@@ -33,12 +39,6 @@ type ProductCardProps = {
   productHref?: ProductHref;
 };
 
-const materialKeys: Record<string, string> = {
-  'Lụa Tơ Tằm': 'silk',
-  'Gấm': 'brocade',
-  'Tơ Nhung': 'velvet',
-  'Voan': 'chiffon',
-};
 
 export function ProductCard({
   imageSrc = '/logoPage.png',
@@ -46,8 +46,10 @@ export function ProductCard({
   imageAlt = 'Product image',
   name = 'Allen Solly',
   description = 'Women Textured Handheld Bag',
-  price = '$80.00',
-  originalPrice = '$100.00',
+  price = '',
+  priceValue,
+  slug,
+  originalPrice,
   // badge,
   colorSwatches = [],
   objectFit,
@@ -71,21 +73,14 @@ export function ProductCard({
     e.preventDefault();
     e.stopPropagation();
     
-    const rawPrice = price.replace(/[^0-9.]/g, "");
-    const parsedPrice = parseFloat(rawPrice) || 0;
-
-    const cartEvent = new CustomEvent("cart-add-item", {
-      detail: {
-        id: Date.now(),
-        name,
-        slug: name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, ""),
-        image: currentImageSrc,
-        quantity: 1,
-        price: parsedPrice,
-        size: "M"
-      }
+    useCartStore.getState().addItem({
+      name,
+      slug: slug ?? name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, ""),
+      image: currentImageSrc,
+      // Giỏ hàng lưu số nguyên VND; dữ liệu mock hiện chỉ có chuỗi giá đã định dạng
+      price: priceValue ?? parseVndString(price),
+      size: "M",
     });
-    window.dispatchEvent(cartEvent);
   };
 
   return (

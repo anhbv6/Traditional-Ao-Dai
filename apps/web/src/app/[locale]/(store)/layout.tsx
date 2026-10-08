@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
-import { Footer } from '@/components/common/Footer';
-import Header from '@/components/common/Header';
+import { Footer } from '@/components/common/footer/Footer';
+import { Header } from '@/components/common/header/Header';
 import { ScrollToTopButton } from '@/components/common/ScrollToTopButton';
 import { ConditionalFooter } from './ConditionalFooter';
 

@@ -1,6 +1,5 @@
 import React from 'react';
-import { AuthImageBanner } from '@/features/auth/components/AuthImageBanner';
-import { ForgotForm } from '@/features/auth/components/forgot/ForgotForm';
+import { AuthImageBanner, ForgotForm } from '@/features/auth';
 
 export default function ForgotPage() {
   return (

@@ -1,34 +1,40 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Users, Shield, RefreshCw, Lock, Unlock } from "lucide-react";
-import { showToast } from "@/components/ui/toast";
 import {
   getStaffListAction,
   updateStaffPermissionAction,
   toggleStaffActiveAction,
 } from "../actions";
 import { type StaffPermissionInput, type StaffMemberItem } from "../types";
+import { useTranslations } from "next-intl";
+import { useNotify } from "@/hooks/useNotify";
+
+const STAFF_QUERY_KEY = ["admin", "staff"] as const;
 
 export function AdminStaffManagement() {
-  const [staffList, setStaffList] = useState<StaffMemberItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const notify = useNotify();
+  const tToast = useTranslations("AdminPage.toasts");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
-  const fetchStaff = async () => {
-    setIsLoading(true);
-    const res = await getStaffListAction();
-    if (res.success && res.data) {
-      setStaffList(res.data as StaffMemberItem[]);
-    } else {
-      showToast.error("Không thể tải danh sách nhân viên.");
-    }
-    setIsLoading(false);
-  };
-
-  useEffect(() => {
-    fetchStaff();
-  }, []);
+  // Dữ liệu server -> React Query; cập nhật lạc quan (optimistic) bằng setQueryData
+  const { data: staffList = [], isFetching: isLoading, refetch } = useQuery({
+    queryKey: STAFF_QUERY_KEY,
+    queryFn: async () => {
+      const res = await getStaffListAction();
+      if (!res.success) {
+        notify.error(res.error, "STAFF_LIST_FAILED");
+        return [];
+      }
+      return (res.data ?? []) as StaffMemberItem[];
+    },
+  });
+  const fetchStaff = () => void refetch();
+  const setStaffList = (updater: (prev: StaffMemberItem[]) => StaffMemberItem[]) =>
+    queryClient.setQueryData<StaffMemberItem[]>(STAFF_QUERY_KEY, (prev) => updater(prev ?? []));
 
   const handleTogglePermission = async (
     staffId: string,
@@ -50,15 +56,15 @@ export function AdminStaffManagement() {
 
     const res = await updateStaffPermissionAction(staffId, newPerms);
     if (res.success) {
-      showToast.success("Đã cập nhật phân quyền nhân viên!");
+      notify.success(tToast("permissionUpdateSuccess"));
       // Cập nhật state local
       setStaffList((prev) =>
         prev.map((s) =>
-          s.id === staffId ? { ...s, staffPermission: { ...s.staffPermission, ...newPerms } as any } : s
+          s.id === staffId ? { ...s, staffPermission: { ...s.staffPermission, ...newPerms } as StaffMemberItem["staffPermission"] } : s
         )
       );
     } else {
-      showToast.error(res.error || "Không thể cập nhật phân quyền.");
+      notify.error(res.error, "STAFF_PERMISSION_UPDATE_FAILED");
     }
     setUpdatingId(null);
   };
@@ -67,14 +73,12 @@ export function AdminStaffManagement() {
     setUpdatingId(staffId);
     const res = await toggleStaffActiveAction(staffId, !currentActive);
     if (res.success) {
-      showToast.success(
-        !currentActive ? "Đã mở khóa tài khoản nhân viên!" : "Đã khóa tài khoản nhân viên!"
-      );
+      notify.success(tToast(!currentActive ? "staffUnlocked" : "staffLocked"));
       setStaffList((prev) =>
         prev.map((s) => (s.id === staffId ? { ...s, isActive: !currentActive } : s))
       );
     } else {
-      showToast.error(res.error || "Không thể cập nhật trạng thái.");
+      notify.error(res.error, "STAFF_STATUS_UPDATE_FAILED");
     }
     setUpdatingId(null);
   };

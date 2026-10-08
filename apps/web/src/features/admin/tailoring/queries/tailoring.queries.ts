@@ -1,3 +1,4 @@
+import { type Prisma } from "@repo/db";
 import { prisma } from "../../server/db.server";
 import { type TailoringItemData, type TailoringStatus } from "../types/tailoring.types";
 
@@ -6,7 +7,7 @@ import { type TailoringItemData, type TailoringStatus } from "../types/tailoring
  */
 export async function getTailoringItemsQuery(status?: TailoringStatus | "ALL"): Promise<TailoringItemData[]> {
   try {
-    const whereCondition: any = {
+    const whereCondition: Prisma.OrderItemWhereInput = {
       isCustomFit: true,
     };
 

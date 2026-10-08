@@ -1,7 +1,8 @@
 import { Router } from 'express'
 import * as otpController from './otp.controller'
 import { validate } from '../../shared/middlewares/validate'
-import { sendOtpSchema, verifyOtpSchema } from './otp.schema'
+import { sendOtpSchema } from './otp.schema'
+import { rateLimit } from '../../shared/utils/rateLimit'
 
 const router = Router()
 
@@ -54,64 +55,18 @@ const router = Router()
  *                       type: integer
  *                       example: 300
  *       400:
- *         description: Validation error
+ *         description: VALIDATION_ERROR, INVALID_PHONE_NUMBER, PHONE_ALREADY_EXISTS (purpose REGISTER)
+ *       404:
+ *         description: USER_NOT_FOUND (purpose LOGIN). Với RESET_PASSWORD luôn trả về thành công để không lộ SĐT tồn tại hay không.
  *       429:
- *         description: Cooldown active
+ *         description: OTP_COOLDOWN_ACTIVE (60s), OTP_DAILY_LIMIT_REACHED (10 SMS/SĐT/ngày) hoặc TOO_MANY_REQUESTS (giới hạn theo IP)
  */
-router.post('/send', validate(sendOtpSchema), otpController.sendOtp)
-
-/**
- * @openapi
- * /api/auth/otp/verify:
- *   post:
- *     summary: Verify OTP
- *     description: Verifies the 6-digit OTP code against the one stored in Redis.
- *     tags:
- *       - Auth
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - phone
- *               - purpose
- *               - code
- *             properties:
- *               phone:
- *                 type: string
- *                 example: "0987654321"
- *               purpose:
- *                 type: string
- *                 enum: [REGISTER, LOGIN, RESET_PASSWORD]
- *                 example: REGISTER
- *               code:
- *                 type: string
- *                 example: "123456"
- *     responses:
- *       200:
- *         description: OTP verified successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: string
- *                   example: success
- *                 message:
- *                   type: string
- *                   example: OTP_VERIFIED_SUCCESS
- *                 data:
- *                   type: object
- *                   properties:
- *                     isValid:
- *                       type: boolean
- *                       example: true
- *       400:
- *         description: Invalid OTP or expired
- */
-router.post('/verify', validate(verifyOtpSchema), otpController.verifyOtp)
+router.post(
+  '/send',
+  validate(sendOtpSchema),
+  rateLimit({ name: 'otp-send-ip-hour', max: 10, windowSec: 60 * 60 }),
+  rateLimit({ name: 'otp-send-ip-day', max: 30, windowSec: 24 * 60 * 60 }),
+  otpController.sendOtp
+)
 
 export default router

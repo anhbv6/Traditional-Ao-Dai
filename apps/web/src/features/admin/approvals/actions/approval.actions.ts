@@ -1,7 +1,8 @@
 "use server";
 
 import { prisma } from "../../server/db.server";
-import { type ApprovalStatus } from "@repo/db";
+import { authorizeAdminAction } from "../../server/adminAuth.server";
+import { type ApprovalStatus, type Prisma } from "@repo/db";
 import { type CreateApprovalInput, type ReviewApprovalInput } from "../types/approval.types";
 import { getApprovalRequestsQuery } from "../queries/approval.queries";
 
@@ -9,17 +10,20 @@ import { getApprovalRequestsQuery } from "../queries/approval.queries";
  * Server Action: Lấy danh sách yêu cầu phê duyệt
  */
 export async function getApprovalRequestsAction(statusFilter?: ApprovalStatus) {
+  const auth = await authorizeAdminAction();
+  if (!auth.success) return auth;
+
   try {
     const data = await getApprovalRequestsQuery(statusFilter);
     return {
       success: true,
       data,
     };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Lỗi Action getApprovalRequestsAction:", error);
     return {
       success: false,
-      error: error?.message || "Không thể tải danh sách phê duyệt từ cơ sở dữ liệu.",
+      error: "APPROVAL_LIST_FAILED",
     };
   }
 }
@@ -28,14 +32,18 @@ export async function getApprovalRequestsAction(statusFilter?: ApprovalStatus) {
  * Server Action: Nhân viên tạo yêu cầu gửi lên Admin phê duyệt
  */
 export async function createApprovalRequestAction(input: CreateApprovalInput) {
+  const auth = await authorizeAdminAction();
+  if (!auth.success) return auth;
+
   try {
     const request = await prisma.approvalRequest.create({
       data: {
         actionType: input.actionType,
         description: input.description,
-        payload: input.payload as any,
+        payload: input.payload as Prisma.InputJsonValue,
         status: "PENDING",
-        requestedById: input.requestedById,
+        // Luôn lấy người gửi từ phiên đăng nhập, không tin giá trị client gửi lên
+        requestedById: auth.user.id,
       },
       include: {
         requestedBy: {
@@ -52,7 +60,7 @@ export async function createApprovalRequestAction(input: CreateApprovalInput) {
     console.error("Lỗi Action createApprovalRequestAction:", error);
     return {
       success: false,
-      error: "Không thể tạo yêu cầu phê duyệt.",
+      error: "APPROVAL_CREATE_FAILED",
     };
   }
 }
@@ -61,6 +69,9 @@ export async function createApprovalRequestAction(input: CreateApprovalInput) {
  * Server Action: Admin phê duyệt hoặc từ chối yêu cầu của Staff
  */
 export async function reviewApprovalRequestAction(input: ReviewApprovalInput) {
+  const auth = await authorizeAdminAction({ role: "ADMIN" });
+  if (!auth.success) return auth;
+
   try {
     const existing = await prisma.approvalRequest.findUnique({
       where: { id: input.requestId },
@@ -69,14 +80,14 @@ export async function reviewApprovalRequestAction(input: ReviewApprovalInput) {
     if (!existing) {
       return {
         success: false,
-        error: "Yêu cầu phê duyệt không tồn tại.",
+        error: "APPROVAL_NOT_FOUND",
       };
     }
 
     if (existing.status !== "PENDING") {
       return {
         success: false,
-        error: "Yêu cầu này đã được xử lý trước đó.",
+        error: "APPROVAL_ALREADY_PROCESSED",
       };
     }
 
@@ -85,7 +96,7 @@ export async function reviewApprovalRequestAction(input: ReviewApprovalInput) {
       where: { id: input.requestId },
       data: {
         status: input.status,
-        reviewedById: input.reviewedById,
+        reviewedById: auth.user.id,
         rejectReason: input.status === "REJECTED" ? input.rejectReason : null,
       },
       include: {
@@ -100,7 +111,7 @@ export async function reviewApprovalRequestAction(input: ReviewApprovalInput) {
 
     // Nếu phê duyệt thành công, tự động thực thi logic nghiệp vụ tương ứng
     if (input.status === "APPROVED") {
-      const payload = existing.payload as Record<string, any>;
+      const payload = existing.payload as Record<string, unknown> | null;
       if (existing.actionType === "CANCEL_ORDER" && payload?.orderId) {
         await prisma.order.update({
           where: { id: String(payload.orderId) },
@@ -117,7 +128,7 @@ export async function reviewApprovalRequestAction(input: ReviewApprovalInput) {
     console.error("Lỗi Action reviewApprovalRequestAction:", error);
     return {
       success: false,
-      error: "Không thể xử lý phê duyệt yêu cầu.",
+      error: "APPROVAL_REVIEW_FAILED",
     };
   }
 }

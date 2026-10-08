@@ -1,5 +1,6 @@
 'use client';
 
+import { VIETNAM_PHONE_REGEX } from '@repo/shared';
 import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { motion } from 'motion/react';
@@ -49,8 +50,7 @@ export function EnterForgotForm({
         return;
       }
     } else {
-      const phoneRegex = /^(0|\+84)[3|5|7|8|9][0-9]{8}$/;
-      if (!phoneRegex.test(cleanVal)) {
+      if (!VIETNAM_PHONE_REGEX.test(cleanVal)) {
         showToast.error(t('invalidPhone') || 'Số điện thoại không hợp lệ.');
         return;
       }

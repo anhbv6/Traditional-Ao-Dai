@@ -1,14 +1,18 @@
 import { z } from 'zod'
+import {
+  emailSchema,
+  loginPasswordSchema,
+  newPasswordSchema,
+  verificationCodeSchema,
+  vietnamPhoneSchema,
+} from '@repo/shared'
 
-const vietnamPhoneSchema = z.string().regex(/^(0|\+84)[35789][0-9]{8}$/, 'Invalid phone number format')
+// Mọi thông điệp lỗi là MÃ KEY viết hoa — FE dịch qua messages/<locale>/errors.json
 
-/**
- * Validation schema for credentials login (email and password)
- */
 export const loginSchema = z.object({
   body: z.object({
-    email: z.string().min(1, 'Email or phone number is required'),
-    password: z.string().min(6, 'Password must be at least 6 characters'),
+    email: z.string().trim().min(1, 'EMAIL_OR_PHONE_REQUIRED'),
+    password: loginPasswordSchema,
     rememberMe: z.boolean().optional().default(false),
   }),
 })
@@ -17,7 +21,7 @@ export type LoginInput = z.infer<typeof loginSchema>
 
 export const refreshTokenSchema = z.object({
   body: z.object({
-    refreshToken: z.string().min(1, 'Refresh token is required'),
+    refreshToken: z.string().min(1, 'REFRESH_TOKEN_REQUIRED'),
   }),
 })
 
@@ -25,28 +29,28 @@ export type RefreshTokenInput = z.infer<typeof refreshTokenSchema>
 
 export const logoutSchema = z.object({
   body: z.object({
-    refreshToken: z.string().min(1, 'Refresh token is required').optional(),
+    refreshToken: z.string().min(1, 'REFRESH_TOKEN_REQUIRED').optional(),
   }).optional(),
 })
 
 export type LogoutInput = z.infer<typeof logoutSchema>
 
 const baseRegisterSchema = z.object({
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-  name: z.string().min(2, 'Name must be at least 2 characters').optional(),
+  password: newPasswordSchema,
+  name: z.string().trim().min(2, 'NAME_MIN_LENGTH').optional(),
 })
 
 const emailRegisterSchema = baseRegisterSchema.extend({
   registerType: z.literal('email'),
-  email: z.string().email('Invalid email format'),
-  phone: vietnamPhoneSchema.optional(),
+  email: emailSchema,
+  // Không nhận SĐT khi đăng ký bằng email: SĐT chỉ được gắn vào tài khoản sau khi xác minh OTP
 })
 
 const phoneRegisterSchema = baseRegisterSchema.extend({
   registerType: z.literal('phone'),
   phone: vietnamPhoneSchema,
-  code: z.string().regex(/^\d{6}$/, 'OTP code must be exactly 6 digits'),
-  email: z.string().email('Invalid email format').optional(),
+  code: verificationCodeSchema,
+  email: emailSchema.optional(),
 })
 
 export const registerSchema = z.object({
@@ -58,24 +62,19 @@ export const registerSchema = z.object({
 
 export type RegisterInput = z.infer<typeof registerSchema>
 
-/**
- * Validation schema for checking email/phone availability
- */
 export const checkAccountSchema = z.object({
   query: z.object({
-    email: z.string().email('Invalid email format').optional(),
+    email: emailSchema.optional(),
     phone: vietnamPhoneSchema.optional(),
   }),
 })
 
 export type CheckAccountInput = z.infer<typeof checkAccountSchema>
 
-
-
 export const otpLoginSchema = z.object({
   body: z.object({
     phone: vietnamPhoneSchema,
-    code: z.string().regex(/^\d{6}$/, 'OTP code must be exactly 6 digits'),
+    code: verificationCodeSchema,
     rememberMe: z.boolean().optional().default(false),
   }),
 })
@@ -84,7 +83,7 @@ export type OtpLoginInput = z.infer<typeof otpLoginSchema>
 
 export const googleLoginSchema = z.object({
   body: z.object({
-    credential: z.string().min(1, 'Google credential token is required'),
+    credential: z.string().min(1, 'GOOGLE_CREDENTIAL_REQUIRED'),
     rememberMe: z.boolean().optional().default(true),
   }),
 })
@@ -93,7 +92,7 @@ export type GoogleLoginInput = z.infer<typeof googleLoginSchema>
 
 export const forgotPasswordEmailSchema = z.object({
   body: z.object({
-    email: z.string().email('Invalid email format'),
+    email: emailSchema,
   }),
 })
 
@@ -101,12 +100,12 @@ export type ForgotPasswordEmailInput = z.infer<typeof forgotPasswordEmailSchema>
 
 export const resetPasswordEmailSchema = z.object({
   body: z.object({
-    email: z.string().email('Invalid email format'),
-    code: z.string().regex(/^\d{6}$/, 'Verification code must be exactly 6 digits').optional(),
-    resetToken: z.string().min(20, 'Reset token is invalid').optional(),
-    password: z.string().min(6, 'Password must be at least 6 characters'),
+    email: emailSchema,
+    code: verificationCodeSchema.optional(),
+    resetToken: z.string().min(20, 'RESET_TOKEN_INVALID').optional(),
+    password: newPasswordSchema,
   }).refine((data) => data.code || data.resetToken, {
-    message: 'Verification code or reset token is required',
+    message: 'VERIFICATION_CODE_OR_RESET_TOKEN_REQUIRED',
     path: ['code'],
   }),
 })
@@ -116,11 +115,11 @@ export type ResetPasswordEmailInput = z.infer<typeof resetPasswordEmailSchema>
 export const resetPasswordPhoneSchema = z.object({
   body: z.object({
     phone: vietnamPhoneSchema,
-    code: z.string().regex(/^\d{6}$/, 'OTP code must be exactly 6 digits').optional(),
-    resetToken: z.string().min(20, 'Reset token is invalid').optional(),
-    password: z.string().min(6, 'Password must be at least 6 characters'),
+    code: verificationCodeSchema.optional(),
+    resetToken: z.string().min(20, 'RESET_TOKEN_INVALID').optional(),
+    password: newPasswordSchema,
   }).refine((data) => data.code || data.resetToken, {
-    message: 'OTP code or reset token is required',
+    message: 'OTP_CODE_OR_RESET_TOKEN_REQUIRED',
     path: ['code'],
   }),
 })
@@ -129,8 +128,8 @@ export type ResetPasswordPhoneInput = z.infer<typeof resetPasswordPhoneSchema>
 
 export const verifyResetPasswordEmailSchema = z.object({
   body: z.object({
-    email: z.string().email('Invalid email format'),
-    code: z.string().regex(/^\d{6}$/, 'Verification code must be exactly 6 digits'),
+    email: emailSchema,
+    code: verificationCodeSchema,
   }),
 })
 
@@ -139,7 +138,7 @@ export type VerifyResetPasswordEmailInput = z.infer<typeof verifyResetPasswordEm
 export const verifyResetPasswordPhoneSchema = z.object({
   body: z.object({
     phone: vietnamPhoneSchema,
-    code: z.string().regex(/^\d{6}$/, 'OTP code must be exactly 6 digits'),
+    code: verificationCodeSchema,
   }),
 })
 

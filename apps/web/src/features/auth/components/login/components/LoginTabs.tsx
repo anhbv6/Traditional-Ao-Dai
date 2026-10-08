@@ -1,13 +1,13 @@
 import React from 'react';
 import { Key, Smartphone } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { motion } from 'motion/react';
+import { motion, type Variants } from 'motion/react';
 
 interface LoginTabsProps {
   isOtpMode: boolean;
   setIsOtpMode: (val: boolean) => void;
   t: (key: string) => string;
-  itemVariants: any;
+  itemVariants: Variants;
 }
 
 export function LoginTabs({ isOtpMode, setIsOtpMode, t, itemVariants }: LoginTabsProps) {

@@ -17,19 +17,3 @@ export async function sendOtp(req: Request, res: Response, next: NextFunction): 
     return next(error)
   }
 }
-
-/**
- * Controller handler for verifying OTP
- */
-export async function verifyOtp(req: Request, res: Response, next: NextFunction): Promise<any> {
-  try {
-    const { phone, purpose, code } = req.body
-    const isValid = await otpService.verifyOtp(phone, purpose, code)
-    return sendSuccess(res, {
-      data: { isValid },
-      message: 'OTP_VERIFIED_SUCCESS',
-    })
-  } catch (error) {
-    return next(error)
-  }
-}

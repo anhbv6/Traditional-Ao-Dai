@@ -5,7 +5,6 @@ import { Search, ChevronDown, HelpCircle } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
 import { useFaqs } from "../hooks/useFaqs";
-import { type CategoryId } from "../types/faqs.types";
 
 export function FaqsExperience() {
   const {

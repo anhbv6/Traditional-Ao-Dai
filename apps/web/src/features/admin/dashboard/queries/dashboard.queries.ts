@@ -1,5 +1,6 @@
+import { toVnd } from "@repo/shared";
 import { prisma } from "../../server/db.server";
-import { type FilterType, type StatItem, type OrderItem } from "../types/dashboard.types";
+import { type FilterType, type StatItem} from "../types/dashboard.types";
 
 /**
  * Lấy số liệu thống kê tổng quan (Doanh thu, số đơn, tỉ lệ may đo...) từ DB
@@ -7,7 +8,7 @@ import { type FilterType, type StatItem, type OrderItem } from "../types/dashboa
 export async function getDashboardStatsQuery(filter: FilterType = "week"): Promise<StatItem> {
   try {
     const now = new Date();
-    let startDate = new Date();
+    const startDate = new Date();
 
     if (filter === "today") {
       startDate.setHours(0, 0, 0, 0);
@@ -101,10 +102,22 @@ export async function getAdminOrdersQuery() {
       take: 50,
     });
 
-    return orders;
+    // Decimal của Prisma không serialize được qua Server Action -> chuyển về số nguyên VND
+    return orders.map((order) => ({
+      ...order,
+      subTotal: toVnd(order.subTotal),
+      discountAmount: toVnd(order.discountAmount),
+      shippingFee: toVnd(order.shippingFee),
+      totalAmount: toVnd(order.totalAmount),
+      items: order.items.map((item) => ({
+        ...item,
+        unitPrice: toVnd(item.unitPrice),
+        totalPrice: toVnd(item.totalPrice),
+      })),
+    }));
   } catch (error) {
     console.error("Lỗi khi query danh sách đơn hàng:", error);
-    throw new Error("Không thể tải danh sách đơn hàng.");
+    throw new Error("ORDER_LIST_FAILED");
   }
 }
 
@@ -154,3 +167,6 @@ export async function getTailoringMonitorQuery() {
     return [];
   }
 }
+
+/** Đơn hàng thô (đã chuẩn hóa tiền tệ) trả về từ getAdminOrdersQuery */
+export type AdminDashboardOrder = Awaited<ReturnType<typeof getAdminOrdersQuery>>[number];

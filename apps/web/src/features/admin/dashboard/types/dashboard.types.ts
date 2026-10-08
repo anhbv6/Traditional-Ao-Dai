@@ -1,4 +1,6 @@
 import { type OrderStatus as DbOrderStatus } from "@repo/db";
+import { formatVnd } from "@repo/shared";
+import { type AdminDashboardOrder } from "../queries/dashboard.queries";
 
 export type FilterType = "today" | "week" | "month";
 
@@ -132,9 +134,9 @@ export function mapUiStatusToDbStatus(status: OrderStatus): DbOrderStatus {
 /**
  * Chuyển đổi dữ liệu đơn hàng từ Prisma DB sang OrderItem cho giao diện Dashboard
  */
-export function mapPrismaOrderToOrderItem(order: any): OrderItem {
-  const isCustom = order.items?.some((i: any) => i.isCustomFit) ?? false;
-  const customItem = order.items?.find((i: any) => i.isCustomFit && (i.height || i.bust || i.waist));
+export function mapPrismaOrderToOrderItem(order: AdminDashboardOrder): OrderItem {
+  const isCustom = order.items.some((i) => i.isCustomFit);
+  const customItem = order.items.find((i) => i.isCustomFit && (i.height || i.bust || i.waist));
 
   const measurements: Measurement | undefined = customItem
     ? {
@@ -160,14 +162,14 @@ export function mapPrismaOrderToOrderItem(order: any): OrderItem {
     rawId: order.id,
     customer: order.customerName || order.createdBy?.name || "Khách hàng",
     type: isCustom ? "custom" : "ready",
-    total: `${Number(order.totalAmount || 0).toLocaleString("vi-VN")} ₫`,
+    total: formatVnd(order.totalAmount),
     status: mapDbStatusToUiStatus(order.orderStatus),
     date: dateStr,
     phone: order.customerPhone || "—",
     address: order.shippingAddress || "—",
-    items: (order.items || []).map((item: any) => ({
+    items: order.items.map((item) => ({
       name: item.productName || item.product?.name || "Áo Dài",
-      price: `${Number(item.totalPrice || item.unitPrice || 0).toLocaleString("vi-VN")} ₫`,
+      price: formatVnd(item.totalPrice || item.unitPrice),
       quantity: item.quantity || 1,
       size: item.isCustomFit ? undefined : "M",
     })),

@@ -1,13 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { useAuthStore } from "@/features/auth/store/authStore";
-import { type AuthUser } from "@/features/auth/types/auth.types";
+import { useAuthStore, type AuthUser } from "@/features/auth";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { apiClient, getErrorMessage } from "@/lib/api-client";
+import { apiClient } from "@/lib/api-client";
+import { getErrorMessage, translateMessage } from "@/lib/messages";
 import { showToast as toast } from "@/components/ui/toast";
 import { useTranslations } from "next-intl";
-import { translateProfileResponse } from "../utils/translateProfileResponse";
 
 // Helper to parse User-Agent
 function parseUserAgent(ua: string) {
@@ -125,20 +124,20 @@ export function useSecurity() {
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-      toast.success("Thay đổi mật khẩu thành công!");
+      toast.success(t("security.toasts.passwordChangeSuccess"));
       setTimeout(() => setShowSuccessPass(false), 3000);
     },
     onError: (error: unknown) => {
-      const fallback = "Có lỗi xảy ra khi đổi mật khẩu";
+      const fallback = t("security.toasts.passwordChangeError");
       const message = getErrorMessage(error, fallback);
-      toast.error(translateProfileResponse(t, message, fallback));
+      toast.error(translateMessage(message, fallback, t));
     },
   });
 
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (newPassword !== confirmPassword) {
-      toast.error("Mật khẩu xác nhận không khớp.");
+      toast.error(t("security.toasts.passwordMismatch"));
       return;
     }
     changePasswordMutation.mutate({
@@ -162,10 +161,10 @@ export function useSecurity() {
       setShow2faSetup(false);
       setOtpCode("");
       setShowSuccess2fa(true);
-      toast.success("Thiết lập 2FA thành công!");
+      toast.success(t("security.twoFactor.success"));
       setTimeout(() => setShowSuccess2fa(false), 3000);
     } else {
-      toast.error("Mã OTP không hợp lệ.");
+      toast.error(t("security.toasts.otpInvalid"));
     }
   };
 
@@ -176,12 +175,12 @@ export function useSecurity() {
     },
     onSuccess: () => {
       refetchSessions();
-      toast.success("Đã đăng xuất thiết bị thành công!");
+      toast.success(t("security.toasts.revokeSuccess"));
     },
     onError: (error: unknown) => {
-      const fallback = "Có lỗi xảy ra khi hủy phiên đăng nhập";
+      const fallback = t("security.toasts.revokeError");
       const message = getErrorMessage(error, fallback);
-      toast.error(translateProfileResponse(t, message, fallback));
+      toast.error(translateMessage(message, fallback, t));
     },
   });
 
@@ -209,12 +208,12 @@ export function useSecurity() {
       if (response.data) {
         setUser(response.data);
       }
-      toast.success("Liên kết tài khoản Google thành công!");
+      toast.success(t("security.toasts.linkGoogleSuccess"));
     },
     onError: (error: unknown) => {
-      const fallback = "Có lỗi xảy ra khi liên kết tài khoản";
+      const fallback = t("security.toasts.linkGoogleError");
       const message = getErrorMessage(error, fallback);
-      toast.error(translateProfileResponse(t, message, fallback));
+      toast.error(translateMessage(message, fallback, t));
     },
   });
 
@@ -228,12 +227,12 @@ export function useSecurity() {
       if (response.data) {
         setUser(response.data);
       }
-      toast.success("Hủy liên kết tài khoản Google thành công!");
+      toast.success(t("security.toasts.unlinkGoogleSuccess"));
     },
     onError: (error: unknown) => {
-      const fallback = "Có lỗi xảy ra khi hủy liên kết";
+      const fallback = t("security.toasts.unlinkGoogleError");
       const message = getErrorMessage(error, fallback);
-      toast.error(translateProfileResponse(t, message, fallback));
+      toast.error(translateMessage(message, fallback, t));
     },
   });
 

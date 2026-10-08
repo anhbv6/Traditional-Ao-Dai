@@ -21,7 +21,7 @@ const TestimonialCard = ({ name, role, content, avatar }: TestimonialCardProps) 
         </div>
         
         <p className="mt-4 font-[family-name:var(--font-lora)] text-[var(--text-main)] text-[14px] leading-relaxed italic">
-          "{content}"
+          &ldquo;{content}&rdquo;
         </p>
       </div>
       

@@ -1,4 +1,5 @@
 import React from "react";
+import { formatVnd } from "@repo/shared";
 import Image from "next/image";
 import { Trash2, Plus, Minus } from "lucide-react";
 import { Link } from "@/i18n/routing";
@@ -6,9 +7,9 @@ import { type CartItem } from "../types/cart.types";
 
 interface CartItemListProps {
   cartItems: CartItem[];
-  handleQuantityChange: (id: number, delta: number) => void;
-  handleQuantityInput: (id: number, value: string) => void;
-  handleRemoveItem: (id: number) => void;
+  handleQuantityChange: (id: string, delta: number) => void;
+  handleQuantityInput: (id: string, value: string) => void;
+  handleRemoveItem: (id: string) => void;
 }
 
 export function CartItemList({
@@ -47,7 +48,7 @@ export function CartItemList({
                 </p>
               </div>
               <p className="text-sm sm:text-base font-extrabold text-[#2A2525]">
-                ${item.price.toFixed(2)}
+                {formatVnd(item.price)}
               </p>
             </div>
 

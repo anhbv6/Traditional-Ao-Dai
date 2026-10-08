@@ -25,7 +25,9 @@ import { ProductCard } from './ProductCard';
 import { ProductMobileFilterDock } from './ProductMobileFilterDock';
 import { FilterSidebar } from './FilterSidebar';
 import { useProducts } from '../hooks/useProducts';
-import { productCatalog, type GridSize, type SortKey } from '../types/products.types';
+import { type GridSize, type SortKey } from '../types/products.types';
+import { productCatalog } from '../data/mockProducts';
+import { parseVndString } from '@/features/cart';
 
 const sortKeys: SortKey[] = ['all', 'newest', 'priceAsc', 'priceDesc', 'bestSeller', 'favorite'];
 
@@ -63,7 +65,6 @@ export function ProductsCollection({ initialCategory }: ProductsCollectionProps)
     setSortKey,
     gridSize,
     setGridSize,
-    currentPage,
     productListTopRef,
     filteredProducts,
     visibleProducts,
@@ -240,6 +241,8 @@ export function ProductsCollection({ initialCategory }: ProductsCollectionProps)
                 name={product.name[locale]}
                 description={product.description[locale]}
                 price={product.price[locale]}
+                priceValue={parseVndString(product.price.vi)}
+                slug={product.id}
                 originalPrice={product.originalPrice?.[locale]}
                 colorSwatches={product.colors}
                 sizes={product.sizes}

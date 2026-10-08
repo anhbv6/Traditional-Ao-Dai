@@ -1,12 +1,5 @@
-export interface CartItem {
-  id: number;
-  name: string;
-  slug: string;
-  image: string;
-  quantity: number;
-  price: number;
-  size: string;
-}
+// Checkout dùng chung kiểu dòng giỏ hàng với feature cart
+export type { CartItem } from "@/features/cart";
 
 export interface ShippingData {
   fullName: string;

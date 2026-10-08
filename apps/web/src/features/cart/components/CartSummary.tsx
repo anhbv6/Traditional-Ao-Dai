@@ -1,4 +1,5 @@
 import React from "react";
+import { formatVnd } from "@repo/shared";
 import { Link } from "@/i18n/routing";
 import { type ActiveDiscount } from "../types/cart.types";
 
@@ -8,7 +9,6 @@ interface CartSummaryProps {
   discountAmount: number;
   shippingCost: number;
   shippingThreshold: number;
-  tax: number;
   total: number;
 }
 
@@ -18,7 +18,6 @@ export function CartSummary({
   discountAmount,
   shippingCost,
   shippingThreshold,
-  tax,
   total,
 }: CartSummaryProps) {
   return (
@@ -30,14 +29,14 @@ export function CartSummary({
       <div className="mt-4 space-y-3 text-xs text-[#706565]">
         <div className="flex items-center justify-between">
           <span>Tạm tính</span>
-          <span className="font-semibold text-[#2A2525]">${subtotal.toFixed(2)}</span>
+          <span className="font-semibold text-[#2A2525]">{formatVnd(subtotal)}</span>
         </div>
 
         {activeDiscount && (
           <div className="flex items-center justify-between text-emerald-600 font-medium">
             <span>Mã giảm giá ({activeDiscount.code})</span>
             {activeDiscount.type === "percentage" ? (
-              <span>-${discountAmount.toFixed(2)}</span>
+              <span>-{formatVnd(discountAmount)}</span>
             ) : (
               <span>Freeship</span>
             )}
@@ -49,18 +48,16 @@ export function CartSummary({
           {shippingCost === 0 ? (
             <span className="text-emerald-600 font-semibold">Miễn phí</span>
           ) : (
-            <span className="font-semibold text-[#2A2525]">${shippingCost.toFixed(2)}</span>
+            <span className="font-semibold text-[#2A2525]">{formatVnd(shippingCost)}</span>
           )}
         </div>
 
-        <div className="flex items-center justify-between">
-          <span>Thuế VAT (8%)</span>
-          <span className="font-semibold text-[#2A2525]">${tax.toFixed(2)}</span>
-        </div>
 
         <div className="border-t border-[#E2D9D2]/60 pt-3 flex items-end justify-between">
-          <span className="text-sm font-bold text-[#2A2525]">Tổng cộng</span>
-          <span className="text-lg font-extrabold text-[#800020]">${total.toFixed(2)}</span>
+          <span className="text-sm font-bold text-[#2A2525]">
+            Tổng cộng <span className="block text-[10px] font-normal text-[#706565]">(Đã bao gồm VAT)</span>
+          </span>
+          <span className="text-lg font-extrabold text-[#800020]">{formatVnd(total)}</span>
         </div>
       </div>
 
@@ -68,12 +65,12 @@ export function CartSummary({
       {shippingCost > 0 && (
         <div className="mt-4 p-3 bg-white border border-[#E2D9D2]/30 rounded-lg text-[10px] text-[#706565]">
           <p>
-            Mua thêm <span className="font-bold text-[#800020]">${(shippingThreshold - subtotal).toFixed(2)}</span> để được <strong>Miễn phí vận chuyển</strong>!
+            Mua thêm <span className="font-bold text-[#800020]">{formatVnd(shippingThreshold - subtotal)}</span> để được <strong>Miễn phí vận chuyển</strong>!
           </p>
           <div className="mt-2 w-full h-1.5 bg-[#FAF7F5] rounded-full overflow-hidden">
             <div 
               className="h-full bg-[#800020] transition-all duration-500" 
-              style={{ width: `${(subtotal / shippingThreshold) * 100}%` }}
+              style={{ width: `${Math.min(100, (subtotal / shippingThreshold) * 100)}%` }}
             />
           </div>
         </div>

@@ -1,8 +1,9 @@
 import { useState } from 'react';
+import { VIETNAM_PHONE_REGEX } from '@repo/shared';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/routing';
-import { getMeApi, loginApi, sendOtpApi, loginWithOtpApi, loginWithGoogleApi } from '../api/auth.api';
-import { useAuthStore } from '../store/authStore';
+import { loginApi, sendOtpApi, loginWithOtpApi, loginWithGoogleApi } from '../api/auth.api';
+import { establishCustomerSession } from '../utils/session';
 import { showToast } from '@/components/ui/toast';
 import { notifyError, notifySuccess } from '@/lib/messages';
 
@@ -22,18 +23,7 @@ export function useLogin() {
     try {
       const res = await loginApi({ email: emailOrPhone.trim(), password, rememberMe });
 
-      const { setAccessToken, setAuthenticated, setLoading } = useAuthStore.getState();
-      setAccessToken(res.data.accessToken);
-
-      const me = await getMeApi();
-      setAuthenticated(res.data.accessToken, me.data);
-      setLoading(false);
-
-      // Lưu cookie cho Next.js Server Middleware (Proxy) nhận diện
-      // Nếu rememberMe=true: lưu 7 ngày; nếu false: session cookie (tự xóa khi tắt trình duyệt, khớp với BE)
-      const maxAgeAttr = rememberMe ? `; max-age=${7 * 86400}` : '';
-      document.cookie = `user_logged_in=true; path=/${maxAgeAttr}; SameSite=Lax`;
-      document.cookie = `auth_role=${me.data?.role || 'CUSTOMER'}; path=/${maxAgeAttr}; SameSite=Lax`;
+      await establishCustomerSession(res.data.accessToken);
 
       notifySuccess(res.message, t('LOGIN_SUCCESS') || t('success'), t);
 
@@ -48,8 +38,7 @@ export function useLogin() {
   };
 
   const sendOtpCode = async (phone: string) => {
-    const phoneRegex = /^(0|\+84)[3|5|7|8|9][0-9]{8}$/;
-    if (!phoneRegex.test(phone.trim())) {
+    if (!VIETNAM_PHONE_REGEX.test(phone.trim())) {
       showToast.error(t('invalidPhone') || 'Số điện thoại không hợp lệ');
       return;
     }
@@ -73,16 +62,7 @@ export function useLogin() {
     try {
       const res = await loginWithOtpApi({ phone, code: otpInput, rememberMe });
 
-      const { setAccessToken, setAuthenticated, setLoading } = useAuthStore.getState();
-      setAccessToken(res.data.accessToken);
-
-      const me = await getMeApi();
-      setAuthenticated(res.data.accessToken, me.data);
-      setLoading(false);
-
-      const maxAgeAttr = rememberMe ? `; max-age=${7 * 86400}` : '';
-      document.cookie = `user_logged_in=true; path=/${maxAgeAttr}; SameSite=Lax`;
-      document.cookie = `auth_role=${me.data?.role || 'CUSTOMER'}; path=/${maxAgeAttr}; SameSite=Lax`;
+      await establishCustomerSession(res.data.accessToken);
 
       notifySuccess(res.message, t('LOGIN_SUCCESS') || t('success'), t);
       router.push('/');
@@ -101,16 +81,7 @@ export function useLogin() {
     try {
       const res = await loginWithGoogleApi(credential, rememberMe);
 
-      const { setAccessToken, setAuthenticated, setLoading } = useAuthStore.getState();
-      setAccessToken(res.data.accessToken);
-
-      const me = await getMeApi();
-      setAuthenticated(res.data.accessToken, me.data);
-      setLoading(false);
-
-      const maxAgeAttr = rememberMe ? `; max-age=${7 * 86400}` : '';
-      document.cookie = `user_logged_in=true; path=/${maxAgeAttr}; SameSite=Lax`;
-      document.cookie = `auth_role=${me.data?.role || 'CUSTOMER'}; path=/${maxAgeAttr}; SameSite=Lax`;
+      await establishCustomerSession(res.data.accessToken);
 
       notifySuccess(res.message, t('LOGIN_SUCCESS') || t('success'), t);
       router.push('/');

@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useTransition } from "react";
-import { type AdminOrderItem, type OrderStatus, type PaymentStatus } from "../types/orders.types";
-import { updateOrderStatusAction, updatePaymentStatusAction } from "../actions/orders.actions";
+import { type AdminOrderItem, type OrderStatus} from "../types/orders.types";
+import { updateOrderStatusAction} from "../actions/orders.actions";
 import { 
   Package, 
   Clock, 
@@ -14,16 +14,17 @@ import {
   Filter, 
   ChevronRight,
   User,
-  Phone,
+  
   MapPin,
-  Sparkles
+  Sparkles,
+  type LucideIcon,
 } from "lucide-react";
 
 interface OrdersListProps {
   initialOrders: AdminOrderItem[];
 }
 
-const statusBadges: Record<OrderStatus, { label: string; bg: string; text: string; icon: any }> = {
+const statusBadges: Record<OrderStatus, { label: string; bg: string; text: string; icon: LucideIcon }> = {
   PENDING: { label: "Chờ xác nhận", bg: "bg-amber-50 border-amber-200", text: "text-amber-700", icon: Clock },
   CONFIRMED: { label: "Đã xác nhận", bg: "bg-blue-50 border-blue-200", text: "text-blue-700", icon: CheckCircle2 },
   IN_PRODUCTION: { label: "Đang may đo", bg: "bg-purple-50 border-purple-200", text: "text-purple-700", icon: Scissors },

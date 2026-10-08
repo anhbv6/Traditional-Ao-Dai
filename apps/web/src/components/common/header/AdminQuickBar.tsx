@@ -3,12 +3,13 @@
 import React from 'react';
 import { Shield, ArrowRight } from 'lucide-react';
 import { Link } from '@/i18n/routing';
-import { useAuthStore } from '@/features/auth/store/authStore';
+import { useAdminSession } from '@/features/admin';
 
 export function AdminQuickBar() {
-  const { user, isAuthenticated, isAdmin, isAdminOrStaff } = useAuthStore();
+  // Phiên quản trị lấy từ server, chỉ hỏi khi trình duyệt có cờ `admin_session`
+  const { user, isAdmin } = useAdminSession();
 
-  if (!isAuthenticated || !user || !isAdminOrStaff) {
+  if (!user) {
     return null;
   }
 

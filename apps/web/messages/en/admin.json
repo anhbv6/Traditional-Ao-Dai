@@ -142,5 +142,21 @@
       "completed": "Completed",
       "shipping": "Shipping"
     }
+  },
+  "toasts": {
+    "approveSuccess": "Request approved successfully!",
+    "rejectSuccess": "Request rejected successfully!",
+    "rejectReasonRequired": "Please enter a rejection reason.",
+    "avatarTooLarge": "Image size must not exceed 5MB.",
+    "avatarUploadSuccess": "Avatar uploaded successfully!",
+    "avatarUploadError": "Image upload failed. Please try again!",
+    "nameRequired": "Please enter your full name.",
+    "profileUpdateSuccess": "Profile updated successfully!",
+    "newPasswordRequired": "Please enter a new password.",
+    "passwordMismatch": "Password confirmation does not match.",
+    "passwordChangeSuccess": "Password changed! All other sessions have been signed out.",
+    "permissionUpdateSuccess": "Staff permissions updated!",
+    "staffUnlocked": "Staff account unlocked!",
+    "staffLocked": "Staff account locked!"
   }
 }

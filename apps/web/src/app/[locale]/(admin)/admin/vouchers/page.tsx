@@ -1,10 +1,13 @@
 import React from "react";
 import { getAdminVouchersQuery, VouchersList } from "@/features/admin/vouchers";
 import { Ticket } from "lucide-react";
+import { requireAdminPage } from "@/features/admin/server/adminAuth.server";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminVouchersPage() {
+  await requireAdminPage({ role: "ADMIN" });
+
   const vouchers = await getAdminVouchersQuery();
 
   return (

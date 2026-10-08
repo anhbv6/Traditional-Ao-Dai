@@ -1,3 +1,4 @@
+import { VIETNAM_PHONE_REGEX } from '@repo/shared';
 import * as z from 'zod';
 
 type RegisterTranslation = (key: string) => string;
@@ -28,7 +29,7 @@ export function createRegisterSchema(t: RegisterTranslation) {
 
   const phoneRegisterSchema = baseSchema.extend({
     registerType: z.literal('phone'),
-    phone: z.string().regex(/^(0|\+84)[3|5|7|8|9][0-9]{8}$/, {
+    phone: z.string().regex(VIETNAM_PHONE_REGEX, {
       message: t('invalidPhone'),
     }),
     email: z.string().optional(),

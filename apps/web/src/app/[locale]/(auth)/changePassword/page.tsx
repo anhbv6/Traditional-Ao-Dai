@@ -1,6 +1,5 @@
 import React from 'react';
-import { AuthImageBanner } from '@/features/auth/components/AuthImageBanner';
-import { ChangePasswordForm } from '@/features/auth/components/forgot/components/ChangePasswordForm';
+import { AuthImageBanner, ChangePasswordForm } from '@/features/auth';
 
 export default function ChangePasswordPage() {
   return (

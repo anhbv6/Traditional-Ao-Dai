@@ -1,10 +1,13 @@
 import React from "react";
 import { getAdminProductsListQuery, ProductsList } from "@/features/admin/products";
 import { Shirt } from "lucide-react";
+import { requireAdminPage } from "@/features/admin/server/adminAuth.server";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminProductsPage() {
+  await requireAdminPage();
+
   const products = await getAdminProductsListQuery();
 
   return (

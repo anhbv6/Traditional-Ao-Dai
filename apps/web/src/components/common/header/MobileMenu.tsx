@@ -17,10 +17,8 @@ import {
 import { SearchBar } from './SearchBar';
 import { Logo } from './Logo';
 import type { NavItem } from './types';
-import { logoutApi } from '@/features/auth/api/auth.api';
-import { useAuthStore } from '@/features/auth/store/authStore';
-import { clearBrowserAuthTokens } from '@/lib/api-client';
-import { isUserAdminOrStaff } from '@/features/auth/utils/authRoles';
+import { useAuthStore, useCustomerLogout } from '@/features/auth';
+import { executeAdminLogout, useAdminSession, useAdminSessionCache } from '@/features/admin';
 
 type MobileMenuProps = {
   items: NavItem[];
@@ -49,8 +47,16 @@ export function MobileMenu({
   const [isPending, startTransition] = useTransition();
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const { isAuthenticated, user, isAdminOrStaff, logout: storeLogout } = useAuthStore();
-  const isAdmin = isAdminOrStaff || isUserAdminOrStaff(user);
+  const { isAuthenticated, user: customer } = useAuthStore();
+  const { user: adminUser, isAdminOrStaff: isAdmin } = useAdminSession();
+  const adminSessionCache = useAdminSessionCache();
+  const user = customer ?? adminUser;
+  const { logout } = useCustomerLogout(async () => {
+    if (isAdmin) {
+      await executeAdminLogout();
+      adminSessionCache.clear();
+    }
+  });
   const userName = user?.name || user?.email || (isAuthenticated ? 'Account' : undefined);
 
   const handleSelectLanguage = (newLocale: string) => {
@@ -66,16 +72,7 @@ export function MobileMenu({
   const handleLogout = () => {
     setIsDrawerOpen(false);
     startTransition(async () => {
-      try {
-        await logoutApi();
-      } catch {
-        // Local logout should still complete if the server session is already gone.
-      } finally {
-        clearBrowserAuthTokens();
-        storeLogout();
-        router.push('/login');
-        router.refresh();
-      }
+      await logout();
     });
   };
 

@@ -1,72 +1,19 @@
-import { CookieOptions, Request, Response, NextFunction } from 'express'
+import { Request, Response, NextFunction } from 'express'
+import { AUTH_COOKIES } from '@repo/shared'
 import * as authService from './auth.service'
 import * as userService from '../../user/user.service'
 import { AuthenticatedRequest } from '../../../shared/middlewares/authGuard'
 import { sendSuccess, sendError } from '../../../shared/utils/response'
-import { secondsUntil } from '../../../shared/utils/number'
-
-const REFRESH_TOKEN_COOKIE = 'refreshToken'
-
+import { clearCustomerSessionCookies, setCustomerSessionCookies } from '../../../shared/utils/authCookies'
 
 function getClientIp(req: Request): string | undefined {
-  const forwardedFor = req.headers['x-forwarded-for']
-  if (Array.isArray(forwardedFor)) {
-    return forwardedFor[0]
-  }
-
-  if (typeof forwardedFor === 'string') {
-    return forwardedFor.split(',')[0]?.trim()
-  }
-
+  // `trust proxy` đã được cấu hình ở index.ts nên req.ip là IP thật (không tự đọc X-Forwarded-For vì client có thể giả mạo)
   return req.ip
 }
 
-function getCookie(req: Request, name: string): string | undefined {
-  if (req.cookies && typeof req.cookies[name] === 'string') {
-    return req.cookies[name]
-  }
-
-  const cookieHeader = req.headers.cookie
-  if (!cookieHeader) {
-    return undefined
-  }
-
-  const cookies = cookieHeader.split(';').map((cookie) => cookie.trim())
-  const prefix = `${name}=`
-  const rawCookie = cookies.find((cookie) => cookie.startsWith(prefix))
-  if (!rawCookie) {
-    return undefined
-  }
-
-  return decodeURIComponent(rawCookie.slice(prefix.length))
-}
-
-function refreshCookieOptions(rememberMe: boolean, expiresAt: Date): CookieOptions {
-  const options: CookieOptions = {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    path: '/',
-  }
-
-  if (rememberMe) {
-    options.maxAge = secondsUntil(expiresAt) * 1000
-  }
-
-  return options
-}
-
-function setRefreshTokenCookie(res: Response, refreshToken: string, rememberMe: boolean, expiresAt: Date) {
-  res.cookie(REFRESH_TOKEN_COOKIE, refreshToken, refreshCookieOptions(rememberMe, expiresAt))
-}
-
-function clearRefreshTokenCookie(res: Response) {
-  res.clearCookie(REFRESH_TOKEN_COOKIE, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    path: '/',
-  })
+function getRefreshTokenCookie(req: Request): string | undefined {
+  const value = req.cookies?.[AUTH_COOKIES.refreshToken]
+  return typeof value === 'string' && value ? value : undefined
 }
 
 /**
@@ -94,7 +41,7 @@ export async function login(req: Request, res: Response, next: NextFunction): Pr
       deviceInfo: req.headers['user-agent'],
       ipAddress: getClientIp(req),
     })
-    setRefreshTokenCookie(res, result.refreshToken, result.rememberMe, result.refreshTokenExpiresAt)
+    setCustomerSessionCookies(res, result.refreshToken, result.rememberMe, result.refreshTokenExpiresAt)
     return sendSuccess(res, {
       data: {
         accessToken: result.accessToken,
@@ -111,9 +58,9 @@ export async function login(req: Request, res: Response, next: NextFunction): Pr
  */
 export async function refreshToken(req: Request, res: Response, next: NextFunction): Promise<any> {
   try {
-    const refreshToken = getCookie(req, REFRESH_TOKEN_COOKIE)
+    const refreshToken = getRefreshTokenCookie(req)
     if (!refreshToken) {
-      clearRefreshTokenCookie(res)
+      clearCustomerSessionCookies(res)
       return sendError(res, {
         statusCode: 401,
         message: 'REFRESH_TOKEN_MISSING',
@@ -122,7 +69,7 @@ export async function refreshToken(req: Request, res: Response, next: NextFuncti
 
     const result = await authService.refreshClientToken({ refreshToken })
     if (result.refreshToken) {
-      setRefreshTokenCookie(res, result.refreshToken, result.rememberMe, result.refreshTokenExpiresAt)
+      setCustomerSessionCookies(res, result.refreshToken, result.rememberMe, result.refreshTokenExpiresAt)
     }
     return sendSuccess(res, {
       data: {
@@ -131,7 +78,7 @@ export async function refreshToken(req: Request, res: Response, next: NextFuncti
       message: 'REFRESH_TOKEN_SUCCESS',
     })
   } catch (error) {
-    clearRefreshTokenCookie(res)
+    clearCustomerSessionCookies(res)
     return next(error)
   }
 }
@@ -157,12 +104,12 @@ export async function checkAccount(req: Request, res: Response, next: NextFuncti
  */
 export async function logout(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<any> {
   try {
-    const refreshToken = getCookie(req, REFRESH_TOKEN_COOKIE)
+    const refreshToken = getRefreshTokenCookie(req)
     if (refreshToken) {
       await authService.logoutClientByRefreshToken(refreshToken)
     }
 
-    clearRefreshTokenCookie(res)
+    clearCustomerSessionCookies(res)
     return sendSuccess(res, {
       data: null,
       message: 'LOGOUT_SUCCESS',
@@ -206,7 +153,7 @@ export async function loginWithOtp(req: Request, res: Response, next: NextFuncti
       deviceInfo: req.headers['user-agent'],
       ipAddress: getClientIp(req),
     })
-    setRefreshTokenCookie(res, result.refreshToken, result.rememberMe, result.refreshTokenExpiresAt)
+    setCustomerSessionCookies(res, result.refreshToken, result.rememberMe, result.refreshTokenExpiresAt)
     return sendSuccess(res, {
       data: {
         accessToken: result.accessToken,
@@ -232,7 +179,7 @@ export async function loginWithGoogle(req: Request, res: Response, next: NextFun
       },
       rememberMe
     )
-    setRefreshTokenCookie(res, result.refreshToken, result.rememberMe, result.refreshTokenExpiresAt)
+    setCustomerSessionCookies(res, result.refreshToken, result.rememberMe, result.refreshTokenExpiresAt)
     return sendSuccess(res, {
       data: {
         accessToken: result.accessToken,

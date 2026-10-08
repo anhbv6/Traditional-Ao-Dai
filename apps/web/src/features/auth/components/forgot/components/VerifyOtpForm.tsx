@@ -5,7 +5,6 @@ import { useTranslations } from 'next-intl';
 import { motion } from 'motion/react';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { showToast } from '@/components/ui/toast';
 import { notifyError, notifySuccess } from '@/lib/messages';
 import { forgotPasswordEmailApi, verifyResetPasswordEmailApi, verifyResetPasswordPhoneApi } from '../../../api/forgot.api';
 import { sendOtpApi } from '../../../api/auth.api';

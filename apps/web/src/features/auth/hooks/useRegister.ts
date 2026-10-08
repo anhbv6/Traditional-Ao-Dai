@@ -9,12 +9,12 @@ import * as z from 'zod';
 import { type RegisterFormData } from '../types/register.types';
 import { createRegisterSchema } from '../validations/register.validation';
 import { showToast } from '@/components/ui/toast';
-import { extractErrorMessage } from '@/lib/api-client';
+import { extractErrorMessage } from '@/lib/messages';
 import { notifyError, notifySuccess, resolveErrorMessage } from '@/lib/messages';
 import { withMinDelay } from '@/lib/utils';
 import { checkEmailApi, checkPhoneApi, registerApi } from '../api/register.api';
-import { getMeApi, loginWithGoogleApi, sendOtpApi } from '../api/auth.api';
-import { useAuthStore } from '../store/authStore';
+import { loginWithGoogleApi, sendOtpApi } from '../api/auth.api';
+import { establishCustomerSession } from '../utils/session';
 
 export function useRegister() {
   const t = useTranslations('Auth');
@@ -43,6 +43,7 @@ export function useRegister() {
     register,
     handleSubmit,
     watch,
+    getValues,
     control,
     setValue,
     setError,
@@ -260,7 +261,8 @@ export function useRegister() {
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    const data = watch();
+    // Đọc giá trị form trong event handler bằng getValues (watch() chỉ dùng khi cần re-render theo giá trị)
+    const data = getValues();
     if (data.registerType !== 'phone') return;
 
     try {
@@ -288,7 +290,7 @@ export function useRegister() {
   };
 
   const handleResendOtp = async () => {
-    const data = watch();
+    const data = getValues();
     if (data.registerType !== 'phone') return;
 
     try {
@@ -308,16 +310,7 @@ export function useRegister() {
       setIsRegistering(true);
       const res = await loginWithGoogleApi(credential);
 
-      const { setAccessToken, setAuthenticated, setLoading } = useAuthStore.getState();
-      setAccessToken(res.data.accessToken);
-
-      const me = await getMeApi();
-      setAuthenticated(res.data.accessToken, me.data);
-      setLoading(false);
-
-      // Lưu cookie cho Next.js Server Middleware (Proxy) nhận diện
-      document.cookie = `user_logged_in=true; path=/; max-age=${7 * 86400}; SameSite=Lax`;
-      document.cookie = `auth_role=${me.data?.role || 'CUSTOMER'}; path=/; max-age=${7 * 86400}; SameSite=Lax`;
+      await establishCustomerSession(res.data.accessToken);
 
       notifySuccess(res.message, t('LOGIN_SUCCESS') || t('success'), t);
       router.push('/');

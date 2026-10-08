@@ -26,7 +26,6 @@ export function CartExperience() {
     discountAmount,
     shippingThreshold,
     shippingCost,
-    tax,
     total,
   } = useCart();
 
@@ -100,7 +99,6 @@ export function CartExperience() {
               discountAmount={discountAmount}
               shippingCost={shippingCost}
               shippingThreshold={shippingThreshold}
-              tax={tax}
               total={total}
             />
           </div>

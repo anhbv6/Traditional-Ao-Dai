@@ -26,7 +26,7 @@ export async function updateProfile(req: AuthenticatedRequest, res: Response, ne
 export async function changePassword(req: AuthenticatedRequest, res: Response, next: NextFunction) {
   try {
     const userId = req.user!.userId
-    await userService.changeUserPassword(userId, req.body)
+    await userService.changeUserPassword(userId, req.body, req.user!.sessionId)
     return sendSuccess(res, {
       statusCode: 200,
       message: 'CHANGE_PASSWORD_SUCCESS',
@@ -103,6 +103,68 @@ export async function revokeSession(req: AuthenticatedRequest, res: Response, ne
       statusCode: 200,
       message: 'REVOKE_SESSION_SUCCESS',
       data: null,
+    })
+  } catch (error) {
+    return next(error)
+  }
+}
+
+// ─── Contact Verification Controllers ───────────────────────────────────────────
+
+/**
+ * Gửi mã xác minh tới email
+ */
+export async function requestEmailVerification(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  try {
+    const result = await userService.requestEmailVerification(req.user!.userId, req.body.email)
+    return sendSuccess(res, {
+      message: 'VERIFICATION_CODE_SENT',
+      data: result,
+    })
+  } catch (error) {
+    return next(error)
+  }
+}
+
+/**
+ * Xác nhận mã email
+ */
+export async function confirmEmailVerification(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  try {
+    const user = await userService.confirmEmailVerification(req.user!.userId, req.body.email, req.body.code)
+    return sendSuccess(res, {
+      message: 'EMAIL_VERIFIED_SUCCESS',
+      data: user,
+    })
+  } catch (error) {
+    return next(error)
+  }
+}
+
+/**
+ * Gửi OTP tới SĐT
+ */
+export async function requestPhoneVerification(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  try {
+    const result = await userService.requestPhoneVerification(req.user!.userId, req.body.phone)
+    return sendSuccess(res, {
+      message: 'OTP_SENT_SUCCESS',
+      data: result,
+    })
+  } catch (error) {
+    return next(error)
+  }
+}
+
+/**
+ * Xác nhận OTP SĐT
+ */
+export async function confirmPhoneVerification(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  try {
+    const user = await userService.confirmPhoneVerification(req.user!.userId, req.body.phone, req.body.code)
+    return sendSuccess(res, {
+      message: 'PHONE_VERIFIED_SUCCESS',
+      data: user,
     })
   } catch (error) {
     return next(error)

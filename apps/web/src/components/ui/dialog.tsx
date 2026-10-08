@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog"
 
-import { cn } from "@/lib/utils"
+import { cn, resolveClassName } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { XIcon } from "lucide-react"
 
@@ -23,12 +23,6 @@ function DialogClose({ ...props }: DialogPrimitive.Close.Props) {
   return <DialogPrimitive.Close data-slot="dialog-close" {...props} />
 }
 
-function resolveClassName<T>(
-  className: string | ((state: T) => string | undefined) | undefined,
-  state: T
-): string | undefined {
-  return typeof className === "function" ? className(state) : className
-}
 
 function DialogOverlay({
   className,

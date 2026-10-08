@@ -6,7 +6,7 @@ import { Lock, Eye, EyeOff, Shield, ShieldAlert, Sparkles, Smartphone, LogOut, L
 import { useSecurity } from "../../hooks/useProfile";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
-import { GoogleAuthButton } from "@/features/auth/components/GoogleAuthButton";
+import { GoogleAuthButton } from "@/features/auth";
 
 export function SecurityTab() {
   const t = useTranslations("ProfilePage.security");

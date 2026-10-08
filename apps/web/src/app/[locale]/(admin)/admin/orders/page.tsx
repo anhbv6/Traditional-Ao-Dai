@@ -1,10 +1,13 @@
 import React from "react";
 import { getAdminOrdersListQuery, OrdersList } from "@/features/admin/orders";
 import { ShoppingBag } from "lucide-react";
+import { requireAdminPage } from "@/features/admin/server/adminAuth.server";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminOrdersPage() {
+  await requireAdminPage();
+
   const orders = await getAdminOrdersListQuery();
 
   return (

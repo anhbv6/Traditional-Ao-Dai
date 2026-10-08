@@ -3,7 +3,8 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useLocale } from "next-intl";
 import { useLenis } from "lenis/react";
-import { productCatalog, type GridSize, type SortKey, type Locale } from "../types/products.types";
+import { type GridSize, type SortKey, type Locale } from "../types/products.types";
+import { productCatalog } from "../data/mockProducts";
 import { maxPrice, matchCollection } from "../components/FilterSidebar";
 
 const pageSizeMap: Record<GridSize, number> = {

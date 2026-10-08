@@ -1,10 +1,13 @@
 import React from "react";
 import { getAdminCustomersQuery, CustomersList } from "@/features/admin/customers";
 import { Users } from "lucide-react";
+import { requireAdminPage } from "@/features/admin/server/adminAuth.server";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminCustomersPage() {
+  await requireAdminPage();
+
   const customers = await getAdminCustomersQuery();
 
   return (

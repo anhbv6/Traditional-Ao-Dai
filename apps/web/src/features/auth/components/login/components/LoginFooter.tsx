@@ -1,10 +1,10 @@
 import React from 'react';
 import { Link } from '@/i18n/routing';
-import { motion } from 'motion/react';
+import { motion, type Variants } from 'motion/react';
 
 interface LoginFooterProps {
   t: (key: string) => string;
-  itemVariants: any;
+  itemVariants: Variants;
 }
 
 export function LoginFooter({ t, itemVariants }: LoginFooterProps) {

@@ -1,6 +1,5 @@
 import React from 'react';
-import { AuthImageBanner } from '@/features/auth/components/AuthImageBanner';
-import { RegisterForm } from '@/features/auth/components/register/RegisterForm';
+import { AuthImageBanner, RegisterForm } from '@/features/auth';
 
 export default function RegisterPage() {
   return (

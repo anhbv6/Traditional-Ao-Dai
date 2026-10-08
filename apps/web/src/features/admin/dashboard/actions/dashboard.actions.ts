@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "../../server/db.server";
+import { authorizeAdminAction } from "../../server/adminAuth.server";
 import { type OrderStatus as DbOrderStatus } from "@repo/db";
 import { type CreateStaffOrderInput } from "../types/dashboard.types";
 import { getAdminOrdersQuery, getDashboardStatsQuery } from "../queries/dashboard.queries";
@@ -9,17 +10,20 @@ import { getAdminOrdersQuery, getDashboardStatsQuery } from "../queries/dashboar
  * Server Action: Lấy thống kê số liệu Dashboard
  */
 export async function getDashboardStatsAction(filter: "today" | "week" | "month" = "week") {
+  const auth = await authorizeAdminAction();
+  if (!auth.success) return auth;
+
   try {
     const stats = await getDashboardStatsQuery(filter);
     return {
       success: true,
       data: stats,
     };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Lỗi Action getDashboardStatsAction:", error);
     return {
       success: false,
-      error: error?.message || "Không thể tải số liệu thống kê.",
+      error: "DASHBOARD_STATS_FAILED",
     };
   }
 }
@@ -28,17 +32,20 @@ export async function getDashboardStatsAction(filter: "today" | "week" | "month"
  * Server Action: Lấy danh sách đơn hàng cho Admin & Staff trực tiếp từ DB
  */
 export async function getAdminOrdersAction() {
+  const auth = await authorizeAdminAction({ permission: "canManageOrders" });
+  if (!auth.success) return auth;
+
   try {
     const orders = await getAdminOrdersQuery();
     return {
       success: true,
       data: orders,
     };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Lỗi Action getAdminOrdersAction:", error);
     return {
       success: false,
-      error: error?.message || "Không thể tải danh sách đơn hàng.",
+      error: "ORDER_LIST_FAILED",
     };
   }
 }
@@ -47,6 +54,9 @@ export async function getAdminOrdersAction() {
  * Server Action: Cập nhật trạng thái đơn hàng
  */
 export async function updateOrderStatusAction(orderId: string, status: DbOrderStatus) {
+  const auth = await authorizeAdminAction({ permission: "canManageOrders" });
+  if (!auth.success) return auth;
+
   try {
     const updated = await prisma.order.update({
       where: { id: orderId },
@@ -61,7 +71,7 @@ export async function updateOrderStatusAction(orderId: string, status: DbOrderSt
     console.error("Lỗi Action updateOrderStatusAction:", error);
     return {
       success: false,
-      error: "Không thể cập nhật trạng thái đơn hàng.",
+      error: "ORDER_STATUS_UPDATE_FAILED",
     };
   }
 }
@@ -70,6 +80,9 @@ export async function updateOrderStatusAction(orderId: string, status: DbOrderSt
  * Server Action: Nhân viên tạo đơn hàng đặt hộ khách hàng tại quầy hoặc qua hotline
  */
 export async function createStaffOrderAction(input: CreateStaffOrderInput) {
+  const auth = await authorizeAdminAction({ permission: "canManageOrders" });
+  if (!auth.success) return auth;
+
   try {
     const orderNumber = `AD-${Date.now().toString().slice(-6)}`;
     const subTotal = input.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -78,7 +91,7 @@ export async function createStaffOrderAction(input: CreateStaffOrderInput) {
     const order = await prisma.order.create({
       data: {
         orderNumber,
-        createdById: input.staffId,
+        createdById: auth.user.id,
         customerName: input.customerName,
         customerEmail: input.customerEmail,
         customerPhone: input.customerPhone,
@@ -129,7 +142,7 @@ export async function createStaffOrderAction(input: CreateStaffOrderInput) {
     console.error("Lỗi Action createStaffOrderAction:", error);
     return {
       success: false,
-      error: "Không thể tạo đơn hàng trên hệ thống.",
+      error: "ORDER_CREATE_FAILED",
     };
   }
 }

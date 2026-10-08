@@ -2,13 +2,15 @@
 
 import React, { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { User, Mail, Phone, Calendar as CalendarIcon, Camera, Smile } from "lucide-react";
+import { User, Mail, Phone, Calendar as CalendarIcon, Camera, Smile, BadgeCheck, type LucideIcon } from "lucide-react";
 import { usePersonalInfo } from "../../hooks/useProfile";
+import { useContactVerification } from "../../hooks/useContactVerification";
+import { ContactVerificationDialog } from "./ContactVerificationDialog";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { uploadImageApi } from "@/features/upload/api/upload.api";
+import { uploadImageApi } from "@/features/upload";
 import { showToast as toast } from "@/components/ui/toast";
 import {
   Select,
@@ -24,10 +26,6 @@ export function PersonalInfoTab() {
   const {
     fullName,
     setFullName,
-    email,
-    setEmail,
-    phone,
-    setPhone,
     gender,
     setGender,
     dob,
@@ -41,6 +39,7 @@ export function PersonalInfoTab() {
     isLoading,
     user,
   } = usePersonalInfo();
+  const contactVerification = useContactVerification();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -206,6 +205,7 @@ export function PersonalInfoTab() {
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
           <DialogContent className="max-w-[280px] sm:max-w-[360px] !p-0 overflow-hidden rounded-2xl shadow-2xl !border-none">
             {displayAvatar ? (
+              // eslint-disable-next-line @next/next/no-img-element -- ảnh từ URL tùy ý (blob xem trước / avatar / ảnh do admin nhập), không tối ưu được bằng next/image
               <img 
                 src={displayAvatar} 
                 alt={fullName} 
@@ -242,53 +242,22 @@ export function PersonalInfoTab() {
           </div>
 
           {/* Email */}
-          <div className="space-y-2">
-            <label className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-[#706565]">
-              {t("email")}
-            </label>
-            {!isEditing ? (
-              <div className="flex items-center gap-2.5 sm:gap-3.5 w-full h-10 rounded-xl border border-[#800020]/5 bg-gradient-to-r from-[#FAF7F5]/40 to-white px-3 sm:px-4 text-xs sm:text-sm text-[#2A2525] font-semibold shadow-xs hover:border-[#800020]/10 transition-all duration-300">
-                <Mail size={14} className="text-[#800020]/70 sm:hidden shrink-0" />
-                <Mail size={16} className="text-[#800020]/70 hidden sm:block shrink-0" />
-                <span>{email || "-"}</span>
-              </div>
-            ) : (
-              <div className="relative">
-                <Mail className="absolute left-3 sm:left-3.5 top-1/2 size-3.5 sm:size-4 -translate-y-1/2 text-[#800020]/50 pointer-events-none" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full h-10 rounded-xl border border-[#E2D9D2] bg-white pl-10 pr-3 sm:pl-11 sm:pr-4 text-xs sm:text-sm text-[#2A2525] outline-none transition-all duration-300 focus:border-[#800020] focus:ring-1 focus:ring-[#800020] hover:border-[#800020]/30 shadow-xs"
-                />
-              </div>
-            )}
-          </div>
+          <ContactField
+            label={t("email")}
+            icon={Mail}
+            value={user?.email || ""}
+            isVerified={Boolean(user?.isEmailVerified)}
+            onAction={() => contactVerification.open("email")}
+          />
 
           {/* Phone */}
-          <div className="space-y-2">
-            <label className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-[#706565]">
-              {t("phone")}
-            </label>
-            {!isEditing ? (
-              <div className="flex items-center gap-2.5 sm:gap-3.5 w-full h-10 rounded-xl border border-[#800020]/5 bg-gradient-to-r from-[#FAF7F5]/40 to-white px-3 sm:px-4 text-xs sm:text-sm text-[#2A2525] font-semibold shadow-xs hover:border-[#800020]/10 transition-all duration-300">
-                <Phone size={14} className="text-[#800020]/70 sm:hidden shrink-0" />
-                <Phone size={16} className="text-[#800020]/70 hidden sm:block shrink-0" />
-                <span>{phone || "-"}</span>
-              </div>
-            ) : (
-              <div className="relative">
-                <Phone className="absolute left-3 sm:left-3.5 top-1/2 size-3.5 sm:size-4 -translate-y-1/2 text-[#800020]/50 pointer-events-none" />
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  required
-                  className="w-full h-10 rounded-xl border border-[#E2D9D2] bg-white pl-10 pr-3 sm:pl-11 sm:pr-4 text-xs sm:text-sm text-[#2A2525] outline-none transition-all duration-300 focus:border-[#800020] focus:ring-1 focus:ring-[#800020] hover:border-[#800020]/30 shadow-xs"
-                />
-              </div>
-            )}
-          </div>
+          <ContactField
+            label={t("phone")}
+            icon={Phone}
+            value={user?.phone || ""}
+            isVerified={Boolean(user?.isPhoneVerified)}
+            onAction={() => contactVerification.open("phone")}
+          />
 
           {/* DOB */}
           <div className="space-y-2">
@@ -381,7 +350,7 @@ export function PersonalInfoTab() {
           <div className="pt-4 animate-fade-in flex flex-col justify-end sm:flex-row gap-3">
             <button
               type="submit"
-              disabled={isLoading || isUploadingAvatar || !fullName.trim() || !email.trim() || !phone.trim() || !dob.trim()}
+              disabled={isLoading || isUploadingAvatar || !fullName.trim() || !dob.trim()}
               className="w-full sm:w-auto inline-flex h-9 sm:h-11 items-center justify-center rounded-lg bg-[#800020] px-6 sm:px-8 text-xs font-semibold uppercase tracking-[1.5px] text-white transition-all hover:bg-[#800020]/90 focus:outline-none focus:ring-2 focus:ring-[#800020] focus:ring-offset-2 cursor-pointer shadow-sm hover:shadow-md duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading || isUploadingAvatar ? "Đang lưu..." : t("saveBtn")}
@@ -397,6 +366,53 @@ export function PersonalInfoTab() {
           </div>
         )}
       </form>
+
+      <ContactVerificationDialog {...contactVerification} />
+    </div>
+  );
+}
+
+interface ContactFieldProps {
+  label: string;
+  icon: LucideIcon;
+  value: string;
+  isVerified: boolean;
+  onAction: () => void;
+}
+
+/**
+ * Hiển thị Email/SĐT kèm trạng thái xác minh. Không sửa trực tiếp — mọi thay đổi đi qua hộp thoại xác minh mã.
+ */
+function ContactField({ label, icon: Icon, value, isVerified, onAction }: ContactFieldProps) {
+  const t = useTranslations("ProfilePage.personal");
+  const actionLabel = !value ? t("addBtn") : isVerified ? t("changeBtn") : t("verifyBtn");
+
+  return (
+    <div className="space-y-2">
+      <label className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-[#706565]">
+        {label}
+      </label>
+      <div className="flex items-center gap-2.5 sm:gap-3.5 w-full h-10 rounded-xl border border-[#800020]/5 bg-gradient-to-r from-[#FAF7F5]/40 to-white pl-3 pr-1.5 sm:pl-4 text-xs sm:text-sm text-[#2A2525] font-semibold shadow-xs hover:border-[#800020]/10 transition-all duration-300">
+        <Icon className="size-3.5 sm:size-4 text-[#800020]/70 shrink-0" />
+        <span className="min-w-0 flex-1 truncate">{value || "-"}</span>
+        {value && (
+          <span
+            className={`hidden sm:inline-flex items-center gap-1 shrink-0 text-[10px] font-semibold uppercase tracking-wide ${
+              isVerified ? "text-emerald-700" : "text-amber-700"
+            }`}
+          >
+            {isVerified && <BadgeCheck className="size-3.5" />}
+            {isVerified ? t("verified") : t("unverified")}
+          </span>
+        )}
+        <button
+          type="button"
+          onClick={onAction}
+          className="shrink-0 h-7 rounded-lg border border-[#800020]/30 px-2.5 text-[10px] sm:text-[11px] font-semibold uppercase tracking-wide text-[#800020] transition-all hover:bg-[#800020] hover:text-white cursor-pointer"
+        >
+          {actionLabel}
+        </button>
+      </div>
     </div>
   );
 }

@@ -24,7 +24,7 @@ export interface ApprovalRequestItem {
   id: string;
   actionType: string;
   description: string;
-  payload: any;
+  payload: Record<string, unknown> | null;
   status: ApprovalStatus;
   requestedById: string;
   reviewedById: string | null;

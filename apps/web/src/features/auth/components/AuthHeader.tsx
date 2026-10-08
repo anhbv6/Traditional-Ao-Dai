@@ -1,11 +1,11 @@
 import React from 'react';
-import { motion } from 'motion/react';
+import { motion, type Variants } from 'motion/react';
 import { AuthMobileLogo } from './AuthMobileLogo';
 
 interface AuthHeaderProps {
   title: string;
   subtitle: string;
-  itemVariants?: any;
+  itemVariants?: Variants;
 }
 
 export function AuthHeader({ title, subtitle, itemVariants }: AuthHeaderProps) {

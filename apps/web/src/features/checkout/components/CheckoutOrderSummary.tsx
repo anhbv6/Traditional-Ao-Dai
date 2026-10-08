@@ -1,12 +1,12 @@
 import React from "react";
 import Image from "next/image";
+import { formatVnd } from "@repo/shared";
 import { type CartItem } from "../types/checkout.types";
 
 interface CheckoutOrderSummaryProps {
   cartItems: CartItem[];
   subtotal: number;
   shippingCost: number;
-  tax: number;
   total: number;
 }
 
@@ -14,7 +14,6 @@ export function CheckoutOrderSummary({
   cartItems,
   subtotal,
   shippingCost,
-  tax,
   total,
 }: CheckoutOrderSummaryProps) {
   return (
@@ -48,7 +47,7 @@ export function CheckoutOrderSummary({
                   Kích cỡ: {item.size} • SL: {item.quantity}
                 </p>
                 <p className="mt-1 text-xs font-bold text-[#2A2525]">
-                  ${(item.price * item.quantity).toFixed(2)}
+                  {formatVnd(item.price * item.quantity)}
                 </p>
               </div>
             </div>
@@ -60,7 +59,7 @@ export function CheckoutOrderSummary({
       <div className="mt-4 pt-3 border-t border-[#E2D9D2]/60 space-y-2.5 text-xs text-[#706565]">
         <div className="flex items-center justify-between">
           <span>Tạm tính</span>
-          <span className="font-semibold text-[#2A2525]">${subtotal.toFixed(2)}</span>
+          <span className="font-semibold text-[#2A2525]">{formatVnd(subtotal)}</span>
         </div>
 
         <div className="flex items-center justify-between">
@@ -68,18 +67,13 @@ export function CheckoutOrderSummary({
           {shippingCost === 0 ? (
             <span className="text-emerald-600 font-semibold">Miễn phí</span>
           ) : (
-            <span className="font-semibold text-[#2A2525]">${shippingCost.toFixed(2)}</span>
+            <span className="font-semibold text-[#2A2525]">{formatVnd(shippingCost)}</span>
           )}
-        </div>
-
-        <div className="flex items-center justify-between">
-          <span>Thuế VAT (8%)</span>
-          <span className="font-semibold text-[#2A2525]">${tax.toFixed(2)}</span>
         </div>
 
         <div className="border-t border-[#E2D9D2]/60 pt-3 flex items-end justify-between">
           <span className="text-sm font-bold text-[#2A2525]">Tổng thanh toán</span>
-          <span className="text-base font-extrabold text-[#800020]">${total.toFixed(2)}</span>
+          <span className="text-base font-extrabold text-[#800020]">{formatVnd(total)}</span>
         </div>
       </div>
     </div>

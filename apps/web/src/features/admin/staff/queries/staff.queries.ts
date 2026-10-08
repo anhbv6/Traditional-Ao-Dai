@@ -35,7 +35,7 @@ export async function getStaffListQuery(): Promise<StaffMemberItem[]> {
     return staffMembers as StaffMemberItem[];
   } catch (error) {
     console.error("Lỗi khi query danh sách nhân viên từ DB:", error);
-    throw new Error("Không thể tải danh sách nhân viên từ cơ sở dữ liệu.");
+    throw new Error("STAFF_LIST_FAILED");
   }
 }
 

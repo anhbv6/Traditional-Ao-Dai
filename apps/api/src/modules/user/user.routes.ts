@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import * as userController from './user.controller'
-import { requireAuth } from '../../shared/middlewares/authGuard'
+import { AuthenticatedRequest, requireAuth } from '../../shared/middlewares/authGuard'
+import { rateLimit } from '../../shared/utils/rateLimit'
 import { validate } from '../../shared/middlewares/validate'
 import {
   updateProfileSchema,
@@ -11,12 +12,21 @@ import {
   createAddressSchema,
   updateAddressSchema,
   addressIdParamsSchema,
+  requestEmailVerificationSchema,
+  confirmEmailVerificationSchema,
+  requestPhoneVerificationSchema,
+  confirmPhoneVerificationSchema,
 } from './user.schema'
 
 const router = Router()
 
 // All user routes require authentication
 router.use(requireAuth)
+
+// Giới hạn tần suất theo từng tài khoản cho các thao tác gửi / xác nhận mã
+const byUser = (req: Express.Request) => (req as AuthenticatedRequest).user?.userId
+const sendCodeLimit = rateLimit({ name: 'contact-send-user', max: 5, windowSec: 60 * 60, key: byUser })
+const confirmCodeLimit = rateLimit({ name: 'contact-confirm-user', max: 20, windowSec: 15 * 60, key: byUser })
 
 /**
  * @openapi
@@ -56,7 +66,7 @@ router.use(requireAuth)
  *       200:
  *         description: UPDATE_PROFILE_SUCCESS
  *       400:
- *         description: VALIDATION_ERROR, EMAIL_ALREADY_EXISTS, PHONE_ALREADY_EXISTS, or GENDER_INVALID
+ *         description: VALIDATION_ERROR, GENDER_INVALID, EMAIL_CHANGE_REQUIRES_VERIFICATION, PHONE_CHANGE_REQUIRES_VERIFICATION (đổi email/SĐT phải qua /user/email|phone/verification), CANNOT_REMOVE_LAST_IDENTIFIER
  *       401:
  *         description: Unauthorized
  */
@@ -67,7 +77,7 @@ router.put('/profile', validate(updateProfileSchema), userController.updateProfi
  * /api/user/change-password:
  *   post:
  *     summary: Change User Password
- *     description: Change the authenticated customer's login password.
+ *     description: Change the authenticated customer's login password. Mọi phiên đăng nhập khác (trừ phiên hiện tại) sẽ bị đăng xuất.
  *     tags:
  *       - User
  *     security:
@@ -205,6 +215,138 @@ router.get('/sessions', userController.getSessions)
  *         description: SESSION_NOT_FOUND
  */
 router.delete('/session/:sessionId', validate(deleteSessionSchema), userController.revokeSession)
+
+// ─── Contact Verification Routes (/api/user/email|phone/verification) ─────────
+
+/**
+ * @openapi
+ * /api/user/email/verification:
+ *   post:
+ *     summary: Send Email Verification Code
+ *     description: Gửi mã 6 số (hiệu lực 10 phút) tới email cần xác minh — email mới muốn đổi sang, hoặc email hiện tại chưa xác minh. Cooldown 60 giây, tối đa 5 lần/giờ/tài khoản.
+ *     tags:
+ *       - User
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email]
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: "new.email@gmail.com"
+ *     responses:
+ *       200:
+ *         description: VERIFICATION_CODE_SENT
+ *       400:
+ *         description: VALIDATION_ERROR, EMAIL_ALREADY_EXISTS, EMAIL_ALREADY_VERIFIED
+ *       429:
+ *         description: COOLDOWN_ACTIVE, EMAIL_DAILY_LIMIT_REACHED, TOO_MANY_REQUESTS
+ */
+router.post('/email/verification', validate(requestEmailVerificationSchema), sendCodeLimit, userController.requestEmailVerification)
+
+/**
+ * @openapi
+ * /api/user/email/verification/confirm:
+ *   post:
+ *     summary: Confirm Email Verification Code
+ *     description: Xác nhận mã email. Thành công thì email của tài khoản được cập nhật và đánh dấu đã xác minh. Nhập sai 5 lần mã bị hủy.
+ *     tags:
+ *       - User
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, code]
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               code:
+ *                 type: string
+ *                 example: "123456"
+ *     responses:
+ *       200:
+ *         description: EMAIL_VERIFIED_SUCCESS (data là thông tin người dùng đã cập nhật)
+ *       400:
+ *         description: VERIFICATION_CODE_EXPIRED_OR_INVALID, INCORRECT_VERIFICATION_CODE, EMAIL_ALREADY_EXISTS
+ *       429:
+ *         description: VERIFICATION_TOO_MANY_ATTEMPTS, TOO_MANY_REQUESTS
+ */
+router.post('/email/verification/confirm', validate(confirmEmailVerificationSchema), confirmCodeLimit, userController.confirmEmailVerification)
+
+/**
+ * @openapi
+ * /api/user/phone/verification:
+ *   post:
+ *     summary: Send Phone Verification OTP
+ *     description: Gửi OTP tới SĐT cần xác minh — SĐT mới muốn đổi sang, hoặc SĐT hiện tại chưa xác minh. Cooldown 60 giây, tối đa 10 SMS/SĐT/ngày.
+ *     tags:
+ *       - User
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [phone]
+ *             properties:
+ *               phone:
+ *                 type: string
+ *                 example: "0912345678"
+ *     responses:
+ *       200:
+ *         description: OTP_SENT_SUCCESS
+ *       400:
+ *         description: INVALID_PHONE_NUMBER, PHONE_ALREADY_EXISTS, PHONE_ALREADY_VERIFIED
+ *       429:
+ *         description: OTP_COOLDOWN_ACTIVE, OTP_DAILY_LIMIT_REACHED, TOO_MANY_REQUESTS
+ */
+router.post('/phone/verification', validate(requestPhoneVerificationSchema), sendCodeLimit, userController.requestPhoneVerification)
+
+/**
+ * @openapi
+ * /api/user/phone/verification/confirm:
+ *   post:
+ *     summary: Confirm Phone Verification OTP
+ *     description: Xác nhận OTP. Thành công thì SĐT được cập nhật và đánh dấu đã xác minh; nếu tài khoản khác đang giữ SĐT này ở trạng thái chưa xác minh, SĐT được chuyển sang tài khoản hiện tại.
+ *     tags:
+ *       - User
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [phone, code]
+ *             properties:
+ *               phone:
+ *                 type: string
+ *               code:
+ *                 type: string
+ *                 example: "123456"
+ *     responses:
+ *       200:
+ *         description: PHONE_VERIFIED_SUCCESS (data là thông tin người dùng đã cập nhật)
+ *       400:
+ *         description: OTP_EXPIRED_OR_NOT_FOUND, OTP_INCORRECT, PHONE_ALREADY_EXISTS
+ *       429:
+ *         description: OTP_TOO_MANY_ATTEMPTS, TOO_MANY_REQUESTS
+ */
+router.post('/phone/verification/confirm', validate(confirmPhoneVerificationSchema), confirmCodeLimit, userController.confirmPhoneVerification)
 
 // ─── Address Routes (/api/user/addresses) ───────────────────────────────────────
 

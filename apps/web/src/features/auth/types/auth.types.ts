@@ -9,6 +9,7 @@ export interface AuthUser {
   role: string;
   isActive: boolean;
   isEmailVerified?: boolean;
+  isPhoneVerified?: boolean;
   socialAccounts?: Array<{
     id: string;
     provider: string;
@@ -70,11 +71,3 @@ export interface RegisterResponse {
 
 export type SendOtpResponse = OtpSendResponse;
 
-export interface VerifyOtpResponse {
-  status: string;
-  statusCode: number;
-  message: string;
-  data: {
-    isValid: boolean;
-  } | null;
-}

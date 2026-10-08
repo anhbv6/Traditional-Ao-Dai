@@ -1,8 +1,6 @@
 "use client";
 
 import React from "react";
-import { Link } from "@/i18n/routing";
-import { ArrowLeft } from "lucide-react";
 import { useCheckout } from "../hooks/useCheckout";
 import { CheckoutProgress } from "./CheckoutProgress";
 import { CheckoutShippingForm } from "./CheckoutShippingForm";
@@ -13,7 +11,6 @@ import { CheckoutOrderSummary } from "./CheckoutOrderSummary";
 
 export function CheckoutExperience() {
   const {
-    t,
     step,
     cartItems,
     isLoaded,
@@ -29,7 +26,6 @@ export function CheckoutExperience() {
     handlePlaceOrder,
     subtotal,
     shippingCost,
-    tax,
     total,
   } = useCheckout();
 
@@ -90,7 +86,6 @@ export function CheckoutExperience() {
             cartItems={cartItems}
             subtotal={subtotal}
             shippingCost={shippingCost}
-            tax={tax}
             total={total}
           />
         </div>

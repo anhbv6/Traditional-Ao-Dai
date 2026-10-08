@@ -1,12 +1,16 @@
 "use server";
 
 import { prisma } from "../../server/db.server";
+import { authorizeAdminAction } from "../../server/adminAuth.server";
 import { revalidatePath } from "next/cache";
 
 /**
  * Server Action: Bật/Tắt trạng thái hoạt động của sản phẩm
  */
 export async function toggleProductActiveAction(productId: string, isActive: boolean) {
+  const auth = await authorizeAdminAction({ permission: "canManageInventory" });
+  if (!auth.success) return auth;
+
   try {
     const updated = await prisma.product.update({
       where: { id: productId },
@@ -20,11 +24,11 @@ export async function toggleProductActiveAction(productId: string, isActive: boo
       success: true,
       data: updated,
     };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Lỗi toggleProductActiveAction:", error);
     return {
       success: false,
-      error: error?.message || "Không thể cập nhật trạng thái sản phẩm.",
+      error: "PRODUCT_UPDATE_FAILED",
     };
   }
 }
@@ -33,6 +37,9 @@ export async function toggleProductActiveAction(productId: string, isActive: boo
  * Server Action: Bật/Tắt tính năng may đo riêng (Custom Fit)
  */
 export async function toggleProductCustomFitAction(productId: string, isCustomFit: boolean) {
+  const auth = await authorizeAdminAction({ permission: "canManageInventory" });
+  if (!auth.success) return auth;
+
   try {
     const updated = await prisma.product.update({
       where: { id: productId },
@@ -45,11 +52,11 @@ export async function toggleProductCustomFitAction(productId: string, isCustomFi
       success: true,
       data: updated,
     };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Lỗi toggleProductCustomFitAction:", error);
     return {
       success: false,
-      error: error?.message || "Không thể cập nhật tùy chọn may đo.",
+      error: "PRODUCT_UPDATE_FAILED",
     };
   }
 }

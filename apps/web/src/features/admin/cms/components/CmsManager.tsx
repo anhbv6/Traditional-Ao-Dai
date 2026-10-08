@@ -10,7 +10,6 @@ import {
   CheckCircle,
   XCircle,
   Calendar,
-  Layers,
 } from "lucide-react";
 
 interface CmsManagerProps {

@@ -10,8 +10,6 @@ import {
   Scissors,
   CheckCircle,
   XCircle,
-  Layers,
-  Sparkles,
 } from "lucide-react";
 
 interface ProductsListProps {
@@ -105,6 +103,7 @@ export function ProductsList({ initialProducts }: ProductsListProps) {
                       <div className="flex items-center gap-3">
                         <div className="size-10 rounded-lg bg-zinc-100 border border-zinc-200 overflow-hidden shrink-0 flex items-center justify-center">
                           {product.images?.[0] ? (
+                            // eslint-disable-next-line @next/next/no-img-element -- ảnh từ URL tùy ý (blob xem trước / avatar / ảnh do admin nhập), không tối ưu được bằng next/image
                             <img
                               src={product.images[0]}
                               alt={product.name}

@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 import { useRouter } from '@/i18n/routing';
 import { SectionHeading } from './SectionHeading';
 
-const CircularGallery = dynamic(() => import('@/components/CircularGallery'), {
+const CircularGallery = dynamic(() => import('@/components/effects/CircularGallery'), {
   ssr: false,
 });
 

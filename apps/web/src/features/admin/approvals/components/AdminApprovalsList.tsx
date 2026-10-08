@@ -1,39 +1,42 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { CheckCircle2, XCircle, Clock, AlertTriangle, UserCheck, RefreshCw, FileText } from "lucide-react";
 import { showToast } from "@/components/ui/toast";
-import { useAuthStore } from "@/features/auth/store/authStore";
+import { useAdminSession } from "../../session";
 import {
   getApprovalRequestsAction,
   reviewApprovalRequestAction,
 } from "../actions";
 import { type ApprovalRequestItem } from "../types";
+import { type ApprovalStatus } from "@repo/db";
+import { useTranslations } from "next-intl";
+import { useNotify } from "@/hooks/useNotify";
 
 export function AdminApprovalsList() {
-  const { user } = useAuthStore();
-  const [requests, setRequests] = useState<ApprovalRequestItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { user } = useAdminSession({ force: true });
+  const notify = useNotify();
+  const tToast = useTranslations("AdminPage.toasts");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [rejectingId, setRejectingId] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const fetchRequests = async () => {
-    setIsLoading(true);
-    const filter = statusFilter === "ALL" ? undefined : (statusFilter as any);
-    const res = await getApprovalRequestsAction(filter);
-    if (res.success && res.data) {
-      setRequests(res.data as ApprovalRequestItem[]);
-    } else {
-      showToast.error("Không thể tải danh sách phê duyệt.");
-    }
-    setIsLoading(false);
-  };
-
-  useEffect(() => {
-    fetchRequests();
-  }, [statusFilter]);
+  // Dữ liệu server -> React Query (không tự fetch trong useEffect)
+  const { data: requests = [], isFetching: isLoading, refetch } = useQuery({
+    queryKey: ["admin", "approvals", statusFilter],
+    queryFn: async () => {
+      const filter = statusFilter === "ALL" ? undefined : (statusFilter as ApprovalStatus);
+      const res = await getApprovalRequestsAction(filter);
+      if (!res.success) {
+        notify.error(res.error, "APPROVAL_LIST_FAILED");
+        return [];
+      }
+      return (res.data ?? []) as ApprovalRequestItem[];
+    },
+  });
+  const fetchRequests = () => void refetch();
 
   const handleApprove = async (id: string) => {
     if (!user) return;
@@ -45,17 +48,17 @@ export function AdminApprovalsList() {
     });
 
     if (res.success) {
-      showToast.success("Đã phê duyệt yêu cầu thành công!");
+      notify.success(tToast("approveSuccess"));
       fetchRequests();
     } else {
-      showToast.error(res.error || "Không thể phê duyệt yêu cầu.");
+      notify.error(res.error, "APPROVAL_REVIEW_FAILED");
     }
     setIsProcessing(false);
   };
 
   const handleReject = async (id: string) => {
     if (!user || !rejectReason.trim()) {
-      showToast.error("Vui lòng nhập lý do từ chối.");
+      showToast.error(tToast("rejectReasonRequired"));
       return;
     }
     setIsProcessing(true);
@@ -67,12 +70,12 @@ export function AdminApprovalsList() {
     });
 
     if (res.success) {
-      showToast.success("Đã từ chối yêu cầu thành công!");
+      notify.success(tToast("rejectSuccess"));
       setRejectingId(null);
       setRejectReason("");
       fetchRequests();
     } else {
-      showToast.error(res.error || "Không thể từ chối yêu cầu.");
+      notify.error(res.error, "APPROVAL_REVIEW_FAILED");
     }
     setIsProcessing(false);
   };

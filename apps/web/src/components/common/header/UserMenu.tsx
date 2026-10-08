@@ -2,15 +2,13 @@
 
 import { useState } from 'react';
 import { LogOut, UserRound } from 'lucide-react';
-import { Link, useRouter } from '@/i18n/routing';
-import { logoutApi } from '@/features/auth/api/auth.api';
-import { useAuthStore } from '@/features/auth/store/authStore';
-import { clearBrowserAuthTokens } from '@/lib/api-client';
+import { Link} from '@/i18n/routing';
+import { useAuthStore, useCustomerLogout } from '@/features/auth';
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ConfirmDialog, Dropdown } from "@/components/shared";
 import { useTranslations } from 'next-intl';
 
-import { isUserAdminOrStaff } from '@/features/auth/utils/authRoles';
+import { executeAdminLogout, useAdminSession, useAdminSessionCache } from '@/features/admin';
 
 type UserMenuProps = {
   loginLabel?: string;
@@ -34,32 +32,25 @@ export function UserMenu({
   logoutLabel = 'Logout',
   userName: initialUserName,
 }: UserMenuProps) {
-  const router = useRouter();
-  const { isAuthenticated, user, isAdminOrStaff, logout: storeLogout } = useAuthStore();
+  const { isAuthenticated, user: customer } = useAuthStore();
+  // Storefront hiển thị phiên khách hàng; nếu chỉ có phiên quản trị thì hiển thị tài khoản quản trị
+  const { user: adminUser, isAdminOrStaff: isAdmin } = useAdminSession();
+  const adminSessionCache = useAdminSessionCache();
+  const user = customer ?? adminUser;
   const userName = initialUserName || user?.name || user?.email || (isAuthenticated ? 'Account' : undefined);
   const avatarUrl = user?.avatar || undefined;
   const avatarLabel = userName || profileLabel;
   const avatarFallback = getUserInitials(user?.name || user?.email || userName);
   const [openConfirm, setOpenConfirm] = useState(false);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const { logout: handleLogout, isLoggingOut } = useCustomerLogout(async () => {
+    if (isAdmin) {
+      await executeAdminLogout();
+      adminSessionCache.clear();
+    }
+  });
   const t = useTranslations("ProfilePage");
-  
-  const isAdmin = isAdminOrStaff || isUserAdminOrStaff(user);
 
-  const handleLogout = async () => {
-    setIsLoggingOut(true)
-    try {
-        await logoutApi();
-      } catch {
-        // Local logout should still complete if the server session is already gone.
-      } finally {
-        clearBrowserAuthTokens();
-        storeLogout();
-        router.push('/login');
-        router.refresh();
-        setIsLoggingOut(false)
-      }
-  };
+
 
   if (!userName) {
     return (

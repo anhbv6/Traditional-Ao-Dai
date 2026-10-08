@@ -25,7 +25,7 @@ export async function getApprovalRequestsQuery(statusFilter?: ApprovalStatus): P
     return requests as ApprovalRequestItem[];
   } catch (error) {
     console.error("Lỗi khi query danh sách phê duyệt từ DB:", error);
-    throw new Error("Không thể tải danh sách phê duyệt từ cơ sở dữ liệu.");
+    throw new Error("APPROVAL_LIST_FAILED");
   }
 }
 

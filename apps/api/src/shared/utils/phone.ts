@@ -1,16 +1,15 @@
-export function normalizeVietnamPhone(phone?: string | null) {
-  if (!phone) {
-    return phone
-  }
+import { randomInt } from 'crypto'
 
-  return phone.startsWith('+84') ? `0${phone.slice(3)}` : phone
-}
+// Chuẩn hóa SĐT dùng chung với Frontend
+export { normalizeVietnamPhone } from '@repo/shared'
 
+/**
+ * Sinh mã OTP gồm `length` chữ số bằng bộ sinh số ngẫu nhiên an toàn mật mã (CSPRNG)
+ */
 export function generateOtp(length = 6): string {
-  const digits = '0123456789'
   let otp = ''
   for (let i = 0; i < length; i++) {
-    otp += digits[Math.floor(Math.random() * 10)]
+    otp += randomInt(0, 10).toString()
   }
   return otp
 }

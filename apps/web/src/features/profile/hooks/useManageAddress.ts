@@ -4,10 +4,9 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useShallow } from "zustand/react/shallow";
 import { useTranslations } from "next-intl";
 import { type Address, type AddressPayload } from "../types/profile.types";
-import { getErrorMessage } from "@/lib/api-client";
+import { getErrorMessage, translateMessage } from "@/lib/messages";
 import { useAddressStore } from "../store/addressStore";
 import { showToast as toast } from "@/components/ui/toast";
-import { translateProfileResponse } from "../utils/translateProfileResponse";
 import {
   createAddressApi,
   deleteAddressApi,
@@ -56,12 +55,12 @@ export function useManageAddress() {
       refreshAddresses();
       const fallback = t("responses.SET_DEFAULT_ADDRESS_SUCCESS");
       const message = getResponseMessage(response, "SET_DEFAULT_ADDRESS_SUCCESS");
-      toast.success(translateProfileResponse(t, message, fallback));
+      toast.success(translateMessage(message, fallback, t));
     },
     onError: (error: unknown) => {
       const fallback = t("responses.SET_DEFAULT_ADDRESS_ERROR");
       const message = getErrorMessage(error, fallback);
-      toast.error(translateProfileResponse(t, message, fallback));
+      toast.error(translateMessage(message, fallback, t));
     },
   });
 
@@ -129,13 +128,13 @@ export function useAddressForm() {
       refreshAddresses();
       const fallback = t("responses.CREATE_ADDRESS_SUCCESS");
       const message = getResponseMessage(response, "CREATE_ADDRESS_SUCCESS");
-      toast.success(translateProfileResponse(t, message, fallback));
+      toast.success(translateMessage(message, fallback, t));
       closeForm();
     },
     onError: (error: unknown) => {
       const fallback = t("responses.CREATE_ADDRESS_ERROR");
       const message = getErrorMessage(error, fallback);
-      toast.error(translateProfileResponse(t, message, fallback));
+      toast.error(translateMessage(message, fallback, t));
     },
   });
 
@@ -145,13 +144,13 @@ export function useAddressForm() {
       refreshAddresses();
       const fallback = t("responses.UPDATE_ADDRESS_SUCCESS");
       const message = getResponseMessage(response, "UPDATE_ADDRESS_SUCCESS");
-      toast.success(translateProfileResponse(t, message, fallback));
+      toast.success(translateMessage(message, fallback, t));
       closeForm();
     },
     onError: (error: unknown) => {
       const fallback = t("responses.UPDATE_ADDRESS_ERROR");
       const message = getErrorMessage(error, fallback);
-      toast.error(translateProfileResponse(t, message, fallback));
+      toast.error(translateMessage(message, fallback, t));
     },
   });
 
@@ -205,12 +204,12 @@ export function useDeleteAddress() {
       refreshAddresses();
       const fallback = t("responses.DELETE_ADDRESS_SUCCESS");
       const message = getResponseMessage(response, "DELETE_ADDRESS_SUCCESS");
-      toast.success(translateProfileResponse(t, message, fallback));
+      toast.success(translateMessage(message, fallback, t));
     },
     onError: (error: unknown) => {
       const fallback = t("responses.DELETE_ADDRESS_ERROR");
       const message = getErrorMessage(error, fallback);
-      toast.error(translateProfileResponse(t, message, fallback));
+      toast.error(translateMessage(message, fallback, t));
     },
   });
 

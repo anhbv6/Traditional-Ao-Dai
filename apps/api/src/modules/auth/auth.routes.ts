@@ -15,8 +15,28 @@ import {
   verifyResetPasswordPhoneSchema,
 } from './auth.schema'
 import { requireAuth } from '../../shared/middlewares/authGuard'
+import { rateLimit } from '../../shared/utils/rateLimit'
 
 const router = Router()
+
+// ─── Rate limits (chống brute-force mật khẩu/OTP, spam email, dò tài khoản) ─────
+const MINUTE = 60
+const byIp = (name: string, max: number, windowSec: number) => rateLimit({ name, max, windowSec })
+const byBody = (name: string, field: string, max: number, windowSec: number) =>
+  rateLimit({
+    name,
+    max,
+    windowSec,
+    key: (req) => {
+      const value = req.body?.[field]
+      return typeof value === 'string' ? value.trim() : undefined
+    },
+  })
+
+const loginLimits = [byIp('login-ip', 20, 15 * MINUTE), byBody('login-account', 'email', 10, 15 * MINUTE)]
+const otpLoginLimits = [byIp('login-otp-ip', 20, 15 * MINUTE), byBody('login-otp-phone', 'phone', 10, 15 * MINUTE)]
+const adminLoginLimits = [byIp('admin-login-ip', 10, 15 * MINUTE), byBody('admin-login-account', 'email', 5, 15 * MINUTE)]
+const verifyCodeLimits = [byIp('verify-code-ip', 20, 15 * MINUTE)]
 
 /**
  * @openapi
@@ -77,9 +97,11 @@ const router = Router()
  *                   type: string
  *                   example: REGISTER_SUCCESS
  *       400:
- *         description: Validation error or account already exists
+ *         description: VALIDATION_ERROR, EMAIL_ALREADY_EXISTS, PHONE_ALREADY_EXISTS, OTP_EXPIRED_OR_NOT_FOUND, OTP_INCORRECT
+ *       429:
+ *         description: OTP_TOO_MANY_ATTEMPTS, TOO_MANY_REQUESTS
  */
-router.post('/register', validate(registerSchema), clientAuthController.register)
+router.post('/register', validate(registerSchema), byIp('register-ip', 10, 60 * MINUTE), clientAuthController.register)
 
 /**
  * @openapi
@@ -136,9 +158,13 @@ router.post('/register', validate(registerSchema), clientAuthController.register
  *       400:
  *         description: Validation error
  *       401:
- *         description: Invalid credentials
+ *         description: INVALID_CREDENTIALS (không phân biệt sai tài khoản hay sai mật khẩu)
+ *       403:
+ *         description: ACCOUNT_DEACTIVATED
+ *       429:
+ *         description: TOO_MANY_REQUESTS (20 lần/15 phút/IP, 10 lần/15 phút/tài khoản)
  */
-router.post('/login', validate(loginSchema), clientAuthController.login)
+router.post('/login', validate(loginSchema), ...loginLimits, clientAuthController.login)
 
 /**
  * @openapi
@@ -185,11 +211,11 @@ router.post('/login', validate(loginSchema), clientAuthController.login)
  *                       type: string
  *                       example: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
  *       400:
- *         description: Validation error or user not found
- *       401:
- *         description: Invalid OTP
+ *         description: VALIDATION_ERROR, ACCOUNT_NOT_REGISTERED, PHONE_NOT_VERIFIED (chỉ SĐT đã xác minh mới đăng nhập OTP được), OTP_EXPIRED_OR_NOT_FOUND, OTP_INCORRECT
+ *       429:
+ *         description: OTP_TOO_MANY_ATTEMPTS (sai 5 lần mã bị hủy), TOO_MANY_REQUESTS
  */
-router.post('/login/otp', validate(otpLoginSchema), clientAuthController.loginWithOtp)
+router.post('/login/otp', validate(otpLoginSchema), ...otpLoginLimits, clientAuthController.loginWithOtp)
 
 /**
  * @openapi
@@ -233,11 +259,13 @@ router.post('/login/otp', validate(otpLoginSchema), clientAuthController.loginWi
  *                       type: string
  *                       example: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
  *       400:
- *         description: Validation error or invalid Google token
+ *         description: GOOGLE_AUTH_FAILED, GOOGLE_TOKEN_INVALID, GOOGLE_EMAIL_NOT_VERIFIED
  *       403:
- *         description: Forbidden - Account locked or de-activated
+ *         description: ACCOUNT_DEACTIVATED, INSUFFICIENT_PERMISSIONS
+ *       409:
+ *         description: GOOGLE_EMAIL_ACCOUNT_UNVERIFIED (email đã có tài khoản chưa xác minh — đăng nhập bằng mật khẩu rồi liên kết Google trong hồ sơ), GOOGLE_ACCOUNT_MISMATCH (tài khoản đã liên kết một Google khác)
  */
-router.post('/google', validate(googleLoginSchema), clientAuthController.loginWithGoogle)
+router.post('/google', validate(googleLoginSchema), byIp('google-ip', 30, 15 * MINUTE), clientAuthController.loginWithGoogle)
 
 /**
  * @openapi
@@ -274,12 +302,10 @@ router.post('/google', validate(googleLoginSchema), clientAuthController.loginWi
  *                 message:
  *                   type: string
  *                   example: VERIFICATION_CODE_SENT
- *       404:
- *         description: Email not found
  *       429:
- *         description: Cooldown active
+ *         description: COOLDOWN_ACTIVE (60s), EMAIL_DAILY_LIMIT_REACHED, TOO_MANY_REQUESTS. Luôn trả VERIFICATION_CODE_SENT dù email có tồn tại hay không (chống dò tài khoản).
  */
-router.post('/forgot-password/email', validate(forgotPasswordEmailSchema), clientAuthController.forgotPasswordEmail)
+router.post('/forgot-password/email', validate(forgotPasswordEmailSchema), byIp('forgot-email-ip', 10, 60 * MINUTE), clientAuthController.forgotPasswordEmail)
 
 /**
  * @openapi
@@ -330,11 +356,11 @@ router.post('/forgot-password/email', validate(forgotPasswordEmailSchema), clien
  *                       type: integer
  *                       example: 3600
  *       400:
- *         description: Incorrect or expired verification code
- *       404:
- *         description: User with this email was not found
+ *         description: VERIFICATION_CODE_EXPIRED_OR_INVALID, INCORRECT_VERIFICATION_CODE
+ *       429:
+ *         description: VERIFICATION_TOO_MANY_ATTEMPTS (sai 5 lần mã bị hủy), TOO_MANY_REQUESTS
  */
-router.post('/forgot-password/email/verify', validate(verifyResetPasswordEmailSchema), clientAuthController.verifyResetPasswordEmail)
+router.post('/forgot-password/email/verify', validate(verifyResetPasswordEmailSchema), ...verifyCodeLimits, clientAuthController.verifyResetPasswordEmail)
 
 /**
  * @openapi
@@ -384,11 +410,11 @@ router.post('/forgot-password/email/verify', validate(verifyResetPasswordEmailSc
  *                       type: integer
  *                       example: 3600
  *       400:
- *         description: Incorrect or expired OTP code
- *       404:
- *         description: User with this phone number was not found
+ *         description: OTP_EXPIRED_OR_NOT_FOUND, OTP_INCORRECT, PHONE_NOT_VERIFIED
+ *       429:
+ *         description: OTP_TOO_MANY_ATTEMPTS, TOO_MANY_REQUESTS
  */
-router.post('/forgot-password/phone/verify', validate(verifyResetPasswordPhoneSchema), clientAuthController.verifyResetPasswordPhone)
+router.post('/forgot-password/phone/verify', validate(verifyResetPasswordPhoneSchema), ...verifyCodeLimits, clientAuthController.verifyResetPasswordPhone)
 
 /**
  * @openapi
@@ -438,7 +464,7 @@ router.post('/forgot-password/phone/verify', validate(verifyResetPasswordPhoneSc
  *       404:
  *         description: User not found
  */
-router.post('/reset-password/email', validate(resetPasswordEmailSchema), clientAuthController.resetPasswordEmail)
+router.post('/reset-password/email', validate(resetPasswordEmailSchema), ...verifyCodeLimits, clientAuthController.resetPasswordEmail)
 
 /**
  * @openapi
@@ -487,7 +513,7 @@ router.post('/reset-password/email', validate(resetPasswordEmailSchema), clientA
  *       404:
  *         description: User not found
  */
-router.post('/reset-password/phone', validate(resetPasswordPhoneSchema), clientAuthController.resetPasswordPhone)
+router.post('/reset-password/phone', validate(resetPasswordPhoneSchema), ...verifyCodeLimits, clientAuthController.resetPasswordPhone)
 
 /**
  * @openapi
@@ -533,7 +559,7 @@ router.post('/reset-password/phone', validate(resetPasswordPhoneSchema), clientA
  *       401:
  *         description: Refresh token is missing, expired, or invalid
  */
-router.post('/refresh-token', clientAuthController.refreshToken)
+router.post('/refresh-token', byIp('refresh-ip', 120, MINUTE), clientAuthController.refreshToken)
 
 /**
  * @openapi
@@ -583,7 +609,7 @@ router.post('/refresh-token', clientAuthController.refreshToken)
  *       400:
  *         description: Validation error or missing parameters
  */
-router.get('/check-account', validate(checkAccountSchema), clientAuthController.checkAccount)
+router.get('/check-account', validate(checkAccountSchema), byIp('check-account-ip', 30, 5 * MINUTE), clientAuthController.checkAccount)
 
 /**
  * @openapi
@@ -621,7 +647,7 @@ router.get('/check-account', validate(checkAccountSchema), clientAuthController.
  *       401:
  *         description: Unauthorized - JWT token missing, invalid or expired
  */
-router.get('/me', requireAuth as any, clientAuthController.getMe)
+router.get('/me', requireAuth, clientAuthController.getMe)
 
 /**
  * @openapi
@@ -729,20 +755,21 @@ router.post('/logout', clientAuthController.logout)
  *       400:
  *         description: Validation error
  *       401:
- *         description: Invalid credentials
+ *         description: INVALID_CREDENTIALS
+ *       429:
+ *         description: TOO_MANY_REQUESTS (10 lần/15 phút/IP, 5 lần/15 phút/tài khoản)
+ *     x-notes: Thành công thì token được đặt vào cookie httpOnly `admin_token` (SameSite=Strict) + cookie `admin_session` (vai trò, chỉ để hiển thị UI). Body chỉ có `data.user`.
  */
-router.post('/admin/login', validate(loginSchema), adminAuthController.loginAdmin)
+router.post('/admin/login', validate(loginSchema), ...adminLoginLimits, adminAuthController.loginAdmin)
 
 /**
  * @openapi
  * /api/auth/admin/logout:
  *   post:
  *     summary: Admin & Staff Logout
- *     description: Revoke session and log out the authenticated administrative user.
+ *     description: Thu hồi phiên quản trị (đọc từ cookie httpOnly admin_token) và xóa cookie admin_token / admin_session. Luôn thành công, kể cả khi phiên đã hết hạn.
  *     tags:
  *       - Auth
- *     security:
- *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Logout successful
@@ -762,7 +789,7 @@ router.post('/admin/login', validate(loginSchema), adminAuthController.loginAdmi
  *                   nullable: true
  *                   example: null
  */
-router.post('/admin/logout', requireAuth, adminAuthController.logoutAdmin)
+router.post('/admin/logout', adminAuthController.logoutAdmin)
 
 
 export default router

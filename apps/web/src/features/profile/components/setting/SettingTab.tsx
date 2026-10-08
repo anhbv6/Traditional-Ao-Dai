@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useTransition } from "react";
+import React, { useTransition } from "react";
+import { useLocalStorageBoolean } from "@/hooks/useLocalStorageBoolean";
 import { useTranslations, useLocale } from "next-intl";
 import { ChevronDown } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
@@ -15,27 +16,11 @@ export function SettingTab() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  const [twoFactor, setTwoFactor] = useState(true);
-  const [pushNotifications, setPushNotifications] = useState(true);
-  const [desktopNotifications, setDesktopNotifications] = useState(true);
-  const [emailNotifications, setEmailNotifications] = useState(true);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-
-    const saved2FA = localStorage.getItem("2fa");
-    if (saved2FA !== null) setTwoFactor(saved2FA === "true");
-
-    const savedPush = localStorage.getItem("push");
-    if (savedPush !== null) setPushNotifications(savedPush === "true");
-
-    const savedDesktop = localStorage.getItem("desktop");
-    if (savedDesktop !== null) setDesktopNotifications(savedDesktop === "true");
-
-    const savedEmail = localStorage.getItem("email");
-    if (savedEmail !== null) setEmailNotifications(savedEmail === "true");
-  }, []);
+  // Tùy chọn hiển thị lưu ở trình duyệt (chưa có API cài đặt tài khoản)
+  const [twoFactor, setTwoFactor] = useLocalStorageBoolean("2fa", true);
+  const [pushNotifications, setPushNotifications] = useLocalStorageBoolean("push", true);
+  const [desktopNotifications, setDesktopNotifications] = useLocalStorageBoolean("desktop", true);
+  const [emailNotifications, setEmailNotifications] = useLocalStorageBoolean("email", true);
 
   const handleLanguageChange = (newLocale: string) => {
     if (newLocale === currentLocale || isPending) return;
@@ -44,18 +29,6 @@ export function SettingTab() {
     });
   };
 
-  const handleToggle = (key: string, value: boolean, setter: (val: boolean) => void) => {
-    setter(value);
-    localStorage.setItem(key, String(value));
-  };
-
-  if (!mounted) {
-    return (
-      <div className="rounded-2xl border border-[#800020]/10 bg-white p-6 shadow-sm sm:p-8 min-h-[400px] flex items-center justify-center">
-        <div className="size-8 animate-spin rounded-full border-4 border-[#800020] border-t-transparent" />
-      </div>
-    );
-  }
 
   return (
     <div className="rounded-2xl border border-[#800020]/10 bg-white p-6 shadow-sm sm:p-8 animate-fade-in">
@@ -151,7 +124,7 @@ export function SettingTab() {
           <div className="shrink-0 flex items-center">
             <Switch
               checked={twoFactor}
-              onCheckedChange={(val) => handleToggle("2fa", val, setTwoFactor)}
+              onCheckedChange={(val) => setTwoFactor(val)}
               className="cursor-pointer"
             />
           </div>
@@ -170,7 +143,7 @@ export function SettingTab() {
           <div className="shrink-0 flex items-center">
             <Switch
               checked={pushNotifications}
-              onCheckedChange={(val) => handleToggle("push", val, setPushNotifications)}
+              onCheckedChange={(val) => setPushNotifications(val)}
               className="cursor-pointer"
             />
           </div>
@@ -189,7 +162,7 @@ export function SettingTab() {
           <div className="shrink-0 flex items-center">
             <Switch
               checked={desktopNotifications}
-              onCheckedChange={(val) => handleToggle("desktop", val, setDesktopNotifications)}
+              onCheckedChange={(val) => setDesktopNotifications(val)}
               className="cursor-pointer"
             />
           </div>
@@ -208,7 +181,7 @@ export function SettingTab() {
           <div className="shrink-0 flex items-center">
             <Switch
               checked={emailNotifications}
-              onCheckedChange={(val) => handleToggle("email", val, setEmailNotifications)}
+              onCheckedChange={(val) => setEmailNotifications(val)}
               className="cursor-pointer"
             />
           </div>

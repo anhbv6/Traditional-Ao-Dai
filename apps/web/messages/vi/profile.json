@@ -85,7 +85,27 @@
     "cancelBtn": "Hủy bỏ",
     "avatarUrlInvalid": "Không nhận được URL ảnh đại diện hợp lệ.",
     "avatarUploadFailed": "Tải ảnh đại diện lên thất bại. Vui lòng thử lại.",
-    "updateError": "Có lỗi xảy ra trong quá trình cập nhật"
+    "updateError": "Có lỗi xảy ra trong quá trình cập nhật",
+    "verifyEmailTitle": "Xác minh email",
+    "verifyPhoneTitle": "Xác minh số điện thoại",
+    "verifyEmailDesc": "Nhập email bạn muốn sử dụng. Chúng tôi sẽ gửi mã xác minh 6 số tới email này.",
+    "verifyPhoneDesc": "Nhập số điện thoại bạn muốn sử dụng. Chúng tôi sẽ gửi mã OTP 6 số qua SMS.",
+    "enterCodeDesc": "Nhập mã 6 số vừa được gửi tới {target}.",
+    "changeTarget": "Đổi email / số khác",
+    "resendCode": "Gửi lại mã",
+    "resendIn": "Gửi lại sau {seconds}s",
+    "sendCodeBtn": "Gửi mã",
+    "sendingCode": "Đang gửi...",
+    "verifying": "Đang xác minh...",
+    "confirmBtn": "Xác nhận",
+    "addBtn": "Thêm",
+    "changeBtn": "Đổi",
+    "verifyBtn": "Xác minh",
+    "verified": "Đã xác minh",
+    "unverified": "Chưa xác minh",
+    "verifyError": "Không thể xác minh. Vui lòng thử lại.",
+    "codeSent": "Đã gửi mã xác minh.",
+    "verifySuccess": "Xác minh thành công!"
   },
   "orders": {
     "title": "Lịch sử đơn hàng",
@@ -216,6 +236,18 @@
       "subtitle": "Quản lý các thiết bị và trình duyệt đang đăng nhập tài khoản của bạn.",
       "revokeBtn": "Đăng xuất thiết bị",
       "revokeAll": "Đăng xuất tất cả thiết bị khác"
+    },
+    "toasts": {
+      "passwordChangeSuccess": "Đổi mật khẩu thành công! Các thiết bị khác đã được đăng xuất.",
+      "passwordChangeError": "Có lỗi xảy ra khi đổi mật khẩu.",
+      "passwordMismatch": "Mật khẩu xác nhận không khớp.",
+      "otpInvalid": "Mã OTP không hợp lệ.",
+      "revokeSuccess": "Đã đăng xuất thiết bị thành công!",
+      "revokeError": "Có lỗi xảy ra khi hủy phiên đăng nhập.",
+      "linkGoogleSuccess": "Liên kết tài khoản Google thành công!",
+      "linkGoogleError": "Có lỗi xảy ra khi liên kết tài khoản Google.",
+      "unlinkGoogleSuccess": "Hủy liên kết tài khoản Google thành công!",
+      "unlinkGoogleError": "Có lỗi xảy ra khi hủy liên kết tài khoản Google."
     }
   }
 }

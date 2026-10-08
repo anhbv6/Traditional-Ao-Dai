@@ -7,7 +7,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit -p ."
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
@@ -16,8 +17,10 @@
     "@marsidev/react-turnstile": "^1.5.5",
     "@react-oauth/google": "^0.13.5",
     "@repo/db": "workspace:*",
+    "@repo/shared": "workspace:*",
     "@smastrom/react-rating": "^1.5.0",
     "@tanstack/react-query": "^5.101.4",
+    "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
     "date-fns": "^4.4.0",
     "embla-carousel": "^8.6.0",

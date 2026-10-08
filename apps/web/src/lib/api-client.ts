@@ -1,12 +1,21 @@
-import { useAuthStore } from '@/features/auth/store/authStore';
+import { AUTH_COOKIES } from '@repo/shared';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+/**
+ * HTTP client dùng chung cho toàn bộ Frontend.
+ *
+ * - Trình duyệt gọi đường dẫn tương đối `/api/*` (Next.js rewrites chuyển tiếp sang Express -> cùng origin).
+ * - Server (RSC / Route Handler) gọi thẳng địa chỉ nội bộ `API_INTERNAL_URL`.
+ * - Tầng `lib` KHÔNG import từ `features/*`: phần trạng thái đăng nhập được feature auth đăng ký qua `configureApiClient`.
+ * - KHÔNG đọc/ghi cookie phiên ở đây — cookie do Backend đặt (httpOnly), client chỉ đọc cờ `has_session`.
+ */
+
+const BROWSER_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
+const SERVER_BASE_URL = `${(process.env.API_INTERNAL_URL || 'http://127.0.0.1:3001').replace(/\/$/, '')}/api`;
 
 type CustomRequestInit = Omit<RequestInit, 'body'> & {
   body?: unknown;
   params?: Record<string, string | number | boolean>;
   retryOnUnauthorized?: boolean;
-  redirectOnUnauthorized?: boolean;
   skipAuth?: boolean;
 };
 
@@ -20,132 +29,72 @@ export class HttpError extends Error {
   }
 }
 
+// ─── Auth handlers (đăng ký bởi feature auth) ──────────────────────────────────
+
+export interface ApiClientAuthHandlers {
+  /** Access token khách hàng đang giữ trong bộ nhớ */
+  getAccessToken: () => string | null;
+  /** Lưu access token mới sau khi refresh thành công */
+  onAccessTokenRefreshed: (accessToken: string) => void;
+  /** Refresh thất bại -> xóa trạng thái đăng nhập phía client */
+  onSessionExpired: () => void;
+}
+
+let authHandlers: ApiClientAuthHandlers | null = null;
+
+export function configureApiClient(handlers: ApiClientAuthHandlers) {
+  authHandlers = handlers;
+}
+
+function readCookie(name: string): string | undefined {
+  if (typeof document === 'undefined') return undefined;
+  const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
+  return match ? decodeURIComponent(match[1]) : undefined;
+}
+
+/** Khách hàng đang có phiên (dựa vào cờ `has_session` do Backend đặt) */
+export function hasCustomerSession(): boolean {
+  return Boolean(readCookie(AUTH_COOKIES.customerSessionHint));
+}
+
+/** Admin/Staff đang có phiên — chỉ dùng cho UI (vai trò thật được xác minh ở server) */
+export function getAdminSessionHint(): string | undefined {
+  return readCookie(AUTH_COOKIES.adminSessionHint);
+}
+
+function getLocalePrefix(pathname: string) {
+  const first = pathname.split('/').filter(Boolean)[0];
+  return first === 'vi' || first === 'en' ? first : 'vi';
+}
+
 /**
- * Xóa trạng thái đăng nhập Khách hàng trên trình duyệt
+ * Hết phiên ở trang yêu cầu đăng nhập -> chuyển về trang đăng nhập tương ứng
  */
-export const clearCustomerAuth = () => {
-  useAuthStore.getState().logout();
-  if (typeof document !== 'undefined') {
-    document.cookie = 'user_logged_in=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
-    const roleMatch = document.cookie.match(/auth_role=([^;]+)/);
-    if (roleMatch && decodeURIComponent(roleMatch[1]) === 'CUSTOMER') {
-      document.cookie = 'auth_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
-    }
-  }
-};
+function redirectToLoginAfterSessionExpired() {
+  if (typeof window === 'undefined') return;
+
+  const { pathname } = window.location;
+  const locale = getLocalePrefix(pathname);
+  const isProfileRoute = pathname.split('/').filter(Boolean).includes('profile');
+  if (!isProfileRoute) return;
+
+  const loginPath = `/${locale}/login`;
+  if (pathname === loginPath) return;
+
+  window.sessionStorage.setItem('auth:session-expired', 'true');
+  window.location.assign(`${loginPath}?redirect=${encodeURIComponent(pathname)}`);
+}
 
 /**
- * Xóa trạng thái đăng nhập Quản trị viên (Admin/Staff) trên trình duyệt
- */
-export const clearAdminAuth = () => {
-  useAuthStore.getState().logout();
-  if (typeof document !== 'undefined') {
-    document.cookie = 'admin_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
-    document.cookie = 'auth_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
-  }
-};
-
-/**
- * Xóa toàn bộ trạng thái đăng nhập trên trình duyệt
- */
-export const clearBrowserAuth = () => {
-  useAuthStore.getState().logout();
-  if (typeof document !== 'undefined') {
-    document.cookie = 'user_logged_in=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
-    document.cookie = 'admin_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
-    document.cookie = 'auth_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
-  }
-};
-
-export const clearBrowserAuthTokens = clearBrowserAuth;
-
-/**
- * Kiểm tra xem người dùng có từng có phiên đăng nhập hay không
- */
-const hasActiveAuthSession = (): boolean => {
-  if (typeof window === 'undefined') return false;
-  const hasToken = Boolean(useAuthStore.getState().accessToken);
-  const cookies = document.cookie || '';
-  const hasUserCookie = cookies.includes('user_logged_in=') || cookies.includes('refreshToken=');
-  const hasAdminCookie = cookies.includes('admin_token=');
-  return hasToken || hasUserCookie || hasAdminCookie;
-};
-
-/**
- * Kiểm tra xem đường dẫn hiện tại có phải là trang yêu cầu bắt buộc đăng nhập không
- */
-const isCurrentRouteProtected = (): boolean => {
-  if (typeof window === 'undefined') return false;
-  const pathname = window.location.pathname;
-  const segments = pathname.split('/').filter(Boolean);
-  const first = segments[0];
-  const isLocale = first === 'vi' || first === 'en';
-  const pathWithoutLocale = isLocale ? `/${segments.slice(1).join('/')}` : pathname;
-
-  return (
-    pathWithoutLocale === '/admin' ||
-    pathWithoutLocale.startsWith('/admin/') ||
-    pathWithoutLocale === '/profile' ||
-    pathWithoutLocale.startsWith('/profile/')
-  );
-};
-
-/**
- * Xác định trang Login tương ứng theo ngữ cảnh (Admin vs Customer)
- */
-const getLoginPath = (): string => {
-  if (typeof window === 'undefined') {
-    return '/login';
-  }
-
-  const pathname = window.location.pathname;
-  const segments = pathname.split('/').filter(Boolean);
-  const first = segments[0];
-  const locale = first === 'vi' || first === 'en' ? first : 'vi';
-  const pathWithoutLocale = first === 'vi' || first === 'en' ? `/${segments.slice(1).join('/')}` : pathname;
-
-  // Nếu đang ở khu vực quản trị Admin -> Chuyển về /admin/login
-  if (pathWithoutLocale === '/admin' || pathWithoutLocale.startsWith('/admin/')) {
-    return `/${locale}/admin/login`;
-  }
-
-  // Khách hàng thông thường -> Chuyển về /login
-  return `/${locale}/login`;
-};
-
-/**
- * Chuyển hướng khi hết hạn phiên đăng nhập (Chỉ chuyển hướng khi thực sự cần thiết)
- */
-const redirectToLoginAfterSessionExpired = () => {
-  if (typeof window === 'undefined') {
-    return;
-  }
-
-  const loginPath = getLoginPath();
-  if (window.location.pathname === loginPath) {
-    return;
-  }
-
-  // CHỈ chuyển hướng nếu người dùng đang ở trang bảo vệ HOẶC trước đó đã từng có phiên đăng nhập
-  // Không làm gián đoạn trải nghiệm của khách vãng lai đang xem hàng công khai
-  if (isCurrentRouteProtected() || hasActiveAuthSession()) {
-    window.sessionStorage.setItem('auth:session-expired', 'true');
-    window.location.assign(loginPath);
-  }
-};
-
-/**
- * Chuẩn hóa URL gọi trực tiếp tới Backend REST API
+ * Chuẩn hóa URL: chấp nhận cả '/api/auth/login' lẫn '/auth/login'
  */
 function buildFullUrl(url: string, queryString: string): string {
   if (url.startsWith('http://') || url.startsWith('https://')) {
     return `${url}${queryString}`;
   }
 
-  // Tách query params có sẵn trong URL nếu có (ví dụ: '/api/upload?folder=general')
   const [cleanUrl, inlineQuery] = url.split('?');
 
-  // Chuẩn hóa đường dẫn: loại bỏ tiền tố /api trùng lặp với BASE_URL
   let path = cleanUrl;
   if (path.startsWith('/api/')) {
     path = path.slice(4);
@@ -155,14 +104,9 @@ function buildFullUrl(url: string, queryString: string): string {
     path = `/${path}`;
   }
 
-  // Tương thích các endpoint đặc biệt
-  if (path === '/auth/refresh') {
-    path = '/auth/refresh-token';
-  }
+  const rawBase = typeof window === 'undefined' ? SERVER_BASE_URL : BROWSER_BASE_URL;
+  const base = rawBase.endsWith('/') ? rawBase.slice(0, -1) : rawBase;
 
-  const base = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL;
-
-  // Ghép nối query strings nếu có
   let finalQuery = '';
   if (inlineQuery && queryString) {
     finalQuery = `?${inlineQuery}&${queryString.replace(/^\?/, '')}`;
@@ -175,60 +119,41 @@ function buildFullUrl(url: string, queryString: string): string {
   return `${base}${path}${finalQuery}`;
 }
 
-// Biến lưu giữ Promise refresh token đơn nhất (Single-Flight Mutex chống Race Condition)
+// Single-flight: nhiều request cùng gặp 401 chỉ gọi refresh một lần
 let refreshTokenPromise: Promise<string | undefined> | null = null;
 
+/**
+ * Làm mới access token khách hàng bằng refresh token (cookie httpOnly do Backend quản lý)
+ */
 export const refreshBrowserToken = async (): Promise<string | undefined> => {
-  // Nếu đang có một request refresh token khác chạy dở dang, cùng chờ kết quả chung
   if (refreshTokenPromise) {
     return refreshTokenPromise;
   }
 
   refreshTokenPromise = (async () => {
     try {
-      const refreshUrl = buildFullUrl('/auth/refresh-token', '');
-      const res = await fetch(refreshUrl, {
+      const res = await fetch(buildFullUrl('/auth/refresh-token', ''), {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
       });
 
       const isJson = res.headers.get('content-type')?.includes('application/json');
-      const payload = (isJson ? await res.json() : await res.text()) as
-        | { data?: { accessToken?: string } }
-        | string;
+      const payload = (isJson ? await res.json() : await res.text()) as { data?: { accessToken?: string } } | string;
+      const accessToken = typeof payload === 'object' ? payload.data?.accessToken : undefined;
 
-      if (!res.ok) {
-        clearCustomerAuth();
+      if (!res.ok || !accessToken) {
+        authHandlers?.onSessionExpired();
         redirectToLoginAfterSessionExpired();
-        throw new HttpError({
-          status: res.status,
-          payload,
-        });
-      }
-
-      if (typeof payload === 'string') {
-        clearCustomerAuth();
-        redirectToLoginAfterSessionExpired();
-        throw new HttpError({
-          status: res.status,
-          payload,
-        });
-      }
-
-      const accessToken = payload.data?.accessToken;
-      if (!accessToken) {
-        clearCustomerAuth();
-        redirectToLoginAfterSessionExpired();
+        if (!res.ok) {
+          throw new HttpError({ status: res.status, payload });
+        }
         return undefined;
       }
 
-      useAuthStore.getState().setAccessToken(accessToken);
+      authHandlers?.onAccessTokenRefreshed(accessToken);
       return accessToken;
     } finally {
-      // Giải phóng lock sau khi hoàn tất
       refreshTokenPromise = null;
     }
   })();
@@ -275,7 +200,7 @@ const request = async <ResponseData>(
   const isServer = typeof window === 'undefined';
 
   if (!options?.skipAuth && !isServer) {
-    token = useAuthStore.getState().accessToken || undefined;
+    token = authHandlers?.getAccessToken() || undefined;
   }
 
   if (token) {
@@ -307,7 +232,8 @@ const request = async <ResponseData>(
     res.status === 401 &&
     !isServer &&
     options?.retryOnUnauthorized !== false &&
-    hasActiveAuthSession()
+    !options?.skipAuth &&
+    hasCustomerSession()
   ) {
     try {
       const nextAccessToken = await refreshBrowserToken();
@@ -348,253 +274,3 @@ export const apiClient = {
   patch: <T>(url: string, body: unknown, options?: Omit<CustomRequestInit, 'body'>) =>
     request<T>('PATCH', url, { ...options, body }),
 };
-
-/**
- * Bộ mã khóa lỗi chuẩn hóa cho toàn bộ hệ thống (i18n Error Keys)
- */
-export const ERROR_KEYS = {
-  DEFAULT_ERROR: 'DEFAULT_ERROR',
-  NETWORK_ERROR: 'NETWORK_ERROR',
-  REQUEST_TIMEOUT: 'REQUEST_TIMEOUT',
-  HTTP_400: 'HTTP_400',
-  HTTP_401: 'HTTP_401',
-  HTTP_403: 'HTTP_403',
-  HTTP_404: 'HTTP_404',
-  HTTP_409: 'HTTP_409',
-  HTTP_422: 'HTTP_422',
-  HTTP_429: 'HTTP_429',
-  HTTP_500: 'HTTP_500',
-  HTTP_502: 'HTTP_502',
-  HTTP_503: 'HTTP_503',
-  HTTP_504: 'HTTP_504',
-} as const;
-
-export type ErrorKey = (typeof ERROR_KEYS)[keyof typeof ERROR_KEYS];
-
-/**
- * Trích xuất mã khóa lỗi i18n hoặc thông báo lỗi từ nhiều định dạng lỗi khác nhau:
- * - HttpError từ API Backend (payload: message, errors mảng hoặc object, error_description, error, detail)
- * - Lỗi kết nối mạng (AbortError -> REQUEST_TIMEOUT, Failed to fetch -> NETWORK_ERROR)
- * - Mã HTTP Status Code khi không có payload chi tiết -> HTTP_400..HTTP_504
- * - Error thông thường trong JavaScript
- * - String hoặc Plain Object lỗi
- */
-export function extractErrorMessage(
-  err: unknown,
-  fallback: string = ERROR_KEYS.DEFAULT_ERROR
-): string {
-  // 1. err rỗng / falsy
-  if (!err) {
-    return fallback;
-  }
-
-  // 2. err là string
-  if (typeof err === 'string') {
-    const trimmed = err.trim();
-    return trimmed.length > 0 ? trimmed : fallback;
-  }
-
-  // 3. err là HttpError hoặc đối tượng có payload / status
-  if (err instanceof HttpError || (typeof err === 'object' && err !== null && ('payload' in err || 'status' in err))) {
-    const httpErr = err as { status?: number; payload?: unknown };
-    let payload = httpErr.payload;
-
-    // Nếu payload là string JSON, thử parse
-    if (typeof payload === 'string') {
-      const trimmedPayload = payload.trim();
-      if (trimmedPayload.startsWith('{') || trimmedPayload.startsWith('[')) {
-        try {
-          payload = JSON.parse(trimmedPayload);
-        } catch {
-          // Bỏ qua nếu parse thất bại
-        }
-      } else if (!trimmedPayload.toLowerCase().startsWith('<!doctype') && !trimmedPayload.toLowerCase().startsWith('<html')) {
-        // Không phải trang HTML báo lỗi server thì trả về chuỗi text
-        if (trimmedPayload.length > 0) {
-          return trimmedPayload;
-        }
-      }
-    }
-
-    if (payload && typeof payload === 'object') {
-      const p = payload as Record<string, any>;
-
-      // 3.1. payload.errors là mảng (ví dụ Zod issues hoặc Express validator)
-      if (Array.isArray(p.errors) && p.errors.length > 0) {
-        const errorStrings = p.errors
-          .map((item: any) => {
-            if (typeof item === 'string') return item.trim();
-            if (item && typeof item === 'object') {
-              return item.message || item.msg || item.error || '';
-            }
-            return '';
-          })
-          .filter(Boolean);
-
-        if (errorStrings.length > 0) {
-          return errorStrings.join(', ');
-        }
-      }
-
-      // 3.2. payload.errors là object/dictionary (ví dụ { email: 'Email required', password: ['Min 6 chars'] })
-      if (p.errors && typeof p.errors === 'object' && !Array.isArray(p.errors)) {
-        const fieldErrors = Object.values(p.errors)
-          .flatMap((val: any) => (Array.isArray(val) ? val : [val]))
-          .map((v: any) => (typeof v === 'string' ? v.trim() : (v?.message || '')))
-          .filter(Boolean);
-
-        if (fieldErrors.length > 0) {
-          return fieldErrors.join(', ');
-        }
-      }
-
-      // 3.3. payload.message (chuỗi hoặc mảng chuỗi)
-      if (typeof p.message === 'string' && p.message.trim().length > 0) {
-        return p.message.trim();
-      }
-      if (Array.isArray(p.message) && p.message.length > 0) {
-        const msgs = p.message.map((m: any) => (typeof m === 'string' ? m.trim() : String(m))).filter(Boolean);
-        if (msgs.length > 0) {
-          return msgs.join(', ');
-        }
-      }
-
-      // 3.4. payload.error_description (OAuth2 chuẩn)
-      if (typeof p.error_description === 'string' && p.error_description.trim().length > 0) {
-        return p.error_description.trim();
-      }
-
-      // 3.5. payload.error (chuỗi hoặc object)
-      if (typeof p.error === 'string' && p.error.trim().length > 0) {
-        return p.error.trim();
-      }
-      if (p.error && typeof p.error === 'object' && typeof p.error.message === 'string') {
-        return p.error.message.trim();
-      }
-
-      // 3.6. payload.detail hoặc payload.details (RFC 7807 Problem Details)
-      if (typeof p.detail === 'string' && p.detail.trim().length > 0) {
-        return p.detail.trim();
-      }
-      if (typeof p.details === 'string' && p.details.trim().length > 0) {
-        return p.details.trim();
-      }
-      if (Array.isArray(p.details) && p.details.length > 0) {
-        const detailMsgs = p.details
-          .map((d: any) => (typeof d === 'string' ? d.trim() : (d?.message || '')))
-          .filter(Boolean);
-        if (detailMsgs.length > 0) {
-          return detailMsgs.join(', ');
-        }
-      }
-
-      // 3.7. payload.data bọc lồng
-      if (p.data && typeof p.data === 'object') {
-        if (typeof p.data.message === 'string' && p.data.message.trim().length > 0) {
-          return p.data.message.trim();
-        }
-        if (typeof p.data.error === 'string' && p.data.error.trim().length > 0) {
-          return p.data.error.trim();
-        }
-      }
-    }
-
-    // 3.8. Nếu không có message trong payload nhưng có HTTP Status code:
-    // Trả về i18n key chuẩn để client dịch theo ngôn ngữ tương ứng
-    const isCustomFallback =
-      fallback !== ERROR_KEYS.DEFAULT_ERROR &&
-      fallback !== 'Đã có lỗi xảy ra, vui lòng thử lại sau.';
-
-    if (httpErr.status && !isCustomFallback) {
-      switch (httpErr.status) {
-        case 400:
-          return ERROR_KEYS.HTTP_400;
-        case 401:
-          return ERROR_KEYS.HTTP_401;
-        case 403:
-          return ERROR_KEYS.HTTP_403;
-        case 404:
-          return ERROR_KEYS.HTTP_404;
-        case 409:
-          return ERROR_KEYS.HTTP_409;
-        case 422:
-          return ERROR_KEYS.HTTP_422;
-        case 429:
-          return ERROR_KEYS.HTTP_429;
-        case 500:
-          return ERROR_KEYS.HTTP_500;
-        case 502:
-          return ERROR_KEYS.HTTP_502;
-        case 503:
-          return ERROR_KEYS.HTTP_503;
-        case 504:
-          return ERROR_KEYS.HTTP_504;
-        default:
-          return `HTTP_${httpErr.status}`;
-      }
-    }
-  }
-
-  // 4. Axios-like error (err.response?.data)
-  if (typeof err === 'object' && err !== null && 'response' in err) {
-    const axiosData = (err as any).response?.data;
-    if (axiosData) {
-      const axiosMsg = extractErrorMessage(axiosData, fallback);
-      if (axiosMsg && axiosMsg !== fallback) {
-        return axiosMsg;
-      }
-    }
-  }
-
-  // 5. JavaScript Error chuẩn
-  if (err instanceof Error) {
-    // 5.1. Bắt lỗi mạng & Timeout -> Trả về mã i18n key
-    if (err.name === 'AbortError') {
-      return ERROR_KEYS.REQUEST_TIMEOUT;
-    }
-    const lowerMsg = err.message.toLowerCase();
-    if (
-      lowerMsg === 'failed to fetch' ||
-      lowerMsg.includes('networkerror') ||
-      lowerMsg.includes('network request failed') ||
-      lowerMsg.includes('err_connection_refused')
-    ) {
-      return ERROR_KEYS.NETWORK_ERROR;
-    }
-
-    // 5.2. Không trả về các chuỗi kỹ thuật vô nghĩa với người dùng
-    if (
-      err.message &&
-      !err.message.startsWith('HTTP Error:') &&
-      err.message !== '[object Object]' &&
-      err.message.trim().length > 0
-    ) {
-      return err.message.trim();
-    }
-  }
-
-  // 6. Plain Object có message / error / msg
-  if (typeof err === 'object' && err !== null) {
-    const obj = err as Record<string, any>;
-    if (typeof obj.message === 'string' && obj.message.trim().length > 0) {
-      return obj.message.trim();
-    }
-    if (typeof obj.error === 'string' && obj.error.trim().length > 0) {
-      return obj.error.trim();
-    }
-    if (typeof obj.msg === 'string' && obj.msg.trim().length > 0) {
-      return obj.msg.trim();
-    }
-    if (typeof obj.detail === 'string' && obj.detail.trim().length > 0) {
-      return obj.detail.trim();
-    }
-  }
-
-  return fallback;
-}
-
-/**
- * Alias của extractErrorMessage để đảm bảo tương thích ngược 100%
- */
-export const getErrorMessage = extractErrorMessage;
-

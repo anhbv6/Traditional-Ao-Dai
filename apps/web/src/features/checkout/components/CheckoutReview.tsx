@@ -95,7 +95,7 @@ export function CheckoutReview({
       <div className="flex gap-2.5 items-start bg-emerald-50/50 border border-emerald-100 p-3 rounded-lg text-[10px] text-emerald-800">
         <Shield size={14} className="shrink-0 text-emerald-600 mt-0.5" />
         <p>
-          Đơn hàng của bạn được bảo mật hoàn toàn bởi hệ thống bảo mật SSL của chúng tôi. Bằng cách nhấp vào "Đặt hàng ngay", bạn đồng ý với các chính sách mua hàng và điều khoản dịch vụ.
+          Đơn hàng của bạn được bảo mật hoàn toàn bởi hệ thống bảo mật SSL của chúng tôi. Bằng cách nhấp vào &ldquo;Đặt hàng ngay&rdquo;, bạn đồng ý với các chính sách mua hàng và điều khoản dịch vụ.
         </p>
       </div>
 

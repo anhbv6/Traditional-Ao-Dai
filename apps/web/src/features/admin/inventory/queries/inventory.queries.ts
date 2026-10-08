@@ -1,3 +1,4 @@
+import { type Prisma } from "@repo/db";
 import { prisma } from "../../server/db.server";
 import { type AdminInventoryVariant } from "../types/inventory.types";
 
@@ -6,7 +7,7 @@ import { type AdminInventoryVariant } from "../types/inventory.types";
  */
 export async function getAdminInventoryQuery(search?: string): Promise<AdminInventoryVariant[]> {
   try {
-    const whereCondition: any = {};
+    const whereCondition: Prisma.ProductVariantWhereInput = {};
     if (search) {
       whereCondition.OR = [
         { sku: { contains: search, mode: "insensitive" } },

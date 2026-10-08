@@ -6,8 +6,8 @@ import {
   AdminHeader,
   AdminAccessDenied,
   useAdminLayout,
-} from "@/features/admin/components/header";
-import { AdminProfileDialog } from "@/features/admin/components/AdminProfileDialog";
+} from "@/features/admin/layout";
+import { AdminProfileDialog } from "@/features/admin/session";
 import { LoadingOverlay } from "@/components/shared/LoadingOverlay";
 
 const geistSans = Geist({

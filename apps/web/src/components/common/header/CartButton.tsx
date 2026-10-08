@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ShoppingBag, Trash2 } from 'lucide-react';
 import Image from 'next/image';
+import { formatVnd } from '@repo/shared';
+import { calculateCartTotals, useCartStore } from '@/features/cart';
 import { Link } from '@/i18n/routing';
 import {
   DropdownMenu,
@@ -16,116 +18,13 @@ type CartButtonProps = {
 };
 
 export function CartButton({ label = 'Cart' }: CartButtonProps) {
-  // Initialize with empty array to prevent hydration mismatch, will load from localStorage in useEffect
-  const [cartItems, setCartItems] = useState<{
-    id: number;
-    name: string;
-    slug: string;
-    image: string;
-    quantity: number;
-    price: number;
-    size: string;
-  }[]>([]);
+  // Giỏ hàng dùng chung store với trang giỏ hàng & checkout (không còn đồng bộ bằng window event)
+  const cartItems = useCartStore((state) => state.items);
+  const removeCartItem = useCartStore((state) => state.removeItem);
 
   const [isOpen, setIsOpen] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
   const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const isInitialized = useRef(false);
-
-  // Load from localStorage on mount
-  useEffect(() => {
-    const stored = localStorage.getItem('cart_items');
-    if (stored) {
-      try {
-        setCartItems(JSON.parse(stored));
-      } catch (err) {
-        console.error("Failed to parse cart items from localStorage", err);
-      }
-    } else {
-      // Setup mock defaults on first load
-      const defaultItems = [
-        {
-          id: 1,
-          name: "Girls Pink Moana Printed Dress",
-          slug: "girls-pink-moana-printed-dress",
-          image: "https://images.unsplash.com/photo-1618244972963-dbee1a7edc95?q=80&w=200&auto=format&fit=crop",
-          quantity: 1,
-          price: 80.00,
-          size: "S",
-        },
-        {
-          id: 2,
-          name: "Women Textured Handheld Bag",
-          slug: "women-textured-handheld-bag",
-          image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?q=80&w=200&auto=format&fit=crop",
-          quantity: 1,
-          price: 80.00,
-          size: "Regular",
-        },
-        {
-          id: 3,
-          name: "Tailored Cotton Casual Shirt",
-          slug: "tailored-cotton-casual-shirt",
-          image: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=200&auto=format&fit=crop",
-          quantity: 1,
-          price: 40.00,
-          size: "M",
-        }
-      ];
-      setCartItems(defaultItems);
-      localStorage.setItem('cart_items', JSON.stringify(defaultItems));
-    }
-    isInitialized.current = true;
-
-    // Listen to updates from other pages (e.g. Cart page updates)
-    const handleCartUpdated = () => {
-      const updated = localStorage.getItem('cart_items');
-      if (updated) {
-        try {
-          setCartItems(JSON.parse(updated));
-        } catch (err) {
-          console.error("Failed to parse updated cart items", err);
-        }
-      }
-    };
-
-    window.addEventListener("cart-updated", handleCartUpdated);
-    return () => {
-      window.removeEventListener("cart-updated", handleCartUpdated);
-    };
-  }, []);
-
-  // Save to localStorage when cart items change
-  useEffect(() => {
-    if (isInitialized.current) {
-      localStorage.setItem('cart_items', JSON.stringify(cartItems));
-    }
-  }, [cartItems]);
-
-  // Listen to global custom cart-add-item event
-  useEffect(() => {
-    const handleAddItem = (e: Event) => {
-      const customEvent = e as CustomEvent;
-      const newItem = customEvent.detail;
-
-      setCartItems(prev => {
-        const existingItem = prev.find(item => item.slug === newItem.slug);
-        if (existingItem) {
-          return prev.map(item =>
-            item.slug === newItem.slug
-              ? { ...item, quantity: item.quantity + 1 }
-              : item
-          );
-        }
-        return [...prev, { ...newItem, id: Date.now() }];
-      });
-    };
-
-    window.addEventListener("cart-add-item", handleAddItem);
-    return () => {
-      window.removeEventListener("cart-add-item", handleAddItem);
-    };
-  }, []);
 
   useEffect(() => {
     return () => {
@@ -135,16 +34,13 @@ export function CartButton({ label = 'Cart' }: CartButtonProps) {
     };
   }, []);
 
-  // Remove item handler
-  const removeItem = (id: number, e: React.MouseEvent) => {
+  const removeItem = (id: string, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setCartItems(prev => prev.filter(item => item.id !== id));
+    removeCartItem(id);
   };
 
-  // Calculate statistics dynamically
-  const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-  const totalCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+  const { subtotal, totalQuantity: totalCount } = calculateCartTotals(cartItems);
 
   const handleMouseEnter = () => {
     if (hoverTimeoutRef.current) {
@@ -251,7 +147,7 @@ export function CartButton({ label = 'Cart' }: CartButtonProps) {
                         </Link>
                       </h4>
                       <p className="mt-1 text-[11px] text-[#2A2525] font-semibold">
-                        {item.quantity} x ${item.price.toFixed(2)}
+                        {item.quantity} x {formatVnd(item.price)}
                       </p>
                       <p className="mt-0.5 text-[10px] text-[#706565]">
                         Size: {item.size}
@@ -272,7 +168,7 @@ export function CartButton({ label = 'Cart' }: CartButtonProps) {
               {/* Subtotal */}
               <div className="pt-3 border-t border-[#E2D9D2]/40 flex items-center justify-between">
                 <span className="text-xs font-bold text-[#2A2525]">Subtotal</span>
-                <span className="text-sm font-extrabold text-[#800020]">${subtotal.toFixed(2)}</span>
+                <span className="text-sm font-extrabold text-[#800020]">{formatVnd(subtotal)}</span>
               </div>
 
               {/* Buttons */}

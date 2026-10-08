@@ -12,12 +12,8 @@ import { ManagePaymentTab } from "./manage-payment";
 import { SecurityTab } from "./security";
 import { SettingTab } from "./setting";
 import { useProfile } from "../hooks/useProfile";
-import { useRouter } from "@/i18n/routing";
-import { useAuthStore } from "@/features/auth/store/authStore";
-import { logoutApi } from "@/features/auth/api/auth.api";
-import { clearBrowserAuthTokens } from "@/lib/api-client";
 import { ConfirmDialog } from "@/components/shared";
-import { isUserAdminOrStaff } from "@/features/auth/utils/authRoles";
+import { useCustomerLogout } from "@/features/auth";
 
 export function ProfileExperience() {
   const t = useTranslations("ProfilePage");
@@ -25,27 +21,7 @@ export function ProfileExperience() {
   const { activeTab, setActiveTab } = useProfile();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openConfirm, setOpenConfirm] = useState(false);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const router = useRouter();
-  const user = useAuthStore((state) => state.user);
-  const isAdminOrStaff = useAuthStore((state) => state.isAdminOrStaff);
-  const logoutStore = useAuthStore((state) => state.logout);
-  const isAdmin = isAdminOrStaff || isUserAdminOrStaff(user);
-
-  const handleLogout = async () => {
-    setIsLoggingOut(true);
-    try {
-      await logoutApi();
-    } catch {
-      // Ignore API error to proceed with local logout
-    } finally {
-      clearBrowserAuthTokens();
-      logoutStore();
-      router.push("/login");
-      router.refresh();
-      setIsLoggingOut(false);
-    }
-  };
+  const { logout: handleLogout, isLoggingOut } = useCustomerLogout();
 
   const tabList = [
     { id: "personal" as const, label: t("tabs.personal"), icon: User },
@@ -112,9 +88,8 @@ export function ProfileExperience() {
               );
             })}
 
-            {/* Logout Button (ẩn nếu là Quản trị viên truy cập trang client) */}
-            {!isAdmin && (
-              <div className="border-t border-[#E2D9D2]/40 mt-3 pt-2">
+            {/* Logout Button */}
+                          <div className="border-t border-[#E2D9D2]/40 mt-3 pt-2">
                 <button
                   onClick={() => setOpenConfirm(true)}
                   className="cursor-pointer flex w-full items-center gap-3.5 rounded-xl px-4 py-3 text-sm font-semibold text-rose-600 hover:bg-rose-50 transition-all duration-300"
@@ -123,7 +98,7 @@ export function ProfileExperience() {
                   <span>{tCommon("logout")}</span>
                 </button>
               </div>
-            )}
+
           </nav>
  
           {/* Mobile Floating Action Button (FAB) Menu */}
@@ -168,9 +143,8 @@ export function ProfileExperience() {
                 );
               })}
               
-              {/* Logout Option in FAB (ẩn nếu là Quản trị viên truy cập trang client) */}
-              {!isAdmin && (
-                <button
+              {/* Logout Option in FAB */}
+                              <button
                   onClick={() => {
                     setIsMobileMenuOpen(false);
                     setOpenConfirm(true);
@@ -180,7 +154,7 @@ export function ProfileExperience() {
                   <LogOut size={16} className="shrink-0 text-rose-500" />
                   <span>{tCommon("logout")}</span>
                 </button>
-              )}
+
             </div>
 
             {/* Main Trigger FAB Button */}

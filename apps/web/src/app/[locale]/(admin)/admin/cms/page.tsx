@@ -1,10 +1,13 @@
 import React from "react";
 import { getCmsArticlesAndFaqsQuery, CmsManager } from "@/features/admin/cms";
 import { FileText } from "lucide-react";
+import { requireAdminPage } from "@/features/admin/server/adminAuth.server";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminCmsPage() {
+  await requireAdminPage();
+
   const { articles, faqs } = await getCmsArticlesAndFaqsQuery();
 
   return (

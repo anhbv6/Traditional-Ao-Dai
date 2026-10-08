@@ -1,3 +1,4 @@
+import { type Prisma } from "@repo/db";
 import { prisma } from "../../server/db.server";
 import { type AdminVoucherItem } from "../types/vouchers.types";
 
@@ -6,7 +7,7 @@ import { type AdminVoucherItem } from "../types/vouchers.types";
  */
 export async function getAdminVouchersQuery(search?: string): Promise<AdminVoucherItem[]> {
   try {
-    const whereCondition: any = {};
+    const whereCondition: Prisma.VoucherWhereInput = {};
     if (search) {
       whereCondition.OR = [
         { code: { contains: search, mode: "insensitive" } },
@@ -28,7 +29,7 @@ export async function getAdminVouchersQuery(search?: string): Promise<AdminVouch
       id: v.id,
       code: v.code,
       description: v.description,
-      discountType: v.discountType as any,
+      discountType: v.discountType,
       value: Number(v.value),
       minOrderValue: v.minOrderValue ? Number(v.minOrderValue) : null,
       maxDiscount: v.maxDiscount ? Number(v.maxDiscount) : null,

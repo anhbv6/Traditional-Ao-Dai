@@ -6,72 +6,67 @@ Dự án được xây dựng theo kiến trúc **PNPM Monorepo** phân tách r�
 
 ---
 
+
+> 📐 **Quy chuẩn dự án:** [`docs/PROJECT_RULES.md`](docs/PROJECT_RULES.md) — đọc trước khi đóng góp code. Tóm tắt cho từng workspace nằm ở các file `AGENTS.md`.
+
 ## 🏗️ Cấu Trúc Monorepo & Thiết Kế Hệ Thống
 
-Dự án được cấu trúc dưới dạng monorepo để quản lý đồng thời cả Frontend, Backend và Database. Hệ thống áp dụng các mô hình kiến trúc hiện đại: Frontend sử dụng **Feature-based Architecture** và Backend thiết kế theo mô hình **Modular Monolith**.
+Frontend áp dụng **Feature-based Architecture**, Backend thiết kế theo **Modular Monolith**, hợp đồng dữ liệu FE/BE dùng chung qua package `@repo/shared`.
+
+### 🔀 Luồng hệ thống
+
+```text
+Trình duyệt ── /vi/...  ─► apps/web (Next.js) ── Server/Client Components
+            ── /api/... ─► apps/web rewrites ───► apps/api (Express) ── Prisma ──► PostgreSQL
+                                                         └─ ioredis ──► Redis (OTP, rate-limit)
+Admin (Server Actions) ───────────────────────── Prisma (trực tiếp) ──► PostgreSQL
+```
+
+*   **Cùng origin:** trình duyệt chỉ gọi `/api/*` trên domain của web, Next.js chuyển tiếp sang Express → cookie phiên httpOnly dùng chung, không cần CORS.
+*   **Storefront** lấy dữ liệu qua Express API. **Admin** dùng Server Components + Server Actions gọi Prisma trực tiếp, mỗi action đều kiểm tra phiên và quyền.
 
 ### 📁 Sơ đồ thư mục dự án
 
 ```text
 learn-ecommerce-shop/
 ├── apps/
-│   ├── web/               # 💻 Frontend Storefront (Next.js 16, React 19)
+│   ├── web/                      # 💻 Storefront + Admin (Next.js 16, React 19)
+│   │   ├── messages/{vi,en}/     # File dịch next-intl (errors.json = toàn bộ mã lỗi BE)
 │   │   └── src/
-│   │       ├── app/       # App Router đa ngôn ngữ /[locale] (Routing & Layout layer)
-│   │       │   └── [locale]/
-│   │       │       ├── (store)/  # Nhóm trang bán hàng (home, products, cart...)
-│   │       │       ├── (auth)/   # Nhóm trang xác thực (login, signin...)
-│   │       │       └── (admin)/  # Nhóm trang quản trị
-│   │       ├── components/# Các UI component dùng chung toàn cục (Global UI)
-│   │       ├── features/  # Module nghiệp vụ tách biệt (Feature-based Architecture)
-│   │       │   └── products/ # Ví dụ: Module quản lý sản phẩm
-│   │       ├── i18n/      # Cấu hình đa ngôn ngữ (Localization)
-│   │       ├── lib/       # Cấu hình các thư viện (như axios client, utils...)
-│   │       └── types/     # Định nghĩa kiểu dùng chung cho frontend
-│   └── api/               # ⚙️ Backend API (Express.js, TypeScript) - Modular Monolith
-│       ├── .env.example   # File mẫu cấu hình biến môi trường của API & DB
+│   │       ├── app/[locale]/     # Routing: (store), (auth), (admin)
+│   │       ├── components/       # ui (shadcn), shared, common, providers
+│   │       ├── features/         # Module nghiệp vụ: auth, cart, products, profile, admin/...
+│   │       ├── hooks/            # Hook dùng chung
+│   │       ├── i18n/             # Cấu hình next-intl
+│   │       ├── lib/              # api-client, errorMessage, utils, jwt.server
+│   │       └── proxy.ts          # Middleware Next 16: i18n + chặn route
+│   └── api/                      # ⚙️ Backend API (Express) - Modular Monolith
 │       └── src/
-│           ├── index.ts   # Entrypoint khởi chạy API server & gắn middleware toàn cục
-│           ├── routes.ts  # Bộ định tuyến trung tâm (central router)
-│           ├── modules/   # Các module nghiệp vụ tự đóng gói (Self-contained)
-│           │   └── auth/  # Ví dụ: Module xác thực (routes, controller, service, schema)
-│           └── shared/    # Các thành phần dùng chung (config, middlewares, utils)
+│           ├── index.ts          # Entrypoint: helmet, CORS, body limit, health check, graceful shutdown
+│           ├── routes.ts         # Bộ định tuyến trung tâm
+│           ├── modules/          # auth, otp, user, upload (routes/controller/service/schema/KEYS.md)
+│           └── shared/           # config (env, swagger), middlewares, utils (rateLimit, verificationCode, authCookies...)
 ├── packages/
-│   └── db/                # 🗄️ Database layer dùng chung (@repo/db)
-│       ├── prisma/
-│       │   └── schema.prisma # Định nghĩa cấu hình DB Schema (PostgreSQL)
-│       └── src/
-│           └── index.ts   # Khởi tạo Prisma Client instance dùng chung
-├── docker-compose.yml     # Khởi chạy dịch vụ phụ trợ (Redis) bằng Docker
-├── package.json           # Các script chạy chung của toàn bộ workspace
-└── pnpm-workspace.yaml    # Khai báo các package trong workspace
+│   ├── db/                       # 🗄️ Prisma schema, migrations, seed, Prisma Client (@repo/db)
+│   └── shared/                   # 🤝 Validator Zod, kiểu response, tên cookie, tiền tệ, locale (@repo/shared)
+├── docs/PROJECT_RULES.md         # 📐 Quy chuẩn dự án
+├── .github/workflows/ci.yml      # CI: typecheck + lint
+├── docker-compose.yml            # Redis
+└── pnpm-workspace.yaml
 ```
 
 ### 💻 Thiết kế Frontend (Feature-based Architecture)
 
-Frontend nằm tại [`apps/web`](file:///E:/draftcode/learn-ecommerce-shop/apps/web) được thiết kế theo kiến trúc **Feature-based**, giúp dễ dàng mở rộng và bảo trì bằng cách đóng gói các thành phần giao diện và logic có liên quan chặt chẽ vào từng module chức năng (Features):
-
-*   **`features/`**: Mỗi thư mục con đại diện cho một chức năng nghiệp vụ của hệ thống (ví dụ: `auth`, `products`, `cart`, `checkout`). Cấu trúc bên trong mỗi feature tuân thủ nguyên tắc tự đóng gói:
-    *   `components/`: Các React component phục vụ riêng cho tính năng đó.
-    *   `api/`: Các truy vấn API, query/mutation hooks phục vụ riêng cho dữ liệu của feature.
-    *   `hooks/`: Các custom hooks chứa logic nghiệp vụ và state riêng biệt.
-    *   `types/`: Định nghĩa kiểu dữ liệu TS cho riêng feature.
-    *   `index.ts`: Điểm xuất khẩu (export) duy nhất. Chỉ những gì được export ở đây mới có thể được import sử dụng ở bên ngoài module (tránh việc import sâu gây rối mã nguồn).
-*   **`app/[locale]/`**: Đóng vai trò là lớp Router (routing layer) và Layout. Lớp này chỉ import các features từ thư mục `features/` để lắp ráp thành một trang hoàn thiện, hạn chế viết trực tiếp logic nghiệp vụ hay UI lớn tại đây.
+*   **`features/<feature>/`** tự đóng gói `api/`, `components/`, `hooks/`, `store/`, `types/`, `utils/`, `validations/` và chỉ public qua `index.ts`.
+*   **`app/[locale]/`** là lớp routing/layout, chỉ lắp ráp feature.
+*   **State:** React Query cho dữ liệu từ server, Zustand cho client state (phiên khách hàng, giỏ hàng). Phiên admin đọc từ server qua `useAdminSession()`.
+*   **Khu vực Admin:** `features/admin/<module>/{queries,actions,components}` — Server Action luôn gọi `authorizeAdminAction()`, page luôn gọi `requireAdminPage()`.
 
 ### ⚙️ Thiết kế Backend (Modular Monolith)
 
-Backend API nằm tại [`apps/api`](file:///E:/draftcode/learn-ecommerce-shop/apps/api) được chia thành các cấu trúc thành phần rõ ràng:
-
-*   **`modules/`**: Chứa các module chức năng độc lập. Mỗi module tự chịu trách nhiệm về logic của riêng mình và bao gồm:
-    *   `*.routes.ts`: Khai báo các endpoints cho module đó.
-    *   `*.controller.ts`: Xử lý HTTP request/response và nhận/phản hồi dữ liệu.
-    *   `*.service.ts`: Xử lý logic nghiệp vụ chính (Business logic) và tương tác database qua Prisma.
-    *   `*.schema.ts`: Định nghĩa và kiểm tra (validate) định dạng dữ liệu gửi lên (sử dụng Zod).
-*   **`shared/`**: Chứa các phần dùng chung cho tất cả các module trong ứng dụng:
-    *   `config/`: Chứa các cấu hình toàn cục (như cấu hình các biến môi trường validated qua Zod).
-    *   `middlewares/`: Chứa các middleware dùng chung như `authGuard` (xác thực token), `errorHandler` (bắt và xử lý lỗi tập trung) và `validate` (validate dữ liệu đầu vào).
-    *   `utils/`: Chứa các hàm tiện ích (như xử lý password, ký và kiểm tra JWT token).
+*   **`modules/<module>/`**: `*.routes.ts` (endpoint + Swagger), `*.controller.ts` (mỏng), `*.service.ts` (nghiệp vụ + Prisma), `*.schema.ts` (Zod), `KEYS.md` (mã phản hồi).
+*   **`shared/`**: `config/` (env Zod, Swagger), `middlewares/` (`authGuard`, `errorHandler`, `validate`, `requestLogger`), `utils/` (`rateLimit`, `verificationCode`, `authCookies`, `session`, `jwt`, `mail`...).
+*   Response thống nhất `{ status, statusCode, message: "MA_KEY", data, meta }` — `message` luôn là mã KEY để FE dịch.
 
 ---
 
@@ -108,7 +103,7 @@ Backend API nằm tại [`apps/api`](file:///E:/draftcode/learn-ecommerce-shop/a
 *   **Đa Ngôn Ngữ & Tiện Ích Khác:**
     *   **Next-intl (v4.13.2):** Hỗ trợ chuyển đổi ngôn ngữ (i18n) mượt mà dựa trên routing.
     *   **Date-fns (v4.4.0):** Xử lý định dạng ngày tháng hiển thị đơn hàng, đánh giá.
-    *   **React Hot Toast:** Hệ thống thông báo (Toaster alerts) đẹp mắt.
+    *   **Toast (Base UI):** Hệ thống thông báo `showToast` dựng trên `@base-ui/react/toast` (`components/ui/toast.tsx`).
 *   **Bảo Mật:**
     *   **@marsidev/react-turnstile:** Tích hợp Cloudflare Turnstile chống spam form đăng ký/đăng nhập.
     *   **@react-oauth/google:** Đăng nhập trực tiếp bằng tài khoản Google phía client.
@@ -124,9 +119,10 @@ Backend API nằm tại [`apps/api`](file:///E:/draftcode/learn-ecommerce-shop/a
     *   **Bcryptjs (v3.0.3):** Mã hoá một chiều mật khẩu trước khi lưu trữ vào Database.
     *   **Google Auth Library (v11.0.2):** Thư viện chính thức xác thực OAuth2 token từ Google trên server.
 *   **Giao Tiếp Dịch Vụ & Database:**
-    *   **IoRedis (v6.0.0):** Kết nối đến máy chủ Redis để quản lý session và lưu trữ OTP.
+    *   **IoRedis (v6.0.0):** Kết nối Redis để lưu OTP, mã xác minh email, reset token và bộ đếm rate-limit.
     *   **Nodemailer (v9.0.5):** Gửi email chứa mã xác thực OTP hoặc hóa đơn mua hàng.
     *   **Cors (v2.8.6):** Middleware kiểm soát chính sách chia sẻ tài nguyên nguồn gốc chéo an toàn.
+    *   **Helmet (v8):** Thiết lập các HTTP security header.
 *   **Xác Thực Đầu Vào & Tài Liệu:**
     *   **Zod (v4.4.3):** Middleware kiểm tra kiểu dữ liệu đầu vào của các API request.
     *   **Swagger JSDoc & Swagger UI Express:** Tự động biên dịch comment JSDoc thành file đặc tả OpenAPI và hiển thị thành giao diện Web UI chuyên nghiệp tại route `/api-docs`.
@@ -137,14 +133,18 @@ Backend API nằm tại [`apps/api`](file:///E:/draftcode/learn-ecommerce-shop/a
 *   **PostgreSQL:** Hệ quản trị cơ sở dữ liệu quan hệ mạnh mẽ lưu giữ mọi thông tin nghiệp vụ.
 *   **Dotenv-cli:** Giúp nạp động file môi trường phục vụ cho các câu lệnh migrate và generate của Prisma.
 
+### 🤝 Shared Contracts (`packages/shared`)
+
+*   Validator Zod (SĐT, email, mật khẩu, mã OTP), kiểu response API, tên cookie phiên, `formatVnd` / `toVnd`, `pickLocalized` — dùng chung cho cả Backend và Frontend để hai phía luôn khớp nhau.
+
 ---
 
 ## 📦 Hướng Dẫn Cài Đặt Chung Chi Tiết
 
 Vui lòng chuẩn bị sẵn các môi trường sau trước khi cài đặt:
-- **Node.js** phiên bản từ `18.x` trở lên.
-- **PNPM** cài đặt toàn cục: `npm install -g pnpm`.
-- **Docker Desktop** (dành cho chạy Redis và các dịch vụ phụ trợ).
+- **Node.js** phiên bản **22.18 trở lên** (khuyến nghị 24) — các package workspace được Node chạy thẳng từ mã TypeScript.
+- **PNPM** cài đặt toàn cục: `npm install -g pnpm` (đây là lệnh npm duy nhất được dùng; mọi thao tác trong dự án đều dùng pnpm).
+- **Docker Desktop** (dành cho chạy Redis).
 - Một cơ sở dữ liệu **PostgreSQL** (chạy local hoặc cloud).
 
 ### Các bước cài đặt:
@@ -156,111 +156,86 @@ Vui lòng chuẩn bị sẵn các môi trường sau trước khi cài đặt:
    ```
 
 2. **Cài đặt toàn bộ dependencies trong monorepo:**
-   Sử dụng PNPM để cài đặt đồng thời thư viện cho cả root, web, api và db:
    ```bash
    pnpm install
    ```
 
-3. **Cấu hình các biến môi trường:**
-   Sao chép file cấu hình mẫu `.env.example` thành file cấu hình chính thức `.env` đặt bên trong thư mục [`apps/api`](file:///E:/draftcode/learn-ecommerce-shop/apps/api):
+3. **Tạo cặp khóa JWT RS256** theo hướng dẫn trong [`apps/api/configJWT.md`](apps/api/configJWT.md).
+
+4. **Cấu hình biến môi trường cho Backend** — sao chép rồi điền giá trị:
    ```bash
    cp apps/api/.env.example apps/api/.env
    ```
+   Các biến bắt buộc: `DATABASE_URL`, `JWT_PRIVATE_KEY`, `JWT_PUBLIC_KEY`, `REDIS_*`, `GOOGLE_CLIENT_ID`, `CLOUDINARY_*`. `SMTP_*` có thể bỏ trống khi dev (email sẽ được in ra console). Ý nghĩa từng biến được ghi chú ngay trong file `.env.example`.
 
-4. **Khai báo thông số trong file `apps/api/.env`:**
-   Mở file [`apps/api/.env`](file:///E:/draftcode/learn-ecommerce-shop/apps/api/.env) và điền đầy đủ các thông số sau:
-   ```env
-   PORT=3001
-   NODE_ENV=development
-   
-   # Kết nối CSDL PostgreSQL (Hãy thay thế bằng thông tin của bạn)
-   DATABASE_URL="postgresql://postgres:postgres@localhost:5432/ecommerce?schema=public"
-   
-   # Cấu hình khóa bảo mật JWT (Dạng chuỗi Base64 hoặc ký tự bảo mật)
-   JWT_PRIVATE_KEY="chuỗi_private_key_của_bạn"
-   JWT_PUBLIC_KEY="chuỗi_public_key_của_bạn"
-   JWT_EXPIRES_IN="15m"
-   JWT_REFRESH_EXPIRES_IN="7d"
-   
-   # URL Frontend để cấu hình CORS
-   FRONTEND_URL="http://localhost:3000"
-
-   # Cấu hình kết nối tới Redis
-   REDIS_HOST=localhost
-   REDIS_PORT=6379
-   REDIS_PASSWORD=
-   OTP_TTL_SECONDS=300
+5. **Cấu hình biến môi trường cho Frontend:**
+   ```bash
+   cp apps/web/.env.example apps/web/.env
    ```
+   *   `NEXT_PUBLIC_API_URL="/api"` — giữ nguyên (web gọi API cùng origin qua Next.js rewrites).
+   *   `API_INTERNAL_URL="http://127.0.0.1:3001"` — địa chỉ Express mà Next.js chuyển tiếp tới.
+   *   `JWT_PUBLIC_KEY` — **giống hệt** giá trị trong `apps/api/.env` (chỉ public key, dùng để xác minh phiên quản trị ở server).
+   *   `NEXT_PUBLIC_GOOGLE_CLIENT_ID` — Client ID Google OAuth.
 
 ---
 
 ## 🚀 Hướng Dẫn Khởi Chạy Từng Phần & Câu Lệnh Chi Tiết
 
-**⚠️ QUAN TRỌNG:** Để dự án không bị lỗi kết nối, bạn **bắt buộc** phải khởi chạy các dịch vụ theo đúng thứ tự 4 bước sau:
+**⚠️ QUAN TRỌNG:** Khởi chạy các dịch vụ theo đúng thứ tự 4 bước sau:
 
-### Step 1: Khởi chạy dịch vụ phụ trợ (Redis Container)
-Chạy dịch vụ Redis trên máy ảo Docker thông qua Docker Compose ở thư mục gốc:
+### Step 1: Khởi chạy Redis
 ```bash
 docker compose up -d
 ```
-*   **Giải thích:** Lệnh này tải ảnh `redis:7-alpine` và khởi động một Redis server chạy ngầm ở cổng `6379`. Dùng làm kho chứa tạm mã OTP gửi đến điện thoại/email khách hàng.
-*   **Các lệnh bổ trợ hữu ích:**
-    *   *Dừng dịch vụ:* `docker compose down`
-    *   *Xem nhật ký hoạt động (Logs):* `docker compose logs -f redis`
-    *   *Kiểm tra dữ liệu bên trong:* `docker exec -it shop-redis redis-cli` (gõ `keys *` để xem toàn bộ dữ liệu đang cache).
+*   Dừng: `docker compose down` · Xem log: `docker compose logs -f redis` · Xem dữ liệu: `docker exec -it shop-redis redis-cli`.
 
-### Step 2: Khởi tạo và Đồng bộ hóa Cơ sở dữ liệu (PostgreSQL & Prisma)
-Khi database PostgreSQL của bạn đã được bật, chạy các lệnh sau từ thư mục gốc của monorepo:
+### Step 2: Khởi tạo cơ sở dữ liệu (PostgreSQL & Prisma)
+```bash
+pnpm db:generate   # Sinh Prisma Client
+pnpm db:deploy     # Áp dụng toàn bộ migration lên database
+pnpm db:seed       # Tạo tài khoản admin + danh mục, sản phẩm mẫu
+```
+*   Tài khoản admin mặc định: **`admin@gmail.com` / `admin123`** (đổi qua biến `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`).
+*   Khi sửa schema: `pnpm db:migrate --name <ten_thay_doi>` rồi `pnpm db:generate` (Windows: dừng dev server trước khi generate).
 
-1. **Khởi tạo mã nguồn Prisma Client (TypeScript Types):**
-   ```bash
-   pnpm db:generate
-   ```
-   *   **Tác dụng:** Lệnh này đọc file `schema.prisma` và tự động biên dịch thành các kiểu dữ liệu TypeScript tương ứng cho ứng dụng sử dụng.
-
-2. **Chạy Migration để tạo cấu trúc bảng:**
-   ```bash
-   pnpm db:migrate
-   ```
-   *   **Tác dụng:** Đồng bộ các bảng như `User`, `Product`, `Order`... vào database PostgreSQL local của bạn.
-
-3. **Khởi tạo dữ liệu mẫu (Seeding):**
-   ```bash
-   pnpm --filter @repo/db seed
-   ```
-   *   **Tác dụng:** Thực thi file `seed.ts` để tạo tài khoản Admin mặc định đăng nhập hệ thống: **Email:** `admin@gmail.com` / **Mật khẩu:** `123`.
-
-### Step 3: Khởi chạy Backend API Server (Express.js)
-Để bắt đầu chạy server API, thực thi câu lệnh sau tại thư mục gốc:
+### Step 3: Khởi chạy Backend API
 ```bash
 pnpm --filter @repo/api dev
 ```
-*   **Giải thích:** Lệnh này chạy server bằng công cụ `tsx` để theo dõi và cập nhật trực tiếp thay đổi trong thư mục `apps/api`.
-*   **Đầu ra:**
-    *   API chạy tại địa chỉ: [http://localhost:3001](http://localhost:3001)
-    *   Giao diện tài liệu Swagger API: [http://localhost:3001/api-docs](http://localhost:3001/api-docs) (Nơi bạn có thể test trực tiếp các API đăng nhập, lấy sản phẩm).
+*   API: [http://localhost:3001](http://localhost:3001) · Health check (kèm DB + Redis): [http://localhost:3001/api/health](http://localhost:3001/api/health)
+*   Swagger UI: [http://localhost:3001/api-docs](http://localhost:3001/api-docs) (chỉ bật ngoài production).
 
-### Step 4: Khởi chạy Frontend Web Storefront (Next.js)
-Để chạy giao diện website Next.js, thực thi câu lệnh sau tại thư mục gốc:
+### Step 4: Khởi chạy Frontend
 ```bash
 pnpm --filter @repo/web dev
 ```
-*   **Giải thích:** Khởi chạy máy chủ phát triển Next.js.
-*   **Đầu ra:**
-    *   Truy cập giao diện Web tại địa chỉ: [http://localhost:3000](http://localhost:3000) (Hệ thống sẽ tự nhận diện ngôn ngữ và điều hướng về `/vi` hoặc `/en`).
+*   Storefront: [http://localhost:3000](http://localhost:3000) (tự điều hướng về `/vi` hoặc `/en`) · Admin: [http://localhost:3000/vi/admin/login](http://localhost:3000/vi/admin/login)
+*   Mọi request `/api/*` từ trình duyệt đi qua cổng 3000.
 
 ---
 
-## ⚡ Lệnh Chạy Toàn Bộ Dự Án Song Song (Cách Nhanh Nhất)
+## ⚡ Lệnh Chạy Nhanh & Kiểm Tra Chất Lượng
 
-Sau khi bạn đã hoàn thành việc setup Database ở lần đầu, ở những lần chạy sau, bạn chỉ cần thực hiện 2 lệnh siêu nhanh sau để mở dự án:
+```bash
+docker compose up -d   # Bật Redis
+pnpm dev               # Chạy song song API + Web
+pnpm check             # Type-check + lint toàn repo (bắt buộc xanh trước khi commit)
+```
 
-1. **Bật Redis:**
-   ```bash
-   docker compose up -d
-   ```
-2. **Khởi chạy đồng thời cả FE Web & BE API:**
-   ```bash
-   pnpm dev
-   ```
-   *Lệnh này sẽ tự động chạy song song hai câu lệnh ở Step 3 và Step 4 mà không cần bạn phải mở nhiều cửa sổ terminal khác nhau.*
+| Lệnh | Tác dụng |
+| :--- | :--- |
+| `pnpm typecheck` | `tsc --noEmit` cho mọi workspace |
+| `pnpm lint` | ESLint |
+| `pnpm build` | Build tất cả workspace |
+| `pnpm db:studio` | Mở Prisma Studio |
+
+CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) tự chạy `typecheck` + `lint` cho mọi Pull Request.
+
+---
+
+## 🌐 Ghi Chú Triển Khai (Production)
+
+*   Đặt **reverse proxy** (nginx / Cloudflare) trước Next.js, cấu hình `X-Forwarded-For` (ví dụ nginx: `proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;`) và đặt `TRUST_PROXY` trong `apps/api/.env` bằng số proxy đó. Rate-limit theo IP phụ thuộc vào cấu hình này.
+*   Web và API phải chạy **cùng domain** (web chuyển tiếp `/api` sang API qua `API_INTERNAL_URL`); cookie được đặt `Secure` khi `NODE_ENV=production` nên bắt buộc HTTPS.
+*   Áp dụng migration bằng `pnpm db:deploy` (không chạy `db:migrate` trên production).
+*   Swagger UI tự tắt khi `NODE_ENV=production`.

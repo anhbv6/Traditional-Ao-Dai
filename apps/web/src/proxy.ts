@@ -1,6 +1,8 @@
 import createMiddleware from 'next-intl/middleware';
 import { type NextRequest, NextResponse } from 'next/server';
 import { routing } from './i18n/routing';
+import { AUTH_COOKIES } from '@repo/shared';
+import { verifyAccessToken } from './lib/jwt.server';
 
 const intlMiddleware = createMiddleware(routing);
 
@@ -17,25 +19,35 @@ export default function proxy(request: NextRequest) {
   // 1. Phân tích locale và path thuần không chứa locale
   const pathnameSegments = pathname.split('/').filter(Boolean);
   const firstSegment = pathnameSegments[0];
-  const isLocale = routing.locales.includes(firstSegment as any);
+  const isLocale = (routing.locales as readonly string[]).includes(firstSegment);
   const currentLocale = isLocale ? firstSegment : routing.defaultLocale;
   const pathWithoutLocale = isLocale
     ? `/${pathnameSegments.slice(1).join('/')}`
     : pathname;
 
   // 2. Đọc cookie xác thực
-  const adminToken = request.cookies.get('admin_token')?.value;
-  const userLoggedIn =
-    request.cookies.get('user_logged_in')?.value ||
-    request.cookies.get('refreshToken')?.value;
-  const authRole = request.cookies.get('auth_role')?.value;
+  // admin_token phải được xác minh chữ ký RS256 + hạn dùng; vai trò quản trị lấy từ payload đã ký,
+  // KHÔNG lấy từ cookie auth_role (client có thể tự sửa)
+  const adminPayload = verifyAccessToken(request.cookies.get(AUTH_COOKIES.adminToken)?.value);
+  const adminRole =
+    adminPayload?.role === 'ADMIN' || adminPayload?.role === 'STAFF' ? adminPayload.role : null;
+  const hasValidAdminToken = Boolean(adminRole);
+  // Cùng origin với API nên proxy đọc được cookie httpOnly `refreshToken` do Backend đặt
+  const userLoggedIn = Boolean(request.cookies.get(AUTH_COOKIES.refreshToken)?.value);
 
   // 3. Bảo vệ khu vực Admin (/admin, /admin/dashboard, /admin/staff...)
   if (pathWithoutLocale === '/admin' || pathWithoutLocale.startsWith('/admin/')) {
     const isLoginPage = pathWithoutLocale === '/admin/login';
 
     if (isLoginPage) {
-      if (adminToken) {
+      // Phiên đã bị thu hồi phía server (đăng xuất ở nơi khác, bị khóa...) -> xóa cookie cũ, ở lại trang đăng nhập
+      if (request.nextUrl.searchParams.get('expired') === '1') {
+        const response = intlMiddleware(request);
+        response.cookies.delete(AUTH_COOKIES.adminToken);
+        response.cookies.delete(AUTH_COOKIES.adminSessionHint);
+        return response;
+      }
+      if (hasValidAdminToken) {
         return NextResponse.redirect(
           new URL(`/${currentLocale}/admin/dashboard`, request.url)
         );
@@ -43,14 +55,14 @@ export default function proxy(request: NextRequest) {
       return intlMiddleware(request);
     }
 
-    // Nếu tài khoản hiện tại là Khách hàng (CUSTOMER) mà cố truy cập vào admin -> chuyển sang 403 Forbidden
-    if (authRole === 'CUSTOMER' && !adminToken) {
+    // Khách hàng đang đăng nhập (không có phiên quản trị) cố truy cập admin -> 403 Forbidden
+    if (userLoggedIn && !hasValidAdminToken) {
       return NextResponse.redirect(
         new URL(`/${currentLocale}/403`, request.url)
       );
     }
 
-    if (!adminToken) {
+    if (!hasValidAdminToken) {
       return NextResponse.redirect(
         new URL(`/${currentLocale}/admin/login`, request.url)
       );
@@ -63,7 +75,7 @@ export default function proxy(request: NextRequest) {
       pathWithoutLocale === '/admin/vouchers' ||
       pathWithoutLocale.startsWith('/admin/vouchers/');
 
-    if (isSuperAdminRoute && authRole === 'STAFF') {
+    if (isSuperAdminRoute && adminRole !== 'ADMIN') {
       // Nhân viên Staff không có quyền vào Nhân sự & Voucher -> redirect về dashboard
       return NextResponse.redirect(
         new URL(`/${currentLocale}/admin/dashboard`, request.url)
@@ -73,9 +85,9 @@ export default function proxy(request: NextRequest) {
     return intlMiddleware(request);
   }
 
-  // 4. Bảo vệ trang cá nhân người dùng (/profile, /profile/orders...)
+  // 4. Bảo vệ trang cá nhân khách hàng (/profile, /profile/orders...)
   if (pathWithoutLocale === '/profile' || pathWithoutLocale.startsWith('/profile/')) {
-    if (!userLoggedIn && !adminToken) {
+    if (!userLoggedIn) {
       const loginUrl = new URL(`/${currentLocale}/login`, request.url);
       loginUrl.searchParams.set('redirect', pathname);
       return NextResponse.redirect(loginUrl);

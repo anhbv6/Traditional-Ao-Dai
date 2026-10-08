@@ -1,7 +1,10 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
 import { ProductDetailClient } from './ProductDetailClient';
-import { mockDetailProducts, productCatalog, type DisplayProduct, type RelatedProductItem } from '../types/products.types';
+import { type DisplayProduct, type RelatedProductItem } from '../types/products.types';
+import { productCatalog } from '../data/mockProducts';
+import { mockDetailProducts } from '../data/detailMockProduct';
+import { type MeasurementField } from '../data/detailMockProduct';
 
 interface ProductDetailProps {
   slug: string;
@@ -12,7 +15,7 @@ export function ProductDetail({ slug, locale }: ProductDetailProps) {
   let displayProduct: DisplayProduct;
   let galleryImages: string[] = [];
   let relatedProducts: RelatedProductItem[] = [];
-  let customMeasurementFields: any[] = [];
+  let customMeasurementFields: MeasurementField[] = [];
 
   if (slug in mockDetailProducts) {
     const mock = mockDetailProducts[slug];
