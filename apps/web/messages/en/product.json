@@ -14,8 +14,6 @@
     "longDescription": "This design is finished with a graceful silhouette, selected fabric, and refined details for formal occasions. It keeps the traditional elegance of Ao Dai while remaining easy to wear in a modern wardrobe.",
     "secondaryDescription": "Each piece can be advised against real body measurements to keep the fit comfortable through long events.",
     "enterMeasurements": "Enter your measurements (cm)",
-    "addedToCart": "🛒 ADDED TO CART!\n\n• Product: {product}\n• Color: {color}\n• Size: {size}\n• Quantity: {quantity}\n",
-    "customMeasurementsPrefix": "• Custom Measurements: ",
     "customerReviewsTitle": "Customer Reviews",
     "addReview": "Add your Review",
     "yourRating": "Your Rating",
@@ -25,10 +23,14 @@
     "namePlaceholder": "Enter Your Name",
     "emailPlaceholder": "Enter Your Email",
     "reviewPlaceholder": "Enter Your Review",
-    "submitReview": "Submit"
+    "submitReview": "Submit",
+    "measurementsRequired": "Please fill in all required measurements (cm) before adding to cart"
   },
   "addToCart": "Add to Cart",
+  "cartAdded": "Added to cart",
+  "customTailor": "Custom tailor",
   "addToWishlist": "Add to Wishlist",
+  "removeFromWishlist": "Remove from Wishlist",
   "compare": "Compare Product",
   "quickView": "Quick View",
   "close": "Close",
@@ -70,5 +72,16 @@
     "silk": "Silk Collection",
     "brocade": "Luxury Brocade",
     "embroidered": "Embroidered Art"
+  },
+  "sale": "Sale",
+  "colorsLabel": "Available colors",
+  "addedShort": "Added to cart",
+  "quantity": {
+    "decrease": "Decrease quantity",
+    "increase": "Increase quantity"
+  },
+  "gallery": {
+    "previous": "Previous image",
+    "next": "Next image"
   }
 }

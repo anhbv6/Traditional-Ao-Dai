@@ -2,15 +2,17 @@
 
 import { prisma } from "../../server/db.server";
 import { authorizeAdminAction } from "../../server/adminAuth.server";
+import { ADMIN_ACTION_ACCESS } from "../../session/permissions";
 import { type OrderStatus as DbOrderStatus } from "@repo/db";
 import { type CreateStaffOrderInput } from "../types/dashboard.types";
-import { getAdminOrdersQuery, getDashboardStatsQuery } from "../queries/dashboard.queries";
+import { getAdminOrdersQuery, getDashboardStatsQuery, getLowStockVariantsQuery } from "../queries/dashboard.queries";
 
 /**
  * Server Action: Lấy thống kê số liệu Dashboard
  */
 export async function getDashboardStatsAction(filter: "today" | "week" | "month" = "week") {
-  const auth = await authorizeAdminAction();
+  // Doanh thu & thống kê kinh doanh: ADMIN hoặc STAFF có quyền xem báo cáo
+  const auth = await authorizeAdminAction(ADMIN_ACTION_ACCESS.viewReports);
   if (!auth.success) return auth;
 
   try {
@@ -32,7 +34,7 @@ export async function getDashboardStatsAction(filter: "today" | "week" | "month"
  * Server Action: Lấy danh sách đơn hàng cho Admin & Staff trực tiếp từ DB
  */
 export async function getAdminOrdersAction() {
-  const auth = await authorizeAdminAction({ permission: "canManageOrders" });
+  const auth = await authorizeAdminAction(ADMIN_ACTION_ACCESS.viewDashboardOrders);
   if (!auth.success) return auth;
 
   try {
@@ -144,5 +146,20 @@ export async function createStaffOrderAction(input: CreateStaffOrderInput) {
       success: false,
       error: "ORDER_CREATE_FAILED",
     };
+  }
+}
+
+/**
+ * Server Action: Danh sách SKU sắp hết hàng cho khối cảnh báo dashboard
+ */
+export async function getLowStockVariantsAction() {
+  const auth = await authorizeAdminAction(ADMIN_ACTION_ACCESS.manageInventory);
+  if (!auth.success) return auth;
+
+  try {
+    return { success: true as const, data: await getLowStockVariantsQuery() };
+  } catch (error) {
+    console.error("Lỗi Action getLowStockVariantsAction:", error);
+    return { success: false as const, error: "INVENTORY_LIST_FAILED" };
   }
 }

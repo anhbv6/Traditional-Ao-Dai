@@ -5,6 +5,7 @@ import { prisma } from "./db.server";
 import { type Role } from "@repo/db";
 import { AUTH_COOKIES } from "@repo/shared";
 import { verifyAccessToken } from "@/lib/jwt.server";
+import { canAccess, type AdminAccessRule, type StaffPermissionField } from "../session/permissions";
 
 export interface AdminSessionUser {
   id: string;
@@ -45,12 +46,8 @@ export const ADMIN_SESSION_USER_SELECT = {
   },
 } as const;
 
-export type StaffPermissionField =
-  | "canManageOrders"
-  | "canUpdateTailoring"
-  | "canManageInventory"
-  | "canViewReports"
-  | "canManageContent";
+// Kiểu quyền dùng chung với client — định nghĩa tại session/permissions.ts
+export type { StaffPermissionField } from "../session/permissions";
 
 /**
  * Kiểm tra xác thực quyền Admin hoặc Staff trong Server Components & Server Actions.
@@ -133,33 +130,6 @@ export async function checkAuthAdmin(
   }
 }
 
-/**
- * Kiểm tra phân quyền chi tiết (Granular Permission) của nhân viên Staff
- */
-export async function checkStaffPermission(
-  userId: string,
-  permissionField: StaffPermissionField
-): Promise<boolean> {
-  try {
-    const staff = await prisma.user.findUnique({
-      where: { id: userId },
-      include: { staffPermission: true },
-    });
-
-    if (!staff) return false;
-    if (staff.role === "ADMIN") return true; // Super Admin có toàn quyền
-
-    if (staff.role === "STAFF" && staff.staffPermission) {
-      return Boolean(staff.staffPermission[permissionField]);
-    }
-
-    return false;
-  } catch (error) {
-    console.error("Lỗi kiểm tra quyền chi tiết Staff:", error);
-    return false;
-  }
-}
-
 export type AdminActionAuth =
   | { success: true; user: AdminSessionUser; sessionId: string }
   | { success: false; error: string };
@@ -172,17 +142,15 @@ export type AdminActionAuth =
  * const auth = await authorizeAdminAction({ permission: "canManageOrders" });
  * if (!auth.success) return auth;
  */
-export async function authorizeAdminAction(options?: {
-  role?: "ADMIN";
-  permission?: StaffPermissionField;
-}): Promise<AdminActionAuth> {
+export async function authorizeAdminAction(options?: AdminAccessRule): Promise<AdminActionAuth> {
   const result = await checkAuthAdmin(options?.role);
 
   if (!result.isAuthenticated || !result.user) {
     return { success: false, error: result.error || "INSUFFICIENT_PERMISSIONS" };
   }
 
-  if (options?.permission && !(await checkStaffPermission(result.user.id, options.permission))) {
+  // Quyền chi tiết đã nằm trong phiên (đọc từ DB ở checkAuthAdmin) -> không cần truy vấn thêm
+  if (!canAccess(result.user, options)) {
     return { success: false, error: "STAFF_PERMISSION_DENIED" };
   }
 
@@ -192,9 +160,9 @@ export async function authorizeAdminAction(options?: {
 /**
  * Cổng bảo vệ cho Server Component (page.tsx) của khu vực quản trị — đọc dữ liệu trực tiếp từ DB nên
  * không thể chỉ dựa vào proxy (proxy chỉ xác minh chữ ký, không biết phiên đã bị thu hồi hay chưa).
- * Chưa đăng nhập / phiên hết hạn -> về trang đăng nhập; thiếu quyền Super Admin -> về dashboard.
+ * Chưa đăng nhập / phiên hết hạn -> về trang đăng nhập; thiếu quyền (ADMIN_MODULE_ACCESS) -> về dashboard.
  */
-export async function requireAdminPage(options?: { role?: "ADMIN" }): Promise<AdminSessionUser> {
+export async function requireAdminPage(options?: AdminAccessRule): Promise<AdminSessionUser> {
   const locale = await getLocale();
   const result = await checkAuthAdmin();
 
@@ -203,7 +171,8 @@ export async function requireAdminPage(options?: { role?: "ADMIN" }): Promise<Ad
     redirect(`/${locale}/admin/login?expired=1`);
   }
 
-  if (options?.role === "ADMIN" && result.user.role !== "ADMIN") {
+  // Thiếu quyền Super Admin / quyền chi tiết của module -> về dashboard (menu cũng đã ẩn module này)
+  if (!canAccess(result.user, options)) {
     redirect(`/${locale}/admin/dashboard`);
   }
 

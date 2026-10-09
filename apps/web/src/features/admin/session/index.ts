@@ -1,4 +1,5 @@
 export * from "./hooks/useAdminSession";
+export * from "./permissions";
 export * from "./components/PermissionGate";
 export * from "./components/AdminProfileDialog";
 export { executeAdminLogout } from "../layout/actions/header.actions";

@@ -120,5 +120,7 @@
   "VERIFICATION_CODE_OR_RESET_TOKEN_REQUIRED": "Verification code or reset token is required.",
   "VERIFICATION_TOO_MANY_ATTEMPTS": "Too many incorrect attempts. Please request a new code.",
   "VOUCHER_UPDATE_FAILED": "Unable to update the voucher.",
-  "WARD_NAME_REQUIRED": "Please select ward."
+  "WARD_NAME_REQUIRED": "Please select ward.",
+  "INVENTORY_LIST_FAILED": "Unable to load inventory.",
+  "STAFF_CREATE_FAILED": "Unable to create the staff account."
 }

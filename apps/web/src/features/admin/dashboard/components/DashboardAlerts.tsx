@@ -1,59 +1,68 @@
 import React from "react";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, PackageCheck } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
+import { ADMIN_CARD_CLASS } from "../../ui";
+import { type LowStockVariant } from "../queries/dashboard.queries";
 
 interface DashboardAlertsProps {
-  tLowFabrics: string;
+  items: LowStockVariant[];
+  isLoading?: boolean;
+  title: string;
+  subtitle: string;
   tLowStock: string;
-  title?: string;
-  subtitle?: string;
+  tStockLeft: string;
+  tEmpty: string;
 }
 
-export function DashboardAlerts({
-  tLowFabrics,
-  tLowStock,
-  title = "Cảnh báo Vận hành & Kho vải",
-  subtitle = "Vật liệu và sản phẩm cần bổ sung khẩn cấp.",
-}: DashboardAlertsProps) {
+/**
+ * Cảnh báo vận hành: các SKU của sản phẩm đang bán có tồn kho thấp (dữ liệu thật từ ProductVariant)
+ */
+export function DashboardAlerts({ items, isLoading, title, subtitle, tLowStock, tStockLeft, tEmpty }: DashboardAlertsProps) {
   return (
-    <div className="rounded-xl border border-[#E4E4E7] bg-white p-6 shadow-xs flex flex-col justify-between">
+    <div className={`${ADMIN_CARD_CLASS} flex flex-col p-6`}>
       <div>
-        <h3 className="text-lg font-semibold text-[#09090B] flex items-center gap-2">
-          <AlertTriangle size={18} className="text-[#09090B]" />
+        <h3 className="flex items-center gap-2 text-lg font-semibold text-[#09090B]">
+          <AlertTriangle size={18} />
           {title}
         </h3>
-        <p className="text-xs text-[#71717A] mt-0.5">{subtitle}</p>
+        <p className="mt-0.5 text-xs text-[#71717A]">{subtitle}</p>
       </div>
 
-      <div className="space-y-4 mt-6 overflow-y-auto max-h-[220px] scrollbar-thin">
-        {/* Warning 1 */}
-        <div className="p-3.5 rounded-lg border border-amber-200 bg-amber-50/30 flex gap-3.5">
-          <AlertTriangle size={18} className="text-amber-700 shrink-0 mt-0.5" />
-          <div>
-            <h4 className="text-xs font-bold text-amber-900 uppercase tracking-wider">{tLowFabrics}</h4>
-            <p className="text-xs font-semibold text-[#09090B] mt-1">Lụa tơ tằm đỏ đô (Mã LH-09)</p>
-            <p className="text-[10px] text-[#71717A] mt-0.5">Còn 12m - Thấp hơn mức tối thiểu để phục vụ 8 đơn may đo.</p>
+      <div className="mt-6 max-h-[220px] space-y-3 overflow-y-auto">
+        {isLoading ? (
+          <div className="flex justify-center py-8">
+            <Spinner className="size-5 text-[#71717A]" />
           </div>
-        </div>
-
-        {/* Warning 2 */}
-        <div className="p-3.5 rounded-lg border border-rose-200 bg-rose-50/30 flex gap-3.5">
-          <AlertTriangle size={18} className="text-rose-700 shrink-0 mt-0.5" />
-          <div>
-            <h4 className="text-xs font-bold text-rose-900 uppercase tracking-wider">{tLowStock}</h4>
-            <p className="text-xs font-semibold text-[#09090B] mt-1">Áo Dài Cách Tân Hoa Đào (Size M)</p>
-            <p className="text-[10px] text-[#71717A] mt-0.5">Còn 2 sản phẩm - Mẫu áo bán chạy đang thiếu size phổ biến.</p>
+        ) : items.length === 0 ? (
+          <div className="flex flex-col items-center gap-2 py-8 text-center text-xs text-[#71717A]">
+            <PackageCheck size={20} />
+            <span>{tEmpty}</span>
           </div>
-        </div>
-
-        {/* Warning 3 */}
-        <div className="p-3.5 rounded-lg border border-rose-200 bg-rose-50/30 flex gap-3.5">
-          <AlertTriangle size={18} className="text-rose-700 shrink-0 mt-0.5" />
-          <div>
-            <h4 className="text-xs font-bold text-rose-900 uppercase tracking-wider">{tLowStock}</h4>
-            <p className="text-xs font-semibold text-[#09090B] mt-1">Áo Dài Gấm Song Hỷ (Size S)</p>
-            <p className="text-[10px] text-[#71717A] mt-0.5">Còn 3 sản phẩm - Cần nhập thêm gấp.</p>
-          </div>
-        </div>
+        ) : (
+          items.map((item) => {
+            const isOut = item.stock === 0;
+            return (
+              <div
+                key={item.id}
+                className={`flex gap-3 rounded-lg border p-3 ${isOut ? "border-rose-200 bg-rose-50/40" : "border-amber-200 bg-amber-50/40"}`}
+              >
+                <AlertTriangle size={16} className={`mt-0.5 shrink-0 ${isOut ? "text-rose-700" : "text-amber-700"}`} />
+                <div className="min-w-0">
+                  <p className={`text-[10px] font-bold uppercase tracking-wider ${isOut ? "text-rose-800" : "text-amber-800"}`}>
+                    {tLowStock}
+                  </p>
+                  <p className="mt-0.5 truncate text-xs font-semibold text-[#09090B]">
+                    {item.productName} — {item.size}
+                    {item.color ? ` / ${item.color}` : ""}
+                  </p>
+                  <p className="mt-0.5 font-mono text-[10px] text-[#71717A]">
+                    {item.sku} · {tStockLeft}: {item.stock}
+                  </p>
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
     </div>
   );

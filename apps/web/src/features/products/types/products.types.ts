@@ -14,12 +14,22 @@ export interface DisplayColor {
   imageSrc?: string;
 }
 
+/** Giá theo size (số nguyên VND) — size may đo có thể đắt hơn và không áp dụng giảm giá */
+export type SizePrices = Record<string, { price: number; originalPrice?: number }>;
+
 export interface DisplayProduct {
   id: string;
+  /** Slug trên URL `/products/<slug>` — khóa sản phẩm trong giỏ hàng & yêu thích */
+  slug: string;
   name: string;
   description: string;
   price: string;
+  /** Giá số nguyên VND (giỏ hàng / yêu thích) */
+  priceValue: number;
   originalPrice?: string;
+  originalPriceValue?: number;
+  /** Giá riêng theo từng size (nếu sản phẩm có biến thể giá) */
+  sizePrices?: SizePrices;
   imageSrc: string;
   hoverImageSrc: string;
   imageAlt: string;
@@ -45,6 +55,8 @@ export interface RelatedProductItem {
   name: string;
   description: string;
   price: string;
+  /** Giá số nguyên VND (giỏ hàng / yêu thích) */
+  priceValue: number;
   originalPrice?: string;
   colors: DisplayColor[];
   sizes: string[];

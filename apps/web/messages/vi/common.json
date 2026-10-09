@@ -11,6 +11,33 @@
   "search": "Tìm kiếm",
   "searchPlaceholder": "Nhập tên áo dài, bộ sưu tập...",
   "searchSupportingText": "Gõ tên sản phẩm hoặc từ khóa để tìm nhanh",
+  "searchPanel": {
+    "open": "Mở tìm kiếm",
+    "close": "Đóng",
+    "clear": "Xóa từ khóa",
+    "submit": "Tìm kiếm",
+    "recent": "Tìm kiếm gần đây",
+    "clearRecent": "Xóa lịch sử",
+    "removeRecent": "Xóa “{query}” khỏi lịch sử",
+    "popular": "Từ khóa phổ biến",
+    "results": "Sản phẩm gợi ý",
+    "viewAll": "Xem tất cả {count} kết quả",
+    "noResults": "Không tìm thấy sản phẩm cho “{query}”",
+    "noResultsHint": "Thử từ khóa ngắn hơn hoặc chọn một từ khóa phổ biến bên dưới.",
+    "minChars": "Nhập ít nhất {min} ký tự để xem gợi ý",
+    "custom": "May đo",
+    "hintNavigate": "di chuyển",
+    "hintOpen": "mở",
+    "hintClose": "đóng",
+    "keywords": [
+      "Áo dài cưới",
+      "Lụa tơ tằm",
+      "Gấm",
+      "Cách tân",
+      "May đo",
+      "Lễ Tết"
+    ]
+  },
   "tagline": "Tôn nét dịu dàng Áo Việt, Lưu nét thanh xuân Đời người",
   "login": "Đăng nhập",
   "logout": "Đăng xuất",
@@ -20,12 +47,6 @@
   "previous": "Trước",
   "next": "Sau",
   "continueShopping": "Tiếp tục mua sắm",
-  "cartMessages": {
-    "promoRequired": "Vui lòng nhập mã giảm giá",
-    "promoInvalid": "Mã giảm giá không hợp lệ hoặc đã hết hạn",
-    "promoPercentApplied": "Áp dụng mã giảm giá {value}% thành công!",
-    "promoFreeshipApplied": "Áp dụng mã miễn phí vận chuyển thành công!"
-  },
   "checkoutErrors": {
     "fullNameRequired": "Vui lòng nhập họ và tên",
     "phoneRequired": "Vui lòng nhập số điện thoại",

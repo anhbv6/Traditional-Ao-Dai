@@ -1,82 +1,70 @@
-import { toVnd } from "@repo/shared";
+import { formatVnd, toVnd } from "@repo/shared";
 import { prisma } from "../../server/db.server";
 import { type FilterType, type StatItem} from "../types/dashboard.types";
 
 /**
  * Lấy số liệu thống kê tổng quan (Doanh thu, số đơn, tỉ lệ may đo...) từ DB
  */
+const PAID_STATUSES = ["PAID", "PARTIALLY_PAID"] as const;
+
+/** Mốc bắt đầu của kỳ thống kê */
+function getPeriodStart(filter: FilterType, now: Date): Date {
+  const start = new Date(now);
+  if (filter === "today") start.setHours(0, 0, 0, 0);
+  else if (filter === "week") start.setDate(now.getDate() - 7);
+  else start.setMonth(now.getMonth() - 1);
+  return start;
+}
+
+/** Định dạng chênh lệch phần trăm so với kỳ trước (kỳ trước = 0 thì không so sánh được) */
+function formatPercentDiff(current: number, previous: number): string {
+  if (previous === 0) return current > 0 ? "Mới" : "0%";
+  const diff = ((current - previous) / previous) * 100;
+  return `${diff > 0 ? "+" : ""}${diff.toFixed(1)}%`;
+}
+
+async function sumPaidRevenue(from: Date, to: Date): Promise<number> {
+  const result = await prisma.order.aggregate({
+    where: { createdAt: { gte: from, lt: to }, paymentStatus: { in: [...PAID_STATUSES] } },
+    _sum: { totalAmount: true },
+  });
+  return toVnd(result._sum.totalAmount);
+}
+
+/**
+ * Lấy số liệu thống kê tổng quan (doanh thu, số đơn, tỉ lệ may đo...) và so sánh với kỳ trước cùng độ dài
+ */
 export async function getDashboardStatsQuery(filter: FilterType = "week"): Promise<StatItem> {
   try {
     const now = new Date();
-    const startDate = new Date();
+    const startDate = getPeriodStart(filter, now);
+    // Kỳ trước: cùng độ dài, kết thúc ngay trước kỳ hiện tại
+    const previousStart = new Date(startDate.getTime() - (now.getTime() - startDate.getTime()));
 
-    if (filter === "today") {
-      startDate.setHours(0, 0, 0, 0);
-    } else if (filter === "week") {
-      startDate.setDate(now.getDate() - 7);
-    } else if (filter === "month") {
-      startDate.setMonth(now.getMonth() - 1);
-    }
+    const [revenue, previousRevenue, ordersCount, previousOrdersCount, pendingCount, customItemsCount, totalItemsCount] =
+      await Promise.all([
+        sumPaidRevenue(startDate, now),
+        sumPaidRevenue(previousStart, startDate),
+        prisma.order.count({ where: { createdAt: { gte: startDate } } }),
+        prisma.order.count({ where: { createdAt: { gte: previousStart, lt: startDate } } }),
+        prisma.order.count({ where: { orderStatus: "PENDING", createdAt: { gte: startDate } } }),
+        prisma.orderItem.count({ where: { isCustomFit: true, createdAt: { gte: startDate } } }),
+        prisma.orderItem.count({ where: { createdAt: { gte: startDate } } }),
+      ]);
 
-    const [ordersCount, pendingCount, ordersWithRevenue, customItemsCount, totalItemsCount] = await Promise.all([
-      prisma.order.count({
-        where: { createdAt: { gte: startDate } },
-      }),
-      prisma.order.count({
-        where: {
-          orderStatus: "PENDING",
-          createdAt: { gte: startDate },
-        },
-      }),
-      prisma.order.findMany({
-        where: {
-          createdAt: { gte: startDate },
-          paymentStatus: { in: ["PAID", "PARTIALLY_PAID"] },
-        },
-        select: { totalAmount: true },
-      }),
-      prisma.orderItem.count({
-        where: {
-          isCustomFit: true,
-          createdAt: { gte: startDate },
-        },
-      }),
-      prisma.orderItem.count({
-        where: {
-          createdAt: { gte: startDate },
-        },
-      }),
-    ]);
-
-    const totalRevenueNumber = ordersWithRevenue.reduce(
-      (sum, o) => sum + Number(o.totalAmount || 0),
-      0
-    );
-
-    const customRatio =
-      totalItemsCount > 0
-        ? Math.round((customItemsCount / totalItemsCount) * 100)
-        : 70;
+    const ordersDelta = ordersCount - previousOrdersCount;
 
     return {
-      revenue: `${totalRevenueNumber.toLocaleString("vi-VN")} ₫`,
-      revenueDiff: "+15.4%",
+      revenue: formatVnd(revenue),
+      revenueDiff: formatPercentDiff(revenue, previousRevenue),
       orders: ordersCount,
-      ordersDiff: `+${ordersCount} đơn`,
+      ordersDiff: `${ordersDelta > 0 ? "+" : ""}${ordersDelta} đơn`,
       pending: pendingCount,
-      customRatio,
+      customRatio: totalItemsCount > 0 ? Math.round((customItemsCount / totalItemsCount) * 100) : 0,
     };
   } catch (error) {
     console.error("Lỗi khi query thống kê Dashboard:", error);
-    // Fallback nếu DB trống
-    return {
-      revenue: "0 ₫",
-      revenueDiff: "0%",
-      orders: 0,
-      ordersDiff: "0 đơn",
-      pending: 0,
-      customRatio: 0,
-    };
+    throw new Error("DASHBOARD_STATS_FAILED");
   }
 }
 
@@ -170,3 +158,29 @@ export async function getTailoringMonitorQuery() {
 
 /** Đơn hàng thô (đã chuẩn hóa tiền tệ) trả về từ getAdminOrdersQuery */
 export type AdminDashboardOrder = Awaited<ReturnType<typeof getAdminOrdersQuery>>[number];
+
+/** Ngưỡng tồn kho coi là "sắp hết hàng" */
+export const LOW_STOCK_THRESHOLD = 5;
+
+/**
+ * Các biến thể (SKU) của sản phẩm đang bán có tồn kho thấp — dùng cho khối cảnh báo trên dashboard
+ */
+export async function getLowStockVariantsQuery(limit = 6) {
+  const variants = await prisma.productVariant.findMany({
+    where: { stock: { lte: LOW_STOCK_THRESHOLD }, product: { isActive: true } },
+    orderBy: { stock: "asc" },
+    take: limit,
+    select: { id: true, sku: true, size: true, color: true, stock: true, product: { select: { name: true } } },
+  });
+
+  return variants.map((variant) => ({
+    id: variant.id,
+    sku: variant.sku,
+    size: variant.size,
+    color: variant.color,
+    stock: variant.stock,
+    productName: variant.product.name,
+  }));
+}
+
+export type LowStockVariant = Awaited<ReturnType<typeof getLowStockVariantsQuery>>[number];

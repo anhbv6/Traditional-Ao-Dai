@@ -1,11 +1,16 @@
+import { AdminApprovalsList } from "@/features/admin";
+import { requireAdminPage } from "@/features/admin/server/adminAuth.server";
+import { ADMIN_MODULE_ACCESS } from "@/features/admin/session/permissions";
+import { AdminPage } from "@/features/admin/ui";
+
 export const dynamic = "force-dynamic";
 
-import { AdminApprovalsList } from "@/features/admin";
+export default async function AdminApprovalsPage() {
+  await requireAdminPage(ADMIN_MODULE_ACCESS.approvals);
 
-export default function AdminApprovalsPage() {
   return (
-    <div className="mx-auto max-w-[1440px] w-full px-5 sm:px-8 lg:px-12 py-8">
+    <AdminPage>
       <AdminApprovalsList />
-    </div>
+    </AdminPage>
   );
 }

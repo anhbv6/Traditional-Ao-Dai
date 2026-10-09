@@ -1,74 +1,119 @@
 "use client";
 
-import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useEffect, useRef, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { type Locale } from "@repo/shared";
+import { showToast } from "@/components/ui/toast";
+import { UNDO_TIMEOUT } from "@/components/shared/UndoSnackbar";
 import { useCartHydrated, useCartStore } from "../store/cartStore";
 import { calculateCartTotals, findDemoDiscount } from "../utils/pricing";
+import { type CartItem } from "../types/cart.types";
+
+interface RemovedLine {
+  item: CartItem;
+  index: number;
+}
 
 export function useCart() {
-  const t = useTranslations("Common");
+  const t = useTranslations("CartPage");
+  const locale = useLocale() as Locale;
   const isLoaded = useCartHydrated();
   const cartItems = useCartStore((state) => state.items);
   const activeDiscount = useCartStore((state) => state.discount);
-  const { updateQuantity, removeItem, applyDiscount } = useCartStore.getState();
+  const { updateQuantity, removeItem, restoreItem, applyDiscount, clear } = useCartStore.getState();
 
-  // Promo code form state
   const [promoCode, setPromoCode] = useState("");
   const [promoError, setPromoError] = useState<string | null>(null);
-  const [promoSuccess, setPromoSuccess] = useState<string | null>(null);
+  const [lastRemoved, setLastRemoved] = useState<RemovedLine | null>(null);
+  const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const handleQuantityChange = (id: string, delta: number) => {
-    const item = cartItems.find((cartItem) => cartItem.id === id);
-    if (item) updateQuantity(id, item.quantity + delta);
+  useEffect(() => () => {
+    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+  }, []);
+
+  const dismissUndo = () => {
+    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+    setLastRemoved(null);
   };
 
-  const handleQuantityInput = (id: string, value: string) => {
-    updateQuantity(id, parseInt(value.replace(/\D/g, ""), 10) || 1);
+  const handleRemoveItem = (id: string) => {
+    const index = cartItems.findIndex((item) => item.id === id);
+    if (index === -1) return;
+    // Hoàn tác không khôi phục mã giảm giá đã bị gỡ khi giỏ trống — khách nhập lại nếu cần
+    removeItem(id);
+    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+    setLastRemoved({ item: cartItems[index], index });
+    undoTimerRef.current = setTimeout(() => setLastRemoved(null), UNDO_TIMEOUT);
+  };
+
+  const handleUndo = () => {
+    if (lastRemoved) restoreItem(lastRemoved.item, lastRemoved.index);
+    dismissUndo();
+  };
+
+  const handleClearAll = () => {
+    dismissUndo();
+    clear();
+    setPromoCode("");
+    setPromoError(null);
+    showToast.success(t("toast.cleared"));
   };
 
   const handleApplyPromo = (e: React.FormEvent) => {
     e.preventDefault();
     setPromoError(null);
-    setPromoSuccess(null);
 
     if (!promoCode.trim()) {
-      setPromoError(t("cartMessages.promoRequired"));
+      setPromoError(t("promo.required"));
       return;
     }
 
     const discount = findDemoDiscount(promoCode);
     if (!discount) {
-      setPromoError(t("cartMessages.promoInvalid"));
+      setPromoError(t("promo.invalid"));
       return;
     }
 
     applyDiscount(discount);
-    setPromoSuccess(
-      discount.type === "percentage"
-        ? t("cartMessages.promoPercentApplied", { value: discount.value })
-        : t("cartMessages.promoFreeshipApplied")
-    );
+    setPromoCode("");
   };
+
+  const handleRemovePromo = () => {
+    applyDiscount(null);
+    setPromoError(null);
+  };
+
+  // Mô tả mã đang áp dụng suy ra từ store (còn đúng sau khi tải lại trang)
+  const promoDescription = activeDiscount
+    ? activeDiscount.type === "percentage"
+      ? t("promo.percentApplied", { value: activeDiscount.value })
+      : t("promo.freeshipApplied")
+    : null;
 
   const totals = calculateCartTotals(cartItems, activeDiscount);
 
   return {
     t,
-    cartItems,
+    locale,
     isLoaded,
+    cartItems,
+    totals,
+    hasCustomItems: cartItems.some((item) => item.measurements),
     promoCode,
-    setPromoCode,
-    activeDiscount,
+    setPromoCode: (value: string) => {
+      setPromoCode(value);
+      if (promoError) setPromoError(null);
+    },
     promoError,
-    promoSuccess,
-    handleQuantityChange,
-    handleQuantityInput,
-    handleRemoveItem: removeItem,
+    activeDiscount,
+    promoDescription,
     handleApplyPromo,
-    subtotal: totals.subtotal,
-    discountAmount: totals.discountAmount,
-    shippingThreshold: totals.freeShippingThreshold,
-    shippingCost: totals.shippingCost,
-    total: totals.total,
+    handleRemovePromo,
+    handleQuantityChange: updateQuantity,
+    handleRemoveItem,
+    handleClearAll,
+    lastRemoved,
+    handleUndo,
+    dismissUndo,
   };
 }

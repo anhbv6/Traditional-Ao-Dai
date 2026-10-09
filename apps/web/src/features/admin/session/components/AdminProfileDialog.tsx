@@ -163,31 +163,31 @@ export function AdminProfileDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[480px] p-0 overflow-hidden bg-white border border-zinc-200 rounded-2xl shadow-xl">
+      <DialogContent className="admin-shell sm:max-w-[480px] p-0 overflow-hidden bg-white border border-[#E4E4E7] rounded-xl shadow-xl">
         <DialogHeader className="p-6 pb-4 border-b border-zinc-100 bg-zinc-50/50">
           <div className="flex items-center gap-3">
-            <div className="size-10 rounded-xl bg-zinc-900 text-white flex items-center justify-center shadow-xs">
+            <div className="size-10 rounded-xl bg-[#18181B] text-white flex items-center justify-center shadow-2xs">
               <User size={18} />
             </div>
             <div>
-              <DialogTitle className="text-base font-bold text-zinc-900">
+              <DialogTitle className="text-base font-bold text-[#09090B]">
                 Hồ sơ tài khoản Quản trị
               </DialogTitle>
-              <DialogDescription className="text-xs text-zinc-500 mt-0.5">
+              <DialogDescription className="text-xs text-[#71717A] mt-0.5">
                 Cập nhật thông tin nhận diện cá nhân và bảo mật tài khoản
               </DialogDescription>
             </div>
           </div>
 
           {/* Tab buttons */}
-          <div className="flex border border-zinc-200/80 p-0.5 rounded-lg bg-zinc-100/80 mt-4 text-xs font-medium">
+          <div className="flex border border-[#E4E4E7] p-0.5 rounded-lg bg-zinc-100/80 mt-4 text-xs font-medium">
             <button
               type="button"
               onClick={() => setActiveTab("info")}
               className={`flex-1 py-1.5 rounded-md transition-all ${
                 activeTab === "info"
-                  ? "bg-white text-zinc-900 font-semibold shadow-2xs"
-                  : "text-zinc-600 hover:text-zinc-900"
+                  ? "bg-white text-[#09090B] font-semibold shadow-2xs"
+                  : "text-zinc-600 hover:text-[#09090B]"
               }`}
             >
               Thông tin cá nhân
@@ -197,8 +197,8 @@ export function AdminProfileDialog({
               onClick={() => setActiveTab("security")}
               className={`flex-1 py-1.5 rounded-md transition-all ${
                 activeTab === "security"
-                  ? "bg-white text-zinc-900 font-semibold shadow-2xs"
-                  : "text-zinc-600 hover:text-zinc-900"
+                  ? "bg-white text-[#09090B] font-semibold shadow-2xs"
+                  : "text-zinc-600 hover:text-[#09090B]"
               }`}
             >
               Đổi mật khẩu
@@ -211,7 +211,7 @@ export function AdminProfileDialog({
             {/* Avatar upload section */}
             <div className="flex items-center gap-4 pb-2 border-b border-zinc-100">
               <div className="relative group">
-                <div className="size-16 rounded-full overflow-hidden border-2 border-zinc-200 bg-zinc-100 flex items-center justify-center font-bold text-lg text-zinc-600">
+                <div className="size-16 rounded-full overflow-hidden border-2 border-[#E4E4E7] bg-zinc-100 flex items-center justify-center font-bold text-lg text-zinc-600">
                   {avatarUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element -- ảnh từ URL tùy ý (blob xem trước / avatar / ảnh do admin nhập), không tối ưu được bằng next/image
                     <img
@@ -228,7 +228,7 @@ export function AdminProfileDialog({
                   type="button"
                   disabled={isUploadingAvatar}
                   onClick={() => fileInputRef.current?.click()}
-                  className="absolute bottom-0 right-0 p-1.5 rounded-full bg-zinc-900 text-white hover:bg-zinc-800 shadow-md cursor-pointer transition-transform hover:scale-105"
+                  className="absolute bottom-0 right-0 p-1.5 rounded-full bg-[#18181B] text-white hover:bg-[#09090B] shadow-md cursor-pointer transition-transform hover:scale-105"
                   title="Thay đổi ảnh đại diện"
                 >
                   {isUploadingAvatar ? (
@@ -247,16 +247,16 @@ export function AdminProfileDialog({
               </div>
 
               <div>
-                <p className="text-xs font-semibold text-zinc-900">
+                <p className="text-xs font-semibold text-[#09090B]">
                   Ảnh đại diện
                 </p>
-                <p className="text-[11px] text-zinc-500 mt-0.5">
+                <p className="text-[11px] text-[#71717A] mt-0.5">
                   Định dạng PNG, JPG, WEBP (Tối đa 5MB)
                 </p>
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="mt-1 text-xs font-medium text-zinc-700 hover:text-zinc-900 underline underline-offset-2"
+                  className="mt-1 text-xs font-medium text-zinc-700 hover:text-[#09090B] underline underline-offset-2"
                 >
                   Chọn ảnh mới
                 </button>
@@ -280,7 +280,7 @@ export function AdminProfileDialog({
                     onChange={(e) => setName(e.target.value)}
                     required
                     placeholder="Nhập họ và tên..."
-                    className="w-full h-9 pl-9 pr-3 text-xs rounded-lg border border-zinc-200 bg-white text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
+                    className="w-full h-9 pl-9 pr-3 text-xs rounded-lg border border-[#E4E4E7] bg-white text-[#09090B] placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                   />
                 </div>
               </div>
@@ -298,7 +298,7 @@ export function AdminProfileDialog({
                     type="email"
                     value={user?.email || ""}
                     disabled
-                    className="w-full h-9 pl-9 pr-3 text-xs rounded-lg border border-zinc-200 bg-zinc-50 text-zinc-500 cursor-not-allowed"
+                    className="w-full h-9 pl-9 pr-3 text-xs rounded-lg border border-[#E4E4E7] bg-zinc-50 text-[#71717A] cursor-not-allowed"
                   />
                 </div>
                 <p className="text-[10px] text-zinc-400 mt-1">
@@ -320,7 +320,7 @@ export function AdminProfileDialog({
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="Ví dụ: 0987654321"
-                    className="w-full h-9 pl-9 pr-3 text-xs rounded-lg border border-zinc-200 bg-white text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
+                    className="w-full h-9 pl-9 pr-3 text-xs rounded-lg border border-[#E4E4E7] bg-white text-[#09090B] placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                   />
                 </div>
               </div>
@@ -329,9 +329,9 @@ export function AdminProfileDialog({
                 <label className="block text-xs font-semibold text-zinc-700 mb-1">
                   Vai trò phân quyền
                 </label>
-                <div className="flex items-center gap-2 p-2 rounded-lg bg-zinc-50 border border-zinc-200 text-xs">
+                <div className="flex items-center gap-2 p-2 rounded-lg bg-zinc-50 border border-[#E4E4E7] text-xs">
                   <ShieldCheck size={16} className="text-zinc-700" />
-                  <span className="font-semibold text-zinc-900">
+                  <span className="font-semibold text-[#09090B]">
                     {isAdmin ? "Quản trị viên tối cao (Super Admin)" : "Nhân viên vận hành (Staff)"}
                   </span>
                 </div>
@@ -342,14 +342,14 @@ export function AdminProfileDialog({
               <button
                 type="button"
                 onClick={() => onOpenChange(false)}
-                className="px-3.5 py-2 text-xs font-medium text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 rounded-lg transition-colors cursor-pointer"
+                className="px-3.5 py-2 text-xs font-medium text-zinc-600 hover:text-[#09090B] hover:bg-zinc-100 rounded-lg transition-colors cursor-pointer"
               >
                 Hủy bỏ
               </button>
               <button
                 type="submit"
                 disabled={isSavingInfo || isUploadingAvatar}
-                className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-zinc-900 hover:bg-zinc-800 rounded-lg shadow-xs transition-all cursor-pointer disabled:opacity-60"
+                className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-[#18181B] hover:bg-[#09090B] rounded-lg shadow-2xs transition-all cursor-pointer disabled:opacity-60"
               >
                 {isSavingInfo ? (
                   <>
@@ -378,7 +378,7 @@ export function AdminProfileDialog({
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
                   placeholder="Nhập mật khẩu hiện tại..."
-                  className="w-full h-9 pl-9 pr-9 text-xs rounded-lg border border-zinc-200 bg-white text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
+                  className="w-full h-9 pl-9 pr-9 text-xs rounded-lg border border-[#E4E4E7] bg-white text-[#09090B] placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                 />
                 <button
                   type="button"
@@ -405,7 +405,7 @@ export function AdminProfileDialog({
                   onChange={(e) => setNewPassword(e.target.value)}
                   required
                   placeholder="Tối thiểu 6 ký tự..."
-                  className="w-full h-9 pl-9 pr-9 text-xs rounded-lg border border-zinc-200 bg-white text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
+                  className="w-full h-9 pl-9 pr-9 text-xs rounded-lg border border-[#E4E4E7] bg-white text-[#09090B] placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                 />
                 <button
                   type="button"
@@ -432,7 +432,7 @@ export function AdminProfileDialog({
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                   placeholder="Nhập lại mật khẩu mới..."
-                  className="w-full h-9 pl-9 pr-9 text-xs rounded-lg border border-zinc-200 bg-white text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
+                  className="w-full h-9 pl-9 pr-9 text-xs rounded-lg border border-[#E4E4E7] bg-white text-[#09090B] placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                 />
                 <button
                   type="button"
@@ -448,14 +448,14 @@ export function AdminProfileDialog({
               <button
                 type="button"
                 onClick={() => onOpenChange(false)}
-                className="px-3.5 py-2 text-xs font-medium text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 rounded-lg transition-colors cursor-pointer"
+                className="px-3.5 py-2 text-xs font-medium text-zinc-600 hover:text-[#09090B] hover:bg-zinc-100 rounded-lg transition-colors cursor-pointer"
               >
                 Hủy bỏ
               </button>
               <button
                 type="submit"
                 disabled={isSavingSecurity}
-                className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-zinc-900 hover:bg-zinc-800 rounded-lg shadow-xs transition-all cursor-pointer disabled:opacity-60"
+                className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-[#18181B] hover:bg-[#09090B] rounded-lg shadow-2xs transition-all cursor-pointer disabled:opacity-60"
               >
                 {isSavingSecurity ? (
                   <>

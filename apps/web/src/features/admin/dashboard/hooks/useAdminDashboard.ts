@@ -17,6 +17,7 @@ import {
 import {
   getDashboardStatsAction,
   getAdminOrdersAction,
+  getLowStockVariantsAction,
   updateOrderStatusAction,
 } from "../actions/dashboard.actions";
 import { type AdminDashboardOrder } from "../queries/dashboard.queries";
@@ -30,12 +31,8 @@ const defaultStats: StatItem = {
   customRatio: 0,
 };
 
-const defaultPieData: PieDataItem[] = [
-  { name: "Áo Dài Gấm Song Hỷ", value: 38, color: "#09090B" },
-  { name: "Áo Dài Tơ Tằm Cổ Điển", value: 25, color: "#27272A" },
-  { name: "Áo Dài Nhung Đỏ", value: 22, color: "#71717A" },
-  { name: "Áo Dài Cách Tân", value: 15, color: "#E4E4E7" },
-];
+// Không hiển thị số liệu mẫu: chưa có đơn trong kỳ thì biểu đồ ở trạng thái trống
+const defaultPieData: PieDataItem[] = [];
 
 const DASHBOARD_ORDERS_KEY = ["admin", "dashboard", "orders"] as const;
 const PIE_COLORS = ["#09090B", "#27272A", "#71717A", "#E4E4E7", "#A1A1AA"];
@@ -66,7 +63,14 @@ function buildPieData(rawOrders: AdminDashboardOrder[]): PieDataItem[] {
     }));
 }
 
-export function useAdminDashboard() {
+interface DashboardAccess {
+  reports: boolean;
+  inventory: boolean;
+  tailoring: boolean;
+  orders: boolean;
+}
+
+export function useAdminDashboard(access: DashboardAccess) {
   const t = useTranslations("AdminPage");
   const queryClient = useQueryClient();
   const notify = useNotify();
@@ -77,6 +81,8 @@ export function useAdminDashboard() {
   // 1. Số liệu thống kê (Server Action -> Prisma), cache theo bộ lọc thời gian
   const statsQuery = useQuery({
     queryKey: ["admin", "dashboard", "stats", filter],
+    // Không gọi action khi không có quyền (tránh lỗi STAFF_PERMISSION_DENIED)
+    enabled: access.reports,
     queryFn: async () => {
       const res = await getDashboardStatsAction(filter);
       return res.success && res.data ? res.data : defaultStats;
@@ -86,12 +92,23 @@ export function useAdminDashboard() {
   // 2. Danh sách đơn hàng + phân bổ sản phẩm cho biểu đồ
   const ordersQuery = useQuery({
     queryKey: DASHBOARD_ORDERS_KEY,
+    enabled: access.orders || access.tailoring,
     queryFn: async () => {
       const res = await getAdminOrdersAction();
       if (!res.success || !Array.isArray(res.data)) {
         return { orders: [] as OrderItem[], pieData: defaultPieData };
       }
       return { orders: res.data.map(mapPrismaOrderToOrderItem), pieData: buildPieData(res.data) };
+    },
+  });
+
+  // 3. Sản phẩm sắp hết hàng (cảnh báo kho) — cần quyền tồn kho
+  const lowStockQuery = useQuery({
+    queryKey: ["admin", "dashboard", "low-stock"],
+    enabled: access.inventory,
+    queryFn: async () => {
+      const res = await getLowStockVariantsAction();
+      return res.success ? res.data : [];
     },
   });
 
@@ -163,5 +180,7 @@ export function useAdminDashboard() {
     getStatusColor,
     refreshOrders: () => void ordersQuery.refetch(),
     refreshStats: () => void statsQuery.refetch(),
+    lowStockItems: lowStockQuery.data ?? [],
+    isLoadingLowStock: lowStockQuery.isFetching,
   };
 }

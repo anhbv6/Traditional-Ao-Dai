@@ -5,18 +5,16 @@ import { HeaderWrapper } from './HeaderWrapper';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { Logo } from './Logo';
 import { MobileMenu } from './MobileMenu';
-import { SearchBar } from './SearchBar';
+import { SearchOverlay } from './SearchOverlay';
 import { UserMenu } from './UserMenu';
 import { WishlistButton } from './WishlistButton';
 import type { NavItem } from './types';
 
 type HeaderProps = {
   sticky?: boolean;
-  cartCount?: number;
-  wishlistCount?: number;
 };
 
-export async function Header({ sticky = true, cartCount = 0, wishlistCount = 0 }: HeaderProps) {
+export async function Header({ sticky = true }: HeaderProps) {
   const t = await getTranslations('Common');
 
   // Danh sách NavItems dành cho PC Desktop (Không có Wishlist)
@@ -40,26 +38,26 @@ export async function Header({ sticky = true, cartCount = 0, wishlistCount = 0 }
         <Logo textLogo/>
         <DesktopNav items={desktopNavItems} />
         <div className="flex items-center gap-1 sm:gap-2">
-          <SearchBar placeholder={t('search')} />
+          <SearchOverlay label={t('search')} placeholder={t('searchPlaceholder')} />
 
           {/* PC Desktop Header Items */}
           <div className="hidden lg:flex lg:items-center lg:gap-2">
-            <WishlistButton count={wishlistCount} label={t('wishlist')} />
-            <CartButton count={cartCount} label={t('cart')} />
+            <WishlistButton label={t('wishlist')} />
+            <CartButton label={t('cart')} preview />
             <LanguageSwitcher />
             <UserMenu loginLabel={t('login')} profileLabel={t('profile')} ordersLabel={t('orders')} logoutLabel={t('logout')} />
           </div>
 
           {/* Mobile Header Items: Cart icon + Mobile Menu Drawer */}
           <div className="flex items-center gap-1 lg:hidden">
-            <CartButton count={cartCount} label={t('cart')} />
+            <CartButton label={t('cart')} />
             <MobileMenu
               items={mobileNavItems}
               searchPlaceholder={t('searchPlaceholder')}
+              searchLabel={t('search')}
               loginLabel={t('login')}
               profileLabel={t('profile')}
               logoutLabel={t('logout')}
-              wishlistCount={wishlistCount}
               languageLabel={t('language')}
               taglineDrawer={t(('tagline'))}
             />

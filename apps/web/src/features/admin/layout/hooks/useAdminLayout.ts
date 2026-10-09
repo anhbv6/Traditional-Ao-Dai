@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/routing";
 import { useAdminSession, useAdminSessionCache } from "../../session";
+import { ADMIN_MODULE_ACCESS, canAccess, type AdminModule } from "../../session/permissions";
 import { getAdminNavLinks } from "../queries/header.queries";
 import { executeAdminLogout } from "../actions/header.actions";
 import { type AdminLayoutState } from "../types/header.types";
@@ -20,18 +21,18 @@ export function useAdminLayout(): AdminLayoutState {
   const isLoginPage = Boolean(pathname?.includes("/admin/login"));
 
   // 2. Phiên quản trị lấy từ server (xác minh token + phiên + DB), không dùng localStorage hay cookie đọc bằng JS
-  const { user, isLoading, isAdmin: isSuperAdmin, isStaff } = useAdminSession({ force: !isLoginPage });
+  const { user, isLoading, isAdmin: isSuperAdmin } = useAdminSession({ force: !isLoginPage });
   const sessionCache = useAdminSessionCache();
   const currentRole = user?.role;
 
-  // 3. Staff không có quyền vào /staff, /vouchers (proxy và page cũng chặn ở server)
-  const isSuperAdminOnlyRoute = Boolean(
-    pathname?.includes("/admin/staff") || pathname?.includes("/admin/vouchers")
+  // 3. Module hiện tại theo URL -> kiểm tra quyền (page ở server cũng chặn & chuyển về dashboard)
+  const currentModule = (Object.keys(ADMIN_MODULE_ACCESS) as AdminModule[]).find((key) =>
+    pathname?.includes(`/admin/${key}`)
   );
-  const isAccessDenied = Boolean(isSuperAdminOnlyRoute && isStaff);
+  const isAccessDenied = Boolean(user && currentModule && !canAccess(user, ADMIN_MODULE_ACCESS[currentModule]));
 
-  // 4. Danh sách menu đã được lọc quyền, gán active và tích hợp dịch i18n
-  const navLinks = getAdminNavLinks(pathname, isSuperAdmin, (key) => tNav(key));
+  // 4. Danh sách menu đã được lọc theo ma trận quyền, gán active và dịch i18n
+  const navLinks = getAdminNavLinks(pathname, user, (key) => tNav(key));
 
   // 5. Đăng xuất
   const handleLogout = async () => {

@@ -1,11 +1,4 @@
 {
-  "nav": {
-    "hero": "Khởi đầu",
-    "pain-solution": "Vấn đề & Giải pháp",
-    "fit-model": "Phom dáng chuẩn",
-    "atelier": "Xưởng may nghệ nhân",
-    "testimonials": "Cảm nhận khách hàng"
-  },
   "hero": {
     "eyebrow": "Câu chuyện AODAI",
     "title": "Kiến tạo phom dáng Áo dài chuẩn xác từng milimet",
@@ -17,7 +10,11 @@
     },
     "imageAlt": "Nghệ nhân đo may áo dài truyền thống",
     "measureTitle": "Tỉ mỉ từng số đo",
-    "measureText": "Đội ngũ chuyên nghiệp thực hiện tối thiểu 12 phép đo cơ thể để đảm bảo độ khít hoàn hảo."
+    "measureText": "Đội ngũ chuyên nghiệp thực hiện tối thiểu 12 phép đo cơ thể để đảm bảo độ khít hoàn hảo.",
+    "primaryAction": "Đặt lịch may đo",
+    "secondaryAction": "Xem bộ sưu tập",
+    "secondaryImageAlt": "Chi tiết áo dài gấm thêu hoa sen",
+    "since": "Từ 2012 · Hà Nội"
   },
   "pain": {
     "eyebrow": "Vấn đề của tà áo dài truyền thống",
@@ -26,19 +23,24 @@
     "cards": {
       "armhole": {
         "title": "Căng nách khó chịu",
-        "text": "Đường cắt nách quá hẹp hoặc không đúng góc khiến bạn không thể nhấc tay thoải mái."
+        "text": "Đường cắt nách quá hẹp hoặc không đúng góc khiến bạn không thể nhấc tay thoải mái.",
+        "fix": "Hạ và mở rộng góc nách 1,5–2cm, giữ đường vai gọn để giơ tay thoải mái mà áo không bị kéo."
       },
       "belly": {
         "title": "Lộ khuyết điểm eo bụng",
-        "text": "Chất vải ôm sát không có sự co giãn hoặc tà eo xẻ quá cao dễ làm lộ khuyết điểm khi ngồi."
+        "text": "Chất vải ôm sát không có sự co giãn hoặc tà eo xẻ quá cao dễ làm lộ khuyết điểm khi ngồi.",
+        "fix": "Tinh chỉnh độ rủ thân trước và hạ điểm xẻ tà vừa đủ, che khéo vùng bụng khi ngồi hay cúi."
       },
       "fit": {
         "title": "Phom dáng chung chung",
-        "text": "May đo công nghiệp theo size rập chuẩn chung thường không vừa vặn với các dáng người thực tế."
+        "text": "May đo công nghiệp theo size rập chuẩn chung thường không vừa vặn với các dáng người thực tế.",
+        "fix": "Cắt rập riêng theo 12 số đo của chính bạn, thử áo và chỉnh lại trước khi hoàn thiện."
       }
     },
     "solutionEyebrow": "Giải pháp từ AODAI",
-    "solutionText": "Chúng tôi nghiên cứu và tinh chỉnh các chi tiết nách, eo, và tà xẻ để tà áo dài vừa giữ nét tôn dáng, vừa thoải mái tối đa khi mặc cả ngày."
+    "solutionText": "Chúng tôi nghiên cứu và tinh chỉnh các chi tiết nách, eo, và tà xẻ để tà áo dài vừa giữ nét tôn dáng, vừa thoải mái tối đa khi mặc cả ngày.",
+    "problemLabel": "Vấn đề thường gặp",
+    "fixLabel": "Cách AODAI xử lý"
   },
   "fit": {
     "eyebrow": "Thử nghiệm phom dáng",
@@ -89,7 +91,8 @@
           }
         }
       }
-    }
+    },
+    "compareLabel": "So sánh trước và sau"
   },
   "atelier": {
     "eyebrow": "Nghệ nhân & Xưởng may",
@@ -130,39 +133,16 @@
       }
     }
   },
-  "testimonials": {
-    "eyebrow": "Khách hàng chia sẻ",
-    "title": "Khoảnh khắc trọn vẹn cùng AODAI",
-    "description": "Lắng nghe chia sẻ chân thực từ những người phụ nữ đã tự tin diện tà áo dài thiết kế của chúng tôi trong các dịp trọng đại nhất cuộc đời.",
-    "previous": "Trước đó",
-    "next": "Tiếp theo",
-    "customerPhoto": "Ảnh chụp thực tế",
-    "goTo": "Xem trang {index}",
-    "items": {
-      "wedding": {
-        "imageAlt": "Khách hàng mặc áo dài cưới đỏ đô",
-        "quote": "Chiếc áo dài cưới thêu hoa sen đỏ đô làm tôi vô cùng tự hào trong ngày trọng đại. Phom dáng ôm khít tôn dáng cực kỳ và thêu tay vô cùng tinh xảo.",
-        "name": "Khánh Linh",
-        "occasion": "Cô dâu mới"
-      },
-      "graduation": {
-        "imageAlt": "Khách hàng mặc áo dài kỷ yếu trắng",
-        "quote": "Diện áo dài lụa tơ tằm trắng trong lễ tốt nghiệp, tôi thấy chụp góc nào cũng đẹp và mặc cả ngày dài nắng nóng vẫn rất thoáng mát, dễ chịu.",
-        "name": "Hoàng Yến",
-        "occasion": "Tốt nghiệp Đại học"
-      },
-      "tet": {
-        "imageAlt": "Khách hàng mặc áo dài Tết gấm hoa",
-        "quote": "Năm nào cả nhà tôi cũng may áo dài Tết ở đây. Gấm dày dặn sang trọng, hoa văn chìm tinh tế lắm, mặc chụp ảnh xuân ai cũng khen hết lời.",
-        "name": "Chị Thanh Hằng",
-        "occasion": "Diện Tết truyền thống"
-      },
-      "engagement": {
-        "imageAlt": "Khách hàng mặc áo dài đính hôn pastel",
-        "quote": "Áo dáng cách tân thêu ren pastel vừa dịu dàng thanh lịch, vừa giữ được sự kín đáo trang nghiêm cần thiết cho lễ ăn hỏi của tôi.",
-        "name": "Thu Hương",
-        "occasion": "Lễ đính hôn"
-      }
-    }
+  "manifesto": {
+    "eyebrow": "Triết lý của chúng tôi",
+    "text": "Một tà áo dài đẹp là khi người mặc quên rằng mình đang mặc nó — chỉ còn lại sự tự tin, thoải mái và nét duyên rất riêng.",
+    "author": "Linh An — Người sáng lập AODAI"
+  },
+  "cta": {
+    "eyebrow": "Bắt đầu cùng AODAI",
+    "title": "Tà áo của riêng bạn, bắt đầu từ một buổi trò chuyện",
+    "description": "Hẹn lịch tư vấn miễn phí tại xưởng hoặc trực tuyến — chúng tôi lắng nghe, đo đạc và phác thảo cùng bạn.",
+    "primaryAction": "Đặt lịch tư vấn",
+    "secondaryAction": "Câu hỏi thường gặp"
   }
 }

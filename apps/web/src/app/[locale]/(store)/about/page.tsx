@@ -1,15 +1,9 @@
-import { Container } from '@/components/ui/container'
-import { Breadcrumbs } from '@/components/common/Breadcrumbs'
 import { AboutExperience } from '@/features/about'
 import React from 'react'
 
+/** Trang cấp 1 (ngay dưới trang chủ) — không cần breadcrumb, hero bắt đầu ngay dưới header */
 function About() {
-  return (
-    <Container as="section" className="py-8 sm:py-10">
-      <Breadcrumbs />
-      <AboutExperience />
-    </Container>
-  )
+  return <AboutExperience />
 }
 
 export default About

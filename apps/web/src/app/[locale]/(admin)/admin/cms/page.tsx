@@ -1,32 +1,28 @@
 import React from "react";
-import { getCmsArticlesAndFaqsQuery, CmsManager } from "@/features/admin/cms";
 import { FileText } from "lucide-react";
+import { getCmsArticlesAndFaqsQuery, CmsManager } from "@/features/admin/cms";
 import { requireAdminPage } from "@/features/admin/server/adminAuth.server";
+import { ADMIN_MODULE_ACCESS } from "@/features/admin/session/permissions";
+import { AdminMetaValue, AdminPage, AdminPageHeader } from "@/features/admin/ui";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminCmsPage() {
-  await requireAdminPage();
+  await requireAdminPage(ADMIN_MODULE_ACCESS.cms);
 
   const { articles, faqs } = await getCmsArticlesAndFaqsQuery();
 
   return (
-    <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12 py-8 space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-[#E4E4E7] pb-5">
-        <div>
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-zinc-500">
-            <FileText size={14} /> Nội dung & Hướng dẫn
-          </div>
-          <h2 className="text-2xl font-bold text-[#09090B] tracking-tight mt-1">
-            Quản Trị Tin Tức & FAQs
-          </h2>
-        </div>
-        <div className="text-xs text-zinc-500">
-          <span className="font-mono font-bold text-zinc-900">{articles.length}</span> bài viết • <span className="font-mono font-bold text-zinc-900">{faqs.length}</span> câu hỏi
-        </div>
-      </div>
+    <AdminPage>
+      <AdminPageHeader
+        icon={FileText}
+        eyebrow="Nội dung & Hướng dẫn"
+        title="Quản Trị Tin Tức & FAQs"
+        description="Bật/tắt xuất bản bài viết và câu hỏi thường gặp hiển thị trên cửa hàng."
+        meta={<><AdminMetaValue>{articles.length}</AdminMetaValue> bài viết • <AdminMetaValue>{faqs.length}</AdminMetaValue> câu hỏi</>}
+      />
 
       <CmsManager initialArticles={articles} initialFaqs={faqs} />
-    </div>
+    </AdminPage>
   );
 }

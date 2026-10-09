@@ -24,7 +24,7 @@ export function AdminLoginForm() {
   } = useAdminLogin();
 
   return (
-    <div className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden font-[family-name:var(--font-geist-sans)] animate-pastel-flow px-4 py-12 select-none">
+    <div className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden animate-pastel-flow px-4 py-12 select-none">
       <LoadingOverlay visible={isLoading} messageKey="verifying" />
       <AdminLoginBackground />
       {/* Centered Luxury Glassmorphic Admin Card */}

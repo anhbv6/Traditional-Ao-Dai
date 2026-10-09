@@ -1,48 +1,96 @@
 {
-  "title": "Contact & Consultation",
-  "subtitle": "Our consultants are ready to help with styling, fitting appointments, and custom tailoring requests for meaningful occasions.",
-  "directTitle": "Direct information",
-  "directSubtitle": "Reach the showroom and tailoring team quickly",
-  "hotline": "Hotline & Zalo quick support",
-  "hotlineValue": "0909 000 000",
-  "address": "Showroom / workshop address",
-  "addressValue": "AODAI Showroom, District 1, Ho Chi Minh City",
-  "hours": "Opening hours",
-  "hoursValue": "09:00 - 21:00, Monday - Sunday",
-  "email": "Customer care email",
-  "emailValue": "hello@aodai.vn",
-  "map": "Embedded Google Map",
-  "formTitle": "Send a consultation request",
-  "formSubtitle": "Tell us what you need",
-  "name": "Full name",
-  "phoneEmail": "Phone number / Email",
-  "requestType": "Request type",
-  "message": "Message",
-  "submit": "Send request",
-  "sendError": "Failed to send consultation request. Please try again later.",
-  "namePlaceholder": "Enter your full name",
-  "contactPlaceholder": "Enter your phone number or email",
-  "messagePlaceholder": "Tell us about your preferred design, fitting schedule, or custom request.",
-  "options": {
-    "model": "Style consultation",
-    "fitting": "Book a fitting",
-    "custom": "Custom tailoring",
-    "order": "Order support"
+  "intro": {
+    "eyebrow": "Contact",
+    "title": "Visit the atelier, or leave us a note.",
+    "subtitle": "Choosing a design, booking a fitting or commissioning a made-to-measure piece for an important occasion — tell us about it and a tailor will answer you directly.",
+    "phone": {
+      "label": "Hotline",
+      "value": "0909 000 000",
+      "note": "Call during opening hours to reach a consultant."
+    },
+    "zalo": {
+      "label": "Zalo",
+      "value": "Message on Zalo",
+      "note": "Send reference photos and measurements — easiest from afar."
+    },
+    "email": {
+      "label": "Email",
+      "value": "hello@aodai.vn",
+      "note": "Partnerships, bulk tailoring, existing orders."
+    }
   },
-  "faqTitle": "Frequently asked questions",
-  "faqSubtitle": "Helpful answers before contacting support",
-  "faqs": {
-    "reply": {
-      "question": "How fast will I receive a reply?",
-      "answer": "Usually within 15-30 minutes during working hours."
+  "message": {
+    "eyebrow": "Send a note",
+    "title": "Tell us about your occasion",
+    "description": "No need to know your measurements or a design name. A few lines about the occasion, timing and what you have in mind are enough to start.",
+    "steps": {
+      "read": {
+        "title": "A tailor reads your note",
+        "description": "During opening hours, expect a first reply within about 15–30 minutes."
+      },
+      "call": {
+        "title": "We call to understand your needs",
+        "description": "We talk through your figure, fabrics, budget and the date you need it."
+      },
+      "meet": {
+        "title": "Book a fitting or send measurements",
+        "description": "Visit the showroom to be measured, or measure at home with our guide."
+      }
+    }
+  },
+  "form": {
+    "name": "Full name",
+    "namePlaceholder": "Nguyen Thu Ha",
+    "contact": "Phone or email",
+    "contactPlaceholder": "0909 000 000",
+    "requestType": "What can we help with",
+    "options": {
+      "model": "Choosing a design",
+      "fitting": "Book a fitting",
+      "custom": "Made to measure",
+      "order": "An existing order"
     },
-    "custom": {
-      "question": "Do you offer custom tailoring?",
-      "answer": "Yes. You can submit measurements or book a showroom appointment for direct guidance."
-    },
-    "exchange": {
-      "question": "Can I exchange size after delivery?",
-      "answer": "Ready-to-wear items support size exchange by policy if tags remain and the item is unused."
+    "message": "Your note",
+    "messagePlaceholder": "e.g. I need a red wedding ao dai for December…",
+    "privacy": "Your details are only used to get back to you and are never shared with third parties.",
+    "submit": "Send note",
+    "sending": "Sending…",
+    "success": "Thank you! Your note has been sent — we will be in touch shortly.",
+    "sendError": "Could not send your note. Please try again or call our hotline."
+  },
+  "visit": {
+    "eyebrow": "Showroom & atelier",
+    "title": "Come for a fitting and a cup of tea",
+    "mapTitle": "Map to the showroom",
+    "addressLabel": "Address",
+    "address": "AODAI Showroom, District 1, Ho Chi Minh City",
+    "hoursLabel": "Opening hours",
+    "hours": "09:00 – 21:00",
+    "days": "Monday – Sunday",
+    "note": "Book ahead to have a dedicated tailor measure and fit you without waiting.",
+    "directions": "Get directions"
+  },
+  "faq": {
+    "eyebrow": "Before you reach out",
+    "title": "You might be wondering",
+    "viewAll": "See all questions",
+    "items": {
+      "reply": {
+        "question": "How soon will I hear back?",
+        "answer": "Usually within 15–30 minutes during opening hours. Notes sent after hours are answered the next morning."
+      },
+      "appointment": {
+        "question": "Do I need to book a fitting in advance?",
+        "answer": "It is not required, but booking ahead gets you a dedicated tailor and the designs you like ready to try."
+      },
+      "custom": {
+        "question": "I live far away — can I still order made to measure?",
+        "answer": "Yes. Send your measurements via Zalo or email following our guide, and we tailor and deliver to your door."
+      },
+      "exchange": {
+        "question": "Can I exchange the size after delivery?",
+        "answer": "Ready-to-wear pieces can be exchanged for another size under our policy if tags are intact and unworn."
+      }
     }
   }
 }

@@ -1,11 +1,4 @@
 {
-  "nav": {
-    "hero": "Intro",
-    "pain-solution": "Pain & Solution",
-    "fit-model": "Fit Model",
-    "atelier": "Atelier",
-    "testimonials": "Testimonials"
-  },
   "hero": {
     "eyebrow": "AODAI Story",
     "title": "Crafting Gowns to Fit Every Curve Perfectly",
@@ -17,7 +10,11 @@
     },
     "imageAlt": "Artisans tailoring traditional Vietnamese gown",
     "measureTitle": "Precise Measurements",
-    "measureText": "Our professional fit specialists take a minimum of 12 distinct measurements to ensure a perfect second-skin fit."
+    "measureText": "Our professional fit specialists take a minimum of 12 distinct measurements to ensure a perfect second-skin fit.",
+    "primaryAction": "Book a fitting",
+    "secondaryAction": "View collections",
+    "secondaryImageAlt": "Detail of a lotus-embroidered brocade Ao Dai",
+    "since": "Since 2012 · Hanoi"
   },
   "pain": {
     "eyebrow": "Traditional Ao Dai Issues",
@@ -26,19 +23,24 @@
     "cards": {
       "armhole": {
         "title": "Tight Armholes",
-        "text": "Narrow cuts or rigid lines prevent you from lifting your arms comfortably or moving naturally."
+        "text": "Narrow cuts or rigid lines prevent you from lifting your arms comfortably or moving naturally.",
+        "fix": "We lower and widen the armhole by 1.5–2cm while keeping a clean shoulder line, so you can raise your arms freely."
       },
       "belly": {
         "title": "Exposed Waistline",
-        "text": "Fitted fabrics without flexible ease can make you feel self-conscious and restricted when sitting down."
+        "text": "Fitted fabrics without flexible ease can make you feel self-conscious and restricted when sitting down.",
+        "fix": "We refine the front drape and set the side slit at just the right height to flatter the waist when sitting or bending."
       },
       "fit": {
         "title": "Generic Size Charts",
-        "text": "Mass-produced sizing templates fail to accommodate the beautiful diversity of real body shapes."
+        "text": "Mass-produced sizing templates fail to accommodate the beautiful diversity of real body shapes.",
+        "fix": "Every pattern is cut to your own 12 measurements, then fitted and adjusted before finishing."
       }
     },
     "solutionEyebrow": "The AODAI Solution",
-    "solutionText": "We re-engineered the armholes, waist ease, and slit points to ensure your Ao Dai is both stunning and comfortably wearable all day."
+    "solutionText": "We re-engineered the armholes, waist ease, and slit points to ensure your Ao Dai is both stunning and comfortably wearable all day.",
+    "problemLabel": "Common problem",
+    "fixLabel": "How AODAI solves it"
   },
   "fit": {
     "eyebrow": "Fit Profiling",
@@ -89,7 +91,8 @@
           }
         }
       }
-    }
+    },
+    "compareLabel": "Before and after"
   },
   "atelier": {
     "eyebrow": "Our Artisans & Atelier",
@@ -130,39 +133,16 @@
       }
     }
   },
-  "testimonials": {
-    "eyebrow": "Client Stories",
-    "title": "Cherished Moments with AODAI",
-    "description": "Read stories from women who wore our custom-designed gowns during the most meaningful moments of their lives.",
-    "previous": "Previous",
-    "next": "Next",
-    "customerPhoto": "Customer Photo",
-    "goTo": "Go to slide {index}",
-    "items": {
-      "wedding": {
-        "imageAlt": "Customer wearing red wedding Ao Dai",
-        "quote": "My burgundy lotus wedding gown made me feel extremely proud. The custom fit was flawless, and the hand-embroidery was exceptionally intricate.",
-        "name": "Khanh Linh",
-        "occasion": "Bridal Gown"
-      },
-      "graduation": {
-        "imageAlt": "Customer wearing white graduation Ao Dai",
-        "quote": "Wearing the mulberry silk gown for graduation, I felt comfortable all day in the summer heat and every photo turned out beautifully.",
-        "name": "Hoang Yen",
-        "occasion": "Graduation Day"
-      },
-      "tet": {
-        "imageAlt": "Customer wearing Tet brocade Ao Dai",
-        "quote": "Our family gets custom Tet gowns here every year. The brocade has a premium texture and elegant motifs. Everyone complimented our spring photos.",
-        "name": "Mrs. Thanh Hang",
-        "occasion": "Tet Festival"
-      },
-      "engagement": {
-        "imageAlt": "Customer wearing pastel engagement Ao Dai",
-        "quote": "The modern pastel gown was elegant and kept the dignified coverage needed for my engagement ceremony. Highly recommend!",
-        "name": "Thu Huong",
-        "occasion": "Engagement Ceremony"
-      }
-    }
+  "manifesto": {
+    "eyebrow": "Our philosophy",
+    "text": "A beautiful Ao Dai is one the wearer forgets she is wearing — leaving only confidence, comfort and a grace that is entirely her own.",
+    "author": "Linh An — Founder of AODAI"
+  },
+  "cta": {
+    "eyebrow": "Begin with AODAI",
+    "title": "Your own Ao Dai starts with a conversation",
+    "description": "Book a free consultation in our atelier or online — we listen, measure and sketch together with you.",
+    "primaryAction": "Book a consultation",
+    "secondaryAction": "FAQs"
   }
 }

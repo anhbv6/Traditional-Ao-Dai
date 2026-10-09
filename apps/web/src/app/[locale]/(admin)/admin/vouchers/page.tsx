@@ -1,32 +1,28 @@
 import React from "react";
-import { getAdminVouchersQuery, VouchersList } from "@/features/admin/vouchers";
 import { Ticket } from "lucide-react";
+import { getAdminVouchersQuery, VouchersList } from "@/features/admin/vouchers";
 import { requireAdminPage } from "@/features/admin/server/adminAuth.server";
+import { ADMIN_MODULE_ACCESS } from "@/features/admin/session/permissions";
+import { AdminMetaValue, AdminPage, AdminPageHeader } from "@/features/admin/ui";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminVouchersPage() {
-  await requireAdminPage({ role: "ADMIN" });
+  await requireAdminPage(ADMIN_MODULE_ACCESS.vouchers);
 
   const vouchers = await getAdminVouchersQuery();
 
   return (
-    <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12 py-8 space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-[#E4E4E7] pb-5">
-        <div>
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-zinc-500">
-            <Ticket size={14} /> Marketing & Khuyến mãi
-          </div>
-          <h2 className="text-2xl font-bold text-[#09090B] tracking-tight mt-1">
-            Mã Giảm Giá (Vouchers)
-          </h2>
-        </div>
-        <div className="text-xs text-zinc-500">
-          Tổng cộng <span className="font-mono font-bold text-zinc-900">{vouchers.length}</span> mã khuyến mãi
-        </div>
-      </div>
+    <AdminPage>
+      <AdminPageHeader
+        icon={Ticket}
+        eyebrow="Marketing & Khuyến mãi"
+        title="Mã Giảm Giá (Vouchers)"
+        description="Bật/tắt hiệu lực mã giảm giá và theo dõi số lượt đã sử dụng."
+        meta={<>Tổng cộng <AdminMetaValue>{vouchers.length}</AdminMetaValue> mã khuyến mãi</>}
+      />
 
       <VouchersList initialVouchers={vouchers} />
-    </div>
+    </AdminPage>
   );
 }

@@ -1,32 +1,28 @@
 import React from "react";
-import { getTailoringItemsQuery, TailoringBoard } from "@/features/admin/tailoring";
 import { Scissors } from "lucide-react";
+import { getTailoringItemsQuery, TailoringBoard } from "@/features/admin/tailoring";
 import { requireAdminPage } from "@/features/admin/server/adminAuth.server";
+import { ADMIN_MODULE_ACCESS } from "@/features/admin/session/permissions";
+import { AdminMetaValue, AdminPage, AdminPageHeader } from "@/features/admin/ui";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminTailoringPage() {
-  await requireAdminPage();
+  await requireAdminPage(ADMIN_MODULE_ACCESS.tailoring);
 
   const tailoringItems = await getTailoringItemsQuery();
 
   return (
-    <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12 py-8 space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-[#E4E4E7] pb-5">
-        <div>
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-purple-700">
-            <Scissors size={14} /> Xưởng may đo thủ công
-          </div>
-          <h2 className="text-2xl font-bold text-[#09090B] tracking-tight mt-1">
-            Tiến Độ May Đo Áo Dài
-          </h2>
-        </div>
-        <div className="text-xs text-zinc-500">
-          Đang may <span className="font-mono font-bold text-zinc-900">{tailoringItems.length}</span> áo theo số đo riêng
-        </div>
-      </div>
+    <AdminPage>
+      <AdminPageHeader
+        icon={Scissors}
+        eyebrow="Xưởng may đo thủ công"
+        title="Tiến Độ May Đo Áo Dài"
+        description="Cập nhật từng công đoạn may theo số đo riêng và ghi nhật ký thợ phụ trách."
+        meta={<>Đang may <AdminMetaValue>{tailoringItems.length}</AdminMetaValue> áo theo số đo riêng</>}
+      />
 
       <TailoringBoard initialItems={tailoringItems} />
-    </div>
+    </AdminPage>
   );
 }

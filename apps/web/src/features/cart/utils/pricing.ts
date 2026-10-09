@@ -4,6 +4,11 @@ import { type ActiveDiscount, type CartItem, type CartTotals } from "../types/ca
 export const FREE_SHIPPING_THRESHOLD = 1_000_000;
 /** Phí vận chuyển tiêu chuẩn */
 export const STANDARD_SHIPPING_FEE = 30_000;
+/**
+ * Số lượng tối đa cho một dòng giỏ hàng (chống đặt nhầm số lượng lớn).
+ * Tồn kho thật phải được Backend kiểm tra lại khi tạo đơn.
+ */
+export const MAX_LINE_QUANTITY = 10;
 
 /**
  * Mã giảm giá demo phía client. Khi có module orders/vouchers, mã phải được xác thực ở Backend
@@ -18,8 +23,14 @@ export function findDemoDiscount(code: string): ActiveDiscount | null {
   return DEMO_DISCOUNTS[code.trim().toUpperCase()] ?? null;
 }
 
+/** Ép số lượng về khoảng hợp lệ [1, MAX_LINE_QUANTITY] */
+export function clampQuantity(quantity: number): number {
+  return Math.min(MAX_LINE_QUANTITY, Math.max(1, Math.floor(quantity) || 1));
+}
+
 /**
  * Tính tổng tiền giỏ hàng (giá đã bao gồm VAT). Hàm thuần, dùng chung cho trang giỏ hàng, checkout và mini-cart.
+ * Ngưỡng miễn phí vận chuyển xét trên tạm tính (trước giảm giá).
  */
 export function calculateCartTotals(items: CartItem[], discount: ActiveDiscount | null = null): CartTotals {
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -37,6 +48,7 @@ export function calculateCartTotals(items: CartItem[], discount: ActiveDiscount 
     discountAmount,
     shippingCost,
     freeShippingThreshold: FREE_SHIPPING_THRESHOLD,
+    freeShippingRemaining: isFreeShipping ? 0 : FREE_SHIPPING_THRESHOLD - subtotal,
     total: Math.max(0, subtotal - discountAmount) + shippingCost,
     totalQuantity,
   };

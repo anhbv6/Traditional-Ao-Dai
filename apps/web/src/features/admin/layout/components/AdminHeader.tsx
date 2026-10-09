@@ -41,7 +41,7 @@ export function AdminHeader({
           {/* Nút về trang khách hàng (Client store) */}
           <Link
             href="/"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 transition-all border border-zinc-200/80 bg-white shadow-2xs"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 transition-all border border-[#E4E4E7] bg-white shadow-2xs"
             title={t("viewStore")}
           >
             <Store size={14} className="text-zinc-600" />

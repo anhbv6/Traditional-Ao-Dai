@@ -14,8 +14,6 @@
     "longDescription": "Thiết kế được hoàn thiện với phom dáng mềm mại, chất liệu chọn lọc và các chi tiết tinh tế để phù hợp cho những dịp trang trọng. Sản phẩm giữ nét thanh lịch truyền thống nhưng vẫn dễ phối trong nhịp sống hiện đại.",
     "secondaryDescription": "Mỗi mẫu có thể được tư vấn chỉnh size theo số đo thực tế để tạo cảm giác thoải mái khi mặc trong thời gian dài.",
     "enterMeasurements": "Nhập số đo của bạn (cm)",
-    "addedToCart": "🛒 ĐÃ THÊM VÀO GIỎ HÀNG!\n\n• Sản phẩm: {product}\n• Màu sắc: {color}\n• Kích thước: {size}\n• Số lượng: {quantity}\n",
-    "customMeasurementsPrefix": "• Số đo may đo: ",
     "customerReviewsTitle": "Đánh giá của khách hàng",
     "addReview": "Thêm đánh giá của bạn",
     "yourRating": "Đánh giá của bạn",
@@ -25,10 +23,14 @@
     "namePlaceholder": "Nhập tên của bạn",
     "emailPlaceholder": "Nhập email của bạn",
     "reviewPlaceholder": "Nhập đánh giá của bạn",
-    "submitReview": "Gửi đánh giá"
+    "submitReview": "Gửi đánh giá",
+    "measurementsRequired": "Vui lòng nhập đủ số đo bắt buộc (cm) trước khi thêm vào giỏ"
   },
   "addToCart": "Thêm vào giỏ hàng",
+  "cartAdded": "Đã thêm vào giỏ hàng",
+  "customTailor": "Đặt may đo",
   "addToWishlist": "Thêm vào yêu thích",
+  "removeFromWishlist": "Bỏ khỏi yêu thích",
   "compare": "So sánh sản phẩm",
   "quickView": "Xem nhanh",
   "close": "Đóng",
@@ -70,5 +72,16 @@
     "silk": "Áo Dài Lụa Tơ Tằm",
     "brocade": "Áo Dài Gấm Luxury",
     "embroidered": "Áo Dài Thêu Tay"
+  },
+  "sale": "Giảm giá",
+  "colorsLabel": "Màu có sẵn",
+  "addedShort": "Đã thêm vào giỏ",
+  "quantity": {
+    "decrease": "Giảm số lượng",
+    "increase": "Tăng số lượng"
+  },
+  "gallery": {
+    "previous": "Ảnh trước",
+    "next": "Ảnh sau"
   }
 }

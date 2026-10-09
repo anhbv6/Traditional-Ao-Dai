@@ -15,6 +15,13 @@ interface DashboardStatsGridProps {
   tUrgentTailor?: string;
 }
 
+/** Màu chênh lệch so với kỳ trước: tăng = xanh, giảm = đỏ, không đổi = xám */
+function diffToneClass(diff: string): string {
+  if (diff.startsWith("-")) return "text-rose-700";
+  if (diff.startsWith("+") || diff === "Mới") return "text-emerald-700";
+  return "text-[#71717A]";
+}
+
 export function DashboardStatsGrid({
   stats,
   isLoading,
@@ -29,11 +36,11 @@ export function DashboardStatsGrid({
 }: DashboardStatsGridProps) {
   if (isLoading) {
     return (
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-10 w-full max-w-full animate-pulse">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 w-full max-w-full animate-pulse">
         {Array.from({ length: 4 }).map((_, i) => (
           <div
             key={i}
-            className="rounded-xl border border-[#E4E4E7] bg-white p-6 shadow-xs flex flex-col justify-between h-[150px]"
+            className="rounded-xl border border-[#E4E4E7] bg-white p-6 shadow-2xs flex flex-col justify-between h-[150px]"
           >
             <div className="flex items-center justify-between">
               <div className="h-4 w-28 bg-zinc-200 rounded" />
@@ -50,9 +57,9 @@ export function DashboardStatsGrid({
   }
 
   return (
-    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-10 w-full max-w-full">
+    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 w-full max-w-full">
       {/* Doanh thu */}
-      <div className="rounded-xl border border-[#E4E4E7] bg-white p-6 shadow-xs flex flex-col justify-between">
+      <div className="rounded-xl border border-[#E4E4E7] bg-white p-6 shadow-2xs flex flex-col justify-between">
         <div className="flex items-center justify-between">
           <span className="text-sm font-semibold uppercase tracking-[0.5px] text-[#71717A]">{tRevenue}</span>
           <div className="grid size-9 place-items-center rounded-lg bg-[#F4F4F5] text-[#09090B]">
@@ -61,15 +68,15 @@ export function DashboardStatsGrid({
         </div>
         <div className="mt-4">
           <h3 className="text-3xl font-bold tracking-tight text-[#09090B] font-mono">{stats.revenue}</h3>
-          <p className="mt-1 text-xs font-normal text-emerald-700 flex items-center gap-1">
-            <span>{stats.revenueDiff}</span>
+          <p className="mt-1 flex items-center gap-1 text-xs font-normal">
+            <span className={diffToneClass(stats.revenueDiff)}>{stats.revenueDiff}</span>
             <span className="text-[#71717A]">{tComparedToBefore}</span>
           </p>
         </div>
       </div>
 
       {/* Tổng đơn hàng */}
-      <div className="rounded-xl border border-[#E4E4E7] bg-white p-6 shadow-xs flex flex-col justify-between">
+      <div className="rounded-xl border border-[#E4E4E7] bg-white p-6 shadow-2xs flex flex-col justify-between">
         <div className="flex items-center justify-between">
           <span className="text-sm font-semibold uppercase tracking-[0.5px] text-[#71717A]">{tOrders}</span>
           <div className="grid size-9 place-items-center rounded-lg bg-[#F4F4F5] text-[#09090B]">
@@ -78,15 +85,15 @@ export function DashboardStatsGrid({
         </div>
         <div className="mt-4">
           <h3 className="text-3xl font-bold tracking-tight text-[#09090B] font-mono">{stats.orders}</h3>
-          <p className="mt-1 text-xs font-normal text-emerald-700 flex items-center gap-1">
-            <span>{stats.ordersDiff}</span>
+          <p className="mt-1 flex items-center gap-1 text-xs font-normal">
+            <span className={diffToneClass(stats.ordersDiff)}>{stats.ordersDiff}</span>
             <span className="text-[#71717A]">{tComparedToBefore}</span>
           </p>
         </div>
       </div>
 
       {/* Chờ xử lý */}
-      <div className="rounded-xl border border-[#E4E4E7] bg-white p-6 shadow-xs flex flex-col justify-between">
+      <div className="rounded-xl border border-[#E4E4E7] bg-white p-6 shadow-2xs flex flex-col justify-between">
         <div className="flex items-center justify-between">
           <span className="text-sm font-semibold uppercase tracking-[0.5px] text-[#71717A]">{tPending}</span>
           <div className="grid size-9 place-items-center rounded-lg bg-[#F4F4F5] text-[#09090B]">
@@ -100,7 +107,7 @@ export function DashboardStatsGrid({
       </div>
 
       {/* Tỷ lệ may sẵn/may đo */}
-      <div className="rounded-xl border border-[#E4E4E7] bg-white p-6 shadow-xs flex flex-col justify-between">
+      <div className="rounded-xl border border-[#E4E4E7] bg-white p-6 shadow-2xs flex flex-col justify-between">
         <div className="flex items-center justify-between mb-3">
           <span className="text-sm font-semibold uppercase tracking-[0.5px] text-[#71717A]">{tRatio}</span>
           <div className="grid size-9 place-items-center rounded-lg bg-[#F4F4F5] text-[#09090B]">

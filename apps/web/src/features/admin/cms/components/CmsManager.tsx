@@ -84,7 +84,7 @@ export function CmsManager({ initialArticles, initialFaqs }: CmsManagerProps) {
         <div className="bg-white rounded-xl border border-[#E4E4E7] shadow-2xs overflow-hidden">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-[#E4E4E7] bg-zinc-50/50 text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">
+              <tr className="border-b border-[#E4E4E7] bg-zinc-50/50 text-[11px] font-semibold text-[#71717A] uppercase tracking-wider">
                 <th className="py-3 px-4">Tiêu đề bài viết</th>
                 <th className="py-3 px-4">Tác giả</th>
                 <th className="py-3 px-4">Ngày đăng</th>
@@ -94,7 +94,7 @@ export function CmsManager({ initialArticles, initialFaqs }: CmsManagerProps) {
             <tbody className="divide-y divide-[#E4E4E7] text-sm">
               {articles.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="py-12 text-center text-zinc-500">
+                  <td colSpan={4} className="py-12 text-center text-[#71717A]">
                     <FileText className="mx-auto size-8 text-zinc-300 mb-2" />
                     Chưa có bài viết nào.
                   </td>
@@ -103,13 +103,13 @@ export function CmsManager({ initialArticles, initialFaqs }: CmsManagerProps) {
                 articles.map((article) => (
                   <tr key={article.id} className="hover:bg-zinc-50/80 transition-colors">
                     <td className="py-3.5 px-4">
-                      <div className="font-semibold text-zinc-900 line-clamp-1">{article.title}</div>
+                      <div className="font-semibold text-[#09090B] line-clamp-1">{article.title}</div>
                       <div className="text-xs text-zinc-400 font-mono">/{article.slug}</div>
                     </td>
                     <td className="py-3.5 px-4 text-zinc-600 text-xs font-medium">
                       {article.authorName}
                     </td>
-                    <td className="py-3.5 px-4 text-zinc-500 font-mono text-xs">
+                    <td className="py-3.5 px-4 text-[#71717A] font-mono text-xs">
                       <span className="inline-flex items-center gap-1">
                         <Calendar size={12} className="text-zinc-400" />
                         {new Date(article.createdAt).toLocaleDateString("vi-VN")}
@@ -122,7 +122,7 @@ export function CmsManager({ initialArticles, initialFaqs }: CmsManagerProps) {
                         className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border transition-colors cursor-pointer ${
                           article.isPublished
                             ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                            : "bg-zinc-100 text-zinc-500 border-zinc-200"
+                            : "bg-zinc-100 text-[#71717A] border-[#E4E4E7]"
                         }`}
                       >
                         {article.isPublished ? (
@@ -148,7 +148,7 @@ export function CmsManager({ initialArticles, initialFaqs }: CmsManagerProps) {
       {activeTab === "faqs" && (
         <div className="space-y-3">
           {faqs.length === 0 ? (
-            <div className="bg-white p-12 text-center rounded-xl border border-[#E4E4E7] text-zinc-500">
+            <div className="bg-white p-12 text-center rounded-xl border border-[#E4E4E7] text-[#71717A]">
               <HelpCircle className="mx-auto size-8 text-zinc-300 mb-2" />
               Chưa có câu hỏi FAQ nào.
             </div>
@@ -161,7 +161,7 @@ export function CmsManager({ initialArticles, initialFaqs }: CmsManagerProps) {
                       {faq.category}
                     </span>
                   )}
-                  <h4 className="font-semibold text-sm text-zinc-900">{faq.question}</h4>
+                  <h4 className="font-semibold text-sm text-[#09090B]">{faq.question}</h4>
                   <p className="text-xs text-zinc-600 mt-1 line-clamp-2">{faq.answer}</p>
                 </div>
 
@@ -171,7 +171,7 @@ export function CmsManager({ initialArticles, initialFaqs }: CmsManagerProps) {
                   className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border shrink-0 transition-colors cursor-pointer ${
                     faq.isActive
                       ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                      : "bg-zinc-100 text-zinc-500 border-zinc-200"
+                      : "bg-zinc-100 text-[#71717A] border-[#E4E4E7]"
                   }`}
                 >
                   {faq.isActive ? <CheckCircle size={12} /> : <XCircle size={12} />}

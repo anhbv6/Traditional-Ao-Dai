@@ -176,6 +176,7 @@ Vui lòng chuẩn bị sẵn các môi trường sau trước khi cài đặt:
    *   `API_INTERNAL_URL="http://127.0.0.1:3001"` — địa chỉ Express mà Next.js chuyển tiếp tới.
    *   `JWT_PUBLIC_KEY` — **giống hệt** giá trị trong `apps/api/.env` (chỉ public key, dùng để xác minh phiên quản trị ở server).
    *   `NEXT_PUBLIC_GOOGLE_CLIENT_ID` — Client ID Google OAuth.
+   *   `DATABASE_URL` — **giống hệt** giá trị trong `apps/api/.env`. Khu vực admin gọi Prisma trực tiếp từ Next.js; thiếu biến này mọi trang admin sẽ bị đẩy về trang đăng nhập.
 
 ---
 

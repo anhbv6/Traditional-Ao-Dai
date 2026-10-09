@@ -4,6 +4,7 @@ import { useSyncExternalStore } from "react";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { type ActiveDiscount, type CartItem, type NewCartItem } from "../types/cart.types";
+import { clampQuantity } from "../utils/pricing";
 
 interface CartState {
   items: CartItem[];
@@ -12,11 +13,22 @@ interface CartState {
   addItem: (item: NewCartItem) => void;
   updateQuantity: (id: string, quantity: number) => void;
   removeItem: (id: string) => void;
+  /** Khôi phục dòng vừa xóa về đúng vị trí cũ (hoàn tác) */
+  restoreItem: (item: CartItem, index: number) => void;
   applyDiscount: (discount: ActiveDiscount | null) => void;
   clear: () => void;
 }
 
-const buildCartItemId = (slug: string, size: string) => `${slug}__${size}`;
+/** Số đo khác nhau là hai sản phẩm may đo khác nhau -> phải là hai dòng riêng */
+const buildCartItemId = ({ slug, size, color, measurements }: NewCartItem) => {
+  const measureKey = measurements
+    ? Object.keys(measurements)
+        .sort()
+        .map((key) => `${key}:${measurements[key]}`)
+        .join(",")
+    : "";
+  return [slug, size, color ?? "", measureKey].join("__");
+};
 
 /**
  * Giỏ hàng — NGUỒN DỮ LIỆU DUY NHẤT cho mini-cart (header), trang giỏ hàng và checkout.
@@ -31,14 +43,14 @@ export const useCartStore = create<CartState>()(
 
       addItem: (item) =>
         set((state) => {
-          const id = buildCartItemId(item.slug, item.size);
-          const quantity = Math.max(1, item.quantity ?? 1);
+          const id = buildCartItemId(item);
+          const quantity = clampQuantity(item.quantity ?? 1);
           const existing = state.items.find((cartItem) => cartItem.id === id);
 
           if (existing) {
             return {
               items: state.items.map((cartItem) =>
-                cartItem.id === id ? { ...cartItem, quantity: cartItem.quantity + quantity } : cartItem
+                cartItem.id === id ? { ...cartItem, quantity: clampQuantity(cartItem.quantity + quantity) } : cartItem
               ),
             };
           }
@@ -49,11 +61,24 @@ export const useCartStore = create<CartState>()(
       updateQuantity: (id, quantity) =>
         set((state) => ({
           items: state.items.map((item) =>
-            item.id === id ? { ...item, quantity: Math.max(1, Math.floor(quantity) || 1) } : item
+            item.id === id ? { ...item, quantity: clampQuantity(quantity) } : item
           ),
         })),
 
-      removeItem: (id) => set((state) => ({ items: state.items.filter((item) => item.id !== id) })),
+      // Giỏ trống thì gỡ luôn mã giảm giá (mã gắn với đơn, không gắn với khách)
+      removeItem: (id) =>
+        set((state) => {
+          const items = state.items.filter((item) => item.id !== id);
+          return { items, discount: items.length > 0 ? state.discount : null };
+        }),
+
+      restoreItem: (item, index) =>
+        set((state) => {
+          if (state.items.some((entry) => entry.id === item.id)) return state;
+          const items = [...state.items];
+          items.splice(Math.min(index, items.length), 0, item);
+          return { items };
+        }),
 
       applyDiscount: (discount) => set({ discount }),
 
@@ -61,7 +86,15 @@ export const useCartStore = create<CartState>()(
     }),
     {
       name: "aodai-cart",
-      version: 1,
+      version: 2,
+      // v1 -> v2: khóa dòng thêm màu/số đo -> tính lại id để dòng cũ vẫn cộng dồn đúng
+      migrate: (persisted, version) => {
+        const state = persisted as Pick<CartState, "items" | "discount">;
+        if (version < 2 && Array.isArray(state?.items)) {
+          return { ...state, items: state.items.map((item) => ({ ...item, id: buildCartItemId(item) })) };
+        }
+        return state;
+      },
       storage: createJSONStorage(() => localStorage),
       skipHydration: true,
       partialize: (state) => ({ items: state.items, discount: state.discount }),

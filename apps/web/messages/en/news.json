@@ -22,5 +22,56 @@
   },
   "similarNews": "Similar News",
   "articleNotFound": "Article not found",
-  "backToNews": "Back to News"
+  "backToNews": "Back to News",
+  "eyebrow": "Ao Dai journal",
+  "author": "Author",
+  "featured": "Featured story",
+  "toc": "Contents",
+  "articleNavigation": "Article navigation",
+  "previousArticle": "Newer article",
+  "nextArticle": "Older article",
+  "share": {
+    "title": "Share",
+    "copy": "Copy link",
+    "copied": "Link copied",
+    "facebook": "Share on Facebook",
+    "more": "More sharing options"
+  },
+  "cta": {
+    "guide": {
+      "eyebrow": "Silk collection",
+      "title": "Mulberry silk Ao Dai that last for years",
+      "description": "Explore natural mulberry silk designs that are easy to care for with the tips in this article.",
+      "action": "Shop silk Ao Dai",
+      "keyword": "Mulberry silk"
+    },
+    "tips": {
+      "eyebrow": "Picked for you",
+      "title": "Find the most flattering wedding Ao Dai",
+      "description": "Hand-embroidered brocade, burgundy velvet and many silhouettes for your big day, ready-made or tailored.",
+      "action": "Shop wedding Ao Dai",
+      "keyword": "Wedding"
+    },
+    "culture": {
+      "eyebrow": "Heritage you can wear",
+      "title": "Hand-embroidered designs with a Vietnamese soul",
+      "description": "Lotus, crane and double-happiness motifs embroidered by hand on every panel.",
+      "action": "Shop embroidered Ao Dai",
+      "keyword": "Embroidery"
+    },
+    "trends": {
+      "eyebrow": "New trends",
+      "title": "Modern Ao Dai for contemporary life",
+      "description": "Elbow sleeves, boat necks, pastel tones — youthful designs that keep their traditional soul.",
+      "action": "Shop modern Ao Dai",
+      "keyword": "Modern"
+    },
+    "tailoring": {
+      "eyebrow": "Tailoring service",
+      "title": "Order an Ao Dai made to your measurements",
+      "description": "Our artisans draft your pattern, fit and finish it in 7–10 days. Contact us for a free measurement consultation.",
+      "action": "Book a fitting",
+      "keyword": "Custom tailor"
+    }
+  }
 }

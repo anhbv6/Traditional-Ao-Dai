@@ -31,7 +31,7 @@ export function DashboardOrdersTable({
   labels,
 }: DashboardOrdersTableProps) {
   return (
-    <div className="rounded-xl border border-[#E4E4E7] bg-white p-6 shadow-sm sm:p-8">
+    <div className="rounded-xl border border-[#E4E4E7] bg-white p-6 shadow-2xs sm:p-8">
       <div className="border-b border-[#E4E4E7] pb-5 mb-6 flex items-center justify-between">
         <h3 className="text-lg font-semibold text-[#09090B]">
           {labels.title}
@@ -67,7 +67,7 @@ export function DashboardOrdersTable({
               ))
             ) : orders.length === 0 ? (
               <tr>
-                <td colSpan={6} className="py-12 text-center text-zinc-500">
+                <td colSpan={6} className="py-12 text-center text-[#71717A]">
                   <Inbox size={32} className="mx-auto mb-2 text-zinc-300" />
                   <p className="text-xs font-medium">{labels.noOrders || "Chưa có đơn hàng nào."}</p>
                 </td>

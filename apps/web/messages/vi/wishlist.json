@@ -1,27 +1,42 @@
 {
+  "eyebrow": "Bộ sưu tập của bạn",
   "title": "Danh sách yêu thích",
-  "subtitle": "Lưu lại các thiết kế áo dài bạn yêu thích nhất để dễ dàng theo dõi và mua sắm.",
+  "subtitle": "Lưu lại những thiết kế áo dài bạn thương để xem lại, đặt may hoặc mua bất cứ lúc nào.",
   "itemCount": "{count} thiết kế",
+  "totalValue": "Tổng giá trị",
+  "sort": {
+    "label": "Sắp xếp",
+    "recent": "Mới thêm",
+    "priceAsc": "Giá tăng",
+    "priceDesc": "Giá giảm"
+  },
   "empty": {
-    "title": "Danh sách yêu thích trống",
-    "description": "Hãy khám phá bộ sưu tập áo dài của chúng tôi và chọn các thiết kế yêu thích của bạn.",
-    "action": "Tiếp tục mua sắm"
+    "title": "Chưa có thiết kế nào",
+    "description": "Chạm vào biểu tượng trái tim trên sản phẩm để lưu những mẫu áo dài bạn yêu thích vào đây.",
+    "action": "Khám phá bộ sưu tập"
   },
   "actions": {
     "addAll": "Thêm tất cả vào giỏ",
     "clearAll": "Xóa tất cả",
-    "addToCart": "Thêm vào giỏ hàng",
+    "confirmClear": "Xác nhận xóa",
+    "cancel": "Hủy",
+    "addToCart": "Thêm vào giỏ",
     "customTailor": "Đặt may đo",
-    "remove": "Xóa"
+    "remove": "Bỏ khỏi yêu thích",
+    "undo": "Hoàn tác",
+    "close": "Đóng"
   },
   "status": {
-    "inStock": "Còn hàng",
-    "custom": "Đặt may theo số đo",
-    "outOfStock": "Hết hàng"
+    "custom": "May đo",
+    "sale": "Giảm giá"
+  },
+  "undo": {
+    "removed": "Đã bỏ “{name}” khỏi danh sách"
   },
   "toast": {
-    "removed": "Đã xóa khỏi danh sách yêu thích!",
     "cleared": "Đã xóa toàn bộ danh sách yêu thích!",
-    "addedToCart": "Đã thêm sản phẩm vào giỏ hàng!"
+    "addedToCart": "Đã thêm sản phẩm vào giỏ hàng!",
+    "addedAllToCart": "Đã thêm {count} sản phẩm vào giỏ hàng!",
+    "nothingToAdd": "Các thiết kế may đo cần chọn số đo ở trang chi tiết."
   }
 }

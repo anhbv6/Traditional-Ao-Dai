@@ -1,18 +1,13 @@
 {
   "banner": {
+    "eyebrow": "Shop",
     "title": "Grace of Áo Dài",
-    "subtitle": "A perfect blend of traditional Vietnamese heritage and contemporary design",
-    "morph1": "Graceful",
-    "morph2": "Elegant",
-    "morph3": "Exquisite",
-    "morph4": "Modern",
-    "morph5": "Proud"
+    "subtitle": "Ready-to-wear and made-to-measure áo dài — in mulberry silk, brocade and chiffon, for weddings, Tết and every day you want to dress well."
   },
   "filter": {
     "title": "Filters",
-    "subtitle": "Find your fit",
     "searchTitle": "Search",
-    "searchPlaceholder": "Search name or ID...",
+    "searchPlaceholder": "Search name, fabric, color…",
     "categoryTitle": "Category / Occasion",
     "collectionTitle": "Collection",
     "purchaseTypeTitle": "Purchase Type",
@@ -20,18 +15,19 @@
     "materialTitle": "Materials",
     "priceTitle": "Price Range",
     "priceRange": "Price: {min}đ - {max}đ",
-    "clearThisFilter": "Clear this filter"
+    "clearAll": "Clear all ({count})",
+    "clear": "Clear",
+    "priceUpTo": "Up to {max}",
+    "clearSearch": "Clear search",
+    "sheetDescription": "Narrow the list by collection, purchase type, colour, material and price.",
+    "clearAllShort": "Clear all",
+    "showResults": "Show {count} products"
   },
   "collection": {
-    "foundCount": "Found {count} matching products",
-    "foundCountMobile": "{count} products",
-    "sortByLabel": "Sort by:",
+    "foundCount": "{count} products",
+    "sortByLabel": "Sort",
     "sortByPlaceholder": "Sort by",
-    "columnsLabel": "Columns:",
-    "columnsPlaceholder": "Select columns",
-    "cols3": "3 Columns",
-    "cols4": "4 Columns",
-    "cols5": "5 Columns",
+    "columnsLabel": "Columns",
     "sortOptions": {
       "all": "Show all",
       "newest": "Newest",
@@ -39,6 +35,50 @@
       "priceDesc": "Price: High to Low",
       "bestSeller": "Best sellers",
       "favorite": "Most favorited"
+    },
+    "allCategories": "All",
+    "emptyTitle": "No matching designs yet",
+    "emptyDescription": "Try removing a few filters, or message us to have the design you want made to measure.",
+    "clearFilters": "Clear filters"
+  },
+  "events": {
+    "label": "Events & offers",
+    "prev": "Previous event",
+    "next": "Next event",
+    "goTo": "Show event: {title}",
+    "endsIn": "Ends in",
+    "ended": "This offer has ended",
+    "units": {
+      "days": "days",
+      "hours": "hrs",
+      "minutes": "min",
+      "seconds": "sec"
+    },
+    "items": {
+      "wedding": {
+        "tag": "Wedding season 2026",
+        "title": "Made-to-measure bridal áo dài",
+        "discount": "-15%",
+        "description": "Order bridal áo dài for the bride and family before 31 Dec — includes one free alteration and a hand-embroidered headwrap.",
+        "cta": "Shop bridal",
+        "imageAlt": "Bride in a gold-embroidered red áo dài in a traditional living room"
+      },
+      "tet": {
+        "tag": "Lunar New Year",
+        "title": "Red brocade for the first day of spring",
+        "discount": "-20%",
+        "description": "Embroidered brocade in red and gold — for temple visits, New Year greetings and spring photos. Delivered before Tết.",
+        "cta": "Shop the Tết collection",
+        "imageAlt": "Woman in a red áo dài holding yellow flowers at a village market"
+      },
+      "silk": {
+        "tag": "New arrivals",
+        "title": "Autumn mulberry silk",
+        "discount": "-10%",
+        "description": "Moss green, ivory and beige of Hanoi autumn, woven from soft, cool mulberry silk that drapes with the body.",
+        "cta": "Shop silk áo dài",
+        "imageAlt": "Woman in a pale green silk áo dài holding lilies by a lake"
+      }
     }
   }
 }

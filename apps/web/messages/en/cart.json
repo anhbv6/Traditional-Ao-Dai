@@ -1,0 +1,75 @@
+{
+  "eyebrow": "Shopping bag",
+  "title": "Your Cart",
+  "itemCount": "{count} items",
+  "continueShopping": "Continue shopping",
+  "columns": {
+    "product": "Product",
+    "price": "Price",
+    "quantity": "Quantity",
+    "lineTotal": "Total"
+  },
+  "item": {
+    "color": "Color",
+    "size": "Size",
+    "custom": "Tailored",
+    "measurements": "Measurements",
+    "decrease": "Decrease quantity",
+    "increase": "Increase quantity",
+    "quantity": "Quantity",
+    "maxReached": "Maximum {max} per item",
+    "remove": "Remove from cart"
+  },
+  "shipping": {
+    "remaining": "Add <b>{amount}</b> more for free shipping",
+    "unlocked": "Your order ships for free"
+  },
+  "promo": {
+    "title": "Promo code",
+    "placeholder": "Enter code (e.g. GIAM10)",
+    "apply": "Apply",
+    "remove": "Remove code",
+    "required": "Please enter a promo code",
+    "invalid": "The promo code is invalid or has expired",
+    "percentApplied": "{value}% off your order",
+    "freeshipApplied": "Free shipping"
+  },
+  "summary": {
+    "title": "Order summary",
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "shipping": "Shipping",
+    "free": "Free",
+    "total": "Total",
+    "vatNote": "VAT included",
+    "checkout": "Proceed to checkout",
+    "customNote": "Tailored pieces take 7–10 days to complete and are not eligible for return (except for manufacturing defects)."
+  },
+  "actions": {
+    "clearAll": "Clear cart",
+    "confirmClear": "Confirm clear",
+    "cancel": "Cancel",
+    "undo": "Undo",
+    "close": "Close"
+  },
+  "undo": {
+    "removed": "Removed “{name}” from your cart"
+  },
+  "empty": {
+    "title": "Your cart is empty",
+    "description": "Explore our Ao Dai designs and pick the one that suits you best.",
+    "action": "Shop now"
+  },
+  "mini": {
+    "title": "Cart",
+    "empty": "Your cart is empty",
+    "shopNow": "Shop now",
+    "quantityPrice": "{quantity} × {price}",
+    "note": "Shipping & promo codes are calculated in the cart",
+    "viewCart": "View cart",
+    "checkout": "Checkout"
+  },
+  "toast": {
+    "cleared": "Your cart has been cleared"
+  }
+}

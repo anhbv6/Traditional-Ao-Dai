@@ -29,8 +29,8 @@ export function AdminUserMenu({
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="flex items-center gap-2 p-1 pl-1.5 pr-2.5 rounded-full hover:bg-zinc-100 transition-all border border-zinc-200/90 bg-white cursor-pointer select-none outline-none shadow-2xs">
-        <div className="size-7 rounded-full overflow-hidden border border-zinc-200 bg-zinc-900 text-white flex items-center justify-center font-bold text-xs">
+      <DropdownMenuTrigger className="flex items-center gap-2 p-1 pl-1.5 pr-2.5 rounded-full hover:bg-zinc-100 transition-all border border-[#E4E4E7] bg-white cursor-pointer select-none outline-none shadow-2xs">
+        <div className="size-7 rounded-full overflow-hidden border border-[#E4E4E7] bg-[#18181B] text-white flex items-center justify-center font-bold text-xs">
           {user?.avatar ? (
             // eslint-disable-next-line @next/next/no-img-element -- ảnh từ URL tùy ý (blob xem trước / avatar / ảnh do admin nhập), không tối ưu được bằng next/image
             <img
@@ -43,10 +43,10 @@ export function AdminUserMenu({
           )}
         </div>
         <div className="hidden sm:flex flex-col text-left">
-          <span className="font-semibold text-xs leading-tight text-zinc-900 max-w-[120px] truncate">
+          <span className="font-semibold text-xs leading-tight text-[#09090B] max-w-[120px] truncate">
             {displayName}
           </span>
-          <span className="text-[10px] text-zinc-500 font-medium">
+          <span className="text-[10px] text-[#71717A] font-medium">
             {displayRole}
           </span>
         </div>
@@ -55,13 +55,13 @@ export function AdminUserMenu({
 
       <DropdownMenuContent
         align="end"
-        className="w-56 p-1.5 shadow-lg rounded-xl border border-zinc-200 bg-white"
+        className="admin-shell w-56 p-1.5 shadow-lg rounded-xl border border-[#E4E4E7] bg-white"
       >
         <div className="px-3 py-2 border-b border-zinc-100">
-          <p className="font-semibold text-xs text-zinc-900 truncate">
+          <p className="font-semibold text-xs text-[#09090B] truncate">
             {displayName}
           </p>
-          <p className="text-[11px] text-zinc-500 truncate">{user?.email || "—"}</p>
+          <p className="text-[11px] text-[#71717A] truncate">{user?.email || "—"}</p>
           <span className="mt-1.5 inline-block px-2 py-0.5 rounded-md bg-zinc-100 text-[10px] font-semibold text-zinc-700">
             {displayRole}
           </span>
@@ -71,7 +71,7 @@ export function AdminUserMenu({
           onClick={onOpenProfile}
           className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 rounded-lg cursor-pointer transition-colors mt-1"
         >
-          <UserCog size={14} className="text-zinc-500" />
+          <UserCog size={14} className="text-[#71717A]" />
           <span>{t("editProfile")}</span>
         </DropdownMenuItem>
 
@@ -79,7 +79,7 @@ export function AdminUserMenu({
           onClick={() => router.push("/")}
           className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 rounded-lg cursor-pointer transition-colors"
         >
-          <Store size={14} className="text-zinc-500" />
+          <Store size={14} className="text-[#71717A]" />
           <span>{t("backToStore")}</span>
         </DropdownMenuItem>
 

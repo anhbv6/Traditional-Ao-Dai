@@ -2,6 +2,7 @@
 
 import { prisma } from "../../server/db.server";
 import { authorizeAdminAction } from "../../server/adminAuth.server";
+import { ADMIN_ACTION_ACCESS, canAccess } from "../../session/permissions";
 import { type ApprovalStatus, type Prisma } from "@repo/db";
 import { type CreateApprovalInput, type ReviewApprovalInput } from "../types/approval.types";
 import { getApprovalRequestsQuery } from "../queries/approval.queries";
@@ -14,7 +15,9 @@ export async function getApprovalRequestsAction(statusFilter?: ApprovalStatus) {
   if (!auth.success) return auth;
 
   try {
-    const data = await getApprovalRequestsQuery(statusFilter);
+    // ADMIN xem toàn bộ hàng đợi; STAFF chỉ xem yêu cầu do mình gửi
+    const ownerFilter = canAccess(auth.user, ADMIN_ACTION_ACCESS.reviewApproval) ? undefined : auth.user.id;
+    const data = await getApprovalRequestsQuery(statusFilter, ownerFilter);
     return {
       success: true,
       data,
@@ -69,7 +72,7 @@ export async function createApprovalRequestAction(input: CreateApprovalInput) {
  * Server Action: Admin phê duyệt hoặc từ chối yêu cầu của Staff
  */
 export async function reviewApprovalRequestAction(input: ReviewApprovalInput) {
-  const auth = await authorizeAdminAction({ role: "ADMIN" });
+  const auth = await authorizeAdminAction(ADMIN_ACTION_ACCESS.reviewApproval);
   if (!auth.success) return auth;
 
   try {

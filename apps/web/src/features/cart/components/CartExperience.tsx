@@ -1,110 +1,214 @@
 "use client";
 
-import React from "react";
-import { ShoppingBag, ArrowLeft } from "lucide-react";
+import React, { useState } from "react";
+import { AnimatePresence, MotionConfig, motion } from "motion/react";
+import { ArrowLeft, ShoppingBag, Trash2 } from "lucide-react";
 import { Link } from "@/i18n/routing";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { UndoSnackbar } from "@/components/shared/UndoSnackbar";
 import { useCart } from "../hooks/useCart";
+import { CartFreeShippingBar } from "./CartFreeShippingBar";
 import { CartItemList } from "./CartItemList";
 import { CartPromoSection } from "./CartPromoSection";
 import { CartSummary } from "./CartSummary";
 
+const EASE = [0.22, 1, 0.36, 1] as const;
+
+/** Khung chờ khi giỏ đang nạp từ localStorage — tránh chớp trạng thái "trống" */
+function CartSkeleton() {
+  return (
+    <div className="grid animate-pulse gap-8 lg:grid-cols-[minmax(0,1fr)_340px]" aria-hidden="true">
+      <div className="space-y-4">
+        {Array.from({ length: 3 }, (_, index) => (
+          <div key={index} className="flex gap-4 border-b border-[var(--border)] pb-4">
+            <div className="aspect-[3/4] w-20 bg-[var(--bg-secondary)]" />
+            <div className="flex-1 space-y-2 pt-1">
+              <div className="h-3 w-2/3 bg-[var(--bg-secondary)]" />
+              <div className="h-3 w-1/3 bg-[var(--bg-secondary)]" />
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="h-72 bg-[var(--bg-secondary)]" />
+    </div>
+  );
+}
+
 export function CartExperience() {
   const {
     t,
-    cartItems,
+    locale,
     isLoaded,
+    cartItems,
+    totals,
+    hasCustomItems,
     promoCode,
     setPromoCode,
-    activeDiscount,
     promoError,
-    promoSuccess,
-    handleQuantityChange,
-    handleQuantityInput,
-    handleRemoveItem,
+    activeDiscount,
+    promoDescription,
     handleApplyPromo,
-    subtotal,
-    discountAmount,
-    shippingThreshold,
-    shippingCost,
-    total,
+    handleRemovePromo,
+    handleQuantityChange,
+    handleRemoveItem,
+    handleClearAll,
+    lastRemoved,
+    handleUndo,
+    dismissUndo,
   } = useCart();
-
-  if (!isLoaded) {
-    return (
-      <div className="py-24 flex items-center justify-center">
-        <div className="size-8 animate-spin rounded-full border-4 border-[#800020] border-t-transparent" />
-      </div>
-    );
-  }
+  const [confirmingClear, setConfirmingClear] = useState(false);
 
   return (
-    <div className="py-4 sm:py-6 animate-fade-in font-[family-name:var(--font-lora)] text-[var(--text-main)]">
-      {/* Back button */}
-      <Link 
-        href="/products" 
-        className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#706565] hover:text-[#800020] transition-colors"
-      >
-        <ArrowLeft size={14} />
-        {t("continueShopping") || "Tiếp tục mua sắm"}
-      </Link>
-
-      <h1 className="mt-4 font-[family-name:var(--font-playfair)] text-3xl font-extrabold text-[#800020] sm:text-4xl">
-        Giỏ Hàng Của Bạn
-      </h1>
-
-      {cartItems.length === 0 ? (
-        /* Empty Cart View */
-        <div className="mt-12 flex flex-col items-center justify-center text-center py-16 px-4 bg-[#FAF7F5] border border-[#E2D9D2]/40 rounded-2xl animate-fade-in">
-          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white text-[#706565]/40 border border-[#E2D9D2]/30 shadow-sm">
-            <ShoppingBag size={36} />
-          </div>
-          <h2 className="mt-6 text-xl font-bold font-[family-name:var(--font-playfair)] text-[#800020]">
-            Giỏ hàng của bạn đang trống
-          </h2>
-          <p className="mt-2 text-sm text-[#706565] max-w-sm">
-            Hãy khám phá các thiết kế áo dài cao cấp của chúng tôi và chọn cho mình sản phẩm phù hợp.
-          </p>
+    <MotionConfig reducedMotion="user">
+      <div className="font-[family-name:var(--font-lora)] text-[var(--text-main)]">
+        {/* Tiêu đề */}
+        <header className="mb-6 sm:mb-8">
           <Link
             href="/products"
-            className="mt-8 inline-flex min-h-11 items-center justify-center rounded-lg bg-[#800020] px-8 text-xs font-semibold uppercase tracking-wider text-white transition-all hover:bg-[#800020]/90 cursor-pointer active:scale-95 duration-200"
+            className="group inline-flex items-center gap-2 text-[10px] uppercase tracking-[2px] text-[var(--text-light)] transition-colors hover:text-[var(--primary-color)] sm:text-[11px]"
           >
-            Mua Sắm Ngay
+            <ArrowLeft size={13} className="transition-transform duration-300 group-hover:-translate-x-1" />
+            {t("continueShopping")}
           </Link>
-        </div>
-      ) : (
-        /* Cart Page Content split into 2 Columns */
-        <div className="mt-8 grid gap-8 lg:grid-cols-3 items-start">
-          {/* Left Column: Items List */}
-          <div className="lg:col-span-2 space-y-4">
-            <CartItemList
-              cartItems={cartItems}
-              handleQuantityChange={handleQuantityChange}
-              handleQuantityInput={handleQuantityInput}
-              handleRemoveItem={handleRemoveItem}
-            />
+          <div className="mt-4 flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
+            <motion.h1
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: EASE }}
+              className="text-2xl font-semibold leading-tight sm:text-3xl"
+            >
+              {t("title")}
+            </motion.h1>
+            {isLoaded && cartItems.length > 0 ? (
+              <span className="text-[11px] uppercase tracking-[1.5px] text-[var(--text-light)] sm:text-xs">
+                {t("itemCount", { count: totals.totalQuantity })}
+              </span>
+            ) : null}
           </div>
+        </header>
 
-          {/* Right Column: Summary & Coupon */}
-          <div className="space-y-6 lg:sticky lg:top-24">
-            <CartPromoSection
-              promoCode={promoCode}
-              setPromoCode={setPromoCode}
-              handleApplyPromo={handleApplyPromo}
-              promoError={promoError}
-              promoSuccess={promoSuccess}
-            />
-            <CartSummary
-              subtotal={subtotal}
-              activeDiscount={activeDiscount}
-              discountAmount={discountAmount}
-              shippingCost={shippingCost}
-              shippingThreshold={shippingThreshold}
-              total={total}
-            />
-          </div>
-        </div>
-      )}
-    </div>
+        {!isLoaded ? (
+          <CartSkeleton />
+        ) : (
+          <AnimatePresence mode="wait" initial={false}>
+            {cartItems.length === 0 ? (
+              <EmptyState
+                key="empty"
+                icon={ShoppingBag}
+                title={t("empty.title")}
+                description={t("empty.description")}
+                action={t("empty.action")}
+              />
+            ) : (
+              <motion.div
+                key="cart"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0, transition: { duration: 0.25 } }}
+                className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-10"
+              >
+                {/* Cột trái: miễn phí vận chuyển + danh sách */}
+                <section aria-label={t("columns.product")}>
+                  <div className="mb-5 border border-[var(--border)] bg-white px-4 py-3">
+                    <CartFreeShippingBar
+                      subtotal={totals.subtotal}
+                      threshold={totals.freeShippingThreshold}
+                      remaining={totals.freeShippingRemaining}
+                      locale={locale}
+                    />
+                  </div>
+
+                  <CartItemList
+                    cartItems={cartItems}
+                    locale={locale}
+                    handleQuantityChange={handleQuantityChange}
+                    handleRemoveItem={handleRemoveItem}
+                  />
+
+                  {/* Xóa toàn bộ giỏ: xác nhận tại chỗ */}
+                  <div className="mt-4 flex justify-end">
+                    <AnimatePresence mode="wait" initial={false}>
+                      {confirmingClear ? (
+                        <motion.div
+                          key="confirm"
+                          initial={{ opacity: 0, x: 12 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: 12 }}
+                          transition={{ duration: 0.25, ease: EASE }}
+                          className="flex items-center gap-2"
+                        >
+                          <button
+                            type="button"
+                            onClick={() => setConfirmingClear(false)}
+                            className="min-h-8 cursor-pointer border border-[var(--border)] px-3 text-[10px] font-semibold uppercase tracking-[1.5px] text-[var(--text-light)] transition-colors hover:border-[var(--text-main)] hover:text-[var(--text-main)]"
+                          >
+                            {t("actions.cancel")}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setConfirmingClear(false);
+                              handleClearAll();
+                            }}
+                            className="min-h-8 cursor-pointer bg-[var(--destructive)] px-3 text-[10px] font-semibold uppercase tracking-[1.5px] text-white transition-opacity hover:opacity-90"
+                          >
+                            {t("actions.confirmClear")}
+                          </button>
+                        </motion.div>
+                      ) : (
+                        <motion.button
+                          key="clear"
+                          type="button"
+                          onClick={() => setConfirmingClear(true)}
+                          initial={{ opacity: 0, x: -12 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -12 }}
+                          transition={{ duration: 0.25, ease: EASE }}
+                          className="inline-flex min-h-8 cursor-pointer items-center gap-1.5 px-2 text-[10px] font-semibold uppercase tracking-[1.5px] text-[var(--text-light)] transition-colors hover:text-[var(--destructive)]"
+                        >
+                          <Trash2 size={12} strokeWidth={1.6} />
+                          {t("actions.clearAll")}
+                        </motion.button>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </section>
+
+                {/* Cột phải: tóm tắt (dính khi cuộn trên desktop) */}
+                <aside className="lg:sticky lg:top-28">
+                  <CartSummary
+                    totals={totals}
+                    activeDiscount={activeDiscount}
+                    locale={locale}
+                    hasCustomItems={hasCustomItems}
+                    promoSlot={
+                      <CartPromoSection
+                        promoCode={promoCode}
+                        setPromoCode={setPromoCode}
+                        handleApplyPromo={handleApplyPromo}
+                        handleRemovePromo={handleRemovePromo}
+                        promoError={promoError}
+                        activeDiscount={activeDiscount}
+                        promoDescription={promoDescription}
+                      />
+                    }
+                  />
+                </aside>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        )}
+
+        <UndoSnackbar
+          activeKey={lastRemoved?.item.id ?? null}
+          message={lastRemoved ? t("undo.removed", { name: lastRemoved.item.name }) : ""}
+          undoLabel={t("actions.undo")}
+          closeLabel={t("actions.close")}
+          onUndo={handleUndo}
+          onDismiss={dismissUndo}
+        />
+      </div>
+    </MotionConfig>
   );
 }
 export default CartExperience;

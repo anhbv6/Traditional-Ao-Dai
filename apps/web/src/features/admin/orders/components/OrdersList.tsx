@@ -84,7 +84,7 @@ export function OrdersList({ initialOrders }: OrdersListProps) {
         </div>
 
         <div className="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
-          <Filter size={15} className="text-zinc-500 shrink-0" />
+          <Filter size={15} className="text-[#71717A] shrink-0" />
           {["ALL", "PENDING", "CONFIRMED", "IN_PRODUCTION", "SHIPPING", "DELIVERED"].map((st) => (
             <button
               key={st}
@@ -106,7 +106,7 @@ export function OrdersList({ initialOrders }: OrdersListProps) {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-[#E4E4E7] bg-zinc-50/50 text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">
+              <tr className="border-b border-[#E4E4E7] bg-zinc-50/50 text-[11px] font-semibold text-[#71717A] uppercase tracking-wider">
                 <th className="py-3 px-4">Mã đơn hàng</th>
                 <th className="py-3 px-4">Khách hàng</th>
                 <th className="py-3 px-4">Sản phẩm / Dịch vụ</th>
@@ -119,7 +119,7 @@ export function OrdersList({ initialOrders }: OrdersListProps) {
             <tbody className="divide-y divide-[#E4E4E7] text-sm">
               {filteredOrders.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-zinc-500">
+                  <td colSpan={7} className="py-12 text-center text-[#71717A]">
                     <Package className="mx-auto size-8 text-zinc-300 mb-2" />
                     Chưa có đơn hàng nào phù hợp với bộ lọc.
                   </td>
@@ -136,12 +136,12 @@ export function OrdersList({ initialOrders }: OrdersListProps) {
                       className="hover:bg-zinc-50/80 transition-colors cursor-pointer"
                       onClick={() => setSelectedOrder(order)}
                     >
-                      <td className="py-3.5 px-4 font-mono font-semibold text-xs text-zinc-900">
+                      <td className="py-3.5 px-4 font-mono font-semibold text-xs text-[#09090B]">
                         {order.orderNumber}
                       </td>
                       <td className="py-3.5 px-4">
-                        <div className="font-medium text-zinc-900">{order.customerName}</div>
-                        <div className="text-xs text-zinc-500 font-mono">{order.customerPhone}</div>
+                        <div className="font-medium text-[#09090B]">{order.customerName}</div>
+                        <div className="text-xs text-[#71717A] font-mono">{order.customerPhone}</div>
                       </td>
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-1.5">
@@ -155,7 +155,7 @@ export function OrdersList({ initialOrders }: OrdersListProps) {
                           )}
                         </div>
                       </td>
-                      <td className="py-3.5 px-4 font-mono font-semibold text-zinc-900">
+                      <td className="py-3.5 px-4 font-mono font-semibold text-[#09090B]">
                         {Number(order.totalAmount).toLocaleString("vi-VN")} ₫
                       </td>
                       <td className="py-3.5 px-4">
@@ -164,7 +164,7 @@ export function OrdersList({ initialOrders }: OrdersListProps) {
                             ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                             : order.paymentStatus === "PARTIALLY_PAID"
                             ? "bg-amber-50 text-amber-700 border border-amber-200"
-                            : "bg-zinc-100 text-zinc-600 border border-zinc-200"
+                            : "bg-zinc-100 text-zinc-600 border border-[#E4E4E7]"
                         }`}>
                           {order.paymentStatus === "PAID" ? "Đã thanh toán" : order.paymentStatus === "PARTIALLY_PAID" ? "Đã cọc" : "Chưa thanh toán"}
                         </span>
@@ -176,7 +176,7 @@ export function OrdersList({ initialOrders }: OrdersListProps) {
                         </span>
                       </td>
                       <td className="py-3.5 px-4 text-right">
-                        <button className="p-1.5 text-zinc-400 hover:text-zinc-900 rounded-lg hover:bg-zinc-100 transition-colors">
+                        <button className="p-1.5 text-zinc-400 hover:text-[#09090B] rounded-lg hover:bg-zinc-100 transition-colors">
                           <ChevronRight size={16} />
                         </button>
                       </td>
@@ -196,12 +196,12 @@ export function OrdersList({ initialOrders }: OrdersListProps) {
             <div className="space-y-6">
               <div className="flex items-center justify-between border-b border-[#E4E4E7] pb-4">
                 <div>
-                  <div className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Chi tiết đơn hàng</div>
-                  <h3 className="text-lg font-bold font-mono text-zinc-900">{selectedOrder.orderNumber}</h3>
+                  <div className="text-xs font-semibold uppercase tracking-wider text-[#71717A]">Chi tiết đơn hàng</div>
+                  <h3 className="text-lg font-bold font-mono text-[#09090B]">{selectedOrder.orderNumber}</h3>
                 </div>
                 <button
                   onClick={() => setSelectedOrder(null)}
-                  className="p-1.5 text-zinc-400 hover:text-zinc-900 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer"
+                  className="p-1.5 text-zinc-400 hover:text-[#09090B] rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer"
                 >
                   <XCircle size={20} />
                 </button>
@@ -209,26 +209,26 @@ export function OrdersList({ initialOrders }: OrdersListProps) {
 
               {/* Thông tin người nhận */}
               <div className="bg-zinc-50 rounded-xl p-4 border border-[#E4E4E7] space-y-2">
-                <div className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Khách hàng & Địa chỉ</div>
-                <div className="flex items-center gap-2 text-sm font-medium text-zinc-900">
-                  <User size={14} className="text-zinc-500" />
+                <div className="text-xs font-semibold text-[#71717A] uppercase tracking-wider">Khách hàng & Địa chỉ</div>
+                <div className="flex items-center gap-2 text-sm font-medium text-[#09090B]">
+                  <User size={14} className="text-[#71717A]" />
                   {selectedOrder.customerName} ({selectedOrder.customerPhone})
                 </div>
                 <div className="flex items-start gap-2 text-xs text-zinc-600">
-                  <MapPin size={14} className="text-zinc-500 shrink-0 mt-0.5" />
+                  <MapPin size={14} className="text-[#71717A] shrink-0 mt-0.5" />
                   {selectedOrder.shippingAddress}
                 </div>
               </div>
 
               {/* Danh sách áo dài trong đơn */}
               <div className="space-y-3">
-                <div className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Danh mục áo dài</div>
+                <div className="text-xs font-semibold text-[#71717A] uppercase tracking-wider">Danh mục áo dài</div>
                 <div className="space-y-2">
                   {selectedOrder.items.map((item) => (
                     <div key={item.id} className="p-3 bg-white rounded-lg border border-[#E4E4E7] flex justify-between items-center">
                       <div>
-                        <div className="font-semibold text-sm text-zinc-900">{item.productName}</div>
-                        <div className="text-xs text-zinc-500">
+                        <div className="font-semibold text-sm text-[#09090B]">{item.productName}</div>
+                        <div className="text-xs text-[#71717A]">
                           {item.variantName ? `Size: ${item.variantName}` : "May đo"} | SL: {item.quantity}
                         </div>
                         {item.isCustomFit && (
@@ -237,7 +237,7 @@ export function OrdersList({ initialOrders }: OrdersListProps) {
                           </div>
                         )}
                       </div>
-                      <div className="font-mono font-semibold text-sm text-zinc-900">
+                      <div className="font-mono font-semibold text-sm text-[#09090B]">
                         {Number(item.totalPrice).toLocaleString("vi-VN")} ₫
                       </div>
                     </div>
@@ -247,7 +247,7 @@ export function OrdersList({ initialOrders }: OrdersListProps) {
 
               {/* Thao tác chuyển trạng thái */}
               <div className="space-y-3">
-                <div className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Cập nhật tiến trình đơn</div>
+                <div className="text-xs font-semibold text-[#71717A] uppercase tracking-wider">Cập nhật tiến trình đơn</div>
                 <div className="grid grid-cols-2 gap-2">
                   {(["CONFIRMED", "IN_PRODUCTION", "READY_TO_SHIP", "SHIPPING", "DELIVERED"] as OrderStatus[]).map((st) => (
                     <button
@@ -256,8 +256,8 @@ export function OrdersList({ initialOrders }: OrdersListProps) {
                       onClick={() => handleStatusChange(selectedOrder.id, st)}
                       className={`px-3 py-2 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
                         selectedOrder.orderStatus === st
-                          ? "bg-zinc-900 text-white border-zinc-900"
-                          : "bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-50 hover:border-zinc-300"
+                          ? "bg-[#18181B] text-white border-zinc-900"
+                          : "bg-white text-zinc-700 border-[#E4E4E7] hover:bg-zinc-50 hover:border-zinc-300"
                       }`}
                     >
                       {statusBadges[st]?.label}
@@ -268,8 +268,8 @@ export function OrdersList({ initialOrders }: OrdersListProps) {
             </div>
 
             <div className="border-t border-[#E4E4E7] pt-4 mt-6 flex justify-between items-center">
-              <span className="text-xs text-zinc-500">Tổng cộng thanh toán</span>
-              <span className="font-mono font-bold text-lg text-zinc-900">
+              <span className="text-xs text-[#71717A]">Tổng cộng thanh toán</span>
+              <span className="font-mono font-bold text-lg text-[#09090B]">
                 {Number(selectedOrder.totalAmount).toLocaleString("vi-VN")} ₫
               </span>
             </div>

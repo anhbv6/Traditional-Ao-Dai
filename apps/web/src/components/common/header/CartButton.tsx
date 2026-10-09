@@ -1,197 +1,219 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-import { ShoppingBag, Trash2 } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { formatVnd } from '@repo/shared';
-import { calculateCartTotals, useCartStore } from '@/features/cart';
-import { Link } from '@/i18n/routing';
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-} from '@/components/ui/dropdown-menu';
+import { AnimatePresence, motion } from 'motion/react';
+import { ShoppingBag, X } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
+import { formatVnd, type Locale } from '@repo/shared';
+import { CartFreeShippingBar, calculateCartTotals, useCartStore } from '@/features/cart';
+import { Link, usePathname } from '@/i18n/routing';
 
 type CartButtonProps = {
-  count?: number;
   label?: string;
+  /** Bật bảng xem nhanh khi rê chuột (chỉ desktop — thiết bị cảm ứng bấm thẳng vào trang giỏ) */
+  preview?: boolean;
 };
 
-export function CartButton({ label = 'Cart' }: CartButtonProps) {
-  // Giỏ hàng dùng chung store với trang giỏ hàng & checkout (không còn đồng bộ bằng window event)
+const EASE = [0.22, 1, 0.36, 1] as const;
+const OPEN_DELAY = 80;
+const CLOSE_DELAY = 180;
+/** Ở chính trang giỏ / thanh toán thì xem nhanh là thừa -> chỉ còn link */
+const NO_PREVIEW_PATHS = ['/cart', '/checkout'];
+
+/**
+ * Nút giỏ hàng ở header. Bấm luôn sang trang giỏ hàng; desktop rê chuột / focus bàn phím mở bảng xem nhanh
+ * (danh sách, tiến trình miễn phí vận chuyển, tạm tính). Số trên huy hiệu "nảy" mỗi khi thay đổi.
+ */
+export function CartButton({ label = 'Cart', preview = false }: CartButtonProps) {
+  const t = useTranslations('CartPage');
+  const locale = useLocale() as Locale;
+  const pathname = usePathname();
   const cartItems = useCartStore((state) => state.items);
-  const removeCartItem = useCartStore((state) => state.removeItem);
+  const { subtotal, totalQuantity, freeShippingThreshold } = calculateCartTotals(cartItems);
+  // Tiến trình freeship ở xem nhanh không xét mã giảm giá (mã chỉ hiện ở trang giỏ)
+  const freeShippingRemaining = Math.max(0, freeShippingThreshold - subtotal);
 
   const [isOpen, setIsOpen] = useState(false);
-  const listRef = useRef<HTMLDivElement>(null);
-  const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const canPreview = preview && !NO_PREVIEW_PATHS.includes(pathname);
 
-  useEffect(() => {
-    return () => {
-      if (hoverTimeoutRef.current) {
-        clearTimeout(hoverTimeoutRef.current);
-      }
-    };
+  useEffect(() => () => {
+    if (timerRef.current) clearTimeout(timerRef.current);
   }, []);
 
-  const removeItem = (id: string, e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    removeCartItem(id);
+  const schedule = (open: boolean) => {
+    if (!canPreview) return;
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => setIsOpen(open), open ? OPEN_DELAY : CLOSE_DELAY);
   };
 
-  const { subtotal, totalQuantity: totalCount } = calculateCartTotals(cartItems);
-
-  const handleMouseEnter = () => {
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current);
-    }
-    setIsOpen(true);
-  };
-
-  const handleMouseLeave = () => {
-    hoverTimeoutRef.current = setTimeout(() => {
-      setIsOpen(false);
-    }, 150);
-  };
-
-  const handleDropdownWheel = (event: React.WheelEvent<HTMLDivElement>) => {
-    const listElement = listRef.current;
-
-    event.preventDefault();
-    event.stopPropagation();
-
-    if (!listElement) {
-      return;
-    }
-
-    const maxScrollTop = listElement.scrollHeight - listElement.clientHeight;
-    if (maxScrollTop <= 0) {
-      return;
-    }
-
-    const nextScrollTop = Math.min(
-      Math.max(listElement.scrollTop + event.deltaY, 0),
-      maxScrollTop
-    );
-
-    listElement.scrollTop = nextScrollTop;
+  const close = () => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    setIsOpen(false);
   };
 
   return (
-    <div 
-      onMouseEnter={handleMouseEnter} 
-      onMouseLeave={handleMouseLeave}
+    <div
       className="relative"
+      onMouseEnter={() => schedule(true)}
+      onMouseLeave={() => schedule(false)}
+      onFocus={() => schedule(true)}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) schedule(false);
+      }}
+      onKeyDown={(e) => {
+        if (e.key === 'Escape') close();
+      }}
     >
-      <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-        {/* Dropdown Menu Trigger */}
-        <DropdownMenuTrigger render={
-          <button
-            type="button"
-            aria-label={label}
-            className="relative grid h-11 w-11 place-items-center text-primary transition-opacity hover:opacity-75 outline-none cursor-pointer"
-          />
-        }>
-          <ShoppingBag size={22} strokeWidth={1.5} aria-hidden="true" />
-          {totalCount > 0 && (
-            <span className="absolute right-1.5 top-1.5 grid h-4 min-w-4 place-items-center rounded-full bg-[#800020] px-1 text-[10px] font-bold leading-none text-white">
-              {totalCount}
-            </span>
-          )}
-        </DropdownMenuTrigger>
+      <Link
+        href="/cart"
+        data-cart-target
+        aria-label={totalQuantity > 0 ? `${label} (${totalQuantity})` : label}
+        aria-expanded={canPreview ? isOpen : undefined}
+        onClick={close}
+        className="relative grid h-11 w-11 place-items-center text-primary transition-opacity hover:opacity-75"
+      >
+        <ShoppingBag size={22} strokeWidth={1.5} aria-hidden="true" />
+        <AnimatePresence initial={false}>
+          {totalQuantity > 0 ? (
+            <motion.span
+              key={totalQuantity}
+              initial={{ scale: 0.4, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.4, opacity: 0, position: 'absolute' }}
+              transition={{ type: 'spring', stiffness: 520, damping: 22 }}
+              className="absolute right-1 top-1.5 grid h-4 min-w-4 place-items-center bg-primary px-1 text-[10px] font-bold leading-none text-white"
+            >
+              {totalQuantity > 99 ? '99+' : totalQuantity}
+            </motion.span>
+          ) : null}
+        </AnimatePresence>
+      </Link>
 
-        {/* Dropdown Menu Content */}
-        <DropdownMenuContent 
-          align="end" 
-          sideOffset={8}
-          showArrow={true}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-          onWheel={handleDropdownWheel}
-          className="w-[320px] bg-white border border-[#E2D9D2] rounded-xl p-4 shadow-xl z-50 text-[#2A2525] overflow-hidden overscroll-contain"
-        >
-          {/* Header */}
-          <div className="pb-3 border-b border-[#E2D9D2]/40 text-xs font-semibold text-[#706565]">
-            {cartItems.length > 0 ? (
-              <span>You have {totalCount} {totalCount === 1 ? 'item' : 'items'} in your cart</span>
+      <AnimatePresence>
+        {canPreview && isOpen ? (
+          <motion.div
+            role="dialog"
+            aria-label={t('mini.title')}
+            initial={{ opacity: 0, y: 8, clipPath: 'inset(0% 0% 100% 0%)' }}
+            animate={{ opacity: 1, y: 0, clipPath: 'inset(0% 0% 0% 0%)' }}
+            exit={{ opacity: 0, y: 6, transition: { duration: 0.18 } }}
+            transition={{ duration: 0.4, ease: EASE }}
+            className="absolute right-0 top-full z-50 mt-2 w-[340px] border border-[var(--border)] border-t-2 border-t-[var(--primary-color)] bg-white font-[family-name:var(--font-lora)] text-[var(--text-main)] shadow-[0_18px_40px_-12px_rgba(42,37,37,0.25)]"
+          >
+            <div className="flex items-baseline justify-between border-b border-[var(--border)] px-4 py-3">
+              <p className="font-[family-name:var(--font-playfair)] text-[15px] font-semibold">{t('mini.title')}</p>
+              {totalQuantity > 0 ? (
+                <p className="text-[10px] uppercase tracking-[1.5px] text-[var(--text-light)]">
+                  {t('itemCount', { count: totalQuantity })}
+                </p>
+              ) : null}
+            </div>
+
+            {cartItems.length === 0 ? (
+              <div className="flex flex-col items-center px-4 py-8 text-center">
+                <ShoppingBag size={26} strokeWidth={1.2} className="text-[var(--primary-color)]/50" />
+                <p className="mt-3 text-[12px] text-[var(--text-light)]">{t('mini.empty')}</p>
+                <Link
+                  href="/products"
+                  onClick={close}
+                  className="mt-4 inline-flex min-h-9 items-center bg-[var(--primary-color)] px-5 text-[10px] font-semibold uppercase tracking-[2px] text-white transition-colors hover:bg-[#2A0A12]"
+                >
+                  {t('mini.shopNow')}
+                </Link>
+              </div>
             ) : (
-              <span className="text-center block py-4 text-xs font-medium text-[#706565]/60">Your cart is empty</span>
-            )}
-          </div>
+              <>
+                <div className="border-b border-[var(--border)] px-4 py-3">
+                  <CartFreeShippingBar
+                    subtotal={subtotal}
+                    threshold={freeShippingThreshold}
+                    remaining={freeShippingRemaining}
+                    locale={locale}
+                    compact
+                  />
+                </div>
 
-          {/* Items List */}
-          {cartItems.length > 0 && (
-            <>
-              <div ref={listRef} className="py-2.5 max-h-[260px] overflow-y-auto overscroll-contain divide-y divide-[#E2D9D2]/30">
-                {cartItems.map((item) => (
-                  <div key={item.id} className="flex gap-3 py-3 first:pt-1 last:pb-1 group">
-                    <div className="relative size-12 shrink-0 overflow-hidden rounded-lg bg-[#FAF7F5] border border-[#E2D9D2]/30">
-                      <Image
-                        src={item.image}
-                        alt={item.name}
-                        fill
-                        sizes="48px"
-                        className="object-cover"
-                        unoptimized
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="text-xs font-bold text-[#800020] line-clamp-1 group-hover:text-[#800020]/85 transition-colors">
+                {/* data-lenis-prevent: cuộn danh sách không kéo theo smooth-scroll của trang */}
+                <ul data-lenis-prevent className="max-h-[280px] overflow-y-auto overscroll-contain px-4">
+                  <AnimatePresence initial={false}>
+                    {cartItems.map((item, index) => (
+                      <motion.li
+                        key={item.id}
+                        layout="position"
+                        initial={{ opacity: 0, x: 12 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, height: 0, paddingTop: 0, paddingBottom: 0 }}
+                        transition={{ duration: 0.35, ease: EASE, delay: isOpen ? Math.min(index, 5) * 0.04 : 0 }}
+                        className="group flex gap-3 overflow-hidden border-b border-[var(--border)] py-3 last:border-b-0"
+                      >
                         <Link
                           href={`/products/${item.slug}`}
-                          onClick={() => setIsOpen(false)}
-                          className="hover:underline cursor-pointer"
+                          onClick={close}
+                          className="relative aspect-[3/4] w-12 shrink-0 overflow-hidden bg-[var(--bg-secondary)]"
                         >
-                          {item.name}
+                          <Image src={item.image} alt={item.name} fill sizes="48px" className="object-cover" />
                         </Link>
-                      </h4>
-                      <p className="mt-1 text-[11px] text-[#2A2525] font-semibold">
-                        {item.quantity} x {formatVnd(item.price)}
-                      </p>
-                      <p className="mt-0.5 text-[10px] text-[#706565]">
-                        Size: {item.size}
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={(e) => removeItem(item.id, e)}
-                      className="text-[#706565]/50 hover:text-rose-600 transition-colors self-center p-1.5 cursor-pointer active:scale-90"
-                      title="Remove item"
-                    >
-                      <Trash2 size={13} />
-                    </button>
+                        <div className="min-w-0 flex-1">
+                          <Link
+                            href={`/products/${item.slug}`}
+                            onClick={close}
+                            className="line-clamp-1 font-[family-name:var(--font-playfair)] text-[13px] font-semibold transition-colors hover:text-[var(--primary-color)]"
+                          >
+                            {item.name}
+                          </Link>
+                          <p className="mt-0.5 truncate text-[10px] text-[var(--text-light)]">
+                            {[item.color, `${t('item.size')} ${item.size}`, item.measurements ? t('item.custom') : null]
+                              .filter(Boolean)
+                              .join(' · ')}
+                          </p>
+                          <p className="mt-1 text-[11px] text-[var(--text-main)]">
+                            {t('mini.quantityPrice', { quantity: item.quantity, price: formatVnd(item.price, locale) })}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => useCartStore.getState().removeItem(item.id)}
+                          aria-label={t('item.remove')}
+                          title={t('item.remove')}
+                          className="grid size-7 shrink-0 cursor-pointer place-items-center self-start text-[var(--text-light)]/60 opacity-0 transition-[opacity,color] hover:text-[var(--destructive)] focus-visible:opacity-100 group-hover:opacity-100"
+                        >
+                          <X size={13} />
+                        </button>
+                      </motion.li>
+                    ))}
+                  </AnimatePresence>
+                </ul>
+
+                <div className="border-t border-[var(--border)] bg-[var(--bg-main)] px-4 py-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[12px] text-[var(--text-light)]">{t('summary.subtotal')}</span>
+                    <span className="text-[15px] font-semibold text-[var(--primary-color)]">{formatVnd(subtotal, locale)}</span>
                   </div>
-                ))}
-              </div>
-
-              {/* Subtotal */}
-              <div className="pt-3 border-t border-[#E2D9D2]/40 flex items-center justify-between">
-                <span className="text-xs font-bold text-[#2A2525]">Subtotal</span>
-                <span className="text-sm font-extrabold text-[#800020]">{formatVnd(subtotal)}</span>
-              </div>
-
-              {/* Buttons */}
-              <div className="mt-4 flex flex-col gap-2">
-                <Link
-                  href="/cart"
-                  onClick={() => setIsOpen(false)}
-                  className="w-full h-9 flex items-center justify-center rounded-lg border border-[#E2D9D2] bg-white text-xs font-bold text-[#706565] hover:bg-[#FAF7F5] hover:text-[#800020] hover:border-[#800020]/30 transition-all duration-300 text-center cursor-pointer active:scale-95"
-                >
-                  View Cart
-                </Link>
-                <Link
-                  href="/checkout"
-                  onClick={() => setIsOpen(false)}
-                  className="w-full h-9 flex items-center justify-center rounded-lg bg-[#800020] text-xs font-bold text-white hover:bg-[#800020]/90 border border-[#800020] transition-all duration-300 text-center cursor-pointer active:scale-95"
-                >
-                  Checkout
-                </Link>
-              </div>
-            </>
-          )}
-        </DropdownMenuContent>
-      </DropdownMenu>
+                  <p className="mt-0.5 text-[10px] text-[var(--text-light)]">{t('mini.note')}</p>
+                  <div className="mt-3 grid grid-cols-2 gap-2">
+                    <Link
+                      href="/cart"
+                      onClick={close}
+                      className="flex min-h-9 items-center justify-center border border-[var(--text-main)]/20 bg-white text-[10px] font-semibold uppercase tracking-[1.5px] transition-colors hover:border-[var(--primary-color)] hover:text-[var(--primary-color)]"
+                    >
+                      {t('mini.viewCart')}
+                    </Link>
+                    <Link
+                      href="/checkout"
+                      onClick={close}
+                      className="flex min-h-9 items-center justify-center bg-[var(--primary-color)] text-[10px] font-semibold uppercase tracking-[1.5px] text-white transition-colors hover:bg-[#2A0A12]"
+                    >
+                      {t('mini.checkout')}
+                    </Link>
+                  </div>
+                </div>
+              </>
+            )}
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
     </div>
   );
 }

@@ -80,13 +80,14 @@
   "chart": {
     "title": "Phân tích Bộ sưu tập Áo Dài bán chạy",
     "subtitle": "Tỷ lệ đóng góp doanh thu theo từng dòng chất liệu.",
-    "overview": "Tổng quan"
+    "overview": "Tổng quan",
+    "empty": "Chưa có đơn hàng trong kỳ để phân tích."
   },
   "alerts": {
-    "title": "Cảnh báo Vận hành & Kho vải",
-    "subtitle": "Vật liệu và sản phẩm cần bổ sung khẩn cấp.",
+    "title": "Cảnh báo tồn kho",
+    "subtitle": "Các mã SKU sắp hết hàng cần bổ sung.",
     "tailoring": "Tiến độ May đo",
-    "lowStock": "Sản phẩm sắp hết hàng (< 5 SP)",
+    "lowStock": "Sắp hết hàng",
     "lowFabrics": "Vật liệu / Kho vải sắp hết",
     "needImport": "Cần nhập gấp",
     "tailorStep": {
@@ -95,7 +96,9 @@
       "sewing": "Khâu ráp",
       "embellishing": "Đính kết",
       "finishing": "Hoàn thiện & Ủi phẳng"
-    }
+    },
+    "stockLeft": "Còn lại",
+    "empty": "Không có sản phẩm nào sắp hết hàng."
   },
   "tailoring": {
     "title": "Theo dõi Tiến độ May đo (Bespoke Workflow)",
@@ -158,5 +161,48 @@
     "permissionUpdateSuccess": "Đã cập nhật phân quyền nhân viên!",
     "staffUnlocked": "Đã mở khóa tài khoản nhân viên!",
     "staffLocked": "Đã khóa tài khoản nhân viên!"
+  },
+  "eyebrow": "Tổng quan vận hành",
+  "noAccess": {
+    "title": "Bạn chưa được cấp quyền xem dữ liệu trên bảng điều khiển",
+    "description": "Liên hệ Super Admin để được cấp quyền (đơn hàng, may đo, tồn kho hoặc báo cáo)."
+  },
+  "staff": {
+    "eyebrow": "Nhân sự & Phân quyền",
+    "title": "Quản Lý Nhân Viên",
+    "description": "Tạo tài khoản nhân viên, bật/tắt từng quyền chi tiết và khóa / mở tài khoản.",
+    "refresh": "Làm mới",
+    "create": "Thêm nhân viên",
+    "creating": "Đang tạo...",
+    "cancel": "Hủy bỏ",
+    "loading": "Đang tải danh sách nhân sự...",
+    "empty": {
+      "title": "Chưa có tài khoản nhân viên nào",
+      "description": "Bấm \"Thêm nhân viên\" để tạo tài khoản Staff đầu tiên."
+    },
+    "columns": {
+      "staff": "Nhân viên",
+      "status": "Trạng thái"
+    },
+    "unnamed": "Chưa đặt tên",
+    "active": "Hoạt động",
+    "locked": "Đã khóa",
+    "permissions": {
+      "canManageOrders": "Đơn hàng & Khách hàng",
+      "canUpdateTailoring": "Xưởng may đo",
+      "canManageInventory": "Sản phẩm & Tồn kho",
+      "canViewReports": "Báo cáo doanh thu",
+      "canManageContent": "Nội dung & FAQ"
+    },
+    "createTitle": "Thêm nhân viên",
+    "createDescription": "Nhân viên đăng nhập tại trang quản trị bằng email và mật khẩu này.",
+    "createSuccess": "Đã tạo tài khoản nhân viên!",
+    "form": {
+      "name": "Họ và tên",
+      "phone": "Số điện thoại",
+      "email": "Email đăng nhập",
+      "password": "Mật khẩu (tối thiểu 6 ký tự)",
+      "permissions": "Quyền được cấp"
+    }
   }
 }

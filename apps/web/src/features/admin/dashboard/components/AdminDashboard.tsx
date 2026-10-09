@@ -2,10 +2,12 @@
 
 import React from "react";
 import { useTranslations } from "next-intl";
-import { Container } from "@/components/ui/container";
-import { Breadcrumbs } from "@/components/common/Breadcrumbs";
+import { LayoutDashboard } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
+import { ADMIN_ACTION_ACCESS, canAccess, useAdminSession } from "../../session";
+import { ADMIN_CARD_CLASS, AdminPage, AdminPageHeader, AdminSegmentedControl } from "../../ui";
+import { type FilterType } from "../types/dashboard.types";
 import { useAdminDashboard } from "../hooks/useAdminDashboard";
-import { DashboardHeader } from "./DashboardHeader";
 import { DashboardStatsGrid } from "./DashboardStatsGrid";
 import { DashboardDonutChart } from "./DashboardDonutChart";
 import { DashboardAlerts } from "./DashboardAlerts";
@@ -15,6 +17,14 @@ import { DashboardOrderDetailDrawer } from "./DashboardOrderDetailDrawer";
 
 export function AdminDashboard() {
   const t = useTranslations("AdminPage");
+  // Mỗi khối dashboard chỉ hiển thị khi người dùng có quyền tương ứng (ma trận ADMIN_ACTION_ACCESS)
+  const { user } = useAdminSession({ force: true });
+  const access = {
+    reports: canAccess(user, ADMIN_ACTION_ACCESS.viewReports),
+    inventory: canAccess(user, ADMIN_ACTION_ACCESS.manageInventory),
+    tailoring: canAccess(user, ADMIN_ACTION_ACCESS.updateTailoring),
+    orders: canAccess(user, ADMIN_ACTION_ACCESS.manageOrders),
+  };
   const {
     filter,
     setFilter,
@@ -28,27 +38,46 @@ export function AdminDashboard() {
     isUpdatingStatus,
     handleUpdateStatus,
     getStatusColor,
-  } = useAdminDashboard();
+    lowStockItems,
+    isLoadingLowStock,
+  } = useAdminDashboard(access);
 
   return (
-    <Container as="section" className="py-12 bg-[#FAFAFA] min-h-screen relative overflow-x-hidden text-[#09090B]">
-      <Breadcrumbs />
-
-      {/* Header & Filter Toggle */}
-      <DashboardHeader
+    <AdminPage>
+      <AdminPageHeader
+        icon={LayoutDashboard}
+        eyebrow={t("eyebrow")}
         title={t("title")}
-        subtitle={t("subtitle")}
-        filter={filter}
-        setFilter={setFilter}
-        isLoading={isLoadingStats}
-        filterLabels={{
-          today: t("filters.today"),
-          week: t("filters.week"),
-          month: t("filters.month"),
-        }}
+        description={t("subtitle")}
+        actions={
+          access.reports ? (
+            <>
+              {isLoadingStats && <Spinner className="size-4 text-[#71717A]" />}
+              <AdminSegmentedControl<FilterType>
+                value={filter}
+                onChange={setFilter}
+                disabled={isLoadingStats}
+                options={[
+                  { value: "today", label: t("filters.today") },
+                  { value: "week", label: t("filters.week") },
+                  { value: "month", label: t("filters.month") },
+                ]}
+              />
+            </>
+          ) : undefined
+        }
       />
 
-      {/* Stats Cards Section */}
+      {/* Người dùng chưa được cấp quyền nào trên dashboard */}
+      {!access.reports && !access.inventory && !access.tailoring && !access.orders && (
+        <div className={`${ADMIN_CARD_CLASS} p-10 text-center`}>
+          <p className="text-sm font-semibold text-[#09090B]">{t("noAccess.title")}</p>
+          <p className="mt-1 text-xs text-[#71717A]">{t("noAccess.description")}</p>
+        </div>
+      )}
+
+      {/* Số liệu kinh doanh — cần quyền xem báo cáo */}
+      {access.reports && (
       <DashboardStatsGrid
         stats={stats}
         isLoading={isLoadingStats}
@@ -61,24 +90,36 @@ export function AdminDashboard() {
         tComparedToBefore={t("stats.comparedToBefore")}
         tUrgentTailor={t("stats.urgentTailor")}
       />
+      )}
 
-      {/* Grid: Charts & In-depth Analytics + Warnings */}
-      <div className="grid gap-6 lg:grid-cols-3 mb-10 w-full max-w-full">
+      {/* Biểu đồ (báo cáo) + cảnh báo kho (tồn kho) */}
+      {(access.reports || access.inventory) && (
+      <div className="grid w-full max-w-full gap-6 lg:grid-cols-3">
+        {access.reports && (
         <DashboardDonutChart
           pieData={pieData}
           title={t("chart.title")}
           subtitle={t("chart.subtitle")}
           tOverview={t("chart.overview")}
+          tEmpty={t("chart.empty")}
         />
+        )}
+        {access.inventory && (
         <DashboardAlerts
+          items={lowStockItems}
+          isLoading={isLoadingLowStock}
           title={t("alerts.title")}
           subtitle={t("alerts.subtitle")}
-          tLowFabrics={t("alerts.lowFabrics")}
           tLowStock={t("alerts.lowStock")}
+          tStockLeft={t("alerts.stockLeft")}
+          tEmpty={t("alerts.empty")}
         />
+        )}
       </div>
+      )}
 
-      {/* Progress & Tailoring Job Monitor */}
+      {/* Theo dõi may đo — cần quyền cập nhật may đo */}
+      {access.tailoring && (
       <DashboardTailoringMonitor
         orders={orders}
         onSelectOrder={setSelectedOrder}
@@ -96,8 +137,11 @@ export function AdminDashboard() {
           finishing: t("alerts.tailorStep.finishing"),
         }}
       />
+      )}
 
-      {/* Latest Orders Area */}
+      {/* Đơn hàng mới & xử lý trạng thái — cần quyền quản lý đơn */}
+      {access.orders && (
+      <>
       <DashboardOrdersTable
         orders={orders}
         isLoading={isLoadingOrders}
@@ -156,6 +200,8 @@ export function AdminDashboard() {
           },
         }}
       />
-    </Container>
+      </>
+      )}
+    </AdminPage>
   );
 }

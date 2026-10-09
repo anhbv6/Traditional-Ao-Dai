@@ -1,27 +1,42 @@
 {
+  "eyebrow": "Your collection",
   "title": "My Wishlist",
-  "subtitle": "Save your favorite Ao Dai designs here to easily track, tailor, and purchase later.",
+  "subtitle": "Keep the Ao Dai designs you love here to revisit, tailor or purchase anytime.",
   "itemCount": "{count} designs",
+  "totalValue": "Total value",
+  "sort": {
+    "label": "Sort by",
+    "recent": "Recently added",
+    "priceAsc": "Price: low",
+    "priceDesc": "Price: high"
+  },
   "empty": {
-    "title": "Your wishlist is empty",
-    "description": "Explore our Ao Dai collections and add designs to your wishlist.",
-    "action": "Continue Shopping"
+    "title": "No designs saved yet",
+    "description": "Tap the heart icon on any product to save the Ao Dai designs you love here.",
+    "action": "Explore the collection"
   },
   "actions": {
-    "addAll": "Add All to Cart",
-    "clearAll": "Clear All",
-    "addToCart": "Add to Cart",
-    "customTailor": "Custom Tailor",
-    "remove": "Remove"
+    "addAll": "Add all to cart",
+    "clearAll": "Clear all",
+    "confirmClear": "Confirm clear",
+    "cancel": "Cancel",
+    "addToCart": "Add to cart",
+    "customTailor": "Custom tailor",
+    "remove": "Remove from wishlist",
+    "undo": "Undo",
+    "close": "Close"
   },
   "status": {
-    "inStock": "In Stock",
-    "custom": "Custom Tailoring",
-    "outOfStock": "Out of Stock"
+    "custom": "Tailored",
+    "sale": "Sale"
+  },
+  "undo": {
+    "removed": "Removed “{name}” from your wishlist"
   },
   "toast": {
-    "removed": "Removed from wishlist!",
-    "cleared": "Cleared all items from wishlist!",
-    "addedToCart": "Added to cart!"
+    "cleared": "Cleared all items from your wishlist!",
+    "addedToCart": "Added to cart!",
+    "addedAllToCart": "Added {count} items to cart!",
+    "nothingToAdd": "Tailored designs need measurements on the product page."
   }
 }

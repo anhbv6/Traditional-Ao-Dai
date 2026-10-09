@@ -5,9 +5,48 @@ import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
+import { cn } from '@/lib/utils';
+import { Reveal } from '@/components/shared/Reveal';
+import { SectionOrnament } from '@/components/shared/SectionOrnament';
 
 import { useNews } from '../hooks/useNews';
 import { categoryKeys, getAuthor } from '../types/news.types';
+
+/** Hiệu ứng ảnh dùng chung: phóng rất chậm khi rê chuột — đồng bộ với trang chủ / Câu chuyện */
+const IMAGE_HOVER = 'object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]';
+/** Khung viền mảnh hiện trong ảnh khi rê chuột */
+const HOVER_FRAME = 'pointer-events-none absolute inset-3 border border-white/0 transition-colors duration-700 group-hover:border-white/60';
+
+/** Dòng thông tin phụ: các mục cách nhau bằng hình thoi nhỏ (thay cho dấu "—") */
+function MetaLine({ items, className }: { items: string[]; className?: string }) {
+  return (
+    <p className={cn('flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] uppercase tracking-[1.8px]', className)}>
+      {items.map((item, i) => (
+        <React.Fragment key={i}>
+          {i > 0 ? <span aria-hidden="true" className="size-1 rotate-45 bg-[var(--accent-color)]" /> : null}
+          <span>{item}</span>
+        </React.Fragment>
+      ))}
+    </p>
+  );
+}
+
+/** Tiêu đề mỗi khối: chữ Playfair thường (không viết hoa đậm), vạch kẻ dưới, link "xem tất cả" gạch chân */
+function SectionTitle({ title, actionLabel, onAction }: { title: string; actionLabel: string; onAction: () => void }) {
+  return (
+    <div className="mb-8 flex items-end justify-between gap-4 border-b border-[var(--text-main)]/80 pb-3">
+      <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-semibold text-[var(--primary-color)] sm:text-[28px]">{title}</h2>
+      <button
+        type="button"
+        onClick={onAction}
+        className="group inline-flex shrink-0 cursor-pointer items-center gap-2 pb-1 text-[11px] font-semibold uppercase tracking-[2px] text-[var(--text-light)] transition-colors hover:text-[var(--primary-color)]"
+      >
+        {actionLabel}
+        <ArrowRight size={13} strokeWidth={1.6} className="transition-transform duration-300 group-hover:translate-x-1" />
+      </button>
+    </div>
+  );
+}
 
 export function NewsClient() {
   const t = useTranslations('NewsPage');
@@ -26,300 +65,198 @@ export function NewsClient() {
 
   return (
     <div>
-
-      {/* Top Banner / Title */}
-      <section className="mt-4 mb-8 text-center max-w-3xl mx-auto flex flex-col items-center">
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-[family-name:var(--font-playfair)] text-[var(--primary-color)] leading-tight">
+      {/* Đầu trang: cùng kiểu tiêu đề căn giữa + hoạ tiết hình thoi như trang chủ */}
+      <section className="mx-auto mb-10 mt-6 flex max-w-3xl flex-col items-center text-center">
+        <p className="text-[11px] font-semibold uppercase tracking-[3px] text-[var(--primary-color)]">{t('eyebrow')}</p>
+        <h1 className="mt-3 font-[family-name:var(--font-playfair)] text-[32px] font-semibold leading-tight text-[var(--primary-color)] sm:text-[44px]">
           {t('title')}
         </h1>
-        <p className="mt-3.5 text-sm sm:text-base leading-7 text-[var(--text-light)]">
-          {t('subtitle')}
-        </p>
+        <SectionOrnament className="mt-5" />
+        <p className="mt-5 text-sm leading-7 text-[var(--text-light)] sm:text-base">{t('subtitle')}</p>
       </section>
 
-      {/* Category Tabs */}
-      <section className="border-y border-[var(--border)] py-4 mb-10">
-        <div className="flex w-full items-center justify-start md:justify-center gap-6 md:gap-10 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden px-4 md:px-0">
+      {/* Tab danh mục: vạch đỏ đô chạy ra dưới mục đang chọn */}
+      <nav aria-label={t('eyebrow')} className="mb-12 border-y border-[var(--border)]">
+        <div className="flex w-full items-center justify-start gap-2 overflow-x-auto px-1 [scrollbar-width:none] md:justify-center md:gap-4 [&::-webkit-scrollbar]:hidden">
           {categoryKeys.map((key) => {
             const isActive = selectedCategory === key;
             return (
               <button
                 key={key}
                 type="button"
+                aria-pressed={isActive}
                 onClick={() => handleCategoryChange(key)}
-                className={`cursor-pointer whitespace-nowrap text-sm font-semibold transition-colors duration-300 font-[family-name:var(--font-lora)] ${
-                  isActive
-                    ? 'text-[var(--primary-color)] font-bold'
-                    : 'text-[var(--text-light)] hover:text-[var(--primary-color)]'
-                }`}
+                className={cn(
+                  'relative cursor-pointer whitespace-nowrap px-4 py-4 text-xs font-semibold uppercase tracking-[2px] transition-colors duration-300',
+                  isActive ? 'text-[var(--primary-color)]' : 'text-[var(--text-light)] hover:text-[var(--primary-color)]',
+                )}
               >
                 {t(`categories.${key}`)}
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    'absolute inset-x-4 -bottom-px h-0.5 origin-center bg-[var(--primary-color)] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]',
+                    isActive ? 'scale-x-100' : 'scale-x-0',
+                  )}
+                />
               </button>
             );
           })}
         </div>
-      </section>
+      </nav>
 
       {filteredArticles.length > 0 ? (
-        <>
-          {/* Hero Section (Article 0) */}
+        // key theo danh mục -> đổi tab thì các khối hiện dần lại
+        <div key={selectedCategory}>
+          {/* Bài nổi bật — nằm ở màn hình đầu (ảnh LCP) nên không dùng hiệu ứng hiện dần */}
           {heroArticle && (
-            <section className="mb-14">
-              {/* Large Cover Image */}
-              <Link
-                href={`/news/${heroArticle.slug}`}
-                className="group block overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-secondary)] relative aspect-[16/10] md:aspect-[21/9] w-full hover:border-[var(--accent-color)] transition-all duration-500 shadow-sm"
-              >
-                <Image
-                  src={heroArticle.imageSrc}
-                  alt={heroArticle.title[locale]}
-                  fill
-                  priority
-                  sizes="100vw"
-                  className="object-cover transition-transform duration-[1200ms] group-hover:scale-[1.02]"
-                />
+            <section className="mb-20">
+              <Link href={`/news/${heroArticle.slug}`} className="group block">
+                <div className="relative aspect-[16/10] w-full overflow-hidden bg-[var(--bg-secondary)] md:aspect-[21/9]">
+                  <Image
+                    src={heroArticle.imageSrc}
+                    alt={heroArticle.title[locale]}
+                    fill
+                    loading="eager"
+                    fetchPriority="high"
+                    sizes="100vw"
+                    className={IMAGE_HOVER}
+                  />
+                  <div aria-hidden="true" className={HOVER_FRAME} />
+                  <span className="absolute left-5 top-5 bg-white/95 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[2px] text-[var(--primary-color)]">
+                    {t('featured')}
+                  </span>
+                </div>
+
+                <div className="mt-6 grid gap-4 lg:grid-cols-[1fr_auto] lg:items-end lg:gap-12">
+                  <div>
+                    <MetaLine
+                      className="text-[var(--text-light)]"
+                      items={[heroArticle.category[locale], getAuthor(heroArticle.id), heroArticle.dateLong[locale], heroArticle.readTime[locale]]}
+                    />
+                    <h2 className="mt-3 max-w-4xl font-[family-name:var(--font-playfair)] text-2xl font-semibold leading-tight text-[var(--primary-color)] decoration-[var(--accent-color)] decoration-1 underline-offset-[6px] group-hover:underline sm:text-3xl lg:text-[40px]">
+                      {heroArticle.title[locale]}
+                    </h2>
+                  </div>
+                  <span className="inline-flex shrink-0 items-center gap-3 border-b border-[var(--primary-color)]/40 pb-1 text-xs font-semibold uppercase tracking-[2px] text-[var(--primary-color)] transition-colors group-hover:border-[var(--primary-color)]">
+                    {t('readArticle')}
+                    <ArrowRight size={15} strokeWidth={1.6} className="transition-transform duration-300 group-hover:translate-x-1" />
+                  </span>
+                </div>
               </Link>
-
-              {/* Meta details row */}
-              <div className="flex flex-wrap items-center justify-between gap-3 mt-4 text-xs font-[family-name:var(--font-lora)] text-[var(--text-light)]">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded-full border border-[var(--border)] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[var(--primary-color)]">
-                    {heroArticle.category[locale]}
-                  </span>
-                  <span className="rounded-full border border-[var(--border)] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[var(--text-light)]">
-                    {getAuthor(heroArticle.id)}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2 font-semibold">
-                  <span>{heroArticle.dateLong[locale]}</span>
-                  <span>—</span>
-                  <span>{heroArticle.readTime[locale]}</span>
-                </div>
-              </div>
-
-              {/* Title & Link */}
-              <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mt-3">
-                <h2 className="font-[family-name:var(--font-playfair)] text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-[var(--primary-color)] leading-tight max-w-4xl hover:text-[var(--accent-color)] transition-colors duration-300">
-                  <Link href={`/news/${heroArticle.slug}`}>{heroArticle.title[locale]}</Link>
-                </h2>
-                <Link
-                  href={`/news/${heroArticle.slug}`}
-                  className="inline-flex items-center gap-1.5 font-semibold text-sm text-[var(--primary-color)] hover:text-[var(--accent-color)] transition-colors whitespace-nowrap group shrink-0 mt-1 md:mt-2"
-                >
-                  {t('readArticle')}
-                  <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
-                </Link>
-              </div>
             </section>
           )}
 
-          {/* Section 2: Latest News (Article 1, 2, 3) */}
+          {/* Tin mới nhất: 1 thẻ lớn chữ đè ảnh + 2 thẻ ngang */}
           {latestNewsArticles.length > 0 && (
-            <section className="mb-14">
-              {/* Section Heading */}
-              <div className="flex items-end justify-between border-b border-[var(--border)] pb-2 mb-6">
-                <h2 className="font-[family-name:var(--font-playfair)] text-lg sm:text-xl md:text-2xl font-bold uppercase tracking-wider text-[var(--primary-color)]">
-                  {t('sections.latestNews')}
-                </h2>
-                <button
-                  type="button"
-                  onClick={() => handleCategoryChange('all')}
-                  className="text-xs font-bold text-[var(--text-light)] hover:text-[var(--primary-color)] transition-colors uppercase inline-flex items-center gap-1 cursor-pointer"
-                >
-                  {t('viewAll')}
-                  <ArrowRight size={12} />
-                </button>
-              </div>
+            <Reveal className="mb-20">
+              <SectionTitle title={t('sections.latestNews')} actionLabel={t('viewAll')} onAction={() => handleCategoryChange('all')} />
 
-              {/* Grid content */}
-              <div className="grid gap-8 lg:grid-cols-2">
-                {/* Left Card: 1 Large overlay text card */}
+              <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
                 {leftLatestArticle && (
                   <Link
                     href={`/news/${leftLatestArticle.slug}`}
-                    className="group relative flex flex-col justify-end overflow-hidden rounded-xl border border-[var(--border)] min-h-[350px] sm:min-h-[400px] hover:border-[var(--accent-color)] transition-all duration-500 shadow-sm"
+                    className="group relative flex min-h-[360px] flex-col justify-end overflow-hidden sm:min-h-[420px]"
                   >
                     <Image
                       src={leftLatestArticle.imageSrc}
                       alt={leftLatestArticle.title[locale]}
                       fill
-                      sizes="(max-width: 1024px) 100vw, 600px"
-                      className="object-cover transition-transform duration-[1000ms] group-hover:scale-[1.03]"
+                      sizes="(max-width: 1024px) 100vw, 640px"
+                      className={IMAGE_HOVER}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/35 to-transparent z-10" />
-
-                    <div className="relative z-20 p-5 sm:p-8 max-w-full">
-                      <h3 className="font-[family-name:var(--font-playfair)] text-lg sm:text-xl lg:text-2xl font-bold text-white leading-snug">
+                    <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#2A0A12]/90 via-[#2A0A12]/30 to-transparent" />
+                    <div aria-hidden="true" className={HOVER_FRAME} />
+                    <div className="relative p-6 sm:p-8">
+                      <MetaLine className="text-white/75" items={[leftLatestArticle.category[locale], leftLatestArticle.dateLong[locale]]} />
+                      <h3 className="mt-3 font-[family-name:var(--font-playfair)] text-xl font-semibold leading-snug text-white sm:text-2xl">
                         {leftLatestArticle.title[locale]}
                       </h3>
-                      <div className="mt-2.5 flex items-center gap-2 text-xs font-semibold text-white/80 font-[family-name:var(--font-lora)]">
-                        <span>{leftLatestArticle.category[locale]}</span>
-                        <span>—</span>
-                        <span>{leftLatestArticle.dateLong[locale]}</span>
-                      </div>
                     </div>
                   </Link>
                 )}
 
-                {/* Right Stack: 2 vertical row cards */}
-                <div className="flex flex-col gap-6 justify-between">
+                <div className="flex flex-col divide-y divide-[var(--border)] border-y border-[var(--border)]">
                   {rightLatestArticles.map((article) => (
-                    <Link
-                      key={article.id}
-                      href={`/news/${article.slug}`}
-                      className="group flex flex-row gap-4 rounded-xl border border-[var(--border)] bg-[var(--bg-main)] p-4 hover:border-[var(--accent-color)] transition-all duration-300 flex-1 min-h-[150px] items-center"
-                    >
-                      {/* Left Text */}
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-[family-name:var(--font-playfair)] text-sm sm:text-base md:text-lg font-bold text-[var(--primary-color)] leading-snug line-clamp-2 transition-colors duration-300 group-hover:text-[var(--accent-color)]">
+                    <Link key={article.id} href={`/news/${article.slug}`} className="group flex flex-1 items-center gap-5 py-6">
+                      <div className="min-w-0 flex-1">
+                        <MetaLine className="text-[var(--accent-color)]" items={[article.category[locale], article.dateShort[locale]]} />
+                        <h3 className="mt-2 line-clamp-2 font-[family-name:var(--font-playfair)] text-lg font-semibold leading-snug text-[var(--primary-color)] decoration-[var(--accent-color)] decoration-1 underline-offset-4 group-hover:underline">
                           {article.title[locale]}
                         </h3>
-                        <div className="mt-2 flex items-center gap-2 text-xs text-[var(--text-light)] font-[family-name:var(--font-lora)]">
-                          <span className="font-semibold text-[var(--accent-color)]">{article.category[locale]}</span>
-                          <span>—</span>
-                          <span>{article.dateShort[locale]}</span>
-                        </div>
+                        <p className="mt-2 line-clamp-2 text-sm leading-6 text-[var(--text-light)]">{article.description[locale]}</p>
                       </div>
-
-                      {/* Right Image */}
-                      <div className="relative w-20 sm:w-36 aspect-[4/3] rounded-lg overflow-hidden shrink-0 bg-[var(--bg-secondary)] border border-[var(--border)]">
-                        <Image
-                          src={article.imageSrc}
-                          alt={article.title[locale]}
-                          fill
-                          sizes="(max-width: 640px) 100px, 150px"
-                          className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                        />
+                      <div className="relative aspect-[4/5] w-24 shrink-0 overflow-hidden bg-[var(--bg-secondary)] sm:w-32">
+                        <Image src={article.imageSrc} alt={article.title[locale]} fill sizes="130px" className={IMAGE_HOVER} />
                       </div>
                     </Link>
                   ))}
 
-                  {/* Empty state if rightLatestArticles is empty */}
                   {rightLatestArticles.length === 0 && (
-                    <div className="flex-1 flex items-center justify-center border border-dashed border-[var(--border)] rounded-xl p-8 bg-[var(--bg-secondary)]/10">
-                      <span className="text-xs text-[var(--text-light)] font-medium">
-                        {t('noArticles')}
-                      </span>
+                    <div className="flex flex-1 items-center justify-center p-8">
+                      <span className="text-sm text-[var(--text-light)]">{t('noArticles')}</span>
                     </div>
                   )}
                 </div>
               </div>
-            </section>
+            </Reveal>
           )}
 
-          {/* Section 3: Technology News (Trends / Articles 4, 5, 6, 7) */}
+          {/* Xu hướng & phong cách: lưới 4 cột ảnh dọc */}
           {trendsArticles.length > 0 && (
-            <section className="mb-14">
-              {/* Section Heading */}
-              <div className="flex items-end justify-between border-b border-[var(--border)] pb-2 mb-6">
-                <h2 className="font-[family-name:var(--font-playfair)] text-lg sm:text-xl md:text-2xl font-bold uppercase tracking-wider text-[var(--primary-color)]">
-                  {t('sections.trendsStyle')}
-                </h2>
-                <button
-                  type="button"
-                  onClick={() => handleCategoryChange('trends')}
-                  className="text-xs font-bold text-[var(--text-light)] hover:text-[var(--primary-color)] transition-colors uppercase inline-flex items-center gap-1 cursor-pointer"
-                >
-                  {t('viewAll')}
-                  <ArrowRight size={12} />
-                </button>
-              </div>
+            <Reveal className="mb-20">
+              <SectionTitle title={t('sections.trendsStyle')} actionLabel={t('viewAll')} onAction={() => handleCategoryChange('trends')} />
 
-              {/* Grid Layout (4 column cards) */}
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 lg:grid-cols-4 lg:gap-x-8">
                 {trendsArticles.map((article) => (
-                  <Link
-                    key={article.id}
-                    href={`/news/${article.slug}`}
-                    className="group block"
-                  >
-                    <div className="relative aspect-[4/3] rounded-lg overflow-hidden bg-[var(--bg-secondary)] border border-[var(--border)] group-hover:border-[var(--accent-color)] transition-all duration-300">
+                  <Link key={article.id} href={`/news/${article.slug}`} className="group block">
+                    <div className="relative aspect-[3/4] overflow-hidden bg-[var(--bg-secondary)]">
                       <Image
                         src={article.imageSrc}
                         alt={article.title[locale]}
                         fill
-                        sizes="(max-width: 640px) 100vw, 300px"
-                        className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                        sizes="(max-width: 1024px) 50vw, 320px"
+                        className={IMAGE_HOVER}
                       />
+                      <div aria-hidden="true" className={HOVER_FRAME} />
                     </div>
-                    <div className="mt-2.5 flex items-center gap-2 text-[10px] sm:text-xs font-[family-name:var(--font-lora)] text-[var(--text-light)]/80">
-                      <span>{getAuthor(article.id)}</span>
-                      <span>—</span>
-                      <span>{article.dateShort[locale]}</span>
-                    </div>
-                    <h3 className="mt-1 font-[family-name:var(--font-playfair)] text-sm sm:text-base font-bold text-[var(--primary-color)] leading-snug line-clamp-2 transition-colors duration-300 group-hover:text-[var(--accent-color)]">
+                    <MetaLine className="mt-4 text-[var(--text-light)]" items={[getAuthor(article.id), article.dateShort[locale]]} />
+                    <h3 className="mt-2 line-clamp-2 font-[family-name:var(--font-playfair)] text-base font-semibold leading-snug text-[var(--primary-color)] decoration-[var(--accent-color)] decoration-1 underline-offset-4 group-hover:underline sm:text-lg">
                       {article.title[locale]}
                     </h3>
                   </Link>
                 ))}
               </div>
-            </section>
+            </Reveal>
           )}
 
-          {/* Section 4: Guides & Podcasts (Articles 8 to 13) */}
+          {/* Cẩm nang & đời sống: danh sách gọn, ảnh vuông nhỏ */}
           {guidesArticles.length > 0 && (
-            <section className="mb-14">
-              {/* Section Heading */}
-              <div className="flex items-end justify-between border-b border-[var(--border)] pb-2 mb-6">
-                <h2 className="font-[family-name:var(--font-playfair)] text-lg sm:text-xl md:text-2xl font-bold uppercase tracking-wider text-[var(--primary-color)]">
-                  {t('sections.guidesLife')}
-                </h2>
-                <button
-                  type="button"
-                  onClick={() => handleCategoryChange('guide')}
-                  className="text-xs font-bold text-[var(--text-light)] hover:text-[var(--primary-color)] transition-colors uppercase inline-flex items-center gap-1 cursor-pointer"
-                >
-                  {t('viewAll')}
-                  <ArrowRight size={12} />
-                </button>
-              </div>
+            <Reveal className="mb-16">
+              <SectionTitle title={t('sections.guidesLife')} actionLabel={t('viewAll')} onAction={() => handleCategoryChange('guide')} />
 
-              {/* Grid layout (3 column horizontal cards) */}
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-x-8 md:grid-cols-2 lg:grid-cols-3">
                 {guidesArticles.map((article) => (
-                  <Link
-                    key={article.id}
-                    href={`/news/${article.slug}`}
-                    className="group flex gap-4 items-start p-4 border border-[var(--border)] bg-[var(--bg-main)] rounded-lg hover:border-[var(--accent-color)] hover:shadow-xs transition-all duration-300 h-full"
-                  >
-                    {/* Left Square Image */}
-                    <div className="relative w-20 sm:w-24 aspect-square rounded-md overflow-hidden shrink-0 bg-[var(--bg-secondary)] border border-[var(--border)]">
-                      <Image
-                        src={article.imageSrc}
-                        alt={article.title[locale]}
-                        fill
-                        sizes="100px"
-                        className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                      />
+                  <Link key={article.id} href={`/news/${article.slug}`} className="group flex items-start gap-4 border-b border-[var(--border)] py-6">
+                    <div className="relative aspect-square w-20 shrink-0 overflow-hidden bg-[var(--bg-secondary)] sm:w-24">
+                      <Image src={article.imageSrc} alt={article.title[locale]} fill sizes="100px" className={IMAGE_HOVER} />
                     </div>
-
-                    {/* Right Content */}
-                    <div className="flex-1 min-w-0 flex flex-col justify-between h-full">
-                      <div>
-                        <h3 className="font-[family-name:var(--font-playfair)] text-sm sm:text-base font-bold text-[var(--primary-color)] line-clamp-1 group-hover:text-[var(--accent-color)] transition-colors duration-300">
-                          {article.title[locale]}
-                        </h3>
-                        <p className="mt-1 font-[family-name:var(--font-lora)] text-[11px] sm:text-xs text-[var(--text-light)] line-clamp-2 leading-relaxed">
-                          {article.description[locale]}
-                        </p>
-                      </div>
-                      <div className="mt-2.5 flex items-center gap-2 text-[10px] sm:text-xs text-[var(--text-light)]/80 font-[family-name:var(--font-lora)]">
-                        <span className="font-semibold">{article.readTime[locale]}</span>
-                        <span>—</span>
-                        <span>{getAuthor(article.id)}</span>
-                      </div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="line-clamp-2 font-[family-name:var(--font-playfair)] text-base font-semibold leading-snug text-[var(--primary-color)] decoration-[var(--accent-color)] decoration-1 underline-offset-4 group-hover:underline">
+                        {article.title[locale]}
+                      </h3>
+                      <p className="mt-1.5 line-clamp-2 text-xs leading-5 text-[var(--text-light)] sm:text-sm sm:leading-6">{article.description[locale]}</p>
+                      <MetaLine className="mt-2 text-[var(--text-light)]" items={[article.readTime[locale], getAuthor(article.id)]} />
                     </div>
                   </Link>
                 ))}
               </div>
-            </section>
+            </Reveal>
           )}
-        </>
+        </div>
       ) : (
-        <div className="text-center py-16 border border-dashed border-[var(--border)] rounded-2xl bg-[var(--bg-secondary)]/10 mb-14">
-          <p className="text-sm text-[var(--text-light)] font-medium">
-            {t('noArticles')}
-          </p>
+        <div className="mb-16 border border-[var(--border)] bg-white py-16 text-center">
+          <p className="text-sm text-[var(--text-light)]">{t('noArticles')}</p>
         </div>
       )}
     </div>

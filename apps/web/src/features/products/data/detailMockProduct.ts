@@ -245,7 +245,7 @@ export const mockDetailProducts: Record<string, MockDetailProduct['data']> = {
         id: "addon_man_01",
         name: "Mấn Đội Đầu Lụa Xoắn Thủ Công",
         price: 150000,
-        thumbnail: "https://images.unsplash.com/photo-1549064482-6779ba3292fe?q=80&w=900&auto=format&fit=crop"
+        thumbnail: "/login_banner.jpg"
       }
     ],
     related_products: [
@@ -318,7 +318,7 @@ export const mockDetailProducts: Record<string, MockDetailProduct['data']> = {
         id: "addon_man_02",
         name: "Mấn Gấm Dệt Kim Tuyến Vàng",
         price: 180000,
-        thumbnail: "https://images.unsplash.com/photo-1549064482-6779ba3292fe?q=80&w=900&auto=format&fit=crop"
+        thumbnail: "/login_banner.jpg"
       }
     ],
     related_products: [
@@ -384,7 +384,7 @@ export const mockDetailProducts: Record<string, MockDetailProduct['data']> = {
         id: "addon_man_03",
         name: "Mấn Cô Dâu Thêu Hoa Phượng",
         price: 250000,
-        thumbnail: "https://images.unsplash.com/photo-1549064482-6779ba3292fe?q=80&w=900&auto=format&fit=crop"
+        thumbnail: "/login_banner.jpg"
       }
     ],
     related_products: [

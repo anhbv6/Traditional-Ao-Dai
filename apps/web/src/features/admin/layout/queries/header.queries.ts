@@ -10,6 +10,7 @@ import {
   FileText,
 } from "lucide-react";
 import { type AdminNavItem } from "../types/header.types";
+import { ADMIN_MODULE_ACCESS, canAccess, type AdminAccessSubject } from "../../session/permissions";
 
 export const ADMIN_NAV_CONFIG: Omit<AdminNavItem, "active">[] = [
   {
@@ -17,88 +18,73 @@ export const ADMIN_NAV_CONFIG: Omit<AdminNavItem, "active">[] = [
     label: "Tổng quan",
     href: "/admin/dashboard",
     icon: LayoutDashboard,
-    adminOnly: false,
   },
   {
     key: "orders",
     label: "Đơn hàng",
     href: "/admin/orders",
     icon: ShoppingBag,
-    adminOnly: false,
   },
   {
     key: "tailoring",
     label: "Xưởng may đo",
     href: "/admin/tailoring",
     icon: Scissors,
-    adminOnly: false,
   },
   {
     key: "products",
     label: "Sản phẩm",
     href: "/admin/products",
     icon: Shirt,
-    adminOnly: false,
   },
   {
     key: "inventory",
     label: "Tồn kho",
     href: "/admin/inventory",
     icon: Boxes,
-    adminOnly: false,
   },
   {
     key: "customers",
     label: "Khách hàng",
     href: "/admin/customers",
     icon: Users,
-    adminOnly: false,
   },
   {
     key: "approvals",
     label: "Phê duyệt",
     href: "/admin/approvals",
     icon: UserCheck,
-    adminOnly: false,
   },
   {
     key: "staff",
     label: "Nhân sự",
     href: "/admin/staff",
     icon: Users,
-    adminOnly: true,
   },
   {
     key: "vouchers",
     label: "Voucher",
     href: "/admin/vouchers",
     icon: Ticket,
-    adminOnly: true,
   },
   {
     key: "cms",
     label: "Nội dung & FAQ",
     href: "/admin/cms",
     icon: FileText,
-    adminOnly: false,
   },
 ];
 
 /**
- * Lấy danh sách menu quản trị viên, tự động lọc theo quyền Super Admin,
- * gán trạng thái active và dịch nhãn qua i18n nếu có hàm tNav.
+ * Lấy danh sách menu quản trị: lọc theo ma trận quyền (ADMIN_MODULE_ACCESS), gán active và dịch nhãn.
+ * Menu chỉ hiển thị module mà người dùng thực sự vào được — trùng khớp với requireAdminPage ở server.
  */
 export function getAdminNavLinks(
   pathname: string | null,
-  isSuperAdmin: boolean,
+  user: AdminAccessSubject | null,
   tNav?: (key: string) => string
 ): AdminNavItem[] {
-  return ADMIN_NAV_CONFIG.filter((item) => {
-    if (item.adminOnly && !isSuperAdmin) {
-      return false;
-    }
-    return true;
-  }).map((item) => ({
+  return ADMIN_NAV_CONFIG.filter((item) => canAccess(user, ADMIN_MODULE_ACCESS[item.key])).map((item) => ({
     ...item,
     label: tNav ? tNav(item.key) : item.label,
     active: pathname ? pathname.includes(item.href) : false,

@@ -1,37 +1,44 @@
-"use client";
-
-import { type LucideIcon } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 
 interface ContactInfoItemProps {
-  icon: LucideIcon;
   label: string;
   value: string;
+  note?: string;
   href?: string;
+  /** Liên kết ra ngoài (Zalo, bản đồ) mở tab mới */
+  external?: boolean;
 }
 
-export function ContactInfoItem({
-  icon: Icon,
-  label,
-  value,
-  href,
-}: ContactInfoItemProps) {
-  const content = (
-    <div className="group flex gap-3 sm:gap-4 border-b border-[var(--border)] py-4 sm:py-5 last:border-b-0">
-      <span className="grid size-10 sm:size-11 shrink-0 place-items-center rounded-md bg-[var(--bg-secondary)] text-[var(--primary-color)] transition-colors group-hover:bg-[var(--primary-color)] group-hover:text-white">
-        <Icon className="size-[17px] sm:size-[19px]" />
-      </span>
-      <span className="min-w-0">
-        <span className="block text-[10px] sm:text-xs font-semibold uppercase text-[var(--text-light)]">{label}</span>
-        <span className="mt-1 block text-sm sm:text-base font-semibold leading-7 text-[var(--text-main)]">{value}</span>
-      </span>
-    </div>
-  );
-
-  if (!href) return content;
+/**
+ * Một kênh liên hệ trong dải thông tin đầu trang: nhãn nhỏ — giá trị chữ lớn — ghi chú.
+ * Không dùng ô icon: giá trị là thứ khách cần đọc nên được làm nổi bật bằng chữ.
+ */
+export function ContactInfoItem({ label, value, note, href, external }: ContactInfoItemProps) {
+  const valueClass =
+    'mt-3 block font-[family-name:var(--font-playfair)] text-[22px] font-semibold leading-snug text-[var(--text-main)] sm:text-[26px]';
 
   return (
-    <a href={href} className="block">
-      {content}
-    </a>
+    <div className="py-6 sm:px-8 sm:first:pl-0 sm:last:pr-0">
+      <dt className="text-[11px] font-semibold uppercase tracking-[3px] text-[var(--text-light)]">{label}</dt>
+      <dd>
+        {href ? (
+          <a
+            href={href}
+            {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+            className={`group inline-flex items-center gap-2 transition-colors hover:text-[var(--primary-color)] ${valueClass}`}
+          >
+            {value}
+            <ArrowUpRight
+              size={18}
+              strokeWidth={1.4}
+              className="text-[var(--accent-color)] transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+            />
+          </a>
+        ) : (
+          <span className={valueClass}>{value}</span>
+        )}
+        {note ? <span className="mt-2 block text-sm leading-6 text-[var(--text-light)]">{note}</span> : null}
+      </dd>
+    </div>
   );
 }

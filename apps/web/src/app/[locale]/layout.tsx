@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Dancing_Script, Lora, Playfair_Display } from "next/font/google";
+import { Dancing_Script, Inter, Lora, Playfair_Display } from "next/font/google";
 import "../globals.css";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
@@ -34,6 +34,16 @@ const dancingScript = Dancing_Script({
   fallback: ["cursive"],
 });
 
+// Font của khu vực admin (xem .admin-shell). Inter thay Geist vì Geist không có bộ ký tự tiếng Việt
+// (dấu ạ, ả, ấ... bị lấy từ font dự phòng -> chữ lẫn 2 font). preload: false để storefront không tải font này.
+const adminSans = Inter({
+  subsets: ["latin", "vietnamese"],
+  variable: "--font-admin",
+  display: "swap",
+  preload: false,
+  fallback: ["system-ui", "-apple-system", "sans-serif"],
+});
+
 export const metadata: Metadata = {
   title: "Traditional Ao Dai",
   description: "Ao Dai Viet Nam Shop",
@@ -63,7 +73,7 @@ export default async function LocaleLayout({
   return (
     <html
       lang={locale}
-      className={`${lora.variable} ${playfair.variable} ${dancingScript.variable} h-full antialiased`}
+      className={`${lora.variable} ${playfair.variable} ${dancingScript.variable} ${adminSans.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>

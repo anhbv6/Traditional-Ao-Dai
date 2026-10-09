@@ -1,11 +1,16 @@
+import { AdminStaffManagement } from "@/features/admin";
+import { requireAdminPage } from "@/features/admin/server/adminAuth.server";
+import { ADMIN_MODULE_ACCESS } from "@/features/admin/session/permissions";
+import { AdminPage } from "@/features/admin/ui";
+
 export const dynamic = "force-dynamic";
 
-import { AdminStaffManagement } from "@/features/admin";
+export default async function AdminStaffPage() {
+  await requireAdminPage(ADMIN_MODULE_ACCESS.staff);
 
-export default function AdminStaffPage() {
   return (
-    <div className="mx-auto max-w-[1440px] w-full px-5 sm:px-8 lg:px-12 py-8">
+    <AdminPage>
       <AdminStaffManagement />
-    </div>
+    </AdminPage>
   );
 }

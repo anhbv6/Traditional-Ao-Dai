@@ -1,89 +1,81 @@
+"use client";
+
 import React from "react";
-import { formatVnd } from "@repo/shared";
+import { ArrowRight, Info } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { formatVnd, type Locale } from "@repo/shared";
 import { Link } from "@/i18n/routing";
-import { type ActiveDiscount } from "../types/cart.types";
+import { type ActiveDiscount, type CartTotals } from "../types/cart.types";
 
 interface CartSummaryProps {
-  subtotal: number;
+  totals: CartTotals;
   activeDiscount: ActiveDiscount | null;
-  discountAmount: number;
-  shippingCost: number;
-  shippingThreshold: number;
-  total: number;
+  locale: Locale;
+  hasCustomItems: boolean;
+  /** Khối mã giảm giá đặt trong thẻ tóm tắt */
+  promoSlot?: React.ReactNode;
 }
 
-export function CartSummary({
-  subtotal,
-  activeDiscount,
-  discountAmount,
-  shippingCost,
-  shippingThreshold,
-  total,
-}: CartSummaryProps) {
+/** Tóm tắt đơn hàng: tạm tính → giảm giá → vận chuyển → tổng; nút thanh toán có nền quét khi rê chuột */
+export function CartSummary({ totals, activeDiscount, locale, hasCustomItems, promoSlot }: CartSummaryProps) {
+  const t = useTranslations("CartPage");
+  const { subtotal, discountAmount, shippingCost, total } = totals;
+
   return (
-    <div className="rounded-2xl border border-[#800020]/10 bg-[#FAF7F5] p-5 shadow-xs">
-      <h3 className="font-[family-name:var(--font-playfair)] text-lg font-bold text-[#800020] border-b border-[#E2D9D2]/60 pb-3">
-        Tóm tắt đơn hàng
-      </h3>
+    <div className="border border-[var(--border)] bg-white p-4 sm:p-5">
+      <h2 className="text-base font-semibold text-[var(--text-main)] sm:text-lg">{t("summary.title")}</h2>
 
-      <div className="mt-4 space-y-3 text-xs text-[#706565]">
+      {promoSlot ? <div className="mt-4 border-t border-[var(--border)] pt-4">{promoSlot}</div> : null}
+
+      <dl className="mt-4 space-y-2.5 border-t border-[var(--border)] pt-4 text-[13px]">
         <div className="flex items-center justify-between">
-          <span>Tạm tính</span>
-          <span className="font-semibold text-[#2A2525]">{formatVnd(subtotal)}</span>
+          <dt className="text-[var(--text-light)]">{t("summary.subtotal")}</dt>
+          <dd className="text-[var(--text-main)]">{formatVnd(subtotal, locale)}</dd>
         </div>
-
-        {activeDiscount && (
-          <div className="flex items-center justify-between text-emerald-600 font-medium">
-            <span>Mã giảm giá ({activeDiscount.code})</span>
-            {activeDiscount.type === "percentage" ? (
-              <span>-{formatVnd(discountAmount)}</span>
-            ) : (
-              <span>Freeship</span>
-            )}
+        {activeDiscount?.type === "percentage" ? (
+          <div className="flex items-center justify-between text-emerald-800">
+            <dt>
+              {t("summary.discount")} <span className="text-[11px] tracking-[1px]">({activeDiscount.code})</span>
+            </dt>
+            <dd>−{formatVnd(discountAmount, locale)}</dd>
           </div>
-        )}
-
+        ) : null}
         <div className="flex items-center justify-between">
-          <span>Phí vận chuyển</span>
-          {shippingCost === 0 ? (
-            <span className="text-emerald-600 font-semibold">Miễn phí</span>
-          ) : (
-            <span className="font-semibold text-[#2A2525]">{formatVnd(shippingCost)}</span>
-          )}
+          <dt className="text-[var(--text-light)]">{t("summary.shipping")}</dt>
+          <dd className={shippingCost === 0 ? "text-emerald-800" : "text-[var(--text-main)]"}>
+            {shippingCost === 0 ? t("summary.free") : formatVnd(shippingCost, locale)}
+          </dd>
         </div>
+      </dl>
 
-
-        <div className="border-t border-[#E2D9D2]/60 pt-3 flex items-end justify-between">
-          <span className="text-sm font-bold text-[#2A2525]">
-            Tổng cộng <span className="block text-[10px] font-normal text-[#706565]">(Đã bao gồm VAT)</span>
-          </span>
-          <span className="text-lg font-extrabold text-[#800020]">{formatVnd(total)}</span>
+      <div className="mt-4 flex items-end justify-between border-t border-[var(--border)] pt-4">
+        <div>
+          <p className="text-[13px] font-semibold text-[var(--text-main)]">{t("summary.total")}</p>
+          <p className="text-[10px] text-[var(--text-light)]">{t("summary.vatNote")}</p>
         </div>
+        <p className="text-lg font-semibold text-[var(--primary-color)] sm:text-xl">{formatVnd(total, locale)}</p>
       </div>
 
-      {/* Free shipping progress indicator */}
-      {shippingCost > 0 && (
-        <div className="mt-4 p-3 bg-white border border-[#E2D9D2]/30 rounded-lg text-[10px] text-[#706565]">
-          <p>
-            Mua thêm <span className="font-bold text-[#800020]">{formatVnd(shippingThreshold - subtotal)}</span> để được <strong>Miễn phí vận chuyển</strong>!
-          </p>
-          <div className="mt-2 w-full h-1.5 bg-[#FAF7F5] rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-[#800020] transition-all duration-500" 
-              style={{ width: `${Math.min(100, (subtotal / shippingThreshold) * 100)}%` }}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Checkout Button */}
       <Link
         href="/checkout"
-        className="mt-6 flex min-h-11 items-center justify-center rounded-lg bg-[#800020] text-xs font-semibold uppercase tracking-wider text-white transition-all hover:bg-[#800020]/90 cursor-pointer text-center active:scale-95 duration-200"
+        className="group/btn relative mt-5 flex min-h-11 items-center justify-center overflow-hidden bg-[var(--primary-color)] text-[11px] font-semibold uppercase tracking-[2px] text-white"
       >
-        Tiến Hành Thanh Toán
+        <span
+          aria-hidden="true"
+          className="absolute inset-0 origin-left scale-x-0 bg-[#2A0A12] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/btn:scale-x-100"
+        />
+        <span className="relative flex items-center gap-2">
+          {t("summary.checkout")}
+          <ArrowRight size={14} className="transition-transform duration-300 group-hover/btn:translate-x-1" />
+        </span>
       </Link>
+
+      {hasCustomItems ? (
+        <p className="mt-3 flex gap-2 text-[11px] leading-5 text-[var(--text-light)]">
+          <Info size={13} strokeWidth={1.6} className="mt-0.5 shrink-0 text-[var(--primary-color)]" />
+          {t("summary.customNote")}
+        </p>
+      ) : null}
     </div>
   );
 }
-export default CartSummary;

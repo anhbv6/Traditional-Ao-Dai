@@ -2,6 +2,7 @@ import React from 'react';
 import { notFound } from 'next/navigation';
 import { ProductDetailClient } from './ProductDetailClient';
 import { type DisplayProduct, type RelatedProductItem } from '../types/products.types';
+import { parseVndString } from '@/features/cart';
 import { productCatalog } from '../data/mockProducts';
 import { mockDetailProducts } from '../data/detailMockProduct';
 import { type MeasurementField } from '../data/detailMockProduct';
@@ -24,12 +25,29 @@ export function ProductDetail({ slug, locale }: ProductDetailProps) {
     customMeasurementFields = mock.custom_measurement_fields;
 
     const baseVariant = mock.variants[0];
+    // Giá theo size: lấy biến thể có hình thức mua cơ bản (giá không phụ thuộc màu)
+    const basePurchaseType = mock.options.find(o => o.code === 'purchase_type')?.values[0]?.id;
+    const sizePrices = Object.fromEntries(
+      (mock.options.find(o => o.code === 'size')?.values ?? []).map(sizeValue => {
+        const variant = mock.variants.find(
+          v => v.options_combination.size === sizeValue.id && v.options_combination.purchase_type === basePurchaseType
+        );
+        return [
+          sizeValue.label,
+          { price: variant?.price ?? baseVariant.price, originalPrice: variant?.compare_at_price ?? undefined },
+        ];
+      })
+    );
 
     displayProduct = {
       id: mock.id,
+      slug: mock.slug,
       name: mock.name,
       description: mock.short_description,
       price: baseVariant.price.toLocaleString('vi-VN') + 'đ',
+      priceValue: baseVariant.price,
+      originalPriceValue: baseVariant.compare_at_price || undefined,
+      sizePrices,
       originalPrice: baseVariant.compare_at_price
         ? baseVariant.compare_at_price.toLocaleString('vi-VN') + 'đ'
         : undefined,
@@ -64,6 +82,7 @@ export function ProductDetail({ slug, locale }: ProductDetailProps) {
         name: p.name,
         description: catalogItem?.description[locale] || p.name,
         price: p.price.toLocaleString('vi-VN') + 'đ',
+        priceValue: p.price,
         originalPrice: undefined,
         colors: catalogItem?.colors.map(c => ({ name: c.name, hex: c.hex, imageSrc: c.imageSrc })) || [],
         sizes: catalogItem?.sizes || ['S', 'M', 'L'],
@@ -96,6 +115,7 @@ export function ProductDetail({ slug, locale }: ProductDetailProps) {
       name: p.name[locale],
       description: p.description[locale],
       price: p.price[locale],
+      priceValue: p.numericPrice,
       originalPrice: p.originalPrice?.[locale],
       colors: p.colors.map(c => ({ name: c.name, hex: c.hex, imageSrc: c.imageSrc })),
       sizes: p.sizes,
@@ -105,10 +125,13 @@ export function ProductDetail({ slug, locale }: ProductDetailProps) {
 
     displayProduct = {
       id: product.id,
+      slug: product.id,
       name: product.name[locale],
       description: product.description[locale],
       price: product.price[locale],
+      priceValue: product.numericPrice,
       originalPrice: product.originalPrice?.[locale],
+      originalPriceValue: product.originalPrice ? parseVndString(product.originalPrice.vi) : undefined,
       imageSrc: product.imageSrc,
       hoverImageSrc: product.hoverImageSrc,
       imageAlt: product.imageAlt,

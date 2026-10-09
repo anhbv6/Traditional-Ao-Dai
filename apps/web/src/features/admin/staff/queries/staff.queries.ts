@@ -24,6 +24,7 @@ export async function getStaffListQuery(): Promise<StaffMemberItem[]> {
             canUpdateTailoring: true,
             canManageInventory: true,
             canViewReports: true,
+            canManageContent: true,
           },
         },
       },

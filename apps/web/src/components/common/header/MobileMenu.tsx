@@ -18,15 +18,17 @@ import { SearchBar } from './SearchBar';
 import { Logo } from './Logo';
 import type { NavItem } from './types';
 import { useAuthStore, useCustomerLogout } from '@/features/auth';
+import { useWishlistStore } from '@/features/wishlist';
+import { useSearchHistoryStore } from '@/features/products';
 import { executeAdminLogout, useAdminSession, useAdminSessionCache } from '@/features/admin';
 
 type MobileMenuProps = {
   items: NavItem[];
   searchPlaceholder?: string;
+  searchLabel?: string;
   loginLabel?: string;
   profileLabel?: string;
   logoutLabel?: string;
-  wishlistCount?: number;
   languageLabel?: string;
   taglineDrawer?: string;
 };
@@ -34,10 +36,10 @@ type MobileMenuProps = {
 export function MobileMenu({
   items,
   searchPlaceholder = 'Search...',
+  searchLabel = 'Search',
   loginLabel = 'Login',
   profileLabel = 'Profile',
   logoutLabel = 'Logout',
-  wishlistCount = 0,
   languageLabel = 'Ngôn ngữ',
   taglineDrawer,
 }: MobileMenuProps) {
@@ -48,6 +50,7 @@ export function MobileMenu({
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { isAuthenticated, user: customer } = useAuthStore();
+  const wishlistCount = useWishlistStore((state) => state.items.length);
   const { user: adminUser, isAdminOrStaff: isAdmin } = useAdminSession();
   const adminSessionCache = useAdminSessionCache();
   const user = customer ?? adminUser;
@@ -68,6 +71,13 @@ export function MobileMenu({
   };
 
   const locales = routing.locales;
+
+  /** Tìm từ menu mobile: lưu lịch sử, đóng menu rồi sang trang kết quả (cùng luồng với bảng tìm kiếm trên header) */
+  const handleSearch = (keyword: string) => {
+    useSearchHistoryStore.getState().add(keyword);
+    setIsDrawerOpen(false);
+    router.push(`/products?q=${encodeURIComponent(keyword)}#product-list`);
+  };
 
   const handleLogout = () => {
     setIsDrawerOpen(false);
@@ -104,10 +114,7 @@ export function MobileMenu({
           <div className="flex-1 flex flex-col justify-between overflow-y-auto px-5 pb-5">
             <div>
               <div className="py-5">
-                <SearchBar
-                  compact={false}
-                  placeholder={searchPlaceholder}
-                />
+                <SearchBar placeholder={searchPlaceholder} submitLabel={searchLabel} onSearch={handleSearch} />
               </div>
 
               <nav className="grid gap-1" aria-label="Mobile navigation">
@@ -120,7 +127,7 @@ export function MobileMenu({
                       <span className="font-[family-name:var(--font-lora)]">
                         {item.label}
                         {item.href === '/wishlist' && wishlistCount > 0 ? (
-                          <span className="ml-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-white">
+                          <span className="ml-2 inline-flex h-5 min-w-5 items-center justify-center bg-primary px-1 text-[10px] font-bold text-white">
                             {wishlistCount}
                           </span>
                         ) : null}

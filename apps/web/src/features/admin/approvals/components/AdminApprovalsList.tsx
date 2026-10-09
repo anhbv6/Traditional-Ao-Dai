@@ -4,7 +4,8 @@ import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { CheckCircle2, XCircle, Clock, AlertTriangle, UserCheck, RefreshCw, FileText } from "lucide-react";
 import { showToast } from "@/components/ui/toast";
-import { useAdminSession } from "../../session";
+import { ADMIN_ACTION_ACCESS, canAccess, useAdminSession } from "../../session";
+import { AdminPageHeader, AdminSecondaryButton, AdminSegmentedControl } from "../../ui";
 import {
   getApprovalRequestsAction,
   reviewApprovalRequestAction,
@@ -16,6 +17,8 @@ import { useNotify } from "@/hooks/useNotify";
 
 export function AdminApprovalsList() {
   const { user } = useAdminSession({ force: true });
+  // Chỉ Super Admin được duyệt/từ chối; STAFF chỉ xem yêu cầu của chính mình (server cũng lọc theo người gửi)
+  const canReview = canAccess(user, ADMIN_ACTION_ACCESS.reviewApproval);
   const notify = useNotify();
   const tToast = useTranslations("AdminPage.toasts");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
@@ -125,57 +128,43 @@ export function AdminApprovalsList() {
 
   return (
     <div className="space-y-6">
-      {/* Header & Filter Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-zinc-200/80 shadow-2xs">
-        <div>
-          <h2 className="text-lg font-bold text-zinc-900 flex items-center gap-2">
-            <UserCheck size={20} className="text-zinc-800" />
-            <span>Hàng Đợi Phê Duyệt Của Nhân Viên</span>
-          </h2>
-          <p className="text-xs text-zinc-500 mt-0.5">
-            Duyệt các thao tác nhạy cảm do Staff gửi lên (hủy đơn, giảm giá đặc biệt, sửa giá).
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <div className="inline-flex bg-zinc-100 p-1 rounded-xl text-xs font-medium">
-            {["ALL", "PENDING", "APPROVED", "REJECTED"].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setStatusFilter(tab)}
-                className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                  statusFilter === tab
-                    ? "bg-white text-zinc-900 font-semibold shadow-2xs"
-                    : "text-zinc-500 hover:text-zinc-900"
-                }`}
-              >
-                {tab === "ALL" && "Tất cả"}
-                {tab === "PENDING" && "Chờ duyệt"}
-                {tab === "APPROVED" && "Đã duyệt"}
-                {tab === "REJECTED" && "Từ chối"}
-              </button>
-            ))}
-          </div>
-
-          <button
-            onClick={fetchRequests}
-            disabled={isLoading}
-            className="p-2 rounded-xl border border-zinc-200 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50 transition-colors cursor-pointer"
-            title="Làm mới"
-          >
-            <RefreshCw size={15} className={isLoading ? "animate-spin" : ""} />
-          </button>
-        </div>
-      </div>
+      <AdminPageHeader
+        icon={UserCheck}
+        eyebrow="Kiểm soát nội bộ"
+        title={canReview ? "Hàng Đợi Phê Duyệt" : "Yêu Cầu Phê Duyệt Của Tôi"}
+        description={
+          canReview
+            ? "Duyệt các thao tác nhạy cảm do nhân viên gửi lên (hủy đơn, giảm giá đặc biệt, hoàn tiền)."
+            : "Theo dõi trạng thái các yêu cầu hủy đơn / hoàn tiền / giảm giá bạn đã gửi lên Super Admin."
+        }
+        actions={
+          <>
+            <AdminSegmentedControl
+              value={statusFilter}
+              onChange={setStatusFilter}
+              options={[
+                { value: "ALL", label: "Tất cả" },
+                { value: "PENDING", label: "Chờ duyệt" },
+                { value: "APPROVED", label: "Đã duyệt" },
+                { value: "REJECTED", label: "Từ chối" },
+              ]}
+            />
+            <AdminSecondaryButton onClick={fetchRequests} disabled={isLoading} title="Làm mới">
+              <RefreshCw size={14} className={isLoading ? "animate-spin" : ""} />
+              <span>Làm mới</span>
+            </AdminSecondaryButton>
+          </>
+        }
+      />
 
       {/* Requests List */}
       {isLoading ? (
-        <div className="bg-white rounded-2xl border border-zinc-200/80 p-12 text-center text-sm text-zinc-500">
+        <div className="bg-white rounded-xl border border-[#E4E4E7] p-12 text-center text-sm text-[#71717A]">
           <RefreshCw size={24} className="animate-spin mx-auto text-zinc-400 mb-3" />
           <p>Đang tải dữ liệu hàng đợi phê duyệt...</p>
         </div>
       ) : requests.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-zinc-200/80 p-12 text-center text-zinc-500">
+        <div className="bg-white rounded-xl border border-[#E4E4E7] p-12 text-center text-[#71717A]">
           <FileText size={32} className="mx-auto text-zinc-300 mb-3" />
           <p className="text-sm font-medium text-zinc-700">Không có yêu cầu phê duyệt nào</p>
           <p className="text-xs text-zinc-400 mt-1">Các thao tác do nhân viên gửi lên sẽ xuất hiện tại đây.</p>
@@ -185,7 +174,7 @@ export function AdminApprovalsList() {
           {requests.map((req) => (
             <div
               key={req.id}
-              className="bg-white border border-zinc-200/80 rounded-2xl p-5 shadow-2xs hover:shadow-sm transition-all"
+              className="bg-white border border-[#E4E4E7] rounded-xl p-5 shadow-2xs hover:shadow-2xs transition-all"
             >
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-100">
                 <div className="flex items-center gap-2.5 flex-wrap">
@@ -197,7 +186,7 @@ export function AdminApprovalsList() {
                 </div>
 
                 <div className="text-xs text-zinc-600">
-                  Người yêu cầu: <strong className="text-zinc-900 font-semibold">{req.requestedBy?.name || req.requestedBy?.email}</strong>
+                  Người yêu cầu: <strong className="text-[#09090B] font-semibold">{req.requestedBy?.name || req.requestedBy?.email}</strong>
                 </div>
               </div>
 
@@ -218,7 +207,7 @@ export function AdminApprovalsList() {
               )}
 
               {/* Action Buttons for PENDING */}
-              {req.status === "PENDING" && (
+              {canReview && req.status === "PENDING" && (
                 <div className="pt-2 flex items-center justify-end gap-2">
                   {rejectingId === req.id ? (
                     <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -238,7 +227,7 @@ export function AdminApprovalsList() {
                       </button>
                       <button
                         onClick={() => { setRejectingId(null); setRejectReason(""); }}
-                        className="px-3 py-1.5 border border-zinc-200 text-zinc-600 hover:bg-zinc-100 rounded-lg text-xs cursor-pointer"
+                        className="px-3 py-1.5 border border-[#E4E4E7] text-zinc-600 hover:bg-zinc-100 rounded-lg text-xs cursor-pointer"
                       >
                         Hủy
                       </button>
@@ -255,7 +244,7 @@ export function AdminApprovalsList() {
                       <button
                         onClick={() => handleApprove(req.id)}
                         disabled={isProcessing}
-                        className="px-4 py-2 bg-zinc-900 hover:bg-black text-white rounded-xl text-xs font-semibold shadow-2xs transition-all cursor-pointer"
+                        className="px-4 py-2 bg-[#18181B] hover:bg-black text-white rounded-xl text-xs font-semibold shadow-2xs transition-all cursor-pointer"
                       >
                         Phê duyệt yêu cầu
                       </button>

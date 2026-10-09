@@ -2,13 +2,14 @@
 
 import { prisma } from "../../server/db.server";
 import { authorizeAdminAction } from "../../server/adminAuth.server";
+import { ADMIN_ACTION_ACCESS } from "../../session/permissions";
 import { revalidatePath } from "next/cache";
 
 /**
  * Server Action: Khóa hoặc mở khóa tài khoản khách hàng
  */
 export async function toggleCustomerActiveAction(userId: string, isActive: boolean) {
-  const auth = await authorizeAdminAction({ role: "ADMIN" });
+  const auth = await authorizeAdminAction(ADMIN_ACTION_ACCESS.toggleCustomerActive);
   if (!auth.success) return auth;
 
   try {

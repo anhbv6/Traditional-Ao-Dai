@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { motion } from 'motion/react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { Rating, RoundedStar } from '@smastrom/react-rating';
@@ -15,6 +16,19 @@ interface ProductTabsProps {
   locale: 'vi' | 'en';
 }
 
+type TabKey = 'description' | 'information' | 'reviews';
+const TAB_KEYS: TabKey[] = ['description', 'information', 'reviews'];
+const EASE = [0.22, 1, 0.36, 1] as const;
+
+/** Nội dung tab hiện ra nhẹ nhàng mỗi lần chuyển tab (panel được dựng lại khi kích hoạt) */
+function TabPanelMotion({ children }: { children: React.ReactNode }) {
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, ease: EASE }}>
+      {children}
+    </motion.div>
+  );
+}
+
 const ratingStyles = {
   itemShapes: RoundedStar,
   activeFillColor: '#ff9e00',
@@ -24,6 +38,7 @@ const ratingStyles = {
 export default function ProductTabs({ product, locale }: ProductTabsProps) {
   const t = useTranslations('Product');
   const [rating, setRating] = useState(0);
+  const [tab, setTab] = useState<TabKey>('description');
 
   // Translations are loaded dynamically using next-intl
 
@@ -31,54 +46,63 @@ export default function ProductTabs({ product, locale }: ProductTabsProps) {
     {
       name: 'Mark Williams',
       reviewer: 'Krist',
-      date: 'June 05, 2023',
+      date: locale === 'vi' ? '05/06/2026' : 'June 05, 2026',
       avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=160&auto=format&fit=crop',
-      title: locale === 'vi' ? 'Sản phẩm rất đẹp, tôi rất thích' : 'Excellent Product, I Love It 😍',
+      title: locale === 'vi' ? 'Sản phẩm rất đẹp, tôi rất thích' : 'Beautiful piece, I love it',
       content:
         locale === 'vi'
           ? 'Chất vải mềm, màu sắc sang và đường may rất chỉn chu. Form áo lên dáng đẹp, phù hợp cho những dịp trang trọng.'
-          : 'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters.',
+          : 'The fabric is soft, the colour feels refined and the stitching is meticulous. The silhouette is flattering and perfect for formal occasions.',
     },
     {
       name: 'Alexa Johnson',
       reviewer: 'Krist',
-      date: 'June 05, 2023',
+      date: locale === 'vi' ? '05/06/2026' : 'June 05, 2026',
       avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=160&auto=format&fit=crop',
-      title: locale === 'vi' ? 'Con gái tôi rất hài lòng với sản phẩm này' : 'My Daughter is very much happy with this products',
+      title: locale === 'vi' ? 'Con gái tôi rất hài lòng với sản phẩm này' : 'My daughter is very happy with it',
       content:
         locale === 'vi'
           ? 'Mẫu áo ngoài đời đẹp hơn ảnh, mặc nhẹ và thoải mái. Gia đình tôi rất hài lòng với phần tư vấn chọn size.'
-          : 'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters.',
+          : 'It looks even better in person, light and comfortable to wear. Our family was very pleased with the sizing advice.',
     },
   ];
 
   return (
-    <Tabs defaultValue="description" className="flex-col mt-12 border-t border-[var(--border)] py-5">
-      <TabsList variant="line" className="h-auto gap-4 sm:gap-6 p-0 flex w-full overflow-x-auto md:overflow-x-visible whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <TabsTrigger
-          value="description"
-          className="px-0 pb-2 sm:pb-3 text-xs sm:text-sm font-semibold shrink-0 data-active:text-[var(--primary-color)] data-active:border-b-[var(--primary-color)] data-active:border-t-transparent data-active:border-x-transparent data-active:rounded-none"
-        >
-          {t('details.description')}
-        </TabsTrigger>
-        <TabsTrigger
-          value="information"
-          className="px-0 pb-2 sm:pb-3 text-xs sm:text-sm font-semibold shrink-0 data-active:text-[var(--primary-color)] data-active:border-b-[var(--primary-color)] data-active:border-t-transparent data-active:border-x-transparent data-active:rounded-none"
-        >
-          {t('details.information')}
-        </TabsTrigger>
-        <TabsTrigger
-          value="reviews"
-          className="px-0 pb-2 sm:pb-3 text-xs sm:text-sm font-semibold shrink-0 data-active:text-[var(--primary-color)] data-active:border-b-[var(--primary-color)] data-active:border-t-transparent data-active:border-x-transparent data-active:rounded-none"
-        >
-          {t('details.reviews')}
-        </TabsTrigger>
+    <Tabs
+      value={tab}
+      onValueChange={(value) => setTab(value as TabKey)}
+      className="mt-12 flex-col border-t border-[var(--border)] py-5"
+    >
+      <TabsList
+        variant="line"
+        className="flex h-auto w-full gap-5 overflow-x-auto whitespace-nowrap border-b border-[var(--border)] p-0 [scrollbar-width:none] sm:gap-8 md:overflow-x-visible [&::-webkit-scrollbar]:hidden"
+      >
+        {TAB_KEYS.map((key) => (
+          <TabsTrigger
+            key={key}
+            value={key}
+            className="relative flex-none shrink-0 rounded-none border-0 px-0 pb-3 text-xs font-semibold uppercase tracking-[1.5px] text-[var(--text-light)] transition-colors after:hidden hover:text-[var(--text-main)] data-active:text-[var(--primary-color)] sm:text-[13px]"
+          >
+            {t(`details.${key}`)}
+            {/* Gạch chân đỏ đô trượt theo tab đang chọn */}
+            {tab === key ? (
+              <motion.span
+                layoutId="product-tab-underline"
+                className="absolute inset-x-0 -bottom-px h-0.5 bg-[var(--primary-color)]"
+                transition={{ type: 'spring', stiffness: 400, damping: 34 }}
+              />
+            ) : null}
+          </TabsTrigger>
+        ))}
       </TabsList>
       <TabsContent value="description" className="w-full pt-5 text-sm leading-7 text-[var(--text-main)]">
+        <TabPanelMotion>
         <p>{product.longDescription}</p>
         <p className="mt-4">{product.secondaryDescription}</p>
+        </TabPanelMotion>
       </TabsContent>
       <TabsContent value="information" className="w-full pt-5 text-sm leading-7 text-[var(--text-main)]">
+        <TabPanelMotion>
         <div className="max-w-2xl pb-4">
           {product.colors && product.colors.length > 0 && (
             <div className="flex py-3.5">
@@ -109,8 +133,10 @@ export default function ProductTabs({ product, locale }: ProductTabsProps) {
             </div>
           )}
         </div>
+        </TabPanelMotion>
       </TabsContent>
       <TabsContent value="reviews" className="w-full pt-5 text-sm text-[var(--text-main)]">
+        <TabPanelMotion>
         <div>
           <h3 className="font-[family-name:var(--font-lora)] text-xl font-bold text-[var(--text-main)]">
             {t('details.customerReviewsTitle')}
@@ -119,7 +145,7 @@ export default function ProductTabs({ product, locale }: ProductTabsProps) {
           <div className="mt-5">
             {customerReviews.map((review) => (
               <article key={review.name} className="flex gap-4 py-6 first:pt-0">
-                <div className="relative size-12 shrink-0 overflow-hidden rounded-full bg-[var(--bg-secondary)]">
+                <div className="relative size-12 shrink-0 overflow-hidden bg-[var(--bg-secondary)]">
                   <Image src={review.avatar} alt={review.name} fill sizes="48px" className="object-cover" />
                 </div>
                 <div className="min-w-0 flex-1">
@@ -168,7 +194,7 @@ export default function ProductTabs({ product, locale }: ProductTabsProps) {
                 id="review-name"
                 type="text"
                 placeholder={t('details.namePlaceholder')}
-                className="mt-2 h-12 w-full rounded-md border border-[var(--border)] bg-[var(--bg-main)] px-4 text-sm text-[var(--text-main)] outline-none transition-colors placeholder:text-[var(--text-light)]/50 focus:border-[var(--primary-color)] focus:ring-2 focus:ring-[var(--ring)]/25"
+                className="mt-2 h-12 w-full border border-[var(--border)] bg-[var(--bg-main)] px-4 text-sm text-[var(--text-main)] outline-none transition-colors placeholder:text-[var(--text-light)]/50 focus:border-[var(--primary-color)] focus:ring-2 focus:ring-[var(--ring)]/25"
               />
             </div>
 
@@ -180,7 +206,7 @@ export default function ProductTabs({ product, locale }: ProductTabsProps) {
                 id="review-email"
                 type="email"
                 placeholder={t('details.emailPlaceholder')}
-                className="mt-2 h-12 w-full rounded-md border border-[var(--border)] bg-[var(--bg-main)] px-4 text-sm text-[var(--text-main)] outline-none transition-colors placeholder:text-[var(--text-light)]/50 focus:border-[var(--primary-color)] focus:ring-2 focus:ring-[var(--ring)]/25"
+                className="mt-2 h-12 w-full border border-[var(--border)] bg-[var(--bg-main)] px-4 text-sm text-[var(--text-main)] outline-none transition-colors placeholder:text-[var(--text-light)]/50 focus:border-[var(--primary-color)] focus:ring-2 focus:ring-[var(--ring)]/25"
               />
             </div>
 
@@ -192,18 +218,19 @@ export default function ProductTabs({ product, locale }: ProductTabsProps) {
                 id="review-content"
                 placeholder={t('details.reviewPlaceholder')}
                 rows={5}
-                className="mt-2 w-full resize-y rounded-md border border-[var(--border)] bg-[var(--bg-main)] px-4 py-3 text-sm leading-6 text-[var(--text-main)] outline-none transition-colors placeholder:text-[var(--text-light)]/50 focus:border-[var(--primary-color)] focus:ring-2 focus:ring-[var(--ring)]/25"
+                className="mt-2 w-full resize-y border border-[var(--border)] bg-[var(--bg-main)] px-4 py-3 text-sm leading-6 text-[var(--text-main)] outline-none transition-colors placeholder:text-[var(--text-light)]/50 focus:border-[var(--primary-color)] focus:ring-2 focus:ring-[var(--ring)]/25"
               />
             </div>
 
             <Button
               type="submit"
-              className="h-12 min-w-32 rounded-md bg-[var(--primary-color)] px-8 text-white hover:bg-[var(--accent-color)]"
+              className="h-12 min-w-32 bg-[var(--primary-color)] px-8 text-white hover:bg-[var(--accent-color)]"
             >
               {t('details.submitReview')}
             </Button>
           </form>
         </div>
+        </TabPanelMotion>
       </TabsContent>
     </Tabs>
   );

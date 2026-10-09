@@ -7,6 +7,7 @@ import { Toaster } from '@/components/ui/toast';
 import { SmoothScrollProvider } from './SmoothScrollProvider';
 import { useAuthStore, establishCustomerSession } from '@/features/auth';
 import { rehydrateCart } from '@/features/cart';
+import { rehydrateWishlist } from '@/features/wishlist';
 import { hasCustomerSession, refreshBrowserToken, HttpError } from '@/lib/api-client';
 
 interface GoogleAccountsId {
@@ -63,8 +64,9 @@ export function AppProviders({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     patchGsiInitialize();
-    // Nạp giỏ hàng từ localStorage sau khi hydrate (store dùng skipHydration để tránh lệch SSR)
+    // Nạp giỏ hàng & danh sách yêu thích từ localStorage sau khi hydrate (store dùng skipHydration để tránh lệch SSR)
     rehydrateCart();
+    rehydrateWishlist();
   }, []);
 
   // Khôi phục phiên KHÁCH HÀNG một lần khi tải ứng dụng:

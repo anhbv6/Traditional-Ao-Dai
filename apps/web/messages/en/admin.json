@@ -80,13 +80,14 @@
   "chart": {
     "title": "Best-selling Ao Dai Collections",
     "subtitle": "Revenue share distribution by fabric line.",
-    "overview": "Overview"
+    "overview": "Overview",
+    "empty": "No orders in this period to analyze."
   },
   "alerts": {
-    "title": "Operations & Fabric Stock Alerts",
-    "subtitle": "Materials and garments requiring urgent replenishment.",
+    "title": "Stock alerts",
+    "subtitle": "SKUs running low that need restocking.",
     "tailoring": "Bespoke Tailoring Progress",
-    "lowStock": "Low Stock Products (< 5 Qty)",
+    "lowStock": "Low stock",
     "lowFabrics": "Low Stock Fabrics & Materials",
     "needImport": "Need Import",
     "tailorStep": {
@@ -95,7 +96,9 @@
       "sewing": "Hand Sewing",
       "embellishing": "Embellishment",
       "finishing": "Pressing & Finishing"
-    }
+    },
+    "stockLeft": "In stock",
+    "empty": "No products are running low."
   },
   "tailoring": {
     "title": "Bespoke Tailoring Workflow Monitor",
@@ -158,5 +161,48 @@
     "permissionUpdateSuccess": "Staff permissions updated!",
     "staffUnlocked": "Staff account unlocked!",
     "staffLocked": "Staff account locked!"
+  },
+  "eyebrow": "Operations overview",
+  "noAccess": {
+    "title": "You have not been granted access to dashboard data",
+    "description": "Contact a Super Admin to request permissions (orders, tailoring, inventory or reports)."
+  },
+  "staff": {
+    "eyebrow": "Staff & Permissions",
+    "title": "Staff Management",
+    "description": "Create staff accounts, toggle each permission and lock / unlock accounts.",
+    "refresh": "Refresh",
+    "create": "Add staff",
+    "creating": "Creating...",
+    "cancel": "Cancel",
+    "loading": "Loading staff...",
+    "empty": {
+      "title": "No staff accounts yet",
+      "description": "Click \"Add staff\" to create the first staff account."
+    },
+    "columns": {
+      "staff": "Staff",
+      "status": "Status"
+    },
+    "unnamed": "Unnamed",
+    "active": "Active",
+    "locked": "Locked",
+    "permissions": {
+      "canManageOrders": "Orders & Customers",
+      "canUpdateTailoring": "Tailoring workshop",
+      "canManageInventory": "Products & Inventory",
+      "canViewReports": "Revenue reports",
+      "canManageContent": "Content & FAQ"
+    },
+    "createTitle": "Add staff",
+    "createDescription": "The staff member signs in to the admin area with this email and password.",
+    "createSuccess": "Staff account created!",
+    "form": {
+      "name": "Full name",
+      "phone": "Phone number",
+      "email": "Login email",
+      "password": "Password (min 6 characters)",
+      "permissions": "Granted permissions"
+    }
   }
 }

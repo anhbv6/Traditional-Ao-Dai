@@ -1,23 +1,19 @@
 "use client";
 
 import React from "react";
-import { MessageCircle, Send } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { cn } from "@/lib/utils";
 import { useContact } from "../hooks/useContact";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { optionKeys } from "../types/contact.types";
 
+/** Ô nhập kiểu gạch chân — nhẹ hơn ô viền hộp, hợp với nền giấy kem của storefront */
+const fieldClass =
+  "mt-2 block w-full border-0 border-b border-[var(--border)] bg-transparent px-0 py-2.5 text-[15px] text-[var(--text-main)] outline-none transition-colors placeholder:text-[var(--text-light)]/55 focus:border-[var(--primary-color)]";
+const labelClass = "text-[11px] font-semibold uppercase tracking-[2.5px] text-[var(--text-light)]";
+
 export function ContactForm() {
-  const t = useTranslations("ContactPage");
+  const t = useTranslations("ContactPage.form");
   const tCommon = useTranslations("Common");
   const { formData, isSubmitting, isSuccess, error, handleChange, handleSubmit } = useContact();
 
@@ -26,107 +22,93 @@ export function ContactForm() {
       ? t(error as Parameters<typeof t>[0])
       : tCommon.has(`errors.${error}` as Parameters<typeof tCommon.has>[0])
         ? tCommon(`errors.${error}` as Parameters<typeof tCommon>[0])
-        : error
+        : t("sendError")
     : null;
 
   return (
-    <div className="border border-[var(--border)] bg-[var(--bg-main)] p-4 sm:p-6 lg:p-7">
-      <div className="mb-5 sm:mb-6 flex items-start gap-3 sm:gap-4">
-        <span className="grid size-10 sm:size-12 shrink-0 place-items-center rounded-md bg-[var(--primary-color)] text-white">
-          <MessageCircle className="size-5 sm:size-[21px]" />
-        </span>
-        <div>
-          <p className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.18em] text-[var(--accent-color)]">{t("formSubtitle")}</p>
-          <h2 className="mt-1.5 text-xl sm:text-2xl font-[family-name:var(--font-playfair)] font-bold text-[var(--primary-color)]">{t("formTitle")}</h2>
-        </div>
-      </div>
-
-      {isSuccess && (
-        <div className="mb-4 rounded-md bg-emerald-50 border border-emerald-200 p-4 text-emerald-800 text-sm font-semibold">
-          {t("successMessage") || "Cảm ơn bạn! Thông tin liên hệ đã được gửi thành công."}
-        </div>
-      )}
-
-      {errorMessage && (
-        <div className="mb-4 rounded-md bg-red-50 border border-red-200 p-4 text-red-800 text-sm font-semibold">
-          {errorMessage}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="grid gap-4">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <label className="block">
-            <span className="text-xs font-bold text-[var(--text-main)] block">{t("name")}</span>
-            <Input
-              required
-              className="mt-1.5 rounded-md border border-[var(--border)] bg-[var(--bg-main)] focus:bg-white focus:border-[var(--primary-color)] focus:ring-2 focus:ring-[var(--ring)]/30 transition-colors"
-              placeholder={t("namePlaceholder")}
-              style={{ height: "44px" }}
-              value={formData.name}
-              onChange={(e) => handleChange("name", e.target.value)}
-            />
-          </label>
-          <label className="block">
-            <span className="text-xs font-bold text-[var(--text-main)] block">{t("phoneEmail")}</span>
-            <Input
-              required
-              className="mt-1.5 rounded-md border border-[var(--border)] bg-[var(--bg-main)] focus:bg-white focus:border-[var(--primary-color)] focus:ring-2 focus:ring-[var(--ring)]/30 transition-colors"
-              placeholder={t("contactPlaceholder")}
-              style={{ height: "44px" }}
-              value={formData.contactInfo}
-              onChange={(e) => handleChange("contactInfo", e.target.value)}
-            />
-          </label>
-        </div>
-
+    <form onSubmit={handleSubmit} className="bg-[var(--bg-main)] p-6 sm:p-10 lg:p-12">
+      <div className="grid gap-8 sm:grid-cols-2 sm:gap-10">
         <label className="block">
-          <span className="text-xs font-bold text-[var(--text-main)] block">{t("requestType")}</span>
-          <div className="mt-1.5">
-            <Select 
-              value={formData.requestType} 
-              onValueChange={(val) => handleChange("requestType", val || "")}
-            >
-              <SelectTrigger
-                className="flex w-full items-center justify-between gap-1.5 rounded-md border border-[var(--border)] !bg-[var(--bg-main)] px-3 py-2 font-[family-name:var(--font-lora)] text-sm text-[var(--text-main)] outline-none transition-colors focus-visible:border-[var(--primary-color)] focus-visible:bg-white focus-visible:ring-2 focus-visible:ring-[var(--ring)]/30 hover:border-[var(--primary-color)] shadow-none"
-                style={{ height: "44px" }}
-              >
-                <SelectValue placeholder={t("requestType")} />
-              </SelectTrigger>
-              <SelectContent className="bg-[var(--bg-main)] border border-[var(--border)] text-[var(--text-main)] shadow-md font-[family-name:var(--font-lora)]">
-                <SelectGroup>
-                  <SelectLabel>{t("requestType")}</SelectLabel>
-                  {optionKeys.map((key) => (
-                    <SelectItem key={key} value={t(`options.${key}`)} className="cursor-pointer">
-                      {t(`options.${key}`)}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
-        </label>
-
-        <label className="block">
-          <span className="text-xs font-bold text-[var(--text-main)] block">{t("message")}</span>
-          <textarea
+          <span className={labelClass}>{t("name")}</span>
+          <input
             required
-            rows={5}
-            placeholder={t("messagePlaceholder")}
-            className="mt-1.5 w-full resize-y rounded-md border border-[var(--border)] bg-[var(--bg-main)] px-3 py-2.5 text-sm leading-6 text-[var(--text-main)] outline-none transition-colors placeholder:text-[var(--text-light)]/60 focus:bg-white focus:border-[var(--primary-color)] focus:ring-2 focus:ring-[var(--ring)]/30"
-            value={formData.message}
-            onChange={(e) => handleChange("message", e.target.value)}
+            autoComplete="name"
+            className={fieldClass}
+            placeholder={t("namePlaceholder")}
+            value={formData.name}
+            onChange={(e) => handleChange("name", e.target.value)}
           />
         </label>
+        <label className="block">
+          <span className={labelClass}>{t("contact")}</span>
+          <input
+            required
+            autoComplete="tel"
+            className={fieldClass}
+            placeholder={t("contactPlaceholder")}
+            value={formData.contactInfo}
+            onChange={(e) => handleChange("contactInfo", e.target.value)}
+          />
+        </label>
+      </div>
 
+      {/* Loại nhu cầu: chọn một chạm bằng thẻ, không giấu trong dropdown */}
+      <fieldset className="mt-10">
+        <legend className={labelClass}>{t("requestType")}</legend>
+        <div className="mt-4 flex flex-wrap gap-2.5">
+          {optionKeys.map((key) => (
+            <label key={key} className="cursor-pointer">
+              <input
+                type="radio"
+                name="requestType"
+                value={key}
+                checked={formData.requestType === key}
+                onChange={() => handleChange("requestType", key)}
+                className="peer sr-only"
+              />
+              <span className="inline-flex min-h-10 items-center border border-[var(--border)] px-4 text-sm text-[var(--text-main)] transition-colors hover:border-[var(--primary-color)] peer-checked:border-[var(--primary-color)] peer-checked:bg-[var(--primary-color)] peer-checked:text-white peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[var(--ring)]">
+                {t(`options.${key}`)}
+              </span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <label className="mt-10 block">
+        <span className={labelClass}>{t("message")}</span>
+        <textarea
+          required
+          rows={4}
+          placeholder={t("messagePlaceholder")}
+          className={cn(fieldClass, "resize-y leading-7")}
+          value={formData.message}
+          onChange={(e) => handleChange("message", e.target.value)}
+        />
+      </label>
+
+      {isSuccess || errorMessage ? (
+        <p
+          role="status"
+          className={cn(
+            "mt-8 border-l-2 py-1 pl-4 text-sm leading-6",
+            isSuccess ? "border-[var(--primary-color)] text-[var(--text-main)]" : "border-[var(--destructive)] text-[var(--destructive)]"
+          )}
+        >
+          {isSuccess ? t("success") : errorMessage}
+        </p>
+      ) : null}
+
+      <div className="mt-10 flex flex-col-reverse gap-5 sm:flex-row sm:items-center sm:justify-between">
+        <p className="max-w-xs text-xs leading-5 text-[var(--text-light)]">{t("privacy")}</p>
         <button
           type="submit"
           disabled={isSubmitting}
-          className="justify-self-end inline-flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-md bg-[var(--primary-color)] px-6 text-sm font-semibold text-white transition-colors hover:bg-[var(--accent-color)] sm:w-fit disabled:opacity-50 disabled:cursor-not-allowed"
+          className="group inline-flex min-h-12 cursor-pointer items-center justify-center gap-3 bg-[var(--primary-color)] px-8 text-xs font-semibold uppercase tracking-[2px] text-white transition-colors duration-300 hover:bg-[#2A0A12] disabled:cursor-not-allowed disabled:opacity-60"
         >
-          <Send size={17} />
-          {isSubmitting ? t("sending") || "Đang gửi..." : t("submit")}
+          {isSubmitting ? t("sending") : t("submit")}
+          <ArrowRight size={16} strokeWidth={1.6} className="transition-transform duration-300 group-hover:translate-x-1" />
         </button>
-      </form>
-    </div>
+      </div>
+    </form>
   );
 }

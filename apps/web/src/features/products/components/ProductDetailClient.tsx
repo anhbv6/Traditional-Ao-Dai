@@ -1,6 +1,7 @@
 'use client';
 
-import React from 'react';
+import React, { useRef } from 'react';
+import { flyToCart } from '@/components/shared/flyToCart';
 import ProductGallery from './detail/ProductGallery';
 import ProductInfo from './detail/ProductInfo';
 import ProductTabs from './detail/ProductTabs';
@@ -38,7 +39,17 @@ export function ProductDetailClient({
     customMeasurements,
     onCustomMeasurementChange,
     onAddToCart,
-  } = useProductDetail(product, galleryImages);
+    selectedPrice,
+  } = useProductDetail(product, galleryImages, customMeasurementFields);
+  const galleryFrameRef = useRef<HTMLDivElement>(null);
+  const currentImageSrc = galleryImages[activeImageIndex] || product.imageSrc;
+
+  /** Thêm vào giỏ thành công -> ảnh đang xem bay vào icon giỏ trên header */
+  const handleAddToCart = () => {
+    const added = onAddToCart();
+    if (added) flyToCart(currentImageSrc, galleryFrameRef.current);
+    return added;
+  };
 
   return (
     <>
@@ -51,6 +62,7 @@ export function ProductDetailClient({
           productName={product.name}
           imageAlt={product.imageAlt}
           defaultImageSrc={product.imageSrc}
+          imageFrameRef={galleryFrameRef}
         />
 
         {/* Info & Configurations Section */}
@@ -68,7 +80,9 @@ export function ProductDetailClient({
           onQuantityChange={setQuantity}
           isWishlisted={isWishlisted}
           onWishlistToggle={onWishlistToggle}
-          onAddToCart={onAddToCart}
+          onAddToCart={handleAddToCart}
+          currentImageSrc={currentImageSrc}
+          selectedPrice={selectedPrice}
         />
       </div>
 

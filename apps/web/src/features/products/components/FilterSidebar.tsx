@@ -1,10 +1,9 @@
 'use client';
 
 import { ReactNode, useState } from 'react';
-import { ChevronDown, SlidersHorizontal, Search, Check, X } from 'lucide-react';
+import { ChevronDown, Check } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
-import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import type { MockProduct } from '../data/mockProducts';
 
@@ -34,7 +33,7 @@ export const collectionOptions = [
   { id: 'embroidered', label: 'Áo Dài Thêu Tay' },
 ];
 
-const categoryKeys: Record<string, string> = {
+export const categoryKeys: Record<string, string> = {
   'Áo dài Cưới': 'wedding',
   'Áo dài Cách tân': 'modern',
   'Áo dài Lễ/Tết': 'festival',
@@ -51,7 +50,7 @@ const colorKeys: Record<string, string> = {
   'Gấm thêu': 'embroideredBrocade',
 };
 
-const materialKeys: Record<string, string> = {
+export const materialKeys: Record<string, string> = {
   'Lụa Tơ Tằm': 'silk',
   'Gấm': 'brocade',
   'Tơ Nhung': 'velvet',
@@ -79,10 +78,6 @@ export const matchCollection = (product: MockProduct, colId: string) => {
 
 interface FilterSidebarProps {
   locale: 'vi' | 'en';
-  searchQuery: string;
-  setSearchQuery: (query: string) => void;
-  selectedCategories: string[];
-  setSelectedCategories: React.Dispatch<React.SetStateAction<string[]>>;
   selectedCollections: string[];
   setSelectedCollections: React.Dispatch<React.SetStateAction<string[]>>;
   selectedPurchaseTypes: string[];
@@ -96,14 +91,44 @@ interface FilterSidebarProps {
   onFilterChange: () => void;
   productCatalog: MockProduct[];
   toggleValue: (value: string, values: string[], setter: React.Dispatch<React.SetStateAction<string[]>>) => void;
+  activeFilterCount: number;
+  onClearAll: () => void;
 }
 
-export function FilterSidebar({
+export type FilterGroupsProps = Omit<FilterSidebarProps, 'activeFilterCount' | 'onClearAll'>;
+
+/**
+ * Cột lọc bên trái (desktop): không khung, không ô icon — chỉ tiêu đề nhỏ in hoa và vạch kẻ mảnh,
+ * để sự chú ý dồn về lưới sản phẩm. "Danh mục" đã có thanh tab phía trên lưới nên không lặp lại ở đây.
+ */
+export function FilterSidebar({ activeFilterCount, onClearAll, ...groupProps }: FilterSidebarProps) {
+  const t = useTranslations('ProductsPage.filter');
+
+  return (
+    <aside
+      data-lenis-prevent
+      className="hidden [scrollbar-width:none] lg:sticky lg:top-28 lg:block lg:max-h-[calc(100vh-140px)] lg:self-start lg:overflow-y-auto lg:pr-4"
+    >
+      <div className="flex items-baseline justify-between border-b border-[var(--text-main)]/80 pb-3">
+        <h2 className="text-[11px] font-semibold uppercase tracking-[3px] text-[var(--text-main)]">{t('title')}</h2>
+        {activeFilterCount > 0 ? (
+          <button
+            type="button"
+            onClick={onClearAll}
+            className="cursor-pointer text-xs text-[var(--text-light)] underline-offset-4 transition-colors hover:text-[var(--primary-color)] hover:underline"
+          >
+            {t('clearAll', { count: activeFilterCount })}
+          </button>
+        ) : null}
+      </div>
+      <FilterGroups {...groupProps} />
+    </aside>
+  );
+}
+
+/** Các nhóm lọc (bộ sưu tập, hình thức mua, màu, chất liệu, giá) — dùng chung cho cột lọc desktop và sheet lọc mobile */
+export function FilterGroups({
   locale,
-  searchQuery,
-  setSearchQuery,
-  selectedCategories,
-  setSelectedCategories,
   selectedCollections,
   setSelectedCollections,
   selectedPurchaseTypes,
@@ -117,90 +142,19 @@ export function FilterSidebar({
   onFilterChange,
   productCatalog,
   toggleValue,
-}: FilterSidebarProps) {
+}: FilterGroupsProps) {
   const t = useTranslations('ProductsPage.filter');
   const tp = useTranslations('Product');
 
   return (
-    <aside
-      data-lenis-prevent
-      className="hidden border-r border-[var(--bg-secondary)] pr-0 lg:sticky lg:top-24 lg:block lg:max-h-[calc(100vh-120px)] lg:overflow-y-auto lg:pr-8 pr-2 custom-scrollbar"
-    >
-      <style>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: var(--bg-secondary);
-          border-radius: 2px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: var(--accent-color);
-        }
-        /* For Firefox */
-        .custom-scrollbar {
-          scrollbar-width: thin;
-          scrollbar-color: var(--bg-secondary) transparent;
-        }
-      `}</style>
-      <div className="mb-7 flex items-center gap-3">
-        <span className="grid size-10 place-items-center bg-[var(--primary-color)] rounded-[4px] text-white">
-          <SlidersHorizontal size={18} />
-        </span>
-        <div>
-          <p className="text-xs font-bold uppercase tracking-[2px] text-[var(--text-light)]">{t('title')}</p>
-          <h2 className="text-xl font-semibold">{t('subtitle')}</h2>
-        </div>
-      </div>
-
-      {/* Search Input */}
-      <div className="relative mb-6">
-        <span className="absolute inset-y-0 left-3 flex items-center text-[var(--text-light)] pointer-events-none">
-          <Search size={18} />
-        </span>
-        <Input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => {
-            setSearchQuery(e.target.value);
-            onFilterChange();
-          }}
-          placeholder={t('searchPlaceholder')}
-          className="pl-10"
-        />
-      </div>
-
-      {/* Category Filter */}
-      <FilterSection
-        title={t('categoryTitle')}
-        onClear={() => {
-          setSelectedCategories([]);
-          onFilterChange();
-        }}
-        hasActiveFilters={selectedCategories.length > 0}
-      >
-        {categoryOptions.map((category) => (
-          <CheckOption
-            key={category}
-            label={categoryKeys[category] ? tp(`categories.${categoryKeys[category]}`) : category}
-            count={productCatalog.filter((product) => product.category === category).length}
-            checked={selectedCategories.includes(category)}
-            onCheckedChange={() => toggleValue(category, selectedCategories, setSelectedCategories)}
-          />
-        ))}
-      </FilterSection>
-
-      {/* Collection Filter */}
+    <>
       <FilterSection
         title={t('collectionTitle')}
+        activeCount={selectedCollections.length}
         onClear={() => {
           setSelectedCollections([]);
           onFilterChange();
         }}
-        hasActiveFilters={selectedCollections.length > 0}
       >
         {collectionOptions.map((col) => (
           <CheckOption
@@ -213,14 +167,13 @@ export function FilterSidebar({
         ))}
       </FilterSection>
 
-      {/* Purchase Type Filter */}
       <FilterSection
         title={t('purchaseTypeTitle')}
+        activeCount={selectedPurchaseTypes.length}
         onClear={() => {
           setSelectedPurchaseTypes([]);
           onFilterChange();
         }}
-        hasActiveFilters={selectedPurchaseTypes.length > 0}
       >
         {purchaseOptions.map((option) => (
           <CheckOption
@@ -233,55 +186,48 @@ export function FilterSidebar({
         ))}
       </FilterSection>
 
-      {/* Color Filter */}
       <FilterSection
         title={t('colorTitle')}
-        onClear={() => setSelectedColors([])}
-        hasActiveFilters={selectedColors.length > 0}
+        activeCount={selectedColors.length}
+        onClear={() => {
+          setSelectedColors([]);
+          onFilterChange();
+        }}
       >
-        <div className="grid grid-cols-2 gap-3">
+        <div className="flex flex-wrap gap-2.5">
           {colorOptions.map((color) => {
             const isSelected = selectedColors.includes(color.name);
+            const label = colorKeys[color.name] ? tp(`colors.${colorKeys[color.name]}`) : color.name;
             return (
               <button
                 key={color.name}
                 type="button"
+                title={label}
+                aria-label={label}
+                aria-pressed={isSelected}
                 onClick={() => toggleValue(color.name, selectedColors, setSelectedColors)}
                 className={cn(
-                  'flex min-h-10 cursor-pointer items-center gap-2.5 text-left text-sm text-[var(--text-light)] transition-all duration-200 hover:text-[var(--primary-color)]',
-                  isSelected && 'font-bold text-[var(--primary-color)] scale-[1.02]'
+                  'grid size-8 cursor-pointer place-items-center rounded-full border border-black/10 ring-offset-2 ring-offset-[var(--bg-main)] transition-shadow duration-200 hover:ring-1 hover:ring-[var(--text-light)]',
+                  isSelected && 'ring-1 ring-[var(--primary-color)] hover:ring-[var(--primary-color)]'
                 )}
+                style={{ backgroundColor: color.hex }}
               >
-                <span
-                  className={cn(
-                    "relative flex size-6 shrink-0 items-center justify-center rounded-full border border-white shadow-[0_0_0_1px_rgba(42,37,37,0.2)] transition-all duration-200",
-                    isSelected && "shadow-[0_0_0_2px_var(--primary-color)] scale-[1.08]"
-                  )}
-                  style={{ backgroundColor: color.hex }}
-                >
-                  {isSelected && (
-                    <Check
-                      size={12}
-                      strokeWidth={4}
-                      className={colorKeys[color.name] === 'white' ? 'text-[var(--text-main)]' : 'text-white'}
-                    />
-                  )}
-                </span>
-                <span>{colorKeys[color.name] ? tp(`colors.${colorKeys[color.name]}`) : color.name}</span>
+                {isSelected ? (
+                  <Check size={13} strokeWidth={3} className={colorKeys[color.name] === 'white' ? 'text-[var(--text-main)]' : 'text-white'} />
+                ) : null}
               </button>
             );
           })}
         </div>
       </FilterSection>
 
-      {/* Material Filter */}
       <FilterSection
         title={t('materialTitle')}
+        activeCount={selectedMaterials.length}
         onClear={() => {
           setSelectedMaterials([]);
           onFilterChange();
         }}
-        hasActiveFilters={selectedMaterials.length > 0}
       >
         {materialOptions.map((material) => (
           <CheckOption
@@ -294,115 +240,98 @@ export function FilterSidebar({
         ))}
       </FilterSection>
 
-      {/* Price Limit Filter */}
       <FilterSection
         title={t('priceTitle')}
+        activeCount={priceLimit < maxPrice ? 1 : 0}
         onClear={() => {
           setPriceLimit(maxPrice);
           onFilterChange();
         }}
-        hasActiveFilters={priceLimit < maxPrice}
       >
-        <p className="mb-4 text-sm text-[var(--text-light)]">
-          {t('priceRange', { min: formatPrice(minPrice, locale), max: formatPrice(priceLimit, locale) })}
-        </p>
         <input
           type="range"
           min={minPrice}
           max={maxPrice}
           step={100000}
           value={priceLimit}
+          aria-label={t('priceTitle')}
           onChange={(event) => {
             setPriceLimit(Number(event.target.value));
             onFilterChange();
           }}
           className="h-1 w-full cursor-pointer accent-[var(--primary-color)]"
         />
+        <p className="mt-3 flex justify-between text-xs text-[var(--text-light)]">
+          <span>{formatPrice(minPrice, locale)}đ</span>
+          <span className="font-semibold text-[var(--text-main)]">{t('priceUpTo', { max: formatPrice(priceLimit, locale) })}</span>
+        </p>
       </FilterSection>
-    </aside>
+    </>
   );
 }
 
+/** Một nhóm lọc mở/đóng được; hiện số mục đang chọn và nút xóa riêng của nhóm */
 export function FilterSection({
   title,
   children,
   defaultOpen = true,
+  activeCount = 0,
   onClear,
-  hasActiveFilters = false,
 }: {
   title: string;
   children: ReactNode;
   defaultOpen?: boolean;
+  activeCount?: number;
   onClear?: () => void;
-  hasActiveFilters?: boolean;
 }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const t = useTranslations('ProductsPage.filter');
 
   return (
-    <section className="border-t border-[var(--bg-secondary)] py-3">
-      <div className="flex items-center justify-between gap-3 select-none">
-        <div
+    <section className="border-b border-[var(--border)] py-4">
+      <div className="flex items-center justify-between gap-3">
+        <button
+          type="button"
+          aria-expanded={isOpen}
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-2 cursor-pointer group flex-1"
+          className="flex flex-1 cursor-pointer items-center gap-2 text-left text-sm font-semibold text-[var(--text-main)] transition-colors hover:text-[var(--primary-color)]"
         >
-          <span
-            className={cn(
-              "w-1 h-3.5 rounded-full bg-[var(--primary-color)] transition-all duration-300",
-              isOpen ? "opacity-100 scale-100" : "opacity-0 scale-50"
-            )}
-          />
-          <h3
-            className={cn(
-              "text-base transition-all duration-200",
-              isOpen
-                ? "font-bold text-[var(--primary-color)]"
-                : "font-semibold text-[var(--text-main)] group-hover:text-[var(--primary-color)]"
-            )}
+          {title}
+          {activeCount > 0 ? (
+            <span className="grid size-5 place-items-center rounded-full bg-[var(--primary-color)] text-[10px] font-semibold text-white">
+              {activeCount}
+            </span>
+          ) : null}
+        </button>
+        {onClear && activeCount > 0 ? (
+          <button
+            type="button"
+            onClick={onClear}
+            className="cursor-pointer text-xs text-[var(--text-light)] transition-colors hover:text-[var(--primary-color)]"
           >
-            {title}
-          </h3>
-        </div>
-        <div className="flex items-center gap-2.5">
-          {onClear && hasActiveFilters && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onClear();
-              }}
-              className="grid size-5 place-items-center rounded-full bg-[var(--bg-secondary)] text-[var(--text-light)] hover:bg-[var(--primary-color)] hover:text-white transition-colors cursor-pointer"
-              title={t('clearThisFilter')}
-            >
-              <X size={12} strokeWidth={2.5} />
-            </button>
-          )}
-          <div
-            onClick={() => setIsOpen(!isOpen)}
-            className="cursor-pointer text-[var(--text-light)] hover:text-[var(--primary-color)] transition-colors"
-          >
-            <ChevronDown
-              size={16}
-              className={cn(
-                "transition-transform duration-200",
-                isOpen ? "rotate-0" : "-rotate-90"
-              )}
-            />
-          </div>
-        </div>
+            {t('clear')}
+          </button>
+        ) : null}
+        <button
+          type="button"
+          aria-label={title}
+          onClick={() => setIsOpen(!isOpen)}
+          className="cursor-pointer text-[var(--text-light)] transition-colors hover:text-[var(--primary-color)]"
+        >
+          <ChevronDown size={16} strokeWidth={1.6} className={cn('transition-transform duration-300', isOpen ? 'rotate-180' : 'rotate-0')} />
+        </button>
       </div>
-      <div
-        className={cn(
-          "space-y-3 transition-all duration-300 overflow-hidden",
-          isOpen ? "max-h-[1000px] opacity-100 mt-6" : "max-h-0 opacity-0"
-        )}
-      >
-        {children}
+      {/* Mở/đóng mượt bằng grid-rows 0fr -> 1fr (không cần đo chiều cao) */}
+      <div className={cn('grid transition-[grid-template-rows] duration-300 ease-out', isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]')}>
+        <div className="overflow-hidden">
+          <div className="space-y-2.5 pt-4">{children}</div>
+        </div>
       </div>
     </section>
   );
 }
 
+/** Một lựa chọn dạng ô tích — dùng chung cho cột lọc desktop và dock lọc mobile */
 export function CheckOption({
   label,
   count,
@@ -415,16 +344,14 @@ export function CheckOption({
   onCheckedChange: () => void;
 }) {
   return (
-    <label className="flex min-h-8 cursor-pointer items-center justify-between gap-3 text-sm text-[var(--text-main)]">
-      <span className="flex items-center gap-3 select-none">
-        <Checkbox
-          checked={checked}
-          onCheckedChange={onCheckedChange}
-          className="cursor-pointer"
-        />
-        <span>{label}</span>
+    <label className="group flex min-h-7 cursor-pointer items-center justify-between gap-3 text-sm">
+      <span className="flex select-none items-center gap-3">
+        <Checkbox checked={checked} onCheckedChange={onCheckedChange} className="size-4 rounded-[3px] shadow-none" />
+        <span className={cn('transition-colors', checked ? 'text-[var(--primary-color)]' : 'text-[var(--text-main)] group-hover:text-[var(--primary-color)]')}>
+          {label}
+        </span>
       </span>
-      <span className="text-[var(--text-light)]">({count})</span>
+      <span className="text-xs tabular-nums text-[var(--text-light)]/70">{count}</span>
     </label>
   );
 }

@@ -139,7 +139,7 @@ export const mockArticles: MockArticle[] = [
       vi: '05 Tháng 7, 2026',
       en: 'July 05, 2026',
     },
-    imageSrc: 'https://images.unsplash.com/photo-1549064482-6779ba3292fe?q=80&w=800&auto=format&fit=crop',
+    imageSrc: '/login_banner.jpg',
     readTime: {
       vi: '4 phút đọc',
       en: '4 min read',

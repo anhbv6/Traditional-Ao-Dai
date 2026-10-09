@@ -1,0 +1,75 @@
+{
+  "eyebrow": "Giỏ hàng",
+  "title": "Giỏ hàng của bạn",
+  "itemCount": "{count} sản phẩm",
+  "continueShopping": "Tiếp tục mua sắm",
+  "columns": {
+    "product": "Sản phẩm",
+    "price": "Đơn giá",
+    "quantity": "Số lượng",
+    "lineTotal": "Thành tiền"
+  },
+  "item": {
+    "color": "Màu",
+    "size": "Size",
+    "custom": "May đo",
+    "measurements": "Số đo",
+    "decrease": "Giảm số lượng",
+    "increase": "Tăng số lượng",
+    "quantity": "Số lượng",
+    "maxReached": "Tối đa {max} sản phẩm mỗi loại",
+    "remove": "Xóa khỏi giỏ"
+  },
+  "shipping": {
+    "remaining": "Mua thêm <b>{amount}</b> để được miễn phí vận chuyển",
+    "unlocked": "Đơn hàng của bạn được miễn phí vận chuyển"
+  },
+  "promo": {
+    "title": "Mã giảm giá",
+    "placeholder": "Nhập mã (VD: GIAM10)",
+    "apply": "Áp dụng",
+    "remove": "Gỡ mã",
+    "required": "Vui lòng nhập mã giảm giá",
+    "invalid": "Mã giảm giá không hợp lệ hoặc đã hết hạn",
+    "percentApplied": "Giảm {value}% cho đơn hàng",
+    "freeshipApplied": "Miễn phí vận chuyển"
+  },
+  "summary": {
+    "title": "Tóm tắt đơn hàng",
+    "subtotal": "Tạm tính",
+    "discount": "Giảm giá",
+    "shipping": "Phí vận chuyển",
+    "free": "Miễn phí",
+    "total": "Tổng cộng",
+    "vatNote": "Đã bao gồm VAT",
+    "checkout": "Tiến hành thanh toán",
+    "customNote": "Sản phẩm may đo cần 7–10 ngày hoàn thiện và không áp dụng đổi trả (trừ lỗi kỹ thuật)."
+  },
+  "actions": {
+    "clearAll": "Xóa giỏ hàng",
+    "confirmClear": "Xác nhận xóa",
+    "cancel": "Hủy",
+    "undo": "Hoàn tác",
+    "close": "Đóng"
+  },
+  "undo": {
+    "removed": "Đã xóa “{name}” khỏi giỏ hàng"
+  },
+  "empty": {
+    "title": "Giỏ hàng đang trống",
+    "description": "Hãy khám phá các thiết kế áo dài và chọn cho mình mẫu ưng ý nhất.",
+    "action": "Mua sắm ngay"
+  },
+  "mini": {
+    "title": "Giỏ hàng",
+    "empty": "Chưa có sản phẩm nào trong giỏ",
+    "shopNow": "Mua sắm ngay",
+    "quantityPrice": "{quantity} × {price}",
+    "note": "Phí vận chuyển & mã giảm giá được tính ở giỏ hàng",
+    "viewCart": "Xem giỏ hàng",
+    "checkout": "Thanh toán"
+  },
+  "toast": {
+    "cleared": "Đã xóa toàn bộ giỏ hàng"
+  }
+}

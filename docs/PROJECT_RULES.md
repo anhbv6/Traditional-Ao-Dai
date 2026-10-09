@@ -87,7 +87,7 @@ Trình duyệt ── /vi/... ─►│ proxy.ts (i18n + chặn route)  →  Ser
 | File | Biến quan trọng |
 | :--- | :--- |
 | `apps/api/.env` | `DATABASE_URL`, `JWT_PRIVATE_KEY`, `JWT_PUBLIC_KEY`, `REDIS_*`, `SMTP_*`, `CLOUDINARY_*`, `GOOGLE_CLIENT_ID`, `TRUST_PROXY` |
-| `apps/web/.env` | `NEXT_PUBLIC_API_URL="/api"`, `API_INTERNAL_URL`, `JWT_PUBLIC_KEY` (chỉ public key — dùng ở server để xác minh `admin_token`), `NEXT_PUBLIC_GOOGLE_CLIENT_ID` |
+| `apps/web/.env` | `NEXT_PUBLIC_API_URL="/api"`, `API_INTERNAL_URL`, `JWT_PUBLIC_KEY` (chỉ public key — dùng ở server để xác minh `admin_token`), `DATABASE_URL` (khu vực admin gọi Prisma trực tiếp — thiếu biến này mọi trang admin bị đẩy về đăng nhập), `NEXT_PUBLIC_GOOGLE_CLIENT_ID` |
 | `packages/db` | Không có `.env` riêng — đọc `apps/api/.env` qua `dotenv-cli` |
 
 - Biến có tiền tố `NEXT_PUBLIC_` sẽ lộ ra trình duyệt → **không bao giờ** đặt bí mật vào đó. Private key JWT chỉ nằm ở `apps/api/.env`.
@@ -322,8 +322,25 @@ features/admin/layout/            # Khung trang admin: AdminHeader, AdminSubNav,
 features/admin/login/             # Màn đăng nhập admin (gọi Express /api/auth/admin/login)
 ```
 
+### Ma trận phân quyền (nguồn duy nhất: `features/admin/session/permissions.ts`)
+
+| Module | ADMIN | STAFF cần quyền | Ghi chú nghiệp vụ |
+| :--- | :---: | :--- | :--- |
+| Tổng quan (dashboard) | ✓ | — (mọi nhân viên) | Mỗi khối hiển thị theo quyền: số liệu doanh thu/biểu đồ = `canViewReports`, cảnh báo tồn kho = `canManageInventory`, theo dõi may đo = `canUpdateTailoring`, đơn hàng mới = `canManageOrders` |
+| Đơn hàng | ✓ | `canManageOrders` | Cập nhật trạng thái xử lý & thanh toán; hủy đơn / hoàn tiền / giảm giá tay phải gửi yêu cầu phê duyệt |
+| Xưởng may đo | ✓ | `canUpdateTailoring` | Cập nhật công đoạn, người thực hiện ghi vào TailoringLog |
+| Sản phẩm, Tồn kho | ✓ | `canManageInventory` | Bật/tắt sản phẩm, tùy chọn may đo, số lượng tồn |
+| Khách hàng | ✓ | `canManageOrders` | Tra cứu thông tin & số đo để xử lý đơn. **Khóa/mở tài khoản chỉ ADMIN** |
+| Phê duyệt | ✓ (xem tất cả + duyệt/từ chối) | — | STAFF chỉ thấy yêu cầu do chính mình gửi, không có nút duyệt |
+| Nhân sự | ✓ | ✗ | Tạo nhân viên, cấp 5 quyền chi tiết, khóa/mở tài khoản |
+| Voucher | ✓ | ✗ | |
+| Nội dung & FAQ | ✓ | `canManageContent` | |
+
+- Menu (`getAdminNavLinks`), page (`requireAdminPage(ADMIN_MODULE_ACCESS.<module>)`), Server Action (`authorizeAdminAction(...)`) và nút trên UI (`canAccess(user, ADMIN_ACTION_ACCESS.<action>)`) **đều đọc cùng ma trận này** — không viết điều kiện quyền rời rạc.
+- Nhân viên chưa có bản ghi `StaffPermission` = không có quyền chi tiết nào. Tạo nhân viên luôn tạo kèm bản ghi quyền.
+
 ### Quy tắc
-- Page (`app/[locale]/(admin)/admin/<module>/page.tsx`) là Server Component: `await requireAdminPage()` (thêm `{ role: 'ADMIN' }` cho trang Super Admin) rồi gọi query.
+- Page (`app/[locale]/(admin)/admin/<module>/page.tsx`) là Server Component: `await requireAdminPage(ADMIN_MODULE_ACCESS.<module>)` rồi gọi query; giao diện dùng `AdminPage` + `AdminPageHeader` (`features/admin/ui`), quy chuẩn chi tiết ở `app/[locale]/(admin)/admin/variables.md`.
 - Server Action:
   ```ts
   "use server";

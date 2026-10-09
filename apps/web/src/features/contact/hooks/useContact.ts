@@ -3,19 +3,22 @@
 import { useState } from "react";
 import { resolveErrorMessage } from "@/lib/messages";
 import { sendContactMessage } from "../api/contact.api";
+import type { ContactFormValues } from "../types/contact.types";
+
+const EMPTY_FORM: ContactFormValues = {
+  name: "",
+  contactInfo: "",
+  requestType: "",
+  message: "",
+};
 
 export function useContact() {
-  const [formData, setFormData] = useState({
-    name: "",
-    contactInfo: "",
-    requestType: "",
-    message: "",
-  });
+  const [formData, setFormData] = useState<ContactFormValues>(EMPTY_FORM);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleChange = (field: string, value: string) => {
+  const handleChange = <K extends keyof ContactFormValues>(field: K, value: ContactFormValues[K]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -26,13 +29,9 @@ export function useContact() {
     setError(null);
 
     try {
-      const response = await sendContactMessage(formData);
-      if (response.success) {
-        setIsSuccess(true);
-        setFormData({ name: "", contactInfo: "", requestType: "", message: "" });
-      } else {
-        setError(response.message || "Something went wrong.");
-      }
+      await sendContactMessage(formData);
+      setIsSuccess(true);
+      setFormData(EMPTY_FORM);
     } catch (err: unknown) {
       setError(resolveErrorMessage(err, "sendError"));
     } finally {

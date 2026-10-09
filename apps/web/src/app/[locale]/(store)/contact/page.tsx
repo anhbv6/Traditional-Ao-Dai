@@ -1,15 +1,9 @@
 import React from "react";
 import { ContactExperience } from "@/features/contact";
-import { Container } from "@/components/ui/container";
-import { Breadcrumbs } from "@/components/common/Breadcrumbs";
 
+/** Trang cấp 1 (ngay dưới trang chủ) — không cần breadcrumb */
 function ContactPage() {
-  return (
-    <Container as="section" className="py-8 sm:py-12">
-      <Breadcrumbs />
-      <ContactExperience />
-    </Container>
-  );
+  return <ContactExperience />;
 }
 
 export default ContactPage;

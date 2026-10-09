@@ -22,5 +22,56 @@
   },
   "similarNews": "Bài Viết Liên Quan",
   "articleNotFound": "Không tìm thấy bài viết",
-  "backToNews": "Quay lại Tin tức"
+  "backToNews": "Quay lại Tin tức",
+  "eyebrow": "Bản tin áo dài",
+  "author": "Tác giả",
+  "featured": "Bài nổi bật",
+  "toc": "Mục lục",
+  "articleNavigation": "Điều hướng bài viết",
+  "previousArticle": "Bài mới hơn",
+  "nextArticle": "Bài trước đó",
+  "share": {
+    "title": "Chia sẻ",
+    "copy": "Sao chép liên kết",
+    "copied": "Đã sao chép liên kết",
+    "facebook": "Chia sẻ lên Facebook",
+    "more": "Chia sẻ khác"
+  },
+  "cta": {
+    "guide": {
+      "eyebrow": "Bộ sưu tập lụa",
+      "title": "Tà áo lụa tơ tằm bền đẹp theo năm tháng",
+      "description": "Khám phá những mẫu áo dài lụa tơ tằm tự nhiên, dễ chăm sóc theo đúng hướng dẫn trong bài.",
+      "action": "Xem áo dài lụa",
+      "keyword": "Lụa tơ tằm"
+    },
+    "tips": {
+      "eyebrow": "Gợi ý cho bạn",
+      "title": "Tìm tà áo dài cưới tôn dáng nhất",
+      "description": "Gấm thêu tay, nhung đỏ đô và nhiều phom dáng cho ngày trọng đại, có sẵn size hoặc nhận may đo.",
+      "action": "Xem áo dài cưới",
+      "keyword": "Áo dài cưới"
+    },
+    "culture": {
+      "eyebrow": "Di sản trên tà áo",
+      "title": "Những thiết kế thêu tay mang hồn Việt",
+      "description": "Họa tiết sen, hạc, song hỷ được nghệ nhân thêu tay tỉ mỉ trên từng tà áo.",
+      "action": "Xem áo dài thêu",
+      "keyword": "Thêu"
+    },
+    "trends": {
+      "eyebrow": "Xu hướng mới",
+      "title": "Áo dài cách tân cho nhịp sống hiện đại",
+      "description": "Tay lỡ, cổ thuyền, gam pastel — những thiết kế trẻ trung vẫn giữ nét truyền thống.",
+      "action": "Xem áo dài cách tân",
+      "keyword": "Cách tân"
+    },
+    "tailoring": {
+      "eyebrow": "Dịch vụ may đo",
+      "title": "Đặt may áo dài theo số đo của riêng bạn",
+      "description": "Nghệ nhân cắt rập riêng, thử áo và hoàn thiện trong 7–10 ngày. Liên hệ để được tư vấn số đo miễn phí.",
+      "action": "Đặt lịch may đo",
+      "keyword": "May đo"
+    }
+  }
 }

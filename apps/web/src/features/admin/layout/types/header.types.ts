@@ -1,12 +1,12 @@
 import { type LucideIcon } from "lucide-react";
 import { type AdminSessionUser } from "../../server/adminAuth.server";
+import { type AdminModule } from "../../session/permissions";
 
 export interface AdminNavItem {
-  key: string;
+  key: AdminModule;
   label: string;
   href: string;
   icon: LucideIcon;
-  adminOnly?: boolean;
   active?: boolean;
 }
 

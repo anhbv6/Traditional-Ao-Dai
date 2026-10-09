@@ -38,7 +38,6 @@
   --font-lora: var(--font-lora), 'Lora', Georgia, serif;
   --font-playfair: var(--font-playfair), 'Playfair Display', Georgia, serif;
   --font-dancing: var(--font-dancing), 'Dancing Script', cursive;
-  --font-geist: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
 }
 
 /* Modern CSS Reset - Bọc trong @layer base để không đè các utility class margin (mt-*, mb-*, mx-*, m-*) của Tailwind */
@@ -99,6 +98,27 @@
     h2 { font-size: 24px; }
     body { font-size: 15px; }
   }
+
+  /*
+   * Khu vực quản trị (admin): tách hẳn khỏi kiểu chữ storefront (Lora / Playfair, h1 48px, line-height 1.75).
+   * Gắn class `admin-shell` ở thẻ bọc ngoài cùng của layout admin. Nằm trong @layer base nên class Tailwind vẫn ghi đè được.
+   * Quy chuẩn: app/[locale]/(admin)/admin/variables.md
+   */
+  .admin-shell {
+    /* --font-admin do next/font gắn ở <html> (app/[locale]/layout.tsx) nên cả portal (dialog, dropdown) cũng dùng được */
+    font-family: var(--font-admin), system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #09090B;
+  }
+
+  .admin-shell :where(h1, h2, h3, h4, h5, h6, .product-title) {
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: 600;
+    line-height: 1.3;
+    color: inherit;
+  }
 }
 
 /* Custom Component Classes */
@@ -149,6 +169,35 @@
 .animate-fade-in-up {
   opacity: 0;
   animation: fadeInUp 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+/* Hiện dần nhẹ hơn fadeInUp (dịch ít, chậm hơn) — dùng khi đổi tab danh sách sản phẩm ở home */
+@keyframes fadeInSoft {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-soft {
+  opacity: 0;
+  animation: fadeInSoft 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-soft {
+    animation-duration: 0.01ms;
+  }
+}
+
+/* Thanh tiến trình tự chạy (slider đánh giá ở home) */
+@keyframes progress-fill {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
 }
 
 @theme inline {

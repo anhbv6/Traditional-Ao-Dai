@@ -11,6 +11,33 @@
   "search": "Search",
   "searchPlaceholder": "Enter product name, collection...",
   "searchSupportingText": "Type product name or keyword to search",
+  "searchPanel": {
+    "open": "Open search",
+    "close": "Close",
+    "clear": "Clear",
+    "submit": "Search",
+    "recent": "Recent searches",
+    "clearRecent": "Clear history",
+    "removeRecent": "Remove “{query}” from history",
+    "popular": "Popular searches",
+    "results": "Suggested products",
+    "viewAll": "View all {count} results",
+    "noResults": "No products found for “{query}”",
+    "noResultsHint": "Try a shorter keyword or pick a popular search below.",
+    "minChars": "Type at least {min} characters to see suggestions",
+    "custom": "Tailored",
+    "hintNavigate": "navigate",
+    "hintOpen": "open",
+    "hintClose": "close",
+    "keywords": [
+      "Wedding ao dai",
+      "Mulberry silk",
+      "Brocade",
+      "Modern",
+      "Custom tailor",
+      "Tet"
+    ]
+  },
   "tagline": "Embrace the Grace of Áo Việt, Embrace Youth for Life.",
   "login": "Login",
   "logout": "Logout",
@@ -20,12 +47,6 @@
   "previous": "Previous",
   "next": "Next",
   "continueShopping": "Continue shopping",
-  "cartMessages": {
-    "promoRequired": "Please enter a promo code",
-    "promoInvalid": "The promo code is invalid or has expired",
-    "promoPercentApplied": "{value}% discount applied!",
-    "promoFreeshipApplied": "Free shipping code applied!"
-  },
   "checkoutErrors": {
     "fullNameRequired": "Please enter your full name",
     "phoneRequired": "Please enter your phone number",

@@ -68,7 +68,7 @@ export function DashboardTailoringMonitor({
   };
 
   return (
-    <div className="rounded-xl border border-[#E4E4E7] bg-white p-6 shadow-sm mb-10 w-full max-w-full">
+    <div className="rounded-xl border border-[#E4E4E7] bg-white p-6 shadow-2xs w-full max-w-full">
       <div className="border-b border-[#E4E4E7] pb-5 mb-6 flex items-center gap-2.5">
         <Activity size={20} className="text-[#09090B]" />
         <div>

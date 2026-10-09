@@ -2,23 +2,33 @@
 
 import React, { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Users, Shield, RefreshCw, Lock, Unlock } from "lucide-react";
-import {
-  getStaffListAction,
-  updateStaffPermissionAction,
-  toggleStaffActiveAction,
-} from "../actions";
-import { type StaffPermissionInput, type StaffMemberItem } from "../types";
 import { useTranslations } from "next-intl";
+import { Users, Shield, RefreshCw, Lock, Unlock, UserPlus } from "lucide-react";
 import { useNotify } from "@/hooks/useNotify";
+import { getStaffListAction, updateStaffPermissionAction, toggleStaffActiveAction } from "../actions";
+import { type StaffPermissionInput, type StaffMemberItem } from "../types";
+import { STAFF_PERMISSION_FIELDS, type StaffPermissionField } from "../../session/permissions";
+import { ADMIN_CARD_CLASS, AdminPageHeader, AdminSecondaryButton } from "../../ui";
+import { CreateStaffDialog } from "./CreateStaffDialog";
 
 const STAFF_QUERY_KEY = ["admin", "staff"] as const;
+
+/** Nhân viên chưa có bản ghi StaffPermission = không có quyền nào (khớp với kiểm tra ở server) */
+const NO_PERMISSIONS: StaffPermissionInput = {
+  canManageOrders: false,
+  canUpdateTailoring: false,
+  canManageInventory: false,
+  canViewReports: false,
+  canManageContent: false,
+};
 
 export function AdminStaffManagement() {
   const queryClient = useQueryClient();
   const notify = useNotify();
+  const t = useTranslations("AdminPage.staff");
   const tToast = useTranslations("AdminPage.toasts");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   // Dữ liệu server -> React Query; cập nhật lạc quan (optimistic) bằng setQueryData
   const { data: staffList = [], isFetching: isLoading, refetch } = useQuery({
@@ -32,36 +42,27 @@ export function AdminStaffManagement() {
       return (res.data ?? []) as StaffMemberItem[];
     },
   });
-  const fetchStaff = () => void refetch();
+
   const setStaffList = (updater: (prev: StaffMemberItem[]) => StaffMemberItem[]) =>
     queryClient.setQueryData<StaffMemberItem[]>(STAFF_QUERY_KEY, (prev) => updater(prev ?? []));
 
-  const handleTogglePermission = async (
-    staffId: string,
-    currentPerms: StaffPermissionInput | null,
-    field: keyof StaffPermissionInput
-  ) => {
-    setUpdatingId(staffId);
-    const basePerms: StaffPermissionInput = currentPerms || {
-      canManageOrders: true,
-      canUpdateTailoring: true,
-      canManageInventory: false,
-      canViewReports: false,
+  const handleTogglePermission = async (staff: StaffMemberItem, field: StaffPermissionField) => {
+    setUpdatingId(staff.id);
+    const current = staff.staffPermission ?? { ...NO_PERMISSIONS, id: "" };
+    const nextPermissions: StaffPermissionInput = {
+      canManageOrders: current.canManageOrders,
+      canUpdateTailoring: current.canUpdateTailoring,
+      canManageInventory: current.canManageInventory,
+      canViewReports: current.canViewReports,
+      canManageContent: current.canManageContent,
+      [field]: !current[field],
     };
 
-    const newPerms = {
-      ...basePerms,
-      [field]: !basePerms[field],
-    };
-
-    const res = await updateStaffPermissionAction(staffId, newPerms);
+    const res = await updateStaffPermissionAction(staff.id, nextPermissions);
     if (res.success) {
       notify.success(tToast("permissionUpdateSuccess"));
-      // Cập nhật state local
       setStaffList((prev) =>
-        prev.map((s) =>
-          s.id === staffId ? { ...s, staffPermission: { ...s.staffPermission, ...newPerms } as StaffMemberItem["staffPermission"] } : s
-        )
+        prev.map((s) => (s.id === staff.id ? { ...s, staffPermission: { ...nextPermissions, id: staff.staffPermission?.id ?? "" } } : s))
       );
     } else {
       notify.error(res.error, "STAFF_PERMISSION_UPDATE_FAILED");
@@ -74,9 +75,7 @@ export function AdminStaffManagement() {
     const res = await toggleStaffActiveAction(staffId, !currentActive);
     if (res.success) {
       notify.success(tToast(!currentActive ? "staffUnlocked" : "staffLocked"));
-      setStaffList((prev) =>
-        prev.map((s) => (s.id === staffId ? { ...s, isActive: !currentActive } : s))
-      );
+      setStaffList((prev) => prev.map((s) => (s.id === staffId ? { ...s, isActive: !currentActive } : s)));
     } else {
       notify.error(res.error, "STAFF_STATUS_UPDATE_FAILED");
     }
@@ -85,140 +84,93 @@ export function AdminStaffManagement() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-zinc-200/80 shadow-2xs">
-        <div>
-          <h2 className="text-lg font-bold text-zinc-900 flex items-center gap-2">
-            <Users size={20} className="text-zinc-800" />
-            <span>Quản Lý Nhân Sự & Phân Quyền Chi Tiết</span>
-          </h2>
-          <p className="text-xs text-zinc-500 mt-0.5">
-            Bật/tắt các quyền hạn chi tiết (Granular Permissions) cho từng nhân viên Staff.
-          </p>
-        </div>
+      <AdminPageHeader
+        icon={Users}
+        eyebrow={t("eyebrow")}
+        title={t("title")}
+        description={t("description")}
+        actions={
+          <>
+            <AdminSecondaryButton onClick={() => void refetch()} disabled={isLoading}>
+              <RefreshCw size={14} className={isLoading ? "animate-spin" : ""} />
+              <span>{t("refresh")}</span>
+            </AdminSecondaryButton>
+            <button
+              type="button"
+              onClick={() => setIsCreateOpen(true)}
+              className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-[#18181B] px-3 py-2 text-xs font-semibold text-white shadow-2xs transition-colors hover:bg-[#09090B]"
+            >
+              <UserPlus size={14} />
+              <span>{t("create")}</span>
+            </button>
+          </>
+        }
+      />
 
-        <button
-          onClick={fetchStaff}
-          disabled={isLoading}
-          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-zinc-200 text-xs font-semibold text-zinc-700 hover:text-zinc-950 hover:bg-zinc-50 transition-all cursor-pointer"
-        >
-          <RefreshCw size={14} className={isLoading ? "animate-spin" : ""} />
-          <span>Làm mới</span>
-        </button>
-      </div>
-
-      {/* Staff Table */}
-      {isLoading ? (
-        <div className="bg-white rounded-2xl border border-zinc-200/80 p-12 text-center text-sm text-zinc-500">
-          <RefreshCw size={24} className="animate-spin mx-auto text-zinc-400 mb-3" />
-          <p>Đang tải danh sách nhân sự...</p>
+      {isLoading && staffList.length === 0 ? (
+        <div className={`${ADMIN_CARD_CLASS} p-12 text-center text-sm text-[#71717A]`}>
+          <RefreshCw size={24} className="mx-auto mb-3 animate-spin text-zinc-400" />
+          <p>{t("loading")}</p>
         </div>
       ) : staffList.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-zinc-200/80 p-12 text-center text-zinc-500">
-          <Shield size={32} className="mx-auto text-zinc-300 mb-3" />
-          <p className="text-sm font-medium text-zinc-700">Chưa có tài khoản nhân viên nào</p>
-          <p className="text-xs text-zinc-400 mt-1">Các tài khoản có Role STAFF sẽ xuất hiện ở bảng này.</p>
+        <div className={`${ADMIN_CARD_CLASS} p-12 text-center text-[#71717A]`}>
+          <Shield size={32} className="mx-auto mb-3 text-zinc-300" />
+          <p className="text-sm font-medium text-zinc-700">{t("empty.title")}</p>
+          <p className="mt-1 text-xs text-zinc-400">{t("empty.description")}</p>
         </div>
       ) : (
-        <div className="bg-white border border-zinc-200/80 rounded-2xl overflow-hidden shadow-2xs">
+        <div className={`${ADMIN_CARD_CLASS} overflow-hidden`}>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs text-zinc-700">
-              <thead className="bg-zinc-50/75 border-b border-zinc-200/80 text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">
+              <thead className="border-b border-[#E4E4E7] bg-zinc-50/75 text-[11px] font-semibold uppercase tracking-wider text-[#71717A]">
                 <tr>
-                  <th className="px-5 py-3.5">Nhân viên</th>
-                  <th className="px-4 py-3.5 text-center">Tạo/Xem Đơn</th>
-                  <th className="px-4 py-3.5 text-center">Tiến độ May đo</th>
-                  <th className="px-4 py-3.5 text-center">Kho Vải/SP</th>
-                  <th className="px-4 py-3.5 text-center">Báo cáo Doanh thu</th>
-                  <th className="px-4 py-3.5 text-center">Trạng thái</th>
+                  <th className="px-5 py-3.5">{t("columns.staff")}</th>
+                  {STAFF_PERMISSION_FIELDS.map((field) => (
+                    <th key={field} className="px-4 py-3.5 text-center">
+                      {t(`permissions.${field}`)}
+                    </th>
+                  ))}
+                  <th className="px-4 py-3.5 text-center">{t("columns.status")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-100">
                 {staffList.map((staff) => {
-                  const perms = staff.staffPermission || {
-                    canManageOrders: true,
-                    canUpdateTailoring: true,
-                    canManageInventory: false,
-                    canViewReports: false,
-                  };
+                  const permissions = staff.staffPermission ?? NO_PERMISSIONS;
+                  const isUpdating = updatingId === staff.id;
 
                   return (
-                    <tr key={staff.id} className="hover:bg-zinc-50/50 transition-colors">
+                    <tr key={staff.id} className="transition-colors hover:bg-zinc-50/50">
                       <td className="px-5 py-4">
-                        <div className="font-semibold text-zinc-900 text-sm">
-                          {staff.name || "Chưa đặt tên"}
-                        </div>
-                        <div className="text-zinc-500 text-[11px]">
-                          {staff.email || staff.phone}
-                        </div>
+                        <div className="text-sm font-semibold text-[#09090B]">{staff.name || t("unnamed")}</div>
+                        <div className="text-[11px] text-[#71717A]">{staff.email || staff.phone}</div>
                       </td>
 
-                      {/* canManageOrders */}
-                      <td className="px-4 py-4 text-center">
-                        <input
-                          type="checkbox"
-                          checked={Boolean(perms.canManageOrders)}
-                          onChange={() => handleTogglePermission(staff.id, perms, "canManageOrders")}
-                          disabled={updatingId === staff.id}
-                          className="size-4 rounded border-zinc-300 text-zinc-900 accent-zinc-900 cursor-pointer"
-                        />
-                      </td>
+                      {STAFF_PERMISSION_FIELDS.map((field) => (
+                        <td key={field} className="px-4 py-4 text-center">
+                          <input
+                            type="checkbox"
+                            aria-label={t(`permissions.${field}`)}
+                            checked={permissions[field]}
+                            onChange={() => handleTogglePermission(staff, field)}
+                            disabled={isUpdating}
+                            className="size-4 cursor-pointer rounded border-zinc-300 accent-zinc-900"
+                          />
+                        </td>
+                      ))}
 
-                      {/* canUpdateTailoring */}
-                      <td className="px-4 py-4 text-center">
-                        <input
-                          type="checkbox"
-                          checked={Boolean(perms.canUpdateTailoring)}
-                          onChange={() => handleTogglePermission(staff.id, perms, "canUpdateTailoring")}
-                          disabled={updatingId === staff.id}
-                          className="size-4 rounded border-zinc-300 text-zinc-900 accent-zinc-900 cursor-pointer"
-                        />
-                      </td>
-
-                      {/* canManageInventory */}
-                      <td className="px-4 py-4 text-center">
-                        <input
-                          type="checkbox"
-                          checked={Boolean(perms.canManageInventory)}
-                          onChange={() => handleTogglePermission(staff.id, perms, "canManageInventory")}
-                          disabled={updatingId === staff.id}
-                          className="size-4 rounded border-zinc-300 text-zinc-900 accent-zinc-900 cursor-pointer"
-                        />
-                      </td>
-
-                      {/* canViewReports */}
-                      <td className="px-4 py-4 text-center">
-                        <input
-                          type="checkbox"
-                          checked={Boolean(perms.canViewReports)}
-                          onChange={() => handleTogglePermission(staff.id, perms, "canViewReports")}
-                          disabled={updatingId === staff.id}
-                          className="size-4 rounded border-zinc-300 text-zinc-900 accent-zinc-900 cursor-pointer"
-                        />
-                      </td>
-
-                      {/* Active Status */}
                       <td className="px-4 py-4 text-center">
                         <button
+                          type="button"
                           onClick={() => handleToggleActive(staff.id, staff.isActive)}
-                          disabled={updatingId === staff.id}
-                          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                          disabled={isUpdating}
+                          className={`inline-flex cursor-pointer items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold transition-all ${
                             staff.isActive
-                              ? "bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100"
-                              : "bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100"
+                              ? "border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                              : "border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100"
                           }`}
                         >
-                          {staff.isActive ? (
-                            <>
-                              <Unlock size={10} />
-                              <span>Hoạt động</span>
-                            </>
-                          ) : (
-                            <>
-                              <Lock size={10} />
-                              <span>Đã khóa</span>
-                            </>
-                          )}
+                          {staff.isActive ? <Unlock size={10} /> : <Lock size={10} />}
+                          <span>{staff.isActive ? t("active") : t("locked")}</span>
                         </button>
                       </td>
                     </tr>
@@ -229,6 +181,12 @@ export function AdminStaffManagement() {
           </div>
         </div>
       )}
+
+      <CreateStaffDialog
+        open={isCreateOpen}
+        onOpenChange={setIsCreateOpen}
+        onCreated={(member) => setStaffList((prev) => [member, ...prev])}
+      />
     </div>
   );
 }

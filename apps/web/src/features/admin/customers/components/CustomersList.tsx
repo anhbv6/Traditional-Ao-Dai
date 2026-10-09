@@ -3,6 +3,8 @@
 import React, { useState, useTransition } from "react";
 import { type AdminCustomerItem } from "../types/customers.types";
 import { toggleCustomerActiveAction } from "../actions/customers.actions";
+import { ADMIN_ACTION_ACCESS, canAccess, useAdminSession } from "../../session";
+import { useNotify } from "@/hooks/useNotify";
 import {
   Users,
   Search,
@@ -24,6 +26,10 @@ export function CustomersList({ initialCustomers }: CustomersListProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState<AdminCustomerItem | null>(null);
   const [isPending, startTransition] = useTransition();
+  const notify = useNotify();
+  // Khóa / mở tài khoản khách hàng chỉ dành cho Super Admin (server cũng chặn)
+  const { user } = useAdminSession({ force: true });
+  const canToggleActive = canAccess(user, ADMIN_ACTION_ACCESS.toggleCustomerActive);
 
   const filtered = customers.filter((c) => {
     return (
@@ -40,6 +46,8 @@ export function CustomersList({ initialCustomers }: CustomersListProps) {
         setCustomers((prev) =>
           prev.map((c) => (c.id === userId ? { ...c, isActive: !current } : c))
         );
+      } else {
+        notify.error(res.error, "CUSTOMER_UPDATE_FAILED");
       }
     });
   };
@@ -65,7 +73,7 @@ export function CustomersList({ initialCustomers }: CustomersListProps) {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-[#E4E4E7] bg-zinc-50/50 text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">
+              <tr className="border-b border-[#E4E4E7] bg-zinc-50/50 text-[11px] font-semibold text-[#71717A] uppercase tracking-wider">
                 <th className="py-3 px-4">Khách hàng</th>
                 <th className="py-3 px-4">Số điện thoại</th>
                 <th className="py-3 px-4">Đơn hàng</th>
@@ -78,7 +86,7 @@ export function CustomersList({ initialCustomers }: CustomersListProps) {
             <tbody className="divide-y divide-[#E4E4E7] text-sm">
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-zinc-500">
+                  <td colSpan={7} className="py-12 text-center text-[#71717A]">
                     <Users className="mx-auto size-8 text-zinc-300 mb-2" />
                     Không tìm thấy khách hàng nào.
                   </td>
@@ -91,7 +99,7 @@ export function CustomersList({ initialCustomers }: CustomersListProps) {
                     className="hover:bg-zinc-50/80 transition-colors cursor-pointer"
                   >
                     <td className="py-3.5 px-4">
-                      <div className="font-semibold text-zinc-900">{cust.name || "Khách vãng lai"}</div>
+                      <div className="font-semibold text-[#09090B]">{cust.name || "Khách vãng lai"}</div>
                       <div className="text-xs text-zinc-400 font-mono">{cust.email || "--"}</div>
                     </td>
                     <td className="py-3.5 px-4 font-mono text-zinc-700 text-xs">
@@ -102,7 +110,7 @@ export function CustomersList({ initialCustomers }: CustomersListProps) {
                         <ShoppingBag size={12} className="text-zinc-400" /> {cust.ordersCount} đơn
                       </span>
                     </td>
-                    <td className="py-3.5 px-4 font-mono font-semibold text-zinc-900">
+                    <td className="py-3.5 px-4 font-mono font-semibold text-[#09090B]">
                       {cust.totalSpent.toLocaleString("vi-VN")} ₫
                     </td>
                     <td className="py-3.5 px-4">
@@ -116,9 +124,10 @@ export function CustomersList({ initialCustomers }: CustomersListProps) {
                     </td>
                     <td className="py-3.5 px-4" onClick={(e) => e.stopPropagation()}>
                       <button
-                        disabled={isPending}
+                        disabled={isPending || !canToggleActive}
                         onClick={() => handleToggleActive(cust.id, cust.isActive)}
-                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border transition-colors cursor-pointer ${
+                        title={canToggleActive ? undefined : "Chỉ Super Admin được khóa / mở tài khoản khách hàng"}
+                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border transition-colors ${canToggleActive ? "cursor-pointer" : "cursor-default"} ${
                           cust.isActive
                             ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                             : "bg-rose-50 text-rose-700 border-rose-200"
@@ -136,7 +145,7 @@ export function CustomersList({ initialCustomers }: CustomersListProps) {
                       </button>
                     </td>
                     <td className="py-3.5 px-4 text-right">
-                      <button className="p-1.5 text-zinc-400 hover:text-zinc-900 rounded-lg hover:bg-zinc-100 transition-colors">
+                      <button className="p-1.5 text-zinc-400 hover:text-[#09090B] rounded-lg hover:bg-zinc-100 transition-colors">
                         <ChevronRight size={16} />
                       </button>
                     </td>
@@ -155,16 +164,16 @@ export function CustomersList({ initialCustomers }: CustomersListProps) {
             <div className="space-y-6">
               <div className="flex items-center justify-between border-b border-[#E4E4E7] pb-4">
                 <div>
-                  <div className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+                  <div className="text-xs font-semibold uppercase tracking-wider text-[#71717A]">
                     Hồ sơ khách hàng
                   </div>
-                  <h3 className="text-lg font-bold text-zinc-900">
+                  <h3 className="text-lg font-bold text-[#09090B]">
                     {selectedCustomer.name || "Khách hàng"}
                   </h3>
                 </div>
                 <button
                   onClick={() => setSelectedCustomer(null)}
-                  className="p-1.5 text-zinc-400 hover:text-zinc-900 rounded-lg hover:bg-zinc-100 cursor-pointer"
+                  className="p-1.5 text-zinc-400 hover:text-[#09090B] rounded-lg hover:bg-zinc-100 cursor-pointer"
                 >
                   <XCircle size={20} />
                 </button>
@@ -184,25 +193,25 @@ export function CustomersList({ initialCustomers }: CustomersListProps) {
 
               {/* Danh sách các hồ sơ số đo áo dài đã lưu */}
               <div className="space-y-3">
-                <div className="text-xs font-semibold uppercase tracking-wider text-zinc-500 flex items-center gap-1.5">
+                <div className="text-xs font-semibold uppercase tracking-wider text-[#71717A] flex items-center gap-1.5">
                   <Ruler size={14} /> Danh sách hồ sơ số đo may riêng
                 </div>
                 {selectedCustomer.measurements.length === 0 ? (
-                  <div className="p-6 text-center bg-zinc-50 rounded-xl border border-zinc-200 text-zinc-400 text-xs">
+                  <div className="p-6 text-center bg-zinc-50 rounded-xl border border-[#E4E4E7] text-zinc-400 text-xs">
                     Khách hàng này chưa lưu số đo may đo nào.
                   </div>
                 ) : (
                   selectedCustomer.measurements.map((profile) => (
                     <div key={profile.id} className="p-4 bg-white rounded-xl border border-[#E4E4E7] shadow-2xs space-y-3">
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-sm text-zinc-900">{profile.profileName}</span>
+                        <span className="font-bold text-sm text-[#09090B]">{profile.profileName}</span>
                         {profile.isDefault && (
-                          <span className="px-2 py-0.5 rounded bg-zinc-900 text-white text-[10px] font-semibold">
+                          <span className="px-2 py-0.5 rounded bg-[#18181B] text-white text-[10px] font-semibold">
                             Mặc định
                           </span>
                         )}
                       </div>
-                      <div className="grid grid-cols-4 gap-2 text-[11px] bg-zinc-50 p-2.5 rounded-lg border border-zinc-200">
+                      <div className="grid grid-cols-4 gap-2 text-[11px] bg-zinc-50 p-2.5 rounded-lg border border-[#E4E4E7]">
                         <div>
                           <span className="text-zinc-400 block text-[9px]">Ngực</span>
                           <span className="font-mono font-bold text-zinc-800">{profile.bust || "--"} cm</span>
@@ -221,7 +230,7 @@ export function CustomersList({ initialCustomers }: CustomersListProps) {
                         </div>
                       </div>
                       {profile.note && (
-                        <div className="text-xs text-zinc-500 italic">
+                        <div className="text-xs text-[#71717A] italic">
                           Ghi chú: {profile.note}
                         </div>
                       )}
@@ -232,8 +241,8 @@ export function CustomersList({ initialCustomers }: CustomersListProps) {
             </div>
 
             <div className="border-t border-[#E4E4E7] pt-4 mt-6 flex justify-between items-center text-xs">
-              <span className="text-zinc-500">Tổng doanh thu từ khách:</span>
-              <span className="font-mono font-bold text-base text-zinc-900">
+              <span className="text-[#71717A]">Tổng doanh thu từ khách:</span>
+              <span className="font-mono font-bold text-base text-[#09090B]">
                 {selectedCustomer.totalSpent.toLocaleString("vi-VN")} ₫
               </span>
             </div>

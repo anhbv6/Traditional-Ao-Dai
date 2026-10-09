@@ -2,13 +2,13 @@
   "title": "Chào mừng đến với Webshop",
   "subtitle": "Khám phá các mẫu áo dài thanh lịch",
   "hero": {
-    "eyebrow": "Bộ sưu tập mới",
-    "title": "Áo dài thanh lịch cho mùa lễ hội",
-    "subtitle": "Những thiết kế mềm mại, phom dáng thoáng và chi tiết hoa lá tinh tế dành cho khoảnh khắc trang trọng nhưng vẫn nhẹ nhàng.",
-    "primaryAction": "Khám phá ngay",
-    "secondaryAction": "Câu chuyện thương hiệu",
-    "imageAlt": "Minh họa áo dài hoa sen màu đỏ đô",
-    "note": "Lụa mềm, thêu hoa thủ công và phom dáng được tinh chỉnh cho từng dịp.",
+    "eyebrow": "Bộ sưu tập Hoa Sen · Thu Đông 2026",
+    "title": "Nét xưa trong từng tà áo",
+    "subtitle": "Lụa tơ tằm, gấm thêu tay và phom dáng may đo riêng — để tà áo dài kể câu chuyện của chính bạn trong những khoảnh khắc trang trọng nhất.",
+    "primaryAction": "Khám phá bộ sưu tập",
+    "secondaryAction": "Đặt may đo",
+    "imageAlt": "Người mẫu mặc áo dài gấm đỏ đô thêu hoa sen vàng trong gian nhà cổ",
+    "note": "Gấm đỏ đô thêu sen kim tuyến — hoàn thiện thủ công trong 7 ngày.",
     "metrics": {
       "designs": {
         "value": "48+",
@@ -19,30 +19,28 @@
         "label": "dòng chất liệu"
       },
       "fitting": {
-        "value": "3D",
-        "label": "tư vấn phom dáng"
+        "value": "7 ngày",
+        "label": "hoàn thiện may đo"
       }
-    }
+    },
+    "caption": "Áo dài Gấm Sen Vàng",
+    "scroll": "Cuộn để khám phá"
   },
   "bestSellers": {
-    "eyebrow": "Sản Phẩm Nổi Bật",
-    "title": "Sản phẩm bán chạy / Xu hướng",
-    "description": "Các mẫu áo dài được chọn nhiều cho mùa cưới, Tết, kỷ yếu và những dịp trang trọng.",
-    "viewAll": "Xem tất cả sản phẩm"
-  },
-  "featuredCollections": {
-    "eyebrow": "BST Nổi Bật",
-    "title": "Bộ Sưu Tập Nổi Bật",
-    "description": "Đi thẳng đến các dòng áo dài đang được quan tâm nhất trong mùa này.",
-    "wedding": "Áo Dài Cưới",
-    "modern": "Áo Dài Cách Tân",
-    "silk": "Áo Dài Lụa Tơ Tằm",
-    "brocade": "Áo Dài Gấm Luxury",
-    "embroidered": "Áo Dài Thêu Tay"
+    "eyebrow": "Được yêu thích",
+    "title": "Những tà áo được chọn nhiều nhất",
+    "description": "Chọn theo dịp bạn sắp diện — chúng tôi gợi ý những mẫu phù hợp nhất.",
+    "viewAll": "Xem tất cả sản phẩm",
+    "tabs": {
+      "all": "Tất cả",
+      "wedding": "Cưới hỏi",
+      "tet": "Lễ & Tết",
+      "modern": "Cách tân"
+    }
   },
   "promoteFeedback": {
-    "eyebrow": "Cảm Nhận Khách Hàng",
-    "title": "Khoảnh Khắc Ý Nghĩa",
+    "eyebrow": "Cảm nhận khách hàng",
+    "title": "Khoảnh khắc ý nghĩa",
     "description": "Chia sẻ chân thực từ những vị khách quý khi diện lên mình tà áo Việt.",
     "reviews": {
       "1": {
@@ -75,12 +73,106 @@
         "role": "Giáo viên trung học",
         "content": "Mặc áo dài đứng lớp cả ngày mà không hề thấy bí bách. Chất vải thoáng khí, đường may rất chắc chắn, giặt nhiều lần vẫn bền màu như mới."
       }
-    }
+    },
+    "rating": "4.9/5 từ hơn 1.200 đánh giá",
+    "prev": "Đánh giá trước",
+    "next": "Đánh giá tiếp theo",
+    "goTo": "Xem đánh giá {index}"
   },
   "articleNews": {
-    "eyebrow": "Bản Tin Áo Dài",
-    "title": "Câu Chuyện & Cẩm Nang",
-    "description": "Cập nhật các bài viết mới nhất về văn hóa áo dài, bí quyết chọn lựa và bảo quản trang phục từ chuyên gia.",
-    "readMore": "Xem chi tiết"
+    "eyebrow": "Bản tin áo dài",
+    "title": "Câu chuyện & cẩm nang",
+    "description": "Văn hoá áo dài, bí quyết chọn lựa và cách bảo quản trang phục từ chuyên gia.",
+    "readMore": "Xem chi tiết",
+    "viewAll": "Xem tất cả bài viết",
+    "prev": "Bài viết trước",
+    "next": "Bài viết tiếp theo"
+  },
+  "trust": {
+    "silk": {
+      "title": "Lụa tơ tằm chọn lọc",
+      "desc": "Dệt tại làng nghề Vạn Phúc"
+    },
+    "embroidery": {
+      "title": "Thêu tay thủ công",
+      "desc": "Từng đường kim do nghệ nhân"
+    },
+    "tailoring": {
+      "title": "May đo theo số đo",
+      "desc": "Chỉnh phom miễn phí lần đầu"
+    },
+    "delivery": {
+      "title": "Giao hàng toàn quốc",
+      "desc": "Đóng hộp quà, kèm thiệp viết tay"
+    }
+  },
+  "featuredCollections": {
+    "eyebrow": "Bộ sưu tập",
+    "title": "Mỗi dịp, một tà áo",
+    "description": "Ba dòng áo dài được tuyển chọn cho những khoảnh khắc đáng nhớ nhất trong năm.",
+    "explore": "Xem bộ sưu tập",
+    "items": {
+      "tet": {
+        "name": "Áo Dài Du Xuân",
+        "desc": "Sắc đỏ ấm áp cho ngày Tết đoàn viên và những buổi du xuân."
+      },
+      "modern": {
+        "name": "Áo Dài Cách Tân",
+        "desc": "Voan lụa nhẹ, tông pastel — thanh lịch cho thường nhật."
+      },
+      "wedding": {
+        "name": "Áo Dài Cưới Hỏi",
+        "desc": "Gấm thêu hỷ sự, phom truyền thống cho ngày trọng đại."
+      }
+    }
+  },
+  "craftStory": {
+    "eyebrow": "Hành trình một tà áo",
+    "title": "Từ sợi tơ đến tà áo",
+    "description": "Mỗi chiếc áo dài đi qua ba công đoạn thủ công, kéo dài từ 5 đến 7 ngày.",
+    "cta": "Tìm hiểu về chúng tôi",
+    "steps": {
+      "1": {
+        "label": "Chất liệu",
+        "title": "Chọn tơ, chọn gấm",
+        "content": "Lụa tơ tằm và gấm được tuyển từ các làng dệt lâu đời, kiểm tra độ mềm, độ rủ và sắc màu dưới ánh sáng tự nhiên trước khi cắt."
+      },
+      "2": {
+        "label": "Thêu tay",
+        "title": "Hoa văn thêu thủ công",
+        "content": "Nghệ nhân thêu từng cánh sen, cành mai bằng chỉ kim tuyến. Một thân áo thêu kín có thể mất đến 40 giờ."
+      },
+      "3": {
+        "label": "May đo",
+        "title": "Phom dáng của riêng bạn",
+        "content": "Áo được cắt theo 12 số đo cơ thể, thử và chỉnh lại để tà áo ôm vừa vặn mà vẫn thanh thoát khi bước đi."
+      }
+    }
+  },
+  "bespoke": {
+    "eyebrow": "Dịch vụ may đo",
+    "title": "Một tà áo chỉ dành cho bạn",
+    "description": "Bốn bước đơn giản để có chiếc áo dài vừa vặn tuyệt đối — tại cửa hàng hoặc trực tuyến.",
+    "primaryAction": "Đặt lịch may đo",
+    "secondaryAction": "Câu hỏi thường gặp",
+    "note": "Tư vấn miễn phí · Chỉnh sửa miễn phí lần đầu",
+    "steps": {
+      "1": {
+        "title": "Tư vấn",
+        "desc": "Chia sẻ dịp mặc, sở thích màu sắc và kiểu dáng."
+      },
+      "2": {
+        "title": "Lấy số đo",
+        "desc": "Đo tại cửa hàng hoặc tự đo theo hướng dẫn chi tiết."
+      },
+      "3": {
+        "title": "Chọn vải & hoa văn",
+        "desc": "Chọn chất liệu, màu và hoạ tiết thêu theo ý bạn."
+      },
+      "4": {
+        "title": "Thử & hoàn thiện",
+        "desc": "Thử áo, tinh chỉnh và nhận áo trong hộp quà."
+      }
+    }
   }
 }

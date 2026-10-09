@@ -1,97 +1,179 @@
-import React from "react";
-import { formatVnd } from "@repo/shared";
+"use client";
+
+import React, { useState } from "react";
 import Image from "next/image";
-import { Trash2, Plus, Minus } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import { X } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { formatVnd, type Locale } from "@repo/shared";
 import { Link } from "@/i18n/routing";
+import { MAX_LINE_QUANTITY } from "../utils/pricing";
 import { type CartItem } from "../types/cart.types";
+import { QuantityStepper } from "./QuantityStepper";
+
+const EASE = [0.22, 1, 0.36, 1] as const;
+const FALLBACK_IMAGE = "/logoPage.png";
+/** Lưới cột desktop: sản phẩm | đơn giá | số lượng | thành tiền | xóa */
+const ROW_GRID = "md:grid md:grid-cols-[minmax(0,1fr)_110px_120px_120px_32px] md:items-center md:gap-4";
 
 interface CartItemListProps {
   cartItems: CartItem[];
-  handleQuantityChange: (id: string, delta: number) => void;
-  handleQuantityInput: (id: string, value: string) => void;
+  locale: Locale;
+  handleQuantityChange: (id: string, quantity: number) => void;
   handleRemoveItem: (id: string) => void;
 }
 
-export function CartItemList({
-  cartItems,
-  handleQuantityChange,
-  handleQuantityInput,
-  handleRemoveItem,
-}: CartItemListProps) {
+function CartLineImage({ item }: { item: CartItem }) {
+  const [failed, setFailed] = useState(false);
   return (
-    <div className="rounded-2xl border border-[#800020]/10 bg-white p-4 sm:p-6 shadow-xs divide-y divide-[#E2D9D2]/40">
-      {cartItems.map((item) => (
-        <div key={item.id} className="flex gap-4 py-5 first:pt-0 last:pb-0 group">
-          {/* Image */}
-          <div className="relative size-20 sm:size-24 shrink-0 overflow-hidden rounded-xl bg-[#FAF7F5] border border-[#E2D9D2]/30">
-            <Image
-              src={item.image}
-              alt={item.name}
-              fill
-              sizes="(max-width: 640px) 80px, 96px"
-              className="object-cover"
-              unoptimized
-            />
-          </div>
+    <Link
+      href={`/products/${item.slug}`}
+      className="relative block aspect-[3/4] w-[72px] shrink-0 overflow-hidden bg-[var(--bg-secondary)] sm:w-20"
+    >
+      <Image
+        src={failed ? FALLBACK_IMAGE : item.image}
+        alt={item.name}
+        fill
+        sizes="80px"
+        className={`transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-105 ${failed ? "object-contain p-2" : "object-cover"}`}
+        onError={() => setFailed(true)}
+      />
+    </Link>
+  );
+}
 
-          {/* Item Info & Actions */}
-          <div className="flex-1 flex flex-col justify-between min-w-0">
-            <div className="flex items-start justify-between gap-2">
-              <div>
-                <h3 className="font-[family-name:var(--font-playfair)] text-sm sm:text-base font-bold text-[#800020] hover:text-[#800020]/90">
-                  <Link href={`/products/${item.slug}`} className="hover:underline">
-                    {item.name}
-                  </Link>
-                </h3>
-                <p className="mt-1 text-xs text-[#706565]">
-                  Kích cỡ: <span className="font-bold text-[#2A2525]">{item.size}</span>
-                </p>
-              </div>
-              <p className="text-sm sm:text-base font-extrabold text-[#2A2525]">
-                {formatVnd(item.price)}
-              </p>
-            </div>
+/**
+ * Danh sách dòng giỏ hàng. Desktop: dạng bảng có tiêu đề cột. Mobile: ảnh + thông tin xếp gọn, số lượng & thành tiền ở hàng dưới.
+ * Xóa dòng: dòng co chiều cao và mờ dần, các dòng dưới trượt lên.
+ */
+export function CartItemList({ cartItems, locale, handleQuantityChange, handleRemoveItem }: CartItemListProps) {
+  const t = useTranslations("CartPage");
+  const stepperLabels = {
+    decrease: t("item.decrease"),
+    increase: t("item.increase"),
+    quantity: t("item.quantity"),
+    maxReached: t("item.maxReached", { max: MAX_LINE_QUANTITY }),
+  };
 
-            <div className="mt-4 flex items-center justify-between">
-              {/* Quantity Selector */}
-              <div className="flex items-center rounded-lg border border-[#E2D9D2] bg-[#FAF7F5] p-0.5">
-                <button
-                  type="button"
-                  onClick={() => handleQuantityChange(item.id, -1)}
-                  className="flex size-7 items-center justify-center rounded-md text-[#706565] hover:bg-white hover:text-[#800020] transition-colors cursor-pointer disabled:opacity-50"
-                  disabled={item.quantity <= 1}
-                >
-                  <Minus size={11} />
-                </button>
-                <input
-                  type="text"
-                  value={item.quantity}
-                  onChange={(e) => handleQuantityInput(item.id, e.target.value)}
-                  className="w-10 text-center text-xs font-bold text-[#2A2525] bg-transparent outline-none border-none"
-                />
-                <button
-                  type="button"
-                  onClick={() => handleQuantityChange(item.id, 1)}
-                  className="flex size-7 items-center justify-center rounded-md text-[#706565] hover:bg-white hover:text-[#800020] transition-colors cursor-pointer"
-                >
-                  <Plus size={11} />
-                </button>
-              </div>
+  return (
+    <div>
+      {/* Tiêu đề cột (desktop) */}
+      <div className={`hidden border-b border-[var(--border)] pb-2.5 text-[10px] uppercase tracking-[2px] text-[var(--text-light)] ${ROW_GRID}`}>
+        <span>{t("columns.product")}</span>
+        <span className="text-right">{t("columns.price")}</span>
+        <span className="text-center">{t("columns.quantity")}</span>
+        <span className="text-right">{t("columns.lineTotal")}</span>
+        <span />
+      </div>
 
-              {/* Trash Button */}
-              <button
-                type="button"
-                onClick={() => handleRemoveItem(item.id)}
-                className="flex size-8 items-center justify-center rounded-lg text-[#706565]/60 hover:bg-rose-50 hover:text-rose-600 transition-colors cursor-pointer active:scale-90"
-                title="Xóa sản phẩm"
+      <ul>
+        <AnimatePresence initial={false}>
+          {cartItems.map((item, index) => {
+            const lineTotal = item.price * item.quantity;
+            const measurements = item.measurements ? Object.entries(item.measurements) : [];
+
+            return (
+              <motion.li
+                key={item.id}
+                layout="position"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0, transition: { duration: 0.35, ease: EASE } }}
+                transition={{ duration: 0.5, ease: EASE, delay: Math.min(index, 6) * 0.04 }}
+                className="overflow-hidden border-b border-[var(--border)]"
               >
-                <Trash2 size={15} />
-              </button>
-            </div>
-          </div>
-        </div>
-      ))}
+                <div className={`flex gap-3 py-4 sm:gap-4 sm:py-5 ${ROW_GRID}`}>
+                  {/* Sản phẩm */}
+                  <div className="flex min-w-0 flex-1 gap-3 sm:gap-4">
+                    <CartLineImage item={item} />
+                    <div className="flex min-w-0 flex-1 flex-col">
+                      <div className="flex items-start justify-between gap-2">
+                        <h3 className="min-w-0 text-[13px] leading-snug sm:text-[15px]">
+                          <Link
+                            href={`/products/${item.slug}`}
+                            className="line-clamp-2 font-[family-name:var(--font-playfair)] font-semibold text-[var(--text-main)] transition-colors hover:text-[var(--primary-color)]"
+                          >
+                            {item.name}
+                          </Link>
+                        </h3>
+                        {/* Nút xóa (mobile) */}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveItem(item.id)}
+                          aria-label={t("item.remove")}
+                          className="-mr-1 -mt-1 grid size-7 shrink-0 cursor-pointer place-items-center text-[var(--text-light)] transition-colors hover:text-[var(--destructive)] md:hidden"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+
+                      <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-[var(--text-light)] sm:text-xs">
+                        {item.color ? (
+                          <span>
+                            {t("item.color")}: <span className="text-[var(--text-main)]">{item.color}</span>
+                          </span>
+                        ) : null}
+                        {item.color ? <span aria-hidden="true" className="h-2.5 w-px bg-[var(--border)]" /> : null}
+                        <span>
+                          {t("item.size")}: <span className="text-[var(--text-main)]">{item.size}</span>
+                        </span>
+                        {measurements.length > 0 ? (
+                          <span className="bg-[var(--primary-color)] px-1.5 py-px text-[9px] font-semibold uppercase tracking-[1px] text-white">
+                            {t("item.custom")}
+                          </span>
+                        ) : null}
+                      </p>
+
+                      {measurements.length > 0 ? (
+                        <p className="mt-1 line-clamp-2 text-[10px] leading-4 text-[var(--text-light)] sm:text-[11px]">
+                          {t("item.measurements")}: {measurements.map(([label, value]) => `${label}: ${value}`).join(" · ")}
+                        </p>
+                      ) : null}
+
+                      {/* Đơn giá (mobile) */}
+                      <p className="mt-1.5 flex items-baseline gap-1.5 text-[12px] md:hidden">
+                        <span className="text-[var(--text-main)]">{formatVnd(item.price, locale)}</span>
+                        {item.originalPrice ? (
+                          <span className="text-[10px] text-[var(--text-light)]/70 line-through">{formatVnd(item.originalPrice, locale)}</span>
+                        ) : null}
+                      </p>
+
+                      {/* Số lượng + thành tiền (mobile) */}
+                      <div className="mt-auto flex items-end justify-between gap-2 pt-2.5 md:hidden">
+                        <QuantityStepper value={item.quantity} onChange={(q) => handleQuantityChange(item.id, q)} labels={stepperLabels} />
+                        <span className="text-[13px] font-semibold text-[var(--primary-color)]">{formatVnd(lineTotal, locale)}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Cột desktop */}
+                  <div className="hidden text-right text-[13px] md:block">
+                    <p className="text-[var(--text-main)]">{formatVnd(item.price, locale)}</p>
+                    {item.originalPrice ? (
+                      <p className="text-[11px] text-[var(--text-light)]/70 line-through">{formatVnd(item.originalPrice, locale)}</p>
+                    ) : null}
+                  </div>
+                  <div className="hidden justify-center md:flex">
+                    <QuantityStepper value={item.quantity} onChange={(q) => handleQuantityChange(item.id, q)} labels={stepperLabels} />
+                  </div>
+                  <p className="hidden text-right text-[14px] font-semibold text-[var(--primary-color)] md:block">
+                    {formatVnd(lineTotal, locale)}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveItem(item.id)}
+                    aria-label={t("item.remove")}
+                    title={t("item.remove")}
+                    className="group hidden size-8 cursor-pointer place-items-center text-[var(--text-light)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--destructive)] md:grid"
+                  >
+                    <X size={15} className="transition-transform duration-300 group-hover:rotate-90" />
+                  </button>
+                </div>
+              </motion.li>
+            );
+          })}
+        </AnimatePresence>
+      </ul>
     </div>
   );
 }
-export default CartItemList;

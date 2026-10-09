@@ -2,14 +2,18 @@
 
 import { prisma } from "../../server/db.server";
 import { authorizeAdminAction } from "../../server/adminAuth.server";
-import { type StaffPermissionInput } from "../types/staff.types";
+import { ADMIN_MODULE_ACCESS } from "../../session/permissions";
+import bcrypt from "bcryptjs";
+import { z } from "zod";
+import { emailSchema, newPasswordSchema, normalizeVietnamPhone, vietnamPhoneSchema } from "@repo/shared";
+import { type CreateStaffInput, type StaffPermissionInput } from "../types/staff.types";
 import { getStaffListQuery } from "../queries/staff.queries";
 
 /**
  * Server Action: Lấy danh sách nhân viên kèm theo phân quyền chi tiết
  */
 export async function getStaffListAction() {
-  const auth = await authorizeAdminAction({ role: "ADMIN" });
+  const auth = await authorizeAdminAction(ADMIN_MODULE_ACCESS.staff);
   if (!auth.success) return auth;
 
   try {
@@ -34,7 +38,7 @@ export async function updateStaffPermissionAction(
   userId: string,
   permissions: StaffPermissionInput
 ) {
-  const auth = await authorizeAdminAction({ role: "ADMIN" });
+  const auth = await authorizeAdminAction(ADMIN_MODULE_ACCESS.staff);
   if (!auth.success) return auth;
 
   try {
@@ -52,14 +56,14 @@ export async function updateStaffPermissionAction(
         canUpdateTailoring: permissions.canUpdateTailoring,
         canManageInventory: permissions.canManageInventory,
         canViewReports: permissions.canViewReports,
-        canManageContent: Boolean(permissions.canManageContent),
+        canManageContent: permissions.canManageContent,
       },
       update: {
         canManageOrders: permissions.canManageOrders,
         canUpdateTailoring: permissions.canUpdateTailoring,
         canManageInventory: permissions.canManageInventory,
         canViewReports: permissions.canViewReports,
-        canManageContent: Boolean(permissions.canManageContent),
+        canManageContent: permissions.canManageContent,
       },
     });
 
@@ -80,7 +84,7 @@ export async function updateStaffPermissionAction(
  * Server Action: Khóa hoặc mở khóa tài khoản nhân viên
  */
 export async function toggleStaffActiveAction(userId: string, isActive: boolean) {
-  const auth = await authorizeAdminAction({ role: "ADMIN" });
+  const auth = await authorizeAdminAction(ADMIN_MODULE_ACCESS.staff);
   if (!auth.success) return auth;
 
   try {
@@ -109,5 +113,82 @@ export async function toggleStaffActiveAction(userId: string, isActive: boolean)
       success: false,
       error: "STAFF_STATUS_UPDATE_FAILED",
     };
+  }
+}
+
+const createStaffSchema = z.object({
+  name: z.string().trim().min(2, "NAME_MIN_LENGTH"),
+  email: emailSchema,
+  phone: vietnamPhoneSchema.optional().or(z.literal("")),
+  password: newPasswordSchema,
+  permissions: z.object({
+    canManageOrders: z.boolean(),
+    canUpdateTailoring: z.boolean(),
+    canManageInventory: z.boolean(),
+    canViewReports: z.boolean(),
+    canManageContent: z.boolean(),
+  }),
+});
+
+/**
+ * Server Action: Super Admin tạo tài khoản nhân viên (role STAFF) kèm bộ quyền chi tiết ban đầu.
+ * Luôn tạo bản ghi StaffPermission để quyền hiển thị trên UI trùng với quyền server kiểm tra.
+ */
+export async function createStaffAction(input: CreateStaffInput) {
+  const auth = await authorizeAdminAction(ADMIN_MODULE_ACCESS.staff);
+  if (!auth.success) return auth;
+
+  const parsed = createStaffSchema.safeParse(input);
+  if (!parsed.success) {
+    return { success: false as const, error: parsed.error.issues[0]?.message || "VALIDATION_ERROR" };
+  }
+
+  const { name, password, permissions } = parsed.data;
+  const email = parsed.data.email.toLowerCase();
+  const phone = normalizeVietnamPhone(parsed.data.phone) || null;
+
+  try {
+    const [emailOwner, phoneOwner] = await Promise.all([
+      prisma.user.findUnique({ where: { email }, select: { id: true } }),
+      phone ? prisma.user.findUnique({ where: { phone }, select: { id: true } }) : null,
+    ]);
+    if (emailOwner) return { success: false as const, error: "EMAIL_ALREADY_EXISTS" };
+    if (phoneOwner) return { success: false as const, error: "PHONE_ALREADY_EXISTS" };
+
+    const created = await prisma.user.create({
+      data: {
+        name,
+        email,
+        phone,
+        password: await bcrypt.hash(password, 10),
+        role: "STAFF",
+        isActive: true,
+        isEmailVerified: true,
+        staffPermission: { create: permissions },
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        isActive: true,
+        createdAt: true,
+        staffPermission: {
+          select: {
+            id: true,
+            canManageOrders: true,
+            canUpdateTailoring: true,
+            canManageInventory: true,
+            canViewReports: true,
+            canManageContent: true,
+          },
+        },
+      },
+    });
+
+    return { success: true as const, data: created };
+  } catch (error) {
+    console.error("Lỗi Action createStaffAction:", error);
+    return { success: false as const, error: "STAFF_CREATE_FAILED" };
   }
 }

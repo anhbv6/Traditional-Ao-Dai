@@ -85,7 +85,7 @@ export function DashboardOrderDetailDrawer({
                       {labels.updateStatus}
                     </label>
                     {isUpdating && (
-                      <div className="flex items-center gap-1.5 text-xs text-zinc-500 font-medium">
+                      <div className="flex items-center gap-1.5 text-xs text-[#71717A] font-medium">
                         <Spinner className="size-3" />
                         <span>Đang lưu...</span>
                       </div>
@@ -98,7 +98,7 @@ export function DashboardOrderDetailDrawer({
                       onChange={(e) =>
                         onUpdateStatus(selectedOrder.id, e.target.value as OrderStatus)
                       }
-                      className="w-full rounded-lg border border-[#E4E4E7] bg-white px-4 py-3 text-sm font-semibold text-[#09090B] outline-none shadow-sm focus:border-[#09090B] focus:ring-1 focus:ring-[#09090B] cursor-pointer disabled:opacity-60"
+                      className="w-full rounded-lg border border-[#E4E4E7] bg-white px-4 py-3 text-sm font-semibold text-[#09090B] outline-none shadow-2xs focus:border-[#09090B] focus:ring-1 focus:ring-[#09090B] cursor-pointer disabled:opacity-60"
                     >
                       {(["pending_approval", "cutting_fabric", "sewing_job", "completed", "shipping"] as OrderStatus[]).map(
                         (status) => (
@@ -174,7 +174,7 @@ export function DashboardOrderDetailDrawer({
                     {selectedOrder.items.map((item, index) => (
                       <div
                         key={index}
-                        className="flex justify-between items-center p-3 rounded-lg border border-[#E4E4E7] text-xs font-semibold text-[#09090B] bg-white shadow-xs"
+                        className="flex justify-between items-center p-3 rounded-lg border border-[#E4E4E7] text-xs font-semibold text-[#09090B] bg-white shadow-2xs"
                       >
                         <div>
                           <p className="text-[#09090B] font-semibold">{item.name}</p>

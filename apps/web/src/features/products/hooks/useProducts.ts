@@ -1,11 +1,12 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocale } from "next-intl";
 import { useLenis } from "lenis/react";
 import { type GridSize, type SortKey, type Locale } from "../types/products.types";
 import { productCatalog } from "../data/mockProducts";
 import { maxPrice, matchCollection } from "../components/FilterSidebar";
+import { scoreProduct } from "../utils/search";
 
 const pageSizeMap: Record<GridSize, number> = {
   3: 15,
@@ -13,13 +14,13 @@ const pageSizeMap: Record<GridSize, number> = {
   5: 20,
 };
 
-export function useProducts(initialCategory?: string) {
+export function useProducts(initialCategory?: string, initialQuery = "") {
   const locale = useLocale() as Locale;
-  const [searchQuery, setSearchQuery] = useState("");
+  // Từ khóa ban đầu lấy từ `?q=` (ô tìm kiếm trên header)
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
 
-  const [selectedCategories, setSelectedCategories] = useState<string[]>(
-    initialCategory ? [] : ["Áo dài Cưới"]
-  );
+  // Mặc định hiển thị toàn bộ sản phẩm — khách tự thu hẹp bằng bộ lọc
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedCollections, setSelectedCollections] = useState<string[]>(
     initialCategory ? [initialCategory] : []
   );
@@ -37,10 +38,8 @@ export function useProducts(initialCategory?: string) {
 
   const filteredProducts = useMemo(() => {
     const filtered = productCatalog.filter((product) => {
-      const searchMatch =
-        !searchQuery ||
-        product.name[locale].toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.id.toLowerCase().includes(searchQuery.toLowerCase());
+      // Không phân biệt dấu, tìm cả tên / mô tả / chất liệu / danh mục / màu / hình thức mua (dùng chung với header)
+      const searchMatch = !searchQuery.trim() || scoreProduct(product, searchQuery, locale) > 0;
       const categoryMatch = selectedCategories.length === 0 || selectedCategories.includes(product.category);
       const collectionMatch =
         selectedCollections.length === 0 ||
@@ -76,7 +75,8 @@ export function useProducts(initialCategory?: string) {
       if (lenis) {
         lenis.scrollTo(productListTop, {
           duration: 1.1,
-          offset: 0,
+          // Chừa chỗ cho header dính (80px) — thanh tìm kiếm ghim ngay bên dưới
+          offset: -80,
         });
         return;
       }
@@ -87,6 +87,15 @@ export function useProducts(initialCategory?: string) {
       });
     });
   }, [lenis]);
+
+  // Đến từ CTA banner sự kiện (`?category=...#product-list`): cuộn tới danh sách một lần sau khi dựng.
+  // Chỉ là hiệu ứng cuộn (không đồng bộ state); ref chặn chạy lại khi `lenis` khởi tạo xong muộn.
+  const hasScrolledToHash = useRef(false);
+  useEffect(() => {
+    if (hasScrolledToHash.current || window.location.hash !== "#product-list") return;
+    hasScrolledToHash.current = true;
+    scrollToProductListTop();
+  }, [scrollToProductListTop]);
 
   const resetPageAndScroll = useCallback(() => {
     setCurrentPage(1);
@@ -100,6 +109,26 @@ export function useProducts(initialCategory?: string) {
 
   const toggleValue = (value: string, values: string[], setter: React.Dispatch<React.SetStateAction<string[]>>) => {
     setter(values.includes(value) ? values.filter((item) => item !== value) : [...values, value]);
+    resetPageAndScroll();
+  };
+
+  /** Số nhóm lọc đang bật (không tính ô tìm kiếm) — dùng để hiện nút "Xóa tất cả" */
+  const activeFilterCount =
+    selectedCategories.length +
+    selectedCollections.length +
+    selectedPurchaseTypes.length +
+    selectedColors.length +
+    selectedMaterials.length +
+    (priceLimit < maxPrice ? 1 : 0);
+
+  const clearFilters = () => {
+    setSearchQuery("");
+    setSelectedCategories([]);
+    setSelectedCollections([]);
+    setSelectedPurchaseTypes([]);
+    setSelectedColors([]);
+    setSelectedMaterials([]);
+    setPriceLimit(maxPrice);
     resetPageAndScroll();
   };
 
@@ -134,5 +163,7 @@ export function useProducts(initialCategory?: string) {
     resetPageAndScroll,
     setPageAndScroll,
     toggleValue,
+    activeFilterCount,
+    clearFilters,
   };
 }

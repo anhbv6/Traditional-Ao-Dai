@@ -68,7 +68,7 @@ export function VouchersList({ initialVouchers }: VouchersListProps) {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-[#E4E4E7] bg-zinc-50/50 text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">
+              <tr className="border-b border-[#E4E4E7] bg-zinc-50/50 text-[11px] font-semibold text-[#71717A] uppercase tracking-wider">
                 <th className="py-3 px-4">Mã Voucher</th>
                 <th className="py-3 px-4">Mức giảm</th>
                 <th className="py-3 px-4">Đơn tối thiểu</th>
@@ -80,7 +80,7 @@ export function VouchersList({ initialVouchers }: VouchersListProps) {
             <tbody className="divide-y divide-[#E4E4E7] text-sm">
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-zinc-500">
+                  <td colSpan={6} className="py-12 text-center text-[#71717A]">
                     <Ticket className="mx-auto size-8 text-zinc-300 mb-2" />
                     Chưa có mã giảm giá nào.
                   </td>
@@ -92,16 +92,16 @@ export function VouchersList({ initialVouchers }: VouchersListProps) {
                   return (
                     <tr key={voucher.id} className="hover:bg-zinc-50/80 transition-colors">
                       <td className="py-3.5 px-4">
-                        <div className="font-mono font-bold text-xs text-zinc-900 bg-zinc-100 px-2.5 py-1 rounded inline-block border border-zinc-200">
+                        <div className="font-mono font-bold text-xs text-[#09090B] bg-zinc-100 px-2.5 py-1 rounded inline-block border border-[#E4E4E7]">
                           {voucher.code}
                         </div>
                         {voucher.description && (
-                          <div className="text-xs text-zinc-500 mt-1 line-clamp-1">
+                          <div className="text-xs text-[#71717A] mt-1 line-clamp-1">
                             {voucher.description}
                           </div>
                         )}
                       </td>
-                      <td className="py-3.5 px-4 font-semibold text-zinc-900">
+                      <td className="py-3.5 px-4 font-semibold text-[#09090B]">
                         {voucher.discountType === "PERCENTAGE" ? (
                           <span className="inline-flex items-center gap-1 text-purple-700 font-mono">
                             <Percent size={13} /> {voucher.value}%
@@ -140,7 +140,7 @@ export function VouchersList({ initialVouchers }: VouchersListProps) {
                           className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border transition-colors cursor-pointer ${
                             voucher.isActive
                               ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                              : "bg-zinc-100 text-zinc-500 border-zinc-200"
+                              : "bg-zinc-100 text-[#71717A] border-[#E4E4E7]"
                           }`}
                         >
                           {voucher.isActive ? (

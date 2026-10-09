@@ -37,7 +37,7 @@ const productImages = [
   'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=900&auto=format&fit=crop',
   'https://images.unsplash.com/photo-1608748010899-18f300247112?q=80&w=900&auto=format&fit=crop',
   'https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=900&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1549064482-6779ba3292fe?q=80&w=900&auto=format&fit=crop',
+  '/login_banner.jpg',
   'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=900&auto=format&fit=crop',
   'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=900&auto=format&fit=crop',
   'https://images.unsplash.com/photo-1496747611176-843222e1e57c?q=80&w=900&auto=format&fit=crop',

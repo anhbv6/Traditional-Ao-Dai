@@ -1,14 +1,22 @@
 import React from "react";
 import { getTranslations } from "next-intl/server";
-import { Container } from "@/components/ui/container";
 import {
   HeroBanner,
-  BestSellers,
+  HomeTrustStrip,
   FeaturedCollections,
+  BestSellers,
+  CraftStory,
+  BespokeService,
   PromoteFeedBack,
   ArticleNews,
 } from "@/features/home";
 
+/**
+ * Trình tự màn home theo mạch kể chuyện:
+ * Cảm xúc (hero) → Niềm tin (cam kết) → Cảm hứng (BST) → Lựa chọn (bán chạy) →
+ * Giá trị (hành trình thủ công) → Hành động (may đo) → Bằng chứng (đánh giá) → Nội dung (bản tin).
+ * Nền xen kẽ kem / trắng / đỏ đô / be để mỗi khối có nhịp riêng, tránh cảm giác một dải dài đơn điệu.
+ */
 export default async function Home() {
   const t = await getTranslations('HomePage');
 
@@ -22,18 +30,21 @@ export default async function Home() {
         secondaryAction={t('hero.secondaryAction')}
         imageAlt={t('hero.imageAlt')}
         note={t('hero.note')}
+        caption={t('hero.caption')}
+        scrollLabel={t('hero.scroll')}
         metrics={[
           { value: t('hero.metrics.designs.value'), label: t('hero.metrics.designs.label') },
           { value: t('hero.metrics.fabric.value'), label: t('hero.metrics.fabric.label') },
           { value: t('hero.metrics.fitting.value'), label: t('hero.metrics.fitting.label') },
         ]}
       />
-      <Container>
-        <BestSellers />
-        <FeaturedCollections />
-        <PromoteFeedBack />
-        <ArticleNews />
-      </Container>
+      <HomeTrustStrip />
+      <FeaturedCollections />
+      <BestSellers />
+      <CraftStory />
+      <BespokeService />
+      <PromoteFeedBack />
+      <ArticleNews />
     </>
   );
 }

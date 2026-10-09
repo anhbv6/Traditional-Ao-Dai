@@ -2,13 +2,13 @@
   "title": "Welcome to Webshop",
   "subtitle": "Discover elegant Ao Dai designs",
   "hero": {
-    "eyebrow": "New collection",
-    "title": "Elegant Ao Dai for graceful occasions",
-    "subtitle": "Soft silhouettes, airy tailoring, and delicate botanical details designed for formal moments that still feel gentle.",
-    "primaryAction": "Explore now",
-    "secondaryAction": "Our story",
-    "imageAlt": "Burgundy lotus Ao Dai illustration",
-    "note": "Soft silk, hand-finished floral details, and refined fits for every occasion.",
+    "eyebrow": "The Lotus Collection · Fall Winter 2026",
+    "title": "Heritage in every panel",
+    "subtitle": "Mulberry silk, hand-embroidered brocade and a silhouette tailored just for you — so your Ao Dai tells your own story on the moments that matter.",
+    "primaryAction": "Explore the collection",
+    "secondaryAction": "Book a fitting",
+    "imageAlt": "Model wearing a burgundy brocade Ao Dai with golden lotus embroidery in a traditional house",
+    "note": "Burgundy brocade with gold-thread lotus — handcrafted in 7 days.",
     "metrics": {
       "designs": {
         "value": "48+",
@@ -19,31 +19,29 @@
         "label": "fabric lines"
       },
       "fitting": {
-        "value": "3D",
-        "label": "fit guidance"
+        "value": "7 days",
+        "label": "bespoke turnaround"
       }
-    }
+    },
+    "caption": "Golden Lotus Brocade Ao Dai",
+    "scroll": "Scroll to discover"
   },
   "bestSellers": {
-    "eyebrow": "Best Sellers",
-    "title": "Best Sellers / Trending",
-    "description": "Most selected Ao Dai designs for weddings, Tet holiday, yearbooks, and formal events.",
-    "viewAll": "View all products"
-  },
-  "featuredCollections": {
-    "eyebrow": "Featured Collections",
-    "title": "Our Signature Lines",
-    "description": "Explore our most anticipated traditional and modern silhouettes of the season.",
-    "wedding": "Wedding Collection",
-    "modern": "Modern Collection",
-    "silk": "Silk Collection",
-    "brocade": "Luxury Brocade",
-    "embroidered": "Embroidered Art"
+    "eyebrow": "Most loved",
+    "title": "The pieces chosen most often",
+    "description": "Pick the occasion you are dressing for — we will suggest the best matches.",
+    "viewAll": "View all products",
+    "tabs": {
+      "all": "All",
+      "wedding": "Wedding",
+      "tet": "Festive & Tet",
+      "modern": "Modern"
+    }
   },
   "promoteFeedback": {
-    "eyebrow": "Client Stories",
-    "title": "Heartwarming Moments",
-    "description": "Genuine sharing from our beloved customers wearing our traditional creations.",
+    "eyebrow": "Client stories",
+    "title": "Meaningful moments",
+    "description": "Genuine words from our beloved customers wearing our traditional creations.",
     "reviews": {
       "1": {
         "name": "Mai Anh Le",
@@ -75,12 +73,106 @@
         "role": "High School Teacher",
         "content": "Wearing this to teach all day is extremely comfortable. The fabric is highly breathable, the stitching is durable, and the colors stay brand new."
       }
-    }
+    },
+    "rating": "4.9/5 from over 1,200 reviews",
+    "prev": "Previous review",
+    "next": "Next review",
+    "goTo": "Go to review {index}"
   },
   "articleNews": {
-    "eyebrow": "Ao Dai Journal",
-    "title": "Stories & Insights",
-    "description": "Read the latest stories about Ao Dai culture, tailoring tips, and preservation guides from our experts.",
-    "readMore": "Read more"
+    "eyebrow": "Ao Dai journal",
+    "title": "Stories & insights",
+    "description": "Ao Dai culture, styling tips and garment care guides from our experts.",
+    "readMore": "Read more",
+    "viewAll": "View all articles",
+    "prev": "Previous article",
+    "next": "Next article"
+  },
+  "trust": {
+    "silk": {
+      "title": "Selected mulberry silk",
+      "desc": "Woven in Van Phuc craft village"
+    },
+    "embroidery": {
+      "title": "Hand embroidery",
+      "desc": "Every stitch by an artisan"
+    },
+    "tailoring": {
+      "title": "Made to measure",
+      "desc": "First alteration is free"
+    },
+    "delivery": {
+      "title": "Nationwide delivery",
+      "desc": "Gift-boxed with a handwritten card"
+    }
+  },
+  "featuredCollections": {
+    "eyebrow": "Collections",
+    "title": "One occasion, one Ao Dai",
+    "description": "Three curated lines for the most memorable moments of the year.",
+    "explore": "View collection",
+    "items": {
+      "tet": {
+        "name": "Spring Festival Ao Dai",
+        "desc": "Warm reds for Tet reunions and spring outings."
+      },
+      "modern": {
+        "name": "Modern Ao Dai",
+        "desc": "Light silk voile in pastel tones — effortless every day."
+      },
+      "wedding": {
+        "name": "Wedding Ao Dai",
+        "desc": "Embroidered brocade in a classic cut for the big day."
+      }
+    }
+  },
+  "craftStory": {
+    "eyebrow": "The journey of an Ao Dai",
+    "title": "From silk thread to gown",
+    "description": "Every Ao Dai goes through three handcrafted stages over 5 to 7 days.",
+    "cta": "About us",
+    "steps": {
+      "1": {
+        "label": "Fabric",
+        "title": "Choosing silk and brocade",
+        "content": "Mulberry silk and brocade are sourced from long-standing weaving villages and checked for softness, drape and colour in natural light before cutting."
+      },
+      "2": {
+        "label": "Embroidery",
+        "title": "Hand-embroidered motifs",
+        "content": "Artisans stitch every lotus petal and apricot branch in metallic thread. A fully embroidered bodice can take up to 40 hours."
+      },
+      "3": {
+        "label": "Tailoring",
+        "title": "A silhouette of your own",
+        "content": "Each gown is cut to 12 body measurements, then fitted and adjusted so it hugs the body yet flows gracefully as you walk."
+      }
+    }
+  },
+  "bespoke": {
+    "eyebrow": "Bespoke service",
+    "title": "An Ao Dai made only for you",
+    "description": "Four simple steps to a perfectly fitted Ao Dai — in store or online.",
+    "primaryAction": "Book a fitting",
+    "secondaryAction": "FAQs",
+    "note": "Free consultation · First alteration free",
+    "steps": {
+      "1": {
+        "title": "Consult",
+        "desc": "Share the occasion, colours and styles you love."
+      },
+      "2": {
+        "title": "Measure",
+        "desc": "Get measured in store or follow our detailed guide."
+      },
+      "3": {
+        "title": "Fabric & motif",
+        "desc": "Choose the fabric, colour and embroidery pattern."
+      },
+      "4": {
+        "title": "Fit & finish",
+        "desc": "Try it on, fine-tune and receive it gift-boxed."
+      }
+    }
   }
 }

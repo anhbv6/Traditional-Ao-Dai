@@ -28,6 +28,9 @@
 - TUYỆT ĐỐI KHÔNG tự ghi `document.cookie` cho auth, KHÔNG lưu token/thông tin người dùng vào `localStorage` — cookie do Backend quản lý.
 
 # 5. Khu vực Admin (gọi DB trực tiếp)
+- Server Next cần `DATABASE_URL` trong `apps/web/.env` (cùng giá trị với `apps/api/.env`).
+- Phân quyền: một nguồn duy nhất `features/admin/session/permissions.ts` (`ADMIN_MODULE_ACCESS`, `ADMIN_ACTION_ACCESS`, `canAccess`) dùng chung cho menu, page, action và UI.
+- Giao diện: mọi trang dùng `AdminPage` + `AdminPageHeader` (`features/admin/ui`); quy chuẩn token tại `app/[locale]/(admin)/admin/variables.md`. Layout gắn class `admin-shell` (font Inter, reset kiểu chữ storefront).
 - `features/admin/<module>/queries` (đọc Prisma, dùng ở Server Component) + `actions` (`"use server"`).
 - Mọi Server Action gọi `authorizeAdminAction({ role?, permission? })` ở dòng đầu; mọi page đọc DB gọi `requireAdminPage()`.
 - Người thực hiện lấy từ `auth.user.id`, không nhận từ client. Không trả `error.message` nội bộ — `error` luôn là mã KEY, client hiển thị qua `useNotify()`.

@@ -22,6 +22,8 @@ export default function RelatedProducts({ relatedProducts, title }: RelatedProdu
             name={item.name}
             description={item.description}
             price={item.price}
+            priceValue={item.priceValue}
+            slug={item.id}
             originalPrice={item.originalPrice}
             colorSwatches={item.colors}
             sizes={item.sizes}

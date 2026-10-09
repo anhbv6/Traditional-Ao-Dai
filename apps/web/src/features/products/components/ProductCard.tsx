@@ -1,13 +1,15 @@
 'use client';
 
-import { useState } from 'react';
-import type { ComponentProps } from 'react';
+import { useRef, useState } from 'react';
 import Image from 'next/image';
-import { Heart, ShoppingBag } from 'lucide-react';
+import { Heart, Scissors, ShoppingBag } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { Link } from '@/i18n/routing';
+import { Link, useRouter } from '@/i18n/routing';
 import { parseVndString, useCartStore } from '@/features/cart';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useIsWishlisted, useWishlistStore } from '@/features/wishlist';
+import { showToast } from '@/components/ui/toast';
+import { flyToCart } from '@/components/shared/flyToCart';
+import { materialKeys } from './FilterSidebar';
 
 export type ProductColorSwatch = {
   name: string;
@@ -15,7 +17,8 @@ export type ProductColorSwatch = {
   imageSrc?: string;
 };
 
-type ProductHref = ComponentProps<typeof Link>['href'];
+/** Dùng chung cho Link ở tiêu đề và router.push khi bấm thẻ (kiểu của router hẹp hơn Link) */
+type ProductHref = Parameters<ReturnType<typeof useRouter>['push']>[0];
 
 type ProductCardProps = {
   imageSrc?: string;
@@ -30,7 +33,8 @@ type ProductCardProps = {
   /** Slug sản phẩm — khóa nhận diện trong giỏ hàng */
   slug?: string;
   originalPrice?: string;
-  // badge?: string;
+  /** Giá gốc số nguyên VND (dùng cho danh sách yêu thích) */
+  originalPriceValue?: number;
   colorSwatches?: ProductColorSwatch[];
   sizes?: string[];
   material?: string;
@@ -39,112 +43,212 @@ type ProductCardProps = {
   productHref?: ProductHref;
 };
 
+const MAX_SWATCHES = 4;
 
+/**
+ * Thẻ sản phẩm kiểu tạp chí: ảnh dọc chiếm trọn thẻ, chữ tối giản bên dưới (tên — chất liệu — giá + màu).
+ * Rê chuột (desktop): ảnh phụ mờ dần vào, dải "Thêm vào giỏ" trượt lên từ đáy ảnh.
+ * Mobile: nút yêu thích / giỏ hàng luôn hiện dạng icon nhỏ ở góc ảnh.
+ */
 export function ProductCard({
   imageSrc = '/logoPage.png',
   hoverImageSrc,
   imageAlt = 'Product image',
-  name = 'Allen Solly',
-  description = 'Women Textured Handheld Bag',
+  name = '',
+  description,
   price = '',
   priceValue,
   slug,
   originalPrice,
-  // badge,
+  originalPriceValue,
   colorSwatches = [],
+  sizes = [],
+  material,
+  purchaseType,
   objectFit,
   productHref,
 }: ProductCardProps) {
   const t = useTranslations('Product');
   const fallbackImageSrc = '/logoPage.png';
-  const [isHovered, setIsHovered] = useState(false);
-  const selectedColorIndex: number | null = null;
   const [failedImageSrc, setFailedImageSrc] = useState<string | null>(null);
-  const swatchImageSrc = selectedColorIndex === null ? undefined : colorSwatches[selectedColorIndex]?.imageSrc;
-  const displayImageSrc = swatchImageSrc ?? (isHovered && hoverImageSrc ? hoverImageSrc : imageSrc);
-  const currentImageSrc = failedImageSrc === displayImageSrc ? fallbackImageSrc : displayImageSrc;
+  const [hoverImageFailed, setHoverImageFailed] = useState(false);
+  const currentImageSrc = failedImageSrc === imageSrc ? fallbackImageSrc : imageSrc;
   const isPlaceholder = currentImageSrc === fallbackImageSrc;
   const fitMode = objectFit ?? (isPlaceholder ? 'contain' : 'cover');
-  const imageClassName = `transition-transform duration-[800ms] cubic-bezier(0.25, 1, 0.5, 1) group-hover:scale-[1.04] ${
+  // Ảnh phụ được tải sẵn và xếp chồng lên ảnh chính; rê chuột chỉ làm mờ dần (không đổi src -> không nháy / giật)
+  const showHoverImage = Boolean(hoverImageSrc) && !hoverImageFailed && !isPlaceholder;
+  const imageClassName = `transition-[opacity,transform] duration-[1200ms,1800ms] ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform group-hover:scale-[1.03] ${
     fitMode === 'cover' ? 'object-cover' : 'object-contain px-8 py-10 sm:px-10'
   }`;
+  const imageSizes = '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 300px';
 
+  const router = useRouter();
+  const imageFrameRef = useRef<HTMLDivElement>(null);
+  const targetHref = productHref ?? '/products';
+
+  /**
+   * Bấm vào bất kỳ đâu trên thẻ -> sang trang chi tiết.
+   * Bỏ qua khi bấm vào link (tiêu đề đã tự điều hướng) hoặc nút (yêu thích / giỏ hàng).
+   */
+  const handleCardClick = (e: React.MouseEvent<HTMLElement>) => {
+    if ((e.target as HTMLElement).closest('a, button')) return;
+    router.push(targetHref);
+  };
+
+  // Dòng phụ dưới tên: ưu tiên chất liệu (ngắn, dễ so sánh), không có thì dùng mô tả
+  const subline = material ? (materialKeys[material] ? t(`materials.${materialKeys[material]}`) : material) : description;
+  const itemSlug = slug ?? name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+  // Giỏ hàng / yêu thích lưu số nguyên VND; dữ liệu mock hiện chỉ có chuỗi giá đã định dạng
+  const itemPrice = priceValue ?? parseVndString(price);
+  const isWishlisted = useIsWishlisted(itemSlug);
+
+  const isCustom = purchaseType === 'custom';
+
+  /**
+   * Thêm nhanh: hàng may sẵn -> size M (hoặc size đầu tiên nếu không có M);
+   * hàng may đo -> sang trang chi tiết để nhập số đo (không thêm thẳng vào giỏ).
+   */
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
+    if (isCustom) {
+      router.push(targetHref);
+      return;
+    }
+
+    const size = sizes.includes('M') ? 'M' : (sizes[0] ?? 'M');
     useCartStore.getState().addItem({
       name,
-      slug: slug ?? name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, ""),
+      slug: itemSlug,
       image: currentImageSrc,
-      // Giỏ hàng lưu số nguyên VND; dữ liệu mock hiện chỉ có chuỗi giá đã định dạng
-      price: priceValue ?? parseVndString(price),
-      size: "M",
+      price: itemPrice,
+      originalPrice: originalPriceValue,
+      size,
+    });
+    flyToCart(currentImageSrc, imageFrameRef.current);
+    showToast.success(t('cartAdded'), `${name} · ${t('sizeLabel')} ${size}`);
+  };
+
+  const handleToggleWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    useWishlistStore.getState().toggle({
+      slug: itemSlug,
+      name,
+      image: imageSrc,
+      price: itemPrice,
+      originalPrice: originalPriceValue,
+      subline: subline || undefined,
+      purchaseType: purchaseType === 'custom' ? 'custom' : 'ready',
     });
   };
 
+  const extraSwatches = colorSwatches.length - MAX_SWATCHES;
+
   return (
     <article
-      className="group w-full overflow-hidden font-[family-name:var(--font-lora)] text-[var(--text-main)]"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      className="group w-full cursor-pointer font-[family-name:var(--font-lora)] text-[var(--text-main)]"
+      onMouseEnter={() => router.prefetch(targetHref)}
+      onClick={handleCardClick}
     >
-      <div className="relative aspect-[4/5] overflow-hidden bg-[var(--bg-secondary)]">
+      <div ref={imageFrameRef} className="relative aspect-[3/4] overflow-hidden bg-[var(--bg-secondary)]">
         <Image
           src={currentImageSrc}
           alt={imageAlt}
-          fill={true}
-          sizes="(max-width: 640px) 92vw, (max-width: 1024px) 44vw, (max-width: 1280px) 25vw, 300px"
+          fill
+          sizes={imageSizes}
           className={imageClassName}
-          onError={() => setFailedImageSrc(displayImageSrc)}
+          onError={() => setFailedImageSrc(imageSrc)}
         />
+        {showHoverImage ? (
+          <Image
+            src={hoverImageSrc as string}
+            alt=""
+            aria-hidden="true"
+            fill
+            sizes={imageSizes}
+            className={`opacity-0 group-hover:opacity-100 ${imageClassName}`}
+            onError={() => setHoverImageFailed(true)}
+          />
+        ) : null}
 
-        <div className="absolute right-2 top-3 flex translate-x-0 flex-col gap-2 opacity-100 transition-all duration-[600ms] ease-out sm:right-4 sm:top-4 sm:translate-x-3 sm:opacity-0 sm:group-hover:translate-x-0 sm:group-hover:opacity-100">
+        {originalPrice ? (
+          <span className="absolute left-0 top-3 bg-[var(--primary-color)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[1.5px] text-white">
+            {t('sale')}
+          </span>
+        ) : null}
+
+        <div
+          className={`absolute right-2.5 top-2.5 flex flex-col gap-2 transition-opacity duration-500 lg:group-hover:opacity-100 ${
+            isWishlisted ? '' : 'lg:opacity-0'
+          }`}
+        >
           <button
             type="button"
-            aria-label={t('addToWishlist')}
-            className="cursor-pointer grid size-8 place-items-center rounded-full bg-white text-[var(--text-main)] shadow-sm transition-colors duration-300 hover:bg-[var(--primary-color)] hover:text-white sm:size-10"
+            onClick={handleToggleWishlist}
+            aria-pressed={isWishlisted}
+            aria-label={isWishlisted ? t('removeFromWishlist') : t('addToWishlist')}
+            className={`grid size-8 cursor-pointer place-items-center backdrop-blur-sm transition-colors duration-300 active:scale-90 sm:size-9 ${
+              isWishlisted
+                ? 'bg-[var(--primary-color)] text-white'
+                : 'bg-white/90 text-[var(--text-main)] hover:bg-[var(--primary-color)] hover:text-white'
+            }`}
           >
-            <Heart size={16} strokeWidth={2} />
+            <Heart
+              size={15}
+              strokeWidth={1.6}
+              fill={isWishlisted ? 'currentColor' : 'none'}
+              className={`transition-transform duration-300 ${isWishlisted ? 'scale-110' : ''}`}
+            />
           </button>
           <button
             type="button"
             onClick={handleAddToCart}
-            aria-label={t('addToCart')}
-            className="cursor-pointer grid size-8 place-items-center rounded-full bg-white text-[var(--text-main)] shadow-sm transition-colors duration-300 hover:bg-[var(--primary-color)] hover:text-white sm:size-10 active:scale-90"
+            aria-label={isCustom ? t('customTailor') : t('addToCart')}
+            className="grid size-8 cursor-pointer place-items-center bg-white/90 text-[var(--text-main)] backdrop-blur-sm transition-colors duration-300 hover:bg-[var(--primary-color)] hover:text-white active:scale-90 sm:size-9 lg:hidden"
           >
-            <ShoppingBag size={16} strokeWidth={2} />
+            <ShoppingBag size={15} strokeWidth={1.6} />
           </button>
         </div>
+
+        {/* Desktop: dải thêm vào giỏ trượt lên khi rê chuột */}
+        <button
+          type="button"
+          onClick={handleAddToCart}
+          className="absolute inset-x-0 bottom-0 hidden min-h-11 translate-y-full cursor-pointer items-center justify-center gap-2.5 bg-white/95 text-[11px] font-semibold uppercase tracking-[2px] text-[var(--text-main)] backdrop-blur-sm transition-[transform,background-color,color] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[var(--primary-color)] hover:text-white focus-visible:translate-y-0 group-hover:translate-y-0 lg:flex"
+        >
+          {isCustom ? <Scissors size={14} strokeWidth={1.6} /> : <ShoppingBag size={14} strokeWidth={1.6} />}
+          {isCustom ? t('customTailor') : t('addToCart')}
+        </button>
       </div>
 
-      <div className="pb-4 pt-6 w-full min-w-0 overflow-hidden">
-        <TooltipProvider delay={200}>
-          <Tooltip>
-            <h3 className="w-full min-w-0">
-              <TooltipTrigger
-                render={
-                  <Link
-                    href={productHref ?? '/products'}
-                    className="block w-full min-w-0 max-w-full cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap border-0 bg-transparent p-0 text-left font-[family-name:var(--font-playfair)] text-base font-semibold leading-tight text-[var(--primary-color)] sm:text-lg"
-                  />
-                }
-              >
-                {name}
-              </TooltipTrigger>
-            </h3>
-            <TooltipContent className="bg-[var(--primary-color)] text-white border-0 shadow-md text-xs font-[family-name:var(--font-lora)] px-3 py-2 rounded-md">
-              {name}
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-        <p title={description} className="mt-2 text-xs leading-relaxed text-[var(--text-light)] sm:text-sm line-clamp-2">
-          {description}
-        </p>
-        <div className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-sm leading-none sm:mt-3 sm:text-lg">
-          <span className="font-semibold text-[var(--primary-color)]">{price}</span>
-          {originalPrice ? (
-            <span className="text-xs text-[var(--text-light)]/60 line-through sm:text-sm">{originalPrice}</span>
+      <div className="pt-4">
+        <h3 className="min-w-0">
+          <Link
+            href={targetHref}
+            title={name}
+            className="block truncate font-[family-name:var(--font-playfair)] text-[15px] font-semibold leading-snug text-[var(--text-main)] transition-colors hover:text-[var(--primary-color)] sm:text-[17px]"
+          >
+            {name}
+          </Link>
+        </h3>
+        {subline ? <p className="mt-1 truncate text-xs text-[var(--text-light)] sm:text-[13px]">{subline}</p> : null}
+
+        {/* Giá + màu: trên thẻ hẹp (mobile 2 cột) dải màu tự xuống dòng thay vì ép giá gốc xuống dưới */}
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 sm:mt-2.5">
+          <p className="flex items-baseline gap-x-1.5 whitespace-nowrap text-[13px] sm:gap-x-2 sm:text-[15px]">
+            <span className="font-semibold text-[var(--primary-color)]">{price}</span>
+            {originalPrice ? <span className="text-[11px] text-[var(--text-light)]/70 line-through sm:text-xs">{originalPrice}</span> : null}
+          </p>
+          {colorSwatches.length > 0 ? (
+            <ul className="flex shrink-0 items-center gap-1" aria-label={t('colorsLabel')}>
+              {colorSwatches.slice(0, MAX_SWATCHES).map((swatch) => (
+                <li key={swatch.name} title={swatch.name} className="size-2.5 rounded-full ring-1 ring-black/10" style={{ backgroundColor: swatch.hex }} />
+              ))}
+              {extraSwatches > 0 ? <li className="ml-0.5 text-[10px] text-[var(--text-light)]">+{extraSwatches}</li> : null}
+            </ul>
           ) : null}
         </div>
       </div>

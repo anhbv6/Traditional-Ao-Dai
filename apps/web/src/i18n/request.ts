@@ -13,6 +13,7 @@ export default getRequestConfig(async ({requestLocale}) => {
       about,
       auth,
       breadcrumbs,
+      cart,
       common,
       contact,
       footer,
@@ -29,6 +30,7 @@ export default getRequestConfig(async ({requestLocale}) => {
       import(`../../messages/${locale}/about.json`).then(m => m.default),
       import(`../../messages/${locale}/auth.json`).then(m => m.default),
       import(`../../messages/${locale}/breadcrumbs.json`).then(m => m.default),
+      import(`../../messages/${locale}/cart.json`).then(m => m.default),
       import(`../../messages/${locale}/common.json`).then(m => m.default),
       import(`../../messages/${locale}/contact.json`).then(m => m.default),
       import(`../../messages/${locale}/footer.json`).then(m => m.default),
@@ -55,6 +57,7 @@ export default getRequestConfig(async ({requestLocale}) => {
               }
             },
             Breadcrumbs: breadcrumbs,
+            CartPage: cart,
             Common: {
               ...common,
               errors: {

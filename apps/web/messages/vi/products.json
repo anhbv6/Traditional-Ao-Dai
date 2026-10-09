@@ -1,18 +1,13 @@
 {
   "banner": {
-    "title": "Áo Dài Sắc Việt",
-    "subtitle": "Sự kết hợp hoàn mỹ giữa nét đẹp truyền thống và phong cách đương đại",
-    "morph1": "Duyên Dáng",
-    "morph2": "Thanh Lịch",
-    "morph3": "Kiêu Sa",
-    "morph4": "Hiện Đại",
-    "morph5": "Tự Hào"
+    "eyebrow": "Cửa hàng",
+    "title": "Áo dài Sắc Việt",
+    "subtitle": "Áo dài may sẵn và nhận may đo theo số đo riêng — từ lụa tơ tằm, gấm đến voan, cho ngày cưới, lễ Tết và những ngày thường muốn mặc đẹp."
   },
   "filter": {
     "title": "Bộ lọc",
-    "subtitle": "Tìm đúng mẫu",
     "searchTitle": "Tìm kiếm",
-    "searchPlaceholder": "Tìm tên hoặc mã sản phẩm...",
+    "searchPlaceholder": "Tìm theo tên, chất liệu, màu…",
     "categoryTitle": "Loại sản phẩm / Dịp",
     "collectionTitle": "Bộ sưu tập",
     "purchaseTypeTitle": "Hình thức mua",
@@ -20,18 +15,19 @@
     "materialTitle": "Chất liệu",
     "priceTitle": "Khoảng giá",
     "priceRange": "Giá: {min}đ - {max}đ",
-    "clearThisFilter": "Xóa bộ lọc mục này"
+    "clearAll": "Xóa tất cả ({count})",
+    "clear": "Xóa",
+    "priceUpTo": "Đến {max}đ",
+    "clearSearch": "Xóa từ khóa",
+    "sheetDescription": "Thu hẹp danh sách theo bộ sưu tập, hình thức mua, màu sắc, chất liệu và giá.",
+    "clearAllShort": "Xóa tất cả",
+    "showResults": "Xem {count} sản phẩm"
   },
   "collection": {
-    "foundCount": "Tìm thấy {count} sản phẩm phù hợp",
-    "foundCountMobile": "{count} sản phẩm",
-    "sortByLabel": "Sắp xếp:",
+    "foundCount": "{count} sản phẩm",
+    "sortByLabel": "Sắp xếp",
     "sortByPlaceholder": "Sắp xếp theo",
-    "columnsLabel": "Cột hiển thị:",
-    "columnsPlaceholder": "Chọn cột",
-    "cols3": "3 Cột",
-    "cols4": "4 Cột",
-    "cols5": "5 Cột",
+    "columnsLabel": "Cột",
     "sortOptions": {
       "all": "Hiển thị tất cả",
       "newest": "Mới nhất",
@@ -39,6 +35,50 @@
       "priceDesc": "Giá giảm dần",
       "bestSeller": "Bán chạy nhất",
       "favorite": "Được yêu thích nhất"
+    },
+    "allCategories": "Tất cả",
+    "emptyTitle": "Chưa có mẫu phù hợp",
+    "emptyDescription": "Thử bỏ bớt vài bộ lọc, hoặc nhắn cho chúng tôi để may đo đúng mẫu bạn đang tìm.",
+    "clearFilters": "Xóa bộ lọc"
+  },
+  "events": {
+    "label": "Sự kiện & ưu đãi",
+    "prev": "Sự kiện trước",
+    "next": "Sự kiện tiếp theo",
+    "goTo": "Xem sự kiện: {title}",
+    "endsIn": "Kết thúc sau",
+    "ended": "Ưu đãi đã kết thúc",
+    "units": {
+      "days": "ngày",
+      "hours": "giờ",
+      "minutes": "phút",
+      "seconds": "giây"
+    },
+    "items": {
+      "wedding": {
+        "tag": "Mùa cưới 2026",
+        "title": "Áo dài cưới may đo",
+        "discount": "-15%",
+        "description": "Đặt may áo dài cưới cho cô dâu và gia đình trước 31/12 — tặng kèm một lần chỉnh sửa và khăn vấn thêu tay.",
+        "cta": "Xem áo dài cưới",
+        "imageAlt": "Cô dâu mặc áo dài đỏ thêu kim tuyến trong phòng khách cổ"
+      },
+      "tet": {
+        "tag": "Đón Tết Đinh Mùi",
+        "title": "Gấm đỏ cho ngày đầu năm",
+        "discount": "-20%",
+        "description": "Bộ sưu tập gấm thêu sắc đỏ, vàng — mặc đi chùa, chúc Tết và chụp ảnh xuân. Giao trước 28 tháng Chạp.",
+        "cta": "Xem bộ sưu tập Tết",
+        "imageAlt": "Cô gái mặc áo dài đỏ cầm bó hoa vàng giữa chợ quê"
+      },
+      "silk": {
+        "tag": "Hàng mới về",
+        "title": "Lụa tơ tằm thu",
+        "discount": "-10%",
+        "description": "Những gam xanh rêu, ngà và be của mùa thu Hà Nội, dệt từ lụa tơ tằm mềm mát, rủ nhẹ theo dáng người.",
+        "cta": "Xem áo dài lụa",
+        "imageAlt": "Cô gái mặc áo dài lụa xanh nhạt cầm hoa loa kèn bên hồ"
+      }
     }
   }
 }

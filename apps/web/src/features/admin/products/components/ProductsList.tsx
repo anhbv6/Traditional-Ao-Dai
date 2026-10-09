@@ -78,7 +78,7 @@ export function ProductsList({ initialProducts }: ProductsListProps) {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-[#E4E4E7] bg-zinc-50/50 text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">
+              <tr className="border-b border-[#E4E4E7] bg-zinc-50/50 text-[11px] font-semibold text-[#71717A] uppercase tracking-wider">
                 <th className="py-3 px-4">Sản phẩm</th>
                 <th className="py-3 px-4">Danh mục & Chất liệu</th>
                 <th className="py-3 px-4">Giá niêm yết</th>
@@ -91,7 +91,7 @@ export function ProductsList({ initialProducts }: ProductsListProps) {
             <tbody className="divide-y divide-[#E4E4E7] text-sm">
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-zinc-500">
+                  <td colSpan={7} className="py-12 text-center text-[#71717A]">
                     <Shirt className="mx-auto size-8 text-zinc-300 mb-2" />
                     Chưa có sản phẩm nào.
                   </td>
@@ -101,7 +101,7 @@ export function ProductsList({ initialProducts }: ProductsListProps) {
                   <tr key={product.id} className="hover:bg-zinc-50/80 transition-colors">
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-3">
-                        <div className="size-10 rounded-lg bg-zinc-100 border border-zinc-200 overflow-hidden shrink-0 flex items-center justify-center">
+                        <div className="size-10 rounded-lg bg-zinc-100 border border-[#E4E4E7] overflow-hidden shrink-0 flex items-center justify-center">
                           {product.images?.[0] ? (
                             // eslint-disable-next-line @next/next/no-img-element -- ảnh từ URL tùy ý (blob xem trước / avatar / ảnh do admin nhập), không tối ưu được bằng next/image
                             <img
@@ -114,23 +114,23 @@ export function ProductsList({ initialProducts }: ProductsListProps) {
                           )}
                         </div>
                         <div>
-                          <div className="font-semibold text-zinc-900 line-clamp-1">{product.name}</div>
+                          <div className="font-semibold text-[#09090B] line-clamp-1">{product.name}</div>
                           <div className="text-xs text-zinc-400 font-mono">/{product.slug}</div>
                         </div>
                       </div>
                     </td>
                     <td className="py-3.5 px-4">
                       <div className="font-medium text-zinc-800">{product.categoryName}</div>
-                      <div className="text-xs text-zinc-500">{product.material || "Lụa truyền thống"}</div>
+                      <div className="text-xs text-[#71717A]">{product.material || "Lụa truyền thống"}</div>
                     </td>
-                    <td className="py-3.5 px-4 font-mono font-semibold text-zinc-900">
+                    <td className="py-3.5 px-4 font-mono font-semibold text-[#09090B]">
                       {Number(product.basePrice).toLocaleString("vi-VN")} ₫
                     </td>
                     <td className="py-3.5 px-4">
-                      <div className="font-mono font-medium text-zinc-900">
+                      <div className="font-mono font-medium text-[#09090B]">
                         {product.totalStock} cái
                       </div>
-                      <div className="text-xs text-zinc-500">
+                      <div className="text-xs text-[#71717A]">
                         {product.variantsCount} biến thể
                       </div>
                     </td>
@@ -141,7 +141,7 @@ export function ProductsList({ initialProducts }: ProductsListProps) {
                         className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border transition-colors cursor-pointer ${
                           product.isCustomFit
                             ? "bg-purple-50 text-purple-700 border-purple-200"
-                            : "bg-zinc-100 text-zinc-500 border-zinc-200"
+                            : "bg-zinc-100 text-[#71717A] border-[#E4E4E7]"
                         }`}
                       >
                         <Scissors size={12} />

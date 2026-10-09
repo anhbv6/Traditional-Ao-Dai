@@ -1,23 +1,11 @@
+import type { ContactFormValues } from "../types/contact.types";
+
 /**
- * API methods for the Contact feature
+ * Gửi lời nhắn tư vấn — hiện là mock (Backend chưa có endpoint liên hệ).
+ * Khi có API thật, thay bằng `apiClient.post(...)`.
  */
-
-export interface ContactMessageInput {
-  name: string;
-  contactInfo: string;
-  requestType: string;
-  message: string;
-}
-
-export const sendContactMessage = async (data: ContactMessageInput) => {
-  // Mock API call to simulate network request delay
+export const sendContactMessage = async (data: ContactFormValues) => {
+  void data;
   await new Promise((resolve) => setTimeout(resolve, 800));
-
-  // Simply log the message internally and return success
-  console.log("Contact Message Submitted: ", data);
-
-  return {
-    success: true,
-    message: "Message sent successfully!",
-  };
+  return { success: true };
 };

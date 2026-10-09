@@ -120,5 +120,7 @@
   "VERIFICATION_CODE_OR_RESET_TOKEN_REQUIRED": "Vui lòng cung cấp mã xác minh hoặc mã đặt lại mật khẩu.",
   "VERIFICATION_TOO_MANY_ATTEMPTS": "Bạn đã nhập sai mã xác minh quá nhiều lần. Vui lòng yêu cầu mã mới.",
   "VOUCHER_UPDATE_FAILED": "Không thể cập nhật voucher.",
-  "WARD_NAME_REQUIRED": "Vui lòng chọn phường/xã."
+  "WARD_NAME_REQUIRED": "Vui lòng chọn phường/xã.",
+  "INVENTORY_LIST_FAILED": "Không thể tải danh sách tồn kho.",
+  "STAFF_CREATE_FAILED": "Không thể tạo tài khoản nhân viên."
 }

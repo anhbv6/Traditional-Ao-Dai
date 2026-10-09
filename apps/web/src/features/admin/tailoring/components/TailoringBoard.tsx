@@ -104,7 +104,7 @@ export function TailoringBoard({ initialItems }: TailoringBoardProps) {
       {/* Grid of Tailoring Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredItems.length === 0 ? (
-          <div className="col-span-full py-16 text-center bg-white rounded-xl border border-[#E4E4E7] text-zinc-500">
+          <div className="col-span-full py-16 text-center bg-white rounded-xl border border-[#E4E4E7] text-[#71717A]">
             <Scissors className="mx-auto size-10 text-zinc-300 mb-2" />
             Không có mẫu áo dài nào trong công đoạn này.
           </div>
@@ -122,16 +122,16 @@ export function TailoringBoard({ initialItems }: TailoringBoardProps) {
                 <div>
                   <div className="flex items-start justify-between gap-2 mb-3">
                     <div>
-                      <span className="font-mono text-xs font-bold text-zinc-900">
+                      <span className="font-mono text-xs font-bold text-[#09090B]">
                         {item.orderNumber}
                       </span>
-                      <h4 className="font-semibold text-sm text-zinc-900 mt-0.5 line-clamp-1">
+                      <h4 className="font-semibold text-sm text-[#09090B] mt-0.5 line-clamp-1">
                         {item.productName}
                       </h4>
                     </div>
                     <span
                       className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold border ${
-                        currentStepObj?.color || "bg-zinc-50 text-zinc-700 border-zinc-200"
+                        currentStepObj?.color || "bg-zinc-50 text-zinc-700 border-[#E4E4E7]"
                       }`}
                     >
                       <StepIcon size={12} />
@@ -172,9 +172,9 @@ export function TailoringBoard({ initialItems }: TailoringBoardProps) {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-3 border-t border-[#E4E4E7] text-xs text-zinc-500">
+                <div className="flex items-center justify-between pt-3 border-t border-[#E4E4E7] text-xs text-[#71717A]">
                   <span>{item.latestLog?.staffName ? `Thợ: ${item.latestLog.staffName}` : "Chưa phân công"}</span>
-                  <span className="inline-flex items-center gap-1 font-semibold text-zinc-900 hover:underline">
+                  <span className="inline-flex items-center gap-1 font-semibold text-[#09090B] hover:underline">
                     Xem hồ sơ đo <ChevronRight size={14} />
                   </span>
                 </div>
@@ -187,24 +187,24 @@ export function TailoringBoard({ initialItems }: TailoringBoardProps) {
       {/* Modal chi tiết số đo và chuyển công đoạn */}
       {selectedItem && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl border border-[#E4E4E7] space-y-6 animate-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl border border-[#E4E4E7] space-y-6 animate-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between border-b border-[#E4E4E7] pb-4">
               <div>
-                <div className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+                <div className="text-xs font-semibold text-[#71717A] uppercase tracking-wider">
                   Phiếu cắt may Áo Dài • {selectedItem.orderNumber}
                 </div>
-                <h3 className="text-lg font-bold text-zinc-900">{selectedItem.productName}</h3>
+                <h3 className="text-lg font-bold text-[#09090B]">{selectedItem.productName}</h3>
               </div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => window.print()}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-zinc-200 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 cursor-pointer"
+                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-[#E4E4E7] text-xs font-semibold text-zinc-700 hover:bg-zinc-50 cursor-pointer"
                 >
                   <Printer size={14} /> In phiếu cắt
                 </button>
                 <button
                   onClick={() => setSelectedItem(null)}
-                  className="p-1.5 text-zinc-400 hover:text-zinc-900 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer"
+                  className="p-1.5 text-zinc-400 hover:text-[#09090B] rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer"
                 >
                   <XCircle size={20} />
                 </button>
@@ -213,7 +213,7 @@ export function TailoringBoard({ initialItems }: TailoringBoardProps) {
 
             {/* Bảng chi tiết 12 thông số vàng của Áo Dài */}
             <div>
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-3 flex items-center gap-1.5">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-[#71717A] mb-3 flex items-center gap-1.5">
                 <Ruler size={14} /> Thông số may đo chuẩn (cm / kg)
               </h4>
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 bg-zinc-50 p-4 rounded-xl border border-[#E4E4E7]">
@@ -231,9 +231,9 @@ export function TailoringBoard({ initialItems }: TailoringBoardProps) {
                   { label: "Dài quần", val: selectedItem.pantsLength ? `${selectedItem.pantsLength} cm` : "--" },
                   { label: "Vòng đùi", val: selectedItem.thigh ? `${selectedItem.thigh} cm` : "--" },
                 ].map((stat, idx) => (
-                  <div key={idx} className="bg-white p-2.5 rounded-lg border border-zinc-200">
-                    <span className="text-[10px] text-zinc-500 block uppercase font-medium">{stat.label}</span>
-                    <span className="font-mono font-bold text-sm text-zinc-900">{stat.val}</span>
+                  <div key={idx} className="bg-white p-2.5 rounded-lg border border-[#E4E4E7]">
+                    <span className="text-[10px] text-[#71717A] block uppercase font-medium">{stat.label}</span>
+                    <span className="font-mono font-bold text-sm text-[#09090B]">{stat.val}</span>
                   </div>
                 ))}
               </div>
@@ -247,7 +247,7 @@ export function TailoringBoard({ initialItems }: TailoringBoardProps) {
 
             {/* Chuyển công đoạn xưởng may */}
             <div className="space-y-3">
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-zinc-500 flex items-center gap-1.5">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-[#71717A] flex items-center gap-1.5">
                 <Scissors size={14} /> Chuyển công đoạn xưởng
               </h4>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -261,8 +261,8 @@ export function TailoringBoard({ initialItems }: TailoringBoardProps) {
                       onClick={() => handleUpdateStep(selectedItem, step.status)}
                       className={`p-3 rounded-xl border text-left flex items-center gap-2 transition-all cursor-pointer ${
                         isCurrent
-                          ? "bg-zinc-900 text-white border-zinc-900 shadow-xs"
-                          : "bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-50 hover:border-zinc-300"
+                          ? "bg-[#18181B] text-white border-zinc-900 shadow-2xs"
+                          : "bg-white text-zinc-700 border-[#E4E4E7] hover:bg-zinc-50 hover:border-zinc-300"
                       }`}
                     >
                       <Icon size={16} />
