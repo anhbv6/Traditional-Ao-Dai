@@ -39,7 +39,7 @@ export function UndoSnackbar({
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 40 }}
           transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed inset-x-3 bottom-20 z-40 mx-auto max-w-sm overflow-hidden bg-[var(--text-main)] text-white shadow-lg sm:bottom-6 sm:inset-x-auto sm:left-1/2 sm:w-full sm:-translate-x-1/2"
+          className="fixed inset-x-3 bottom-20 z-40 mx-auto max-w-sm overflow-hidden bg-[var(--bg-inverse)] text-white shadow-lg sm:bottom-6 sm:inset-x-auto sm:left-1/2 sm:w-full sm:-translate-x-1/2"
         >
           <div className="flex items-center gap-3 py-2.5 pl-4 pr-2">
             <p className="min-w-0 flex-1 truncate text-[12px]">{message}</p>

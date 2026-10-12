@@ -37,7 +37,7 @@ export function NewsCta({ categoryKey }: NewsCtaProps) {
       <p className="mt-3 max-w-lg text-[13px] leading-6 text-white/80 sm:text-sm">{t(`cta.${categoryKey}.description`)}</p>
       <Link
         href={href}
-        className="group/cta relative mt-6 inline-flex min-h-11 items-center gap-2 overflow-hidden bg-white px-6 text-[11px] font-semibold uppercase tracking-[2px] text-[var(--primary-color)]"
+        className="group/cta relative mt-6 inline-flex min-h-11 items-center gap-2 overflow-hidden bg-[var(--bg-card)] px-6 text-[11px] font-semibold uppercase tracking-[2px] text-[var(--primary-ink)]"
       >
         <span
           aria-hidden="true"

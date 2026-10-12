@@ -92,7 +92,7 @@ export function MobileMenu({
         <DrawerTrigger asChild>
           <button
             type="button"
-            className="grid h-11 w-11 place-items-center rounded-md text-primary transition-colors hover:bg-secondary"
+            className="grid h-11 w-11 place-items-center rounded-md text-primary-ink transition-colors hover:bg-secondary"
             aria-label="Open navigation"
           >
             <Menu size={24} strokeWidth={1.5} />
@@ -104,7 +104,7 @@ export function MobileMenu({
               <DrawerTitle>
                 <Logo />
               </DrawerTitle>
-              <DrawerDescription className="mt-1 text-sm font-semibold tracking-wide font-[family-name:var(--font-dancing)] text-primary leading-relaxed">
+              <DrawerDescription className="mt-1 text-sm font-semibold tracking-wide font-[family-name:var(--font-dancing)] text-primary-ink leading-relaxed">
                 &ldquo;{taglineDrawer}&rdquo;
               </DrawerDescription>
             </div>
@@ -122,7 +122,7 @@ export function MobileMenu({
                   <DrawerClose key={item.href} asChild>
                     <Link
                       href={item.href}
-                      className="group flex min-h-12 items-center justify-between border-b border-secondary py-3 text-sm font-normal uppercase tracking-[1px] text-foreground transition-colors hover:text-primary"
+                      className="group flex min-h-12 items-center justify-between border-b border-secondary py-3 text-sm font-normal uppercase tracking-[1px] text-foreground transition-colors hover:text-primary-ink"
                     >
                       <span className="font-[family-name:var(--font-lora)]">
                         {item.label}
@@ -141,13 +141,13 @@ export function MobileMenu({
                   <button
                     type="button"
                     onClick={() => setIsLangOpen((prev) => !prev)}
-                    className="flex min-h-12 w-full items-center justify-between py-2 text-sm font-normal uppercase tracking-[1px] text-foreground transition-colors hover:text-primary"
+                    className="flex min-h-12 w-full items-center justify-between py-2 text-sm font-normal uppercase tracking-[1px] text-foreground transition-colors hover:text-primary-ink"
                     aria-expanded={isLangOpen}
                   >
                     <span className="font-[family-name:var(--font-lora)]">
                       {languageLabel} ({currentLocale.toUpperCase()})
                     </span>
-                    <span className="grid h-8 w-8 place-items-center text-primary transition-colors">
+                    <span className="grid h-8 w-8 place-items-center text-primary-ink transition-colors">
                       {isLangOpen ? <Minus size={16} strokeWidth={1.8} /> : <Plus size={16} strokeWidth={1.8} />}
                     </span>
                   </button>
@@ -168,12 +168,12 @@ export function MobileMenu({
                             className={[
                               'flex items-center justify-between rounded-lg px-3 py-2.5 text-xs font-semibold uppercase tracking-wider transition-colors',
                               isSelected
-                                ? 'bg-background text-primary '
-                                : 'text-muted-foreground hover:bg-background hover:text-primary',
+                                ? 'bg-background text-primary-ink '
+                                : 'text-muted-foreground hover:bg-background hover:text-primary-ink',
                             ].join(' ')}
                           >
                             <span>{langName} ({loc.toUpperCase()})</span>
-                            {isSelected && <Check size={14} className="text-primary" />}
+                            {isSelected && <Check size={14} className="text-primary-ink" />}
                           </button>
                         );
                       })}
@@ -201,7 +201,7 @@ export function MobileMenu({
                       type="button"
                       onClick={handleLogout}
                       disabled={isPending}
-                      className="flex min-h-12 items-center justify-center gap-2 rounded-md border border-secondary px-4 text-xs font-semibold uppercase tracking-wider text-foreground transition-colors hover:text-primary disabled:opacity-60"
+                      className="flex min-h-12 items-center justify-center gap-2 rounded-md border border-secondary px-4 text-xs font-semibold uppercase tracking-wider text-foreground transition-colors hover:text-primary-ink disabled:opacity-60"
                     >
                       <LogOut size={16} strokeWidth={1.5} />
                       {logoutLabel}

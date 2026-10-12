@@ -56,7 +56,7 @@ export function NewsShare({ title, layout = "row" }: NewsShareProps) {
   };
 
   const buttonClass =
-    "grid size-9 cursor-pointer place-items-center border border-[var(--border)] bg-white text-[var(--text-main)] transition-colors duration-300 hover:border-[var(--primary-color)] hover:bg-[var(--primary-color)] hover:text-white";
+    "grid size-9 cursor-pointer place-items-center border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-main)] transition-colors duration-300 hover:border-[var(--primary-color)] hover:bg-[var(--primary-color)] hover:text-white";
 
   return (
     <div className={layout === "column" ? "flex flex-col items-start gap-2" : "flex flex-wrap items-center gap-2"}>

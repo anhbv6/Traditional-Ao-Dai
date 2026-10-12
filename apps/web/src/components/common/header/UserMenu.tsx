@@ -73,11 +73,11 @@ export function UserMenu({
           <button
             type="button"
             onClick={toggle}
-            className="grid h-11 w-11 place-items-center rounded-full text-primary transition-opacity hover:opacity-75 outline-none cursor-pointer"
+            className="grid h-11 w-11 place-items-center rounded-full text-primary-ink transition-opacity hover:opacity-75 outline-none cursor-pointer"
             aria-expanded={open}
             aria-label={profileLabel}
           >
-            <Avatar size="lg" className="border border-[#E2D9D2] shadow-sm">
+            <Avatar size="lg" className="border border-[var(--border)] shadow-sm">
               {avatarUrl && (
                 <AvatarImage
                   src={avatarUrl}
@@ -85,7 +85,7 @@ export function UserMenu({
                   className="object-cover"
                 />
               )}
-              <AvatarFallback className="bg-[#FAF7F5] text-xs font-bold uppercase text-[#800020]">
+              <AvatarFallback className="bg-[var(--bg-main)] text-xs font-bold uppercase text-[var(--primary-ink)]">
                 {avatarFallback || <UserRound size={18} strokeWidth={1.6} aria-hidden="true" />}
               </AvatarFallback>
             </Avatar>
@@ -97,14 +97,14 @@ export function UserMenu({
             <Link
               href="/profile"
               onClick={close}
-              className="relative z-10 block rounded-lg px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-[#FAF7F5] hover:text-primary"
+              className="relative z-10 block rounded-lg px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-[var(--bg-main)] hover:text-primary-ink"
             >
               {profileLabel}
             </Link>
             <Link
               href="/profile/orders"
               onClick={close}
-              className="relative z-10 block rounded-lg px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-[#FAF7F5] hover:text-primary"
+              className="relative z-10 block rounded-lg px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-[var(--bg-main)] hover:text-primary-ink"
             >
               {ordersLabel}
             </Link>
@@ -112,7 +112,7 @@ export function UserMenu({
               <Link
                 href="/admin/dashboard"
                 onClick={close}
-                className="relative z-10 block rounded-lg px-3 py-2 text-sm font-semibold text-[#800020] transition-colors hover:bg-[#FAF7F5]"
+                className="relative z-10 block rounded-lg px-3 py-2 text-sm font-semibold text-[var(--primary-ink)] transition-colors hover:bg-[var(--bg-main)]"
               >
                 Về trang quản trị
               </Link>

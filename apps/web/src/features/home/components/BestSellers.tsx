@@ -43,7 +43,7 @@ export function BestSellers() {
     .slice(0, VISIBLE_COUNT);
 
   return (
-    <section className="bg-white py-20 sm:py-28">
+    <section className="bg-[var(--bg-card)] py-20 sm:py-28">
       <div className="mx-auto w-full max-w-[1440px] px-5 sm:px-8 lg:px-10 xl:px-16">
         <SectionHeading index="02" eyebrow={t('eyebrow')} title={t('title')} description={t('description')} />
 
@@ -59,7 +59,7 @@ export function BestSellers() {
                 onClick={() => setActiveTab(tab.key)}
                 className={cn(
                   'relative shrink-0 cursor-pointer px-4 py-2 text-xs font-semibold uppercase tracking-[2px] transition-colors duration-300',
-                  isActive ? 'text-[var(--primary-color)]' : 'text-[var(--text-light)] hover:text-[var(--primary-color)]',
+                  isActive ? 'text-[var(--primary-ink)]' : 'text-[var(--text-light)] hover:text-[var(--primary-ink)]',
                 )}
               >
                 {t(`tabs.${tab.key}`)}
@@ -102,7 +102,7 @@ export function BestSellers() {
         <div className="mt-14 flex justify-center">
           <Link
             href="/products"
-            className="group inline-flex items-center gap-3 border-b border-[var(--primary-color)]/40 pb-1 text-xs font-semibold uppercase tracking-[2px] text-[var(--primary-color)] transition-colors hover:border-[var(--primary-color)]"
+            className="group inline-flex items-center gap-3 border-b border-[var(--primary-color)]/40 pb-1 text-xs font-semibold uppercase tracking-[2px] text-[var(--primary-ink)] transition-colors hover:border-[var(--primary-color)]"
           >
             {t('viewAll')}
             <ArrowRight size={15} strokeWidth={1.6} className="transition-transform duration-300 group-hover:translate-x-1" />

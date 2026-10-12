@@ -40,7 +40,7 @@ export function NewsCard({
   return (
     <Link
       href={`/news/${slug}`}
-      className="group flex h-full flex-col border border-[var(--border)] bg-white transition-colors duration-500 hover:border-[var(--primary-color)]/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary-color)]"
+      className="group flex h-full flex-col border border-[var(--border)] bg-[var(--bg-card)] transition-colors duration-500 hover:border-[var(--primary-color)]/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary-color)]"
     >
       <article className="flex h-full flex-col">
         <div className="relative aspect-[4/3] overflow-hidden bg-[var(--bg-secondary)]">
@@ -60,12 +60,12 @@ export function NewsCard({
 
         <div className="flex flex-1 flex-col p-5 sm:p-7">
           <p className="flex flex-wrap items-center gap-x-2 text-[11px] font-semibold uppercase tracking-[2px] text-[var(--accent-color)]">
-            <span className="text-[var(--primary-color)]">{category}</span>
+            <span className="text-[var(--primary-ink)]">{category}</span>
             <span aria-hidden="true" className="size-1 rotate-45 bg-[var(--accent-color)]" />
             <span>{readTime}</span>
           </p>
 
-          <h3 className="mt-3 line-clamp-2 min-h-[2.6em] font-[family-name:var(--font-playfair)] text-lg font-semibold leading-[1.3] text-[var(--primary-color)] sm:text-xl">
+          <h3 className="mt-3 line-clamp-2 min-h-[2.6em] font-[family-name:var(--font-playfair)] text-lg font-semibold leading-[1.3] text-[var(--primary-ink)] sm:text-xl">
             {title}
           </h3>
 
@@ -76,7 +76,7 @@ export function NewsCard({
               <span className="sm:hidden">{dateShort}</span>
               <span className="hidden sm:inline">{dateLong}</span>
             </time>
-            <span className="inline-flex items-center gap-2 font-semibold uppercase tracking-[1.5px] text-[var(--primary-color)]">
+            <span className="inline-flex items-center gap-2 font-semibold uppercase tracking-[1.5px] text-[var(--primary-ink)]">
               {readMoreLabel}
               <ArrowRight size={14} strokeWidth={1.6} className="transition-transform duration-300 group-hover:translate-x-1" />
             </span>

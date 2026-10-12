@@ -27,13 +27,13 @@ export function QuantityStepper({ value, onChange, labels }: QuantityStepperProp
   };
 
   return (
-    <div className="inline-flex h-8 items-stretch border border-[var(--border)] bg-white sm:h-9" title={atMax ? labels.maxReached : undefined}>
+    <div className="inline-flex h-8 items-stretch border border-[var(--border)] bg-[var(--bg-card)] sm:h-9" title={atMax ? labels.maxReached : undefined}>
       <button
         type="button"
         aria-label={labels.decrease}
         onClick={() => onChange(value - 1)}
         disabled={value <= 1}
-        className="grid w-7 cursor-pointer place-items-center text-[var(--text-light)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--primary-color)] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent sm:w-8"
+        className="grid w-7 cursor-pointer place-items-center text-[var(--text-light)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--primary-ink)] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent sm:w-8"
       >
         <Minus size={12} />
       </button>
@@ -62,7 +62,7 @@ export function QuantityStepper({ value, onChange, labels }: QuantityStepperProp
         aria-label={labels.increase}
         onClick={() => onChange(value + 1)}
         disabled={atMax}
-        className="grid w-7 cursor-pointer place-items-center text-[var(--text-light)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--primary-color)] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent sm:w-8"
+        className="grid w-7 cursor-pointer place-items-center text-[var(--text-light)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--primary-ink)] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent sm:w-8"
       >
         <Plus size={12} />
       </button>

@@ -59,7 +59,7 @@ export function PromoteFeedBack() {
               type="button"
               onClick={() => goTo(current - 1)}
               aria-label={t('prev')}
-              className="flex size-12 cursor-pointer items-center justify-center rounded-full border border-[var(--primary-color)]/30 text-[var(--primary-color)] transition-colors hover:bg-[var(--primary-color)] hover:text-white"
+              className="flex size-12 cursor-pointer items-center justify-center rounded-full border border-[var(--primary-color)]/30 text-[var(--primary-ink)] transition-colors hover:bg-[var(--primary-color)] hover:text-white"
             >
               <ChevronLeft size={18} strokeWidth={1.5} />
             </button>
@@ -67,12 +67,12 @@ export function PromoteFeedBack() {
               type="button"
               onClick={() => goTo(current + 1)}
               aria-label={t('next')}
-              className="flex size-12 cursor-pointer items-center justify-center rounded-full border border-[var(--primary-color)]/30 text-[var(--primary-color)] transition-colors hover:bg-[var(--primary-color)] hover:text-white"
+              className="flex size-12 cursor-pointer items-center justify-center rounded-full border border-[var(--primary-color)]/30 text-[var(--primary-ink)] transition-colors hover:bg-[var(--primary-color)] hover:text-white"
             >
               <ChevronRight size={18} strokeWidth={1.5} />
             </button>
             <span className="ml-3 font-[family-name:var(--font-playfair)] text-sm text-[var(--text-light)]">
-              <span className="text-lg font-semibold text-[var(--primary-color)]">0{current + 1}</span> / 0{total}
+              <span className="text-lg font-semibold text-[var(--primary-ink)]">0{current + 1}</span> / 0{total}
             </span>
           </div>
         </div>
@@ -83,7 +83,7 @@ export function PromoteFeedBack() {
           onMouseLeave={() => setIsHovering(false)}
           onFocus={() => setIsHovering(true)}
           onBlur={() => setIsHovering(false)}
-          className="relative bg-white px-7 py-10 shadow-[0_30px_60px_-35px_rgba(128,0,32,0.35)] sm:px-14 sm:py-14">
+          className="relative bg-[var(--bg-card)] px-7 py-10 shadow-[0_30px_60px_-35px_rgba(128,0,32,0.35)] sm:px-14 sm:py-14">
           <Quote aria-hidden="true" size={56} strokeWidth={1} className="absolute -top-7 left-7 fill-[var(--bg-secondary)] text-[var(--accent-color)] sm:left-14" />
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
@@ -101,7 +101,7 @@ export function PromoteFeedBack() {
                   <Image src={AVATARS[current]} alt={t(`reviews.${key}.name`)} fill sizes="48px" className="object-cover" />
                 </span>
                 <span>
-                  <span className="block font-[family-name:var(--font-playfair)] font-semibold text-[var(--primary-color)]">
+                  <span className="block font-[family-name:var(--font-playfair)] font-semibold text-[var(--primary-ink)]">
                     {t(`reviews.${key}.name`)}
                   </span>
                   <span className="block text-xs text-[var(--text-light)]">{t(`reviews.${key}.role`)}</span>

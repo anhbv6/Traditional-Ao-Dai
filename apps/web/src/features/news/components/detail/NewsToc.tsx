@@ -71,7 +71,7 @@ export function NewsToc({ sections, variant }: NewsTocProps) {
               onClick={scrollTo(section.id)}
               aria-current={isActive ? "location" : undefined}
               className={`relative flex gap-2.5 py-2 pl-4 text-[13px] leading-5 transition-colors duration-300 ${
-                isActive ? "text-[var(--primary-color)]" : "text-[var(--text-light)] hover:text-[var(--text-main)]"
+                isActive ? "text-[var(--primary-ink)]" : "text-[var(--text-light)] hover:text-[var(--text-main)]"
               }`}
             >
               <span aria-hidden="true" className="absolute inset-y-0 left-0 w-px bg-[var(--border)]" />
@@ -102,7 +102,7 @@ export function NewsToc({ sections, variant }: NewsTocProps) {
   }
 
   return (
-    <nav aria-label={t("toc")} className="mb-8 border border-[var(--border)] bg-white">
+    <nav aria-label={t("toc")} className="mb-8 border border-[var(--border)] bg-[var(--bg-card)]">
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}

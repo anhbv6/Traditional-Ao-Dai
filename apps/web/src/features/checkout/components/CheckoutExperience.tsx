@@ -32,7 +32,7 @@ export function CheckoutExperience() {
   if (!isLoaded) {
     return (
       <div className="py-24 flex items-center justify-center">
-        <div className="size-8 animate-spin rounded-full border-4 border-[#800020] border-t-transparent" />
+        <div className="size-8 animate-spin rounded-full border-4 border-[var(--primary-color)] border-t-transparent" />
       </div>
     );
   }

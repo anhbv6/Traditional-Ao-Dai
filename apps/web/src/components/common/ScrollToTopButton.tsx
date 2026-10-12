@@ -65,7 +65,7 @@ export function ScrollToTopButton() {
         isProductPage
           ? 'bottom-24 right-5 sm:bottom-24 sm:right-7 lg:bottom-7'
           : 'bottom-7 right-5 sm:right-7 lg:bottom-7',
-        'hover:bg-[var(--text-main)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent-color)]',
+        'hover:bg-[var(--bg-inverse)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent-color)]',
         isVisible
           ? 'translate-y-0 opacity-100'
           : 'pointer-events-none translate-y-4 opacity-0',

@@ -39,7 +39,7 @@ export function RegisterOtpStep({
     >
       {/* Header */}
       <div className="space-y-2 text-center lg:text-left">
-        <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-semibold leading-tight text-[var(--primary-color)] sm:text-4xl flex items-center justify-center lg:justify-start gap-1.5">
+        <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-semibold leading-tight text-[var(--primary-ink)] sm:text-4xl flex items-center justify-center lg:justify-start gap-1.5">
           <span>{t('otpTitle')}</span>
         </h2>
         <p className="font-[family-name:var(--font-lora)] text-xs sm:text-sm text-[var(--text-light)] leading-relaxed">
@@ -68,7 +68,7 @@ export function RegisterOtpStep({
             disabled={!canResend}
             className={`cursor-pointer font-semibold transition-colors ${
               canResend
-                ? 'text-[var(--primary-color)] hover:text-[var(--accent-color)] underline underline-offset-4'
+                ? 'text-[var(--primary-ink)] hover:text-[var(--accent-color)] underline underline-offset-4'
                 : 'text-[var(--text-light)]/50 cursor-not-allowed'
             }`}
           >
@@ -91,7 +91,7 @@ export function RegisterOtpStep({
         <button
           type="button"
           onClick={() => setIsOtpStep(false)}
-          className="inline-flex items-center gap-1.5 font-semibold text-[var(--primary-color)] hover:text-[var(--accent-color)] transition-colors group/back outline-none border-none bg-transparent cursor-pointer"
+          className="inline-flex items-center gap-1.5 font-semibold text-[var(--primary-ink)] hover:text-[var(--accent-color)] transition-colors group/back outline-none border-none bg-transparent cursor-pointer"
         >
           <ArrowLeft size={14} className="transition-transform group-hover/back:-translate-x-0.5" />
           <span>{t('back')}</span>

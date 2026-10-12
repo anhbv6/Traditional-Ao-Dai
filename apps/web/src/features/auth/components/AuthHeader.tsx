@@ -18,7 +18,7 @@ export function AuthHeader({ title, subtitle, itemVariants }: AuthHeaderProps) {
       <div className="space-y-2 text-center lg:text-left">
         <motion.h2
           variants={itemVariants}
-          className="font-[family-name:var(--font-playfair)] text-2xl font-semibold leading-tight text-[var(--primary-color)] sm:text-4xl"
+          className="font-[family-name:var(--font-playfair)] text-2xl font-semibold leading-tight text-[var(--primary-ink)] sm:text-4xl"
         >
           {title}
         </motion.h2>

@@ -25,7 +25,7 @@ export function ContactInfoItem({ label, value, note, href, external }: ContactI
           <a
             href={href}
             {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-            className={`group inline-flex items-center gap-2 transition-colors hover:text-[var(--primary-color)] ${valueClass}`}
+            className={`group inline-flex items-center gap-2 transition-colors hover:text-[var(--primary-ink)] ${valueClass}`}
           >
             {value}
             <ArrowUpRight

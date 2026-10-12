@@ -31,23 +31,23 @@ export function ManagePaymentTab() {
     if (type === "visa") {
       return "bg-gradient-to-br from-[#1a1c24] via-[#2d3142] to-[#121319] text-white";
     }
-    return "bg-gradient-to-br from-[#800020] via-[#5c0017] to-[#3a000e] text-white";
+    return "bg-gradient-to-br from-[var(--primary-color)] via-[#5c0017] to-[#3a000e] text-white";
   };
 
   return (
-    <div className="rounded-2xl border border-[#800020]/10 bg-white p-5 shadow-sm sm:p-8 animate-fade-in">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E2D9D2]/60 pb-5">
+    <div className="rounded-2xl border border-[var(--primary-color)]/10 bg-[var(--bg-card)] p-5 shadow-sm sm:p-8 animate-fade-in">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--border)]/60 pb-5">
         <div>
-          <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-[#800020]">
+          <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-[var(--primary-ink)]">
             {t("title")}
           </h2>
-          <p className="mt-1 text-sm text-[#706565]">
+          <p className="mt-1 text-sm text-[var(--text-light)]">
             {t("subtitle")}
           </p>
         </div>
         <button
           onClick={handleStartAdd}
-          className="w-full sm:w-auto inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg bg-[#800020] px-4 text-xs font-semibold uppercase tracking-wider text-white transition-all hover:bg-[#800020]/90 cursor-pointer active:scale-95 duration-200"
+          className="w-full sm:w-auto inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg bg-[var(--primary-color)] px-4 text-xs font-semibold uppercase tracking-wider text-white transition-all hover:bg-[var(--primary-color)]/90 cursor-pointer active:scale-95 duration-200"
         >
           <Plus size={15} />
           {t("addBtn")}
@@ -56,10 +56,10 @@ export function ManagePaymentTab() {
 
       {cards.length === 0 ? (
         <div className="my-16 flex flex-col items-center justify-center text-center animate-fade-in">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#FAF7F5] text-[#706565]/40 border border-[#E2D9D2]/30">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--bg-main)] text-[var(--text-light)]/40 border border-[var(--border)]/30">
             <CreditCard size={28} />
           </div>
-          <p className="mt-4 text-[#706565] font-medium">{t("empty")}</p>
+          <p className="mt-4 text-[var(--text-light)] font-medium">{t("empty")}</p>
         </div>
       ) : (
         <div className="mt-6 grid gap-6 md:grid-cols-2">
@@ -147,16 +147,16 @@ export function ManagePaymentTab() {
       {/* Modal Dialog Form */}
       {isAdding && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm animate-fade-in">
-          <div className="w-full max-w-[92%] sm:max-w-[420px] max-h-[85vh] flex flex-col overflow-hidden rounded-2xl border border-[#800020]/10 bg-white shadow-xl animate-scale-up">
+          <div className="w-full max-w-[92%] sm:max-w-[420px] max-h-[85vh] flex flex-col overflow-hidden rounded-2xl border border-[var(--primary-color)]/10 bg-[var(--bg-card)] shadow-xl animate-scale-up">
             {/* Header */}
-            <div className="border-b border-[#E2D9D2]/60 bg-[#FAF7F5] px-4 py-3 flex items-center justify-between shrink-0">
-              <h3 className="font-[family-name:var(--font-playfair)] text-sm sm:text-base font-bold text-[#800020]">
+            <div className="border-b border-[var(--border)]/60 bg-[var(--bg-main)] px-4 py-3 flex items-center justify-between shrink-0">
+              <h3 className="font-[family-name:var(--font-playfair)] text-sm sm:text-base font-bold text-[var(--primary-ink)]">
                 {t("addBtn")}
               </h3>
               <button
                 type="button"
                 onClick={() => setIsAdding(false)}
-                className="rounded-lg p-1 text-[#706565] hover:bg-[#E2D9D2]/40 transition-colors cursor-pointer text-xs"
+                className="rounded-lg p-1 text-[var(--text-light)] hover:bg-[var(--border)]/40 transition-colors cursor-pointer text-xs"
               >
                 ✕
               </button>
@@ -167,7 +167,7 @@ export function ManagePaymentTab() {
               <div className="flex flex-col gap-3.5">
                 {/* Card Holder */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[#706565]">
+                  <label className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[var(--text-light)]">
                     {t("form.cardHolder")}
                   </label>
                   <Input
@@ -182,11 +182,11 @@ export function ManagePaymentTab() {
 
                 {/* Card Number */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[#706565]">
+                  <label className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[var(--text-light)]">
                     {t("form.cardNumber")}
                   </label>
                   <div className="relative">
-                    <CreditCard className="absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-[#706565]/60 z-10" />
+                    <CreditCard className="absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-[var(--text-light)]/60 z-10" />
                     <Input
                       type="text"
                       required
@@ -201,7 +201,7 @@ export function ManagePaymentTab() {
 
                 {/* Expiry Date */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[#706565]">
+                  <label className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[var(--text-light)]">
                     {t("form.expiryDate")}
                   </label>
                   <Input
@@ -217,7 +217,7 @@ export function ManagePaymentTab() {
 
                 {/* CVV */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[#706565]">
+                  <label className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[var(--text-light)]">
                     {t("form.cvv")}
                   </label>
                   <Input
@@ -233,17 +233,17 @@ export function ManagePaymentTab() {
               </div>
 
               {/* Form Actions */}
-              <div className="flex flex-col sm:flex-row justify-end gap-2.5 pt-3 border-t border-[#E2D9D2]/40 mt-4 shrink-0">
+              <div className="flex flex-col sm:flex-row justify-end gap-2.5 pt-3 border-t border-[var(--border)]/40 mt-4 shrink-0">
                 <button
                   type="button"
                   onClick={() => setIsAdding(false)}
-                  className="w-full sm:w-auto inline-flex h-9 items-center justify-center rounded-lg border border-[#E2D9D2] bg-white px-5 text-[11px] font-semibold uppercase tracking-[0.5px] text-[#706565] transition-all hover:bg-gray-50 cursor-pointer active:scale-95 duration-200"
+                  className="w-full sm:w-auto inline-flex h-9 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--bg-card)] px-5 text-[11px] font-semibold uppercase tracking-[0.5px] text-[var(--text-light)] transition-all hover:bg-gray-50 cursor-pointer active:scale-95 duration-200"
                 >
                   {t("form.cancelBtn")}
                 </button>
                 <button
                   type="submit"
-                  className="w-full sm:w-auto inline-flex h-9 items-center justify-center rounded-lg bg-[#800020] px-5 text-[11px] font-semibold uppercase tracking-[0.5px] text-white transition-all hover:bg-[#800020]/95 cursor-pointer active:scale-95 duration-200"
+                  className="w-full sm:w-auto inline-flex h-9 items-center justify-center rounded-lg bg-[var(--primary-color)] px-5 text-[11px] font-semibold uppercase tracking-[0.5px] text-white transition-all hover:bg-[var(--primary-color)]/95 cursor-pointer active:scale-95 duration-200"
                 >
                   {t("form.submitBtn")}
                 </button>

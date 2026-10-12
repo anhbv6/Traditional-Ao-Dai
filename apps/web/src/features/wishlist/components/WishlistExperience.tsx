@@ -124,7 +124,7 @@ export function WishlistExperience() {
                 </div>
                 <div className="flex items-center gap-2 px-3 py-1.5">
                   <dt className="uppercase tracking-[1.5px] text-[var(--text-light)]">{t("totalValue")}</dt>
-                  <dd className="font-semibold text-[var(--primary-color)]">{formatVnd(totalValue, locale)}</dd>
+                  <dd className="font-semibold text-[var(--primary-ink)]">{formatVnd(totalValue, locale)}</dd>
                 </div>
               </motion.dl>
             ) : null}

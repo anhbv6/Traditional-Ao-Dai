@@ -115,7 +115,7 @@ export function FilterSidebar({ activeFilterCount, onClearAll, ...groupProps }: 
           <button
             type="button"
             onClick={onClearAll}
-            className="cursor-pointer text-xs text-[var(--text-light)] underline-offset-4 transition-colors hover:text-[var(--primary-color)] hover:underline"
+            className="cursor-pointer text-xs text-[var(--text-light)] underline-offset-4 transition-colors hover:text-[var(--primary-ink)] hover:underline"
           >
             {t('clearAll', { count: activeFilterCount })}
           </button>
@@ -294,7 +294,7 @@ export function FilterSection({
           type="button"
           aria-expanded={isOpen}
           onClick={() => setIsOpen(!isOpen)}
-          className="flex flex-1 cursor-pointer items-center gap-2 text-left text-sm font-semibold text-[var(--text-main)] transition-colors hover:text-[var(--primary-color)]"
+          className="flex flex-1 cursor-pointer items-center gap-2 text-left text-sm font-semibold text-[var(--text-main)] transition-colors hover:text-[var(--primary-ink)]"
         >
           {title}
           {activeCount > 0 ? (
@@ -307,7 +307,7 @@ export function FilterSection({
           <button
             type="button"
             onClick={onClear}
-            className="cursor-pointer text-xs text-[var(--text-light)] transition-colors hover:text-[var(--primary-color)]"
+            className="cursor-pointer text-xs text-[var(--text-light)] transition-colors hover:text-[var(--primary-ink)]"
           >
             {t('clear')}
           </button>
@@ -316,7 +316,7 @@ export function FilterSection({
           type="button"
           aria-label={title}
           onClick={() => setIsOpen(!isOpen)}
-          className="cursor-pointer text-[var(--text-light)] transition-colors hover:text-[var(--primary-color)]"
+          className="cursor-pointer text-[var(--text-light)] transition-colors hover:text-[var(--primary-ink)]"
         >
           <ChevronDown size={16} strokeWidth={1.6} className={cn('transition-transform duration-300', isOpen ? 'rotate-180' : 'rotate-0')} />
         </button>
@@ -347,7 +347,7 @@ export function CheckOption({
     <label className="group flex min-h-7 cursor-pointer items-center justify-between gap-3 text-sm">
       <span className="flex select-none items-center gap-3">
         <Checkbox checked={checked} onCheckedChange={onCheckedChange} className="size-4 rounded-[3px] shadow-none" />
-        <span className={cn('transition-colors', checked ? 'text-[var(--primary-color)]' : 'text-[var(--text-main)] group-hover:text-[var(--primary-color)]')}>
+        <span className={cn('transition-colors', checked ? 'text-[var(--primary-ink)]' : 'text-[var(--text-main)] group-hover:text-[var(--primary-ink)]')}>
           {label}
         </span>
       </span>

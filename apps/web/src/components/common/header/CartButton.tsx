@@ -72,7 +72,7 @@ export function CartButton({ label = 'Cart', preview = false }: CartButtonProps)
         aria-label={totalQuantity > 0 ? `${label} (${totalQuantity})` : label}
         aria-expanded={canPreview ? isOpen : undefined}
         onClick={close}
-        className="relative grid h-11 w-11 place-items-center text-primary transition-opacity hover:opacity-75"
+        className="relative grid h-11 w-11 place-items-center text-primary-ink transition-opacity hover:opacity-75"
       >
         <ShoppingBag size={22} strokeWidth={1.5} aria-hidden="true" />
         <AnimatePresence initial={false}>
@@ -100,7 +100,7 @@ export function CartButton({ label = 'Cart', preview = false }: CartButtonProps)
             animate={{ opacity: 1, y: 0, clipPath: 'inset(0% 0% 0% 0%)' }}
             exit={{ opacity: 0, y: 6, transition: { duration: 0.18 } }}
             transition={{ duration: 0.4, ease: EASE }}
-            className="absolute right-0 top-full z-50 mt-2 w-[340px] border border-[var(--border)] border-t-2 border-t-[var(--primary-color)] bg-white font-[family-name:var(--font-lora)] text-[var(--text-main)] shadow-[0_18px_40px_-12px_rgba(42,37,37,0.25)]"
+            className="absolute right-0 top-full z-50 mt-2 w-[340px] border border-[var(--border)] border-t-2 border-t-[var(--primary-color)] bg-[var(--bg-card)] font-[family-name:var(--font-lora)] text-[var(--text-main)] shadow-[0_18px_40px_-12px_rgba(42,37,37,0.25)]"
           >
             <div className="flex items-baseline justify-between border-b border-[var(--border)] px-4 py-3">
               <p className="font-[family-name:var(--font-playfair)] text-[15px] font-semibold">{t('mini.title')}</p>
@@ -113,7 +113,7 @@ export function CartButton({ label = 'Cart', preview = false }: CartButtonProps)
 
             {cartItems.length === 0 ? (
               <div className="flex flex-col items-center px-4 py-8 text-center">
-                <ShoppingBag size={26} strokeWidth={1.2} className="text-[var(--primary-color)]/50" />
+                <ShoppingBag size={26} strokeWidth={1.2} className="text-[var(--primary-ink)]/50" />
                 <p className="mt-3 text-[12px] text-[var(--text-light)]">{t('mini.empty')}</p>
                 <Link
                   href="/products"
@@ -159,7 +159,7 @@ export function CartButton({ label = 'Cart', preview = false }: CartButtonProps)
                           <Link
                             href={`/products/${item.slug}`}
                             onClick={close}
-                            className="line-clamp-1 font-[family-name:var(--font-playfair)] text-[13px] font-semibold transition-colors hover:text-[var(--primary-color)]"
+                            className="line-clamp-1 font-[family-name:var(--font-playfair)] text-[13px] font-semibold transition-colors hover:text-[var(--primary-ink)]"
                           >
                             {item.name}
                           </Link>
@@ -189,14 +189,14 @@ export function CartButton({ label = 'Cart', preview = false }: CartButtonProps)
                 <div className="border-t border-[var(--border)] bg-[var(--bg-main)] px-4 py-3">
                   <div className="flex items-center justify-between">
                     <span className="text-[12px] text-[var(--text-light)]">{t('summary.subtotal')}</span>
-                    <span className="text-[15px] font-semibold text-[var(--primary-color)]">{formatVnd(subtotal, locale)}</span>
+                    <span className="text-[15px] font-semibold text-[var(--primary-ink)]">{formatVnd(subtotal, locale)}</span>
                   </div>
                   <p className="mt-0.5 text-[10px] text-[var(--text-light)]">{t('mini.note')}</p>
                   <div className="mt-3 grid grid-cols-2 gap-2">
                     <Link
                       href="/cart"
                       onClick={close}
-                      className="flex min-h-9 items-center justify-center border border-[var(--text-main)]/20 bg-white text-[10px] font-semibold uppercase tracking-[1.5px] transition-colors hover:border-[var(--primary-color)] hover:text-[var(--primary-color)]"
+                      className="flex min-h-9 items-center justify-center border border-[var(--text-main)]/20 bg-[var(--bg-card)] text-[10px] font-semibold uppercase tracking-[1.5px] transition-colors hover:border-[var(--primary-color)] hover:text-[var(--primary-ink)]"
                     >
                       {t('mini.viewCart')}
                     </Link>

@@ -31,32 +31,32 @@ export function SettingTab() {
 
 
   return (
-    <div className="rounded-2xl border border-[#800020]/10 bg-white p-6 shadow-sm sm:p-8 animate-fade-in">
+    <div className="rounded-2xl border border-[var(--primary-color)]/10 bg-[var(--bg-card)] p-6 shadow-sm sm:p-8 animate-fade-in">
       {/* Header */}
-      <div className="border-b border-[#E2D9D2]/60 pb-5 mb-2">
-        <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-[#800020]">
+      <div className="border-b border-[var(--border)]/60 pb-5 mb-2">
+        <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-[var(--primary-ink)]">
           {t("title")}
         </h2>
-        <p className="mt-1 text-sm text-[#706565]">
+        <p className="mt-1 text-sm text-[var(--text-light)]">
           {t("subtitle")}
         </p>
       </div>
 
-      <div className="divide-y divide-[#E2D9D2]/30">
+      <div className="divide-y divide-[var(--border)]/30">
         {/* Appearance Row */}
         <div className="flex items-center justify-between py-5">
           <div className="space-y-1 pr-4">
-            <h3 className="font-semibold text-[#2A2525] text-sm sm:text-base">
+            <h3 className="font-semibold text-[var(--text-main)] text-sm sm:text-base">
               {t("appearance.title")}
             </h3>
-            <p className="text-xs text-[#706565]">
+            <p className="text-xs text-[var(--text-light)]">
               {t("appearance.description")}
             </p>
           </div>
           <div className="shrink-0 z-30 flex items-center">
             <AnimatedThemeToggler
               variant="circle"
-              className="flex size-9 items-center justify-center rounded-lg border border-[#E2D9D2] bg-[#FAF7F5]/50 text-[#706565] hover:border-[#800020] hover:text-[#800020] transition-colors cursor-pointer outline-none shadow-xs [&_svg]:size-4"
+              className="flex size-9 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--bg-main)]/50 text-[var(--text-light)] hover:border-[var(--primary-color)] hover:text-[var(--primary-ink)] transition-colors cursor-pointer outline-none shadow-xs [&_svg]:size-4"
             />
           </div>
         </div>
@@ -64,10 +64,10 @@ export function SettingTab() {
         {/* Language Row */}
         <div className="flex items-center justify-between py-5">
           <div className="space-y-1 pr-4">
-            <h3 className="font-semibold text-[#2A2525] text-sm sm:text-base">
+            <h3 className="font-semibold text-[var(--text-main)] text-sm sm:text-base">
               {t("language.title")}
             </h3>
-            <p className="text-xs text-[#706565]">
+            <p className="text-xs text-[var(--text-light)]">
               {t("language.description")}
             </p>
           </div>
@@ -77,20 +77,20 @@ export function SettingTab() {
                 <button
                   type="button"
                   disabled={isPending}
-                  className="flex h-9 items-center justify-between gap-2.5 rounded-lg border border-[#E2D9D2] bg-[#FAF7F5]/50 px-3.5 text-xs font-semibold text-[#2A2525] hover:border-[#800020] transition-colors cursor-pointer outline-none shadow-xs min-w-[100px]"
+                  className="flex h-9 items-center justify-between gap-2.5 rounded-lg border border-[var(--border)] bg-[var(--bg-main)]/50 px-3.5 text-xs font-semibold text-[var(--text-main)] hover:border-[var(--primary-color)] transition-colors cursor-pointer outline-none shadow-xs min-w-[100px]"
                 >
                   <span>{currentLocale === "vi" ? "Tiếng Việt" : "English"}</span>
-                  <ChevronDown size={14} className="text-[#706565]" />
+                  <ChevronDown size={14} className="text-[var(--text-light)]" />
                 </button>
               } />
-              <PopoverContent className="w-36 p-1 bg-white border border-[#E2D9D2] rounded-xl shadow-lg z-50">
+              <PopoverContent className="w-36 p-1 bg-[var(--bg-card)] border border-[var(--border)] rounded-xl shadow-lg z-50">
                 <button
                   onClick={() => handleLanguageChange("en")}
                   disabled={isPending}
                   className={`flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-xs font-semibold text-left cursor-pointer transition-colors ${
                     currentLocale === "en"
-                      ? "bg-[#800020] text-white"
-                      : "text-[#2A2525] hover:bg-[#FAF7F5]"
+                      ? "bg-[var(--primary-color)] text-white"
+                      : "text-[var(--text-main)] hover:bg-[var(--bg-main)]"
                   }`}
                 >
                   <span>English</span>
@@ -100,8 +100,8 @@ export function SettingTab() {
                   disabled={isPending}
                   className={`flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-xs font-semibold text-left cursor-pointer transition-colors ${
                     currentLocale === "vi"
-                      ? "bg-[#800020] text-white"
-                      : "text-[#2A2525] hover:bg-[#FAF7F5]"
+                      ? "bg-[var(--primary-color)] text-white"
+                      : "text-[var(--text-main)] hover:bg-[var(--bg-main)]"
                   }`}
                 >
                   <span>Tiếng Việt</span>
@@ -114,10 +114,10 @@ export function SettingTab() {
         {/* Two-factor Authentication Row */}
         <div className="flex items-center justify-between py-5">
           <div className="space-y-1 pr-4">
-            <h3 className="font-semibold text-[#2A2525] text-sm sm:text-base">
+            <h3 className="font-semibold text-[var(--text-main)] text-sm sm:text-base">
               {t("twoFactor.title")}
             </h3>
-            <p className="text-xs text-[#706565]">
+            <p className="text-xs text-[var(--text-light)]">
               {t("twoFactor.description")}
             </p>
           </div>
@@ -133,10 +133,10 @@ export function SettingTab() {
         {/* Push Notifications Row */}
         <div className="flex items-center justify-between py-5">
           <div className="space-y-1 pr-4">
-            <h3 className="font-semibold text-[#2A2525] text-sm sm:text-base">
+            <h3 className="font-semibold text-[var(--text-main)] text-sm sm:text-base">
               {t("push.title")}
             </h3>
-            <p className="text-xs text-[#706565]">
+            <p className="text-xs text-[var(--text-light)]">
               {t("push.description")}
             </p>
           </div>
@@ -152,10 +152,10 @@ export function SettingTab() {
         {/* Desktop Notification Row */}
         <div className="flex items-center justify-between py-5">
           <div className="space-y-1 pr-4">
-            <h3 className="font-semibold text-[#2A2525] text-sm sm:text-base">
+            <h3 className="font-semibold text-[var(--text-main)] text-sm sm:text-base">
               {t("desktop.title")}
             </h3>
-            <p className="text-xs text-[#706565]">
+            <p className="text-xs text-[var(--text-light)]">
               {t("desktop.description")}
             </p>
           </div>
@@ -171,10 +171,10 @@ export function SettingTab() {
         {/* Email Notifications Row */}
         <div className="flex items-center justify-between py-5 last:pb-0">
           <div className="space-y-1 pr-4">
-            <h3 className="font-semibold text-[#2A2525] text-sm sm:text-base">
+            <h3 className="font-semibold text-[var(--text-main)] text-sm sm:text-base">
               {t("email.title")}
             </h3>
-            <p className="text-xs text-[#706565]">
+            <p className="text-xs text-[var(--text-light)]">
               {t("email.description")}
             </p>
           </div>

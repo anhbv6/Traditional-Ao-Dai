@@ -35,11 +35,11 @@ function MetaLine({ items, className }: { items: string[]; className?: string })
 function SectionTitle({ title, actionLabel, onAction }: { title: string; actionLabel: string; onAction: () => void }) {
   return (
     <div className="mb-8 flex items-end justify-between gap-4 border-b border-[var(--text-main)]/80 pb-3">
-      <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-semibold text-[var(--primary-color)] sm:text-[28px]">{title}</h2>
+      <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-semibold text-[var(--primary-ink)] sm:text-[28px]">{title}</h2>
       <button
         type="button"
         onClick={onAction}
-        className="group inline-flex shrink-0 cursor-pointer items-center gap-2 pb-1 text-[11px] font-semibold uppercase tracking-[2px] text-[var(--text-light)] transition-colors hover:text-[var(--primary-color)]"
+        className="group inline-flex shrink-0 cursor-pointer items-center gap-2 pb-1 text-[11px] font-semibold uppercase tracking-[2px] text-[var(--text-light)] transition-colors hover:text-[var(--primary-ink)]"
       >
         {actionLabel}
         <ArrowRight size={13} strokeWidth={1.6} className="transition-transform duration-300 group-hover:translate-x-1" />
@@ -67,8 +67,8 @@ export function NewsClient() {
     <div>
       {/* Đầu trang: cùng kiểu tiêu đề căn giữa + hoạ tiết hình thoi như trang chủ */}
       <section className="mx-auto mb-10 mt-6 flex max-w-3xl flex-col items-center text-center">
-        <p className="text-[11px] font-semibold uppercase tracking-[3px] text-[var(--primary-color)]">{t('eyebrow')}</p>
-        <h1 className="mt-3 font-[family-name:var(--font-playfair)] text-[32px] font-semibold leading-tight text-[var(--primary-color)] sm:text-[44px]">
+        <p className="text-[11px] font-semibold uppercase tracking-[3px] text-[var(--primary-ink)]">{t('eyebrow')}</p>
+        <h1 className="mt-3 font-[family-name:var(--font-playfair)] text-[32px] font-semibold leading-tight text-[var(--primary-ink)] sm:text-[44px]">
           {t('title')}
         </h1>
         <SectionOrnament className="mt-5" />
@@ -88,7 +88,7 @@ export function NewsClient() {
                 onClick={() => handleCategoryChange(key)}
                 className={cn(
                   'relative cursor-pointer whitespace-nowrap px-4 py-4 text-xs font-semibold uppercase tracking-[2px] transition-colors duration-300',
-                  isActive ? 'text-[var(--primary-color)]' : 'text-[var(--text-light)] hover:text-[var(--primary-color)]',
+                  isActive ? 'text-[var(--primary-ink)]' : 'text-[var(--text-light)] hover:text-[var(--primary-ink)]',
                 )}
               >
                 {t(`categories.${key}`)}
@@ -123,7 +123,7 @@ export function NewsClient() {
                     className={IMAGE_HOVER}
                   />
                   <div aria-hidden="true" className={HOVER_FRAME} />
-                  <span className="absolute left-5 top-5 bg-white/95 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[2px] text-[var(--primary-color)]">
+                  <span className="absolute left-5 top-5 bg-[var(--bg-card)]/95 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[2px] text-[var(--primary-ink)]">
                     {t('featured')}
                   </span>
                 </div>
@@ -134,11 +134,11 @@ export function NewsClient() {
                       className="text-[var(--text-light)]"
                       items={[heroArticle.category[locale], getAuthor(heroArticle.id), heroArticle.dateLong[locale], heroArticle.readTime[locale]]}
                     />
-                    <h2 className="mt-3 max-w-4xl font-[family-name:var(--font-playfair)] text-2xl font-semibold leading-tight text-[var(--primary-color)] decoration-[var(--accent-color)] decoration-1 underline-offset-[6px] group-hover:underline sm:text-3xl lg:text-[40px]">
+                    <h2 className="mt-3 max-w-4xl font-[family-name:var(--font-playfair)] text-2xl font-semibold leading-tight text-[var(--primary-ink)] decoration-[var(--accent-color)] decoration-1 underline-offset-[6px] group-hover:underline sm:text-3xl lg:text-[40px]">
                       {heroArticle.title[locale]}
                     </h2>
                   </div>
-                  <span className="inline-flex shrink-0 items-center gap-3 border-b border-[var(--primary-color)]/40 pb-1 text-xs font-semibold uppercase tracking-[2px] text-[var(--primary-color)] transition-colors group-hover:border-[var(--primary-color)]">
+                  <span className="inline-flex shrink-0 items-center gap-3 border-b border-[var(--primary-color)]/40 pb-1 text-xs font-semibold uppercase tracking-[2px] text-[var(--primary-ink)] transition-colors group-hover:border-[var(--primary-color)]">
                     {t('readArticle')}
                     <ArrowRight size={15} strokeWidth={1.6} className="transition-transform duration-300 group-hover:translate-x-1" />
                   </span>
@@ -181,7 +181,7 @@ export function NewsClient() {
                     <Link key={article.id} href={`/news/${article.slug}`} className="group flex flex-1 items-center gap-5 py-6">
                       <div className="min-w-0 flex-1">
                         <MetaLine className="text-[var(--accent-color)]" items={[article.category[locale], article.dateShort[locale]]} />
-                        <h3 className="mt-2 line-clamp-2 font-[family-name:var(--font-playfair)] text-lg font-semibold leading-snug text-[var(--primary-color)] decoration-[var(--accent-color)] decoration-1 underline-offset-4 group-hover:underline">
+                        <h3 className="mt-2 line-clamp-2 font-[family-name:var(--font-playfair)] text-lg font-semibold leading-snug text-[var(--primary-ink)] decoration-[var(--accent-color)] decoration-1 underline-offset-4 group-hover:underline">
                           {article.title[locale]}
                         </h3>
                         <p className="mt-2 line-clamp-2 text-sm leading-6 text-[var(--text-light)]">{article.description[locale]}</p>
@@ -221,7 +221,7 @@ export function NewsClient() {
                       <div aria-hidden="true" className={HOVER_FRAME} />
                     </div>
                     <MetaLine className="mt-4 text-[var(--text-light)]" items={[getAuthor(article.id), article.dateShort[locale]]} />
-                    <h3 className="mt-2 line-clamp-2 font-[family-name:var(--font-playfair)] text-base font-semibold leading-snug text-[var(--primary-color)] decoration-[var(--accent-color)] decoration-1 underline-offset-4 group-hover:underline sm:text-lg">
+                    <h3 className="mt-2 line-clamp-2 font-[family-name:var(--font-playfair)] text-base font-semibold leading-snug text-[var(--primary-ink)] decoration-[var(--accent-color)] decoration-1 underline-offset-4 group-hover:underline sm:text-lg">
                       {article.title[locale]}
                     </h3>
                   </Link>
@@ -242,7 +242,7 @@ export function NewsClient() {
                       <Image src={article.imageSrc} alt={article.title[locale]} fill sizes="100px" className={IMAGE_HOVER} />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h3 className="line-clamp-2 font-[family-name:var(--font-playfair)] text-base font-semibold leading-snug text-[var(--primary-color)] decoration-[var(--accent-color)] decoration-1 underline-offset-4 group-hover:underline">
+                      <h3 className="line-clamp-2 font-[family-name:var(--font-playfair)] text-base font-semibold leading-snug text-[var(--primary-ink)] decoration-[var(--accent-color)] decoration-1 underline-offset-4 group-hover:underline">
                         {article.title[locale]}
                       </h3>
                       <p className="mt-1.5 line-clamp-2 text-xs leading-5 text-[var(--text-light)] sm:text-sm sm:leading-6">{article.description[locale]}</p>
@@ -255,7 +255,7 @@ export function NewsClient() {
           )}
         </div>
       ) : (
-        <div className="mb-16 border border-[var(--border)] bg-white py-16 text-center">
+        <div className="mb-16 border border-[var(--border)] bg-[var(--bg-card)] py-16 text-center">
           <p className="text-sm text-[var(--text-light)]">{t('noArticles')}</p>
         </div>
       )}

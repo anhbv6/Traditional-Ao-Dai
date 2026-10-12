@@ -34,7 +34,7 @@ export function NewsHeader({ article, authorName, fullDate, loc }: NewsHeaderPro
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6 }}
-          className="flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[3px] text-[var(--primary-color)] sm:text-[11px]"
+          className="flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[3px] text-[var(--primary-ink)] sm:text-[11px]"
         >
           <motion.span
             aria-hidden="true"
@@ -53,7 +53,7 @@ export function NewsHeader({ article, authorName, fullDate, loc }: NewsHeaderPro
           />
         </motion.p>
 
-        <h1 className="mt-4 text-[26px] font-semibold leading-tight text-[var(--primary-color)] sm:text-[36px] md:text-[42px]">
+        <h1 className="mt-4 text-[26px] font-semibold leading-tight text-[var(--primary-ink)] sm:text-[36px] md:text-[42px]">
           <span className="sr-only">{article.title[loc]}</span>
           <span aria-hidden="true">
             {words.map((word, index) => (

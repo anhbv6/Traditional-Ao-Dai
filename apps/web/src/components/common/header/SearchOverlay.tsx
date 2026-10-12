@@ -32,7 +32,7 @@ function Highlight({ text, query }: { text: string; query: string }) {
     <>
       {getHighlightParts(text, query).map((part, index) =>
         part.match ? (
-          <mark key={index} className="bg-transparent font-semibold text-[var(--primary-color)]">
+          <mark key={index} className="bg-transparent font-semibold text-[var(--primary-ink)]">
             {part.text}
           </mark>
         ) : (
@@ -176,7 +176,7 @@ export function SearchOverlay({ label, placeholder }: SearchOverlayProps) {
           <button
             type="button"
             onClick={() => fillQuery(keyword)}
-            className="cursor-pointer border border-[var(--border)] bg-white px-3 py-1.5 text-[12px] text-[var(--text-main)] transition-colors duration-300 hover:border-[var(--primary-color)] hover:bg-[var(--primary-color)] hover:text-white"
+            className="cursor-pointer border border-[var(--border)] bg-[var(--bg-card)] px-3 py-1.5 text-[12px] text-[var(--text-main)] transition-colors duration-300 hover:border-[var(--primary-color)] hover:bg-[var(--primary-color)] hover:text-white"
           >
             {keyword}
           </button>
@@ -224,7 +224,7 @@ export function SearchOverlay({ label, placeholder }: SearchOverlayProps) {
               <div className="mx-auto flex min-h-0 w-full max-w-4xl flex-col px-5 sm:px-8">
                 {/* Ô nhập */}
                 <form role="search" onSubmit={handleSubmit} className="group/input relative flex items-center gap-3 py-4 sm:py-6">
-                  <Search size={20} strokeWidth={1.5} className="shrink-0 text-[var(--primary-color)]" aria-hidden="true" />
+                  <Search size={20} strokeWidth={1.5} className="shrink-0 text-[var(--primary-ink)]" aria-hidden="true" />
                   <input
                     ref={inputRef}
                     autoFocus
@@ -252,7 +252,7 @@ export function SearchOverlay({ label, placeholder }: SearchOverlayProps) {
                         initial={{ opacity: 0, scale: 0.6 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.6 }}
-                        className="shrink-0 cursor-pointer px-1 text-[10px] uppercase tracking-[1.5px] text-[var(--text-light)] transition-colors hover:text-[var(--primary-color)]"
+                        className="shrink-0 cursor-pointer px-1 text-[10px] uppercase tracking-[1.5px] text-[var(--text-light)] transition-colors hover:text-[var(--primary-ink)]"
                       >
                         {t('searchPanel.clear')}
                       </motion.button>
@@ -306,7 +306,7 @@ export function SearchOverlay({ label, placeholder }: SearchOverlayProps) {
                                 <button
                                   type="button"
                                   onClick={() => fillQuery(item)}
-                                  className="flex min-w-0 flex-1 cursor-pointer items-center gap-2.5 py-2.5 text-left text-[13px] transition-colors hover:text-[var(--primary-color)]"
+                                  className="flex min-w-0 flex-1 cursor-pointer items-center gap-2.5 py-2.5 text-left text-[13px] transition-colors hover:text-[var(--primary-ink)]"
                                 >
                                   <Clock3 size={13} strokeWidth={1.6} className="shrink-0 text-[var(--text-light)]" />
                                   <span className="truncate">{item}</span>
@@ -384,7 +384,7 @@ export function SearchOverlay({ label, placeholder }: SearchOverlayProps) {
                                     <Highlight text={`${product.material} · ${product.category}`} query={trimmed} />
                                   </span>
                                 </span>
-                                <span className="shrink-0 text-[12px] font-semibold text-[var(--primary-color)]">
+                                <span className="shrink-0 text-[12px] font-semibold text-[var(--primary-ink)]">
                                   {product.price[locale]}
                                 </span>
                               </Link>
@@ -395,7 +395,7 @@ export function SearchOverlay({ label, placeholder }: SearchOverlayProps) {
                       <button
                         type="button"
                         onClick={() => goToResults(trimmed)}
-                        className="group/all relative mt-5 flex min-h-10 w-full cursor-pointer items-center justify-center gap-2 overflow-hidden border border-[var(--primary-color)] text-[11px] font-semibold uppercase tracking-[2px] text-[var(--primary-color)] transition-colors duration-500 hover:text-white"
+                        className="group/all relative mt-5 flex min-h-10 w-full cursor-pointer items-center justify-center gap-2 overflow-hidden border border-[var(--primary-color)] text-[11px] font-semibold uppercase tracking-[2px] text-[var(--primary-ink)] transition-colors duration-500 hover:text-white"
                       >
                         <span
                           aria-hidden="true"
@@ -412,9 +412,9 @@ export function SearchOverlay({ label, placeholder }: SearchOverlayProps) {
 
                 {/* Gợi ý phím tắt (desktop) */}
                 <div className="hidden items-center gap-4 border-t border-[var(--border)] py-2.5 text-[10px] uppercase tracking-[1.5px] text-[var(--text-light)] md:flex">
-                  <span><kbd className="border border-[var(--border)] bg-white px-1 font-sans">↑</kbd> <kbd className="border border-[var(--border)] bg-white px-1 font-sans">↓</kbd> {t('searchPanel.hintNavigate')}</span>
-                  <span><kbd className="border border-[var(--border)] bg-white px-1 font-sans">Enter</kbd> {t('searchPanel.hintOpen')}</span>
-                  <span><kbd className="border border-[var(--border)] bg-white px-1 font-sans">Esc</kbd> {t('searchPanel.hintClose')}</span>
+                  <span><kbd className="border border-[var(--border)] bg-[var(--bg-card)] px-1 font-sans">↑</kbd> <kbd className="border border-[var(--border)] bg-[var(--bg-card)] px-1 font-sans">↓</kbd> {t('searchPanel.hintNavigate')}</span>
+                  <span><kbd className="border border-[var(--border)] bg-[var(--bg-card)] px-1 font-sans">Enter</kbd> {t('searchPanel.hintOpen')}</span>
+                  <span><kbd className="border border-[var(--border)] bg-[var(--bg-card)] px-1 font-sans">Esc</kbd> {t('searchPanel.hintClose')}</span>
                 </div>
               </div>
             </motion.div>
@@ -434,7 +434,7 @@ export function SearchOverlay({ label, placeholder }: SearchOverlayProps) {
         aria-haspopup="dialog"
         aria-expanded={open}
         title={`${label} ( / )`}
-        className="grid h-11 w-11 cursor-pointer place-items-center text-primary transition-opacity hover:opacity-75"
+        className="grid h-11 w-11 cursor-pointer place-items-center text-primary-ink transition-opacity hover:opacity-75"
       >
         <Search size={22} strokeWidth={1.5} aria-hidden="true" />
       </button>

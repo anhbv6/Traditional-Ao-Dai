@@ -128,18 +128,18 @@ export function OrderHistoryTab() {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* List / Main Panel */}
-      <div className="rounded-2xl border border-[#800020]/10 bg-white p-5 shadow-sm sm:p-8">
-        <div className="border-b border-[#E2D9D2]/40 pb-5">
-          <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-[#800020]">
+      <div className="rounded-2xl border border-[var(--primary-color)]/10 bg-[var(--bg-card)] p-5 shadow-sm sm:p-8">
+        <div className="border-b border-[var(--border)]/40 pb-5">
+          <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-[var(--primary-ink)]">
             {t("title")}
           </h2>
-          <p className="mt-1 text-sm text-[#706565]">
+          <p className="mt-1 text-sm text-[var(--text-light)]">
             {t("subtitle")}
           </p>
         </div>
 
         {/* Filter Tabs */}
-        <div className="mt-5 flex items-center gap-1.5 overflow-x-auto border-b border-[#E2D9D2]/40 pb-px scrollbar-none select-none">
+        <div className="mt-5 flex items-center gap-1.5 overflow-x-auto border-b border-[var(--border)]/40 pb-px scrollbar-none select-none">
           {filterTabs.map((tab) => {
             const isActive = activeStatus === tab.id;
             const count = getOrderCountByStatus(tab.id);
@@ -147,18 +147,18 @@ export function OrderHistoryTab() {
               <button
                 key={tab.id}
                 onClick={() => setActiveStatus(tab.id)}
-                className={`relative pb-3 pt-1.5 px-2.5 text-xs sm:text-sm font-semibold transition-all duration-300 whitespace-nowrap flex items-center gap-1.5 border-b-2 -mb-px hover:text-[#800020] cursor-pointer ${
+                className={`relative pb-3 pt-1.5 px-2.5 text-xs sm:text-sm font-semibold transition-all duration-300 whitespace-nowrap flex items-center gap-1.5 border-b-2 -mb-px hover:text-[var(--primary-ink)] cursor-pointer ${
                   isActive
-                    ? "text-[#800020] border-[#800020]"
-                    : "text-[#706565] border-transparent"
+                    ? "text-[var(--primary-ink)] border-[var(--primary-color)]"
+                    : "text-[var(--text-light)] border-transparent"
                 }`}
               >
                 <span>{tab.label}</span>
                 <span
                   className={`rounded-full px-1.5 py-0.5 text-[10px] sm:text-xs font-medium transition-colors ${
                     isActive
-                      ? "bg-[#800020]/10 text-[#800020]"
-                      : "bg-[#FAF7F5] text-[#706565] border border-[#E2D9D2]/40"
+                      ? "bg-[var(--primary-color)]/10 text-[var(--primary-ink)]"
+                      : "bg-[var(--bg-main)] text-[var(--text-light)] border border-[var(--border)]/40"
                   }`}
                 >
                   {count}
@@ -169,8 +169,8 @@ export function OrderHistoryTab() {
         </div>
 
         {/* Date Range Picker Row */}
-        <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-2 border-b border-[#E2D9D2]/20">
-          <div className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[#706565]/80">
+        <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-2 border-b border-[var(--border)]/20">
+          <div className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[var(--text-light)]/80">
             {locale === "vi" ? "Bộ lọc thời gian" : "Date Filter"}
           </div>
           <div className="flex items-center gap-2 z-20">
@@ -178,13 +178,13 @@ export function OrderHistoryTab() {
               <PopoverTrigger render={
                 <button
                   type="button"
-                  className="flex h-9 items-center gap-2 rounded-lg border border-[#E2D9D2] bg-white px-3 text-[11px] sm:text-xs font-semibold text-[#706565] hover:border-[#800020] hover:text-[#800020] transition-colors cursor-pointer outline-none shadow-xs"
+                  className="flex h-9 items-center gap-2 rounded-lg border border-[var(--border)] bg-[var(--bg-card)] px-3 text-[11px] sm:text-xs font-semibold text-[var(--text-light)] hover:border-[var(--primary-color)] hover:text-[var(--primary-ink)] transition-colors cursor-pointer outline-none shadow-xs"
                 >
-                  <CalendarIcon size={12} className="text-[#800020]" />
+                  <CalendarIcon size={12} className="text-[var(--primary-ink)]" />
                   <span>{formatDateRange(dateRange)}</span>
                 </button>
               } />
-              <PopoverContent className="w-auto p-0 bg-white border border-[#E2D9D2] rounded-xl shadow-lg z-50">
+              <PopoverContent className="w-auto p-0 bg-[var(--bg-card)] border border-[var(--border)] rounded-xl shadow-lg z-50">
                 <Calendar
                   mode="range"
                   selected={dateRange}
@@ -196,7 +196,7 @@ export function OrderHistoryTab() {
             {dateRange && (dateRange.from || dateRange.to) && (
               <button
                 onClick={() => setDateRange(undefined)}
-                className="flex size-9 items-center justify-center rounded-lg border border-[#E2D9D2] bg-white text-[#706565] hover:border-rose-300 hover:text-rose-600 transition-colors cursor-pointer text-xs"
+                className="flex size-9 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-light)] hover:border-rose-300 hover:text-rose-600 transition-colors cursor-pointer text-xs"
                 title="Xóa lọc ngày"
               >
                 ✕
@@ -207,10 +207,10 @@ export function OrderHistoryTab() {
 
         {filteredOrders.length === 0 ? (
           <div className="my-16 flex flex-col items-center justify-center text-center animate-fade-in">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#FAF7F5] text-[#706565]/40 border border-[#E2D9D2]/30">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--bg-main)] text-[var(--text-light)]/40 border border-[var(--border)]/30">
               <ShoppingBag size={24} />
             </div>
-            <p className="mt-4 text-xs sm:text-sm text-[#706565] font-medium">{t("empty")}</p>
+            <p className="mt-4 text-xs sm:text-sm text-[var(--text-light)] font-medium">{t("empty")}</p>
           </div>
         ) : (
           <>
@@ -218,7 +218,7 @@ export function OrderHistoryTab() {
             <div className="mt-6 hidden sm:block overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-[#E2D9D2]/60 text-xs font-semibold uppercase tracking-wider text-[#706565]">
+                  <tr className="border-b border-[var(--border)]/60 text-xs font-semibold uppercase tracking-wider text-[var(--text-light)]">
                     <th className="pb-4 pr-4">{t("orderId")}</th>
                     <th className="pb-4 pr-4">{t("date")}</th>
                     <th className="pb-4 pr-4">{t("status")}</th>
@@ -226,13 +226,13 @@ export function OrderHistoryTab() {
                     <th className="pb-4 text-right">{t("action")}</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#E2D9D2]/40 text-sm text-[#2A2525]">
+                <tbody className="divide-y divide-[var(--border)]/40 text-sm text-[var(--text-main)]">
                   {filteredOrders.map((order) => (
-                    <tr key={order.id} className="hover:bg-[#FAF7F5]/30">
-                      <td className="py-4 pr-4 font-semibold text-[#800020]">
+                    <tr key={order.id} className="hover:bg-[var(--bg-main)]/30">
+                      <td className="py-4 pr-4 font-semibold text-[var(--primary-ink)]">
                         #{order.id}
                       </td>
-                      <td className="py-4 pr-4 text-[#706565]">{order.date}</td>
+                      <td className="py-4 pr-4 text-[var(--text-light)]">{order.date}</td>
                       <td className="py-4 pr-4">
                         <span
                           className={`inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-medium ${getStatusColor(
@@ -246,7 +246,7 @@ export function OrderHistoryTab() {
                       <td className="py-4 text-right">
                         <button
                           onClick={() => setSelectedOrder(order)}
-                          className="inline-flex size-9 items-center justify-center rounded-lg border border-[#800020]/15 text-[#800020] hover:bg-[#800020] hover:text-white transition-colors cursor-pointer"
+                          className="inline-flex size-9 items-center justify-center rounded-lg border border-[var(--primary-color)]/15 text-[var(--primary-ink)] hover:bg-[var(--primary-color)] hover:text-white transition-colors cursor-pointer"
                           title={t("viewDetail")}
                         >
                           <Eye size={16} />
@@ -264,10 +264,10 @@ export function OrderHistoryTab() {
                 <div 
                   key={order.id}
                   onClick={() => setSelectedOrder(order)}
-                  className="rounded-xl border border-[#E2D9D2]/60 bg-[#FAF7F5]/30 p-4 hover:border-[#800020]/30 transition-all duration-300 space-y-3 active:scale-[0.99]"
+                  className="rounded-xl border border-[var(--border)]/60 bg-[var(--bg-main)]/30 p-4 hover:border-[var(--primary-color)]/30 transition-all duration-300 space-y-3 active:scale-[0.99]"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-[#800020] text-xs">#{order.id}</span>
+                    <span className="font-bold text-[var(--primary-ink)] text-xs">#{order.id}</span>
                     <span
                       className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[9px] font-semibold tracking-wide uppercase ${getStatusColor(
                         order.status
@@ -279,23 +279,23 @@ export function OrderHistoryTab() {
 
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     <div>
-                      <span className="block text-[9px] uppercase tracking-wider text-[#706565]/60 mb-0.5">{t("date")}</span>
-                      <span className="font-medium text-[#2A2525]">{order.date}</span>
+                      <span className="block text-[9px] uppercase tracking-wider text-[var(--text-light)]/60 mb-0.5">{t("date")}</span>
+                      <span className="font-medium text-[var(--text-main)]">{order.date}</span>
                     </div>
                     <div className="text-right">
-                      <span className="block text-[9px] uppercase tracking-wider text-[#706565]/60 mb-0.5">{t("total")}</span>
-                      <span className="font-bold text-[#800020]">{order.total}</span>
+                      <span className="block text-[9px] uppercase tracking-wider text-[var(--text-light)]/60 mb-0.5">{t("total")}</span>
+                      <span className="font-bold text-[var(--primary-ink)]">{order.total}</span>
                     </div>
                   </div>
 
-                  <div className="pt-2 border-t border-[#E2D9D2]/30 flex justify-end">
+                  <div className="pt-2 border-t border-[var(--border)]/30 flex justify-end">
                     <button
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
                         setSelectedOrder(order);
                       }}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-[#800020]/20 bg-white text-[11px] font-semibold text-[#800020] hover:bg-[#800020] hover:text-white transition-all duration-200 cursor-pointer"
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-[var(--primary-color)]/20 bg-[var(--bg-card)] text-[11px] font-semibold text-[var(--primary-ink)] hover:bg-[var(--primary-color)] hover:text-white transition-all duration-200 cursor-pointer"
                     >
                       <Eye size={12} />
                       <span>{t("viewDetail")}</span>
@@ -311,21 +311,21 @@ export function OrderHistoryTab() {
       {/* Modal / Detail View */}
       {selectedOrder && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm animate-fade-in">
-          <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-[#800020]/10 bg-white shadow-xl animate-scale-up">
+          <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-[var(--primary-color)]/10 bg-[var(--bg-card)] shadow-xl animate-scale-up">
             {/* Header */}
-            <div className="border-b border-[#E2D9D2]/60 bg-[#FAF7F5] px-4 py-3 sm:px-6 sm:py-4 flex items-center justify-between">
+            <div className="border-b border-[var(--border)]/60 bg-[var(--bg-main)] px-4 py-3 sm:px-6 sm:py-4 flex items-center justify-between">
               <div>
-                <h3 className="font-[family-name:var(--font-playfair)] text-base sm:text-lg font-bold text-[#800020]">
+                <h3 className="font-[family-name:var(--font-playfair)] text-base sm:text-lg font-bold text-[var(--primary-ink)]">
                   {t("orderId")}: #{selectedOrder.id}
                 </h3>
-                <p className="mt-0.5 flex items-center gap-1.5 text-[10px] sm:text-xs text-[#706565]">
+                <p className="mt-0.5 flex items-center gap-1.5 text-[10px] sm:text-xs text-[var(--text-light)]">
                   <CalendarIcon size={12} />
                   {selectedOrder.date}
                 </p>
               </div>
               <button
                 onClick={() => setSelectedOrder(null)}
-                className="rounded-lg p-1.5 text-[#706565] hover:bg-[#E2D9D2]/40 transition-colors cursor-pointer text-xs"
+                className="rounded-lg p-1.5 text-[var(--text-light)] hover:bg-[var(--border)]/40 transition-colors cursor-pointer text-xs"
               >
                 ✕
               </button>
@@ -336,9 +336,9 @@ export function OrderHistoryTab() {
               {selectedOrder.items.map((item, index) => (
                 <div
                   key={index}
-                  className="flex gap-3 sm:gap-4 rounded-xl border border-[#E2D9D2]/50 p-2.5 sm:p-3 hover:border-[#800020]/20 transition-colors"
+                  className="flex gap-3 sm:gap-4 rounded-xl border border-[var(--border)]/50 p-2.5 sm:p-3 hover:border-[var(--primary-color)]/20 transition-colors"
                 >
-                  <div className="relative size-12 sm:size-16 shrink-0 overflow-hidden rounded-lg bg-[#FAF7F5]">
+                  <div className="relative size-12 sm:size-16 shrink-0 overflow-hidden rounded-lg bg-[var(--bg-main)]">
                     <Image
                       src={item.image}
                       alt={item.name[locale]}
@@ -349,10 +349,10 @@ export function OrderHistoryTab() {
                     />
                   </div>
                   <div className="flex flex-1 flex-col justify-center min-w-0">
-                    <h4 className="font-[family-name:var(--font-playfair)] text-xs sm:text-sm font-semibold text-[#800020] truncate">
+                    <h4 className="font-[family-name:var(--font-playfair)] text-xs sm:text-sm font-semibold text-[var(--primary-ink)] truncate">
                       {item.name[locale]}
                     </h4>
-                    <p className="mt-0.5 text-[10px] sm:text-xs text-[#706565]">
+                    <p className="mt-0.5 text-[10px] sm:text-xs text-[var(--text-light)]">
                       {item.price} x {item.quantity}
                     </p>
                   </div>
@@ -361,7 +361,7 @@ export function OrderHistoryTab() {
             </div>
 
             {/* Footer Summary */}
-            <div className="border-t border-[#E2D9D2]/60 bg-[#FAF7F5] p-4 sm:p-6 flex flex-row items-center justify-between gap-4">
+            <div className="border-t border-[var(--border)]/60 bg-[var(--bg-main)] p-4 sm:p-6 flex flex-row items-center justify-between gap-4">
               <div className="flex items-center">
                 <span
                   className={`inline-flex items-center rounded-md border px-2.5 py-0.5 text-[10px] sm:text-xs font-semibold uppercase tracking-wider ${getStatusColor(
@@ -372,8 +372,8 @@ export function OrderHistoryTab() {
                 </span>
               </div>
               <div className="text-right">
-                <p className="text-[10px] sm:text-xs text-[#706565]">{t("total")}</p>
-                <p className="mt-0.5 font-[family-name:var(--font-playfair)] text-lg sm:text-2xl font-bold text-[#800020]">
+                <p className="text-[10px] sm:text-xs text-[var(--text-light)]">{t("total")}</p>
+                <p className="mt-0.5 font-[family-name:var(--font-playfair)] text-lg sm:text-2xl font-bold text-[var(--primary-ink)]">
                   {selectedOrder.total}
                 </p>
               </div>

@@ -49,7 +49,7 @@ export function GoogleAuthButton({
         type="button"
         variant="outline"
         disabled={disabled}
-        className="h-10 w-full rounded-lg border border-[var(--primary-color)]/25 bg-white px-4 font-[family-name:var(--font-lora)] text-[11px] font-bold uppercase tracking-wider text-[var(--primary-color)] shadow-[0_10px_26px_rgba(128,0,32,0.10)] transition-all group-hover/google:border-[var(--primary-color)]/55 group-hover/google:bg-white group-hover/google:shadow-[0_14px_30px_rgba(128,0,32,0.16)] sm:h-11 sm:text-xs"
+        className="h-10 w-full rounded-lg border border-[var(--primary-color)]/25 bg-[var(--bg-card)] px-4 font-[family-name:var(--font-lora)] text-[11px] font-bold uppercase tracking-wider text-[var(--primary-ink)] shadow-[0_10px_26px_rgba(128,0,32,0.10)] transition-all group-hover/google:border-[var(--primary-color)]/55 group-hover/google:bg-[var(--bg-card)] group-hover/google:shadow-[0_14px_30px_rgba(128,0,32,0.16)] sm:h-11 sm:text-xs"
       >
         <FcGoogle className="size-5" aria-hidden="true" />
         <span>{label}</span>

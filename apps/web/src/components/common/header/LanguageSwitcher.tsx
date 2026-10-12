@@ -31,11 +31,11 @@ export function LanguageSwitcher() {
           type="button"
           onClick={toggle}
           disabled={isPending}
-          className="flex h-9 min-w-16 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-border bg-background px-3 text-xs font-semibold text-primary transition-colors hover:bg-secondary disabled:opacity-60"
+          className="flex h-9 min-w-16 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-border bg-background px-3 text-xs font-semibold text-primary-ink transition-colors hover:bg-secondary disabled:opacity-60"
           aria-label={`Current language: ${currentLocale.toUpperCase()}`}
           aria-expanded={open}
         >
-          <Globe size={13} strokeWidth={1.5} className="text-primary" />
+          <Globe size={13} strokeWidth={1.5} className="text-primary-ink" />
           {currentLocale.toUpperCase()}
         </button>
       )}
@@ -54,8 +54,8 @@ export function LanguageSwitcher() {
                 className={[
                   'relative z-10 flex h-8 cursor-pointer items-center justify-center rounded-md px-3 text-xs font-semibold uppercase transition-colors disabled:opacity-60',
                   isSelected
-                    ? 'bg-secondary text-primary'
-                    : 'text-muted-foreground hover:bg-secondary hover:text-primary',
+                    ? 'bg-secondary text-primary-ink'
+                    : 'text-muted-foreground hover:bg-secondary hover:text-primary-ink',
                 ].join(' ')}
               >
                 {loc.toUpperCase()}

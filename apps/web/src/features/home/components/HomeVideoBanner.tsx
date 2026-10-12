@@ -16,7 +16,7 @@ export function HomeVideoBanner() {
         disablePictureInPicture
         aria-label="Ao Dai showcase video"
       />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-[#FAF7F5]/20" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-[var(--bg-main)]/20" />
     </section>
   );
 }

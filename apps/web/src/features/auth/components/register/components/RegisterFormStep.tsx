@@ -260,7 +260,7 @@ export function RegisterFormStep({
               rightElement={
                 <div className="flex items-center gap-1.5">
                   {isCheckingEmail && (
-                    <RefreshCw size={14} className="text-[#800020] animate-spin" />
+                    <RefreshCw size={14} className="text-[var(--primary-ink)] animate-spin" />
                   )}
                   {!isCheckingEmail && emailCheckResult === 'available' && (
                     <CheckCircle2 size={15} className="text-green-600" />
@@ -276,7 +276,7 @@ export function RegisterFormStep({
                       setValue('email', '');
                       setValue('phone', '');
                     }}
-                    className="text-[var(--text-light)] hover:text-[var(--primary-color)] transition-colors cursor-pointer select-none outline-none p-1 flex items-center justify-center"
+                    className="text-[var(--text-light)] hover:text-[var(--primary-ink)] transition-colors cursor-pointer select-none outline-none p-1 flex items-center justify-center"
                     title={t('switchPhone')}
                   >
                     <Smartphone size={16} />
@@ -297,7 +297,7 @@ export function RegisterFormStep({
                     <button
                       type="button"
                       onClick={() => setIsOtpStep(true)}
-                      className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[var(--primary-color)] hover:text-[var(--accent-color)] transition-colors select-none outline-none cursor-pointer"
+                      className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[var(--primary-ink)] hover:text-[var(--accent-color)] transition-colors select-none outline-none cursor-pointer"
                     >
                       <span>{t('goToOtpStep')}</span>
                     </button>
@@ -313,7 +313,7 @@ export function RegisterFormStep({
                 rightElement={
                   <div className="flex items-center gap-1.5">
                     {isCheckingPhone && (
-                      <RefreshCw size={14} className="text-[#800020] animate-spin" />
+                      <RefreshCw size={14} className="text-[var(--primary-ink)] animate-spin" />
                     )}
                     {!isCheckingPhone && phoneCheckResult === 'available' && (
                       <CheckCircle2 size={15} className="text-green-600" />
@@ -329,7 +329,7 @@ export function RegisterFormStep({
                         setValue('email', '');
                         setValue('phone', '');
                       }}
-                      className="text-[var(--text-light)] hover:text-[var(--primary-color)] transition-colors cursor-pointer select-none outline-none p-1 flex items-center justify-center"
+                      className="text-[var(--text-light)] hover:text-[var(--primary-ink)] transition-colors cursor-pointer select-none outline-none p-1 flex items-center justify-center"
                       title={t('switchEmail')}
                     >
                       <Mail size={16} />
@@ -480,7 +480,7 @@ export function RegisterFormStep({
         {t('alreadyHaveAccount')}{' '}
         <Link
           href="/login"
-          className="font-semibold text-[var(--primary-color)] hover:text-[var(--accent-color)] transition-colors underline decoration-[var(--primary-color)]/20 underline-offset-4"
+          className="font-semibold text-[var(--primary-ink)] hover:text-[var(--accent-color)] transition-colors underline decoration-[var(--primary-ink)]/20 underline-offset-4"
         >
           {t('loginNow')}
         </Link>

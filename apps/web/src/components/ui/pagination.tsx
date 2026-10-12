@@ -54,7 +54,7 @@ function PaginationLink({
           : "h-8 px-2.5 gap-1 sm:h-10 sm:px-4 sm:gap-1.5",
         isActive
           ? "border-[var(--primary-color)] bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)] hover:text-white"
-          : "border-[var(--bg-secondary)] bg-white text-[var(--text-main)] hover:border-[var(--primary-color)] hover:text-[var(--primary-color)] hover:bg-white",
+          : "border-[var(--bg-secondary)] bg-[var(--bg-card)] text-[var(--text-main)] hover:border-[var(--primary-color)] hover:text-[var(--primary-ink)] hover:bg-[var(--bg-card)]",
         className
       )}
       render={

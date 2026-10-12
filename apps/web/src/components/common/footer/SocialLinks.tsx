@@ -27,7 +27,7 @@ export function SocialLinks({ socialLabel }: SocialLinksProps) {
           rel="noreferrer"
           aria-label={label}
           title={label}
-          className="grid place-items-center rounded-md text-primary transition-colors hover:opacity-70"
+          className="grid place-items-center rounded-md text-primary-ink transition-colors hover:opacity-70"
         >
           <Icon size={17} strokeWidth={1.7} />
         </a>

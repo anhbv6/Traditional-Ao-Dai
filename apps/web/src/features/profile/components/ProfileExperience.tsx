@@ -55,10 +55,10 @@ export function ProfileExperience() {
     <div>
       {/* Header */}
       <div className="hidden sm:mb-10 sm:block">
-        <h1 className="font-[family-name:var(--font-playfair)] text-3xl font-bold text-[#800020] sm:text-4xl">
+        <h1 className="font-[family-name:var(--font-playfair)] text-3xl font-bold text-[var(--primary-ink)] sm:text-4xl">
           {t("title")}
         </h1>
-        <p className="mt-2 max-w-2xl text-sm text-[#706565]">
+        <p className="mt-2 max-w-2xl text-sm text-[var(--text-light)]">
           {t("subtitle")}
         </p>
       </div>
@@ -78,18 +78,18 @@ export function ProfileExperience() {
                   className={cn(
                     "cursor-pointer flex w-full items-center gap-3.5 rounded-xl py-3 text-sm font-semibold transition-all duration-300 border-l-4 pl-3",
                     activeTab === tab.id
-                      ? "bg-[#800020]/5 text-[#800020] border-[#800020]"
-                      : "text-[#706565] hover:bg-[#FAF7F5] hover:text-[#800020] border-transparent"
+                      ? "bg-[var(--primary-color)]/5 text-[var(--primary-ink)] border-[var(--primary-color)]"
+                      : "text-[var(--text-light)] hover:bg-[var(--bg-main)] hover:text-[var(--primary-ink)] border-transparent"
                   )}
                 >
-                  <Icon size={18} className={cn("shrink-0", activeTab === tab.id ? "text-[#800020]" : "text-[#706565]/80")} />
+                  <Icon size={18} className={cn("shrink-0", activeTab === tab.id ? "text-[var(--primary-ink)]" : "text-[var(--text-light)]/80")} />
                   <span>{tab.label}</span>
                 </button>
               );
             })}
 
             {/* Logout Button */}
-                          <div className="border-t border-[#E2D9D2]/40 mt-3 pt-2">
+                          <div className="border-t border-[var(--border)]/40 mt-3 pt-2">
                 <button
                   onClick={() => setOpenConfirm(true)}
                   className="cursor-pointer flex w-full items-center gap-3.5 rounded-xl px-4 py-3 text-sm font-semibold text-rose-600 hover:bg-rose-50 transition-all duration-300"
@@ -133,11 +133,11 @@ export function ProfileExperience() {
                     className={cn(
                       "flex items-center gap-3 px-4 py-3 rounded-xl shadow-md border text-xs font-semibold whitespace-nowrap transition-all duration-300 active:scale-95 cursor-pointer w-fit min-w-[180px]",
                       isActive
-                        ? "bg-[#800020] border-[#800020] text-white"
-                        : "bg-[#FAF7F5] border-[#E2D9D2] text-[#706565] hover:border-[#800020]/30"
+                        ? "bg-[var(--primary-color)] border-[var(--primary-color)] text-white"
+                        : "bg-[var(--bg-main)] border-[var(--border)] text-[var(--text-light)] hover:border-[var(--primary-color)]/30"
                     )}
                   >
-                    <Icon size={16} className={cn("shrink-0", isActive ? "text-white" : "text-[#706565]/80")} />
+                    <Icon size={16} className={cn("shrink-0", isActive ? "text-white" : "text-[var(--text-light)]/80")} />
                     <span>{tab.label}</span>
                   </button>
                 );
@@ -149,7 +149,7 @@ export function ProfileExperience() {
                     setIsMobileMenuOpen(false);
                     setOpenConfirm(true);
                   }}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white border border-rose-100 text-rose-600 shadow-md text-xs font-semibold whitespace-nowrap transition-all duration-300 active:scale-95 cursor-pointer w-fit min-w-[180px]"
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl bg-[var(--bg-card)] border border-rose-100 text-rose-600 shadow-md text-xs font-semibold whitespace-nowrap transition-all duration-300 active:scale-95 cursor-pointer w-fit min-w-[180px]"
                 >
                   <LogOut size={16} className="shrink-0 text-rose-500" />
                   <span>{tCommon("logout")}</span>
@@ -161,7 +161,7 @@ export function ProfileExperience() {
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className={cn(
-                "relative z-50 flex size-8 items-center justify-center rounded-full bg-[#800020] text-white shadow-xl hover:bg-[#800020]/90 transition-all duration-300 active:scale-90 cursor-pointer border border-[#800020]/20",
+                "relative z-50 flex size-8 items-center justify-center rounded-full bg-[var(--primary-color)] text-white shadow-xl hover:bg-[var(--primary-color)]/90 transition-all duration-300 active:scale-90 cursor-pointer border border-[var(--primary-color)]/20",
                 isMobileMenuOpen && "rotate-45"
               )}
               aria-label="Toggle profile menu"

@@ -72,14 +72,14 @@ function DrawerContent({
 }
 
 function DrawerHeader({ className, ...props }: React.ComponentProps<'div'>) {
-  return <div className={cn('flex items-start justify-between gap-4 px-5 pb-3 pt-5 border-b border-[#E2A79E]/35', className)} {...props} />;
+  return <div className={cn('flex items-start justify-between gap-4 px-5 pb-3 pt-5 border-b border-[var(--accent-color)]/35', className)} {...props} />;
 }
 
 function DrawerTitle({ className, ...props }: React.ComponentProps<typeof DrawerPrimitive.Title>) {
   return (
     <DrawerPrimitive.Title
       className={cn(
-        'font-[family-name:var(--font-playfair)] text-2xl font-semibold uppercase tracking-[1px] text-[var(--primary-color)]',
+        'font-[family-name:var(--font-playfair)] text-2xl font-semibold uppercase tracking-[1px] text-[var(--primary-ink)]',
         className,
       )}
       {...props}
@@ -103,7 +103,7 @@ function DrawerCloseButton({ className, ...props }: React.ComponentProps<typeof 
   return (
     <DrawerPrimitive.Close
       className={cn(
-        'grid h-10 w-10 shrink-0 place-items-center rounded-md text-[var(--text-main)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--primary-color)]',
+        'grid h-10 w-10 shrink-0 place-items-center rounded-md text-[var(--text-main)] transition-colors hover:bg-[var(--bg-secondary)] hover:text-[var(--primary-ink)]',
         className,
       )}
       {...props}

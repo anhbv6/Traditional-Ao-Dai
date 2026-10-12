@@ -144,7 +144,7 @@ export function EnterForgotForm({
             <button
               type="button"
               onClick={onGoToOtpStep}
-              className="font-semibold text-[var(--primary-color)] hover:text-[var(--accent-color)] transition-colors underline decoration-[var(--primary-color)]/20 underline-offset-4 cursor-pointer"
+              className="font-semibold text-[var(--primary-ink)] hover:text-[var(--accent-color)] transition-colors underline decoration-[var(--primary-ink)]/20 underline-offset-4 cursor-pointer"
             >
               {t('goToOtpStep')}
             </button>
@@ -158,7 +158,7 @@ export function EnterForgotForm({
         >
           <Link
             href="/login"
-            className="inline-flex items-center gap-1.5 font-semibold text-[var(--primary-color)] hover:text-[var(--accent-color)] transition-colors group/back"
+            className="inline-flex items-center gap-1.5 font-semibold text-[var(--primary-ink)] hover:text-[var(--accent-color)] transition-colors group/back"
           >
             <ArrowLeft size={13} className="transition-transform group-hover/back:-translate-x-0.5" />
             <span>{t('backToLogin')}</span>

@@ -193,7 +193,7 @@ export function ProductCard({
             className={`grid size-8 cursor-pointer place-items-center backdrop-blur-sm transition-colors duration-300 active:scale-90 sm:size-9 ${
               isWishlisted
                 ? 'bg-[var(--primary-color)] text-white'
-                : 'bg-white/90 text-[var(--text-main)] hover:bg-[var(--primary-color)] hover:text-white'
+                : 'bg-[var(--bg-card)]/90 text-[var(--text-main)] hover:bg-[var(--primary-color)] hover:text-white'
             }`}
           >
             <Heart
@@ -207,7 +207,7 @@ export function ProductCard({
             type="button"
             onClick={handleAddToCart}
             aria-label={isCustom ? t('customTailor') : t('addToCart')}
-            className="grid size-8 cursor-pointer place-items-center bg-white/90 text-[var(--text-main)] backdrop-blur-sm transition-colors duration-300 hover:bg-[var(--primary-color)] hover:text-white active:scale-90 sm:size-9 lg:hidden"
+            className="grid size-8 cursor-pointer place-items-center bg-[var(--bg-card)]/90 text-[var(--text-main)] backdrop-blur-sm transition-colors duration-300 hover:bg-[var(--primary-color)] hover:text-white active:scale-90 sm:size-9 lg:hidden"
           >
             <ShoppingBag size={15} strokeWidth={1.6} />
           </button>
@@ -217,7 +217,7 @@ export function ProductCard({
         <button
           type="button"
           onClick={handleAddToCart}
-          className="absolute inset-x-0 bottom-0 hidden min-h-11 translate-y-full cursor-pointer items-center justify-center gap-2.5 bg-white/95 text-[11px] font-semibold uppercase tracking-[2px] text-[var(--text-main)] backdrop-blur-sm transition-[transform,background-color,color] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[var(--primary-color)] hover:text-white focus-visible:translate-y-0 group-hover:translate-y-0 lg:flex"
+          className="absolute inset-x-0 bottom-0 hidden min-h-11 translate-y-full cursor-pointer items-center justify-center gap-2.5 bg-[var(--bg-card)]/95 text-[11px] font-semibold uppercase tracking-[2px] text-[var(--text-main)] backdrop-blur-sm transition-[transform,background-color,color] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[var(--primary-color)] hover:text-white focus-visible:translate-y-0 group-hover:translate-y-0 lg:flex"
         >
           {isCustom ? <Scissors size={14} strokeWidth={1.6} /> : <ShoppingBag size={14} strokeWidth={1.6} />}
           {isCustom ? t('customTailor') : t('addToCart')}
@@ -229,7 +229,7 @@ export function ProductCard({
           <Link
             href={targetHref}
             title={name}
-            className="block truncate font-[family-name:var(--font-playfair)] text-[15px] font-semibold leading-snug text-[var(--text-main)] transition-colors hover:text-[var(--primary-color)] sm:text-[17px]"
+            className="block truncate font-[family-name:var(--font-playfair)] text-[15px] font-semibold leading-snug text-[var(--text-main)] transition-colors hover:text-[var(--primary-ink)] sm:text-[17px]"
           >
             {name}
           </Link>
@@ -239,7 +239,7 @@ export function ProductCard({
         {/* Giá + màu: trên thẻ hẹp (mobile 2 cột) dải màu tự xuống dòng thay vì ép giá gốc xuống dưới */}
         <div className="mt-2 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 sm:mt-2.5">
           <p className="flex items-baseline gap-x-1.5 whitespace-nowrap text-[13px] sm:gap-x-2 sm:text-[15px]">
-            <span className="font-semibold text-[var(--primary-color)]">{price}</span>
+            <span className="font-semibold text-[var(--primary-ink)]">{price}</span>
             {originalPrice ? <span className="text-[11px] text-[var(--text-light)]/70 line-through sm:text-xs">{originalPrice}</span> : null}
           </p>
           {colorSwatches.length > 0 ? (

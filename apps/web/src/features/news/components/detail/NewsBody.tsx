@@ -20,7 +20,7 @@ export function NewsBody({ content }: NewsBodyProps) {
   return (
     <div className="text-[15px] leading-8 text-[var(--text-main)] sm:text-[17px] sm:leading-9">
       <Reveal>
-        <p className="first-letter:float-left first-letter:mr-3 first-letter:mt-1 first-letter:font-[family-name:var(--font-playfair)] first-letter:text-[60px] first-letter:font-semibold first-letter:leading-[0.85] first-letter:text-[var(--primary-color)]">
+        <p className="first-letter:float-left first-letter:mr-3 first-letter:mt-1 first-letter:font-[family-name:var(--font-playfair)] first-letter:text-[60px] first-letter:font-semibold first-letter:leading-[0.85] first-letter:text-[var(--primary-ink)]">
           {content.intro}
         </p>
       </Reveal>
@@ -33,7 +33,7 @@ export function NewsBody({ content }: NewsBodyProps) {
                 id={`${section.id}-heading`}
                 className="flex items-baseline gap-3 text-[21px] font-semibold leading-snug text-[var(--text-main)] sm:text-[26px]"
               >
-                <span className="font-[family-name:var(--font-lora)] text-[13px] font-normal tracking-[2px] text-[var(--primary-color)]">
+                <span className="font-[family-name:var(--font-lora)] text-[13px] font-normal tracking-[2px] text-[var(--primary-ink)]">
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 {section.heading}
@@ -49,7 +49,7 @@ export function NewsBody({ content }: NewsBodyProps) {
 
             {section.highlights?.length ? (
               <Reveal delay={0.1}>
-                <ul className="mt-7 space-y-3.5 border-l-2 border-[var(--primary-color)] bg-white py-5 pl-5 pr-4 text-[15px] leading-7 sm:pl-7 sm:text-base">
+                <ul className="mt-7 space-y-3.5 border-l-2 border-[var(--primary-color)] bg-[var(--bg-card)] py-5 pl-5 pr-4 text-[15px] leading-7 sm:pl-7 sm:text-base">
                   {section.highlights.map((item, hIndex) => (
                     <motion.li
                       key={hIndex}
@@ -61,7 +61,7 @@ export function NewsBody({ content }: NewsBodyProps) {
                     >
                       <span aria-hidden="true" className="mt-3 size-1.5 shrink-0 rotate-45 bg-[var(--accent-color)]" />
                       <span>
-                        <strong className="font-semibold text-[var(--primary-color)]">{item.bold}</strong> {item.text}
+                        <strong className="font-semibold text-[var(--primary-ink)]">{item.bold}</strong> {item.text}
                       </span>
                     </motion.li>
                   ))}
@@ -83,7 +83,7 @@ export function NewsBody({ content }: NewsBodyProps) {
                 &ldquo;
               </motion.span>
               <Reveal>
-                <blockquote className="mx-auto max-w-xl font-[family-name:var(--font-playfair)] text-[20px] italic leading-snug text-[var(--primary-color)] sm:text-[26px]">
+                <blockquote className="mx-auto max-w-xl font-[family-name:var(--font-playfair)] text-[20px] italic leading-snug text-[var(--primary-ink)] sm:text-[26px]">
                   {content.quote.text}
                 </blockquote>
                 <figcaption className="mt-4 text-[11px] uppercase tracking-[2.5px] text-[var(--text-light)]">

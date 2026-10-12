@@ -36,7 +36,7 @@ export function SectionHeading({
       <p
         className={cn(
           'flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[3px]',
-          isDark ? 'text-[var(--accent-color)]' : 'text-[var(--primary-color)]',
+          isDark ? 'text-[var(--accent-on-primary)]' : 'text-[var(--primary-ink)]',
         )}
       >
         {index ? <span className="font-[family-name:var(--font-playfair)] text-sm tracking-normal">{index}</span> : null}
@@ -46,7 +46,7 @@ export function SectionHeading({
       <h2
         className={cn(
           'mt-3 font-[family-name:var(--font-playfair)] text-[30px] font-semibold leading-tight sm:text-[42px]',
-          isDark ? 'text-white' : 'text-[var(--primary-color)]',
+          isDark ? 'text-white' : 'text-[var(--primary-ink)]',
         )}
       >
         {title}

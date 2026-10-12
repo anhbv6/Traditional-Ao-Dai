@@ -45,10 +45,10 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
     return (
       <Container as="div" className="py-16 text-center">
         <Breadcrumbs />
-        <h1 className="mt-8 text-2xl font-semibold text-[var(--primary-color)]">{t('articleNotFound')}</h1>
+        <h1 className="mt-8 text-2xl font-semibold text-[var(--primary-ink)]">{t('articleNotFound')}</h1>
         <Link
           href="/news"
-          className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[var(--primary-color)] hover:underline"
+          className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[var(--primary-ink)] hover:underline"
         >
           <ArrowLeft size={16} />
           {t('backToNews')}

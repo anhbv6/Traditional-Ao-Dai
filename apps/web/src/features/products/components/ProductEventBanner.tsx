@@ -132,7 +132,7 @@ export function ProductEventBanner() {
                 <Link
                   href={`/products?category=${event.collection}#product-list`}
                   scroll={false}
-                  className="group/cta inline-flex min-h-12 items-center gap-3 bg-white px-7 text-xs font-semibold uppercase tracking-[2px] text-[var(--text-main)] transition-colors duration-300 hover:bg-[var(--accent-color)] hover:text-white"
+                  className="group/cta inline-flex min-h-12 items-center gap-3 bg-[var(--bg-card)] px-7 text-xs font-semibold uppercase tracking-[2px] text-[var(--text-main)] transition-colors duration-300 hover:bg-[var(--accent-color)] hover:text-white"
                 >
                   {t(`items.${event.id}.cta`)}
                   <ArrowRight size={15} strokeWidth={1.6} className="transition-transform duration-300 group-hover/cta:translate-x-1" />
@@ -184,7 +184,7 @@ export function ProductEventBanner() {
                   type="button"
                   onClick={() => step(delta)}
                   aria-label={label}
-                  className="grid size-10 cursor-pointer place-items-center border border-white/25 text-white transition-colors duration-300 hover:border-white hover:bg-white hover:text-[var(--text-main)]"
+                  className="grid size-10 cursor-pointer place-items-center border border-white/25 text-white transition-colors duration-300 hover:border-white hover:bg-[var(--bg-card)] hover:text-[var(--text-main)]"
                 >
                   <Icon size={16} strokeWidth={1.6} />
                 </button>

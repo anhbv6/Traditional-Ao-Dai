@@ -45,7 +45,7 @@ export function AboutPainSolution() {
             <span aria-hidden="true" className="mt-6 block h-px bg-[var(--border)]">
               <span className="block h-px w-10 bg-[var(--primary-color)] transition-[width] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full" />
             </span>
-            <p className="mt-6 text-[11px] font-semibold uppercase tracking-[2.5px] text-[var(--primary-color)]">{t("fixLabel")}</p>
+            <p className="mt-6 text-[11px] font-semibold uppercase tracking-[2.5px] text-[var(--primary-ink)]">{t("fixLabel")}</p>
             <p className="mt-2 text-[15px] leading-7 text-[var(--text-main)]">{t(`cards.${key}.fix`)}</p>
           </Reveal>
         ))}

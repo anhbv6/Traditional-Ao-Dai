@@ -60,7 +60,7 @@ export function ProductsToolbar({ searchQuery, onSearchChange, tabs, isTabActive
                     onClick={() => onSelectTab(tab.value)}
                     className={cn(
                       'relative flex cursor-pointer items-baseline gap-1.5 py-4 text-sm transition-colors duration-300',
-                      isActive ? 'font-semibold text-[var(--primary-color)]' : 'text-[var(--text-light)] hover:text-[var(--text-main)]'
+                      isActive ? 'font-semibold text-[var(--primary-ink)]' : 'text-[var(--text-light)] hover:text-[var(--text-main)]'
                     )}
                   >
                     {tab.label}
@@ -85,7 +85,7 @@ export function ProductsToolbar({ searchQuery, onSearchChange, tabs, isTabActive
           <Search
             size={16}
             strokeWidth={1.6}
-            className="pointer-events-none absolute left-0 top-1/2 -translate-y-1/2 text-[var(--text-light)] transition-colors group-focus-within:text-[var(--primary-color)] "
+            className="pointer-events-none absolute left-0 top-1/2 -translate-y-1/2 text-[var(--text-light)] transition-colors group-focus-within:text-[var(--primary-ink)] "
           />
           <input
             ref={inputRef}
@@ -103,7 +103,7 @@ export function ProductsToolbar({ searchQuery, onSearchChange, tabs, isTabActive
                 inputRef.current?.focus();
               }}
               aria-label={t('filter.clearSearch')}
-              className="absolute right-0 top-1/2 grid size-6 -translate-y-1/2 cursor-pointer place-items-center text-[var(--text-light)] transition-colors hover:text-[var(--primary-color)]"
+              className="absolute right-0 top-1/2 grid size-6 -translate-y-1/2 cursor-pointer place-items-center text-[var(--text-light)] transition-colors hover:text-[var(--primary-ink)]"
             >
               <X size={14} strokeWidth={1.8} />
             </button>

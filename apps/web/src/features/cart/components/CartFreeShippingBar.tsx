@@ -27,14 +27,14 @@ export function CartFreeShippingBar({ subtotal, threshold, remaining, locale, co
         {unlocked ? (
           <Check size={compact ? 12 : 14} className="shrink-0 text-emerald-700" />
         ) : (
-          <Truck size={compact ? 12 : 14} strokeWidth={1.6} className="shrink-0 text-[var(--primary-color)]" />
+          <Truck size={compact ? 12 : 14} strokeWidth={1.6} className="shrink-0 text-[var(--primary-ink)]" />
         )}
         <span>
           {unlocked
             ? t("shipping.unlocked")
             : t.rich("shipping.remaining", {
                 amount: formatVnd(remaining, locale),
-                b: (chunks) => <strong className="font-semibold text-[var(--primary-color)]">{chunks}</strong>,
+                b: (chunks) => <strong className="font-semibold text-[var(--primary-ink)]">{chunks}</strong>,
               })}
         </span>
       </p>

@@ -22,7 +22,7 @@ export function AboutCta() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center lg:flex-col lg:items-end">
           <Link
             href="/contact"
-            className="group inline-flex min-h-12 items-center justify-center gap-3 bg-white px-8 text-xs font-semibold uppercase tracking-[2px] text-[var(--primary-color)] transition-colors duration-300 hover:bg-[var(--accent-color)] hover:text-white"
+            className="group inline-flex min-h-12 items-center justify-center gap-3 bg-[var(--bg-card)] px-8 text-xs font-semibold uppercase tracking-[2px] text-[var(--primary-ink)] transition-colors duration-300 hover:bg-[var(--accent-color)] hover:text-white"
           >
             {t("primaryAction")}
             <ArrowRight size={16} strokeWidth={1.6} className="transition-transform duration-300 group-hover:translate-x-1" />

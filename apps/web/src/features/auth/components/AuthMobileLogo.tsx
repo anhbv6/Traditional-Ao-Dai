@@ -16,7 +16,7 @@ export function AuthMobileLogo() {
             unoptimized
           />
         </div>
-        <span className="font-[family-name:var(--font-playfair)] text-base font-normal tracking-widest text-[var(--primary-color)] uppercase">
+        <span className="font-[family-name:var(--font-playfair)] text-base font-normal tracking-widest text-[var(--primary-ink)] uppercase">
           AODAI
         </span>
       </Link>

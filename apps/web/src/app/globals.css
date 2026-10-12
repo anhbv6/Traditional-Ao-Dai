@@ -1,59 +1,214 @@
+/*
+ * ============================================================================
+ * GLOBALS.CSS — CẤU HÌNH CSS DÙNG CHUNG CHO TOÀN BỘ apps/web
+ * ============================================================================
+ * Import duy nhất tại app/[locale]/layout.tsx. shadcn đọc file này qua components.json.
+ *
+ * MỤC LỤC
+ *   1. Khởi tạo Tailwind v4 + biến thể dark
+ *   2. Token màu storefront — Light (mặc định)
+ *   3. Token màu storefront — Dark
+ *   4. Ánh xạ token sang Tailwind (@theme inline): màu, bo góc, font, animation
+ *   5. Keyframes dùng bằng arbitrary value / inline style
+ *   6. Base: kiểu chữ storefront
+ *   7. Base: khu vực admin (.admin-shell)
+ *   8. Components: class tự định nghĩa
+ *   9. Hiệu ứng hệ thống (view transition, giảm chuyển động)
+ *
+ * QUY ƯỚC DÙNG MÀU (storefront)
+ *   - KHÔNG viết cứng mã hex (vd. text-[#800020]) — dark mode sẽ không đổi màu được.
+ *   - Dùng biến gốc: text-[var(--text-main)], bg-[var(--bg-card)]... hoặc token Tailwind: text-foreground, bg-card...
+ *   - Màu thương hiệu tách 2 vai trò:
+ *       --primary-color : làm NỀN / VIỀN (nút, badge, đường kẻ) — đi kèm chữ trắng.
+ *       --primary-ink   : làm CHỮ / ICON trên nền trang. Light trùng --primary-color, dark sáng hơn để đọc được.
+ *   - Nền trắng của card/ô nhập dùng --bg-card (không dùng bg-white, trừ chi tiết luôn trắng trên ảnh).
+ *   - Khối nền tối có chữ trắng (snackbar, nút đen) dùng --bg-inverse (không dùng --text-main làm nền).
+ *
+ * Admin dùng tông đơn sắc riêng, luôn ở chế độ sáng — xem app/[locale]/(admin)/admin/variables.md.
+ * ============================================================================
+ */
+
+
+/* ============================================================================
+ * 1. KHỞI TẠO TAILWIND V4 + BIẾN THỂ DARK
+ * ----------------------------------------------------------------------------
+ * - Tailwind v4 tự quét toàn bộ src/, không cần khai báo @source.
+ * - Dark mode bật bằng class `dark` trên <html> (AnimatedThemeToggler).
+ * - Khi trang có `.admin-shell` thì bỏ qua dark: admin luôn sáng, kể cả portal (dialog, dropdown).
+ * ============================================================================ */
 @import "tailwindcss";
 
-@custom-variant dark (&:is(.dark *));
-@source "../components/**/*.{ts,tsx}";
-@source "../features/**/*.{ts,tsx}";
+@custom-variant dark (&:where(.dark:not(:has(.admin-shell)) *));
 
-/* Design System - CSS Variables */
+
+/* ============================================================================
+ * 2. TOKEN MÀU STOREFRONT — LIGHT (MẶC ĐỊNH)
+ * ----------------------------------------------------------------------------
+ * Biến gốc: component dùng trực tiếp qua var(--...) và được ánh xạ sang Tailwind ở mục 4.
+ * ============================================================================ */
 :root {
-  --primary-color: #800020;    /* Đỏ đô - Định hình thương hiệu */
-  --accent-color: #E2A79E;     /* Hồng đất - Nút bấm kêu gọi hành động */
-  --bg-main: #FAF7F5;          /* Trắng kem ấm - Nền web chính */
-  --bg-secondary: #F3ECE7;     /* Phân tách khối nội dung */
-  --text-main: #2A2525;        /* Chữ dễ đọc, không mỏi mắt */
-  --text-light: #706565;       /* Chữ cho ngày tháng, thông tin phụ */
+  color-scheme: light;
+
+  /* Thương hiệu */
+  --primary-color: #800020;     /* Đỏ đô — nền nút, viền, badge thương hiệu */
+  --primary-ink: #800020;       /* Đỏ đô — chữ / icon thương hiệu trên nền trang */
+  --accent-color: #E2A79E;      /* Hồng đất — nút kêu gọi hành động, điểm nhấn */
+  --accent-foreground: #2A2525; /* Chữ trên nền hồng đất (item đang chọn của dropdown) */
+  --accent-on-primary: #E2A79E; /* Chữ nhấn (eyebrow) đặt trên nền đỏ đô */
+
+  /* Nền */
+  --bg-main: #FAF7F5;           /* Trắng kem ấm — nền trang */
+  --bg-secondary: #F3ECE7;      /* Kem đậm — phân tách khối nội dung, ô nhập */
+  --bg-card: #FFFFFF;           /* Trắng — card, bảng, ô nhập khi focus */
+  --bg-popover: #FAF7F5;        /* Nền dropdown, popover */
+  --bg-inverse: #2A2525;        /* Nền tối cố định có chữ trắng (snackbar, nút đen) */
+
+  /* Chữ */
+  --text-main: #2A2525;         /* Chữ chính — dễ đọc, không mỏi mắt */
+  --text-light: #706565;        /* Chữ phụ — ngày tháng, mô tả, nhãn */
+  --heading-color: #800020;     /* Tiêu đề h1–h3 */
+
+  /* Viền & trạng thái */
   --border: #E2D9D2;
-  --ring: #E2A79E;
-  --destructive: #B42318;
+  --ring: #E2A79E;              /* Vòng focus */
+  --destructive: #B42318;       /* Lỗi, xóa */
 }
 
+
+/* ============================================================================
+ * 3. TOKEN MÀU STOREFRONT — DARK
+ * ----------------------------------------------------------------------------
+ * Chỉ đổi giá trị biến gốc; mọi class Tailwind / var(--...) tự đổi theo.
+ * Tông "than ấm" ánh đỏ rượu, khớp chất liệu nhung / lụa của áo dài.
+ * Độ tương phản (WCAG) trên nền --bg-main:
+ *   text-main 15.8 · text-light 8.4 · primary-ink 9.1 · heading 14.6 · accent 5.5
+ *   chữ trắng trên --primary-color 6.8 · trên --accent-color 3.4 · trên --bg-inverse 12.9
+ * ============================================================================ */
+:root.dark:not(:has(.admin-shell)) {
+  color-scheme: dark;
+
+  /* Thương hiệu */
+  --primary-color: #94293E;
+  --primary-ink: #DFA8AF;       /* Hồng đất pha kem nhẹ nhàng */
+  --accent-color: #B87B72;
+  --accent-foreground: #161213;
+  --accent-on-primary: #F6D5CE; /* Hồng phấn — chữ nhấn trên nền đỏ đô (hồng đất trầm sẽ chìm) */
+
+  /* Nền */
+  --bg-main: #141112;
+  --bg-card: #1F1A1C;           /* Nâng sáng card lên 1 tông so với bản cũ */
+  --bg-secondary: #2B2427;      /* Làm sáng nền menu active bên trái */
+  --bg-popover: #241E20;
+  --bg-inverse: #3D3235;
+
+  /* Chữ */
+  --text-main: #F2ECE9;
+  --text-light: #A89A9E;
+  --heading-color: #EBC5C8;     /* Hồng ngọc trai trầm (bớt sắc cam/san hô) */
+
+  /* Viền & trạng thái */
+  --border: #382E31;
+  --ring: #DFA8AF;
+  --destructive: #E5635B;
+}
+
+
+/* ============================================================================
+ * 4. ÁNH XẠ TOKEN SANG TAILWIND (@theme inline)
+ * ----------------------------------------------------------------------------
+ * `inline`: class sinh ra dùng thẳng var(--biến-gốc), nên chỉ cần đổi biến gốc ở mục 2/3.
+ * Tên theo chuẩn shadcn (bg-background, text-muted-foreground, bg-card...).
+ * ============================================================================ */
 @theme inline {
+  /* --- Màu --- */
   --color-background: var(--bg-main);
   --color-foreground: var(--text-main);
+
   --color-primary: var(--primary-color);
-  --color-primary-foreground: #ffffff;
+  --color-primary-foreground: #FFFFFF;
+  --color-primary-ink: var(--primary-ink);        /* text-primary-ink: chữ thương hiệu */
+
   --color-secondary: var(--bg-secondary);
   --color-secondary-foreground: var(--text-main);
+
   --color-muted: var(--bg-secondary);
   --color-muted-foreground: var(--text-light);
+
   --color-accent: var(--accent-color);
-  --color-popover: var(--bg-main);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-card: var(--bg-card);
+  --color-card-foreground: var(--text-main);
+
+  --color-popover: var(--bg-popover);
   --color-popover-foreground: var(--text-main);
+
   --color-border: var(--border);
-  --color-ring: var(--ring);
   --color-input: var(--bg-main);
+  --color-ring: var(--ring);
   --color-destructive: var(--destructive);
+
+  /* --- Bo góc --- */
   --radius-md: 8px;
 
-  --font-lora: var(--font-lora), 'Lora', Georgia, serif;
-  --font-playfair: var(--font-playfair), 'Playfair Display', Georgia, serif;
-  --font-dancing: var(--font-dancing), 'Dancing Script', cursive;
+  /* --- Font: biến --font-* do next/font gắn trên <html> (app/[locale]/layout.tsx) --- */
+  --font-lora: var(--font-lora), 'Lora', Georgia, serif;                       /* Nội dung */
+  --font-playfair: var(--font-playfair), 'Playfair Display', Georgia, serif;   /* Tiêu đề */
+  --font-dancing: var(--font-dancing), 'Dancing Script', cursive;              /* Chữ ký, trang trí */
+
+  /* --- Animation: dùng class animate-* --- */
+  --animate-fade-in-up: fade-in-up 0.8s cubic-bezier(0.25, 1, 0.5, 1) both;   /* Hiện dần từ dưới (hero) */
+  --animate-fade-in-soft: fade-in-soft 1s cubic-bezier(0.22, 1, 0.36, 1) both; /* Hiện dần nhẹ (đổi tab sản phẩm ở home) */
+  --animate-marquee: marquee var(--duration) infinite linear;                  /* components/ui/marquee */
+  --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
+
+  @keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fade-in-soft {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(calc(-100% - var(--gap))); }
+  }
+
+  @keyframes marquee-vertical {
+    from { transform: translateY(0); }
+    to { transform: translateY(calc(-100% - var(--gap))); }
+  }
 }
 
-/* Modern CSS Reset - Bọc trong @layer base để không đè các utility class margin (mt-*, mb-*, mx-*, m-*) của Tailwind */
+
+/* ============================================================================
+ * 5. KEYFRAMES DÙNG BẰNG ARBITRARY VALUE / INLINE STYLE
+ * ----------------------------------------------------------------------------
+ * Để ngoài @theme để luôn được xuất ra CSS (không phụ thuộc class animate-*).
+ * ============================================================================ */
+
+/* Thanh tiến trình tự chạy — PromoteFeedBack (inline style), ProductEventBanner (animate-[progress-fill_...]) */
+@keyframes progress-fill {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+
+/* ============================================================================
+ * 6. BASE — KIỂU CHỮ STOREFRONT
+ * ----------------------------------------------------------------------------
+ * Nằm trong @layer base nên class Tailwind (mt-*, text-*...) luôn ghi đè được.
+ * Phần reset cơ bản (box-sizing, margin, img block, font: inherit) đã có trong preflight của Tailwind.
+ * ============================================================================ */
 @layer base {
-  *, *::before, *::after {
-    box-sizing: border-box;
-  }
-
-  * {
-    margin: 0;
-  }
-
   html, body {
     min-height: 100%;
   }
 
+  /* Khóa cuộn trang khi mở overlay / drawer */
   html.is-scroll-locked,
   html.is-scroll-locked body {
     overflow: hidden;
@@ -72,22 +227,13 @@
 
   h1, h2, h3, .product-title {
     font-family: var(--font-playfair), 'Playfair Display', serif;
-    color: var(--primary-color);
+    color: var(--heading-color);
     line-height: 1.3;
   }
 
   h1 { font-size: 48px; font-weight: 600; }
   h2 { font-size: 32px; font-weight: 600; }
   h3 { font-size: 20px; font-weight: 500; }
-
-  img, picture, video, canvas, svg {
-    display: block;
-    max-width: 100%;
-  }
-
-  input, button, textarea, select {
-    font: inherit;
-  }
 
   p, h1, h2, h3, h4, h5, h6 {
     overflow-wrap: break-word;
@@ -98,14 +244,20 @@
     h2 { font-size: 24px; }
     body { font-size: 15px; }
   }
+}
 
-  /*
-   * Khu vực quản trị (admin): tách hẳn khỏi kiểu chữ storefront (Lora / Playfair, h1 48px, line-height 1.75).
-   * Gắn class `admin-shell` ở thẻ bọc ngoài cùng của layout admin. Nằm trong @layer base nên class Tailwind vẫn ghi đè được.
-   * Quy chuẩn: app/[locale]/(admin)/admin/variables.md
-   */
+
+/* ============================================================================
+ * 7. BASE — KHU VỰC ADMIN (.admin-shell)
+ * ----------------------------------------------------------------------------
+ * Tách hẳn khỏi kiểu chữ storefront (Lora / Playfair, h1 48px, line-height 1.75).
+ * Gắn class `admin-shell` ở thẻ bọc ngoài cùng của layout admin; portal (Dialog, Dropdown) tự gắn thêm.
+ * Màu admin dùng trực tiếp theo bảng trong app/[locale]/(admin)/admin/variables.md.
+ * ============================================================================ */
+@layer base {
   .admin-shell {
-    /* --font-admin do next/font gắn ở <html> (app/[locale]/layout.tsx) nên cả portal (dialog, dropdown) cũng dùng được */
+    color-scheme: light;
+    /* --font-admin do next/font gắn ở <html> nên cả portal cũng dùng được */
     font-family: var(--font-admin), system-ui, -apple-system, sans-serif;
     font-size: 14px;
     line-height: 1.5;
@@ -121,215 +273,49 @@
   }
 }
 
-/* Custom Component Classes */
-.button-action {
-  font-family: var(--font-lora), 'Lora', serif;
-  font-size: 14px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  background-color: var(--accent-color);
-  color: #FFFFFF;
-  padding: 12px 28px;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
 
-.button-action:hover {
-  background-color: var(--primary-color);
-}
-
-.btn-buy-now {
-  font-family: var(--font-lora), 'Lora', serif;
-  background-color: var(--accent-color);
-  color: #ffffff;
-  font-weight: bold;
-  border: none;
-  transition: background-color 0.3s ease;
-  cursor: pointer;
-}
-
-.btn-buy-now:hover {
-  background-color: var(--primary-color);
-}
-
-/* Staggered Fade-in Up Animation */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
+/* ============================================================================
+ * 8. COMPONENTS — CLASS TỰ ĐỊNH NGHĨA
+ * ----------------------------------------------------------------------------
+ * Trong @layer components: class Tailwind truyền kèm vẫn ghi đè được (vd. "button-action px-4").
+ * ============================================================================ */
+@layer components {
+  /* Nút hành động chữ in hoa (trang 404) */
+  .button-action {
+    font-family: var(--font-lora), 'Lora', serif;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background-color: var(--accent-color);
+    color: #FFFFFF;
+    padding: 12px 28px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  .button-action:hover {
+    background-color: var(--primary-color);
   }
 }
 
-.animate-fade-in-up {
-  opacity: 0;
-  animation: fadeInUp 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-}
 
-/* Hiện dần nhẹ hơn fadeInUp (dịch ít, chậm hơn) — dùng khi đổi tab danh sách sản phẩm ở home */
-@keyframes fadeInSoft {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+/* ============================================================================
+ * 9. HIỆU ỨNG HỆ THỐNG
+ * ============================================================================ */
 
-.animate-fade-in-soft {
-  opacity: 0;
-  animation: fadeInSoft 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .animate-fade-in-soft {
-    animation-duration: 0.01ms;
-  }
-}
-
-/* Thanh tiến trình tự chạy (slider đánh giá ở home) */
-@keyframes progress-fill {
-  from { transform: scaleX(0); }
-  to { transform: scaleX(1); }
-}
-
-@theme inline {
-  --animate-marquee: marquee var(--duration) infinite linear;
-  --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
-  @keyframes marquee {
-    from {
-      transform: translateX(0);
-    }
-    to {
-      transform: translateX(calc(-100% - var(--gap)));
-    }
-  }
-  @keyframes marquee-vertical {
-    from {
-      transform: translateY(0);
-    }
-    to {
-      transform: translateY(calc(-100% - var(--gap)));
-    }
-  }
-}
-
-::view-transition-old(root), ::view-transition-new(root) {
+/* Tắt hiệu ứng mờ mặc định của View Transitions — AnimatedThemeToggler tự vẽ hiệu ứng chuyển theme */
+::view-transition-old(root),
+::view-transition-new(root) {
   animation: none;
   mix-blend-mode: normal;
 }
 
-/* Custom CSS Variables - Dark Mode (Đã tối ưu chuẩn UI/UX thời trang) */
-.dark {
-  /* 1. Nền web: Chuyển sang tông xám than ấm sâu hơn để tạo độ sang */
-  --bg-main: #121010;          
-  --bg-secondary: #1E1A1A;     /* Nền Card/Sidebar tách biệt rõ ràng hơn */
-  
-  /* 2. Chữ: Đưa tiêu đề về màu sáng để đọc cực rõ trên nền tối */
-  --text-main: #F7F4F0;        /* Chữ chính & Tiêu đề H1, H2, H3 (Sáng kem) */
-  --text-light: #A89F99;       /* Mô tả phụ, Subtitle */
-  
-  /* 3. Màu thương hiệu & Điểm nhấn */
-  --primary-color: #A32A3B;    /* Đỏ Burgundy (Chủ yếu dùng cho Nền Nút bấm) */
-  --accent-color: #E8B4AC;     /* Hồng đất pastel (Dùng cho Subtitle nhỏ, Icon, Link active) */
-  
-  --border: #2D2625;           /* Viền mỏng phân tách rõ các khối */
-  --ring: #E8B4AC;
-  --destructive: #F04438;
-}
-
-/* Mapping hệ thống Theme */
-.dark {
-  --color-background: var(--bg-main);
-  
-  /* Đổi foreground thành màu sáng để Tiêu đề không bị đỏ chìm nữa */
-  --color-foreground: var(--text-main);
-  
-  --color-primary: var(--primary-color);
-  --color-primary-foreground: #ffffff; /* Chữ trắng nổi bật trên nút đỏ */
-  
-  --color-secondary: var(--bg-secondary);
-  --color-secondary-foreground: var(--text-main);
-  
-  --color-muted: var(--bg-secondary);
-  --color-muted-foreground: var(--text-light);
-  
-  --color-accent: var(--accent-color);
-  --color-accent-foreground: #121010;
-  
-  --color-popover: var(--bg-secondary);
-  --color-popover-foreground: var(--text-main);
-  
-  --color-border: var(--border);
-  --color-ring: var(--ring);
-  --color-input: var(--bg-secondary);
-  --color-destructive: var(--destructive);
-}
-
-.dark .bg-white {
-  background-color: var(--bg-secondary) !important;
-}
-
-.dark .text-\[\#2A2525\] {
-  color: var(--text-main) !important;
-}
-
-.dark .text-\[\#706565\] {
-  color: var(--text-light) !important;
-}
-
-.dark .text-\[\#706565\]\/60 {
-  color: rgba(168, 159, 153, 0.6) !important;
-}
-
-.dark .text-\[\#706565\]\/80 {
-  color: rgba(168, 159, 153, 0.8) !important;
-}
-
-.dark .border-\[\#E2D9D2\] {
-  border-color: var(--border) !important;
-}
-
-.dark .border-\[\#E2D9D2\]\/40 {
-  border-color: rgba(45, 38, 37, 0.4) !important;
-}
-
-.dark .border-\[\#E2D9D2\]\/60 {
-  border-color: rgba(45, 38, 37, 0.6) !important;
-}
-
-.dark .divide-\[\#E2D9D2\]\/30 > * + * {
-  border-color: rgba(45, 38, 37, 0.3) !important;
-}
-
-.dark .divide-\[\#E2D9D2\]\/40 > * + * {
-  border-color: rgba(45, 38, 37, 0.4) !important;
-}
-
-.dark .bg-\[\#FAF7F5\] {
-  background-color: var(--bg-main) !important;
-}
-
-.dark .bg-\[\#FAF7F5\]\/30 {
-  background-color: rgba(18, 16, 16, 0.3) !important;
-}
-
-.dark .bg-\[\#F3ECE7\] {
-  background-color: var(--bg-secondary) !important;
-}
-
-.dark .bg-\[\#F3ECE7\]\/30 {
-  background-color: rgba(30, 26, 26, 0.3) !important;
-}
-
-/* Force titles to use light foreground color in dark mode */
-.dark h1, .dark h2, .dark h3, .dark .product-title {
-  color: var(--text-main) !important;
+/* Tôn trọng thiết lập "giảm chuyển động" của hệ điều hành */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-up,
+  .animate-fade-in-soft {
+    animation-duration: 0.01ms;
+  }
 }

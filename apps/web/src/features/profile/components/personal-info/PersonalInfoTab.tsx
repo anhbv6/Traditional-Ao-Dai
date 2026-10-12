@@ -123,10 +123,10 @@ export function PersonalInfoTab() {
   const displayAvatar = (avatarPreview || avatarUrl || "").trim();
 
   return (
-    <div className="rounded-2xl border border-[#800020]/10 bg-white p-4 shadow-sm sm:p-8">
+    <div className="rounded-2xl border border-[var(--primary-color)]/10 bg-[var(--bg-card)] p-4 shadow-sm sm:p-8">
       <form onSubmit={onSaveSubmit} className="space-y-6">
         {/* Avatar Section */}
-        <div className="flex flex-col sm:flex-row items-center gap-4 pb-4 sm:gap-6 sm:pb-6 border-b border-[#800020]/10">
+        <div className="flex flex-col sm:flex-row items-center gap-4 pb-4 sm:gap-6 sm:pb-6 border-b border-[var(--primary-color)]/10">
           <div className="relative group">
             <Avatar 
               size="xl" 
@@ -135,16 +135,16 @@ export function PersonalInfoTab() {
                   setIsModalOpen(true);
                 }
               }}
-              className={`size-20 sm:size-24 border-2 border-[#E2D9D2] transition-all duration-300 shadow-sm ${
+              className={`size-20 sm:size-24 border-2 border-[var(--border)] transition-all duration-300 shadow-sm ${
                 displayAvatar && !isUploadingAvatar
-                  ? "hover:border-[#800020] cursor-pointer hover:shadow-md" 
+                  ? "hover:border-[var(--primary-color)] cursor-pointer hover:shadow-md" 
                   : "cursor-default"
               }`}
             >
               {displayAvatar ? (
                 <AvatarImage src={displayAvatar} alt={fullName} className="object-cover" />
               ) : null}
-              <AvatarFallback className="bg-[#FAF7F5] text-[#800020] font-bold text-xl sm:text-2xl uppercase">
+              <AvatarFallback className="bg-[var(--bg-main)] text-[var(--primary-ink)] font-bold text-xl sm:text-2xl uppercase">
                 {fullName ? fullName.slice(0, 2) : "US"}
               </AvatarFallback>
             </Avatar>
@@ -161,7 +161,7 @@ export function PersonalInfoTab() {
               <button
                 type="button"
                 onClick={triggerFileSelect}
-                className="absolute bottom-0 right-0 p-2 sm:p-2.5 rounded-full bg-[#800020] text-white hover:bg-[#800020]/95 shadow-md border-2 border-white flex items-center justify-center transition-all duration-300 cursor-pointer hover:scale-105 active:scale-95"
+                className="absolute bottom-0 right-0 p-2 sm:p-2.5 rounded-full bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/95 shadow-md border-2 border-white flex items-center justify-center transition-all duration-300 cursor-pointer hover:scale-105 active:scale-95"
                 aria-label={t("editAvatar")}
                 title={t("editAvatar")}
               >
@@ -180,10 +180,10 @@ export function PersonalInfoTab() {
           />
 
           <div className="flex-1 text-center sm:text-left space-y-1">
-            <h3 className="text-base sm:text-lg font-bold text-[#2A2525] font-[family-name:var(--font-playfair)]">
+            <h3 className="text-base sm:text-lg font-bold text-[var(--text-main)] font-[family-name:var(--font-playfair)]">
               {user?.name || "-"}
             </h3>
-            {user?.email && <p className="text-[11px] sm:text-xs text-[#706565]">
+            {user?.email && <p className="text-[11px] sm:text-xs text-[var(--text-light)]">
               {user.email}
             </p>}
           </div>
@@ -193,7 +193,7 @@ export function PersonalInfoTab() {
               <button
                 type="button"
                 onClick={handleStartEdit}
-                className="w-full sm:w-auto inline-flex h-9 sm:h-10 items-center justify-center rounded-lg border border-[#800020] bg-white px-4 sm:px-5 text-[11px] sm:text-xs font-semibold uppercase tracking-[1px] text-[#800020] transition-all hover:bg-[#800020] hover:text-white cursor-pointer shadow-sm hover:shadow-md active:scale-95 duration-200"
+                className="w-full sm:w-auto inline-flex h-9 sm:h-10 items-center justify-center rounded-lg border border-[var(--primary-color)] bg-[var(--bg-card)] px-4 sm:px-5 text-[11px] sm:text-xs font-semibold uppercase tracking-[1px] text-[var(--primary-ink)] transition-all hover:bg-[var(--primary-color)] hover:text-white cursor-pointer shadow-sm hover:shadow-md active:scale-95 duration-200"
               >
                 {t("changeInfoBtn")}
               </button>
@@ -218,24 +218,24 @@ export function PersonalInfoTab() {
         <div className="grid gap-6 sm:grid-cols-2">
           {/* Full Name */}
           <div className="space-y-2">
-            <label className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-[#706565]">
+            <label className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-[var(--text-light)]">
               {t("fullName")}
             </label>
             {!isEditing ? (
-              <div className="flex items-center gap-2.5 sm:gap-3.5 w-full h-10 rounded-xl border border-[#800020]/5 bg-gradient-to-r from-[#FAF7F5]/40 to-white px-3 sm:px-4 text-xs sm:text-sm text-[#2A2525] font-semibold shadow-xs hover:border-[#800020]/10 transition-all duration-300">
-                <User size={14} className="text-[#800020]/70 sm:hidden shrink-0" />
-                <User size={16} className="text-[#800020]/70 hidden sm:block shrink-0" />
+              <div className="flex items-center gap-2.5 sm:gap-3.5 w-full h-10 rounded-xl border border-[var(--primary-color)]/5 bg-gradient-to-r from-[var(--bg-main)]/40 to-white px-3 sm:px-4 text-xs sm:text-sm text-[var(--text-main)] font-semibold shadow-xs hover:border-[var(--primary-color)]/10 transition-all duration-300">
+                <User size={14} className="text-[var(--primary-ink)]/70 sm:hidden shrink-0" />
+                <User size={16} className="text-[var(--primary-ink)]/70 hidden sm:block shrink-0" />
                 <span>{fullName || "-"}</span>
               </div>
             ) : (
               <div className="relative">
-                <User className="absolute left-3 sm:left-3.5 top-1/2 size-3.5 sm:size-4 -translate-y-1/2 text-[#800020]/50 pointer-events-none" />
+                <User className="absolute left-3 sm:left-3.5 top-1/2 size-3.5 sm:size-4 -translate-y-1/2 text-[var(--primary-ink)]/50 pointer-events-none" />
                 <input
                   type="text"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   required
-                  className="w-full h-10 rounded-xl border border-[#E2D9D2] bg-white pl-10 pr-3 sm:pl-11 sm:pr-4 text-xs sm:text-sm text-[#2A2525] outline-none transition-all duration-300 focus:border-[#800020] focus:ring-1 focus:ring-[#800020] hover:border-[#800020]/30 shadow-xs"
+                  className="w-full h-10 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] pl-10 pr-3 sm:pl-11 sm:pr-4 text-xs sm:text-sm text-[var(--text-main)] outline-none transition-all duration-300 focus:border-[var(--primary-color)] focus:ring-1 focus:ring-[var(--primary-color)] hover:border-[var(--primary-color)]/30 shadow-xs"
                 />
               </div>
             )}
@@ -261,13 +261,13 @@ export function PersonalInfoTab() {
 
           {/* DOB */}
           <div className="space-y-2">
-            <label className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-[#706565]">
+            <label className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-[var(--text-light)]">
               {t("dob")}
             </label>
             {!isEditing ? (
-              <div className="flex items-center gap-2.5 sm:gap-3.5 w-full h-10 rounded-xl border border-[#800020]/5 bg-gradient-to-r from-[#FAF7F5]/40 to-white px-3 sm:px-4 text-xs sm:text-sm text-[#2A2525] font-semibold shadow-xs hover:border-[#800020]/10 transition-all duration-300">
-                <CalendarIcon size={14} className="text-[#800020]/70 sm:hidden shrink-0" />
-                <CalendarIcon size={16} className="text-[#800020]/70 hidden sm:block shrink-0" />
+              <div className="flex items-center gap-2.5 sm:gap-3.5 w-full h-10 rounded-xl border border-[var(--primary-color)]/5 bg-gradient-to-r from-[var(--bg-main)]/40 to-white px-3 sm:px-4 text-xs sm:text-sm text-[var(--text-main)] font-semibold shadow-xs hover:border-[var(--primary-color)]/10 transition-all duration-300">
+                <CalendarIcon size={14} className="text-[var(--primary-ink)]/70 sm:hidden shrink-0" />
+                <CalendarIcon size={16} className="text-[var(--primary-ink)]/70 hidden sm:block shrink-0" />
                 <span>{formatLocalDate(dob)}</span>
               </div>
             ) : (
@@ -276,13 +276,13 @@ export function PersonalInfoTab() {
                   <PopoverTrigger render={
                     <button
                       type="button"
-                      className="w-full h-10 text-left rounded-xl border border-[#E2D9D2] bg-white pl-10 pr-3 sm:pl-11 sm:pr-4 text-xs sm:text-sm text-[#2A2525] outline-none transition-all duration-300 focus:border-[#800020] focus:ring-1 focus:ring-[#800020] cursor-pointer hover:border-[#800020]/30 shadow-xs"
+                      className="w-full h-10 text-left rounded-xl border border-[var(--border)] bg-[var(--bg-card)] pl-10 pr-3 sm:pl-11 sm:pr-4 text-xs sm:text-sm text-[var(--text-main)] outline-none transition-all duration-300 focus:border-[var(--primary-color)] focus:ring-1 focus:ring-[var(--primary-color)] cursor-pointer hover:border-[var(--primary-color)]/30 shadow-xs"
                     >
                       {formatLocalDate(dob)}
                     </button>
                   } />
-                  <CalendarIcon className="absolute left-3 sm:left-3.5 top-1/2 size-3.5 sm:size-4 -translate-y-1/2 text-[#800020]/50 pointer-events-none" />
-                  <PopoverContent className="w-auto p-0 bg-white border border-[#E2D9D2] rounded-xl shadow-lg z-50">
+                  <CalendarIcon className="absolute left-3 sm:left-3.5 top-1/2 size-3.5 sm:size-4 -translate-y-1/2 text-[var(--primary-ink)]/50 pointer-events-none" />
+                  <PopoverContent className="w-auto p-0 bg-[var(--bg-card)] border border-[var(--border)] rounded-xl shadow-lg z-50">
                     <Calendar
                       mode="single"
                       selected={getLocalDate(dob)}
@@ -300,13 +300,13 @@ export function PersonalInfoTab() {
 
         {/* Gender */}
         <div className="space-y-2 w-full sm:max-w-[calc(50%-12px)]">
-          <label className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-[#706565]">
+          <label className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-[var(--text-light)]">
             {t("gender")}
           </label>
           {!isEditing ? (
-              <div className="flex items-center gap-2.5 sm:gap-3.5 w-full h-10 rounded-xl border border-[#800020]/5 bg-gradient-to-r from-[#FAF7F5]/40 to-white px-3 sm:px-4 text-xs sm:text-sm text-[#2A2525] font-semibold shadow-xs hover:border-[#800020]/10 transition-all duration-300 capitalize">
-              <Smile size={14} className="text-[#800020]/70 sm:hidden shrink-0" />
-              <Smile size={16} className="text-[#800020]/70 hidden sm:block shrink-0" />
+              <div className="flex items-center gap-2.5 sm:gap-3.5 w-full h-10 rounded-xl border border-[var(--primary-color)]/5 bg-gradient-to-r from-[var(--bg-main)]/40 to-white px-3 sm:px-4 text-xs sm:text-sm text-[var(--text-main)] font-semibold shadow-xs hover:border-[var(--primary-color)]/10 transition-all duration-300 capitalize">
+              <Smile size={14} className="text-[var(--primary-ink)]/70 sm:hidden shrink-0" />
+              <Smile size={16} className="text-[var(--primary-ink)]/70 hidden sm:block shrink-0" />
               <span>
                 {gender === "male"
                   ? t("genderMale")
@@ -322,25 +322,25 @@ export function PersonalInfoTab() {
                 onValueChange={(val) => setGender(val || "other")}
               >
                 <SelectTrigger
-                  className="!w-full !h-10 !rounded-xl flex items-center justify-between border border-[#E2D9D2] bg-white pl-10 pr-3 sm:pl-11 sm:pr-4 text-xs sm:text-sm text-[#2A2525] outline-none transition-all duration-300 focus-visible:border-[#800020] focus-visible:ring-1 focus-visible:ring-[#800020] hover:border-[#800020]/30 shadow-xs cursor-pointer"
+                  className="!w-full !h-10 !rounded-xl flex items-center justify-between border border-[var(--border)] bg-[var(--bg-card)] pl-10 pr-3 sm:pl-11 sm:pr-4 text-xs sm:text-sm text-[var(--text-main)] outline-none transition-all duration-300 focus-visible:border-[var(--primary-color)] focus-visible:ring-1 focus-visible:ring-[var(--primary-color)] hover:border-[var(--primary-color)]/30 shadow-xs cursor-pointer"
                 >
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-white border border-[#E2D9D2] text-[#2A2525] shadow-lg rounded-xl overflow-hidden font-medium">
+                <SelectContent className="bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-main)] shadow-lg rounded-xl overflow-hidden font-medium">
                   <SelectGroup>
-                    <SelectItem value="male" className="cursor-pointer font-medium hover:bg-[#800020]/5 focus:bg-[#800020]/5 focus:text-[#800020]">
+                    <SelectItem value="male" className="cursor-pointer font-medium hover:bg-[var(--primary-color)]/5 focus:bg-[var(--primary-color)]/5 focus:text-[var(--primary-ink)]">
                       {t("genderMale")}
                     </SelectItem>
-                    <SelectItem value="female" className="cursor-pointer font-medium hover:bg-[#800020]/5 focus:bg-[#800020]/5 focus:text-[#800020]">
+                    <SelectItem value="female" className="cursor-pointer font-medium hover:bg-[var(--primary-color)]/5 focus:bg-[var(--primary-color)]/5 focus:text-[var(--primary-ink)]">
                       {t("genderFemale")}
                     </SelectItem>
-                    <SelectItem value="other" className="cursor-pointer font-medium hover:bg-[#800020]/5 focus:bg-[#800020]/5 focus:text-[#800020]">
+                    <SelectItem value="other" className="cursor-pointer font-medium hover:bg-[var(--primary-color)]/5 focus:bg-[var(--primary-color)]/5 focus:text-[var(--primary-ink)]">
                       {t("genderOther")}
                     </SelectItem>
                   </SelectGroup>
                 </SelectContent>
               </Select>
-              <Smile className="absolute left-3 sm:left-3.5 top-1/2 size-3.5 sm:size-4 -translate-y-1/2 text-[#800020]/50 pointer-events-none" />
+              <Smile className="absolute left-3 sm:left-3.5 top-1/2 size-3.5 sm:size-4 -translate-y-1/2 text-[var(--primary-ink)]/50 pointer-events-none" />
             </div>
           )}
         </div>
@@ -351,7 +351,7 @@ export function PersonalInfoTab() {
             <button
               type="submit"
               disabled={isLoading || isUploadingAvatar || !fullName.trim() || !dob.trim()}
-              className="w-full sm:w-auto inline-flex h-9 sm:h-11 items-center justify-center rounded-lg bg-[#800020] px-6 sm:px-8 text-xs font-semibold uppercase tracking-[1.5px] text-white transition-all hover:bg-[#800020]/90 focus:outline-none focus:ring-2 focus:ring-[#800020] focus:ring-offset-2 cursor-pointer shadow-sm hover:shadow-md duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full sm:w-auto inline-flex h-9 sm:h-11 items-center justify-center rounded-lg bg-[var(--primary-color)] px-6 sm:px-8 text-xs font-semibold uppercase tracking-[1.5px] text-white transition-all hover:bg-[var(--primary-color)]/90 focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] focus:ring-offset-2 cursor-pointer shadow-sm hover:shadow-md duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading || isUploadingAvatar ? "Đang lưu..." : t("saveBtn")}
             </button>
@@ -359,7 +359,7 @@ export function PersonalInfoTab() {
               type="button"
               onClick={handleCancel}
               disabled={isLoading || isUploadingAvatar}
-              className="w-full sm:w-auto inline-flex h-9 sm:h-11 items-center justify-center rounded-lg border border-[#E2D9D2] bg-white px-6 sm:px-8 text-xs font-semibold uppercase tracking-[1.5px] text-gray-700 transition-all hover:bg-gray-50 cursor-pointer shadow-sm hover:shadow-md duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full sm:w-auto inline-flex h-9 sm:h-11 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--bg-card)] px-6 sm:px-8 text-xs font-semibold uppercase tracking-[1.5px] text-gray-700 transition-all hover:bg-gray-50 cursor-pointer shadow-sm hover:shadow-md duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {t("cancelBtn")}
             </button>
@@ -389,11 +389,11 @@ function ContactField({ label, icon: Icon, value, isVerified, onAction }: Contac
 
   return (
     <div className="space-y-2">
-      <label className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-[#706565]">
+      <label className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-[var(--text-light)]">
         {label}
       </label>
-      <div className="flex items-center gap-2.5 sm:gap-3.5 w-full h-10 rounded-xl border border-[#800020]/5 bg-gradient-to-r from-[#FAF7F5]/40 to-white pl-3 pr-1.5 sm:pl-4 text-xs sm:text-sm text-[#2A2525] font-semibold shadow-xs hover:border-[#800020]/10 transition-all duration-300">
-        <Icon className="size-3.5 sm:size-4 text-[#800020]/70 shrink-0" />
+      <div className="flex items-center gap-2.5 sm:gap-3.5 w-full h-10 rounded-xl border border-[var(--primary-color)]/5 bg-gradient-to-r from-[var(--bg-main)]/40 to-white pl-3 pr-1.5 sm:pl-4 text-xs sm:text-sm text-[var(--text-main)] font-semibold shadow-xs hover:border-[var(--primary-color)]/10 transition-all duration-300">
+        <Icon className="size-3.5 sm:size-4 text-[var(--primary-ink)]/70 shrink-0" />
         <span className="min-w-0 flex-1 truncate">{value || "-"}</span>
         {value && (
           <span
@@ -408,7 +408,7 @@ function ContactField({ label, icon: Icon, value, isVerified, onAction }: Contac
         <button
           type="button"
           onClick={onAction}
-          className="shrink-0 h-7 rounded-lg border border-[#800020]/30 px-2.5 text-[10px] sm:text-[11px] font-semibold uppercase tracking-wide text-[#800020] transition-all hover:bg-[#800020] hover:text-white cursor-pointer"
+          className="shrink-0 h-7 rounded-lg border border-[var(--primary-color)]/30 px-2.5 text-[10px] sm:text-[11px] font-semibold uppercase tracking-wide text-[var(--primary-ink)] transition-all hover:bg-[var(--primary-color)] hover:text-white cursor-pointer"
         >
           {actionLabel}
         </button>

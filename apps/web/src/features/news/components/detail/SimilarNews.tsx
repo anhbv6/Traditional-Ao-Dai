@@ -18,7 +18,7 @@ export function SimilarNews({ similarArticles, loc }: SimilarNewsProps) {
   return (
     <section className="mt-20">
       <div className="mb-8 border-b border-[var(--text-main)]/80 pb-3">
-        <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-semibold text-[var(--primary-color)] sm:text-[28px]">{t("similarNews")}</h2>
+        <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-semibold text-[var(--primary-ink)] sm:text-[28px]">{t("similarNews")}</h2>
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

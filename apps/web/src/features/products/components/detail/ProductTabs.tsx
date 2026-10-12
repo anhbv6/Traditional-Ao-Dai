@@ -81,7 +81,7 @@ export default function ProductTabs({ product, locale }: ProductTabsProps) {
           <TabsTrigger
             key={key}
             value={key}
-            className="relative flex-none shrink-0 rounded-none border-0 px-0 pb-3 text-xs font-semibold uppercase tracking-[1.5px] text-[var(--text-light)] transition-colors after:hidden hover:text-[var(--text-main)] data-active:text-[var(--primary-color)] sm:text-[13px]"
+            className="relative flex-none shrink-0 rounded-none border-0 px-0 pb-3 text-xs font-semibold uppercase tracking-[1.5px] text-[var(--text-light)] transition-colors after:hidden hover:text-[var(--text-main)] data-active:text-[var(--primary-ink)] sm:text-[13px]"
           >
             {t(`details.${key}`)}
             {/* Gạch chân đỏ đô trượt theo tab đang chọn */}

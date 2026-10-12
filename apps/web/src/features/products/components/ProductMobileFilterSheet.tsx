@@ -68,7 +68,7 @@ export function ProductMobileFilterSheet({ activeFilterCount, onClearAll, result
             type="button"
             onClick={onClearAll}
             disabled={activeFilterCount === 0}
-            className="cursor-pointer text-xs font-semibold uppercase tracking-[1.5px] text-[var(--text-main)] underline-offset-4 transition-colors hover:text-[var(--primary-color)] hover:underline disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:no-underline"
+            className="cursor-pointer text-xs font-semibold uppercase tracking-[1.5px] text-[var(--text-main)] underline-offset-4 transition-colors hover:text-[var(--primary-ink)] hover:underline disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:no-underline"
           >
             {t('clearAllShort')}
           </button>

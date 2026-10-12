@@ -209,7 +209,7 @@ export function RegisterForm() {
       {/* Floating Audio Toggle Button */}
       <button
         onClick={togglePlay}
-        className="fixed bottom-6 right-6 z-50 flex size-10 items-center justify-center rounded-full bg-[#800020] text-white shadow-lg border border-[#800020]/20 hover:scale-110 active:scale-95 transition-all duration-300 cursor-pointer"
+        className="fixed bottom-6 right-6 z-50 flex size-10 items-center justify-center rounded-full bg-[var(--primary-color)] text-white shadow-lg border border-[var(--primary-color)]/20 hover:scale-110 active:scale-95 transition-all duration-300 cursor-pointer"
         aria-label="Toggle music"
       >
         {isPlaying ? (

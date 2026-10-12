@@ -58,7 +58,7 @@ export function CartPromoSection({
               onClick={handleRemovePromo}
               aria-label={t("promo.remove")}
               title={t("promo.remove")}
-              className="grid size-7 shrink-0 cursor-pointer place-items-center text-emerald-800/70 transition-colors hover:bg-white hover:text-[var(--destructive)]"
+              className="grid size-7 shrink-0 cursor-pointer place-items-center text-emerald-800/70 transition-colors hover:bg-[var(--bg-card)] hover:text-[var(--destructive)]"
             >
               <X size={14} />
             </button>
@@ -81,13 +81,13 @@ export function CartPromoSection({
                 placeholder={t("promo.placeholder")}
                 aria-label={t("promo.title")}
                 aria-invalid={Boolean(promoError)}
-                className={`h-9 min-w-0 flex-1 border bg-white px-3 text-[12px] uppercase tracking-[1px] text-[var(--text-main)] outline-none transition-colors placeholder:normal-case placeholder:tracking-normal placeholder:text-[var(--text-light)]/70 focus:border-[var(--primary-color)] ${
+                className={`h-9 min-w-0 flex-1 border bg-[var(--bg-card)] px-3 text-[12px] uppercase tracking-[1px] text-[var(--text-main)] outline-none transition-colors placeholder:normal-case placeholder:tracking-normal placeholder:text-[var(--text-light)]/70 focus:border-[var(--primary-color)] ${
                   promoError ? "border-[var(--destructive)]" : "border-[var(--border)]"
                 }`}
               />
               <button
                 type="submit"
-                className="h-9 shrink-0 cursor-pointer bg-[var(--text-main)] px-4 text-[10px] font-semibold uppercase tracking-[1.5px] text-white transition-colors hover:bg-[var(--primary-color)]"
+                className="h-9 shrink-0 cursor-pointer bg-[var(--bg-inverse)] px-4 text-[10px] font-semibold uppercase tracking-[1.5px] text-white transition-colors hover:bg-[var(--primary-color)]"
               >
                 {t("promo.apply")}
               </button>

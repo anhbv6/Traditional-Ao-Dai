@@ -58,7 +58,7 @@ export function FeaturedCollections() {
                     {t(`items.${item.key}.desc`)}
                   </p>
                 </div>
-                <span className="flex size-11 shrink-0 items-center justify-center rounded-full border border-white/60 text-white transition-colors duration-300 group-hover:bg-white group-hover:text-[var(--primary-color)]">
+                <span className="flex size-11 shrink-0 items-center justify-center rounded-full border border-white/60 text-white transition-colors duration-300 group-hover:bg-[var(--bg-card)] group-hover:text-[var(--primary-ink)]">
                   <ArrowUpRight size={18} strokeWidth={1.5} />
                   <span className="sr-only">{t('explore')}</span>
                 </span>

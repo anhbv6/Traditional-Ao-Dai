@@ -43,7 +43,7 @@ export function AboutAtelier() {
                 <p className="mt-6 text-[11px] font-semibold uppercase tracking-[2.5px] text-[var(--accent-color)]">
                   {t(`stories.${story.id}.role`)}
                 </p>
-                <h3 className="mt-2 font-[family-name:var(--font-playfair)] text-2xl font-semibold text-[var(--primary-color)]">
+                <h3 className="mt-2 font-[family-name:var(--font-playfair)] text-2xl font-semibold text-[var(--primary-ink)]">
                   {t(`stories.${story.id}.title`)}
                 </h3>
                 <p className="mt-3 border-l border-[var(--accent-color)] pl-4 font-[family-name:var(--font-playfair)] text-[15px] italic leading-7 text-[var(--text-main)]/80 transition-colors duration-700 group-hover:border-[var(--primary-color)]">
@@ -58,7 +58,7 @@ export function AboutAtelier() {
           {METRIC_KEYS.map((key) => (
             <div key={key} className="flex flex-col-reverse justify-end">
               <dt className="mt-1 text-[11px] uppercase leading-5 tracking-[2px] text-[var(--text-light)]">{t(`metrics.${key}.label`)}</dt>
-              <dd className="font-[family-name:var(--font-playfair)] text-3xl font-semibold text-[var(--primary-color)] sm:text-4xl">
+              <dd className="font-[family-name:var(--font-playfair)] text-3xl font-semibold text-[var(--primary-ink)] sm:text-4xl">
                 <CountUp value={t(`metrics.${key}.value`)} />
               </dd>
             </div>

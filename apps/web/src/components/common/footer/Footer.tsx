@@ -11,8 +11,14 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 import { Logo } from '../header/Logo';
 import { OnlyOnHome } from '../OnlyOnHome';
+import { GuestOnly } from '../GuestOnly';
 import { SocialLinks } from './SocialLinks';
 import { QRBank } from './QRBank';
+import { ActionButton, ON_PRIMARY_COLORS } from '@/components/shared/ActionButton';
+import { TextField } from '@/components/shared/TextField';
+
+/* Ô Newsletter cao bằng nút "Đăng ký" (min-h-12), lề trong rộng hơn mặc định */
+const NEWSLETTER_FIELD_CLASS = 'min-h-12 px-4';
 
 type FooterLink = {
   label: string;
@@ -33,7 +39,7 @@ function FooterLinkList({ links }: { links: FooterLink[] }) {
         <li key={`${link.href}-${link.label}`}>
           <Link
             href={link.href}
-            className="text-sm leading-6 text-muted-foreground transition-colors hover:text-primary"
+            className="text-sm leading-6 text-muted-foreground transition-colors hover:text-primary-ink"
           >
             {link.label}
           </Link>
@@ -82,75 +88,87 @@ export async function Footer() {
 
   return (
     <footer className="mt-auto border-t border-accent/30 bg-background">
+      {/* Newsletter / VIP Club: chỉ ở trang chủ và chỉ cho khách chưa đăng nhập.
+          Cùng ngôn ngữ với khối May đo: nền đỏ đô, góc vuông, ô nhập viền trắng mờ, nút ON_PRIMARY_COLORS. */}
       <OnlyOnHome>
-        <section className="bg-primary text-white">
-          <div className="mx-auto grid w-full max-w-7xl gap-5 px-5 py-8 sm:px-8 lg:grid-cols-[1fr_1.15fr] lg:items-center lg:px-12">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[2px] text-accent">
-                {t('newsletter.eyebrow')}
-              </p>
-              <h2 className="mt-2 max-w-2xl font-[family-name:var(--font-playfair)] text-2xl font-semibold leading-tight text-white sm:text-3xl">
-                {t('newsletter.title')}
-              </h2>
-              <p className="mt-3 max-w-xl text-sm leading-6 text-white/78">
-                {t('newsletter.description')}
-              </p>
-            </div>
+        <GuestOnly>
+          <section className="bg-[var(--primary-color)] text-white">
+            <div className="mx-auto grid w-full max-w-[1440px] gap-8 px-5 py-14 sm:px-8 sm:py-16 lg:grid-cols-[1fr_1.15fr] lg:items-center lg:px-10 xl:px-16">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[3px] text-[var(--accent-on-primary)]">
+                  {t('newsletter.eyebrow')}
+                </p>
+                <h2 className="mt-3 max-w-2xl font-[family-name:var(--font-playfair)] text-2xl font-semibold leading-tight text-white sm:text-3xl">
+                  {t('newsletter.title')}
+                </h2>
+                <p className="mt-3 max-w-xl text-sm leading-7 text-white/75">
+                  {t('newsletter.description')}
+                </p>
+              </div>
 
-            <form className="grid gap-3 sm:grid-cols-[1fr_0.75fr_auto]" action={`/${locale}/contact`} method="get">
-              <label className="sr-only" htmlFor="footer-email">
-                {t('newsletter.emailLabel')}
-              </label>
-              <input
-                id="footer-email"
-                name="email"
-                type="email"
-                placeholder={t('newsletter.emailPlaceholder')}
-                className="min-h-12 rounded-md border border-white/20 bg-white px-4 text-sm text-foreground outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/40"
-              />
-              <label className="sr-only" htmlFor="footer-phone">
-                {t('newsletter.phoneLabel')}
-              </label>
-              <input
-                id="footer-phone"
-                name="phone"
-                type="tel"
-                placeholder={t('newsletter.phonePlaceholder')}
-                className="min-h-12 rounded-md border border-white/20 bg-white px-4 text-sm text-foreground outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/40"
-              />
-              <button
-                type="submit"
-                className="cursor-pointer inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-accent px-5 text-xs font-semibold uppercase tracking-[1.5px] text-white transition-colors hover:bg-foreground"
-              >
-                {t('newsletter.submit')}
-                <Send size={15} strokeWidth={1.8} />
-              </button>
-            </form>
-          </div>
-        </section>
+              <form className="grid gap-3 sm:grid-cols-[1fr_0.75fr_auto]" action={`/${locale}/contact`} method="get">
+                {/* Ô nhập dùng chung TextField — tone onPrimary cho nền đỏ đô, dạng hộp cao bằng nút (min-h-12) */}
+                <TextField
+                  id="footer-email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  aria-label={t('newsletter.emailLabel')}
+                  placeholder={t('newsletter.emailPlaceholder')}
+                  tone="onPrimary"
+                  appearance="outline"
+                  prefix={<Mail strokeWidth={1.6} />}
+                  fieldClassName={NEWSLETTER_FIELD_CLASS}
+                />
+                <TextField
+                  id="footer-phone"
+                  name="phone"
+                  type="tel"
+                  mask="phone"
+                  aria-label={t('newsletter.phoneLabel')}
+                  placeholder={t('newsletter.phonePlaceholder')}
+                  tone="onPrimary"
+                  appearance="outline"
+                  prefix={<Phone strokeWidth={1.6} />}
+                  fieldClassName={NEWSLETTER_FIELD_CLASS}
+                />
+                <ActionButton
+                  type="submit"
+                  variant="custom"
+                  size="lg"
+                  colors={ON_PRIMARY_COLORS.solid}
+                  icon={<Send strokeWidth={1.6} />}
+                  iconPosition="end"
+                >
+                  {t('newsletter.submit')}
+                </ActionButton>
+              </form>
+            </div>
+          </section>
+        </GuestOnly>
       </OnlyOnHome>
 
       <section className="mx-auto grid w-full gap-8 px-5 py-10 sm:px-8 lg:grid-cols-[1fr_1.7fr_0.3fr] lg:px-12 lg:py-12">
         <div className="max-w-md">
           <Logo textLogo />
-          <p className="mt-4 font-[family-name:var(--font-dancing)] text-2xl leading-snug text-primary">
+          <p className="mt-4 font-[family-name:var(--font-dancing)] text-2xl leading-snug text-primary-ink">
             {t('brand.tagline')}
           </p>
           <div className="mt-5 grid gap-3 text-sm leading-6 text-muted-foreground">
-            <a className="flex gap-3 transition-colors hover:text-primary" href={showroomMapUrl} target="_blank" rel="noreferrer">
-              <MapPin className="mt-1 h-4 w-4 min-w-4 text-primary" strokeWidth={1.7} />
+            <a className="flex gap-3 transition-colors hover:text-primary-ink" href={showroomMapUrl} target="_blank" rel="noreferrer">
+              <MapPin className="mt-1 h-4 w-4 min-w-4 text-primary-ink" strokeWidth={1.7} />
               <span>{t('brand.address')}</span>
             </a>
-            <a className="flex items-center gap-3 transition-colors hover:text-primary" href={`tel:${t('brand.hotlineValue')}`}>
-              <Phone className="h-4 w-4 min-w-4 text-primary" strokeWidth={1.7} />
+            <a className="flex items-center gap-3 transition-colors hover:text-primary-ink" href={`tel:${t('brand.hotlineValue')}`}>
+              <Phone className="h-4 w-4 min-w-4 text-primary-ink" strokeWidth={1.7} />
               <span>{t('brand.hotline')}</span>
             </a>
-            <a className="flex items-center gap-3 transition-colors hover:text-primary" href={`mailto:${t('brand.emailValue')}`}>
-              <Mail className="h-4 w-4 min-w-4 text-primary" strokeWidth={1.7} />
+            <a className="flex items-center gap-3 transition-colors hover:text-primary-ink" href={`mailto:${t('brand.emailValue')}`}>
+              <Mail className="h-4 w-4 min-w-4 text-primary-ink" strokeWidth={1.7} />
               <span>{t('brand.email')}</span>
             </a>
             <p className="flex items-center gap-3">
-              <Clock3 className="h-4 w-4 min-w-4 text-primary" strokeWidth={1.7} />
+              <Clock3 className="h-4 w-4 min-w-4 text-primary-ink" strokeWidth={1.7} />
               <span>{t('brand.hours')}</span>
             </p>
           </div>
@@ -160,7 +178,7 @@ export async function Footer() {
           <div className="hidden grid-cols-3 gap-7 md:grid">
             {columns.map((column) => (
               <div key={column.title}>
-                <h3 className="mb-4 font-[family-name:var(--font-lora)] text-sm font-semibold uppercase tracking-[1.5px] text-primary">
+                <h3 className="mb-4 font-[family-name:var(--font-lora)] text-sm font-semibold uppercase tracking-[1.5px] text-primary-ink">
                   {column.title}
                 </h3>
                 <FooterLinkList links={column.links} />
@@ -175,7 +193,7 @@ export async function Footer() {
                 className="group border-b border-accent/35 py-2 last:border-b-0"
                 open={index === 0}
               >
-                <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between text-sm font-semibold uppercase tracking-[1.5px] text-primary marker:hidden">
+                <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between text-sm font-semibold uppercase tracking-[1.5px] text-primary-ink marker:hidden">
                   {column.title}
                   <ChevronDown
                     className="h-4 w-4 transition-transform group-open:rotate-180"

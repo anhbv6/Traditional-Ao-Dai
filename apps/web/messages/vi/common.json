@@ -63,5 +63,14 @@
     "cardExpiryRequired": "Vui lòng nhập ngày hết hạn (MM/YY)",
     "cardCvvRequired": "Vui lòng nhập mã CVV",
     "cardCvvInvalid": "CVV không hợp lệ"
+  },
+  "textField": {
+    "clear": "Xóa nội dung",
+    "copy": "Sao chép",
+    "copied": "Đã sao chép",
+    "showPassword": "Hiện mật khẩu",
+    "hidePassword": "Ẩn mật khẩu",
+    "counter": "Đã nhập {count} trên {max} ký tự",
+    "counterNoMax": "Đã nhập {count} ký tự"
   }
 }

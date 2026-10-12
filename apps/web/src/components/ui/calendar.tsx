@@ -46,7 +46,7 @@ function CalendarDropdown({
         type="button"
         disabled={disabled}
         onClick={() => setIsOpen(!isOpen)}
-        className="flex h-8 w-full items-center justify-between gap-1.5 rounded-lg border border-[#E2D9D2] bg-white py-1 pr-2 pl-2.5 text-xs font-semibold text-[var(--text-main)] hover:border-[var(--primary-color)] transition-all duration-300 cursor-pointer outline-none shadow-xs"
+        className="flex h-8 w-full items-center justify-between gap-1.5 rounded-lg border border-[var(--border)] bg-[var(--bg-card)] py-1 pr-2 pl-2.5 text-xs font-semibold text-[var(--text-main)] hover:border-[var(--primary-color)] transition-all duration-300 cursor-pointer outline-none shadow-xs"
         aria-label={ariaLabel}
       >
         <span>{selectedOption ? selectedOption.label : value}</span>
@@ -58,7 +58,7 @@ function CalendarDropdown({
           data-lenis-prevent
           onWheel={(e) => e.stopPropagation()}
           onTouchMove={(e) => e.stopPropagation()}
-          className="absolute top-full left-0 mt-1 z-[60] max-h-60 overflow-y-auto min-w-[120px] rounded-lg bg-[var(--bg-main)] text-[var(--text-main)] shadow-md border border-[#E2D9D2] py-1 animate-in fade-in-0 zoom-in-95 duration-100"
+          className="absolute top-full left-0 mt-1 z-[60] max-h-60 overflow-y-auto min-w-[120px] rounded-lg bg-[var(--bg-main)] text-[var(--text-main)] shadow-md border border-[var(--border)] py-1 animate-in fade-in-0 zoom-in-95 duration-100"
         >
           {options?.map((option) => (
             <button
@@ -78,7 +78,7 @@ function CalendarDropdown({
             >
               <span>{option.label}</span>
               {option.value.toString() === value?.toString() && (
-                <CheckIcon className="absolute right-2 size-3.5 text-[var(--primary-color)] group-hover:text-white" />
+                <CheckIcon className="absolute right-2 size-3.5 text-[var(--primary-ink)] group-hover:text-white" />
               )}
             </button>
           ))}

@@ -91,7 +91,7 @@ export function CartItemList({ cartItems, locale, handleQuantityChange, handleRe
                         <h3 className="min-w-0 text-[13px] leading-snug sm:text-[15px]">
                           <Link
                             href={`/products/${item.slug}`}
-                            className="line-clamp-2 font-[family-name:var(--font-playfair)] font-semibold text-[var(--text-main)] transition-colors hover:text-[var(--primary-color)]"
+                            className="line-clamp-2 font-[family-name:var(--font-playfair)] font-semibold text-[var(--text-main)] transition-colors hover:text-[var(--primary-ink)]"
                           >
                             {item.name}
                           </Link>
@@ -141,7 +141,7 @@ export function CartItemList({ cartItems, locale, handleQuantityChange, handleRe
                       {/* Số lượng + thành tiền (mobile) */}
                       <div className="mt-auto flex items-end justify-between gap-2 pt-2.5 md:hidden">
                         <QuantityStepper value={item.quantity} onChange={(q) => handleQuantityChange(item.id, q)} labels={stepperLabels} />
-                        <span className="text-[13px] font-semibold text-[var(--primary-color)]">{formatVnd(lineTotal, locale)}</span>
+                        <span className="text-[13px] font-semibold text-[var(--primary-ink)]">{formatVnd(lineTotal, locale)}</span>
                       </div>
                     </div>
                   </div>
@@ -156,7 +156,7 @@ export function CartItemList({ cartItems, locale, handleQuantityChange, handleRe
                   <div className="hidden justify-center md:flex">
                     <QuantityStepper value={item.quantity} onChange={(q) => handleQuantityChange(item.id, q)} labels={stepperLabels} />
                   </div>
-                  <p className="hidden text-right text-[14px] font-semibold text-[var(--primary-color)] md:block">
+                  <p className="hidden text-right text-[14px] font-semibold text-[var(--primary-ink)] md:block">
                     {formatVnd(lineTotal, locale)}
                   </p>
                   <button

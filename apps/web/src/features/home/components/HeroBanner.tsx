@@ -1,9 +1,9 @@
 import React from 'react';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
-import { Link } from '@/i18n/routing';
 import { type HeroMetric } from '../types/home.types';
 import { SectionOrnament } from '@/components/shared/SectionOrnament';
+import { ActionLink } from '@/components/shared/ActionLink';
 
 interface HeroBannerProps {
   eyebrow: string;
@@ -41,10 +41,10 @@ export function HeroBanner({
 
       <div className="relative mx-auto grid w-full max-w-[1440px] items-center gap-12 px-5 pb-16 pt-10 sm:px-8 lg:min-h-[calc(100svh-80px)] lg:grid-cols-[1fr_0.9fr] lg:gap-16 lg:px-10 lg:py-14 xl:px-16">
         <div className="relative z-10 flex max-w-2xl flex-col animate-fade-in-up">
-          <p className="text-[11px] font-semibold uppercase tracking-[3.5px] text-[var(--primary-color)]">
+          <p className="text-[11px] font-semibold uppercase tracking-[3.5px] text-[var(--primary-ink)]">
             {eyebrow}
           </p>
-          <h1 className="mt-5 font-[family-name:var(--font-playfair)] text-[44px] font-semibold leading-[1.05] text-[var(--primary-color)] sm:text-[64px] xl:text-[80px]">
+          <h1 className="mt-5 font-[family-name:var(--font-playfair)] text-[44px] font-semibold leading-[1.05] text-[var(--primary-ink)] sm:text-[64px] xl:text-[80px]">
             {title}
           </h1>
           <SectionOrnament className="mt-7" />
@@ -53,26 +53,26 @@ export function HeroBanner({
           </p>
 
           <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
-            <Link
+            {/* CTA chính: xem bộ sưu tập — CTA phụ: liên hệ đặt may (viền mảnh) */}
+            <ActionLink
               href="/products"
-              className="group inline-flex min-h-12 items-center justify-center gap-3 bg-[var(--primary-color)] px-7 text-xs font-semibold uppercase tracking-[2px] text-white transition-colors duration-300 hover:bg-[var(--text-main)]"
+              variant="confirm"
+              size="lg"
+              icon={<ArrowRight strokeWidth={1.6} />}
+              iconPosition="end"
             >
               {primaryAction}
-              <ArrowRight size={16} strokeWidth={1.6} className="transition-transform duration-300 group-hover:translate-x-1" />
-            </Link>
-            <Link
-              href="/contact"
-              className="inline-flex min-h-12 items-center justify-center border border-[var(--primary-color)]/30 px-7 text-xs font-semibold uppercase tracking-[2px] text-[var(--primary-color)] transition-colors duration-300 hover:border-[var(--primary-color)] hover:bg-white"
-            >
+            </ActionLink>
+            <ActionLink href="/contact" variant="dialog" size="lg">
               {secondaryAction}
-            </Link>
+            </ActionLink>
           </div>
 
           <dl className="mt-12 grid max-w-lg grid-cols-3 divide-x divide-[var(--border)] border-t border-[var(--border)] pt-6">
             {metrics.map((metric) => (
               <div key={metric.label} className="flex flex-col-reverse justify-end px-4 first:pl-0">
                 <dt className="mt-1 text-xs leading-5 text-[var(--text-light)]">{metric.label}</dt>
-                <dd className="font-[family-name:var(--font-playfair)] text-2xl font-semibold text-[var(--primary-color)] sm:text-[28px]">
+                <dd className="font-[family-name:var(--font-playfair)] text-2xl font-semibold text-[var(--primary-ink)] sm:text-[28px]">
                   {metric.value}
                 </dd>
               </div>
@@ -95,10 +95,10 @@ export function HeroBanner({
             />
           </div>
 
-          <p className="absolute -left-3 bottom-10 bg-white px-5 py-3 font-[family-name:var(--font-playfair)] text-sm italic text-[var(--primary-color)] shadow-sm sm:-left-10">
+          <p className="absolute -left-3 bottom-10 bg-[var(--bg-card)] px-5 py-3 font-[family-name:var(--font-playfair)] text-sm italic text-[var(--primary-ink)] shadow-sm sm:-left-10">
             {caption}
           </p>
-          <p className="absolute -right-2 top-16 hidden max-w-[200px] border-l-2 border-[var(--accent-color)] bg-white/95 px-4 py-3 text-xs leading-5 text-[var(--text-light)] shadow-sm backdrop-blur sm:block xl:-right-12">
+          <p className="absolute -right-2 top-16 hidden max-w-[200px] border-l-2 border-[var(--accent-color)] bg-[var(--bg-card)]/95 px-4 py-3 text-xs leading-5 text-[var(--text-light)] shadow-sm backdrop-blur sm:block xl:-right-12">
             {note}
           </p>
         </div>

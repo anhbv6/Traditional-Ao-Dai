@@ -26,12 +26,12 @@ export function Breadcrumbs({ lastLabel, className = "" }: BreadcrumbsProps) {
 
   return (
     <Breadcrumb className={`mb-6 select-none ${className}`}>
-      <BreadcrumbList className="text-[#706565]">
+      <BreadcrumbList className="text-[var(--text-light)]">
         {/* Trang chủ */}
         <BreadcrumbItem>
           <BreadcrumbLink 
             render={<Link href="/" />}
-            className="text-[#706565] transition-colors hover:text-[#800020]"
+            className="text-[var(--text-light)] transition-colors hover:text-[var(--primary-ink)]"
           >
             {t("home")}
           </BreadcrumbLink>
@@ -57,16 +57,16 @@ export function Breadcrumbs({ lastLabel, className = "" }: BreadcrumbsProps) {
 
           return (
             <React.Fragment key={href}>
-              <BreadcrumbSeparator className="text-[#706565]/40" />
+              <BreadcrumbSeparator className="text-[var(--text-light)]/40" />
               <BreadcrumbItem>
                 {isLast ? (
-                  <BreadcrumbPage className="font-semibold text-[#2A2525]">
+                  <BreadcrumbPage className="font-semibold text-[var(--text-main)]">
                     {label}
                   </BreadcrumbPage>
                 ) : (
                   <BreadcrumbLink 
                     render={<Link href={href as ComponentProps<typeof Link>["href"]} />}
-                    className="text-[#706565] transition-colors hover:text-[#800020]"
+                    className="text-[var(--text-light)] transition-colors hover:text-[var(--primary-ink)]"
                   >
                     {label}
                   </BreadcrumbLink>

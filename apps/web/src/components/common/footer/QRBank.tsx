@@ -24,7 +24,7 @@ export function QRBank({
         />
       </div>
       <div className="text-center text-[10px] leading-relaxed text-muted-foreground w-full">
-        <p className="font-bold text-primary tracking-wide">{bankName}</p>
+        <p className="font-bold text-primary-ink tracking-wide">{bankName}</p>
         <p className="font-mono mt-0.5 tracking-wider text-foreground font-semibold">
           {accountNumber}
         </p>

@@ -12,7 +12,7 @@ export default function QuantitySelector() {
       <button
         type="button"
         aria-label="Decrease quantity"
-        className="cursor-pointer text-[var(--text-main)] hover:text-[var(--primary-color)] transition-colors p-1"
+        className="cursor-pointer text-[var(--text-main)] hover:text-[var(--primary-ink)] transition-colors p-1"
         onClick={() => setQuantity((q) => Math.max(1, q - 1))}
       >
         <Minus size={16} />
@@ -33,7 +33,7 @@ export default function QuantitySelector() {
       <button
         type="button"
         aria-label="Increase quantity"
-        className="cursor-pointer text-[var(--text-main)] hover:text-[var(--primary-color)] transition-colors p-1"
+        className="cursor-pointer text-[var(--text-main)] hover:text-[var(--primary-ink)] transition-colors p-1"
         onClick={() => setQuantity((q) => q + 1)}
       >
         <Plus size={16} />

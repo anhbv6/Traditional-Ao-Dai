@@ -1,9 +1,10 @@
 import React from 'react';
 import { useTranslations } from 'next-intl';
 import { ArrowRight } from 'lucide-react';
-import { Link } from '@/i18n/routing';
 import { SectionHeading } from './SectionHeading';
 import { Reveal } from '@/components/shared/Reveal';
+import { ActionLink } from '@/components/shared/ActionLink';
+import { ON_PRIMARY_COLORS } from '@/components/shared/ActionButton';
 
 const BESPOKE_STEPS = ['1', '2', '3', '4'] as const;
 
@@ -37,19 +38,20 @@ export function BespokeService() {
 
         <div className="mt-12 flex flex-col items-center gap-5">
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Link
+            {/* Nền khối là đỏ đô → dùng bộ màu dựng sẵn ON_PRIMARY_COLORS (đồng bộ với Newsletter ở footer) */}
+            <ActionLink
               href="/contact"
-              className="group inline-flex min-h-12 items-center justify-center gap-3 bg-white px-8 text-xs font-semibold uppercase tracking-[2px] text-[var(--primary-color)] transition-colors duration-300 hover:bg-[var(--accent-color)] hover:text-white"
+              variant="custom"
+              size="lg"
+              icon={<ArrowRight strokeWidth={1.6} />}
+              iconPosition="end"
+              colors={ON_PRIMARY_COLORS.solid}
             >
               {t('primaryAction')}
-              <ArrowRight size={16} strokeWidth={1.6} className="transition-transform duration-300 group-hover:translate-x-1" />
-            </Link>
-            <Link
-              href="/faqs"
-              className="inline-flex min-h-12 items-center justify-center border border-white/40 px-8 text-xs font-semibold uppercase tracking-[2px] text-white transition-colors duration-300 hover:border-white hover:bg-white/10"
-            >
+            </ActionLink>
+            <ActionLink href="/faqs" variant="custom" size="lg" colors={ON_PRIMARY_COLORS.outline}>
               {t('secondaryAction')}
-            </Link>
+            </ActionLink>
           </div>
           <p className="text-xs tracking-wide text-white/60">{t('note')}</p>
         </div>

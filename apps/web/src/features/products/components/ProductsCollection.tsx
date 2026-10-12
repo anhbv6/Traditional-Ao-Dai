@@ -115,8 +115,8 @@ export function ProductsCollection({ initialCategory, initialQuery }: ProductsCo
             className={cn(
               'cursor-pointer rounded-none border-0 bg-transparent font-[family-name:var(--font-playfair)] text-[15px]',
               safePage === page
-                ? 'bg-transparent text-[var(--primary-color)] shadow-[inset_0_-1px_0_var(--primary-color)] hover:bg-transparent'
-                : 'text-[var(--text-light)] hover:bg-transparent hover:text-[var(--primary-color)]'
+                ? 'bg-transparent text-[var(--primary-ink)] shadow-[inset_0_-1px_0_var(--primary-color)] hover:bg-transparent'
+                : 'text-[var(--text-light)] hover:bg-transparent hover:text-[var(--primary-ink)]'
             )}
           >
             {page}
@@ -237,7 +237,7 @@ export function ProductsCollection({ initialCategory, initialQuery }: ProductsCo
                     }}
                     className={cn(
                       'grid size-7 cursor-pointer place-items-center text-sm tabular-nums transition-colors',
-                      gridSize === size ? 'text-[var(--primary-color)] shadow-[inset_0_-1px_0_var(--primary-color)]' : 'text-[var(--text-light)] hover:text-[var(--text-main)]'
+                      gridSize === size ? 'text-[var(--primary-ink)] shadow-[inset_0_-1px_0_var(--primary-color)]' : 'text-[var(--text-light)] hover:text-[var(--text-main)]'
                     )}
                   >
                     {size}
@@ -310,7 +310,7 @@ export function ProductsCollection({ initialCategory, initialQuery }: ProductsCo
                   onClick={() => safePage > 1 && setPageAndScroll(safePage - 1)}
                   text={tc('previous')}
                   className={cn(
-                    'cursor-pointer rounded-none border-0 bg-transparent text-[var(--text-main)] hover:bg-transparent hover:text-[var(--primary-color)]',
+                    'cursor-pointer rounded-none border-0 bg-transparent text-[var(--text-main)] hover:bg-transparent hover:text-[var(--primary-ink)]',
                     safePage === 1 && 'pointer-events-none opacity-40'
                   )}
                 />
@@ -321,7 +321,7 @@ export function ProductsCollection({ initialCategory, initialQuery }: ProductsCo
                   onClick={() => safePage < pageCount && setPageAndScroll(safePage + 1)}
                   text={tc('next')}
                   className={cn(
-                    'cursor-pointer rounded-none border-0 bg-transparent text-[var(--text-main)] hover:bg-transparent hover:text-[var(--primary-color)]',
+                    'cursor-pointer rounded-none border-0 bg-transparent text-[var(--text-main)] hover:bg-transparent hover:text-[var(--primary-ink)]',
                     safePage === pageCount && 'pointer-events-none opacity-40'
                   )}
                 />

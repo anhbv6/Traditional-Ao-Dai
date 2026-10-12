@@ -41,7 +41,7 @@ export function AboutHeading({ numeral, eyebrow, title, description, className }
         transition={timing(0.8, 0.25)}
         className="flex items-baseline gap-3 text-[11px] font-semibold uppercase tracking-[3px] text-[var(--text-light)]"
       >
-        <span className="font-[family-name:var(--font-playfair)] text-base italic normal-case tracking-normal text-[var(--primary-color)]">
+        <span className="font-[family-name:var(--font-playfair)] text-base italic normal-case tracking-normal text-[var(--primary-ink)]">
           {numeral}.
         </span>
         {eyebrow}

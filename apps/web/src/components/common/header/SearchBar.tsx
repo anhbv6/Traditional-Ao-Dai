@@ -20,8 +20,8 @@ export function SearchBar({ placeholder = 'Search...', submitLabel = 'Search', o
   };
 
   return (
-    <form role="search" onSubmit={handleSubmit} className="group relative flex w-full items-center border border-border bg-white transition-colors focus-within:border-primary">
-      <Search size={16} strokeWidth={1.6} className="pointer-events-none ml-3.5 shrink-0 text-primary" aria-hidden="true" />
+    <form role="search" onSubmit={handleSubmit} className="group relative flex w-full items-center border border-border bg-[var(--bg-card)] transition-colors focus-within:border-primary">
+      <Search size={16} strokeWidth={1.6} className="pointer-events-none ml-3.5 shrink-0 text-primary-ink" aria-hidden="true" />
       <input
         type="search"
         value={value}

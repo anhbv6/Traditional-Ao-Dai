@@ -72,7 +72,7 @@ export default function ProductGallery({
               type="button"
               onClick={() => go(-1)}
               aria-label={t('gallery.previous')}
-              className="absolute left-3 top-1/2 z-10 grid size-9 -translate-y-1/2 cursor-pointer place-items-center bg-white/85 text-[var(--text-main)] backdrop-blur-sm transition-[opacity,background-color,color] duration-300 hover:bg-[var(--primary-color)] hover:text-white lg:opacity-0 lg:group-hover:opacity-100"
+              className="absolute left-3 top-1/2 z-10 grid size-9 -translate-y-1/2 cursor-pointer place-items-center bg-[var(--bg-card)]/85 text-[var(--text-main)] backdrop-blur-sm transition-[opacity,background-color,color] duration-300 hover:bg-[var(--primary-color)] hover:text-white lg:opacity-0 lg:group-hover:opacity-100"
             >
               <ChevronLeft size={18} strokeWidth={1.6} />
             </button>
@@ -80,12 +80,12 @@ export default function ProductGallery({
               type="button"
               onClick={() => go(1)}
               aria-label={t('gallery.next')}
-              className="absolute right-3 top-1/2 z-10 grid size-9 -translate-y-1/2 cursor-pointer place-items-center bg-white/85 text-[var(--text-main)] backdrop-blur-sm transition-[opacity,background-color,color] duration-300 hover:bg-[var(--primary-color)] hover:text-white lg:opacity-0 lg:group-hover:opacity-100"
+              className="absolute right-3 top-1/2 z-10 grid size-9 -translate-y-1/2 cursor-pointer place-items-center bg-[var(--bg-card)]/85 text-[var(--text-main)] backdrop-blur-sm transition-[opacity,background-color,color] duration-300 hover:bg-[var(--primary-color)] hover:text-white lg:opacity-0 lg:group-hover:opacity-100"
             >
               <ChevronRight size={18} strokeWidth={1.6} />
             </button>
             {/* Bộ đếm ảnh: số mới trượt lên */}
-            <div className="pointer-events-none absolute bottom-3 left-3 z-10 flex items-center gap-1 overflow-hidden bg-white/85 px-2.5 py-1 text-[11px] tracking-[1.5px] text-[var(--text-main)] backdrop-blur-sm">
+            <div className="pointer-events-none absolute bottom-3 left-3 z-10 flex items-center gap-1 overflow-hidden bg-[var(--bg-card)]/85 px-2.5 py-1 text-[11px] tracking-[1.5px] text-[var(--text-main)] backdrop-blur-sm">
               <AnimatePresence initial={false} mode="popLayout">
                 <motion.span
                   key={activeImageIndex}

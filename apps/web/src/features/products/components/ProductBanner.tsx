@@ -14,7 +14,7 @@ export function ProductBanner({ eyebrow, title, subtitle }: ProductBannerProps) 
   return (
     <Reveal className="grid gap-5 pt-4 sm:pt-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-end lg:gap-16">
       <div>
-        <p className="text-[11px] font-semibold uppercase tracking-[3.5px] text-[var(--primary-color)]">{eyebrow}</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[3.5px] text-[var(--primary-ink)]">{eyebrow}</p>
         <h1 className="mt-4 font-[family-name:var(--font-playfair)] text-[34px] font-semibold leading-[1.1] text-[var(--text-main)] sm:text-[46px] xl:text-[52px]">
           {title}
         </h1>

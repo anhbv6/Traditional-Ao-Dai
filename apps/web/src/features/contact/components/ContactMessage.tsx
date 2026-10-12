@@ -14,7 +14,7 @@ export function ContactMessage() {
     <section className="bg-[var(--bg-secondary)]">
       <div className="mx-auto grid w-full max-w-[1440px] gap-12 px-5 py-16 sm:px-8 sm:py-24 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20 lg:px-10 xl:px-16">
         <Reveal>
-          <p className="text-[11px] font-semibold uppercase tracking-[3px] text-[var(--primary-color)]">{t('eyebrow')}</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[3px] text-[var(--primary-ink)]">{t('eyebrow')}</p>
           <h2 className="mt-4 max-w-md font-[family-name:var(--font-playfair)] text-[30px] font-semibold leading-tight text-[var(--text-main)] sm:text-[38px]">
             {t('title')}
           </h2>
@@ -23,7 +23,7 @@ export function ContactMessage() {
           <ol className="mt-10 border-t border-[var(--text-main)]/80">
             {stepKeys.map((key, index) => (
               <li key={key} className="grid grid-cols-[2.5rem_1fr] gap-2 border-b border-[var(--border)] py-5">
-                <span className="font-[family-name:var(--font-playfair)] text-lg italic text-[var(--primary-color)]">{index + 1}.</span>
+                <span className="font-[family-name:var(--font-playfair)] text-lg italic text-[var(--primary-ink)]">{index + 1}.</span>
                 <div>
                   <p className="font-semibold text-[var(--text-main)]">{t(`steps.${key}.title`)}</p>
                   <p className="mt-1 text-sm leading-6 text-[var(--text-light)]">{t(`steps.${key}.description`)}</p>

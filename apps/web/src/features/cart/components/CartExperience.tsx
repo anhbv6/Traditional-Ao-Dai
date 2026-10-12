@@ -65,7 +65,7 @@ export function CartExperience() {
         <header className="mb-6 sm:mb-8">
           <Link
             href="/products"
-            className="group inline-flex items-center gap-2 text-[10px] uppercase tracking-[2px] text-[var(--text-light)] transition-colors hover:text-[var(--primary-color)] sm:text-[11px]"
+            className="group inline-flex items-center gap-2 text-[10px] uppercase tracking-[2px] text-[var(--text-light)] transition-colors hover:text-[var(--primary-ink)] sm:text-[11px]"
           >
             <ArrowLeft size={13} className="transition-transform duration-300 group-hover:-translate-x-1" />
             {t("continueShopping")}
@@ -109,7 +109,7 @@ export function CartExperience() {
               >
                 {/* Cột trái: miễn phí vận chuyển + danh sách */}
                 <section aria-label={t("columns.product")}>
-                  <div className="mb-5 border border-[var(--border)] bg-white px-4 py-3">
+                  <div className="mb-5 border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3">
                     <CartFreeShippingBar
                       subtotal={totals.subtotal}
                       threshold={totals.freeShippingThreshold}

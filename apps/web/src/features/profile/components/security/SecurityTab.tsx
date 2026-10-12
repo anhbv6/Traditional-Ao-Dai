@@ -44,35 +44,35 @@ export function SecurityTab() {
 
   const getDeviceIcon = (device: string) => {
     if (device.toLowerCase().includes("macbook") || device.toLowerCase().includes("laptop")) {
-      return <Laptop size={20} className="text-[#800020]" />;
+      return <Laptop size={20} className="text-[var(--primary-ink)]" />;
     }
     if (device.toLowerCase().includes("iphone") || device.toLowerCase().includes("phone")) {
-      return <Smartphone size={20} className="text-[#800020]" />;
+      return <Smartphone size={20} className="text-[var(--primary-ink)]" />;
     }
-    return <Monitor size={20} className="text-[#800020]" />;
+    return <Monitor size={20} className="text-[var(--primary-ink)]" />;
   };
 
   return (
     <div className="space-y-6">
       {/* Title */}
-      <div className="rounded-2xl border border-[#800020]/10 bg-white p-6 shadow-sm sm:p-8 animate-fade-in">
-        <div className="border-b border-[#E2D9D2]/60 pb-5">
-          <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-[#800020]">
+      <div className="rounded-2xl border border-[var(--primary-color)]/10 bg-[var(--bg-card)] p-6 shadow-sm sm:p-8 animate-fade-in">
+        <div className="border-b border-[var(--border)]/60 pb-5">
+          <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-[var(--primary-ink)]">
             {t("title")}
           </h2>
-          <p className="mt-1 text-sm text-[#706565]">
+          <p className="mt-1 text-sm text-[var(--text-light)]">
             {t("subtitle")}
           </p>
         </div>
 
         {/* Two-Factor Authentication (2FA) */}
-        <div className="mt-6 flex flex-col md:flex-row md:items-center justify-between gap-6 p-5 rounded-xl border border-[#E2D9D2]/60 bg-[#FAF7F5]/30">
+        <div className="mt-6 flex flex-col md:flex-row md:items-center justify-between gap-6 p-5 rounded-xl border border-[var(--border)]/60 bg-[var(--bg-main)]/30">
           <div className="flex gap-4">
-            <div className="grid size-12 place-items-center rounded-xl bg-white border border-[#800020]/10 text-[#800020] shrink-0">
+            <div className="grid size-12 place-items-center rounded-xl bg-[var(--bg-card)] border border-[var(--primary-color)]/10 text-[var(--primary-ink)] shrink-0">
               <Smartphone size={24} />
             </div>
             <div className="space-y-1">
-              <h3 className="font-semibold text-[#2A2525] text-sm sm:text-base flex items-center gap-2">
+              <h3 className="font-semibold text-[var(--text-main)] text-sm sm:text-base flex items-center gap-2">
                 {t("twoFactor.title")}
                 <span
                   className={`inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
@@ -84,7 +84,7 @@ export function SecurityTab() {
                   {twoFactorEnabled ? t("twoFactor.statusEnabled") : t("twoFactor.statusDisabled")}
                 </span>
               </h3>
-              <p className="text-xs text-[#706565]">
+              <p className="text-xs text-[var(--text-light)]">
                 {t("twoFactor.subtitle")}
               </p>
             </div>
@@ -95,8 +95,8 @@ export function SecurityTab() {
               onClick={handle2faToggle}
               className={`inline-flex min-h-10 items-center justify-center rounded-lg px-5 text-xs font-semibold uppercase tracking-wider transition-all duration-300 ${
                 twoFactorEnabled
-                  ? "border border-rose-200 bg-white text-rose-600 hover:bg-rose-50"
-                  : "bg-[#800020] text-white hover:bg-[#800020]/90"
+                  ? "border border-rose-200 bg-[var(--bg-card)] text-rose-600 hover:bg-rose-50"
+                  : "bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/90"
               }`}
             >
               {twoFactorEnabled ? "Hủy kích hoạt" : "Thiết lập 2FA"}
@@ -106,14 +106,14 @@ export function SecurityTab() {
 
         {/* 2FA Setup Modal/Box */}
         {show2faSetup && (
-          <div className="mt-6 p-6 rounded-xl border border-[#800020]/20 bg-[#FAF7F5]/40 space-y-6 animate-fade-in">
+          <div className="mt-6 p-6 rounded-xl border border-[var(--primary-color)]/20 bg-[var(--bg-main)]/40 space-y-6 animate-fade-in">
             <div className="flex items-start gap-3">
-              <ShieldAlert size={20} className="text-[#800020] shrink-0 mt-0.5" />
+              <ShieldAlert size={20} className="text-[var(--primary-ink)] shrink-0 mt-0.5" />
               <div>
-                <h4 className="font-bold text-[#800020] text-sm uppercase tracking-wider">
+                <h4 className="font-bold text-[var(--primary-ink)] text-sm uppercase tracking-wider">
                   {t("twoFactor.setupTitle")}
                 </h4>
-                <p className="mt-1 text-xs text-[#706565] leading-relaxed">
+                <p className="mt-1 text-xs text-[var(--text-light)] leading-relaxed">
                   {t("twoFactor.setupSubtitle")}
                 </p>
               </div>
@@ -121,7 +121,7 @@ export function SecurityTab() {
 
             <div className="flex flex-col sm:flex-row items-center gap-6">
               {/* Mock QR Code */}
-              <div className="bg-white p-3 rounded-lg border border-[#E2D9D2] shadow-sm select-none">
+              <div className="bg-[var(--bg-card)] p-3 rounded-lg border border-[var(--border)] shadow-sm select-none">
                 <svg className="size-32 text-gray-800" viewBox="0 0 100 100" fill="currentColor">
                   {/* Outer border & square details */}
                   <path d="M5,5 h30 v30 h-30 z M10,10 h20 v20 h-20 z" />
@@ -140,7 +140,7 @@ export function SecurityTab() {
               {/* OTP Form */}
               <form onSubmit={handle2faVerify} className="flex-1 w-full max-w-xs space-y-3">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-[#706565]">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-light)]">
                     Nhập mã xác thực 6 số
                   </label>
                   <input
@@ -150,7 +150,7 @@ export function SecurityTab() {
                     placeholder="123456"
                     value={otpCode}
                     onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
-                    className="w-full text-center tracking-[8px] rounded-lg border border-[#E2D9D2] bg-white py-2.5 px-4 text-base font-bold text-[#2A2525] outline-none transition-all focus:border-[#800020] focus:ring-1 focus:ring-[#800020]"
+                    className="w-full text-center tracking-[8px] rounded-lg border border-[var(--border)] bg-[var(--bg-card)] py-2.5 px-4 text-base font-bold text-[var(--text-main)] outline-none transition-all focus:border-[var(--primary-color)] focus:ring-1 focus:ring-[var(--primary-color)]"
                   />
                 </div>
 
@@ -158,13 +158,13 @@ export function SecurityTab() {
                   <button
                     type="button"
                     onClick={() => setShow2faSetup(false)}
-                    className="flex-1 min-h-9 text-center border border-[#E2D9D2] hover:bg-white/40 rounded-lg text-xs font-semibold text-[#706565]"
+                    className="flex-1 min-h-9 text-center border border-[var(--border)] hover:bg-white/40 rounded-lg text-xs font-semibold text-[var(--text-light)]"
                   >
                     Hủy
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 min-h-9 bg-[#800020] text-white hover:bg-[#800020]/90 rounded-lg text-xs font-semibold"
+                    className="flex-1 min-h-9 bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/90 rounded-lg text-xs font-semibold"
                   >
                     {t("twoFactor.verifyBtn")}
                   </button>
@@ -182,9 +182,9 @@ export function SecurityTab() {
         )}
 
         {/* Google Account Linking */}
-        <div className="mt-6 flex flex-col md:flex-row md:items-center justify-between gap-6 p-5 rounded-xl border border-[#E2D9D2]/60 bg-[#FAF7F5]/30">
+        <div className="mt-6 flex flex-col md:flex-row md:items-center justify-between gap-6 p-5 rounded-xl border border-[var(--border)]/60 bg-[var(--bg-main)]/30">
           <div className="flex gap-4">
-            <div className="grid size-12 place-items-center rounded-xl bg-white border border-[#800020]/10 text-[#800020] shrink-0">
+            <div className="grid size-12 place-items-center rounded-xl bg-[var(--bg-card)] border border-[var(--primary-color)]/10 text-[var(--primary-ink)] shrink-0">
               <svg className="size-6" viewBox="0 0 24 24">
                 <path
                   fill="#EA4335"
@@ -205,7 +205,7 @@ export function SecurityTab() {
               </svg>
             </div>
             <div className="space-y-1">
-              <h3 className="font-semibold text-[#2A2525] text-sm sm:text-base flex items-center gap-2">
+              <h3 className="font-semibold text-[var(--text-main)] text-sm sm:text-base flex items-center gap-2">
                 Liên kết tài khoản Google
                 <span
                   className={`inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
@@ -217,7 +217,7 @@ export function SecurityTab() {
                   {isGoogleLinked ? "Đã liên kết" : "Chưa liên kết"}
                 </span>
               </h3>
-              <p className="text-xs text-[#706565]">
+              <p className="text-xs text-[var(--text-light)]">
                 Liên kết với tài khoản Google để đăng nhập nhanh chóng bằng 1-click.
               </p>
             </div>
@@ -229,7 +229,7 @@ export function SecurityTab() {
                 type="button"
                 onClick={handleUnlinkGoogle}
                 disabled={isLinking}
-                className="w-full sm:w-auto inline-flex min-h-10 items-center justify-center rounded-lg px-5 text-xs font-semibold uppercase tracking-wider border border-rose-200 bg-white text-rose-600 hover:bg-rose-50 disabled:opacity-50 cursor-pointer"
+                className="w-full sm:w-auto inline-flex min-h-10 items-center justify-center rounded-lg px-5 text-xs font-semibold uppercase tracking-wider border border-rose-200 bg-[var(--bg-card)] text-rose-600 hover:bg-rose-50 disabled:opacity-50 cursor-pointer"
               >
                 Hủy liên kết
               </button>
@@ -239,7 +239,7 @@ export function SecurityTab() {
                   label="Liên kết Google"
                   onCredential={handleLinkGoogle}
                   onError={() => alert("Hệ thống xác thực Google gặp sự cố. Vui lòng thử lại sau.")}
-                  className="!shadow-none !border-[#800020]/25 hover:!border-[#800020]/55"
+                  className="!shadow-none !border-[var(--primary-color)]/25 hover:!border-[var(--primary-color)]/55"
                 />
               </div>
             )}
@@ -248,20 +248,20 @@ export function SecurityTab() {
       </div>
 
       {/* Change Password Form (Dropdown/Accordion style) */}
-      <div className="rounded-2xl border border-[#800020]/10 bg-white shadow-sm overflow-hidden transition-all duration-300">
+      <div className="rounded-2xl border border-[var(--primary-color)]/10 bg-[var(--bg-card)] shadow-sm overflow-hidden transition-all duration-300">
         <button
           onClick={() => setIsPasswordOpen(!isPasswordOpen)}
           className="flex w-full items-center justify-between gap-4 p-6 sm:p-8 text-left outline-none cursor-pointer"
         >
           <div className="flex items-center gap-3">
-            <div className="grid size-10 place-items-center rounded-lg bg-[#FAF7F5] text-[#800020] shrink-0">
+            <div className="grid size-10 place-items-center rounded-lg bg-[var(--bg-main)] text-[var(--primary-ink)] shrink-0">
               <Shield size={20} />
             </div>
             <div>
-              <h2 className="font-[family-name:var(--font-playfair)] text-xl font-bold text-[#800020]">
+              <h2 className="font-[family-name:var(--font-playfair)] text-xl font-bold text-[var(--primary-ink)]">
                 {t("password.title")}
               </h2>
-              <p className="text-xs text-[#706565]">
+              <p className="text-xs text-[var(--text-light)]">
                 {t("password.subtitle")}
               </p>
             </div>
@@ -269,8 +269,8 @@ export function SecurityTab() {
           <ChevronDown
             size={20}
             className={cn(
-              "text-[#706565] transition-transform duration-300 shrink-0",
-              isPasswordOpen && "rotate-180 text-[#800020]"
+              "text-[var(--text-light)] transition-transform duration-300 shrink-0",
+              isPasswordOpen && "rotate-180 text-[var(--primary-ink)]"
             )}
           />
         </button>
@@ -283,7 +283,7 @@ export function SecurityTab() {
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.28, ease: [0.25, 1, 0.5, 1] }}
             >
-              <div className="border-t border-[#E2D9D2]/40 bg-[#FAF7F5]/20 p-6 sm:p-8 pt-0">
+              <div className="border-t border-[var(--border)]/40 bg-[var(--bg-main)]/20 p-6 sm:p-8 pt-0">
                 <form onSubmit={handlePasswordSubmit} className="mt-6 space-y-4 max-w-md">
                   {showSuccessPass && (
                     <div className="flex items-center gap-2 rounded-lg bg-green-50 p-4 text-sm text-green-700 border border-green-200">
@@ -294,22 +294,22 @@ export function SecurityTab() {
 
                   {/* Current Password */}
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-[#706565]">
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-light)]">
                       {t("password.current")}
                     </label>
                     <div className="relative">
-                      <Lock className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#706565]/60" />
+                      <Lock className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[var(--text-light)]/60" />
                       <input
                         type={showCurrent ? "text" : "password"}
                         required
                         value={currentPassword}
                         onChange={(e) => setCurrentPassword(e.target.value)}
-                        className="w-full rounded-lg border border-[#E2D9D2] bg-white py-3 pl-11 pr-11 text-sm text-[#2A2525] outline-none transition-all focus:border-[#800020] focus:ring-1 focus:ring-[#800020]"
+                        className="w-full rounded-lg border border-[var(--border)] bg-[var(--bg-card)] py-3 pl-11 pr-11 text-sm text-[var(--text-main)] outline-none transition-all focus:border-[var(--primary-color)] focus:ring-1 focus:ring-[var(--primary-color)]"
                       />
                       <button
                         type="button"
                         onClick={() => setShowCurrent(!showCurrent)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#706565]/60 hover:text-[#800020]"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-light)]/60 hover:text-[var(--primary-ink)]"
                       >
                         {showCurrent ? <EyeOff size={16} /> : <Eye size={16} />}
                       </button>
@@ -318,22 +318,22 @@ export function SecurityTab() {
 
                   {/* New Password */}
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-[#706565]">
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-light)]">
                       {t("password.new")}
                     </label>
                     <div className="relative">
-                      <Lock className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#706565]/60" />
+                      <Lock className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[var(--text-light)]/60" />
                       <input
                         type={showNew ? "text" : "password"}
                         required
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
-                        className="w-full rounded-lg border border-[#E2D9D2] bg-white py-3 pl-11 pr-11 text-sm text-[#2A2525] outline-none transition-all focus:border-[#800020] focus:ring-1 focus:ring-[#800020]"
+                        className="w-full rounded-lg border border-[var(--border)] bg-[var(--bg-card)] py-3 pl-11 pr-11 text-sm text-[var(--text-main)] outline-none transition-all focus:border-[var(--primary-color)] focus:ring-1 focus:ring-[var(--primary-color)]"
                       />
                       <button
                         type="button"
                         onClick={() => setShowNew(!showNew)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#706565]/60 hover:text-[#800020]"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-light)]/60 hover:text-[var(--primary-ink)]"
                       >
                         {showNew ? <EyeOff size={16} /> : <Eye size={16} />}
                       </button>
@@ -342,22 +342,22 @@ export function SecurityTab() {
 
                   {/* Confirm Password */}
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-[#706565]">
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-light)]">
                       {t("password.confirm")}
                     </label>
                     <div className="relative">
-                      <Lock className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#706565]/60" />
+                      <Lock className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[var(--text-light)]/60" />
                       <input
                         type={showConfirm ? "text" : "password"}
                         required
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        className="w-full rounded-lg border border-[#E2D9D2] bg-white py-3 pl-11 pr-11 text-sm text-[#2A2525] outline-none transition-all focus:border-[#800020] focus:ring-1 focus:ring-[#800020]"
+                        className="w-full rounded-lg border border-[var(--border)] bg-[var(--bg-card)] py-3 pl-11 pr-11 text-sm text-[var(--text-main)] outline-none transition-all focus:border-[var(--primary-color)] focus:ring-1 focus:ring-[var(--primary-color)]"
                       />
                       <button
                         type="button"
                         onClick={() => setShowConfirm(!showConfirm)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#706565]/60 hover:text-[#800020]"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-light)]/60 hover:text-[var(--primary-ink)]"
                       >
                         {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
                       </button>
@@ -368,7 +368,7 @@ export function SecurityTab() {
                   <div className="pt-2">
                     <button
                       type="submit"
-                      className="inline-flex min-h-11 items-center justify-center rounded-lg bg-[#800020] px-6 text-xs font-semibold uppercase tracking-[1px] text-white transition-all hover:bg-[#800020]/90"
+                      className="inline-flex min-h-11 items-center justify-center rounded-lg bg-[var(--primary-color)] px-6 text-xs font-semibold uppercase tracking-[1px] text-white transition-all hover:bg-[var(--primary-color)]/90"
                     >
                       {t("password.submit")}
                     </button>
@@ -381,16 +381,16 @@ export function SecurityTab() {
       </div>
 
       {/* Active Login Sessions */}
-      <div className="rounded-2xl border border-[#800020]/10 bg-white p-6 shadow-sm sm:p-8">
-        <div className="flex items-center gap-3 border-b border-[#E2D9D2]/60 pb-5 mb-5">
-          <div className="grid size-10 place-items-center rounded-lg bg-[#FAF7F5] text-[#800020]">
+      <div className="rounded-2xl border border-[var(--primary-color)]/10 bg-[var(--bg-card)] p-6 shadow-sm sm:p-8">
+        <div className="flex items-center gap-3 border-b border-[var(--border)]/60 pb-5 mb-5">
+          <div className="grid size-10 place-items-center rounded-lg bg-[var(--bg-main)] text-[var(--primary-ink)]">
             <Monitor size={20} />
           </div>
           <div>
-            <h2 className="font-[family-name:var(--font-playfair)] text-xl font-bold text-[#800020]">
+            <h2 className="font-[family-name:var(--font-playfair)] text-xl font-bold text-[var(--primary-ink)]">
               {t("sessions.title")}
             </h2>
-            <p className="text-xs text-[#706565]">
+            <p className="text-xs text-[var(--text-light)]">
               {t("sessions.subtitle")}
             </p>
           </div>
@@ -400,26 +400,26 @@ export function SecurityTab() {
           {sessions.map((sess) => (
             <div
               key={sess.id}
-              className="flex items-center justify-between gap-4 p-4 rounded-xl border border-[#E2D9D2]/50 hover:border-[#800020]/20 transition-all bg-white"
+              className="flex items-center justify-between gap-4 p-4 rounded-xl border border-[var(--border)]/50 hover:border-[var(--primary-color)]/20 transition-all bg-[var(--bg-card)]"
             >
               <div className="flex items-start gap-3.5">
-                <div className="grid size-10 place-items-center rounded-lg bg-[#FAF7F5] shrink-0 mt-0.5">
+                <div className="grid size-10 place-items-center rounded-lg bg-[var(--bg-main)] shrink-0 mt-0.5">
                   {getDeviceIcon(sess.device)}
                 </div>
                 <div>
-                  <h4 className="font-semibold text-[#2A2525] text-sm flex items-center gap-2">
+                  <h4 className="font-semibold text-[var(--text-main)] text-sm flex items-center gap-2">
                     {sess.device}
                     {sess.isCurrent && (
-                      <span className="inline-flex items-center rounded-md bg-[#800020]/5 px-2 py-0.5 text-[9px] font-semibold text-[#800020] border border-[#800020]/15">
+                      <span className="inline-flex items-center rounded-md bg-[var(--primary-color)]/5 px-2 py-0.5 text-[9px] font-semibold text-[var(--primary-ink)] border border-[var(--primary-color)]/15">
                         Thiết bị này
                       </span>
                     )}
                   </h4>
-                  <p className="text-xs text-[#706565] mt-0.5">
+                  <p className="text-xs text-[var(--text-light)] mt-0.5">
                     {sess.browser} • {sess.ip} • {sess.location}
                   </p>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-[#800020] mt-1.5 flex items-center gap-1">
-                    <span className="size-1.5 rounded-full bg-[#800020] animate-pulse" />
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--primary-ink)] mt-1.5 flex items-center gap-1">
+                    <span className="size-1.5 rounded-full bg-[var(--primary-color)] animate-pulse" />
                     {sess.time}
                   </p>
                 </div>
@@ -428,7 +428,7 @@ export function SecurityTab() {
               {!sess.isCurrent && (
                 <button
                   onClick={() => handleRevokeSession(sess.id)}
-                  className="inline-flex size-9 items-center justify-center rounded-lg border border-[#E2D9D2] hover:border-rose-300 hover:text-rose-600 transition-colors shrink-0 text-[#706565]"
+                  className="inline-flex size-9 items-center justify-center rounded-lg border border-[var(--border)] hover:border-rose-300 hover:text-rose-600 transition-colors shrink-0 text-[var(--text-light)]"
                   title={t("sessions.revokeBtn")}
                 >
                   <LogOut size={15} />

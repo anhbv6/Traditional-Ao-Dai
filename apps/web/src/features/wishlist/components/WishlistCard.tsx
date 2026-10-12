@@ -76,7 +76,7 @@ export function WishlistCard({ item, index, locale, labels, onRemove, onPrimaryA
             </span>
           ) : null}
           {isCustom ? (
-            <span className="bg-white/90 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[1.5px] text-[var(--primary-color)] backdrop-blur-sm sm:text-[10px]">
+            <span className="bg-[var(--bg-card)]/90 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[1.5px] text-[var(--primary-ink)] backdrop-blur-sm sm:text-[10px]">
               {labels.custom}
             </span>
           ) : null}
@@ -88,7 +88,7 @@ export function WishlistCard({ item, index, locale, labels, onRemove, onPrimaryA
           onClick={() => onRemove(item)}
           aria-label={labels.remove}
           title={labels.remove}
-          className="absolute right-2 top-2 grid size-7 cursor-pointer place-items-center bg-white/90 text-[var(--text-main)] backdrop-blur-sm transition-[opacity,background-color,color,transform] duration-300 hover:bg-[var(--primary-color)] hover:text-white focus-visible:opacity-100 active:scale-90 sm:size-8 lg:opacity-0 lg:group-hover:opacity-100"
+          className="absolute right-2 top-2 grid size-7 cursor-pointer place-items-center bg-[var(--bg-card)]/90 text-[var(--text-main)] backdrop-blur-sm transition-[opacity,background-color,color,transform] duration-300 hover:bg-[var(--primary-color)] hover:text-white focus-visible:opacity-100 active:scale-90 sm:size-8 lg:opacity-0 lg:group-hover:opacity-100"
         >
           <X size={14} strokeWidth={1.6} className="transition-transform duration-300 group-hover:rotate-90" />
         </button>
@@ -99,7 +99,7 @@ export function WishlistCard({ item, index, locale, labels, onRemove, onPrimaryA
           <Link
             href={href}
             title={item.name}
-            className="block truncate font-[family-name:var(--font-playfair)] font-semibold text-[var(--text-main)] transition-colors hover:text-[var(--primary-color)]"
+            className="block truncate font-[family-name:var(--font-playfair)] font-semibold text-[var(--text-main)] transition-colors hover:text-[var(--primary-ink)]"
           >
             {item.name}
           </Link>
@@ -108,7 +108,7 @@ export function WishlistCard({ item, index, locale, labels, onRemove, onPrimaryA
           <p className="mt-0.5 truncate text-[11px] text-[var(--text-light)] sm:text-xs">{item.subline}</p>
         ) : null}
         <p className="mt-1.5 flex items-baseline gap-x-1.5 whitespace-nowrap text-[12px] sm:text-[14px]">
-          <span className="font-semibold text-[var(--primary-color)]">{formatVnd(item.price, locale)}</span>
+          <span className="font-semibold text-[var(--primary-ink)]">{formatVnd(item.price, locale)}</span>
           {item.originalPrice ? (
             <span className="text-[10px] text-[var(--text-light)]/70 line-through sm:text-[11px]">
               {formatVnd(item.originalPrice, locale)}
@@ -120,7 +120,7 @@ export function WishlistCard({ item, index, locale, labels, onRemove, onPrimaryA
         <button
           type="button"
           onClick={() => onPrimaryAction(item)}
-          className="group/btn relative mt-3 flex min-h-9 w-full cursor-pointer items-center justify-center gap-1.5 overflow-hidden border border-[var(--primary-color)]/30 text-[10px] font-semibold uppercase tracking-[1.5px] text-[var(--primary-color)] transition-colors duration-500 hover:border-[var(--primary-color)] hover:text-white active:scale-[0.98] sm:min-h-10 sm:text-[11px] sm:tracking-[2px]"
+          className="group/btn relative mt-3 flex min-h-9 w-full cursor-pointer items-center justify-center gap-1.5 overflow-hidden border border-[var(--primary-color)]/30 text-[10px] font-semibold uppercase tracking-[1.5px] text-[var(--primary-ink)] transition-colors duration-500 hover:border-[var(--primary-color)] hover:text-white active:scale-[0.98] sm:min-h-10 sm:text-[11px] sm:tracking-[2px]"
         >
           <span
             aria-hidden="true"

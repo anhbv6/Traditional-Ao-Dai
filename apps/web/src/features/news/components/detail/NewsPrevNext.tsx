@@ -22,7 +22,7 @@ export function NewsPrevNext({ previous, next, loc }: NewsPrevNextProps) {
   const card = (article: MockArticle, direction: "previous" | "next") => (
     <Link
       href={`/news/${article.slug}`}
-      className={`group flex items-center gap-4 border border-[var(--border)] bg-white p-3 transition-colors duration-300 hover:border-[var(--primary-color)] ${
+      className={`group flex items-center gap-4 border border-[var(--border)] bg-[var(--bg-card)] p-3 transition-colors duration-300 hover:border-[var(--primary-color)] ${
         direction === "next" ? "flex-row-reverse text-right" : ""
       }`}
     >
@@ -49,7 +49,7 @@ export function NewsPrevNext({ previous, next, loc }: NewsPrevNextProps) {
             <ArrowRight size={12} className="transition-transform duration-300 group-hover:translate-x-1" />
           ) : null}
         </span>
-        <span className="mt-1 line-clamp-2 font-[family-name:var(--font-playfair)] text-[14px] font-semibold leading-snug text-[var(--text-main)] transition-colors group-hover:text-[var(--primary-color)] sm:text-[15px]">
+        <span className="mt-1 line-clamp-2 font-[family-name:var(--font-playfair)] text-[14px] font-semibold leading-snug text-[var(--text-main)] transition-colors group-hover:text-[var(--primary-ink)] sm:text-[15px]">
           {article.title[loc]}
         </span>
       </span>

@@ -92,7 +92,7 @@ export function OtpInput({
           onKeyDown={(e) => handleKeyDown(e, idx)}
           onPaste={idx === 0 ? handlePaste : undefined}
           className={cn(
-            'w-[calc((100%-(length-1)*0.25rem)/length)] max-w-14 aspect-square sm:h-16 text-center text-lg sm:text-xl font-semibold rounded-lg border bg-background text-[var(--text-main)] shadow-none outline-none transition-all focus:bg-white focus:ring-2 focus:ring-[var(--ring)]/30 disabled:opacity-50 disabled:pointer-events-none',
+            'w-[calc((100%-(length-1)*0.25rem)/length)] max-w-14 aspect-square sm:h-16 text-center text-lg sm:text-xl font-semibold rounded-lg border bg-background text-[var(--text-main)] shadow-none outline-none transition-all focus:bg-[var(--bg-card)] focus:ring-2 focus:ring-[var(--ring)]/30 disabled:opacity-50 disabled:pointer-events-none',
             isInvalid
               ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/20'
               : 'border-[var(--border)] focus:border-[var(--primary-color)]',

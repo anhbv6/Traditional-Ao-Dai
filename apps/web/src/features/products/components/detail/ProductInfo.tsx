@@ -150,8 +150,8 @@ export default function ProductInfo({
     <div className="min-w-0 lg:pt-1">
       <motion.div variants={stagger} initial="hidden" animate="show">
         <motion.div variants={rise} className="flex items-start justify-between gap-6">
-          <h1 className="text-[26px] font-semibold leading-tight text-[var(--primary-color)] sm:text-4xl">{product.name}</h1>
-          <span className="mt-1.5 shrink-0 bg-[var(--bg-secondary)] px-3 py-1 text-xs font-semibold text-[var(--primary-color)]">
+          <h1 className="text-[26px] font-semibold leading-tight text-[var(--primary-ink)] sm:text-4xl">{product.name}</h1>
+          <span className="mt-1.5 shrink-0 bg-[var(--bg-secondary)] px-3 py-1 text-xs font-semibold text-[var(--primary-ink)]">
             {product.stock}
           </span>
         </motion.div>
@@ -175,7 +175,7 @@ export default function ProductInfo({
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: '-100%', opacity: 0 }}
               transition={{ duration: 0.45, ease: EASE }}
-              className="text-2xl font-semibold text-[var(--primary-color)]"
+              className="text-2xl font-semibold text-[var(--primary-ink)]"
             >
               {priceText}
             </motion.span>
@@ -281,7 +281,7 @@ export default function ProductInfo({
             className="overflow-hidden"
           >
             <div className="mt-6 border border-[var(--border)] border-l-2 border-l-[var(--primary-color)] bg-[var(--bg-secondary)] p-4">
-              <h4 className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[var(--primary-color)]">
+              <h4 className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[var(--primary-ink)]">
                 <Ruler size={14} strokeWidth={1.6} />
                 {t('details.enterMeasurements')}
               </h4>
@@ -296,7 +296,7 @@ export default function ProductInfo({
                   >
                     <span className="mb-1 text-[10px] font-semibold text-[var(--text-main)]">
                       {field.label}
-                      {field.required ? <span className="text-[var(--primary-color)]"> *</span> : null}
+                      {field.required ? <span className="text-[var(--primary-ink)]"> *</span> : null}
                     </span>
                     <input
                       type="number"
@@ -330,7 +330,7 @@ export default function ProductInfo({
             aria-label={t('quantity.decrease')}
             onClick={() => onQuantityChange(Math.max(1, quantity - 1))}
             disabled={quantity <= 1}
-            className="cursor-pointer p-1 text-[var(--text-main)] transition-colors hover:text-[var(--primary-color)] disabled:cursor-not-allowed disabled:opacity-30"
+            className="cursor-pointer p-1 text-[var(--text-main)] transition-colors hover:text-[var(--primary-ink)] disabled:cursor-not-allowed disabled:opacity-30"
           >
             <Minus size={14} />
           </button>
@@ -352,7 +352,7 @@ export default function ProductInfo({
             aria-label={t('quantity.increase')}
             onClick={() => onQuantityChange(Math.min(MAX_LINE_QUANTITY, quantity + 1))}
             disabled={quantity >= MAX_LINE_QUANTITY}
-            className="cursor-pointer p-1 text-[var(--text-main)] transition-colors hover:text-[var(--primary-color)] disabled:cursor-not-allowed disabled:opacity-30"
+            className="cursor-pointer p-1 text-[var(--text-main)] transition-colors hover:text-[var(--primary-ink)] disabled:cursor-not-allowed disabled:opacity-30"
           >
             <Plus size={14} />
           </button>
@@ -373,7 +373,7 @@ export default function ProductInfo({
           aria-pressed={isWishlisted}
           onClick={onWishlistToggle}
           className={`flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center border transition-colors duration-300 sm:h-12 sm:w-12 ${
-            isWishlisted ? 'border-[var(--primary-color)] text-[var(--primary-color)]' : 'border-[var(--border)] text-[var(--text-main)] hover:border-[var(--primary-color)]'
+            isWishlisted ? 'border-[var(--primary-color)] text-[var(--primary-ink)]' : 'border-[var(--border)] text-[var(--text-main)] hover:border-[var(--primary-color)]'
           }`}
         >
           <UseAnimations animation={heart} size={20} reverse={isWishlisted} strokeColor="currentColor" fillColor="currentColor" />
@@ -410,7 +410,7 @@ export default function ProductInfo({
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ duration: 0.45, ease: EASE }}
-            className="fixed inset-x-0 bottom-0 z-40 flex items-center gap-3 border-t border-[var(--border)] bg-white/95 px-4 py-2.5 shadow-[0_-12px_28px_-16px_rgba(42,37,37,0.35)] backdrop-blur-sm lg:hidden"
+            className="fixed inset-x-0 bottom-0 z-40 flex items-center gap-3 border-t border-[var(--border)] bg-[var(--bg-card)]/95 px-4 py-2.5 shadow-[0_-12px_28px_-16px_rgba(42,37,37,0.35)] backdrop-blur-sm lg:hidden"
           >
             <span className="relative aspect-[3/4] w-9 shrink-0 overflow-hidden bg-[var(--bg-secondary)]">
               <Image src={currentImageSrc} alt="" fill sizes="36px" className="object-cover" />
@@ -418,7 +418,7 @@ export default function ProductInfo({
             <div className="min-w-0 flex-1">
               <p className="truncate font-[family-name:var(--font-playfair)] text-[13px] font-semibold text-[var(--text-main)]">{product.name}</p>
               <p className="truncate text-[11px] text-[var(--text-light)]">
-                <span className="font-semibold text-[var(--primary-color)]">{priceText}</span>
+                <span className="font-semibold text-[var(--primary-ink)]">{priceText}</span>
                 {selectedSize ? ` · ${t('sizeLabel')} ${selectedSize}` : ''}
               </p>
             </div>

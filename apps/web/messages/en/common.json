@@ -63,5 +63,14 @@
     "cardExpiryRequired": "Please enter the expiry date (MM/YY)",
     "cardCvvRequired": "Please enter the CVV",
     "cardCvvInvalid": "Invalid CVV"
+  },
+  "textField": {
+    "clear": "Clear",
+    "copy": "Copy",
+    "copied": "Copied",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "counter": "{count} of {max} characters",
+    "counterNoMax": "{count} characters"
   }
 }

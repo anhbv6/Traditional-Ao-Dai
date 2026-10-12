@@ -94,7 +94,7 @@ export function ArticleNews() {
         <div className="mt-10 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-5">
             <span className="font-[family-name:var(--font-playfair)] text-sm text-[var(--text-light)]">
-              <span className="text-lg font-semibold text-[var(--primary-color)]">{pad(selectedIndex + 1)}</span> / {pad(total)}
+              <span className="text-lg font-semibold text-[var(--primary-ink)]">{pad(selectedIndex + 1)}</span> / {pad(total)}
             </span>
             <span className="relative h-px w-32 bg-[var(--border)] sm:w-48">
               <span
@@ -107,7 +107,7 @@ export function ArticleNews() {
           <div className="flex items-center justify-between gap-6 sm:justify-end">
             <Link
               href="/news"
-              className="group inline-flex items-center gap-3 border-b border-[var(--primary-color)]/40 pb-1 text-xs font-semibold uppercase tracking-[2px] text-[var(--primary-color)] transition-colors hover:border-[var(--primary-color)]"
+              className="group inline-flex items-center gap-3 border-b border-[var(--primary-color)]/40 pb-1 text-xs font-semibold uppercase tracking-[2px] text-[var(--primary-ink)] transition-colors hover:border-[var(--primary-color)]"
             >
               {t('viewAll')}
               <ArrowRight size={15} strokeWidth={1.6} className="transition-transform duration-300 group-hover:translate-x-1" />
@@ -117,7 +117,7 @@ export function ArticleNews() {
                 type="button"
                 onClick={scrollPrev}
                 aria-label={t('prev')}
-                className="flex size-11 cursor-pointer items-center justify-center border border-[var(--primary-color)]/30 text-[var(--primary-color)] transition-colors hover:bg-[var(--primary-color)] hover:text-white"
+                className="flex size-11 cursor-pointer items-center justify-center border border-[var(--primary-color)]/30 text-[var(--primary-ink)] transition-colors hover:bg-[var(--primary-color)] hover:text-white"
               >
                 <ChevronLeft size={18} strokeWidth={1.5} />
               </button>
@@ -125,7 +125,7 @@ export function ArticleNews() {
                 type="button"
                 onClick={scrollNext}
                 aria-label={t('next')}
-                className="flex size-11 cursor-pointer items-center justify-center border border-[var(--primary-color)]/30 text-[var(--primary-color)] transition-colors hover:bg-[var(--primary-color)] hover:text-white"
+                className="flex size-11 cursor-pointer items-center justify-center border border-[var(--primary-color)]/30 text-[var(--primary-ink)] transition-colors hover:bg-[var(--primary-color)] hover:text-white"
               >
                 <ChevronRight size={18} strokeWidth={1.5} />
               </button>

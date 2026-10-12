@@ -19,7 +19,7 @@ export function LoginTabs({ isOtpMode, setIsOtpMode, t, itemVariants }: LoginTab
         className={cn(
           "flex-1 pb-2.5 text-[10px] sm:text-xs font-bold uppercase tracking-wide sm:tracking-wider border-b-2 text-center transition-all cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5",
           !isOtpMode
-            ? "border-[#800020] text-[#800020] font-bold"
+            ? "border-[var(--primary-color)] text-[var(--primary-ink)] font-bold"
             : "border-transparent text-[var(--text-light)] hover:text-[var(--text-main)]"
         )}
       >
@@ -32,7 +32,7 @@ export function LoginTabs({ isOtpMode, setIsOtpMode, t, itemVariants }: LoginTab
         className={cn(
           "flex-1 pb-2.5 text-[10px] sm:text-xs font-bold uppercase tracking-wide sm:tracking-wider border-b-2 text-center transition-all cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5",
           isOtpMode
-            ? "border-[#800020] text-[#800020] font-bold"
+            ? "border-[var(--primary-color)] text-[var(--primary-ink)] font-bold"
             : "border-transparent text-[var(--text-light)] hover:text-[var(--text-main)]"
         )}
       >

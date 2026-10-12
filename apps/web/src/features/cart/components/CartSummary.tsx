@@ -22,7 +22,7 @@ export function CartSummary({ totals, activeDiscount, locale, hasCustomItems, pr
   const { subtotal, discountAmount, shippingCost, total } = totals;
 
   return (
-    <div className="border border-[var(--border)] bg-white p-4 sm:p-5">
+    <div className="border border-[var(--border)] bg-[var(--bg-card)] p-4 sm:p-5">
       <h2 className="text-base font-semibold text-[var(--text-main)] sm:text-lg">{t("summary.title")}</h2>
 
       {promoSlot ? <div className="mt-4 border-t border-[var(--border)] pt-4">{promoSlot}</div> : null}
@@ -53,7 +53,7 @@ export function CartSummary({ totals, activeDiscount, locale, hasCustomItems, pr
           <p className="text-[13px] font-semibold text-[var(--text-main)]">{t("summary.total")}</p>
           <p className="text-[10px] text-[var(--text-light)]">{t("summary.vatNote")}</p>
         </div>
-        <p className="text-lg font-semibold text-[var(--primary-color)] sm:text-xl">{formatVnd(total, locale)}</p>
+        <p className="text-lg font-semibold text-[var(--primary-ink)] sm:text-xl">{formatVnd(total, locale)}</p>
       </div>
 
       <Link
@@ -72,7 +72,7 @@ export function CartSummary({ totals, activeDiscount, locale, hasCustomItems, pr
 
       {hasCustomItems ? (
         <p className="mt-3 flex gap-2 text-[11px] leading-5 text-[var(--text-light)]">
-          <Info size={13} strokeWidth={1.6} className="mt-0.5 shrink-0 text-[var(--primary-color)]" />
+          <Info size={13} strokeWidth={1.6} className="mt-0.5 shrink-0 text-[var(--primary-ink)]" />
           {t("summary.customNote")}
         </p>
       ) : null}

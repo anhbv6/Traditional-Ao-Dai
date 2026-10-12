@@ -30,7 +30,7 @@ export function LoginRememberForgot({
       </div>
       <Link
         href="/forgot"
-        className="font-semibold text-[var(--primary-color)] hover:text-[var(--accent-color)] transition-colors underline decoration-[var(--primary-color)]/20 underline-offset-4"
+        className="font-semibold text-[var(--primary-ink)] hover:text-[var(--accent-color)] transition-colors underline decoration-[var(--primary-ink)]/20 underline-offset-4"
       >
         {t('forgotPassword')}
       </Link>

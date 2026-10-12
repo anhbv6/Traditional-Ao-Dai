@@ -86,7 +86,7 @@ export function ChangePasswordForm({ forgotType = 'email', target = '', resetTok
             </div>
           </div>
           <div className="space-y-2">
-            <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-semibold text-[var(--primary-color)]">
+            <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-semibold text-[var(--primary-ink)]">
               {t('success')}
             </h2>
             <p className="font-[family-name:var(--font-lora)] text-xs sm:text-sm text-[var(--text-light)]">
@@ -199,7 +199,7 @@ export function ChangePasswordForm({ forgotType = 'email', target = '', resetTok
             <button
               type="button"
               onClick={onBack}
-              className="inline-flex items-center gap-1.5 font-semibold text-[var(--primary-color)] hover:text-[var(--accent-color)] transition-colors group/back cursor-pointer"
+              className="inline-flex items-center gap-1.5 font-semibold text-[var(--primary-ink)] hover:text-[var(--accent-color)] transition-colors group/back cursor-pointer"
             >
               <ArrowLeft size={13} className="transition-transform group-hover/back:-translate-x-0.5" />
               <span>Quay lại</span>

@@ -14,7 +14,7 @@ export function ContactIntro() {
     <section className="mx-auto w-full max-w-[1440px] px-5 pb-16 pt-12 sm:px-8 sm:pb-20 sm:pt-20 lg:px-10 xl:px-16">
       <Reveal className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-end lg:gap-16">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[3.5px] text-[var(--primary-color)]">{t('eyebrow')}</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[3.5px] text-[var(--primary-ink)]">{t('eyebrow')}</p>
           <h1 className="mt-5 max-w-2xl font-[family-name:var(--font-playfair)] text-[36px] font-semibold leading-[1.1] text-[var(--text-main)] sm:text-[50px] xl:text-[56px]">
             {t('title')}
           </h1>

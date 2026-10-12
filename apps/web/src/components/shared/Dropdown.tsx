@@ -96,14 +96,14 @@ export function Dropdown({
       >
         <div
           className={cn(
-            "relative rounded-xl border border-[#E2D9D2] bg-white p-2 text-[#2A2525] shadow-xl",
+            "relative rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-2 text-[var(--text-main)] shadow-xl",
             contentClassName
           )}
         >
           {showArrow && (
             <div
               className={cn(
-                "absolute -top-1.5 h-3 w-3 rotate-45 border-l border-t border-[#E2D9D2] bg-white",
+                "absolute -top-1.5 h-3 w-3 rotate-45 border-l border-t border-[var(--border)] bg-[var(--bg-card)]",
                 arrowAlignmentClassName,
                 arrowClassName
               )}

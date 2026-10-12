@@ -43,7 +43,7 @@ export function FitModel() {
                   onClick={() => setActiveProfileId(profile.id)}
                   className={cn(
                     "relative -mb-px cursor-pointer px-1 pb-3 pr-6 text-left text-sm font-semibold transition-colors duration-500",
-                    isActive ? "text-[var(--primary-color)]" : "text-[var(--text-light)] hover:text-[var(--primary-color)]",
+                    isActive ? "text-[var(--primary-ink)]" : "text-[var(--text-light)] hover:text-[var(--primary-ink)]",
                   )}
                 >
                   {t(`profiles.${profile.id}.label`)}
@@ -76,7 +76,7 @@ export function FitModel() {
                     <dt className="mt-1 text-[11px] uppercase tracking-[1.8px] text-[var(--text-light)]">
                       {t(`profiles.${activeProfile.id}.stats.${key}.label`)}
                     </dt>
-                    <dd className="font-[family-name:var(--font-playfair)] text-xl font-semibold text-[var(--primary-color)] sm:text-2xl">
+                    <dd className="font-[family-name:var(--font-playfair)] text-xl font-semibold text-[var(--primary-ink)] sm:text-2xl">
                       {t(`profiles.${activeProfile.id}.stats.${key}.value`)}
                     </dd>
                   </div>
@@ -89,8 +89,8 @@ export function FitModel() {
                   <p className="text-[11px] font-semibold uppercase tracking-[2px] text-[var(--text-light)]">{t("beforeLabel")}</p>
                   <p className="mt-2 text-sm leading-6 text-[var(--text-light)]">{t(`profiles.${activeProfile.id}.before`)}</p>
                 </div>
-                <div className="bg-white p-5 shadow-[inset_3px_0_0_var(--primary-color)]">
-                  <p className="text-[11px] font-semibold uppercase tracking-[2px] text-[var(--primary-color)]">{t("afterLabel")}</p>
+                <div className="bg-[var(--bg-card)] p-5 shadow-[inset_3px_0_0_var(--primary-color)]">
+                  <p className="text-[11px] font-semibold uppercase tracking-[2px] text-[var(--primary-ink)]">{t("afterLabel")}</p>
                   <p className="mt-2 text-sm leading-6 text-[var(--text-main)]">{t(`profiles.${activeProfile.id}.after`)}</p>
                 </div>
               </div>
@@ -115,7 +115,7 @@ export function FitModel() {
                 )}
               />
             ))}
-            <p className="absolute bottom-5 left-5 bg-white/95 px-4 py-2 font-[family-name:var(--font-playfair)] text-sm italic text-[var(--primary-color)]">
+            <p className="absolute bottom-5 left-5 bg-[var(--bg-card)]/95 px-4 py-2 font-[family-name:var(--font-playfair)] text-sm italic text-[var(--primary-ink)]">
               {t(`profiles.${activeProfile.id}.label`)}
             </p>
           </ClipReveal>

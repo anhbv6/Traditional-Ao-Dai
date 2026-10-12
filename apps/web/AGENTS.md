@@ -45,6 +45,9 @@
 
 # 7. Styling & UI Components
 - **Tailwind CSS v4** — KHÔNG dùng v3 syntax. Import qua `@tailwindcss/postcss`.
+- **Màu storefront:** dùng token trong `src/app/globals.css` (`var(--text-main)`, `var(--bg-card)`, `text-primary-ink`...), KHÔNG viết cứng hex — dark mode chỉ đổi biến gốc. Chữ thương hiệu dùng `--primary-ink`, nền/viền thương hiệu dùng `--primary-color`. Admin luôn sáng, màu theo `variables.md`.
+- **Nút hành động storefront:** dùng `ActionButton` (`components/shared`) với `variant` = `confirm` | `dialog` | `cancel` | `disabled` | `custom` (+ `colors` để đổi màu, `loading`, `icon`, `size`); link chuyển trang dùng `ActionLink`. Màu mặc định cấu hình tại `VARIANT_COLORS` trong `ActionButton.tsx`. Server Component import trực tiếp `@/components/shared/ActionButton` (barrel `shared/index` chứa component client).
+- **Ô nhập storefront:** dùng `TextField` (`components/shared/TextField`) — mặc định kiểu gạch chân như màn Liên hệ; có `label`, `prefix`/`suffix`, `clearable`, `passwordToggle`, `copyable`, `loading`, `helperText`/`error`/`success`, `showCount`, `layout`, `appearance`, `mask` (currency/phone/card/date), `debounceMs`. Hàm mask thuần ở `lib/input-mask.ts`. `FormInput` cũ vẫn giữ cho các form auth/admin.
 - **shadcn/ui** (style: base-vega) — Thêm component mới qua CLI. Config tại `components.json`.
 - **Base UI (@base-ui/react)** — className dạng hàm dùng `resolveClassName()`.
 - `cn()` đã tích hợp `tailwind-merge`. **Icons:** lucide-react (primary) + react-icons.

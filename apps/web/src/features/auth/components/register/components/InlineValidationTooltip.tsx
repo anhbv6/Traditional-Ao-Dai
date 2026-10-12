@@ -118,7 +118,7 @@ export function InlineValidationTooltip({
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className={cn(
-          "inline-flex items-center text-[var(--text-light)] hover:text-[#800020] transition-colors outline-none cursor-pointer mb-0.5 shrink-0",
+          "inline-flex items-center text-[var(--text-light)] hover:text-[var(--primary-ink)] transition-colors outline-none cursor-pointer mb-0.5 shrink-0",
           isInvalid && "text-rose-500 hover:text-rose-600"
         )}
         aria-label="Info"

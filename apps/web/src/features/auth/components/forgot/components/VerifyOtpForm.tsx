@@ -188,7 +188,7 @@ export function VerifyOtpForm({
                 onChange={(e) => handleChange(e.target.value, idx)}
                 onKeyDown={(e) => handleKeyDown(e, idx)}
                 onPaste={idx === 0 ? handlePaste : undefined}
-                className="w-[calc((100%-1.25rem)/6)] max-w-14 aspect-square sm:h-16 text-center text-lg sm:text-xl font-semibold rounded-lg border border-[var(--border)] bg-background text-[var(--text-main)] shadow-none outline-none transition-all focus:border-[var(--primary-color)] focus:bg-white focus:ring-2 focus:ring-[var(--ring)]/30"
+                className="w-[calc((100%-1.25rem)/6)] max-w-14 aspect-square sm:h-16 text-center text-lg sm:text-xl font-semibold rounded-lg border border-[var(--border)] bg-background text-[var(--text-main)] shadow-none outline-none transition-all focus:border-[var(--primary-color)] focus:bg-[var(--bg-card)] focus:ring-2 focus:ring-[var(--ring)]/30"
               />
             ))}
           </div>
@@ -204,7 +204,7 @@ export function VerifyOtpForm({
               disabled={!canResend}
               className={`font-semibold transition-colors cursor-pointer ${
                 canResend
-                  ? 'text-[var(--primary-color)] hover:text-[var(--accent-color)] underline underline-offset-4'
+                  ? 'text-[var(--primary-ink)] hover:text-[var(--accent-color)] underline underline-offset-4'
                   : 'text-[var(--text-light)]/50 cursor-not-allowed'
               }`}
             >
@@ -231,7 +231,7 @@ export function VerifyOtpForm({
             <button
               type="button"
               onClick={onBack}
-              className="inline-flex items-center gap-1.5 font-semibold text-[var(--primary-color)] hover:text-[var(--accent-color)] transition-colors group/back cursor-pointer"
+              className="inline-flex items-center gap-1.5 font-semibold text-[var(--primary-ink)] hover:text-[var(--accent-color)] transition-colors group/back cursor-pointer"
             >
               <ArrowLeft size={13} className="transition-transform group-hover/back:-translate-x-0.5" />
               <span>{t('back')}</span>

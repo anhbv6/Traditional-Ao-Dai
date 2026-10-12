@@ -75,7 +75,7 @@ export function CraftStory() {
             </div>
 
             {/* Mục lục các công đoạn: góc vuông, vạch đỏ đô phía trên đánh dấu bước đang xem */}
-            <nav aria-label={t('eyebrow')} className="grid grid-cols-3 border-x border-b border-[var(--border)] bg-white">
+            <nav aria-label={t('eyebrow')} className="grid grid-cols-3 border-x border-b border-[var(--border)] bg-[var(--bg-card)]">
               {CRAFT_STEPS.map((step, i) => {
                 const isActive = activeStep === i;
                 return (
@@ -100,7 +100,7 @@ export function CraftStory() {
                     <span
                       className={cn(
                         'font-[family-name:var(--font-playfair)] text-lg font-semibold transition-colors duration-500',
-                        isActive ? 'text-[var(--primary-color)]' : 'text-[var(--text-light)]/60 group-hover:text-[var(--primary-color)]',
+                        isActive ? 'text-[var(--primary-ink)]' : 'text-[var(--text-light)]/60 group-hover:text-[var(--primary-ink)]',
                       )}
                     >
                       0{i + 1}
@@ -142,7 +142,7 @@ export function CraftStory() {
                     'relative z-10 flex size-10 shrink-0 cursor-pointer items-center justify-center border font-[family-name:var(--font-playfair)] text-sm transition-colors duration-500 lg:size-12',
                     isActive
                       ? 'border-[var(--primary-color)] bg-[var(--primary-color)] text-white'
-                      : 'border-[var(--border)] bg-[var(--bg-main)] text-[var(--text-light)] hover:border-[var(--primary-color)] hover:text-[var(--primary-color)]',
+                      : 'border-[var(--border)] bg-[var(--bg-main)] text-[var(--text-light)] hover:border-[var(--primary-color)] hover:text-[var(--primary-ink)]',
                   )}
                 >
                   0{i + 1}
@@ -161,7 +161,7 @@ export function CraftStory() {
                   <p className="text-[11px] font-semibold uppercase tracking-[3px] text-[var(--accent-color)]">
                     {t(`steps.${step.key}.label`)}
                   </p>
-                  <h3 className="mt-2 font-[family-name:var(--font-playfair)] text-2xl font-semibold text-[var(--primary-color)] sm:text-[32px]">
+                  <h3 className="mt-2 font-[family-name:var(--font-playfair)] text-2xl font-semibold text-[var(--primary-ink)] sm:text-[32px]">
                     <button
                       type="button"
                       onClick={() => scrollToStep(i)}
@@ -174,7 +174,7 @@ export function CraftStory() {
                   {i === CRAFT_STEPS.length - 1 ? (
                     <Link
                       href="/about"
-                      className="group mt-8 inline-flex items-center gap-3 border-b border-[var(--primary-color)]/40 pb-1 text-xs font-semibold uppercase tracking-[2px] text-[var(--primary-color)] hover:border-[var(--primary-color)]"
+                      className="group mt-8 inline-flex items-center gap-3 border-b border-[var(--primary-color)]/40 pb-1 text-xs font-semibold uppercase tracking-[2px] text-[var(--primary-ink)] hover:border-[var(--primary-color)]"
                     >
                       {t('cta')}
                       <ArrowRight size={15} strokeWidth={1.6} className="transition-transform duration-300 group-hover:translate-x-1" />

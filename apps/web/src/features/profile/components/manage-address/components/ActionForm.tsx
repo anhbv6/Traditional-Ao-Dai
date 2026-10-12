@@ -16,13 +16,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useAddressForm, useVietnamAddress } from "../../../hooks/useProfile";
 
 const LABEL_CLASS =
-  "block font-[family-name:var(--font-lora)] text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[#706565]";
+  "block font-[family-name:var(--font-lora)] text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[var(--text-light)]";
 
 const INPUT_CLASS =
-  "!h-9 sm:!h-10 text-sm leading-[1.15] sm:leading-normal text-[#2A2525] bg-white border border-[#E2D9D2] rounded-lg focus:border-[#800020] focus:ring-2 focus:ring-[#800020]/20 hover:border-[#800020]/30 transition-colors placeholder:text-[#706565]/50 placeholder:text-[11px] sm:placeholder:text-xs !pl-8 sm:!pl-9 !pr-3";
+  "!h-9 sm:!h-10 text-sm leading-[1.15] sm:leading-normal text-[var(--text-main)] bg-[var(--bg-card)] border border-[var(--border)] rounded-lg focus:border-[var(--primary-color)] focus:ring-2 focus:ring-[var(--primary-color)]/20 hover:border-[var(--primary-color)]/30 transition-colors placeholder:text-[var(--text-light)]/50 placeholder:text-[11px] sm:placeholder:text-xs !pl-8 sm:!pl-9 !pr-3";
 
 const SELECT_TRIGGER_CLASS =
-  "!w-full !h-9 sm:!h-10 !rounded-lg border border-[#E2D9D2] bg-white text-xs sm:text-sm leading-[1.15] sm:leading-normal text-[#2A2525] outline-none transition-colors focus:border-[#800020] focus:bg-white focus:ring-2 focus:ring-[#800020]/20 hover:border-[#800020]/30 shadow-none cursor-pointer disabled:opacity-50 !pl-8 sm:!pl-9 !pr-3 data-placeholder:text-[#706565]/50 data-placeholder:text-[11px] sm:data-placeholder:text-xs";
+  "!w-full !h-9 sm:!h-10 !rounded-lg border border-[var(--border)] bg-[var(--bg-card)] text-xs sm:text-sm leading-[1.15] sm:leading-normal text-[var(--text-main)] outline-none transition-colors focus:border-[var(--primary-color)] focus:bg-[var(--bg-card)] focus:ring-2 focus:ring-[var(--primary-color)]/20 hover:border-[var(--primary-color)]/30 shadow-none cursor-pointer disabled:opacity-50 !pl-8 sm:!pl-9 !pr-3 data-placeholder:text-[var(--text-light)]/50 data-placeholder:text-[11px] sm:data-placeholder:text-xs";
 
 export function ActionForm() {
   const t = useTranslations("ProfilePage.address");
@@ -123,23 +123,23 @@ export function ActionForm() {
       open={isEditing}
       onOpenChange={setIsEditing}
       title={
-        <span className="font-[family-name:var(--font-playfair)] text-base sm:text-lg font-bold text-[#800020] block">
+        <span className="font-[family-name:var(--font-playfair)] text-base sm:text-lg font-bold text-[var(--primary-ink)] block">
           {editingAddress ? t("editTitle") : t("addBtn")}
         </span>
       }
       description={
-        <span className="text-[11px] sm:text-xs text-[#706565] block">
+        <span className="text-[11px] sm:text-xs text-[var(--text-light)] block">
           {t("subtitle")}
         </span>
       }
       size="xl"
       scrollable
       footer={
-        <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-2.5 w-full pt-1.5 sm:pt-2 border-t border-[#E2D9D2]/60">
+        <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-2.5 w-full pt-1.5 sm:pt-2 border-t border-[var(--border)]/60">
           <button
             type="button"
             onClick={() => setIsEditing(false)}
-            className="w-full sm:w-auto inline-flex h-8 sm:h-9 items-center justify-center rounded-lg border border-[#E2D9D2] bg-white px-4 sm:px-5 text-[11px] sm:text-xs font-semibold uppercase tracking-[0.5px] text-[#706565] transition-all hover:bg-gray-50 cursor-pointer active:scale-95 duration-200"
+            className="w-full sm:w-auto inline-flex h-8 sm:h-9 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--bg-card)] px-4 sm:px-5 text-[11px] sm:text-xs font-semibold uppercase tracking-[0.5px] text-[var(--text-light)] transition-all hover:bg-gray-50 cursor-pointer active:scale-95 duration-200"
           >
             {t("form.cancelBtn")}
           </button>
@@ -147,7 +147,7 @@ export function ActionForm() {
             type="submit"
             form="address-action-form"
             disabled={isMutating || !isFormValid}
-            className="w-full sm:w-auto inline-flex h-8 sm:h-9 items-center justify-center rounded-lg bg-[#800020] px-4 sm:px-5 text-[11px] sm:text-xs font-semibold uppercase tracking-[0.5px] text-white transition-all hover:bg-[#800020]/90 cursor-pointer active:scale-95 duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full sm:w-auto inline-flex h-8 sm:h-9 items-center justify-center rounded-lg bg-[var(--primary-color)] px-4 sm:px-5 text-[11px] sm:text-xs font-semibold uppercase tracking-[0.5px] text-white transition-all hover:bg-[var(--primary-color)]/90 cursor-pointer active:scale-95 duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isMutating ? (
               <span className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
@@ -164,7 +164,7 @@ export function ActionForm() {
           <FormInput
             id="receiverName"
             label={t("form.receiverName")}
-            startIcon={<User size={14} className="text-[#706565]/60" />}
+            startIcon={<User size={14} className="text-[var(--text-light)]/60" />}
             type="text"
             required
             value={formName}
@@ -179,7 +179,7 @@ export function ActionForm() {
           <FormInput
             id="receiverPhone"
             label={t("form.receiverPhone")}
-            startIcon={<Phone size={14} className="text-[#706565]/60" />}
+            startIcon={<Phone size={14} className="text-[var(--text-light)]/60" />}
             type="tel"
             required
             value={formPhone}
@@ -196,7 +196,7 @@ export function ActionForm() {
               {t("form.province")}
             </label>
             <div className="relative w-full">
-              <div className="absolute left-2.5 top-1/2 -translate-y-1/2 flex items-center text-[#706565]/60 z-10 pointer-events-none">
+              <div className="absolute left-2.5 top-1/2 -translate-y-1/2 flex items-center text-[var(--text-light)]/60 z-10 pointer-events-none">
                 <MapPin size={14} />
               </div>
               <Select
@@ -210,12 +210,12 @@ export function ActionForm() {
                 >
                   <SelectValue placeholder={isLoadingProvinces ? t("form.loading") : t("form.placeholderProvince")} />
                 </SelectTrigger>
-                <SelectContent className="bg-white border border-[#E2D9D2] text-[#2A2525] shadow-lg rounded-xl overflow-hidden font-medium z-[100] max-h-60 overscroll-contain">
+                <SelectContent className="bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-main)] shadow-lg rounded-xl overflow-hidden font-medium z-[100] max-h-60 overscroll-contain">
                   {provinces.map((p) => (
                     <SelectItem
                       key={p.code || p.name}
                       value={p.name}
-                      className="cursor-pointer text-xs sm:text-sm font-medium data-[highlighted]:bg-[#800020]/10 data-[highlighted]:text-[#800020] data-[selected]:bg-[#800020] data-[selected]:text-white"
+                      className="cursor-pointer text-xs sm:text-sm font-medium data-[highlighted]:bg-[var(--primary-color)]/10 data-[highlighted]:text-[var(--primary-ink)] data-[selected]:bg-[var(--primary-color)] data-[selected]:text-white"
                     >
                       {p.name}
                     </SelectItem>
@@ -231,7 +231,7 @@ export function ActionForm() {
               {t("form.district")}
             </label>
             <div className="relative w-full">
-              <div className="absolute left-2.5 top-1/2 -translate-y-1/2 flex items-center text-[#706565]/60 z-10 pointer-events-none">
+              <div className="absolute left-2.5 top-1/2 -translate-y-1/2 flex items-center text-[var(--text-light)]/60 z-10 pointer-events-none">
                 <Building2 size={14} />
               </div>
               <Select
@@ -245,12 +245,12 @@ export function ActionForm() {
                 >
                   <SelectValue placeholder={isLoadingDistricts ? t("form.loading") : t("form.placeholderDistrict")} />
                 </SelectTrigger>
-                <SelectContent className="bg-white border border-[#E2D9D2] text-[#2A2525] shadow-lg rounded-xl overflow-hidden font-medium z-[100] max-h-60 overscroll-contain">
+                <SelectContent className="bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-main)] shadow-lg rounded-xl overflow-hidden font-medium z-[100] max-h-60 overscroll-contain">
                   {districts.map((d) => (
                     <SelectItem
                       key={d.code || d.name}
                       value={d.name}
-                      className="cursor-pointer text-xs sm:text-sm font-medium data-[highlighted]:bg-[#800020]/10 data-[highlighted]:text-[#800020] data-[selected]:bg-[#800020] data-[selected]:text-white"
+                      className="cursor-pointer text-xs sm:text-sm font-medium data-[highlighted]:bg-[var(--primary-color)]/10 data-[highlighted]:text-[var(--primary-ink)] data-[selected]:bg-[var(--primary-color)] data-[selected]:text-white"
                     >
                       {d.name}
                     </SelectItem>
@@ -266,7 +266,7 @@ export function ActionForm() {
               {t("form.ward")}
             </label>
             <div className="relative w-full">
-              <div className="absolute left-2.5 top-1/2 -translate-y-1/2 flex items-center text-[#706565]/60 z-10 pointer-events-none">
+              <div className="absolute left-2.5 top-1/2 -translate-y-1/2 flex items-center text-[var(--text-light)]/60 z-10 pointer-events-none">
                 <Navigation size={14} />
               </div>
               <Select
@@ -280,12 +280,12 @@ export function ActionForm() {
                 >
                   <SelectValue placeholder={isLoadingWards ? t("form.loading") : t("form.placeholderWard")} />
                 </SelectTrigger>
-                <SelectContent className="bg-white border border-[#E2D9D2] text-[#2A2525] shadow-lg rounded-xl overflow-hidden font-medium z-[100] max-h-60 overscroll-contain">
+                <SelectContent className="bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-main)] shadow-lg rounded-xl overflow-hidden font-medium z-[100] max-h-60 overscroll-contain">
                   {wards.map((w) => (
                     <SelectItem
                       key={w.code || w.name}
                       value={w.name}
-                      className="cursor-pointer text-xs sm:text-sm font-medium data-[highlighted]:bg-[#800020]/10 data-[highlighted]:text-[#800020] data-[selected]:bg-[#800020] data-[selected]:text-white"
+                      className="cursor-pointer text-xs sm:text-sm font-medium data-[highlighted]:bg-[var(--primary-color)]/10 data-[highlighted]:text-[var(--primary-ink)] data-[selected]:bg-[var(--primary-color)] data-[selected]:text-white"
                     >
                       {w.name}
                     </SelectItem>
@@ -299,7 +299,7 @@ export function ActionForm() {
           <FormInput
             id="addressLabel"
             label={t("form.label")}
-            startIcon={<Tag size={14} className="text-[#706565]/60" />}
+            startIcon={<Tag size={14} className="text-[var(--text-light)]/60" />}
             type="text"
             value={formLabel}
             onChange={(e) => setFormLabel(e.target.value)}
@@ -313,7 +313,7 @@ export function ActionForm() {
           <FormInput
             id="addressDetail"
             label={t("form.detail")}
-            startIcon={<Home size={14} className="text-[#706565]/60" />}
+            startIcon={<Home size={14} className="text-[var(--text-light)]/60" />}
             type="text"
             required
             value={formAddressLine}
@@ -334,7 +334,7 @@ export function ActionForm() {
           />
           <label
             htmlFor="isDefault"
-            className="cursor-pointer text-xs sm:text-sm font-medium text-[#706565] select-none"
+            className="cursor-pointer text-xs sm:text-sm font-medium text-[var(--text-light)] select-none"
           >
             {t("form.isDefault")}
           </label>
@@ -348,13 +348,13 @@ export function ActionForm() {
             </span>
           </div>
 
-          <div className="rounded-xl border border-[#E2D9D2] bg-[#FAF7F5]/70 p-3 sm:p-4 transition-all">
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-main)]/70 p-3 sm:p-4 transition-all">
             <div className="flex items-start justify-between gap-2">
-              <div className="flex items-center gap-1.5 font-[family-name:var(--font-playfair)] text-sm sm:text-base font-bold text-[#800020] min-w-0">
-                <User size={13} className="shrink-0 text-[#800020]" />
+              <div className="flex items-center gap-1.5 font-[family-name:var(--font-playfair)] text-sm sm:text-base font-bold text-[var(--primary-ink)] min-w-0">
+                <User size={13} className="shrink-0 text-[var(--primary-ink)]" />
                 <span className="truncate">
                   {formName?.trim() || (
-                    <span className="text-[#706565]/50 italic text-xs sm:text-sm font-normal">
+                    <span className="text-[var(--text-light)]/50 italic text-xs sm:text-sm font-normal">
                       {t("form.placeholderName")}
                     </span>
                   )}
@@ -362,12 +362,12 @@ export function ActionForm() {
               </div>
               <div className="flex gap-1.5 items-center shrink-0">
                 {formLabel?.trim() && (
-                  <span className="inline-flex items-center rounded bg-white border border-[#E2D9D2] px-2 py-0.5 text-[10px] font-semibold text-[#706565]">
+                  <span className="inline-flex items-center rounded bg-[var(--bg-card)] border border-[var(--border)] px-2 py-0.5 text-[10px] font-semibold text-[var(--text-light)]">
                     {formLabel.trim()}
                   </span>
                 )}
                 {formIsDefault && (
-                  <span className="inline-flex items-center gap-1 rounded bg-[#800020]/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#800020]">
+                  <span className="inline-flex items-center gap-1 rounded bg-[var(--primary-color)]/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[var(--primary-ink)]">
                     <Check size={11} />
                     {t("default")}
                   </span>
@@ -375,19 +375,19 @@ export function ActionForm() {
               </div>
             </div>
 
-            <div className="mt-2 space-y-1 text-xs text-[#706565]">
+            <div className="mt-2 space-y-1 text-xs text-[var(--text-light)]">
               <p className="flex items-center gap-2">
-                <Phone size={12} className="shrink-0 text-[#706565]/70" />
+                <Phone size={12} className="shrink-0 text-[var(--text-light)]/70" />
                 <span>
                   {formPhone?.trim() || (
-                    <span className="text-[#706565]/50 italic">
+                    <span className="text-[var(--text-light)]/50 italic">
                       {t("form.placeholderPhone")}
                     </span>
                   )}
                 </span>
               </p>
               <p className="flex items-start gap-2">
-                <MapPin size={12} className="shrink-0 mt-0.5 text-[#706565]/70" />
+                <MapPin size={12} className="shrink-0 mt-0.5 text-[var(--text-light)]/70" />
                 <span className="leading-relaxed">
                   {[
                     formAddressLine?.trim(),
@@ -397,7 +397,7 @@ export function ActionForm() {
                   ]
                     .filter(Boolean)
                     .join(", ") || (
-                    <span className="text-[#706565]/50 italic">
+                    <span className="text-[var(--text-light)]/50 italic">
                       {t("form.placeholderDetail")}
                     </span>
                   )}

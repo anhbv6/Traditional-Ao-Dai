@@ -45,7 +45,7 @@ export function WishlistToolbar({ sortKey, onSortChange, readyCount, onAddAll, o
                 aria-checked={active}
                 onClick={() => onSortChange(key)}
                 className={`relative cursor-pointer pb-1 text-[11px] uppercase tracking-[1.5px] transition-colors duration-300 sm:text-xs ${
-                  active ? "text-[var(--primary-color)]" : "text-[var(--text-light)] hover:text-[var(--text-main)]"
+                  active ? "text-[var(--primary-ink)]" : "text-[var(--text-light)] hover:text-[var(--text-main)]"
                 }`}
               >
                 {labels.sortOptions[key]}

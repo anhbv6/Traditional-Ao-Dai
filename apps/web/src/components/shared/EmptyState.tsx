@@ -48,7 +48,7 @@ export function EmptyState({ icon: Icon, title, description, action, href = "/pr
             opacity: { duration: 0.5, delay: 0.3 },
             scale: { duration: 2.4, delay: 0.6, repeat: Infinity, ease: "easeInOut" },
           }}
-          className="text-[var(--primary-color)]"
+          className="text-[var(--primary-ink)]"
         >
           <Icon size={26} strokeWidth={1.3} />
         </motion.div>

@@ -18,7 +18,7 @@ export function IconLinkButton({ href, label, icon: Icon, count }: IconLinkButto
             <Link
               href={href}
               aria-label={label}
-              className="relative grid h-11 w-11 place-items-center text-primary transition-opacity hover:opacity-75"
+              className="relative grid h-11 w-11 place-items-center text-primary-ink transition-opacity hover:opacity-75"
             />
           }
         >
