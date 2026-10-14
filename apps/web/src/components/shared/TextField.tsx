@@ -72,6 +72,13 @@ export interface TextFieldProps
   success?: ReactNode;
   /** Hiện bộ đếm ký tự (kết hợp `maxLength` sẽ hiện dạng 12/50) */
   showCount?: boolean;
+  /** Rung nhẹ thông báo lỗi mỗi khi lỗi xuất hiện / đổi nội dung — mặc định true. Tôn trọng prefers-reduced-motion */
+  shakeOnError?: boolean;
+  /**
+   * Đổi giá trị này để rung lại dù nội dung lỗi không đổi (VD bấm "Gửi" lần nữa vẫn sai).
+   * Với React Hook Form: truyền `formState.submitCount`.
+   */
+  shakeKey?: string | number;
 
   /* ---------- Dữ liệu ---------- */
   type?: TextFieldType;
@@ -300,6 +307,8 @@ export function TextField({
   error,
   success,
   showCount = false,
+  shakeOnError = true,
+  shakeKey,
   type = "text",
   value,
   defaultValue,
@@ -566,10 +575,13 @@ export function TextField({
           <div className="min-w-0 space-y-0.5">
             {bottomMessage ? (
               <p
+                /* Đổi key theo nội dung lỗi + shakeKey → <p> gắn lại → animation rung chạy lại */
+                key={hasError ? `error:${typeof errorMessage === "string" ? errorMessage : "node"}:${shakeKey ?? ""}` : "message"}
                 id={messageId}
                 role={hasError ? "alert" : "status"}
                 className={cn(
                   "flex items-start gap-1.5",
+                  hasError && shakeOnError && "motion-safe:animate-shake",
                   hasError
                     ? "text-[var(--tf-invalid)]"
                     : tone === "onPrimary"

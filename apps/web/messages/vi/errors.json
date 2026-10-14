@@ -47,6 +47,7 @@
   "EMAIL_CHANGE_REQUIRES_VERIFICATION": "Đổi email cần xác minh bằng mã gửi tới email mới.",
   "EMAIL_DAILY_LIMIT_REACHED": "Email này đã nhận quá số lượng mã cho phép trong ngày. Vui lòng thử lại vào ngày mai.",
   "EMAIL_INVALID": "Email không đúng định dạng.",
+  "EMAIL_REQUIRED": "Vui lòng nhập email.",
   "EMAIL_OR_PHONE_REQUIRED": "Vui lòng nhập email hoặc số điện thoại.",
   "EMAIL_VERIFIED_SUCCESS": "Xác minh email thành công!",
   "FAQ_UPDATE_FAILED": "Không thể cập nhật trạng thái FAQ.",

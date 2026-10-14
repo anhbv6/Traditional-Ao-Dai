@@ -3,7 +3,8 @@
 import React, { useRef, useState } from 'react';
 import Image from 'next/image';
 import { AnimatePresence, motion, useInView, useReducedMotion } from 'motion/react';
-import { ChevronLeft, ChevronRight, Quote, Star } from 'lucide-react';
+import { Quote, Star } from 'lucide-react';
+import { SliderNav } from '@/components/shared/SliderNav';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { SectionHeading } from './SectionHeading';
@@ -55,22 +56,12 @@ export function PromoteFeedBack() {
             {t('rating')}
           </div>
           <div className="mt-8 flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => goTo(current - 1)}
-              aria-label={t('prev')}
-              className="flex size-12 cursor-pointer items-center justify-center rounded-full border border-[var(--primary-color)]/30 text-[var(--primary-ink)] transition-colors hover:bg-[var(--primary-color)] hover:text-white"
-            >
-              <ChevronLeft size={18} strokeWidth={1.5} />
-            </button>
-            <button
-              type="button"
-              onClick={() => goTo(current + 1)}
-              aria-label={t('next')}
-              className="flex size-12 cursor-pointer items-center justify-center rounded-full border border-[var(--primary-color)]/30 text-[var(--primary-ink)] transition-colors hover:bg-[var(--primary-color)] hover:text-white"
-            >
-              <ChevronRight size={18} strokeWidth={1.5} />
-            </button>
+            <SliderNav
+              onPrev={() => goTo(current - 1)}
+              onNext={() => goTo(current + 1)}
+              prevLabel={t('prev')}
+              nextLabel={t('next')}
+            />
             <span className="ml-3 font-[family-name:var(--font-playfair)] text-sm text-[var(--text-light)]">
               <span className="text-lg font-semibold text-[var(--primary-ink)]">0{current + 1}</span> / 0{total}
             </span>

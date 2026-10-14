@@ -7,8 +7,6 @@
     "subtitle": "Mulberry silk, hand-embroidered brocade and a silhouette tailored just for you — so your Ao Dai tells your own story on the moments that matter.",
     "primaryAction": "Explore the collection",
     "secondaryAction": "Book a fitting",
-    "imageAlt": "Model wearing a burgundy brocade Ao Dai with golden lotus embroidery in a traditional house",
-    "note": "Burgundy brocade with gold-thread lotus — handcrafted in 7 days.",
     "metrics": {
       "designs": {
         "value": "48+",
@@ -23,8 +21,22 @@
         "label": "bespoke turnaround"
       }
     },
-    "caption": "Golden Lotus Brocade Ao Dai",
-    "scroll": "Scroll to discover"
+    "scroll": "Scroll to discover",
+    "slides": {
+      "label": "Featured collection photos",
+      "lotus": {
+        "alt": "Model wearing a burgundy brocade ao dai embroidered with golden lotus in a traditional house",
+        "caption": "Golden Lotus Brocade Ao Dai"
+      },
+      "market": {
+        "alt": "Young woman in a red ao dai holding yellow flowers at a market",
+        "caption": "Spring Outing Ao Dai"
+      },
+      "lily": {
+        "alt": "Young woman in a jade ao dai holding Easter lilies by a lake",
+        "caption": "Easter Lily Ao Dai"
+      }
+    }
   },
   "bestSellers": {
     "eyebrow": "Most loved",

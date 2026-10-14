@@ -7,8 +7,6 @@
     "subtitle": "Lụa tơ tằm, gấm thêu tay và phom dáng may đo riêng — để tà áo dài kể câu chuyện của chính bạn trong những khoảnh khắc trang trọng nhất.",
     "primaryAction": "Khám phá bộ sưu tập",
     "secondaryAction": "Đặt may đo",
-    "imageAlt": "Người mẫu mặc áo dài gấm đỏ đô thêu hoa sen vàng trong gian nhà cổ",
-    "note": "Gấm đỏ đô thêu sen kim tuyến — hoàn thiện thủ công trong 7 ngày.",
     "metrics": {
       "designs": {
         "value": "48+",
@@ -23,8 +21,22 @@
         "label": "hoàn thiện may đo"
       }
     },
-    "caption": "Áo dài Gấm Sen Vàng",
-    "scroll": "Cuộn để khám phá"
+    "scroll": "Cuộn để khám phá",
+    "slides": {
+      "label": "Ảnh bộ sưu tập nổi bật",
+      "lotus": {
+        "alt": "Người mẫu mặc áo dài gấm đỏ đô thêu hoa sen vàng trong gian nhà cổ",
+        "caption": "Áo dài Gấm Sen Vàng"
+      },
+      "market": {
+        "alt": "Thiếu nữ mặc áo dài đỏ ôm bó hoa vàng giữa phiên chợ",
+        "caption": "Áo dài Du Xuân"
+      },
+      "lily": {
+        "alt": "Thiếu nữ mặc áo dài xanh ngọc ôm bó hoa loa kèn bên hồ",
+        "caption": "Áo dài Loa Kèn"
+      }
+    }
   },
   "bestSellers": {
     "eyebrow": "Được yêu thích",

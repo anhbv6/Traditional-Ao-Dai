@@ -1,9 +1,9 @@
-import React from 'react';
-import Image from 'next/image';
+import React, { type ReactNode } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { type HeroMetric } from '../types/home.types';
 import { SectionOrnament } from '@/components/shared/SectionOrnament';
 import { ActionLink } from '@/components/shared/ActionLink';
+import { HeroPetals } from './HeroPetals';
 
 interface HeroBannerProps {
   eyebrow: string;
@@ -11,16 +11,15 @@ interface HeroBannerProps {
   subtitle: string;
   primaryAction: string;
   secondaryAction: string;
-  imageAlt: string;
-  note: string;
-  caption: string;
+  /** Nội dung cột phải (ảnh / video / minh hoạ…). Bỏ trống thì cột phải chỉ giữ chỗ */
+  media?: ReactNode;
   scrollLabel: string;
   metrics: HeroMetric[];
 }
 
 /**
- * Hero dạng "trang tạp chí": chữ bên trái, ảnh khung vòm (gợi ô cửa nhà cổ) bên phải.
- * Ảnh thật của sản phẩm tạo cảm xúc ngay màn hình đầu; 2 CTA tách rõ mua sẵn / may đo.
+ * Hero dạng "trang tạp chí": chữ bên trái, cột phải dành cho ảnh / minh hoạ (truyền qua `media`).
+ * Nền có cánh hoa rơi theo gió (HeroPetals); 2 CTA tách rõ mua sẵn / may đo.
  */
 export function HeroBanner({
   eyebrow,
@@ -28,16 +27,13 @@ export function HeroBanner({
   subtitle,
   primaryAction,
   secondaryAction,
-  imageAlt,
-  note,
-  caption,
+  media,
   scrollLabel,
   metrics,
 }: HeroBannerProps) {
   return (
     <section className="relative overflow-hidden bg-[var(--bg-main)]">
-      {/* Nền giấy dó: dải màu nhạt phía phải giúp ảnh nổi khối */}
-      <div aria-hidden="true" className="absolute inset-y-0 right-0 hidden w-[38%] bg-[var(--bg-secondary)] lg:block" />
+      <HeroPetals />
 
       <div className="relative mx-auto grid w-full max-w-[1440px] items-center gap-12 px-5 pb-16 pt-10 sm:px-8 lg:min-h-[calc(100svh-80px)] lg:grid-cols-[1fr_0.9fr] lg:gap-16 lg:px-10 lg:py-14 xl:px-16">
         <div className="relative z-10 flex max-w-2xl flex-col animate-fade-in-up">
@@ -80,33 +76,21 @@ export function HeroBanner({
           </dl>
         </div>
 
-        <div className="relative mx-auto w-full max-w-[460px] lg:mr-0 xl:max-w-[500px]">
-          {/* Viền vòm lệch phía sau — chi tiết trang trí cổ điển */}
-          <div aria-hidden="true" className="absolute -right-4 -top-4 h-full w-full rounded-t-full border border-[var(--accent-color)]/70 sm:-right-6 sm:-top-6" />
-          <div className="relative aspect-[3/4] overflow-hidden rounded-t-full bg-[var(--bg-secondary)] shadow-[0_40px_80px_-30px_rgba(128,0,32,0.35)]">
-            <Image
-              src="/login_banner.jpg"
-              alt={imageAlt}
-              fill
-              loading="eager"
-              fetchPriority="high"
-              sizes="(max-width: 1024px) 90vw, 500px"
-              className="object-cover object-[50%_30%]"
-            />
-          </div>
-
-          <p className="absolute -left-3 bottom-10 bg-[var(--bg-card)] px-5 py-3 font-[family-name:var(--font-playfair)] text-sm italic text-[var(--primary-ink)] shadow-sm sm:-left-10">
-            {caption}
-          </p>
-          <p className="absolute -right-2 top-16 hidden max-w-[200px] border-l-2 border-[var(--accent-color)] bg-[var(--bg-card)]/95 px-4 py-3 text-xs leading-5 text-[var(--text-light)] shadow-sm backdrop-blur sm:block xl:-right-12">
-            {note}
-          </p>
+        {/* Cột phải: chỗ đặt ảnh / minh hoạ — truyền qua prop `media`.
+            Chưa có media: chỉ giữ khoảng ở desktop, mobile ẩn để không chừa khoảng trắng lớn dưới phần chữ. */}
+        <div
+          className={`relative z-10 mx-auto aspect-[3/4] w-full max-w-[460px] lg:mr-0 xl:max-w-[500px] ${media ? '' : 'hidden lg:block'}`}
+        >
+          {media}
         </div>
       </div>
 
+      {/* Cánh hoa tầng gần bay TRƯỚC nội dung (kể cả ảnh slider) */}
+      <HeroPetals depth="front" className="z-20" />
+
       <div className="pointer-events-none absolute bottom-6 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 text-[10px] uppercase tracking-[3px] text-[var(--text-light)] lg:flex">
         {scrollLabel}
-        <span aria-hidden="true" className="h-10 w-px animate-pulse bg-[var(--primary-color)]/40" />
+        {/* <span aria-hidden="true" className="h-10 w-px animate-pulse bg-[var(--primary-color)]/40" /> */}
       </div>
     </section>
   );

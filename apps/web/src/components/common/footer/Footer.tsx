@@ -4,21 +4,15 @@ import {
   Mail,
   MapPin,
   Phone,
-  Send,
 } from 'lucide-react';
 
-import { getLocale, getTranslations } from 'next-intl/server';
+import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 import { Logo } from '../header/Logo';
-import { OnlyOnHome } from '../OnlyOnHome';
-import { GuestOnly } from '../GuestOnly';
+import { Show } from '../Show';
 import { SocialLinks } from './SocialLinks';
 import { QRBank } from './QRBank';
-import { ActionButton, ON_PRIMARY_COLORS } from '@/components/shared/ActionButton';
-import { TextField } from '@/components/shared/TextField';
-
-/* Ô Newsletter cao bằng nút "Đăng ký" (min-h-12), lề trong rộng hơn mặc định */
-const NEWSLETTER_FIELD_CLASS = 'min-h-12 px-4';
+import { NewsletterForm } from '@/features/newsletter';
 
 type FooterLink = {
   label: string;
@@ -50,7 +44,6 @@ function FooterLinkList({ links }: { links: FooterLink[] }) {
 }
 
 export async function Footer() {
-  const locale = await getLocale();
   const t = await getTranslations('Footer');
 
   const columns: FooterColumn[] = [
@@ -90,63 +83,25 @@ export async function Footer() {
     <footer className="mt-auto border-t border-accent/30 bg-background">
       {/* Newsletter / VIP Club: chỉ ở trang chủ và chỉ cho khách chưa đăng nhập.
           Cùng ngôn ngữ với khối May đo: nền đỏ đô, góc vuông, ô nhập viền trắng mờ, nút ON_PRIMARY_COLORS. */}
-      <OnlyOnHome>
-        <GuestOnly>
-          <section className="bg-[var(--primary-color)] text-white">
-            <div className="mx-auto grid w-full max-w-[1440px] gap-8 px-5 py-14 sm:px-8 sm:py-16 lg:grid-cols-[1fr_1.15fr] lg:items-center lg:px-10 xl:px-16">
-              <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[3px] text-[var(--accent-on-primary)]">
-                  {t('newsletter.eyebrow')}
-                </p>
-                <h2 className="mt-3 max-w-2xl font-[family-name:var(--font-playfair)] text-2xl font-semibold leading-tight text-white sm:text-3xl">
-                  {t('newsletter.title')}
-                </h2>
-                <p className="mt-3 max-w-xl text-sm leading-7 text-white/75">
-                  {t('newsletter.description')}
-                </p>
-              </div>
-
-              <form className="grid gap-3 sm:grid-cols-[1fr_0.75fr_auto]" action={`/${locale}/contact`} method="get">
-                {/* Ô nhập dùng chung TextField — tone onPrimary cho nền đỏ đô, dạng hộp cao bằng nút (min-h-12) */}
-                <TextField
-                  id="footer-email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  aria-label={t('newsletter.emailLabel')}
-                  placeholder={t('newsletter.emailPlaceholder')}
-                  tone="onPrimary"
-                  appearance="outline"
-                  prefix={<Mail strokeWidth={1.6} />}
-                  fieldClassName={NEWSLETTER_FIELD_CLASS}
-                />
-                <TextField
-                  id="footer-phone"
-                  name="phone"
-                  type="tel"
-                  mask="phone"
-                  aria-label={t('newsletter.phoneLabel')}
-                  placeholder={t('newsletter.phonePlaceholder')}
-                  tone="onPrimary"
-                  appearance="outline"
-                  prefix={<Phone strokeWidth={1.6} />}
-                  fieldClassName={NEWSLETTER_FIELD_CLASS}
-                />
-                <ActionButton
-                  type="submit"
-                  variant="custom"
-                  size="lg"
-                  colors={ON_PRIMARY_COLORS.solid}
-                  icon={<Send strokeWidth={1.6} />}
-                  iconPosition="end"
-                >
-                  {t('newsletter.submit')}
-                </ActionButton>
-              </form>
+      <Show when={{ auth: 'guest', path: '/' }}>
+        <section className="bg-[var(--primary-color)] text-white">
+          <div className="mx-auto grid w-full max-w-[1440px] gap-8 px-5 py-14 sm:px-8 sm:py-16 lg:grid-cols-[1fr_1.15fr] lg:items-center lg:px-10 xl:px-16">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[3px] text-[var(--accent-on-primary)]">
+                {t('newsletter.eyebrow')}
+              </p>
+              <h2 className="mt-3 max-w-2xl font-[family-name:var(--font-playfair)] text-2xl font-semibold leading-tight text-white sm:text-3xl">
+                {t('newsletter.title')}
+              </h2>
+              <p className="mt-3 max-w-xl text-sm leading-7 text-white/75">
+                {t('newsletter.description')}
+              </p>
             </div>
-          </section>
-        </GuestOnly>
-      </OnlyOnHome>
+
+            <NewsletterForm />
+          </div>
+        </section>
+      </Show>
 
       <section className="mx-auto grid w-full gap-8 px-5 py-10 sm:px-8 lg:grid-cols-[1fr_1.7fr_0.3fr] lg:px-12 lg:py-12">
         <div className="max-w-md">

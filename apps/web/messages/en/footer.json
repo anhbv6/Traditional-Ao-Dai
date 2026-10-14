@@ -4,10 +4,11 @@
     "title": "Subscribe for new collections & 10% off your first order",
     "description": "Get launch notes for Tet, wedding season, yearbook season, and private offers for loyal customers.",
     "emailLabel": "Email",
-    "phoneLabel": "Phone number",
     "emailPlaceholder": "Your email",
-    "phonePlaceholder": "Phone number",
-    "submit": "Subscribe"
+    "emailHint": "Example: yourname@gmail.com",
+    "submit": "Subscribe",
+    "success": "Subscribed! New collections and offers will be sent to your email.",
+    "legal": "By subscribing, you agree to receive emails about new collections and offers from AODAI under our <link>Privacy Policy</link>. You can unsubscribe at any time via the link at the bottom of every email."
   },
   "brand": {
     "tagline": "Preserving the beauty of Vietnamese Ao Dai",

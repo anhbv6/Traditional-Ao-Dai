@@ -2,6 +2,7 @@ import React from "react";
 import { getTranslations } from "next-intl/server";
 import {
   HeroBanner,
+  HeroSlider,
   HomeTrustStrip,
   FeaturedCollections,
   BestSellers,
@@ -28,9 +29,7 @@ export default async function Home() {
         subtitle={t('hero.subtitle')}
         primaryAction={t('hero.primaryAction')}
         secondaryAction={t('hero.secondaryAction')}
-        imageAlt={t('hero.imageAlt')}
-        note={t('hero.note')}
-        caption={t('hero.caption')}
+        media={<HeroSlider />}
         scrollLabel={t('hero.scroll')}
         metrics={[
           { value: t('hero.metrics.designs.value'), label: t('hero.metrics.designs.label') },

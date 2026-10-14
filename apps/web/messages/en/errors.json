@@ -47,6 +47,7 @@
   "EMAIL_CHANGE_REQUIRES_VERIFICATION": "Changing your email requires a code sent to the new email.",
   "EMAIL_DAILY_LIMIT_REACHED": "This email has reached today's code limit. Please try again tomorrow.",
   "EMAIL_INVALID": "Invalid email format.",
+  "EMAIL_REQUIRED": "Please enter your email.",
   "EMAIL_OR_PHONE_REQUIRED": "Please enter your email or phone number.",
   "EMAIL_VERIFIED_SUCCESS": "Email verified successfully!",
   "FAQ_UPDATE_FAILED": "Unable to update the FAQ.",

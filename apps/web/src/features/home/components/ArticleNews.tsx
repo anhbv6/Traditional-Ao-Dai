@@ -4,7 +4,8 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import { useInView } from 'motion/react';
 import { useLocale, useTranslations } from 'next-intl';
-import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import { SliderNav } from '@/components/shared/SliderNav';
 import { Link } from '@/i18n/routing';
 import { SectionHeading } from './SectionHeading';
 import { mockArticles, NewsCard } from '@/features/news';
@@ -112,24 +113,7 @@ export function ArticleNews() {
               {t('viewAll')}
               <ArrowRight size={15} strokeWidth={1.6} className="transition-transform duration-300 group-hover:translate-x-1" />
             </Link>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={scrollPrev}
-                aria-label={t('prev')}
-                className="flex size-11 cursor-pointer items-center justify-center border border-[var(--primary-color)]/30 text-[var(--primary-ink)] transition-colors hover:bg-[var(--primary-color)] hover:text-white"
-              >
-                <ChevronLeft size={18} strokeWidth={1.5} />
-              </button>
-              <button
-                type="button"
-                onClick={scrollNext}
-                aria-label={t('next')}
-                className="flex size-11 cursor-pointer items-center justify-center border border-[var(--primary-color)]/30 text-[var(--primary-ink)] transition-colors hover:bg-[var(--primary-color)] hover:text-white"
-              >
-                <ChevronRight size={18} strokeWidth={1.5} />
-              </button>
-            </div>
+            <SliderNav onPrev={scrollPrev} onNext={scrollNext} prevLabel={t('prev')} nextLabel={t('next')} />
           </div>
         </div>
       </div>

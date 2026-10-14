@@ -4,10 +4,11 @@
     "title": "Đăng ký nhận thông tin BST mới & Mã giảm giá 10% cho đơn hàng đầu tiên",
     "description": "Nhận lịch ra mắt áo dài Tết, mùa cưới, mùa kỷ yếu và các ưu đãi riêng cho khách hàng thân thiết.",
     "emailLabel": "Email",
-    "phoneLabel": "Số điện thoại",
     "emailPlaceholder": "Email của bạn",
-    "phonePlaceholder": "Số điện thoại",
-    "submit": "Đăng ký"
+    "emailHint": "Ví dụ: tenban@gmail.com",
+    "submit": "Đăng ký",
+    "success": "Đăng ký thành công! Ưu đãi và thông tin BST mới sẽ được gửi tới email của bạn.",
+    "legal": "Bằng việc đăng ký, bạn đồng ý nhận email về bộ sưu tập mới và ưu đãi từ AODAI theo <link>Chính sách bảo mật</link>. Bạn có thể huỷ đăng ký bất cứ lúc nào qua liên kết ở cuối mỗi email."
   },
   "brand": {
     "tagline": "Gìn giữ nét đẹp Áo dài Việt",

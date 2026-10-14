@@ -10,3 +10,4 @@ export * from "./flyToCart";
 export * from "./ActionButton";
 export * from "./ActionLink";
 export * from "./TextField";
+export * from "./SliderNav";
