@@ -24,7 +24,9 @@ const lineVariants: Variants = {
 };
 
 /**
- * Banner sự kiện đầu trang Cửa hàng: khối chữ màu theo sự kiện + ảnh dọc bên phải (trên mobile: ảnh ở trên).
+ * Banner sự kiện đầu trang Cửa hàng — chiều cao CỐ ĐỊNH theo breakpoint, không phụ thuộc ảnh hay độ dài chữ:
+ * - Ảnh là lớp nền tuyệt đối (mobile: nửa trên; desktop: ~58% bên phải), mép ảnh hòa vào màu sự kiện.
+ * - Ít chữ, rõ thông tin: nhãn → tiêu đề (tối đa 2 dòng) → mức giảm + số ngày còn lại → CTA.
  * - Tự chuyển slide khi thanh tiến trình chạy hết (CSS animation -> `onAnimationEnd`), dừng khi rê chuột / focus.
  * - Vuốt ngang để chuyển trên màn cảm ứng; nút trước / sau và chấm số cho bàn phím.
  * - Giảm chuyển động: bỏ hiệu ứng trượt / phóng ảnh (đổi slide tức thì), vẫn tự chuyển và vẫn dừng khi rê chuột.
@@ -40,63 +42,114 @@ export function ProductEventBanner() {
   const goTo = (target: number) => setSlide(([current]) => [target, target >= current ? 1 : -1]);
 
   return (
-    <section
+    <motion.section
       aria-roledescription="carousel"
       aria-label={t('label')}
-      className="group/banner relative overflow-hidden text-white transition-colors duration-1000 ease-out"
+      className="group/banner relative h-[560px] touch-pan-y overflow-hidden text-white transition-colors duration-1000 ease-out lg:h-[500px]"
       style={{ backgroundColor: event.panelColor }}
+      onPanEnd={(_, info) => {
+        if (info.offset.x < -60) step(1);
+        else if (info.offset.x > 60) step(-1);
+      }}
     >
-      <div className="mx-auto grid w-full max-w-[1440px] lg:min-h-[500px] lg:grid-cols-[1fr_minmax(0,600px)]">
-        {/* Ảnh: mờ chéo giữa các slide + phóng chậm (Ken Burns); kéo ngang để chuyển */}
-        <motion.div
-          className="relative h-[260px] cursor-grab touch-pan-y overflow-hidden active:cursor-grabbing sm:h-[400px] lg:order-2 lg:h-auto"
-          drag="x"
-          dragConstraints={{ left: 0, right: 0 }}
-          dragElastic={0.12}
-          onDragEnd={(_, info) => {
-            if (info.offset.x < -60) step(1);
-            else if (info.offset.x > 60) step(-1);
-          }}
-        >
-          <AnimatePresence initial={false}>
-            <motion.div
-              key={event.id}
-              className="absolute inset-0"
-              initial={{ opacity: 0, scale: 1.12 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0 }}
-              transition={
-                reduceMotion
-                  ? { duration: 0 }
-                  : { opacity: { duration: 1, ease: 'easeOut' }, scale: { duration: EVENT_SLIDE_SECONDS + 1, ease: 'easeOut' } }
-              }
-            >
-              <Image
-                src={event.image}
-                alt={t(`items.${event.id}.imageAlt`)}
-                fill
-                priority={index === 0}
-                draggable={false}
-                sizes="(max-width: 1024px) 100vw, 600px"
-                className="pointer-events-none object-cover"
-                style={{ objectPosition: event.imagePosition }}
-              />
-            </motion.div>
-          </AnimatePresence>
-          {/* Nối mép ảnh vào khối màu cho liền mạch */}
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 transition-[background] duration-1000"
-            style={{ background: `linear-gradient(to top, ${event.panelColor} 0%, transparent 35%)` }}
-          />
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 hidden transition-[background] duration-1000 lg:block"
-            style={{ background: `linear-gradient(to right, ${event.panelColor} 0%, transparent 30%)` }}
-          />
-        </motion.div>
+      {/* Ảnh nền: mờ chéo giữa các slide + phóng chậm (Ken Burns) */}
+      <div className="absolute inset-x-0 top-0 h-[60%] lg:inset-y-0 lg:left-auto lg:h-full lg:w-[58%]">
+        <AnimatePresence initial={false}>
+          <motion.div
+            key={event.id}
+            className="absolute inset-0"
+            initial={{ opacity: 0, scale: 1.12 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={
+              reduceMotion
+                ? { duration: 0 }
+                : { opacity: { duration: 1, ease: 'easeOut' }, scale: { duration: EVENT_SLIDE_SECONDS + 1, ease: 'easeOut' } }
+            }
+          >
+            <Image
+              src={event.image}
+              alt={t(`items.${event.id}.imageAlt`)}
+              fill
+              priority={index === 0}
+              draggable={false}
+              sizes="(max-width: 1024px) 100vw, 58vw"
+              className="pointer-events-none select-none object-cover"
+              style={{ objectPosition: event.imagePosition }}
+            />
+          </motion.div>
+        </AnimatePresence>
+        {/* Hòa mép ảnh vào khối màu: mobile hòa xuống dưới, desktop hòa sang trái */}
+        {/* Gradient dùng currentColor để đổi màu mượt cùng lúc với nền section (gradient thường không chuyển tiếp được) */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,currentColor_6%,transparent_50%)] transition-colors duration-1000 ease-out lg:hidden"
+          style={{ color: event.panelColor }}
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 hidden bg-[linear-gradient(to_right,currentColor_0%,color-mix(in_srgb,currentColor_80%,transparent)_15%,transparent_55%)] transition-colors duration-1000 ease-out lg:block"
+          style={{ color: event.panelColor }}
+        />
+      </div>
 
-        <div className="relative flex flex-col justify-between gap-10 px-5 pb-8 pt-2 sm:px-8 lg:order-1 lg:px-10 lg:py-14 xl:px-16">
+      {/* Thanh điều hướng: CTA + nav số — absolute góc dưới phải */}
+      <div className="absolute bottom-5 right-5 z-10 flex items-end gap-4 sm:right-8 lg:bottom-8 lg:right-10 xl:right-16">
+        {/* Nút CTA — đổi theo slide, fade in/out mượt */}
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={event.id}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1, transition: { duration: 0.5, ease: 'easeOut' } }}
+            exit={{ opacity: 0, transition: { duration: 0.3, ease: 'easeIn' } }}
+          >
+            <Link
+              href={`/products?category=${event.collection}#product-list`}
+              scroll={false}
+              className="group/cta inline-flex min-h-10 items-center gap-3 bg-[var(--bg-card)] px-6 text-xs font-semibold uppercase tracking-[2px] text-[var(--text-main)] transition-colors duration-300 hover:bg-[var(--accent-color)] hover:text-white"
+            >
+              {t(`items.${event.id}.cta`)}
+              <ArrowRight size={13} strokeWidth={1.6} className="transition-transform duration-300 group-hover/cta:translate-x-1" />
+            </Link>
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Nav số 01 / 02 / 03 */}
+        <ol className="flex gap-3">
+          {productEvents.map((item, i) => {
+            const isActive = i === index;
+            return (
+              <li key={item.id} className="w-16 sm:w-20">
+                <button
+                  type="button"
+                  onClick={() => goTo(i)}
+                  aria-label={t('goTo', { title: t(`items.${item.id}.title`) })}
+                  aria-current={isActive}
+                  className="group/dot w-full cursor-pointer pb-2 pt-1 text-left"
+                >
+                  <span className={cn('text-[11px] tabular-nums transition-colors', isActive ? 'text-white' : 'text-white/45 group-hover/dot:text-white/80')}>
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span className="mt-2 block h-px overflow-hidden bg-white/20">
+                    {isActive ? (
+                      <span
+                        key={`${item.id}-${index}`}
+                        className="block h-full origin-left scale-x-0 animate-[progress-fill_var(--slide-duration)_linear_forwards] bg-white group-hover/banner:[animation-play-state:paused] group-focus-within/banner:[animation-play-state:paused]"
+                        style={{ ['--slide-duration' as string]: `${EVENT_SLIDE_SECONDS}s` }}
+                        onAnimationEnd={() => step(1)}
+                      />
+                    ) : null}
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ol>
+      </div>
+
+
+      <div className="relative mx-auto flex h-full w-full max-w-[1440px] flex-col px-5 pb-5 sm:px-8 lg:px-10 lg:pb-8 xl:px-16">
+        <div className="flex flex-1 flex-col justify-end lg:justify-center lg:pt-6">
           <AnimatePresence mode="wait" initial={false} custom={direction}>
             <motion.div
               key={event.id}
@@ -106,138 +159,76 @@ export function ProductEventBanner() {
               animate="center"
               exit="exit"
               aria-live="polite"
+              className="max-w-[540px] lg:max-w-[460px] xl:max-w-[540px]"
             >
-              <motion.p variants={lineVariants} className="text-[11px] font-semibold uppercase tracking-[3.5px] text-[var(--accent-color)]">
+              <motion.p
+                variants={lineVariants}
+                className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[3px] text-[var(--accent-color)]"
+              >
+                <span aria-hidden="true" className="size-1.5 rounded-full bg-[var(--accent-color)]" />
                 {t(`items.${event.id}.tag`)}
               </motion.p>
-              <div className="mt-5 flex flex-wrap items-end gap-x-8 gap-y-3">
-                <motion.h2
-                  variants={lineVariants}
-                  className="max-w-lg font-[family-name:var(--font-playfair)] text-[32px] font-semibold leading-[1.1] text-white sm:text-[44px]"
-                >
-                  {t(`items.${event.id}.title`)}
-                </motion.h2>
-                <motion.p
-                  variants={lineVariants}
-                  className="font-[family-name:var(--font-playfair)] text-[44px] font-semibold italic leading-none text-[var(--accent-color)] sm:text-[60px]"
-                >
+              <motion.h2
+                variants={lineVariants}
+                className="mt-3 line-clamp-2 font-[family-name:var(--font-playfair)] text-[30px] font-semibold leading-[1.12] text-white sm:mt-4 sm:text-[40px] xl:text-[48px]"
+              >
+                {t(`items.${event.id}.title`)}
+              </motion.h2>
+              {/* Ưu đãi: mức giảm nổi bật + số ngày còn lại */}
+              <motion.div variants={lineVariants} className="mt-4 flex items-baseline gap-4 sm:mt-5">
+                <p className="font-[family-name:var(--font-playfair)] text-[44px] font-semibold italic leading-none text-[var(--accent-color)] sm:text-[56px]">
                   {t(`items.${event.id}.discount`)}
-                </motion.p>
-              </div>
-              <motion.p variants={lineVariants} className="mt-5 max-w-md text-[15px] leading-7 text-white/75">
-                {t(`items.${event.id}.description`)}
-              </motion.p>
-
-              <motion.div variants={lineVariants} className="mt-8 flex flex-wrap items-center gap-x-10 gap-y-6">
-                <Link
-                  href={`/products?category=${event.collection}#product-list`}
-                  scroll={false}
-                  className="group/cta inline-flex min-h-12 items-center gap-3 bg-[var(--bg-card)] px-7 text-xs font-semibold uppercase tracking-[2px] text-[var(--text-main)] transition-colors duration-300 hover:bg-[var(--accent-color)] hover:text-white"
-                >
-                  {t(`items.${event.id}.cta`)}
-                  <ArrowRight size={15} strokeWidth={1.6} className="transition-transform duration-300 group-hover/cta:translate-x-1" />
-                </Link>
+                </p>
                 <EventCountdown endsAt={event.endsAt} />
               </motion.div>
+
             </motion.div>
           </AnimatePresence>
-
-          {/* Điều hướng: số thứ tự + thanh tiến trình tự chạy, nút trước / sau */}
-          <div className="flex items-center justify-between gap-6">
-            <ol className="flex flex-1 gap-3 sm:max-w-sm">
-              {productEvents.map((item, i) => {
-                const isActive = i === index;
-                return (
-                  <li key={item.id} className="flex-1">
-                    <button
-                      type="button"
-                      onClick={() => goTo(i)}
-                      aria-label={t('goTo', { title: t(`items.${item.id}.title`) })}
-                      aria-current={isActive}
-                      className="group/dot w-full cursor-pointer pb-2 pt-1 text-left"
-                    >
-                      <span className={cn('text-[11px] tabular-nums transition-colors', isActive ? 'text-white' : 'text-white/45 group-hover/dot:text-white/80')}>
-                        {String(i + 1).padStart(2, '0')}
-                      </span>
-                      <span className="mt-2 block h-px overflow-hidden bg-white/20">
-                        {isActive ? (
-                          <span
-                            key={`${item.id}-${index}`}
-                            className="block h-full origin-left scale-x-0 animate-[progress-fill_var(--slide-duration)_linear_forwards] bg-white group-hover/banner:[animation-play-state:paused] group-focus-within/banner:[animation-play-state:paused]"
-                            style={{ ['--slide-duration' as string]: `${EVENT_SLIDE_SECONDS}s` }}
-                            onAnimationEnd={() => step(1)}
-                          />
-                        ) : null}
-                      </span>
-                    </button>
-                  </li>
-                );
-              })}
-            </ol>
-            <div className="flex gap-2">
-              {[
-                { delta: -1, label: t('prev'), Icon: ArrowLeft },
-                { delta: 1, label: t('next'), Icon: ArrowRight },
-              ].map(({ delta, label, Icon }) => (
-                <button
-                  key={delta}
-                  type="button"
-                  onClick={() => step(delta)}
-                  aria-label={label}
-                  className="grid size-10 cursor-pointer place-items-center border border-white/25 text-white transition-colors duration-300 hover:border-white hover:bg-[var(--bg-card)] hover:text-[var(--text-main)]"
-                >
-                  <Icon size={16} strokeWidth={1.6} />
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
+
+        {/* Nút trước / sau — góc dưới phải */}
+        {/* <div className="mt-6 flex items-end justify-end gap-2 lg:mt-0">
+          {[
+            { delta: -1, label: t('prev'), Icon: ArrowLeft },
+            { delta: 1, label: t('next'), Icon: ArrowRight },
+          ].map(({ delta, label, Icon }) => (
+            <button
+              key={delta}
+              type="button"
+              onClick={() => step(delta)}
+              aria-label={label}
+              className="grid size-10 cursor-pointer place-items-center border border-white/25 bg-black/10 text-white backdrop-blur-sm transition-colors duration-300 hover:border-white hover:bg-[var(--bg-card)] hover:text-[var(--text-main)]"
+            >
+              <Icon size={16} strokeWidth={1.6} />
+            </button>
+          ))}
+        </div> */}
       </div>
-    </section>
+    </motion.section>
+
   );
 }
 
 /* ------------------------------------------------------------------ */
-/* Đếm ngược tới lúc ưu đãi kết thúc                                   */
+/* Số ngày còn lại tới lúc ưu đãi kết thúc                             */
 /* ------------------------------------------------------------------ */
 
-/** Đồng hồ dùng chung: mỗi giây báo một lần; server trả null để HTML server/client khớp nhau */
+/** Đồng hồ dùng chung: mỗi phút báo một lần; server trả null để HTML server/client khớp nhau */
 function subscribeClock(onTick: () => void) {
-  const id = window.setInterval(onTick, 1000);
+  const id = window.setInterval(onTick, 60_000);
   return () => window.clearInterval(id);
 }
-const getNowSeconds = () => Math.floor(Date.now() / 1000);
+const getNowMinutes = () => Math.floor(Date.now() / 60_000);
 const getServerNow = () => null;
 
 function EventCountdown({ endsAt }: { endsAt: ProductEvent['endsAt'] }) {
   const t = useTranslations('ProductsPage.events');
-  const now = useSyncExternalStore(subscribeClock, getNowSeconds, getServerNow);
-  const remaining = now === null ? null : Math.max(0, Math.floor(new Date(endsAt).getTime() / 1000) - now);
+  const now = useSyncExternalStore(subscribeClock, getNowMinutes, getServerNow);
+  if (now === null) return null;
 
-  if (remaining === 0) {
-    return <p className="text-xs uppercase tracking-[2px] text-white/60">{t('ended')}</p>;
-  }
+  const remainingMs = new Date(endsAt).getTime() - now * 60_000;
+  const days = Math.floor(remainingMs / 86_400_000);
+  const label = remainingMs <= 0 ? t('ended') : days >= 1 ? t('daysLeft', { days }) : t('endsToday');
 
-  const units = [
-    { key: 'days', value: remaining === null ? null : Math.floor(remaining / 86400) },
-    { key: 'hours', value: remaining === null ? null : Math.floor((remaining % 86400) / 3600) },
-    { key: 'minutes', value: remaining === null ? null : Math.floor((remaining % 3600) / 60) },
-    { key: 'seconds', value: remaining === null ? null : remaining % 60 },
-  ] as const;
-
-  return (
-    <div>
-      <p className="text-[10px] uppercase tracking-[2.5px] text-white/55">{t('endsIn')}</p>
-      <dl className="mt-2 flex items-start divide-x divide-white/20">
-        {units.map((unit) => (
-          <div key={unit.key} className="flex flex-col-reverse px-3 first:pl-0 last:pr-0">
-            <dt className="mt-0.5 text-[10px] text-white/50">{t(`units.${unit.key}`)}</dt>
-            <dd className="font-[family-name:var(--font-playfair)] text-xl tabular-nums text-white sm:text-2xl">
-              {unit.value === null ? '--' : String(unit.value).padStart(2, '0')}
-            </dd>
-          </div>
-        ))}
-      </dl>
-    </div>
-  );
+  return <p className="text-xs uppercase tracking-[2px] text-white/70">{label}</p>;
 }

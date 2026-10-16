@@ -9,6 +9,7 @@ import { parseVndString, useCartStore } from '@/features/cart';
 import { useIsWishlisted, useWishlistStore } from '@/features/wishlist';
 import { showToast } from '@/components/ui/toast';
 import { flyToCart } from '@/components/shared/flyToCart';
+import { AppTooltip } from '@/components/shared/AppTooltip';
 import { HeartToggle } from '@/components/shared/HeartToggle';
 import { SaleGlow } from '@/components/shared/SaleGlow';
 import { materialKeys } from './FilterSidebar';
@@ -223,14 +224,16 @@ export function ProductCard({
       </div>
 
       <div className="pt-4">
+        {/* Tên dài bị cắt 1 dòng → rê chuột / focus hiện tên đầy đủ (tên ngắn hiển thị đủ thì không hiện tooltip) */}
         <h3 className="min-w-0">
-          <Link
-            href={targetHref}
-            title={name}
-            className="block truncate font-[family-name:var(--font-playfair)] text-[15px] font-semibold leading-snug text-[var(--text-main)] transition-colors duration-500 group-hover:text-[var(--primary-ink)] sm:text-[17px]"
-          >
-            {name}
-          </Link>
+          <AppTooltip content={name} onlyWhenTruncated align="start">
+            <Link
+              href={targetHref}
+              className="block truncate font-[family-name:var(--font-playfair)] text-[15px] font-semibold leading-snug text-[var(--text-main)] transition-colors duration-500 group-hover:text-[var(--primary-ink)] sm:text-[17px]"
+            >
+              {name}
+            </Link>
+          </AppTooltip>
         </h3>
         {subline ? <p className="mt-1 truncate text-xs text-[var(--text-light)] sm:text-[13px]">{subline}</p> : null}
 

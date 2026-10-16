@@ -46,20 +46,14 @@
     "prev": "Previous event",
     "next": "Next event",
     "goTo": "Show event: {title}",
-    "endsIn": "Ends in",
+    "daysLeft": "{days} days left",
+    "endsToday": "Ends today",
     "ended": "This offer has ended",
-    "units": {
-      "days": "days",
-      "hours": "hrs",
-      "minutes": "min",
-      "seconds": "sec"
-    },
     "items": {
       "wedding": {
         "tag": "Wedding season 2026",
         "title": "Made-to-measure bridal áo dài",
         "discount": "-15%",
-        "description": "Order bridal áo dài for the bride and family before 31 Dec — includes one free alteration and a hand-embroidered headwrap.",
         "cta": "Shop bridal",
         "imageAlt": "Bride in a gold-embroidered red áo dài in a traditional living room"
       },
@@ -67,7 +61,6 @@
         "tag": "Lunar New Year",
         "title": "Red brocade for the first day of spring",
         "discount": "-20%",
-        "description": "Embroidered brocade in red and gold — for temple visits, New Year greetings and spring photos. Delivered before Tết.",
         "cta": "Shop the Tết collection",
         "imageAlt": "Woman in a red áo dài holding yellow flowers at a village market"
       },
@@ -75,7 +68,6 @@
         "tag": "New arrivals",
         "title": "Autumn mulberry silk",
         "discount": "-10%",
-        "description": "Moss green, ivory and beige of Hanoi autumn, woven from soft, cool mulberry silk that drapes with the body.",
         "cta": "Shop silk áo dài",
         "imageAlt": "Woman in a pale green silk áo dài holding lilies by a lake"
       }

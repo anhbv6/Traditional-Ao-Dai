@@ -1,5 +1,5 @@
-import { LoadingOverlay } from "@/components/shared/LoadingOverlay";
+import { AppLoading } from "@/components/shared/AppLoading";
 
 export default function Loading() {
-  return <LoadingOverlay visible={true} />;
+  return <AppLoading visible={true} />;
 }

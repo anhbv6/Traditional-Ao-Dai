@@ -7,7 +7,7 @@ import { ArrowLeft, ArrowRight, Loader2, ShieldCheck } from "lucide-react";
 import { useAdminLogin } from "../hooks/useAdminLogin";
 import { AdminLoginBackground } from "./AdminLoginBackground";
 import { AdminLoginFormFields } from "./AdminLoginFormFields";
-import { LoadingOverlay } from "@/components/shared";
+import { AppLoading } from "@/components/shared";
 
 export function AdminLoginForm() {
   const {
@@ -25,7 +25,7 @@ export function AdminLoginForm() {
 
   return (
     <div className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden animate-pastel-flow px-4 py-12 select-none">
-      <LoadingOverlay visible={isLoading} messageKey="verifying" />
+      <AppLoading visible={isLoading} />
       <AdminLoginBackground />
       {/* Centered Luxury Glassmorphic Admin Card */}
       <motion.div

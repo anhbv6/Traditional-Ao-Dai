@@ -46,20 +46,14 @@
     "prev": "Sự kiện trước",
     "next": "Sự kiện tiếp theo",
     "goTo": "Xem sự kiện: {title}",
-    "endsIn": "Kết thúc sau",
+    "daysLeft": "Còn {days} ngày",
+    "endsToday": "Kết thúc hôm nay",
     "ended": "Ưu đãi đã kết thúc",
-    "units": {
-      "days": "ngày",
-      "hours": "giờ",
-      "minutes": "phút",
-      "seconds": "giây"
-    },
     "items": {
       "wedding": {
         "tag": "Mùa cưới 2026",
         "title": "Áo dài cưới may đo",
         "discount": "-15%",
-        "description": "Đặt may áo dài cưới cho cô dâu và gia đình trước 31/12 — tặng kèm một lần chỉnh sửa và khăn vấn thêu tay.",
         "cta": "Xem áo dài cưới",
         "imageAlt": "Cô dâu mặc áo dài đỏ thêu kim tuyến trong phòng khách cổ"
       },
@@ -67,7 +61,6 @@
         "tag": "Đón Tết Đinh Mùi",
         "title": "Gấm đỏ cho ngày đầu năm",
         "discount": "-20%",
-        "description": "Bộ sưu tập gấm thêu sắc đỏ, vàng — mặc đi chùa, chúc Tết và chụp ảnh xuân. Giao trước 28 tháng Chạp.",
         "cta": "Xem bộ sưu tập Tết",
         "imageAlt": "Cô gái mặc áo dài đỏ cầm bó hoa vàng giữa chợ quê"
       },
@@ -75,7 +68,6 @@
         "tag": "Hàng mới về",
         "title": "Lụa tơ tằm thu",
         "discount": "-10%",
-        "description": "Những gam xanh rêu, ngà và be của mùa thu Hà Nội, dệt từ lụa tơ tằm mềm mát, rủ nhẹ theo dáng người.",
         "cta": "Xem áo dài lụa",
         "imageAlt": "Cô gái mặc áo dài lụa xanh nhạt cầm hoa loa kèn bên hồ"
       }

@@ -7,7 +7,7 @@ import {
   useAdminLayout,
 } from "@/features/admin/layout";
 import { AdminProfileDialog } from "@/features/admin/session";
-import { LoadingOverlay } from "@/components/shared/LoadingOverlay";
+import { AppLoading } from "@/components/shared/AppLoading";
 
 
 // Khung chung của khu vực admin: font Inter (--font-admin) + reset kiểu chữ storefront (xem .admin-shell trong globals.css)
@@ -40,11 +40,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     );
   }
 
-  // 2. Trạng thái Loading / Khởi tạo hydration ban đầu (sử dụng chung LoadingOverlay với client)
+  // 2. Trạng thái Loading / Khởi tạo hydration ban đầu (sử dụng chung AppLoading với client)
   if (!isHydrated) {
     return (
       <div className={`${SHELL_CLASS} bg-[#FAFAFA]`}>
-        <LoadingOverlay visible={true} />
+        <AppLoading visible={true} />
         <main className="flex-1 flex flex-col">{children}</main>
       </div>
     );
@@ -81,7 +81,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       />
 
       {/* Loading overlay chung khi đang thực hiện thao tác logout */}
-      <LoadingOverlay visible={isLoggingOut} />
+      <AppLoading visible={isLoggingOut} />
     </div>
   );
 }

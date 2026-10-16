@@ -13,7 +13,7 @@ import { resetPasswordEmailApi, resetPasswordPhoneApi } from '../../../api/forgo
 
 // Shared Components
 import { AuthHeader } from '../../AuthHeader';
-import { LoadingOverlay } from '@/components/shared/LoadingOverlay';
+import { AppLoading } from '@/components/shared/AppLoading';
 
 type ChangePasswordFormProps = {
   forgotType?: 'email' | 'phone';
@@ -109,7 +109,7 @@ export function ChangePasswordForm({ forgotType = 'email', target = '', resetTok
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-[var(--bg-main)] px-3.5 py-6 sm:px-8 sm:py-12 lg:px-16 relative">
-      <LoadingOverlay visible={isLoading} messageKey="updating" />
+      <AppLoading visible={isLoading} />
       <motion.div
         variants={containerVariants}
         initial="hidden"

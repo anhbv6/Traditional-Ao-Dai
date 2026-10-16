@@ -7,7 +7,7 @@ import { motion } from 'motion/react';
 import { useRegister } from '../../hooks/useRegister';
 import { RegisterFormStep } from './components/RegisterFormStep';
 import { RegisterOtpStep } from './components/RegisterOtpStep';
-import { LoadingOverlay } from '@/components/shared/LoadingOverlay';
+import { AppLoading } from '@/components/shared/AppLoading';
 
 import { Volume2, VolumeOff } from 'lucide-react';
 
@@ -150,10 +150,7 @@ export function RegisterForm() {
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-[var(--bg-main)] px-3.5 py-6 sm:px-8 sm:py-12 lg:px-16 relative">
-      <LoadingOverlay
-        visible={isRegistering}
-        messageKey={isOtpStep ? 'verifying' : 'updating'}
-      />
+      <AppLoading visible={isRegistering} />
 
       <motion.div
         variants={containerVariants}

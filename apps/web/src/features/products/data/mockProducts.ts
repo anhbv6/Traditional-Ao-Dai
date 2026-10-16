@@ -93,7 +93,7 @@ export const mockProducts: MockProduct[] = [
   },
   {
     id: '2',
-    name: { vi: 'Áo Dài Tơ Tằm Cổ Điển', en: 'Classic Mulberry Silk Ao Dai' },
+    name: { vi: 'Áo Dài Tơ Tằm Cổ Điển siêu đẹp đẳng cấp không 1 nơi nào có uy tín số 1 không ai bì được luôn', en: 'Classic Mulberry Silk Ao Dai' },
     description: {
       vi: 'Làm từ lụa tơ tằm thượng hạng, dáng suông truyền thống mềm mại, bay bổng.',
       en: 'Premium mulberry silk with a graceful traditional drape.',
