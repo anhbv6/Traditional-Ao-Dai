@@ -2,13 +2,15 @@
 
 import { useRef, useState } from 'react';
 import Image from 'next/image';
-import { Heart, Scissors, ShoppingBag } from 'lucide-react';
+import { Scissors, ShoppingBag } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/routing';
 import { parseVndString, useCartStore } from '@/features/cart';
 import { useIsWishlisted, useWishlistStore } from '@/features/wishlist';
 import { showToast } from '@/components/ui/toast';
 import { flyToCart } from '@/components/shared/flyToCart';
+import { HeartToggle } from '@/components/shared/HeartToggle';
+import { SaleGlow } from '@/components/shared/SaleGlow';
 import { materialKeys } from './FilterSidebar';
 
 export type ProductColorSwatch = {
@@ -46,9 +48,14 @@ type ProductCardProps = {
 const MAX_SWATCHES = 4;
 
 /**
- * Thẻ sản phẩm kiểu tạp chí: ảnh dọc chiếm trọn thẻ, chữ tối giản bên dưới (tên — chất liệu — giá + màu).
- * Rê chuột (desktop): ảnh phụ mờ dần vào, dải "Thêm vào giỏ" trượt lên từ đáy ảnh.
- * Mobile: nút yêu thích / giỏ hàng luôn hiện dạng icon nhỏ ở góc ảnh.
+ * Thẻ sản phẩm dùng chung (trang chủ, danh sách, sản phẩm liên quan…) kiểu tạp chí:
+ * ảnh dọc chiếm trọn thẻ, chữ tối giản bên dưới (tên — chất liệu — giá + màu).
+ * - Có giá gốc → khung ảnh viền vàng óng lấp lánh (SaleGlow: luồng sáng chạy quanh viền + sao nhấp nháy),
+ *   số % giảm vàng đậm cạnh giá gốc (lining-nums: số cao đều, thẳng hàng với dấu %).
+ * - Nút yêu thích: HeartToggle (chỉ icon, tim nảy + toả hạt khi thích).
+ * - Rê chuột (desktop): ảnh phụ mờ dần vào + phóng rất chậm, nút yêu thích trượt vào, dải "Thêm vào giỏ" trượt lên.
+ *   Mọi chuyển động vào / ra dùng chung một đường cong êm và thời lượng dài để mượt, không giật khi rê ra nhanh.
+ * - Mobile: nút yêu thích / giỏ hàng luôn hiện ở góc ảnh.
  */
 export function ProductCard({
   imageSrc = '/logoPage.png',
@@ -77,7 +84,7 @@ export function ProductCard({
   const fitMode = objectFit ?? (isPlaceholder ? 'contain' : 'cover');
   // Ảnh phụ được tải sẵn và xếp chồng lên ảnh chính; rê chuột chỉ làm mờ dần (không đổi src -> không nháy / giật)
   const showHoverImage = Boolean(hoverImageSrc) && !hoverImageFailed && !isPlaceholder;
-  const imageClassName = `transition-[opacity,transform] duration-[1200ms,1800ms] ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform group-hover:scale-[1.03] ${
+  const imageClassName = `transition-[opacity,scale] duration-[1400ms,2200ms] ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform group-hover:scale-[1.05] ${
     fitMode === 'cover' ? 'object-cover' : 'object-contain px-8 py-10 sm:px-10'
   }`;
   const imageSizes = '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 300px';
@@ -88,10 +95,11 @@ export function ProductCard({
 
   /**
    * Bấm vào bất kỳ đâu trên thẻ -> sang trang chi tiết.
-   * Bỏ qua khi bấm vào link (tiêu đề đã tự điều hướng) hoặc nút (yêu thích / giỏ hàng).
+   * Bỏ qua khi bấm vào link (tiêu đề đã tự điều hướng), nút (yêu thích / giỏ hàng)
+   * hoặc phần tử tự xử lý tương tác (VD thẻ giảm giá treo kéo được — `data-card-ignore-click`).
    */
   const handleCardClick = (e: React.MouseEvent<HTMLElement>) => {
-    if ((e.target as HTMLElement).closest('a, button')) return;
+    if ((e.target as HTMLElement).closest('a, button, [data-card-ignore-click]')) return;
     router.push(targetHref);
   };
 
@@ -103,6 +111,11 @@ export function ProductCard({
   const isWishlisted = useIsWishlisted(itemSlug);
 
   const isCustom = purchaseType === 'custom';
+
+  /* % giảm giá: ưu tiên số nguyên VND, thiếu thì đọc từ chuỗi giá đã định dạng */
+  const originalValue = originalPriceValue ?? (originalPrice ? parseVndString(originalPrice) : 0);
+  const discountPercent =
+    originalValue > itemPrice && itemPrice > 0 ? Math.round((1 - itemPrice / originalValue) * 100) : 0;
 
   /**
    * Thêm nhanh: hàng may sẵn -> size M (hoặc size đầu tiên nếu không có M);
@@ -174,40 +187,25 @@ export function ProductCard({
           />
         ) : null}
 
-        {originalPrice ? (
-          <span className="absolute left-0 top-3 bg-[var(--primary-color)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[1.5px] text-white">
-            {t('sale')}
-          </span>
-        ) : null}
+        {originalPrice ? <SaleGlow /> : null}
 
+        {/* Nút yêu thích + giỏ (mobile). Desktop: trượt nhẹ từ phải vào khi rê chuột (đang thích thì luôn hiện) */}
         <div
-          className={`absolute right-2.5 top-2.5 flex flex-col gap-2 transition-opacity duration-500 lg:group-hover:opacity-100 ${
-            isWishlisted ? '' : 'lg:opacity-0'
+          className={`absolute right-2.5 top-2.5 z-10 flex flex-col gap-2 transition-[opacity,translate] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] lg:group-hover:translate-x-0 lg:group-hover:opacity-100 ${
+            isWishlisted ? '' : 'lg:translate-x-2 lg:opacity-0'
           }`}
         >
-          <button
-            type="button"
-            onClick={handleToggleWishlist}
-            aria-pressed={isWishlisted}
-            aria-label={isWishlisted ? t('removeFromWishlist') : t('addToWishlist')}
-            className={`grid size-8 cursor-pointer place-items-center backdrop-blur-sm transition-colors duration-300 active:scale-90 sm:size-9 ${
-              isWishlisted
-                ? 'bg-[var(--primary-color)] text-white'
-                : 'bg-[var(--bg-card)]/90 text-[var(--text-main)] hover:bg-[var(--primary-color)] hover:text-white'
-            }`}
-          >
-            <Heart
-              size={15}
-              strokeWidth={1.6}
-              fill={isWishlisted ? 'currentColor' : 'none'}
-              className={`transition-transform duration-300 ${isWishlisted ? 'scale-110' : ''}`}
-            />
-          </button>
+          <HeartToggle
+            active={isWishlisted}
+            onToggle={handleToggleWishlist}
+            labelOn={t('removeFromWishlist')}
+            labelOff={t('addToWishlist')}
+          />
           <button
             type="button"
             onClick={handleAddToCart}
             aria-label={isCustom ? t('customTailor') : t('addToCart')}
-            className="grid size-8 cursor-pointer place-items-center bg-[var(--bg-card)]/90 text-[var(--text-main)] backdrop-blur-sm transition-colors duration-300 hover:bg-[var(--primary-color)] hover:text-white active:scale-90 sm:size-9 lg:hidden"
+            className="grid size-9 cursor-pointer place-items-center bg-[var(--bg-card)]/70 text-[var(--text-main)] shadow-[0_6px_16px_-8px_rgba(128,0,32,0.35)] backdrop-blur-md transition-colors duration-500 hover:bg-[var(--primary-color)] hover:text-white active:scale-90 lg:hidden"
           >
             <ShoppingBag size={15} strokeWidth={1.6} />
           </button>
@@ -217,7 +215,7 @@ export function ProductCard({
         <button
           type="button"
           onClick={handleAddToCart}
-          className="absolute inset-x-0 bottom-0 hidden min-h-11 translate-y-full cursor-pointer items-center justify-center gap-2.5 bg-[var(--bg-card)]/95 text-[11px] font-semibold uppercase tracking-[2px] text-[var(--text-main)] backdrop-blur-sm transition-[transform,background-color,color] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[var(--primary-color)] hover:text-white focus-visible:translate-y-0 group-hover:translate-y-0 lg:flex"
+          className="absolute inset-x-0 bottom-0 hidden min-h-11 translate-y-full cursor-pointer items-center justify-center gap-2.5 bg-[var(--bg-card)]/95 text-[11px] font-semibold uppercase tracking-[2px] text-[var(--text-main)] backdrop-blur-sm transition-[translate,background-color,color] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[var(--primary-color)] hover:text-white focus-visible:translate-y-0 group-hover:translate-y-0 lg:flex"
         >
           {isCustom ? <Scissors size={14} strokeWidth={1.6} /> : <ShoppingBag size={14} strokeWidth={1.6} />}
           {isCustom ? t('customTailor') : t('addToCart')}
@@ -229,7 +227,7 @@ export function ProductCard({
           <Link
             href={targetHref}
             title={name}
-            className="block truncate font-[family-name:var(--font-playfair)] text-[15px] font-semibold leading-snug text-[var(--text-main)] transition-colors hover:text-[var(--primary-ink)] sm:text-[17px]"
+            className="block truncate font-[family-name:var(--font-playfair)] text-[15px] font-semibold leading-snug text-[var(--text-main)] transition-colors duration-500 group-hover:text-[var(--primary-ink)] sm:text-[17px]"
           >
             {name}
           </Link>
@@ -241,6 +239,9 @@ export function ProductCard({
           <p className="flex items-baseline gap-x-1.5 whitespace-nowrap text-[13px] sm:gap-x-2 sm:text-[15px]">
             <span className="font-semibold text-[var(--primary-ink)]">{price}</span>
             {originalPrice ? <span className="text-[11px] text-[var(--text-light)]/70 line-through sm:text-xs">{originalPrice}</span> : null}
+            {discountPercent > 0 ? (
+              <span className="text-[11px] font-semibold text-[var(--sale-gold)] [font-variant-numeric:lining-nums] sm:text-xs">−{discountPercent}%</span>
+            ) : null}
           </p>
           {colorSwatches.length > 0 ? (
             <ul className="flex shrink-0 items-center gap-1" aria-label={t('colorsLabel')}>

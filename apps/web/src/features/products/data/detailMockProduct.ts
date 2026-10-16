@@ -95,24 +95,24 @@ export interface MockDetailProduct {
 }
 
 const colors1 = [
-  { id: 'val_red', label: 'Đỏ Cẩm', hex: '#900C3F', image: 'https://images.unsplash.com/photo-1621184455862-c163dfb30e0f?q=80&w=900&auto=format&fit=crop' },
-  { id: 'val_yellow', label: 'Vàng Cúc', hex: '#FFC300', image: 'https://images.unsplash.com/photo-1608748010899-18f300247112?q=80&w=900&auto=format&fit=crop' },
-  { id: 'val_green', label: 'Xanh Trúc', hex: '#0A5C36', image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=900&auto=format&fit=crop' },
-  { id: 'val_pink', label: 'Hồng Sen', hex: '#D95D80', image: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=900&auto=format&fit=crop' },
-  { id: 'val_white', label: 'Trắng Ngà', hex: '#F7F0E8', image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=900&auto=format&fit=crop' }
+  { id: 'val_red', label: 'Đỏ Cẩm', hex: '#900C3F', image: '/images/ex1.jpg' },
+  { id: 'val_yellow', label: 'Vàng Cúc', hex: '#FFC300', image: '/images/ex3.jpg' },
+  { id: 'val_green', label: 'Xanh Trúc', hex: '#0A5C36', image: '/images/ex2.jpg' },
+  { id: 'val_pink', label: 'Hồng Sen', hex: '#D95D80', image: '/images/ex4.jpg' },
+  { id: 'val_white', label: 'Trắng Ngà', hex: '#F7F0E8', image: '/images/ex6.jpg' }
 ];
 
 const colors2 = [
-  { id: 'val_gold', label: 'Vàng Hoàng Kim', hex: '#D4AF37', image: 'https://images.unsplash.com/photo-1608748010899-18f300247112?q=80&w=900&auto=format&fit=crop' },
-  { id: 'val_red_velvet', label: 'Đỏ Nhung', hex: '#800020', image: 'https://images.unsplash.com/photo-1621184455862-c163dfb30e0f?q=80&w=900&auto=format&fit=crop' },
-  { id: 'val_emerald', label: 'Xanh Ngọc', hex: '#097969', image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=900&auto=format&fit=crop' },
-  { id: 'val_pearl', label: 'Trắng Ngọc Trai', hex: '#EAE6DF', image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=900&auto=format&fit=crop' }
+  { id: 'val_gold', label: 'Vàng Hoàng Kim', hex: '#D4AF37', image: '/images/ex3.jpg' },
+  { id: 'val_red_velvet', label: 'Đỏ Nhung', hex: '#800020', image: '/images/ex1.jpg' },
+  { id: 'val_emerald', label: 'Xanh Ngọc', hex: '#097969', image: '/images/ex2.jpg' },
+  { id: 'val_pearl', label: 'Trắng Ngọc Trai', hex: '#EAE6DF', image: '/images/ex6.jpg' }
 ];
 
 const colors3 = [
-  { id: 'val_wedding_red', label: 'Đỏ Song Hỷ', hex: '#C70039', image: 'https://images.unsplash.com/photo-1621184455862-c163dfb30e0f?q=80&w=900&auto=format&fit=crop' },
-  { id: 'val_rose', label: 'Hồng Tường Vi', hex: '#E0115F', image: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=900&auto=format&fit=crop' },
-  { id: 'val_pure_white', label: 'Trắng Tinh Khôi', hex: '#FFFFFF', image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=900&auto=format&fit=crop' }
+  { id: 'val_wedding_red', label: 'Đỏ Song Hỷ', hex: '#C70039', image: '/images/ex1.jpg' },
+  { id: 'val_rose', label: 'Hồng Tường Vi', hex: '#E0115F', image: '/images/ex4.jpg' },
+  { id: 'val_pure_white', label: 'Trắng Tinh Khôi', hex: '#FFFFFF', image: '/images/ex6.jpg' }
 ];
 
 const sizes = [
@@ -202,17 +202,17 @@ export const mockDetailProducts: Record<string, MockDetailProduct['data']> = {
     gallery: [
       {
         type: "IMAGE",
-        url: "https://images.unsplash.com/photo-1621184455862-c163dfb30e0f?q=80&w=900&auto=format&fit=crop",
+        url: "/images/ex1.jpg",
         alt: "Áo Dài Lụa Hà Đông - Mặt trước"
       },
       {
         type: "IMAGE",
-        url: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=900&auto=format&fit=crop",
+        url: "/images/ex2.jpg",
         alt: "Cận cảnh hoa văn thêu tay"
       },
       {
         type: "IMAGE",
-        url: "https://images.unsplash.com/photo-1608748010899-18f300247112?q=80&w=900&auto=format&fit=crop",
+        url: "/images/ex3.jpg",
         alt: "Áo Dài Lụa Hà Đông - Phối cảnh nghiêng"
       }
     ],
@@ -232,7 +232,7 @@ export const mockDetailProducts: Record<string, MockDetailProduct['data']> = {
       {
         key: "size_guide",
         title: "Bảng quy chuẩn số đo",
-        image_url: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=900&auto=format&fit=crop"
+        image_url: "/images/ex5.jpg"
       },
       {
         key: "care_instructions",
@@ -245,7 +245,7 @@ export const mockDetailProducts: Record<string, MockDetailProduct['data']> = {
         id: "addon_man_01",
         name: "Mấn Đội Đầu Lụa Xoắn Thủ Công",
         price: 150000,
-        thumbnail: "/login_banner.jpg"
+        thumbnail: "/images/ex3.jpg"
       }
     ],
     related_products: [
@@ -254,20 +254,20 @@ export const mockDetailProducts: Record<string, MockDetailProduct['data']> = {
         name: "Áo Dài Cách Tân Gấm Thêu Tay",
         slug: "ao-dai-cach-tan-gam-theu-tay",
         price: 1450000,
-        thumbnail: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=900&auto=format&fit=crop"
+        thumbnail: "/images/ex6.jpg"
       },
       {
         id: "prod_103",
         name: "Áo Dài Truyền Thống Hoa Sen Nổi",
         slug: "ao-dai-truyen-thong-hoa-sen-noi",
         price: 1750000,
-        thumbnail: "https://images.unsplash.com/photo-1496747611176-843222e1e57c?q=80&w=900&auto=format&fit=crop"
+        thumbnail: "/images/ex7.jpg"
       }
     ],
     seo: {
       title: "Áo Dài Cách Tân Lụa Hà Đông Dệt Hoa Cúc - Cao Cấp 2026",
       description: "Mua Áo Dài Cách Tân Lụa Hà Đông chính hãng, có nhận may đo theo số đo riêng...",
-      og_image: "https://images.unsplash.com/photo-1621184455862-c163dfb30e0f?q=80&w=900&auto=format&fit=crop"
+      og_image: "/images/ex1.jpg"
     }
   },
 
@@ -285,12 +285,12 @@ export const mockDetailProducts: Record<string, MockDetailProduct['data']> = {
     gallery: [
       {
         type: "IMAGE",
-        url: "https://images.unsplash.com/photo-1608748010899-18f300247112?q=80&w=900&auto=format&fit=crop",
+        url: "/images/ex3.jpg",
         alt: "Áo Dài Gấm Luxury Hoàng Gia - Mặt trước"
       },
       {
         type: "IMAGE",
-        url: "https://images.unsplash.com/photo-1621184455862-c163dfb30e0f?q=80&w=900&auto=format&fit=crop",
+        url: "/images/ex1.jpg",
         alt: "Cận cảnh hoa văn gấm thêu"
       }
     ],
@@ -318,7 +318,7 @@ export const mockDetailProducts: Record<string, MockDetailProduct['data']> = {
         id: "addon_man_02",
         name: "Mấn Gấm Dệt Kim Tuyến Vàng",
         price: 180000,
-        thumbnail: "/login_banner.jpg"
+        thumbnail: "/images/ex4.jpg"
       }
     ],
     related_products: [
@@ -327,13 +327,13 @@ export const mockDetailProducts: Record<string, MockDetailProduct['data']> = {
         name: "Áo Dài Cách Tân Lụa Hà Đông",
         slug: "ao-dai-cach-tan-lua-ha-dong-det-hoa-cuc",
         price: 1250000,
-        thumbnail: "https://images.unsplash.com/photo-1621184455862-c163dfb30e0f?q=80&w=900&auto=format&fit=crop"
+        thumbnail: "/images/ex1.jpg"
       }
     ],
     seo: {
       title: "Áo Dài Gấm Luxury Hoàng Gia - Đẳng cấp Quý Phái",
       description: "Đặt mua Áo Dài Gấm Luxury Hoàng Gia cao cấp, tôn dáng cực chuẩn cho các dịp lễ trọng đại.",
-      og_image: "https://images.unsplash.com/photo-1608748010899-18f300247112?q=80&w=900&auto=format&fit=crop"
+      og_image: "/images/ex3.jpg"
     }
   },
 
@@ -351,12 +351,12 @@ export const mockDetailProducts: Record<string, MockDetailProduct['data']> = {
     gallery: [
       {
         type: "IMAGE",
-        url: "https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=900&auto=format&fit=crop",
+        url: "/images/ex4.jpg",
         alt: "Áo Dài Cưới Thêu Phượng Hoàng Đỏ - Mặt trước"
       },
       {
         type: "IMAGE",
-        url: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=900&auto=format&fit=crop",
+        url: "/images/ex6.jpg",
         alt: "Áo Dài Cưới Thêu Phượng Hoàng Đỏ - Thumbnail"
       }
     ],
@@ -384,7 +384,7 @@ export const mockDetailProducts: Record<string, MockDetailProduct['data']> = {
         id: "addon_man_03",
         name: "Mấn Cô Dâu Thêu Hoa Phượng",
         price: 250000,
-        thumbnail: "/login_banner.jpg"
+        thumbnail: "/images/ex5.jpg"
       }
     ],
     related_products: [
@@ -393,13 +393,13 @@ export const mockDetailProducts: Record<string, MockDetailProduct['data']> = {
         name: "Áo Dài Cách Tân Lụa Hà Đông",
         slug: "ao-dai-cach-tan-lua-ha-dong-det-hoa-cuc",
         price: 1250000,
-        thumbnail: "https://images.unsplash.com/photo-1621184455862-c163dfb30e0f?q=80&w=900&auto=format&fit=crop"
+        thumbnail: "/images/ex1.jpg"
       }
     ],
     seo: {
       title: "Áo Dài Cưới Thêu Phượng Hoàng Đỏ - Đỉnh Cao Thiết Kế Cưới",
       description: "Áo Dài Cưới thêu phượng hoàng tay đỏ sang trọng, kiêu sa cho cô dâu ngày cưới hỏi truyền thống.",
-      og_image: "https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=900&auto=format&fit=crop"
+      og_image: "/images/ex4.jpg"
     }
   }
 };

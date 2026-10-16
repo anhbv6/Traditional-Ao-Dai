@@ -24,13 +24,14 @@ function resolveClassName<T>(
   return typeof className === "function" ? className(state) : className
 }
 
+/* Vùng hiện toast: ngay DƯỚI header dính (h-20 = 5rem) + 1rem khoảng thở → không che logo / icon / nút đăng nhập */
 function ToastViewport({ className, ...props }: ToastPrimitive.Viewport.Props) {
   return (
     <ToastPrimitive.Viewport
       data-slot="toast-viewport"
       className={(state) =>
         cn(
-          "pointer-events-none fixed right-[2rem] top-[2rem] z-[9999] w-[calc(100vw-4rem)] sm:w-[22.5rem] outline-none",
+          "pointer-events-none fixed right-[2rem] top-[calc(5rem+1rem)] z-[9999] w-[calc(100vw-4rem)] sm:w-[22.5rem] outline-none",
           resolveClassName(className, state)
         )
       }

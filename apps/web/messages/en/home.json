@@ -86,10 +86,11 @@
         "content": "Wearing this to teach all day is extremely comfortable. The fabric is highly breathable, the stitching is durable, and the colors stay brand new."
       }
     },
-    "rating": "4.9/5 from over 1,200 reviews",
     "prev": "Previous review",
     "next": "Next review",
-    "goTo": "Go to review {index}"
+    "goTo": "Go to review {index}",
+    "ratingLabel": "Customer rating",
+    "ratingCount": "From 1,200+ reviews"
   },
   "articleNews": {
     "eyebrow": "Ao Dai journal",
@@ -185,6 +186,17 @@
         "title": "Fit & finish",
         "desc": "Try it on, fine-tune and receive it gift-boxed."
       }
-    }
+    },
+    "imageAlt": "Customer wearing a tailor-made ao dai strolling by a garden"
+  },
+  "stages": {
+    "label": "Home page sections",
+    "hero": "Banner",
+    "collections": "Collections",
+    "bestSellers": "Best sellers",
+    "craft": "Craft",
+    "bespoke": "Bespoke",
+    "reviews": "Reviews",
+    "news": "Journal"
   }
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import Image from 'next/image';
 import { motion } from 'motion/react';
 import { useLenis } from 'lenis/react';
@@ -12,13 +12,12 @@ import { SectionHeading } from './SectionHeading';
 
 const CRAFT_STEPS = [
   { key: '1', image: '/images/login2.jpg', imageClass: 'object-[50%_40%]' },
-  // Phóng to vùng hoa văn thêu trên thân áo
-  { key: '2', image: '/login_banner.jpg', imageClass: 'object-[55%_70%] scale-[1.6]' },
+  { key: '2', image: '/images/ex2.jpg', imageClass: 'object-[50%_30%]' },
   { key: '3', image: '/images/login1.jpg', imageClass: 'object-[50%_45%]' },
 ] as const;
 
-/** Khoảng trống tối thiểu phía trên khi cuộn tới một bước (chừa chỗ cho header dính) */
-const HEADER_OFFSET = 112;
+/** Vị trí dính của cột ảnh = khoảng chừa cho header dính (khớp class `top-28` = 112px) */
+const STICKY_TOP = 112;
 
 const stepElementId = (key: string) => `craft-step-${key}`;
 
@@ -31,19 +30,36 @@ export function CraftStory() {
   const t = useTranslations('HomePage.craftStory');
   const lenis = useLenis();
   const [activeStep, setActiveStep] = useState(0);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const stickyRef = useRef<HTMLDivElement>(null);
 
   const scrollToStep = useCallback(
     (index: number) => {
       const element = document.getElementById(stepElementId(CRAFT_STEPS[index].key));
-      if (!element) return;
+      const grid = gridRef.current;
+      if (!element || !grid) return;
       setActiveStep(index);
 
-      // Căn bước vào giữa màn hình, nhưng không để đè dưới header
-      const offset = -Math.max(HEADER_OFFSET, (window.innerHeight - element.offsetHeight) / 2);
-      if (lenis) {
-        lenis.scrollTo(element, { offset, duration: 1.4, easing: (x) => 1 - Math.pow(1 - x, 3) });
+      const elementCenter = element.getBoundingClientRect().top + window.scrollY + element.offsetHeight / 2;
+      const stickyHeight = stickyRef.current?.offsetHeight ?? 0;
+      let target: number;
+
+      if (stickyHeight > 0) {
+        /* Desktop: căn TÂM bước trùng TÂM cột ảnh đang dính (không phải tâm màn hình),
+           rồi kẹp vị trí cuộn trong khoảng cột ảnh còn dính → ảnh luôn đứng đúng chỗ, không trôi lên / tụt xuống. */
+        const gridTop = grid.getBoundingClientRect().top + window.scrollY;
+        const minScroll = gridTop - STICKY_TOP;
+        const maxScroll = gridTop + grid.offsetHeight - stickyHeight - STICKY_TOP;
+        target = Math.min(Math.max(elementCenter - (STICKY_TOP + stickyHeight / 2), minScroll), maxScroll);
       } else {
-        window.scrollTo({ top: element.getBoundingClientRect().top + window.scrollY + offset, behavior: 'smooth' });
+        /* Mobile (không có cột ảnh dính): căn bước vào giữa phần màn hình dưới header */
+        target = elementCenter - (STICKY_TOP + (window.innerHeight - STICKY_TOP) / 2);
+      }
+
+      if (lenis) {
+        lenis.scrollTo(target, { duration: 1.4, easing: (x) => 1 - Math.pow(1 - x, 3) });
+      } else {
+        window.scrollTo({ top: target, behavior: 'smooth' });
       }
     },
     [lenis],
@@ -53,10 +69,10 @@ export function CraftStory() {
     <section className="mx-auto w-full max-w-[1440px] px-5 py-20 sm:px-8 sm:py-28 lg:px-10 xl:px-16">
       <SectionHeading index="03" eyebrow={t('eyebrow')} title={t('title')} description={t('description')} />
 
-      <div className="grid gap-12 lg:grid-cols-2 lg:gap-20">
+      <div ref={gridRef} className="grid gap-12 lg:grid-cols-2 lg:gap-20">
         {/* Cột ảnh dính — chỉ hiện ở desktop */}
         <div className="hidden lg:block">
-          <div className="sticky top-28 flex max-h-[calc(100svh-9rem)] flex-col">
+          <div ref={stickyRef} className="sticky top-28 flex max-h-[calc(100svh-9rem)] flex-col">
             <div className="relative aspect-[4/5] min-h-0 w-full flex-1 overflow-hidden bg-[var(--bg-secondary)]">
               {CRAFT_STEPS.map((step, i) => (
                 <Image
@@ -120,7 +136,9 @@ export function CraftStory() {
           </div>
         </div>
 
-        <ol className="relative flex flex-col lg:py-[10vh]">
+        {/* Đệm trên / dưới = nửa chiều cao cột ảnh dính − nửa chiều cao một bước (40vh)
+            → bước đầu và bước cuối cũng căn giữa được với ảnh mà ảnh vẫn dính. */}
+        <ol className="relative flex flex-col lg:py-[max(4vh,calc((100svh_-_9rem)/2_-_20vh))]">
           {/* Đường tiến trình dọc */}
           <span aria-hidden="true" className="absolute bottom-0 left-[19px] top-0 w-px bg-[var(--border)] lg:left-[23px]" />
 
@@ -131,8 +149,10 @@ export function CraftStory() {
                 key={step.key}
                 id={stepElementId(step.key)}
                 onViewportEnter={() => setActiveStep(i)}
-                viewport={{ amount: 0.6 }}
-                className="relative flex gap-6 pb-14 last:pb-0 lg:min-h-[60vh] lg:items-center lg:pb-0"
+                /* Bước "đang xem" = bước đi qua dải giữa màn hình (cắt 45% trên + 45% dưới) — ổn định kể cả khi 2 bước cùng hiện */
+                viewport={{ margin: '-45% 0px -45% 0px' }}
+                /* Mỗi bước cao tối thiểu 40vh (trước 60vh) → tổng quãng cuộn ngắn lại ~1/3, ảnh dính vẫn đổi kịp theo bước */
+                className="relative flex gap-6 pb-14 last:pb-0 lg:min-h-[40vh] lg:items-center lg:pb-0"
               >
                 <button
                   type="button"

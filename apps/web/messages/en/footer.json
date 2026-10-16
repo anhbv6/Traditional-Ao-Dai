@@ -52,5 +52,17 @@
     "copyright": "© 2026 AODAI. All rights reserved.",
     "privacy": "Privacy Policy",
     "terms": "Terms of Use"
+  },
+  "qr": {
+    "open": "Enlarge transfer QR code",
+    "eyebrow": "Bank transfer",
+    "title": "Scan the QR code to transfer",
+    "description": "Open your banking app, choose Scan QR and point the camera at the code below. Please include your order number in the transfer note.",
+    "bank": "Bank",
+    "account": "Account number",
+    "holder": "Account holder",
+    "copy": "Copy account number",
+    "copied": "Account number copied",
+    "close": "Close"
   }
 }

@@ -64,10 +64,10 @@
     "title": "Cart",
     "empty": "Your cart is empty",
     "shopNow": "Shop now",
-    "quantityPrice": "{quantity} × {price}",
-    "note": "Shipping & promo codes are calculated in the cart",
     "viewCart": "View cart",
-    "checkout": "Checkout"
+    "checkout": "Checkout",
+    "subtotal": "Subtotal ({count} items)",
+    "each": "{price} each"
   },
   "toast": {
     "cleared": "Your cart has been cleared"

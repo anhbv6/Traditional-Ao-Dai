@@ -86,10 +86,11 @@
         "content": "Mặc áo dài đứng lớp cả ngày mà không hề thấy bí bách. Chất vải thoáng khí, đường may rất chắc chắn, giặt nhiều lần vẫn bền màu như mới."
       }
     },
-    "rating": "4.9/5 từ hơn 1.200 đánh giá",
     "prev": "Đánh giá trước",
     "next": "Đánh giá tiếp theo",
-    "goTo": "Xem đánh giá {index}"
+    "goTo": "Xem đánh giá {index}",
+    "ratingLabel": "Khách hàng đánh giá",
+    "ratingCount": "Từ hơn 1.200 đánh giá"
   },
   "articleNews": {
     "eyebrow": "Bản tin áo dài",
@@ -185,6 +186,17 @@
         "title": "Thử & hoàn thiện",
         "desc": "Thử áo, tinh chỉnh và nhận áo trong hộp quà."
       }
-    }
+    },
+    "imageAlt": "Khách hàng diện áo dài may đo dạo bước bên vườn xanh"
+  },
+  "stages": {
+    "label": "Các phần của trang chủ",
+    "hero": "Banner",
+    "collections": "Bộ sưu tập",
+    "bestSellers": "Bán chạy",
+    "craft": "Thủ công",
+    "bespoke": "May đo",
+    "reviews": "Đánh giá",
+    "news": "Bản tin"
   }
 }

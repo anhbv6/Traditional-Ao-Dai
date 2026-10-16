@@ -1,69 +1,65 @@
 'use client';
 
-import { useLocale } from 'next-intl';
+import { useOptimistic, useTransition } from 'react';
+import { motion } from 'motion/react';
+import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter, routing } from '@/i18n/routing';
-import { useTransition } from 'react';
-import { Globe } from 'lucide-react';
-import { Dropdown } from '@/components/shared';
+import { cn } from '@/lib/utils';
 
+/**
+ * Chọn ngôn ngữ dạng nút gạt "VI | EN" (thay cho dropdown) — thấy ngay ngôn ngữ hiện tại, đổi chỉ một chạm.
+ * Khối nền đỏ đô trượt sang ngôn ngữ vừa chọn NGAY khi bấm (useOptimistic), không chờ trang tải lại.
+ * Vuông góc, viền mảnh — đồng bộ với các nút / ô nhập khác của storefront.
+ */
 export function LanguageSwitcher() {
+  const t = useTranslations('Common');
   const currentLocale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [selectedLocale, setSelectedLocale] = useOptimistic(currentLocale);
 
-  const handleSelectLanguage = (newLocale: string, close: () => void) => {
-    close();
-    if (newLocale === currentLocale || isPending) return;
-
+  const handleSelect = (locale: string) => {
+    if (locale === selectedLocale || isPending) return;
     startTransition(() => {
-      router.replace(pathname, { locale: newLocale });
+      setSelectedLocale(locale);
+      router.replace(pathname, { locale });
     });
   };
 
-  const locales = routing.locales;
-
   return (
-    <Dropdown
-      contentClassName="flex min-w-24 flex-col gap-1"
-      trigger={({ open, toggle }) => (
-        <button
-          type="button"
-          onClick={toggle}
-          disabled={isPending}
-          className="flex h-9 min-w-16 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-border bg-background px-3 text-xs font-semibold text-primary-ink transition-colors hover:bg-secondary disabled:opacity-60"
-          aria-label={`Current language: ${currentLocale.toUpperCase()}`}
-          aria-expanded={open}
-        >
-          <Globe size={13} strokeWidth={1.5} className="text-primary-ink" />
-          {currentLocale.toUpperCase()}
-        </button>
-      )}
+    <div
+      role="group"
+      aria-label={t('language')}
+      aria-busy={isPending || undefined}
+      className="relative flex h-9 items-center border border-[var(--border)] bg-[var(--bg-card)]/60 p-[3px]"
     >
-      {({ close }) => (
-        <>
-          {locales.map((loc) => {
-            const isSelected = loc === currentLocale;
-
-            return (
-              <button
-                key={loc}
-                type="button"
-                onClick={() => handleSelectLanguage(loc, close)}
-                disabled={isPending}
-                className={[
-                  'relative z-10 flex h-8 cursor-pointer items-center justify-center rounded-md px-3 text-xs font-semibold uppercase transition-colors disabled:opacity-60',
-                  isSelected
-                    ? 'bg-secondary text-primary-ink'
-                    : 'text-muted-foreground hover:bg-secondary hover:text-primary-ink',
-                ].join(' ')}
-              >
-                {loc.toUpperCase()}
-              </button>
-            );
-          })}
-        </>
-      )}
-    </Dropdown>
+      {routing.locales.map((locale) => {
+        const isActive = locale === selectedLocale;
+        return (
+          <button
+            key={locale}
+            type="button"
+            lang={locale}
+            onClick={() => handleSelect(locale)}
+            aria-pressed={isActive}
+            className={cn(
+              'relative h-full min-w-9 cursor-pointer px-2.5 text-[11px] font-semibold uppercase tracking-[1.5px] transition-colors duration-300',
+              isActive ? 'text-white' : 'text-[var(--text-light)] hover:text-[var(--primary-ink)]',
+            )}
+          >
+            {isActive ? (
+              <motion.span
+                layoutId="language-switcher-indicator"
+                aria-hidden="true"
+                className="absolute inset-0 bg-[var(--primary-color)]"
+                transition={{ type: 'spring', stiffness: 420, damping: 34 }}
+              />
+            ) : null}
+            <span className="relative">{locale}</span>
+          </button>
+        );
+      })}
+    </div>
   );
 }

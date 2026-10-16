@@ -40,7 +40,7 @@ export function AboutHero() {
           className="absolute inset-0"
         >
           <Image
-            src="/login_banner.jpg"
+            src="/images/ex6.jpg"
             alt={t("imageAlt")}
             fill
             loading="eager"

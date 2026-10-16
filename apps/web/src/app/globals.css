@@ -55,6 +55,7 @@
   --accent-color: #E2A79E;      /* Hồng đất — nút kêu gọi hành động, điểm nhấn */
   --accent-foreground: #2A2525; /* Chữ trên nền hồng đất (item đang chọn của dropdown) */
   --accent-on-primary: #E2A79E; /* Chữ nhấn (eyebrow) đặt trên nền đỏ đô */
+  --sale-gold: #A8781F;         /* Vàng đậm — % giảm giá, nhãn ưu đãi (đồng bộ viền vàng SaleGlow) */
 
   /* Nền */
   --bg-main: #FAF7F5;           /* Trắng kem ấm — nền trang */
@@ -93,6 +94,7 @@
   --accent-color: #B87B72;
   --accent-foreground: #161213;
   --accent-on-primary: #F6D5CE; /* Hồng phấn — chữ nhấn trên nền đỏ đô (hồng đất trầm sẽ chìm) */
+  --sale-gold: #E6C77A;         /* Vàng nhạt — đọc rõ trên nền tối */
 
   /* Nền */
   --bg-main: #141112;
@@ -210,6 +212,57 @@
    - petal-sway    : đung đưa trái ↔ phải (--petal-sway), ease-in-out, chạy xen kẽ.
    - petal-flutter : xoay tròn (--petal-spin) + nghiêng qua lại tối đa --petal-tilt như cánh hoa bập bềnh trong gió
                      (không lật hẳn 360° để cánh không bị nhìn thấy cạnh mỏng như một vạch). */
+/* Thanh cuộn thương hiệu cho vùng cuộn nhỏ (giỏ mini, thân AppDialog…): mảnh, ray trong suốt,
+   con trượt đỏ đô nhạt — đậm lên khi rê chuột. Dùng: class `scrollbar-brand`. */
+@utility scrollbar-brand {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklab, var(--primary-color) 35%, transparent) transparent;
+
+  &::-webkit-scrollbar { width: 4px; height: 4px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: color-mix(in oklab, var(--primary-color) 35%, transparent); }
+  &::-webkit-scrollbar-thumb:hover { background: var(--primary-color); }
+}
+
+/* Vệt sáng quét chéo qua thẻ (OrnateFrame shimmer="loop"): quét trong 35% đầu chu kỳ rồi nghỉ, tạo nhịp "lấp lánh" thưa */
+@keyframes shimmer-sweep {
+  0% { transform: translateX(-160%) skewX(-20deg); }
+  35%, 100% { transform: translateX(260%) skewX(-20deg); }
+}
+
+/* Vệt sáng quét một lần khi rê chuột (OrnateFrame shimmer="hover") */
+@keyframes shimmer-once {
+  from { transform: translateX(-160%) skewX(-20deg); }
+  to { transform: translateX(260%) skewX(-20deg); }
+}
+
+/* Viền vàng óng lấp lánh cho sản phẩm giảm giá (SaleGlow).
+   --sale-angle được khai báo @property để trình duyệt nội suy được góc → luồng sáng xoay mượt quanh viền. */
+@property --sale-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes sale-beam {
+  to { --sale-angle: 360deg; }
+}
+
+/* Quầng vàng bên trong "thở" chậm */
+@keyframes sale-breathe {
+  0%, 100% { opacity: 0.75; }
+  50% { opacity: 1; }
+}
+
+/* Sao lấp lánh: sáng dần – loé – tắt dần trong ~45% chu kỳ (nhiều bước trung gian cho mượt), phần còn lại nghỉ */
+@keyframes sale-twinkle {
+  0%, 100% { opacity: 0; transform: scale(0.2) rotate(0deg); }
+  12% { opacity: 0.7; transform: scale(0.75) rotate(25deg); }
+  22% { opacity: 1; transform: scale(1.1) rotate(50deg); }
+  32% { opacity: 0.6; transform: scale(0.7) rotate(75deg); }
+  45% { opacity: 0; transform: scale(0.2) rotate(100deg); }
+}
+
 @keyframes petal-drift {
   0% { transform: translate3d(0, -12cqh, 0); opacity: 0; }
   8% { opacity: var(--petal-opacity, 1); }

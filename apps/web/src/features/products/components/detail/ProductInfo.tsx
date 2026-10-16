@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { AnimatePresence, motion, type Variants } from 'motion/react';
-import { Check, Minus, Plus, Ruler, ShoppingBag } from 'lucide-react';
+import { Check, Ruler, ShoppingBag } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Rating, RoundedStar } from '@smastrom/react-rating';
 import '@smastrom/react-rating/style.css';
@@ -11,7 +11,7 @@ import UseAnimations from 'react-useanimations';
 import heart from 'react-useanimations/lib/heart';
 import { formatVnd } from '@repo/shared';
 
-import Counter from '@/components/effects/Counter';
+import { QuantitySelector } from '@/components/shared/QuantitySelector';
 import { MAX_LINE_QUANTITY } from '@/features/cart';
 import { DisplayProduct } from '../../types/products.types';
 
@@ -324,39 +324,12 @@ export default function ProductInfo({
         transition={{ duration: 0.7, delay: 0.75, ease: EASE }}
         className="mt-8 flex w-full flex-row items-center gap-2 sm:gap-3"
       >
-        <div className="flex h-11 w-[30%] items-center justify-between border border-[var(--border)] bg-[var(--bg-main)] px-1.5 sm:h-12 sm:w-32 sm:px-3">
-          <button
-            type="button"
-            aria-label={t('quantity.decrease')}
-            onClick={() => onQuantityChange(Math.max(1, quantity - 1))}
-            disabled={quantity <= 1}
-            className="cursor-pointer p-1 text-[var(--text-main)] transition-colors hover:text-[var(--primary-ink)] disabled:cursor-not-allowed disabled:opacity-30"
-          >
-            <Minus size={14} />
-          </button>
-          <div className="flex min-w-[1.25rem] items-center justify-center text-center font-semibold text-[var(--text-main)] select-none sm:min-w-[2rem]">
-            <Counter
-              value={quantity}
-              fontSize={14}
-              padding={1}
-              textColor="var(--text-main)"
-              gradientFrom="var(--bg-main)"
-              gradientTo="transparent"
-              gradientHeight={2}
-              fontWeight="600"
-              counterStyle={{ fontFamily: "var(--font-lora), 'Lora', serif" }}
-            />
-          </div>
-          <button
-            type="button"
-            aria-label={t('quantity.increase')}
-            onClick={() => onQuantityChange(Math.min(MAX_LINE_QUANTITY, quantity + 1))}
-            disabled={quantity >= MAX_LINE_QUANTITY}
-            className="cursor-pointer p-1 text-[var(--text-main)] transition-colors hover:text-[var(--primary-ink)] disabled:cursor-not-allowed disabled:opacity-30"
-          >
-            <Plus size={14} />
-          </button>
-        </div>
+        <QuantitySelector
+          value={quantity}
+          onChange={onQuantityChange}
+          max={MAX_LINE_QUANTITY}
+          labels={{ decrease: t('quantity.decrease'), increase: t('quantity.increase') }}
+        />
 
         <motion.button type="button" onClick={handleAddToCart} whileTap={{ scale: 0.97 }} className={`h-11 flex-1 sm:h-12 ${addButtonClass}`}>
           <span

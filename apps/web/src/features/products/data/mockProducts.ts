@@ -33,21 +33,21 @@ export interface MockProduct {
 }
 
 const productImages = [
-  'https://images.unsplash.com/photo-1621184455862-c163dfb30e0f?q=80&w=900&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=900&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1608748010899-18f300247112?q=80&w=900&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=900&auto=format&fit=crop',
-  '/login_banner.jpg',
-  'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=900&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=900&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1496747611176-843222e1e57c?q=80&w=900&auto=format&fit=crop',
+  '/images/ex1.jpg',
+  '/images/ex2.jpg',
+  '/images/ex3.jpg',
+  '/images/ex4.jpg',
+  '/images/ex2.jpg',
+  '/images/ex5.jpg',
+  '/images/ex6.jpg',
+  '/images/ex7.jpg',
 ];
 
 const detailImages = [
-  'https://images.unsplash.com/photo-1589363460779-cd717d2ed8fa?q=80&w=900&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?q=80&w=900&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?q=80&w=900&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?q=80&w=900&auto=format&fit=crop',
+  '/images/ex8.jpg',
+  '/images/ex9.jpg',
+  '/images/ex10.jpg',
+  '/images/ex1.jpg',
 ];
 
 const colorSets: ProductColorSwatch[][] = [

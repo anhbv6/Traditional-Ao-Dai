@@ -3,133 +3,178 @@
 import React, { useRef, useState } from 'react';
 import Image from 'next/image';
 import { AnimatePresence, motion, useInView, useReducedMotion } from 'motion/react';
-import { Quote, Star } from 'lucide-react';
-import { SliderNav } from '@/components/shared/SliderNav';
 import { useTranslations } from 'next-intl';
+import { RatingBadge } from '@/components/shared/RatingBadge';
+import { SliderNav } from '@/components/shared/SliderNav';
 import { cn } from '@/lib/utils';
 import { SectionHeading } from './SectionHeading';
 
-const REVIEW_KEYS = ['1', '2', '3', '4', '5', '6'] as const;
+/** Mỗi đánh giá kèm ảnh khách diện áo — chữ ở messages HomePage.promoteFeedback.reviews.<key> */
+const REVIEWS = [
+  { key: '1', photo: '/images/ex5.jpg' },
+  { key: '2', photo: '/images/ex6.jpg' },
+  { key: '3', photo: '/images/ex7.jpg' },
+  { key: '4', photo: '/images/ex8.jpg' },
+  { key: '5', photo: '/images/ex9.jpg' },
+  { key: '6', photo: '/images/ex10.jpg' },
+] as const;
+
+/** Điểm đánh giá trung bình (thang 5) */
+const RATING_SCORE = 4.9;
 
 /** Thời gian dừng ở mỗi đánh giá — đủ lâu để đọc trọn một trích dẫn */
 const AUTOPLAY_MS = 7000;
 
-const AVATARS = [
-  'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=150&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=150&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?q=80&w=150&auto=format&fit=crop',
-];
+const EASE = [0.25, 1, 0.5, 1] as const;
+
+const pad = (value: number) => String(value).padStart(2, '0');
 
 /**
- * Một lời chứng thực lớn mỗi lần, tự trượt sang đánh giá kế tiếp sau mỗi 7 giây.
- * Nhịp tự chạy được điều khiển bằng chính thanh tiến trình CSS trên chấm đang chọn (onAnimationEnd),
- * nên tạm dừng chỉ cần `animation-play-state: paused`: khi rê chuột / focus vào thẻ, khi khối ra khỏi màn hình,
- * Khi người dùng bật giảm chuyển động: vẫn tự chuyển nhưng chỉ mờ dần, không trượt ngang.
+ * Cảm nhận khách hàng — bố cục tạp chí hai cột:
+ * - Trái: ảnh khách diện áo (đổi mờ dần theo đánh giá), khung viền mảnh lệch phía sau + thẻ điểm đánh giá đè mép.
+ * - Phải: tiêu đề, trích dẫn lớn, tên khách; MỘT hàng điều khiển duy nhất: thanh tiến trình, ảnh đại diện để chọn, số thứ tự, nút Trước / Sau.
+ * Tự chuyển sau mỗi 7 giây — nhịp do thanh tiến trình CSS điều khiển (onAnimationEnd), nên tạm dừng chỉ cần
+ * `animation-play-state: paused` khi rê chuột / focus vào khối hoặc khối ra khỏi màn hình.
+ * Bật "giảm chuyển động": chỉ mờ dần, không trượt / phóng.
  */
 export function PromoteFeedBack() {
   const t = useTranslations('HomePage.promoteFeedback');
   const reduceMotion = useReducedMotion();
   const [current, setCurrent] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
-  const cardRef = useRef<HTMLElement>(null);
-  const isInView = useInView(cardRef, { amount: 0.5 });
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(sectionRef, { amount: 0.4 });
   const isPlaying = isInView && !isHovering;
 
-  const total = REVIEW_KEYS.length;
-  const key = REVIEW_KEYS[current];
+  const total = REVIEWS.length;
+  const review = REVIEWS[current];
   const goTo = (index: number) => setCurrent((index + total) % total);
 
   return (
-    <section className="bg-[var(--bg-secondary)] py-20 sm:py-28">
-      <div className="mx-auto grid w-full max-w-[1440px] gap-12 px-5 sm:px-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-center lg:gap-20 lg:px-10 xl:px-16">
-        <div>
-          <SectionHeading index="05" align="left" eyebrow={t('eyebrow')} title={t('title')} description={t('description')} className="mb-8 sm:mb-8" />
-          <div className="flex items-center gap-3 text-sm text-[var(--text-main)]">
-            <span className="flex gap-0.5 text-[#C9A227]">
-              {Array.from({ length: 5 }, (_, i) => (
-                <Star key={i} size={15} fill="currentColor" stroke="none" />
-              ))}
-            </span>
-            {t('rating')}
+    <section className="overflow-hidden bg-[var(--bg-secondary)] py-20 sm:py-28">
+      <div
+        ref={sectionRef}
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}
+        onFocus={() => setIsHovering(true)}
+        onBlur={() => setIsHovering(false)}
+        className="mx-auto grid w-full max-w-[1440px] gap-14 px-5 sm:px-8 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:items-center lg:gap-20 lg:px-10 xl:gap-28 xl:px-16"
+      >
+        {/* ---------- Cột trái: ảnh khách + điểm đánh giá ---------- */}
+        <div className="relative mx-auto w-full max-w-[420px] pb-6 pl-6 lg:mx-0 lg:max-w-none">
+          {/* Khung viền mảnh lệch về góc dưới trái — đồng bộ ngôn ngữ khung tranh của banner */}
+          <div aria-hidden="true" className="absolute inset-0 left-0 top-6 right-6 border border-[var(--accent-color)]/60" />
+
+          <div className="relative aspect-[4/5] overflow-hidden bg-[var(--bg-card)] shadow-[0_40px_80px_-40px_rgba(128,0,32,0.45)]">
+            <AnimatePresence initial={false}>
+              <motion.div
+                key={review.key}
+                className="absolute inset-0"
+                initial={{ opacity: 0, scale: reduceMotion ? 1 : 1.06 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 1.1, ease: EASE }}
+              >
+                <Image
+                  src={review.photo}
+                  alt={t(`reviews.${review.key}.name`)}
+                  fill
+                  sizes="(max-width: 1024px) 90vw, 520px"
+                  className="object-cover object-[50%_20%]"
+                />
+              </motion.div>
+            </AnimatePresence>
           </div>
-          <div className="mt-8 flex items-center gap-3">
-            <SliderNav
-              onPrev={() => goTo(current - 1)}
-              onNext={() => goTo(current + 1)}
-              prevLabel={t('prev')}
-              nextLabel={t('next')}
-            />
-            <span className="ml-3 font-[family-name:var(--font-playfair)] text-sm text-[var(--text-light)]">
-              <span className="text-lg font-semibold text-[var(--primary-ink)]">0{current + 1}</span> / 0{total}
-            </span>
-          </div>
+
+          {/* Thẻ điểm đánh giá (component dùng chung) */}
+          <RatingBadge
+            score={RATING_SCORE}
+            label={t('ratingLabel')}
+            caption={t('ratingCount')}
+            className="absolute -right-2 bottom-12 z-10 sm:-right-10"
+          />
         </div>
 
-        <figure
-          ref={cardRef}
-          onMouseEnter={() => setIsHovering(true)}
-          onMouseLeave={() => setIsHovering(false)}
-          onFocus={() => setIsHovering(true)}
-          onBlur={() => setIsHovering(false)}
-          className="relative bg-[var(--bg-card)] px-7 py-10 shadow-[0_30px_60px_-35px_rgba(128,0,32,0.35)] sm:px-14 sm:py-14">
-          <Quote aria-hidden="true" size={56} strokeWidth={1} className="absolute -top-7 left-7 fill-[var(--bg-secondary)] text-[var(--accent-color)] sm:left-14" />
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div
-              key={key}
-              initial={{ opacity: 0, x: reduceMotion ? 0 : 48 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: reduceMotion ? 0 : -48 }}
-              transition={{ duration: 0.9, ease: [0.25, 0.1, 0.25, 1] }}
-            >
-              <blockquote className="min-h-[9rem] font-[family-name:var(--font-playfair)] text-xl italic leading-relaxed text-[var(--text-main)] sm:text-2xl">
-                &ldquo;{t(`reviews.${key}.content`)}&rdquo;
-              </blockquote>
-              <figcaption className="mt-8 flex items-center gap-4 border-t border-[var(--border)] pt-6">
-                <span className="relative size-12 overflow-hidden rounded-full bg-[var(--bg-secondary)]">
-                  <Image src={AVATARS[current]} alt={t(`reviews.${key}.name`)} fill sizes="48px" className="object-cover" />
-                </span>
-                <span>
-                  <span className="block font-[family-name:var(--font-playfair)] font-semibold text-[var(--primary-ink)]">
-                    {t(`reviews.${key}.name`)}
-                  </span>
-                  <span className="block text-xs text-[var(--text-light)]">{t(`reviews.${key}.role`)}</span>
-                </span>
-              </figcaption>
-            </motion.div>
-          </AnimatePresence>
+        {/* ---------- Cột phải: trích dẫn + điều khiển ---------- */}
+        <div>
+          <SectionHeading index="05" align="left" eyebrow={t('eyebrow')} title={t('title')} description={t('description')} className="mb-10 sm:mb-12" />
 
-          <div className="mt-8 flex gap-2">
-            {REVIEW_KEYS.map((item, i) => (
-              <button
-                key={item}
-                type="button"
-                onClick={() => goTo(i)}
-                aria-label={t('goTo', { index: i + 1 })}
-                aria-current={i === current}
-                className={cn(
-                  'relative h-1 cursor-pointer overflow-hidden rounded-full transition-all duration-500',
-                  i === current ? 'w-10 bg-[var(--border)]' : 'w-3 bg-[var(--border)] hover:bg-[var(--accent-color)]',
-                )}
+          <figure aria-live="polite">
+            {/* Dấu ngoặc kép trang trí */}
+            <span aria-hidden="true" className="block h-10 font-[family-name:var(--font-playfair)] text-[88px] leading-none text-[var(--accent-color)]/60">
+              &ldquo;
+            </span>
+
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={review.key}
+                initial={{ opacity: 0, y: reduceMotion ? 0 : 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: reduceMotion ? 0 : -12 }}
+                transition={{ duration: 0.6, ease: EASE }}
               >
-                {i === current ? (
-                  <span
-                    key={current}
-                    aria-hidden="true"
-                    onAnimationEnd={() => goTo(current + 1)}
-                    className="absolute inset-0 origin-left rounded-full bg-[var(--primary-color)]"
-                    style={{
-                      animation: `progress-fill ${AUTOPLAY_MS}ms linear forwards`,
-                      animationPlayState: isPlaying ? 'running' : 'paused',
-                    }}
-                  />
-                ) : null}
-              </button>
-            ))}
+                <blockquote className="min-h-[9.5rem] font-[family-name:var(--font-playfair)] text-xl italic leading-[1.65] text-[var(--text-main)] sm:min-h-[11rem] sm:text-[25px]">
+                  {t(`reviews.${review.key}.content`)}
+                </blockquote>
+                <figcaption className="mt-7 flex items-center gap-4">
+                  <span aria-hidden="true" className="h-px w-10 bg-[var(--accent-color)]" />
+                  <span>
+                    <span className="block font-[family-name:var(--font-playfair)] text-lg font-semibold text-[var(--primary-ink)]">
+                      {t(`reviews.${review.key}.name`)}
+                    </span>
+                    <span className="mt-0.5 block text-[11px] uppercase tracking-[2px] text-[var(--text-light)]">
+                      {t(`reviews.${review.key}.role`)}
+                    </span>
+                  </span>
+                </figcaption>
+              </motion.div>
+            </AnimatePresence>
+          </figure>
+
+          {/* Thanh tiến trình tự chuyển */}
+          <div className="relative mt-10 h-px overflow-hidden bg-[var(--primary-color)]/15">
+            <span
+              key={current}
+              aria-hidden="true"
+              onAnimationEnd={() => goTo(current + 1)}
+              className="absolute inset-0 origin-left bg-[var(--primary-color)]"
+              style={{
+                animation: `progress-fill ${AUTOPLAY_MS}ms linear forwards`,
+                animationPlayState: isPlaying ? 'running' : 'paused',
+              }}
+            />
           </div>
-        </figure>
+
+          {/* Hàng điều khiển: ảnh đại diện (chọn nhanh) — số thứ tự — Trước / Sau */}
+          <div className="mt-6 flex items-center justify-between gap-6">
+            <div className="hidden items-center gap-3 sm:flex">
+              {REVIEWS.map((item, i) => (
+                <button
+                  key={item.key}
+                  type="button"
+                  onClick={() => goTo(i)}
+                  aria-label={t('goTo', { index: i + 1 })}
+                  aria-current={i === current}
+                  className={cn(
+                    'relative block size-10 cursor-pointer overflow-hidden rounded-full ring-offset-2 ring-offset-[var(--bg-secondary)] transition-all duration-500 ease-out',
+                    i === current
+                      ? 'scale-110 ring-1 ring-[var(--accent-color)]'
+                      : 'opacity-55 grayscale-[60%] hover:opacity-100 hover:grayscale-0',
+                  )}
+                >
+                  <Image src={item.photo} alt="" fill sizes="40px" className="object-cover object-[50%_15%]" />
+                </button>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-5">
+              <span className="font-[family-name:var(--font-playfair)] text-sm text-[var(--text-light)]">
+                <span className="text-lg font-semibold text-[var(--primary-ink)]">{pad(current + 1)}</span> / {pad(total)}
+              </span>
+              <SliderNav onPrev={() => goTo(current - 1)} onNext={() => goTo(current + 1)} prevLabel={t('prev')} nextLabel={t('next')} />
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );

@@ -17,7 +17,7 @@ type AuthImageBannerProps = {
 export function AuthImageBanner({
   quote,
   author,
-  imageSrc = "/login_banner.jpg",
+  imageSrc = "/images/ex6.jpg",
   imagePosition = "center center",
   showBlossoms = false,
 }: AuthImageBannerProps) {

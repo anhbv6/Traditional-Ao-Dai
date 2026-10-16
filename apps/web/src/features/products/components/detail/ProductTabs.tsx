@@ -47,7 +47,7 @@ export default function ProductTabs({ product, locale }: ProductTabsProps) {
       name: 'Mark Williams',
       reviewer: 'Krist',
       date: locale === 'vi' ? '05/06/2026' : 'June 05, 2026',
-      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=160&auto=format&fit=crop',
+      avatar: '/images/ex10.jpg',
       title: locale === 'vi' ? 'Sản phẩm rất đẹp, tôi rất thích' : 'Beautiful piece, I love it',
       content:
         locale === 'vi'
@@ -58,7 +58,7 @@ export default function ProductTabs({ product, locale }: ProductTabsProps) {
       name: 'Alexa Johnson',
       reviewer: 'Krist',
       date: locale === 'vi' ? '05/06/2026' : 'June 05, 2026',
-      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=160&auto=format&fit=crop',
+      avatar: '/images/ex8.jpg',
       title: locale === 'vi' ? 'Con gái tôi rất hài lòng với sản phẩm này' : 'My daughter is very happy with it',
       content:
         locale === 'vi'
@@ -146,7 +146,7 @@ export default function ProductTabs({ product, locale }: ProductTabsProps) {
             {customerReviews.map((review) => (
               <article key={review.name} className="flex gap-4 py-6 first:pt-0">
                 <div className="relative size-12 shrink-0 overflow-hidden bg-[var(--bg-secondary)]">
-                  <Image src={review.avatar} alt={review.name} fill sizes="48px" className="object-cover" />
+                  <Image src={review.avatar} alt={review.name} fill sizes="48px" className="object-cover object-top" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="font-medium leading-none text-[var(--text-main)]">{review.name}</p>

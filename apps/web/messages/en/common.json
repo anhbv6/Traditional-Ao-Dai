@@ -72,5 +72,11 @@
     "hidePassword": "Hide password",
     "counter": "{count} of {max} characters",
     "counterNoMax": "{count} characters"
-  }
+  },
+  "dialog": {
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "close": "Close"
+  },
+  "adminDashboard": "Go to admin"
 }

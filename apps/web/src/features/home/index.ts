@@ -1,5 +1,7 @@
 export * from "./components/HeroBanner";
 export * from "./components/HeroSlider";
+export * from "./components/HomeStage";
+export * from "./components/HomeStageNav";
 export * from "./components/HomeVideoBanner";
 export * from "./components/HomeTrustStrip";
 export * from "./components/BestSellers";

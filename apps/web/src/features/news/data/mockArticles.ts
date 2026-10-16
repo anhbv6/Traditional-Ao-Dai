@@ -52,7 +52,7 @@ export const mockArticles: MockArticle[] = [
       vi: '18 Tháng 7, 2026',
       en: 'July 18, 2026',
     },
-    imageSrc: 'https://images.unsplash.com/photo-1582738411706-bfc8e691d1c2?q=80&w=800&auto=format&fit=crop',
+    imageSrc: '/images/ex6.jpg',
     readTime: {
       vi: '5 phút đọc',
       en: '5 min read',
@@ -81,7 +81,7 @@ export const mockArticles: MockArticle[] = [
       vi: '15 Tháng 7, 2026',
       en: 'July 15, 2026',
     },
-    imageSrc: 'https://images.unsplash.com/photo-1621184455862-c163dfb30e0f?q=80&w=800&auto=format&fit=crop',
+    imageSrc: '/images/ex1.jpg',
     readTime: {
       vi: '6 phút đọc',
       en: '6 min read',
@@ -110,7 +110,7 @@ export const mockArticles: MockArticle[] = [
       vi: '10 Tháng 7, 2026',
       en: 'July 10, 2026',
     },
-    imageSrc: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=800&auto=format&fit=crop',
+    imageSrc: '/images/ex2.jpg',
     readTime: {
       vi: '8 phút đọc',
       en: '8 min read',
@@ -139,7 +139,7 @@ export const mockArticles: MockArticle[] = [
       vi: '05 Tháng 7, 2026',
       en: 'July 05, 2026',
     },
-    imageSrc: '/login_banner.jpg',
+    imageSrc: '/images/ex4.jpg',
     readTime: {
       vi: '4 phút đọc',
       en: '4 min read',
@@ -168,7 +168,7 @@ export const mockArticles: MockArticle[] = [
       vi: '01 Tháng 7, 2026',
       en: 'July 01, 2026',
     },
-    imageSrc: 'https://images.unsplash.com/photo-1608748010899-18f300247112?q=80&w=800&auto=format&fit=crop',
+    imageSrc: '/images/ex3.jpg',
     readTime: {
       vi: '7 phút đọc',
       en: '7 min read',
@@ -197,7 +197,7 @@ export const mockArticles: MockArticle[] = [
       vi: '28 Tháng 6, 2026',
       en: 'June 28, 2026',
     },
-    imageSrc: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=800&auto=format&fit=crop',
+    imageSrc: '/images/ex4.jpg',
     readTime: {
       vi: '5 phút đọc',
       en: '5 min read',
@@ -226,7 +226,7 @@ export const mockArticles: MockArticle[] = [
       vi: '25 Tháng 6, 2026',
       en: 'June 25, 2026',
     },
-    imageSrc: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=800&auto=format&fit=crop',
+    imageSrc: '/images/ex5.jpg',
     readTime: {
       vi: '6 phút đọc',
       en: '6 min read',
@@ -255,7 +255,7 @@ export const mockArticles: MockArticle[] = [
       vi: '20 Tháng 6, 2026',
       en: 'June 20, 2026',
     },
-    imageSrc: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=800&auto=format&fit=crop',
+    imageSrc: '/images/ex7.jpg',
     readTime: {
       vi: '5 phút đọc',
       en: '5 min read',
@@ -284,7 +284,7 @@ export const mockArticles: MockArticle[] = [
       vi: '18 Tháng 6, 2026',
       en: 'June 18, 2026',
     },
-    imageSrc: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=800&auto=format&fit=crop',
+    imageSrc: '/images/ex8.jpg',
     readTime: {
       vi: '5 phút đọc',
       en: '5 min read',
@@ -313,7 +313,7 @@ export const mockArticles: MockArticle[] = [
       vi: '15 Tháng 6, 2026',
       en: 'June 15, 2026',
     },
-    imageSrc: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800&auto=format&fit=crop',
+    imageSrc: '/images/ex9.jpg',
     readTime: {
       vi: '6 phút đọc',
       en: '6 min read',
@@ -342,7 +342,7 @@ export const mockArticles: MockArticle[] = [
       vi: '12 Tháng 6, 2026',
       en: 'June 12, 2026',
     },
-    imageSrc: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?q=80&w=800&auto=format&fit=crop',
+    imageSrc: '/images/ex10.jpg',
     readTime: {
       vi: '7 phút đọc',
       en: '7 min read',
@@ -371,7 +371,7 @@ export const mockArticles: MockArticle[] = [
       vi: '10 Tháng 6, 2026',
       en: 'June 10, 2026',
     },
-    imageSrc: 'https://images.unsplash.com/photo-1531297484001-80022131f5a1?q=80&w=800&auto=format&fit=crop',
+    imageSrc: '/images/ex1.jpg',
     readTime: {
       vi: '5 phút đọc',
       en: '5 min read',
@@ -400,7 +400,7 @@ export const mockArticles: MockArticle[] = [
       vi: '08 Tháng 6, 2026',
       en: 'June 08, 2026',
     },
-    imageSrc: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=800&auto=format&fit=crop',
+    imageSrc: '/images/ex2.jpg',
     readTime: {
       vi: '10 phút đọc',
       en: '10 min read',
@@ -429,7 +429,7 @@ export const mockArticles: MockArticle[] = [
       vi: '05 Tháng 6, 2026',
       en: 'June 05, 2026',
     },
-    imageSrc: 'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=800&auto=format&fit=crop',
+    imageSrc: '/images/ex3.jpg',
     readTime: {
       vi: '10 phút đọc',
       en: '10 min read',

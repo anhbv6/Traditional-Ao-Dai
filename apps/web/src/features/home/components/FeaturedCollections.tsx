@@ -10,7 +10,7 @@ import { Reveal } from '@/components/shared/Reveal';
 const COLLECTIONS = [
   { key: 'tet', image: '/images/login1.jpg', position: 'object-[50%_35%]', featured: true },
   { key: 'modern', image: '/images/login2.jpg', position: 'object-[50%_25%]', featured: false },
-  { key: 'wedding', image: '/login_banner.jpg', position: 'object-[50%_35%]', featured: false },
+  { key: 'wedding', image: '/images/ex1.jpg', position: 'object-[50%_20%]', featured: false },
 ] as const;
 
 /**

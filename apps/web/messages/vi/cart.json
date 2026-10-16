@@ -64,10 +64,10 @@
     "title": "Giỏ hàng",
     "empty": "Chưa có sản phẩm nào trong giỏ",
     "shopNow": "Mua sắm ngay",
-    "quantityPrice": "{quantity} × {price}",
-    "note": "Phí vận chuyển & mã giảm giá được tính ở giỏ hàng",
     "viewCart": "Xem giỏ hàng",
-    "checkout": "Thanh toán"
+    "checkout": "Thanh toán",
+    "subtotal": "Tạm tính ({count} sản phẩm)",
+    "each": "{price} / sản phẩm"
   },
   "toast": {
     "cleared": "Đã xóa toàn bộ giỏ hàng"

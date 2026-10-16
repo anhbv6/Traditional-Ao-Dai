@@ -52,5 +52,17 @@
     "copyright": "© 2026 AODAI. All rights reserved.",
     "privacy": "Chính sách bảo mật",
     "terms": "Điều khoản sử dụng"
+  },
+  "qr": {
+    "open": "Phóng to mã QR chuyển khoản",
+    "eyebrow": "Thanh toán chuyển khoản",
+    "title": "Quét mã QR để chuyển khoản",
+    "description": "Mở ứng dụng ngân hàng, chọn quét QR và hướng camera vào mã bên dưới. Vui lòng ghi mã đơn hàng ở nội dung chuyển khoản.",
+    "bank": "Ngân hàng",
+    "account": "Số tài khoản",
+    "holder": "Chủ tài khoản",
+    "copy": "Sao chép số tài khoản",
+    "copied": "Đã sao chép số tài khoản",
+    "close": "Đóng"
   }
 }

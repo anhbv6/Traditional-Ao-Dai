@@ -18,7 +18,7 @@ export interface ProductEvent {
 export const productEvents: ProductEvent[] = [
   {
     id: 'wedding',
-    image: '/login_banner.jpg',
+    image: '/images/ex1.jpg',
     imagePosition: '50% 25%',
     panelColor: '#2A0A12',
     collection: 'wedding',

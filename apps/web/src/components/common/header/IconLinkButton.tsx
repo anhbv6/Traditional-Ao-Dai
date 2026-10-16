@@ -1,5 +1,6 @@
 import { Link } from '@/i18n/routing';
 import type { HeaderActionIcon } from './types';
+import { CountBadge } from './CountBadge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 type IconLinkButtonProps = {
@@ -7,9 +8,11 @@ type IconLinkButtonProps = {
   label: string;
   icon: HeaderActionIcon;
   count?: number;
+  /** Store đã nạp xong chưa — truyền cho CountBadge để không hiện "+N" khi vừa tải trang */
+  countReady?: boolean;
 };
 
-export function IconLinkButton({ href, label, icon: Icon, count }: IconLinkButtonProps) {
+export function IconLinkButton({ href, label, icon: Icon, count, countReady }: IconLinkButtonProps) {
   return (
     <TooltipProvider delay={200}>
       <Tooltip>
@@ -17,17 +20,13 @@ export function IconLinkButton({ href, label, icon: Icon, count }: IconLinkButto
           render={
             <Link
               href={href}
-              aria-label={label}
+              aria-label={count ? `${label} (${count})` : label}
               className="relative grid h-11 w-11 place-items-center text-primary-ink transition-opacity hover:opacity-75"
             />
           }
         >
           <Icon size={22} strokeWidth={1.5} aria-hidden="true" />
-          {count ? (
-            <span className="absolute right-1.5 top-1.5 grid h-4 min-w-4 place-items-center rounded-full bg-primary px-1 text-[10px] font-bold leading-none text-white">
-              {count}
-            </span>
-          ) : null}
+          {count !== undefined ? <CountBadge count={count} ready={countReady} /> : null}
         </TooltipTrigger>
         <TooltipContent className="bg-primary text-white border-0 shadow-md text-xs font-semibold px-2.5 py-1.5 rounded-md">
           {label}

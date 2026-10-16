@@ -3,6 +3,8 @@ import { getTranslations } from "next-intl/server";
 import {
   HeroBanner,
   HeroSlider,
+  HomeStage,
+  HomeStageNav,
   HomeTrustStrip,
   FeaturedCollections,
   BestSellers,
@@ -23,27 +25,42 @@ export default async function Home() {
 
   return (
     <>
-      <HeroBanner
-        eyebrow={t('hero.eyebrow')}
-        title={t('hero.title')}
-        subtitle={t('hero.subtitle')}
-        primaryAction={t('hero.primaryAction')}
-        secondaryAction={t('hero.secondaryAction')}
-        media={<HeroSlider />}
-        scrollLabel={t('hero.scroll')}
-        metrics={[
-          { value: t('hero.metrics.designs.value'), label: t('hero.metrics.designs.label') },
-          { value: t('hero.metrics.fabric.value'), label: t('hero.metrics.fabric.label') },
-          { value: t('hero.metrics.fitting.value'), label: t('hero.metrics.fitting.label') },
-        ]}
-      />
+      <HomeStage id="hero">
+        <HeroBanner
+          eyebrow={t('hero.eyebrow')}
+          title={t('hero.title')}
+          subtitle={t('hero.subtitle')}
+          primaryAction={t('hero.primaryAction')}
+          secondaryAction={t('hero.secondaryAction')}
+          media={<HeroSlider />}
+          scrollLabel={t('hero.scroll')}
+          metrics={[
+            { value: t('hero.metrics.designs.value'), label: t('hero.metrics.designs.label') },
+            { value: t('hero.metrics.fabric.value'), label: t('hero.metrics.fabric.label') },
+            { value: t('hero.metrics.fitting.value'), label: t('hero.metrics.fitting.label') },
+          ]}
+        />
+      </HomeStage>
       <HomeTrustStrip />
-      <FeaturedCollections />
-      <BestSellers />
-      <CraftStory />
-      <BespokeService />
-      <PromoteFeedBack />
-      <ArticleNews />
+      <HomeStage id="collections">
+        <FeaturedCollections />
+      </HomeStage>
+      <HomeStage id="bestSellers">
+        <BestSellers />
+      </HomeStage>
+      <HomeStage id="craft">
+        <CraftStory />
+      </HomeStage>
+      <HomeStage id="bespoke">
+        <BespokeService />
+      </HomeStage>
+      <HomeStage id="reviews">
+        <PromoteFeedBack />
+      </HomeStage>
+      <HomeStage id="news">
+        <ArticleNews />
+      </HomeStage>
+      <HomeStageNav />
     </>
   );
 }

@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils';
  * Ảnh dọc tỉ lệ ~3:4; `position` = object-position để không cắt mặt chủ thể.
  */
 const HERO_SLIDES = [
-  { key: 'lotus', src: '/login_banner.jpg', position: '50% 30%' },
+  { key: 'lotus', src: '/images/ex3.jpg', position: '50% 25%' },
   { key: 'market', src: '/images/login1.jpg', position: '50% 35%' },
   { key: 'lily', src: '/images/login2.jpg', position: '50% 30%' },
 ] as const;

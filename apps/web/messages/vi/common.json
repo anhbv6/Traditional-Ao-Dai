@@ -72,5 +72,11 @@
     "hidePassword": "Ẩn mật khẩu",
     "counter": "Đã nhập {count} trên {max} ký tự",
     "counterNoMax": "Đã nhập {count} ký tự"
-  }
+  },
+  "dialog": {
+    "confirm": "Xác nhận",
+    "cancel": "Huỷ",
+    "close": "Đóng"
+  },
+  "adminDashboard": "Về trang quản trị"
 }

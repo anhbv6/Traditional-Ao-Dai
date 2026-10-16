@@ -1,11 +1,13 @@
 'use client';
 
+import { ActionLink } from '@/components/shared/ActionLink';
 import { useState } from 'react';
-import { LogOut, UserRound } from 'lucide-react';
-import { Link} from '@/i18n/routing';
+import { LayoutDashboard, LogOut, Package, UserRound } from 'lucide-react';
+import { usePathname } from '@/i18n/routing';
 import { useAuthStore, useCustomerLogout } from '@/features/auth';
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { ConfirmDialog, Dropdown } from "@/components/shared";
+import { ConfirmDialog } from "@/components/shared";
+import { AppMenu } from "@/components/shared/AppMenu";
 import { useTranslations } from 'next-intl';
 
 import { executeAdminLogout, useAdminSession, useAdminSessionCache } from '@/features/admin';
@@ -49,89 +51,56 @@ export function UserMenu({
     }
   });
   const t = useTranslations("ProfilePage");
+  const tCommon = useTranslations("Common");
+  const pathname = usePathname();
 
 
 
   if (!userName) {
     return (
-      <Link
-        href="/login"
-        className="min-w-[130px] ml-5 hidden h-11 items-center justify-center rounded-md bg-primary px-6 text-xs font-semibold uppercase tracking-wider text-white transition-opacity hover:opacity-90 sm:inline-flex"
-      >
+      /* Nút chung ActionLink (variant confirm) — đồng bộ hiệu ứng / kích thước với các CTA khác của storefront */
+      <ActionLink href="/login" variant="confirm" size="md" className="ml-3 hidden min-w-[130px] sm:inline-flex">
         {loginLabel}
-      </Link>
+      </ActionLink>
     );
   }
 
   return (
     <>
-      <Dropdown
-        className="hidden sm:block"
-        contentClassName="w-44"
-        align="end"
-        trigger={({ open, toggle }) => (
+      {/* Menu tài khoản: AppMenu chung (Base UI Menu — phím mũi tên, Esc, focus, tự lật khi sát mép) */}
+      <AppMenu
+        width={248}
+        trigger={
           <button
             type="button"
-            onClick={toggle}
-            className="grid h-11 w-11 place-items-center rounded-full text-primary-ink transition-opacity hover:opacity-75 outline-none cursor-pointer"
-            aria-expanded={open}
+            className="hidden h-11 w-11 cursor-pointer place-items-center rounded-full text-primary-ink outline-none transition-opacity hover:opacity-75 focus-visible:ring-2 focus-visible:ring-[var(--primary-color)]/40 sm:grid"
             aria-label={profileLabel}
           >
             <Avatar size="lg" className="border border-[var(--border)] shadow-sm">
-              {avatarUrl && (
-                <AvatarImage
-                  src={avatarUrl}
-                  alt={avatarLabel}
-                  className="object-cover"
-                />
-              )}
+              {avatarUrl && <AvatarImage src={avatarUrl} alt={avatarLabel} className="object-cover" />}
               <AvatarFallback className="bg-[var(--bg-main)] text-xs font-bold uppercase text-[var(--primary-ink)]">
                 {avatarFallback || <UserRound size={18} strokeWidth={1.6} aria-hidden="true" />}
               </AvatarFallback>
             </Avatar>
           </button>
-        )}
-      >
-        {({ close }) => (
-          <>
-            <Link
-              href="/profile"
-              onClick={close}
-              className="relative z-10 block rounded-lg px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-[var(--bg-main)] hover:text-primary-ink"
-            >
-              {profileLabel}
-            </Link>
-            <Link
-              href="/profile/orders"
-              onClick={close}
-              className="relative z-10 block rounded-lg px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-[var(--bg-main)] hover:text-primary-ink"
-            >
-              {ordersLabel}
-            </Link>
-            {isAdmin ? (
-              <Link
-                href="/admin/dashboard"
-                onClick={close}
-                className="relative z-10 block rounded-lg px-3 py-2 text-sm font-semibold text-[var(--primary-ink)] transition-colors hover:bg-[var(--bg-main)]"
-              >
-                Về trang quản trị
-              </Link>
-            ) : (
-              <button
-                type="button"
-                onClick={() => {
-                  close();
-                  setOpenConfirm(true);
-                }}
-                className="relative z-10 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-semibold text-rose-600 transition-colors hover:bg-rose-50 disabled:opacity-60 cursor-pointer"
-              >
-                <LogOut size={15} strokeWidth={1.6} />
-                {logoutLabel}
-              </button>
-            )}
-          </>
-        )}
-      </Dropdown>
+        }
+        header={
+          <div className="min-w-0">
+            <p className="truncate font-[family-name:var(--font-playfair)] text-[15px] font-semibold text-[var(--primary-ink)]">{userName}</p>
+            {user?.email && user.email !== userName ? (
+              <p className="mt-0.5 truncate text-[11px] text-[var(--text-light)]">{user.email}</p>
+            ) : null}
+          </div>
+        }
+        items={[
+          { key: "profile", label: profileLabel, icon: UserRound, href: "/profile", active: pathname === "/profile" },
+          { key: "orders", label: ordersLabel, icon: Package, href: "/profile/orders", active: pathname.startsWith("/profile/orders") },
+          { type: "separator", key: "separator" },
+          isAdmin
+            ? { key: "admin", label: tCommon("adminDashboard"), icon: LayoutDashboard, href: "/admin/dashboard" }
+            : { key: "logout", label: logoutLabel, icon: LogOut, tone: "danger", onSelect: () => setOpenConfirm(true) },
+        ]}
+      />
       <ConfirmDialog
         open={openConfirm}
         onOpenChange={setOpenConfirm}

@@ -89,8 +89,8 @@ async function main() {
       material: 'Gấm Thượng Hải Cao Cấp',
       basePrice: 1200000,
       images: [
-        'https://images.unsplash.com/photo-1621184455862-c163dfb30e0f?auto=format&fit=crop&q=80&w=800',
-        'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&q=80&w=800'
+        '/images/ex1.jpg',
+        '/images/ex2.jpg'
       ],
       isCustomFit: true,
       categorySlug: 'ao-dai-truyen-thong',
@@ -108,7 +108,7 @@ async function main() {
       material: 'Linen phối tơ Organza',
       basePrice: 850000,
       images: [
-        'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&q=80&w=800'
+        '/images/ex4.jpg'
       ],
       isCustomFit: true,
       categorySlug: 'ao-dai-cach-tan',
@@ -125,7 +125,7 @@ async function main() {
       material: 'Lụa Ruby Cao Cấp',
       basePrice: 2800000,
       images: [
-        'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&q=80&w=800'
+        '/images/ex8.jpg'
       ],
       isCustomFit: true,
       categorySlug: 'ao-dai-cuoi-hoi',
