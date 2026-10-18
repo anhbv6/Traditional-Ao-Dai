@@ -265,7 +265,7 @@ export function AppDialog({
               {eyebrow ? (
                 <p className="mb-2 text-[10px] font-semibold uppercase tracking-[2.5px] text-[var(--accent-color)]">{eyebrow}</p>
               ) : null}
-              <DialogPrimitive.Title className="font-[family-name:var(--font-playfair)] text-[22px] font-semibold leading-snug text-[var(--primary-ink)] sm:text-2xl">
+              <DialogPrimitive.Title className="font-[family-name:var(--font-playfair)] text-[1.375rem] font-semibold leading-snug text-[var(--primary-ink)] sm:text-2xl">
                 {title}
               </DialogPrimitive.Title>
               {description ? (

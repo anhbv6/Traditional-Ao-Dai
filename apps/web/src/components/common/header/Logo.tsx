@@ -11,7 +11,7 @@ export function Logo({
   return (
     <Link
       href="/"
-      className="flex items-center gap-2.5 text-[26px] font-normal leading-none text-primary-ink font-[family-name:var(--font-playfair)] tracking-widest uppercase"
+      className="flex items-center gap-2.5 text-[1.625rem] font-normal leading-none text-primary-ink font-[family-name:var(--font-playfair)] tracking-widest uppercase"
       aria-label="AODAI home"
     >
       <div className="relative h-10 w-10 min-w-10 overflow-hidden rounded-md flex items-center justify-center">

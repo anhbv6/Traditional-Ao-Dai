@@ -11,7 +11,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from '@/components/ui/drawer';
-import { FilterGroups, type FilterGroupsProps } from './FilterSidebar';
+import { ActiveFilters, FilterGroups, type FilterGroupsProps } from './FilterSidebar';
 
 interface ProductMobileFilterSheetProps extends FilterGroupsProps {
   activeFilterCount: number;
@@ -60,6 +60,10 @@ export function ProductMobileFilterSheet({ activeFilterCount, onClearAll, result
         </div>
 
         <div data-lenis-prevent className="flex-1 overflow-y-auto overscroll-contain px-5 pb-4">
+          {/* Bộ lọc đang bật — bỏ từng cái ngay trong sheet */}
+          <div className="pt-4 empty:hidden">
+            <ActiveFilters {...groupProps} />
+          </div>
           <FilterGroups {...groupProps} />
         </div>
 

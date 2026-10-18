@@ -1,7 +1,6 @@
 export * from "./components/ProductsCollection";
 export * from "./components/ProductDetailClient";
 export * from "./components/ProductDetail";
-export * from "./components/ProductBanner";
 export * from "./components/ProductEventBanner";
 export * from "./components/ProductCard";
 export * from "./types/products.types";

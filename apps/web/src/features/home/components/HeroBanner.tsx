@@ -40,7 +40,7 @@ export function HeroBanner({
           <p className="text-[11px] font-semibold uppercase tracking-[3.5px] text-[var(--primary-ink)]">
             {eyebrow}
           </p>
-          <h1 className="mt-5 font-[family-name:var(--font-playfair)] text-[44px] font-semibold leading-[1.05] text-[var(--primary-ink)] sm:text-[64px] xl:text-[80px]">
+          <h1 className="mt-5 font-[family-name:var(--font-playfair)] text-[2.75rem] font-semibold leading-[1.05] text-[var(--primary-ink)] sm:text-[3.25rem] lg:text-[4rem] xl:text-[4.5rem] 2xl:text-[5rem]">
             {title}
           </h1>
           <SectionOrnament className="mt-7" />
@@ -68,7 +68,7 @@ export function HeroBanner({
             {metrics.map((metric) => (
               <div key={metric.label} className="flex flex-col-reverse justify-end px-4 first:pl-0">
                 <dt className="mt-1 text-xs leading-5 text-[var(--text-light)]">{metric.label}</dt>
-                <dd className="font-[family-name:var(--font-playfair)] text-2xl font-semibold text-[var(--primary-ink)] sm:text-[28px]">
+                <dd className="font-[family-name:var(--font-playfair)] text-2xl font-semibold text-[var(--primary-ink)] sm:text-[1.75rem]">
                   {metric.value}
                 </dd>
               </div>

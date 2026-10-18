@@ -47,6 +47,7 @@
   "switchLang": "English",
   "previous": "Trước",
   "next": "Sau",
+  "back": "Quay lại",
   "continueShopping": "Tiếp tục mua sắm",
   "checkoutErrors": {
     "fullNameRequired": "Vui lòng nhập họ và tên",
@@ -79,5 +80,16 @@
     "cancel": "Huỷ",
     "close": "Đóng"
   },
-  "adminDashboard": "Về trang quản trị"
+  "adminDashboard": "Về trang quản trị",
+  "mediaUploader": {
+    "dropTitle": "Thêm ảnh hoặc video thực tế",
+    "dropTitleImage": "Thêm ảnh thực tế",
+    "dropHint": "Kéo thả hoặc bấm để chọn · Ảnh ≤ {image}MB, video ≤ {video}MB · Tối đa {max} tệp",
+    "dropHintImage": "Kéo thả hoặc bấm để chọn · Ảnh ≤ {image}MB · Tối đa {max} tệp",
+    "add": "Thêm",
+    "remove": "Gỡ {name}",
+    "invalidType": "Chỉ nhận tệp ảnh hoặc video",
+    "tooLarge": "{name} vượt quá {max}MB",
+    "tooMany": "Chỉ được chọn tối đa {max} tệp"
+  }
 }

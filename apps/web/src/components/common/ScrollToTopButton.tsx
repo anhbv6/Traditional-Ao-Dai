@@ -34,7 +34,8 @@ function easeInOutCubic(progress: number) {
 export function ScrollToTopButton() {
   const isVisible = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const pathname = usePathname();
-  const isProductPage = pathname === '/products';
+  /** Trang có thanh cố định ở đáy (mobile / tablet) — đẩy nút lên để không đè */
+  const hasBottomBar = pathname === '/products' || pathname === '/cart';
 
   function handleClick() {
     const startY = window.scrollY;
@@ -62,7 +63,7 @@ export function ScrollToTopButton() {
       onClick={handleClick}
       className={[
         'cursor-pointer fixed z-40 grid size-8 place-items-center rounded-full bg-[var(--primary-color)] text-white shadow-[0_14px_35px_rgba(42,37,37,0.18)] transition duration-300 sm:size-10',
-        isProductPage
+        hasBottomBar
           ? 'bottom-24 right-5 sm:bottom-24 sm:right-7 lg:bottom-7'
           : 'bottom-7 right-5 sm:right-7 lg:bottom-7',
         'hover:bg-[var(--bg-inverse)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent-color)]',

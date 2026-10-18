@@ -59,7 +59,7 @@ export function AboutHero() {
         </motion.p>
         <motion.h1
           {...fadeUp(0.32)}
-          className="mt-5 max-w-xl font-[family-name:var(--font-playfair)] text-[36px] font-semibold leading-[1.1] text-white sm:text-[50px] xl:text-[58px]"
+          className="mt-5 max-w-xl font-[family-name:var(--font-playfair)] text-[2.25rem] font-semibold leading-[1.1] text-white sm:text-[2.75rem] lg:text-[3rem] xl:text-[3.25rem] 2xl:text-[3.625rem]"
         >
           {t("title")}
         </motion.h1>

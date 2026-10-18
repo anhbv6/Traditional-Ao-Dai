@@ -1,8 +1,6 @@
 import { type ActiveDiscount, type CartItem, type CartTotals } from "../types/cart.types";
 
-/** Miễn phí vận chuyển cho đơn từ 1.000.000₫ */
-export const FREE_SHIPPING_THRESHOLD = 1_000_000;
-/** Phí vận chuyển tiêu chuẩn */
+/** Phí vận chuyển tiêu chuẩn — chỉ miễn phí khi áp mã FREESHIP (không còn ngưỡng theo giá trị đơn) */
 export const STANDARD_SHIPPING_FEE = 30_000;
 /**
  * Số lượng tối đa cho một dòng giỏ hàng (chống đặt nhầm số lượng lớn).
@@ -28,27 +26,34 @@ export function clampQuantity(quantity: number): number {
   return Math.min(MAX_LINE_QUANTITY, Math.max(1, Math.floor(quantity) || 1));
 }
 
+/** % giảm của một dòng so với giá gốc (0 nếu không có giá gốc hợp lệ) */
+export function getDiscountPercent(price: number, originalPrice?: number): number {
+  if (!originalPrice || originalPrice <= price) return 0;
+  return Math.round(((originalPrice - price) / originalPrice) * 100);
+}
+
 /**
  * Tính tổng tiền giỏ hàng (giá đã bao gồm VAT). Hàm thuần, dùng chung cho trang giỏ hàng, checkout và mini-cart.
- * Ngưỡng miễn phí vận chuyển xét trên tạm tính (trước giảm giá).
  */
 export function calculateCartTotals(items: CartItem[], discount: ActiveDiscount | null = null): CartTotals {
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
+  const savings = items.reduce(
+    (sum, item) => sum + (item.originalPrice && item.originalPrice > item.price ? (item.originalPrice - item.price) * item.quantity : 0),
+    0
+  );
 
   const discountAmount =
     discount?.type === "percentage" ? Math.round((subtotal * discount.value) / 100) : 0;
 
-  const isFreeShipping =
-    subtotal === 0 || subtotal >= FREE_SHIPPING_THRESHOLD || discount?.type === "freeship";
+  const isFreeShipping = subtotal === 0 || discount?.type === "freeship";
   const shippingCost = isFreeShipping ? 0 : STANDARD_SHIPPING_FEE;
 
   return {
     subtotal,
     discountAmount,
     shippingCost,
-    freeShippingThreshold: FREE_SHIPPING_THRESHOLD,
-    freeShippingRemaining: isFreeShipping ? 0 : FREE_SHIPPING_THRESHOLD - subtotal,
+    savings,
     total: Math.max(0, subtotal - discountAmount) + shippingCost,
     totalQuantity,
   };

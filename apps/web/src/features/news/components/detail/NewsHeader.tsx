@@ -53,7 +53,7 @@ export function NewsHeader({ article, authorName, fullDate, loc }: NewsHeaderPro
           />
         </motion.p>
 
-        <h1 className="mt-4 text-[26px] font-semibold leading-tight text-[var(--primary-ink)] sm:text-[36px] md:text-[42px]">
+        <h1 className="mt-4 text-[1.625rem] font-semibold leading-tight text-[var(--primary-ink)] sm:text-[2.25rem] md:text-[2.625rem]">
           <span className="sr-only">{article.title[loc]}</span>
           <span aria-hidden="true">
             {words.map((word, index) => (

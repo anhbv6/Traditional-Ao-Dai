@@ -46,6 +46,11 @@ export interface TextFieldProps
   fullWidth?: boolean;
   /** Tông màu theo nền đặt ô: `default` (nền kem/trắng) | `onPrimary` (khối nền đỏ đô như Newsletter) */
   tone?: TextFieldTone;
+  /**
+   * Chiều cao cố định khớp với ActionButton cùng `size` (sm 36px · md 40px · lg 48px theo rem) —
+   * dùng khi đặt ô cạnh nút trên cùng một hàng. Bỏ trống: cao tự nhiên theo nội dung (form dọc).
+   */
+  size?: TextFieldSize;
 
   /* ---------- Slot đầu / cuối ---------- */
   /** Slot đầu: icon tĩnh, chữ (VD "+84"), hoặc dropdown tương tác */
@@ -180,6 +185,15 @@ const LABEL_CLASS =
 const FIELD_BASE_CLASS =
   "relative flex items-center gap-2.5 border-[var(--tf-border)] text-[15px] text-[var(--tf-text)] transition-[border-color,box-shadow,background-color] duration-300";
 
+export type TextFieldSize = "sm" | "md" | "lg";
+
+/* Chiều cao khớp SIZE_CLASS của ActionButton (h-9 / h-10 / h-12) — input bỏ padding dọc để không vượt khung */
+const SIZE_CLASS: Record<TextFieldSize, string> = {
+  sm: "h-9 text-[13px] [&>input]:py-0",
+  md: "h-10 text-sm [&>input]:py-0",
+  lg: "h-12 [&>input]:py-0",
+};
+
 const APPEARANCE_CLASS: Record<NonNullable<TextFieldProps["appearance"]>, string> = {
   underline: "border-0 border-b bg-transparent",
   outline: "border bg-[var(--tf-field-bg)] px-3 focus-within:ring-2 focus-within:ring-[var(--tf-ring)]",
@@ -296,6 +310,7 @@ export function TextField({
   appearance = "underline",
   fullWidth = true,
   tone = "default",
+  size,
   prefix,
   prefixDivider = false,
   suffix,
@@ -494,6 +509,7 @@ export function TextField({
         className={cn(
           FIELD_BASE_CLASS,
           APPEARANCE_CLASS[appearance],
+          size && SIZE_CLASS[size],
           hasLabel && (isHorizontal ? "mt-2 sm:mt-0" : "mt-2"),
           isInteractive && !hasError && INTERACTIVE_CLASS,
           readOnly && !disabled && READONLY_CLASS,

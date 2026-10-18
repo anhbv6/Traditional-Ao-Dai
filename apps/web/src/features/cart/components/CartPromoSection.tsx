@@ -4,6 +4,8 @@ import React from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Tag, X } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { ActionButton } from "@/components/shared/ActionButton";
+import { TextField } from "@/components/shared/TextField";
 import { type ActiveDiscount } from "../types/cart.types";
 
 interface CartPromoSectionProps {
@@ -19,7 +21,7 @@ interface CartPromoSectionProps {
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 /**
- * Mã giảm giá: chưa áp dụng -> ô nhập + nút; đã áp dụng -> thẻ mã (gỡ được). Mỗi đơn chỉ một mã.
+ * Mã giảm giá: chưa áp dụng -> ô nhập (TextField viền hộp) + nút; đã áp dụng -> thẻ mã viền đứt (gỡ được). Mỗi đơn chỉ một mã.
  */
 export function CartPromoSection({
   promoCode,
@@ -33,81 +35,67 @@ export function CartPromoSection({
   const t = useTranslations("CartPage");
 
   return (
-    <div>
-      <p className="flex items-center gap-2 text-[10px] uppercase tracking-[2px] text-[var(--text-light)]">
-        <Tag size={12} strokeWidth={1.6} />
-        {t("promo.title")}
-      </p>
-
-      <AnimatePresence mode="wait" initial={false}>
-        {activeDiscount ? (
-          <motion.div
-            key="applied"
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.25, ease: EASE }}
-            className="mt-2.5 flex items-center justify-between gap-3 border border-dashed border-emerald-700/40 bg-emerald-50/60 px-3 py-2"
-          >
-            <div className="min-w-0">
-              <p className="text-[12px] font-semibold tracking-[1.5px] text-emerald-800">{activeDiscount.code}</p>
-              <p className="truncate text-[11px] text-emerald-800/80">{promoDescription}</p>
+    <AnimatePresence mode="wait" initial={false}>
+      {activeDiscount ? (
+        <motion.div
+          key="applied"
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -6 }}
+          transition={{ duration: 0.25, ease: EASE }}
+        >
+          <p className="text-[11px] font-semibold uppercase tracking-[2.5px] text-[var(--text-light)]">{t("promo.title")}</p>
+          <div className="mt-2 flex items-center justify-between gap-3 border border-dashed border-[var(--sale-gold)]/60 bg-[var(--bg-secondary)]/60 px-3 py-2">
+            <div className="flex min-w-0 items-center gap-2.5">
+              <Tag size={14} strokeWidth={1.6} className="shrink-0 text-[var(--sale-gold)]" />
+              <div className="min-w-0">
+                <p className="text-[12px] font-semibold tracking-[1.5px] text-[var(--text-main)]">{activeDiscount.code}</p>
+                <p className="truncate text-[11px] text-[var(--text-light)]">{promoDescription}</p>
+              </div>
             </div>
             <button
               type="button"
               onClick={handleRemovePromo}
               aria-label={t("promo.remove")}
               title={t("promo.remove")}
-              className="grid size-7 shrink-0 cursor-pointer place-items-center text-emerald-800/70 transition-colors hover:bg-[var(--bg-card)] hover:text-[var(--destructive)]"
+              className="grid size-7 shrink-0 cursor-pointer place-items-center text-[var(--text-light)] transition-colors hover:bg-[var(--bg-card)] hover:text-[var(--destructive)]"
             >
               <X size={14} />
             </button>
-          </motion.div>
-        ) : (
-          <motion.form
-            key="form"
-            onSubmit={handleApplyPromo}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.25, ease: EASE }}
-            className="mt-2.5"
-          >
-            <div className="flex">
-              <input
-                type="text"
-                value={promoCode}
-                onChange={(e) => setPromoCode(e.target.value)}
-                placeholder={t("promo.placeholder")}
-                aria-label={t("promo.title")}
-                aria-invalid={Boolean(promoError)}
-                className={`h-9 min-w-0 flex-1 border bg-[var(--bg-card)] px-3 text-[12px] uppercase tracking-[1px] text-[var(--text-main)] outline-none transition-colors placeholder:normal-case placeholder:tracking-normal placeholder:text-[var(--text-light)]/70 focus:border-[var(--primary-color)] ${
-                  promoError ? "border-[var(--destructive)]" : "border-[var(--border)]"
-                }`}
-              />
-              <button
-                type="submit"
-                className="h-9 shrink-0 cursor-pointer bg-[var(--bg-inverse)] px-4 text-[10px] font-semibold uppercase tracking-[1.5px] text-white transition-colors hover:bg-[var(--primary-color)]"
-              >
-                {t("promo.apply")}
-              </button>
-            </div>
-            <AnimatePresence>
-              {promoError ? (
-                <motion.p
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="overflow-hidden pt-1.5 text-[11px] text-[var(--destructive)]"
-                  role="alert"
-                >
-                  {promoError}
-                </motion.p>
-              ) : null}
-            </AnimatePresence>
-          </motion.form>
-        )}
-      </AnimatePresence>
-    </div>
+          </div>
+        </motion.div>
+      ) : (
+        <motion.form
+          key="form"
+          onSubmit={handleApplyPromo}
+          noValidate
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -6 }}
+          transition={{ duration: 0.25, ease: EASE }}
+        >
+          <label htmlFor="cart-promo-code" className="block text-[11px] font-semibold uppercase tracking-[2.5px] text-[var(--text-light)]">
+            {t("promo.title")}
+          </label>
+          <div className="mt-2 flex items-start gap-2">
+            <TextField
+              id="cart-promo-code"
+              className="min-w-0 flex-1"
+              appearance="outline"
+              size="md"
+              placeholder={t("promo.placeholder")}
+              prefix={<Tag size={14} strokeWidth={1.6} />}
+              inputClassName="uppercase tracking-[1px] placeholder:normal-case placeholder:tracking-normal"
+              value={promoCode}
+              onValueChange={(value) => setPromoCode(value)}
+              error={promoError ?? undefined}
+            />
+            <ActionButton type="submit" variant="dialog" size="md" className="shrink-0">
+              {t("promo.apply")}
+            </ActionButton>
+          </div>
+        </motion.form>
+      )}
+    </AnimatePresence>
   );
 }

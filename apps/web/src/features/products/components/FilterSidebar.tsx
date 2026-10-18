@@ -1,11 +1,11 @@
 'use client';
 
 import { ReactNode, useState } from 'react';
-import { ChevronDown, Check } from 'lucide-react';
+import { ChevronDown, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
-import { Checkbox } from '@/components/ui/checkbox';
 import type { MockProduct } from '../data/mockProducts';
+import { ProductSearchInput } from './ProductSearchInput';
 
 export const minPrice = 500000;
 export const maxPrice = 5000000;
@@ -76,7 +76,20 @@ export const matchCollection = (product: MockProduct, colId: string) => {
   return false;
 };
 
-interface FilterSidebarProps {
+/** Mức giá chọn nhanh (giá tối đa) — `maxPrice` nghĩa là không giới hạn */
+const pricePresets = [1500000, 2000000, 3000000, maxPrice];
+
+/** Giá rút gọn cho chip: 1,5tr / 1.5M */
+function formatPriceShort(value: number, locale: string) {
+  const millions = value / 1000000;
+  return locale === 'vi' ? `${String(millions).replace('.', ',')}tr` : `${millions}M`;
+}
+
+const getColorLabel = (name: string, tp: (key: string) => string) => (colorKeys[name] ? tp(`colors.${colorKeys[name]}`) : name);
+const getMaterialLabel = (material: string, tp: (key: string) => string) =>
+  materialKeys[material] ? tp(`materials.${materialKeys[material]}`) : material;
+
+interface FilterGroupsProps {
   locale: 'vi' | 'en';
   selectedCollections: string[];
   setSelectedCollections: React.Dispatch<React.SetStateAction<string[]>>;
@@ -91,38 +104,133 @@ interface FilterSidebarProps {
   onFilterChange: () => void;
   productCatalog: MockProduct[];
   toggleValue: (value: string, values: string[], setter: React.Dispatch<React.SetStateAction<string[]>>) => void;
+}
+
+export type { FilterGroupsProps };
+
+/** Phần đầu bộ lọc dùng chung desktop / mobile: từ khóa, số bộ lọc đang bật, nút xóa tất cả */
+export interface FilterSummaryProps extends FilterGroupsProps {
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
   activeFilterCount: number;
   onClearAll: () => void;
 }
 
-export type FilterGroupsProps = Omit<FilterSidebarProps, 'activeFilterCount' | 'onClearAll'>;
-
 /**
- * Cột lọc bên trái (desktop): không khung, không ô icon — chỉ tiêu đề nhỏ in hoa và vạch kẻ mảnh,
- * để sự chú ý dồn về lưới sản phẩm. "Danh mục" đã có thanh tab phía trên lưới nên không lặp lại ở đây.
+ * Cột lọc bên trái (desktop), ghim theo khi cuộn:
+ * - Phần đầu CỐ ĐỊNH: ô tìm kiếm → tiêu đề + "Xóa tất cả" → chip các bộ lọc đang bật (bấm để bỏ từng cái).
+ * - Bên dưới là các nhóm lọc, tự cuộn riêng khi dài hơn khung nhìn — phần đầu không bị trôi theo.
+ * "Danh mục" đã có thanh tab phía trên lưới nên không lặp lại ở đây.
  */
-export function FilterSidebar({ activeFilterCount, onClearAll, ...groupProps }: FilterSidebarProps) {
+export function FilterSidebar({ searchQuery, onSearchChange, activeFilterCount, onClearAll, ...groupProps }: FilterSummaryProps) {
   const t = useTranslations('ProductsPage.filter');
+  const canClear = activeFilterCount > 0 || searchQuery.trim().length > 0;
 
   return (
-    <aside
-      data-lenis-prevent
-      className="hidden [scrollbar-width:none] lg:sticky lg:top-28 lg:block lg:max-h-[calc(100vh-140px)] lg:self-start lg:overflow-y-auto lg:pr-4"
-    >
-      <div className="flex items-baseline justify-between border-b border-[var(--text-main)]/80 pb-3">
-        <h2 className="text-[11px] font-semibold uppercase tracking-[3px] text-[var(--text-main)]">{t('title')}</h2>
-        {activeFilterCount > 0 ? (
+    <aside className="hidden lg:sticky lg:top-24 lg:flex lg:max-h-[calc(100vh-7rem)] lg:flex-col lg:self-start">
+      <div className="shrink-0 space-y-4 border-b border-[var(--text-main)]/80 pb-4">
+        <ProductSearchInput value={searchQuery} onChange={onSearchChange} />
+        <div className="flex items-baseline justify-between">
+          <h2 className="text-[11px] font-semibold uppercase tracking-[3px] text-[var(--text-main)]">{t('title')}</h2>
+          {canClear ? (
+            <button
+              type="button"
+              onClick={onClearAll}
+              className="cursor-pointer text-xs text-[var(--text-light)] underline-offset-4 transition-colors hover:text-[var(--primary-ink)] hover:underline"
+            >
+              {activeFilterCount > 0 ? t('clearAll', { count: activeFilterCount }) : t('clearAllShort')}
+            </button>
+          ) : null}
+        </div>
+        <ActiveFilters searchQuery={searchQuery} onSearchChange={onSearchChange} {...groupProps} />
+      </div>
+
+      <div data-lenis-prevent className="min-h-0 flex-1 overflow-y-auto overscroll-contain pr-2 [scrollbar-color:var(--border)_transparent] [scrollbar-width:thin]">
+        <FilterGroups {...groupProps} />
+      </div>
+    </aside>
+  );
+}
+
+/**
+ * Chip các bộ lọc đang bật — nhìn là biết đang lọc gì, bấm ✕ để bỏ đúng lựa chọn đó.
+ * Không có bộ lọc nào thì không chiếm chỗ.
+ */
+export function ActiveFilters({
+  searchQuery,
+  onSearchChange,
+  locale,
+  selectedCollections,
+  setSelectedCollections,
+  selectedPurchaseTypes,
+  setSelectedPurchaseTypes,
+  selectedColors,
+  setSelectedColors,
+  selectedMaterials,
+  setSelectedMaterials,
+  priceLimit,
+  setPriceLimit,
+  onFilterChange,
+  toggleValue,
+}: FilterGroupsProps & { searchQuery?: string; onSearchChange?: (query: string) => void }) {
+  const t = useTranslations('ProductsPage.filter');
+  const tp = useTranslations('Product');
+  const query = searchQuery?.trim();
+
+  const chips = [
+    ...(query && onSearchChange ? [{ key: 'q', label: `“${query}”`, onRemove: () => onSearchChange('') }] : []),
+    ...selectedCollections.map((id) => ({
+      key: `col-${id}`,
+      label: tp(`collections.${id}`),
+      onRemove: () => toggleValue(id, selectedCollections, setSelectedCollections),
+    })),
+    ...selectedPurchaseTypes.map((id) => ({
+      key: `buy-${id}`,
+      label: tp(`purchaseTypes.${id}`),
+      onRemove: () => toggleValue(id, selectedPurchaseTypes, setSelectedPurchaseTypes),
+    })),
+    ...selectedColors.map((name) => ({
+      key: `color-${name}`,
+      label: getColorLabel(name, tp),
+      onRemove: () => toggleValue(name, selectedColors, setSelectedColors),
+    })),
+    ...selectedMaterials.map((material) => ({
+      key: `mat-${material}`,
+      label: getMaterialLabel(material, tp),
+      onRemove: () => toggleValue(material, selectedMaterials, setSelectedMaterials),
+    })),
+    ...(priceLimit < maxPrice
+      ? [
+          {
+            key: 'price',
+            label: t('priceUpTo', { max: formatPrice(priceLimit, locale) }),
+            onRemove: () => {
+              setPriceLimit(maxPrice);
+              onFilterChange();
+            },
+          },
+        ]
+      : []),
+  ];
+
+  if (chips.length === 0) return null;
+
+  return (
+    <ul aria-label={t('activeTitle')} className="flex flex-wrap gap-1.5">
+      {chips.map((chip) => (
+        <li key={chip.key}>
           <button
             type="button"
-            onClick={onClearAll}
-            className="cursor-pointer text-xs text-[var(--text-light)] underline-offset-4 transition-colors hover:text-[var(--primary-ink)] hover:underline"
+            onClick={chip.onRemove}
+            aria-label={t('removeFilter', { label: chip.label })}
+            className="group/chip inline-flex max-w-full cursor-pointer items-center gap-1.5 bg-[var(--primary-color)]/8 py-1 pl-2.5 pr-1.5 text-xs text-[var(--primary-ink)] transition-colors hover:bg-[var(--primary-color)] hover:text-white"
           >
-            {t('clearAll', { count: activeFilterCount })}
+            <span className="truncate">{chip.label}</span>
+            <X size={12} strokeWidth={2} className="shrink-0 opacity-60 group-hover/chip:opacity-100" />
           </button>
-        ) : null}
-      </div>
-      <FilterGroups {...groupProps} />
-    </aside>
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -146,108 +254,87 @@ export function FilterGroups({
   const t = useTranslations('ProductsPage.filter');
   const tp = useTranslations('Product');
 
+  const clearGroup = (setter: React.Dispatch<React.SetStateAction<string[]>>) => () => {
+    setter([]);
+    onFilterChange();
+  };
+  const applyPrice = (limit: number) => {
+    setPriceLimit(limit);
+    onFilterChange();
+  };
+
   return (
     <>
-      <FilterSection
-        title={t('collectionTitle')}
-        activeCount={selectedCollections.length}
-        onClear={() => {
-          setSelectedCollections([]);
-          onFilterChange();
-        }}
-      >
-        {collectionOptions.map((col) => (
-          <CheckOption
-            key={col.id}
-            label={tp(`collections.${col.id}`)}
-            count={productCatalog.filter((product) => matchCollection(product, col.id)).length}
-            checked={selectedCollections.includes(col.id)}
-            onCheckedChange={() => toggleValue(col.id, selectedCollections, setSelectedCollections)}
-          />
-        ))}
+      <FilterSection title={t('collectionTitle')} activeCount={selectedCollections.length} onClear={clearGroup(setSelectedCollections)}>
+        <ChipGroup>
+          {collectionOptions.map((col) => (
+            <FilterChip
+              key={col.id}
+              label={tp(`collections.${col.id}`)}
+              count={productCatalog.filter((product) => matchCollection(product, col.id)).length}
+              selected={selectedCollections.includes(col.id)}
+              onToggle={() => toggleValue(col.id, selectedCollections, setSelectedCollections)}
+            />
+          ))}
+        </ChipGroup>
       </FilterSection>
 
-      <FilterSection
-        title={t('purchaseTypeTitle')}
-        activeCount={selectedPurchaseTypes.length}
-        onClear={() => {
-          setSelectedPurchaseTypes([]);
-          onFilterChange();
-        }}
-      >
-        {purchaseOptions.map((option) => (
-          <CheckOption
-            key={option.id}
-            label={tp(`purchaseTypes.${option.id}`)}
-            count={productCatalog.filter((product) => product.purchaseType === option.id).length}
-            checked={selectedPurchaseTypes.includes(option.id)}
-            onCheckedChange={() => toggleValue(option.id, selectedPurchaseTypes, setSelectedPurchaseTypes)}
-          />
-        ))}
+      <FilterSection title={t('purchaseTypeTitle')} activeCount={selectedPurchaseTypes.length} onClear={clearGroup(setSelectedPurchaseTypes)}>
+        <ChipGroup>
+          {purchaseOptions.map((option) => (
+            <FilterChip
+              key={option.id}
+              label={tp(`purchaseTypes.${option.id}`)}
+              count={productCatalog.filter((product) => product.purchaseType === option.id).length}
+              selected={selectedPurchaseTypes.includes(option.id)}
+              onToggle={() => toggleValue(option.id, selectedPurchaseTypes, setSelectedPurchaseTypes)}
+            />
+          ))}
+        </ChipGroup>
       </FilterSection>
 
-      <FilterSection
-        title={t('colorTitle')}
-        activeCount={selectedColors.length}
-        onClear={() => {
-          setSelectedColors([]);
-          onFilterChange();
-        }}
-      >
-        <div className="flex flex-wrap gap-2.5">
-          {colorOptions.map((color) => {
-            const isSelected = selectedColors.includes(color.name);
-            const label = colorKeys[color.name] ? tp(`colors.${colorKeys[color.name]}`) : color.name;
-            return (
-              <button
-                key={color.name}
-                type="button"
-                title={label}
-                aria-label={label}
-                aria-pressed={isSelected}
-                onClick={() => toggleValue(color.name, selectedColors, setSelectedColors)}
-                className={cn(
-                  'grid size-8 cursor-pointer place-items-center rounded-full border border-black/10 ring-offset-2 ring-offset-[var(--bg-main)] transition-shadow duration-200 hover:ring-1 hover:ring-[var(--text-light)]',
-                  isSelected && 'ring-1 ring-[var(--primary-color)] hover:ring-[var(--primary-color)]'
-                )}
-                style={{ backgroundColor: color.hex }}
-              >
-                {isSelected ? (
-                  <Check size={13} strokeWidth={3} className={colorKeys[color.name] === 'white' ? 'text-[var(--text-main)]' : 'text-white'} />
-                ) : null}
-              </button>
-            );
-          })}
+      <FilterSection title={t('colorTitle')} activeCount={selectedColors.length} onClear={clearGroup(setSelectedColors)}>
+        {/* Ô màu kèm tên — không phải rê chuột mới biết là màu gì */}
+        <ChipGroup>
+          {colorOptions.map((color) => (
+            <FilterChip
+              key={color.name}
+              label={getColorLabel(color.name, tp)}
+              selected={selectedColors.includes(color.name)}
+              onToggle={() => toggleValue(color.name, selectedColors, setSelectedColors)}
+              leading={<span aria-hidden="true" className="size-3.5 shrink-0 rounded-full border border-black/10" style={{ backgroundColor: color.hex }} />}
+            />
+          ))}
+        </ChipGroup>
+      </FilterSection>
+
+      <FilterSection title={t('materialTitle')} activeCount={selectedMaterials.length} onClear={clearGroup(setSelectedMaterials)}>
+        <ChipGroup>
+          {materialOptions.map((material) => (
+            <FilterChip
+              key={material}
+              label={getMaterialLabel(material, tp)}
+              count={productCatalog.filter((product) => product.material === material).length}
+              selected={selectedMaterials.includes(material)}
+              onToggle={() => toggleValue(material, selectedMaterials, setSelectedMaterials)}
+            />
+          ))}
+        </ChipGroup>
+      </FilterSection>
+
+      <FilterSection title={t('priceTitle')} activeCount={priceLimit < maxPrice ? 1 : 0} onClear={() => applyPrice(maxPrice)}>
+        {/* Bấm nhanh mức giá hay dùng; cần chính xác hơn thì kéo thanh bên dưới */}
+        <div className="grid grid-cols-4 gap-1.5">
+          {pricePresets.map((preset) => (
+            <FilterChip
+              key={preset}
+              label={preset === maxPrice ? t('priceAll') : `≤ ${formatPriceShort(preset, locale)}`}
+              selected={priceLimit === preset}
+              onToggle={() => applyPrice(preset)}
+              className="w-full justify-center px-1"
+            />
+          ))}
         </div>
-      </FilterSection>
-
-      <FilterSection
-        title={t('materialTitle')}
-        activeCount={selectedMaterials.length}
-        onClear={() => {
-          setSelectedMaterials([]);
-          onFilterChange();
-        }}
-      >
-        {materialOptions.map((material) => (
-          <CheckOption
-            key={material}
-            label={materialKeys[material] ? tp(`materials.${materialKeys[material]}`) : material}
-            count={productCatalog.filter((product) => product.material === material).length}
-            checked={selectedMaterials.includes(material)}
-            onCheckedChange={() => toggleValue(material, selectedMaterials, setSelectedMaterials)}
-          />
-        ))}
-      </FilterSection>
-
-      <FilterSection
-        title={t('priceTitle')}
-        activeCount={priceLimit < maxPrice ? 1 : 0}
-        onClear={() => {
-          setPriceLimit(maxPrice);
-          onFilterChange();
-        }}
-      >
         <input
           type="range"
           min={minPrice}
@@ -255,15 +342,14 @@ export function FilterGroups({
           step={100000}
           value={priceLimit}
           aria-label={t('priceTitle')}
-          onChange={(event) => {
-            setPriceLimit(Number(event.target.value));
-            onFilterChange();
-          }}
-          className="h-1 w-full cursor-pointer accent-[var(--primary-color)]"
+          onChange={(event) => applyPrice(Number(event.target.value))}
+          className="mt-4 h-1 w-full cursor-pointer accent-[var(--primary-color)]"
         />
-        <p className="mt-3 flex justify-between text-xs text-[var(--text-light)]">
+        <p className="mt-2 flex justify-between text-xs text-[var(--text-light)]">
           <span>{formatPrice(minPrice, locale)}đ</span>
-          <span className="font-semibold text-[var(--text-main)]">{t('priceUpTo', { max: formatPrice(priceLimit, locale) })}</span>
+          <span className="font-semibold text-[var(--text-main)]">
+            {priceLimit < maxPrice ? t('priceUpTo', { max: formatPrice(priceLimit, locale) }) : t('priceAll')}
+          </span>
         </p>
       </FilterSection>
     </>
@@ -288,14 +374,20 @@ export function FilterSection({
   const t = useTranslations('ProductsPage.filter');
 
   return (
-    <section className="border-b border-[var(--border)] py-4">
+    <section className="border-b border-[var(--border)] py-4 last:border-b-0">
       <div className="flex items-center justify-between gap-3">
+        {/* Cả hàng tiêu đề là một nút mở/đóng — vùng bấm lớn, mũi tên chỉ là dấu hiệu */}
         <button
           type="button"
           aria-expanded={isOpen}
           onClick={() => setIsOpen(!isOpen)}
           className="flex flex-1 cursor-pointer items-center gap-2 text-left text-sm font-semibold text-[var(--text-main)] transition-colors hover:text-[var(--primary-ink)]"
         >
+          <ChevronDown
+            size={15}
+            strokeWidth={1.6}
+            className={cn('shrink-0 text-[var(--text-light)] transition-transform duration-300', isOpen ? 'rotate-0' : '-rotate-90')}
+          />
           {title}
           {activeCount > 0 ? (
             <span className="grid size-5 place-items-center rounded-full bg-[var(--primary-color)] text-[10px] font-semibold text-white">
@@ -312,46 +404,59 @@ export function FilterSection({
             {t('clear')}
           </button>
         ) : null}
-        <button
-          type="button"
-          aria-label={title}
-          onClick={() => setIsOpen(!isOpen)}
-          className="cursor-pointer text-[var(--text-light)] transition-colors hover:text-[var(--primary-ink)]"
-        >
-          <ChevronDown size={16} strokeWidth={1.6} className={cn('transition-transform duration-300', isOpen ? 'rotate-180' : 'rotate-0')} />
-        </button>
       </div>
       {/* Mở/đóng mượt bằng grid-rows 0fr -> 1fr (không cần đo chiều cao) */}
       <div className={cn('grid transition-[grid-template-rows] duration-300 ease-out', isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]')}>
         <div className="overflow-hidden">
-          <div className="space-y-2.5 pt-4">{children}</div>
+          <div className="pt-3">{children}</div>
         </div>
       </div>
     </section>
   );
 }
 
-/** Một lựa chọn dạng ô tích — dùng chung cho cột lọc desktop và dock lọc mobile */
-export function CheckOption({
+function ChipGroup({ children }: { children: ReactNode }) {
+  return <div className="flex flex-wrap gap-1.5">{children}</div>;
+}
+
+/** Một lựa chọn dạng chip bật/tắt — gọn hơn ô tích, tự xuống dòng theo bề rộng cột */
+export function FilterChip({
   label,
   count,
-  checked,
-  onCheckedChange,
+  selected,
+  onToggle,
+  leading,
+  className,
 }: {
   label: string;
-  count: number;
-  checked: boolean;
-  onCheckedChange: () => void;
+  count?: number;
+  selected: boolean;
+  onToggle: () => void;
+  leading?: ReactNode;
+  className?: string;
 }) {
+  const isEmpty = count === 0 && !selected;
+
   return (
-    <label className="group flex min-h-7 cursor-pointer items-center justify-between gap-3 text-sm">
-      <span className="flex select-none items-center gap-3">
-        <Checkbox checked={checked} onCheckedChange={onCheckedChange} className="size-4 rounded-[3px] shadow-none" />
-        <span className={cn('transition-colors', checked ? 'text-[var(--primary-ink)]' : 'text-[var(--text-main)] group-hover:text-[var(--primary-ink)]')}>
-          {label}
-        </span>
-      </span>
-      <span className="text-xs tabular-nums text-[var(--text-light)]/70">{count}</span>
-    </label>
+    <button
+      type="button"
+      aria-pressed={selected}
+      onClick={onToggle}
+      disabled={isEmpty}
+      className={cn(
+        'inline-flex min-h-8 cursor-pointer items-center gap-1.5 border px-2 text-xs transition-colors duration-200',
+        selected
+          ? 'border-[var(--primary-color)] bg-[var(--primary-color)] text-white'
+          : 'border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-main)] hover:border-[var(--primary-color)] hover:text-[var(--primary-ink)]',
+        'disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-[var(--border)] disabled:hover:text-[var(--text-main)]',
+        className
+      )}
+    >
+      {leading}
+      <span className="whitespace-nowrap">{label}</span>
+      {count !== undefined ? (
+        <span className={cn('text-[10px] tabular-nums', selected ? 'text-white/75' : 'text-[var(--text-light)]/70')}>{count}</span>
+      ) : null}
+    </button>
   );
 }

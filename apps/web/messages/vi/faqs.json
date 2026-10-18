@@ -1,8 +1,14 @@
 {
-  "title": "Câu hỏi thường gặp (FAQs)",
+  "title": "Câu hỏi thường gặp",
   "subtitle": "Tìm câu trả lời nhanh chóng cho các câu hỏi phổ biến về kích thước, quy trình may đo, giao hàng và thanh toán.",
   "searchPlaceholder": "Tìm kiếm câu hỏi của bạn...",
-  "noResults": "Không tìm thấy kết quả phù hợp cho từ khóa của bạn.",
+  "noResults": "Thử từ khoá khác hoặc chọn \"Tất cả câu hỏi\" — hay hỏi trực tiếp thợ may của chúng tôi.",
+  "eyebrow": "Hỗ trợ khách hàng",
+  "searchLabel": "Tìm câu hỏi",
+  "categoriesLabel": "Chủ đề câu hỏi",
+  "resultCount": "{count} câu hỏi",
+  "noResultsTitle": "Chưa có câu trả lời phù hợp",
+  "resetFilters": "Xem tất cả câu hỏi",
   "categories": {
     "all": "Tất cả câu hỏi",
     "sizing": "May đo & Kích thước",
@@ -43,5 +49,12 @@
       "question": "Tôi có thể thanh toán qua các phương thức nào?",
       "answer": "Chúng tôi hỗ trợ các hình thức thanh toán đa dạng: Thanh toán khi nhận hàng (COD - áp dụng toàn quốc), Chuyển khoản ngân hàng trực tiếp qua QR code, Ví điện tử (Momo, VNPay) hoặc thẻ tín dụng quốc tế (Visa, Mastercard)."
     }
+  },
+  "cta": {
+    "eyebrow": "Vẫn còn băn khoăn?",
+    "title": "Hỏi thẳng thợ may của chúng tôi",
+    "description": "Gửi lời nhắn hoặc gọi hotline — trong giờ làm việc, bạn nhận phản hồi sau khoảng 15–30 phút.",
+    "contact": "Gửi lời nhắn",
+    "call": "Gọi 0909 000 000"
   }
 }

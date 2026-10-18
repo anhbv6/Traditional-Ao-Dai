@@ -21,13 +21,18 @@
     "clearSearch": "Xóa từ khóa",
     "sheetDescription": "Thu hẹp danh sách theo bộ sưu tập, hình thức mua, màu sắc, chất liệu và giá.",
     "clearAllShort": "Xóa tất cả",
-    "showResults": "Xem {count} sản phẩm"
+    "showResults": "Xem {count} sản phẩm",
+    "activeTitle": "Đang lọc",
+    "removeFilter": "Bỏ lọc: {label}",
+    "priceAll": "Tất cả"
   },
   "collection": {
     "foundCount": "{count} sản phẩm",
+    "showingRange": "{from}–{to} / {total} sản phẩm",
     "sortByLabel": "Sắp xếp",
     "sortByPlaceholder": "Sắp xếp theo",
     "columnsLabel": "Cột",
+    "columnsOption": "{count} cột",
     "sortOptions": {
       "all": "Hiển thị tất cả",
       "newest": "Mới nhất",

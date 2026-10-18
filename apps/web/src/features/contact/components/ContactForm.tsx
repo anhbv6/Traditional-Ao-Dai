@@ -4,13 +4,15 @@ import React from "react";
 import { ArrowRight } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
+import { ActionButton } from "@/components/shared/ActionButton";
+import { TextField } from "@/components/shared/TextField";
+import { TextAreaField } from "@/components/shared/TextAreaField";
 import { useContact } from "../hooks/useContact";
 import { optionKeys } from "../types/contact.types";
 
-/** Ô nhập kiểu gạch chân — nhẹ hơn ô viền hộp, hợp với nền giấy kem của storefront */
-const fieldClass =
-  "mt-2 block w-full border-0 border-b border-[var(--border)] bg-transparent px-0 py-2.5 text-[15px] text-[var(--text-main)] outline-none transition-colors placeholder:text-[var(--text-light)]/55 focus:border-[var(--primary-color)]";
-const labelClass = "text-[11px] font-semibold uppercase tracking-[2.5px] text-[var(--text-light)]";
+/** Nhãn nhóm chọn loại nhu cầu — cùng kiểu nhãn của TextField */
+const LEGEND_CLASS = "text-[11px] font-semibold uppercase tracking-[2.5px] text-[var(--text-light)]";
+const MESSAGE_MAX_LENGTH = 1000;
 
 export function ContactForm() {
   const t = useTranslations("ContactPage.form");
@@ -26,36 +28,31 @@ export function ContactForm() {
     : null;
 
   return (
-    <form onSubmit={handleSubmit} className="bg-[var(--bg-main)] p-6 sm:p-10 lg:p-12">
-      <div className="grid gap-8 sm:grid-cols-2 sm:gap-10">
-        <label className="block">
-          <span className={labelClass}>{t("name")}</span>
-          <input
-            required
-            autoComplete="name"
-            className={fieldClass}
-            placeholder={t("namePlaceholder")}
-            value={formData.name}
-            onChange={(e) => handleChange("name", e.target.value)}
-          />
-        </label>
-        <label className="block">
-          <span className={labelClass}>{t("contact")}</span>
-          <input
-            required
-            autoComplete="tel"
-            className={fieldClass}
-            placeholder={t("contactPlaceholder")}
-            value={formData.contactInfo}
-            onChange={(e) => handleChange("contactInfo", e.target.value)}
-          />
-        </label>
+    <form onSubmit={handleSubmit} className="bg-[var(--bg-main)] p-6 sm:p-10 xl:p-12">
+      {/* 2 cột khi đủ rộng; laptop nhỏ (cột form hẹp) xếp 1 cột cho khỏi chật */}
+      <div className="grid gap-7 sm:grid-cols-2 sm:gap-8 lg:grid-cols-1 xl:grid-cols-2 xl:gap-10">
+        <TextField
+          required
+          label={t("name")}
+          autoComplete="name"
+          placeholder={t("namePlaceholder")}
+          value={formData.name}
+          onValueChange={(value) => handleChange("name", value)}
+        />
+        <TextField
+          required
+          label={t("contact")}
+          autoComplete="tel"
+          placeholder={t("contactPlaceholder")}
+          value={formData.contactInfo}
+          onValueChange={(value) => handleChange("contactInfo", value)}
+        />
       </div>
 
       {/* Loại nhu cầu: chọn một chạm bằng thẻ, không giấu trong dropdown */}
-      <fieldset className="mt-10">
-        <legend className={labelClass}>{t("requestType")}</legend>
-        <div className="mt-4 flex flex-wrap gap-2.5">
+      <fieldset className="mt-8 sm:mt-10">
+        <legend className={LEGEND_CLASS}>{t("requestType")}</legend>
+        <div className="mt-3 flex flex-wrap gap-2 sm:mt-4 sm:gap-2.5">
           {optionKeys.map((key) => (
             <label key={key} className="cursor-pointer">
               <input
@@ -66,7 +63,7 @@ export function ContactForm() {
                 onChange={() => handleChange("requestType", key)}
                 className="peer sr-only"
               />
-              <span className="inline-flex min-h-10 items-center border border-[var(--border)] px-4 text-sm text-[var(--text-main)] transition-colors hover:border-[var(--primary-color)] peer-checked:border-[var(--primary-color)] peer-checked:bg-[var(--primary-color)] peer-checked:text-white peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[var(--ring)]">
+              <span className="inline-flex min-h-10 items-center border border-[var(--border)] px-3.5 text-sm text-[var(--text-main)] transition-colors hover:border-[var(--primary-color)] peer-checked:border-[var(--primary-color)] peer-checked:bg-[var(--primary-color)] peer-checked:text-white peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[var(--ring)] sm:px-4">
                 {t(`options.${key}`)}
               </span>
             </label>
@@ -74,17 +71,17 @@ export function ContactForm() {
         </div>
       </fieldset>
 
-      <label className="mt-10 block">
-        <span className={labelClass}>{t("message")}</span>
-        <textarea
-          required
-          rows={4}
-          placeholder={t("messagePlaceholder")}
-          className={cn(fieldClass, "resize-y leading-7")}
-          value={formData.message}
-          onChange={(e) => handleChange("message", e.target.value)}
-        />
-      </label>
+      <TextAreaField
+        required
+        className="mt-8 sm:mt-10"
+        label={t("message")}
+        rows={4}
+        maxLength={MESSAGE_MAX_LENGTH}
+        showCount
+        placeholder={t("messagePlaceholder")}
+        value={formData.message}
+        onValueChange={(value) => handleChange("message", value)}
+      />
 
       {isSuccess || errorMessage ? (
         <p
@@ -98,16 +95,19 @@ export function ContactForm() {
         </p>
       ) : null}
 
-      <div className="mt-10 flex flex-col-reverse gap-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mt-8 flex flex-col-reverse gap-5 sm:mt-10 sm:flex-row sm:items-center sm:justify-between">
         <p className="max-w-xs text-xs leading-5 text-[var(--text-light)]">{t("privacy")}</p>
-        <button
+        <ActionButton
           type="submit"
-          disabled={isSubmitting}
-          className="group inline-flex min-h-12 cursor-pointer items-center justify-center gap-3 bg-[var(--primary-color)] px-8 text-xs font-semibold uppercase tracking-[2px] text-white transition-colors duration-300 hover:bg-[#2A0A12] disabled:cursor-not-allowed disabled:opacity-60"
+          variant="confirm"
+          size="lg"
+          loading={isSubmitting}
+          icon={<ArrowRight />}
+          iconPosition="end"
+          className="w-full sm:w-auto"
         >
           {isSubmitting ? t("sending") : t("submit")}
-          <ArrowRight size={16} strokeWidth={1.6} className="transition-transform duration-300 group-hover:translate-x-1" />
-        </button>
+        </ActionButton>
       </div>
     </form>
   );

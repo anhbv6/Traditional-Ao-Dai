@@ -105,7 +105,8 @@ export function ProductDetail({ slug, locale }: ProductDetailProps) {
     const rawRelated = productCatalog
       .filter((item) => item.id !== product.id)
       .sort((a, b) => Number(b.category === product.category) - Number(a.category === product.category))
-      .slice(0, 4);
+      // Đủ thẻ cho băng chuyền kéo / tự trôi (ưu tiên cùng danh mục)
+      .slice(0, 10);
 
     relatedProducts = rawRelated.map(p => ({
       id: p.id,

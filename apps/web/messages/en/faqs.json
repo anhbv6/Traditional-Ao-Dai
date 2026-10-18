@@ -1,8 +1,14 @@
 {
-  "title": "Frequently Asked Questions (FAQs)",
+  "title": "Frequently asked questions",
   "subtitle": "Find quick answers to common questions about sizing, tailoring, shipping, and payments.",
   "searchPlaceholder": "Search for your questions...",
-  "noResults": "No results found matching your search term.",
+  "noResults": "Try another keyword or pick \"All Questions\" — or ask our tailors directly.",
+  "eyebrow": "Customer care",
+  "searchLabel": "Search questions",
+  "categoriesLabel": "Question topics",
+  "resultCount": "{count, plural, one {# question} other {# questions}}",
+  "noResultsTitle": "No matching answers yet",
+  "resetFilters": "View all questions",
   "categories": {
     "all": "All Questions",
     "sizing": "Sizing & Tailoring",
@@ -43,5 +49,12 @@
       "question": "What payment methods do you support?",
       "answer": "We accept Cash on Delivery (COD - nationwide in Vietnam), Bank Transfer QR code, local e-wallets (Momo, VNPay), and international credit cards (Visa, Mastercard)."
     }
+  },
+  "cta": {
+    "eyebrow": "Still unsure?",
+    "title": "Ask our tailors directly",
+    "description": "Leave a message or call our hotline — during opening hours you will hear back within 15–30 minutes.",
+    "contact": "Send a message",
+    "call": "Call 0909 000 000"
   }
 }

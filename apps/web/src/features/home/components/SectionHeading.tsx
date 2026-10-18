@@ -45,7 +45,7 @@ export function SectionHeading({
       </p>
       <h2
         className={cn(
-          'mt-3 font-[family-name:var(--font-playfair)] text-[30px] font-semibold leading-tight sm:text-[42px]',
+          'mt-3 font-[family-name:var(--font-playfair)] text-[1.875rem] font-semibold leading-tight sm:text-[2.625rem]',
           isDark ? 'text-white' : 'text-[var(--primary-ink)]',
         )}
       >

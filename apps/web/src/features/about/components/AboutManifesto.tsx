@@ -25,7 +25,7 @@ export function AboutManifesto() {
       <div className="max-w-5xl">
         <p
           ref={textRef}
-          className="font-[family-name:var(--font-playfair)] text-[26px] leading-[1.45] text-[var(--primary-ink)] sm:text-[38px] lg:text-[46px]"
+          className="font-[family-name:var(--font-playfair)] text-[1.625rem] leading-[1.45] text-[var(--primary-ink)] sm:text-[2.375rem] lg:text-[2.875rem]"
         >
           {words.map((word, i) => (
             <Word key={i} progress={scrollYProgress} range={[i / words.length, (i + 1) / words.length]}>

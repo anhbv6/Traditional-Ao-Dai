@@ -181,7 +181,7 @@ export function CraftStory() {
                   <p className="text-[11px] font-semibold uppercase tracking-[3px] text-[var(--accent-color)]">
                     {t(`steps.${step.key}.label`)}
                   </p>
-                  <h3 className="mt-2 font-[family-name:var(--font-playfair)] text-2xl font-semibold text-[var(--primary-ink)] sm:text-[32px]">
+                  <h3 className="mt-2 font-[family-name:var(--font-playfair)] text-2xl font-semibold text-[var(--primary-ink)] sm:text-[2rem]">
                     <button
                       type="button"
                       onClick={() => scrollToStep(i)}

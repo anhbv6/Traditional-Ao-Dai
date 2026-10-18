@@ -52,7 +52,7 @@ export function AboutHeading({ numeral, eyebrow, title, description, className }
           <motion.h2
             variants={{ hidden: { y: "105%" }, visible: { y: 0 } }}
             transition={timing(1.1, 0.3)}
-            className="max-w-2xl font-[family-name:var(--font-playfair)] text-[30px] font-semibold leading-tight text-[var(--text-main)] sm:text-[40px]"
+            className="max-w-2xl font-[family-name:var(--font-playfair)] text-[1.875rem] font-semibold leading-tight text-[var(--text-main)] sm:text-[2.5rem]"
           >
             {title}
           </motion.h2>

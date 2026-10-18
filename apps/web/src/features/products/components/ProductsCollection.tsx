@@ -5,14 +5,6 @@ import { AnimatePresence, MotionConfig, motion } from 'motion/react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
   Pagination,
   PaginationContent,
   PaginationEllipsis,
@@ -24,14 +16,14 @@ import {
 import { ProductCard } from './ProductCard';
 import { ProductMobileFilterSheet } from './ProductMobileFilterSheet';
 import { ProductsToolbar } from './ProductsToolbar';
-import { FilterSidebar, categoryKeys, categoryOptions } from './FilterSidebar';
+import { ProductListControls } from './ProductListControls';
+import { ActionButton } from '@/components/shared/ActionButton';
+import { ActiveFilters, FilterSidebar, categoryKeys, categoryOptions } from './FilterSidebar';
 import { useProducts } from '../hooks/useProducts';
-import { type GridSize, type SortKey } from '../types/products.types';
+import { type GridSize } from '../types/products.types';
 import { productCatalog } from '../data/mockProducts';
 import { parseVndString } from '@/features/cart';
 
-const sortKeys: SortKey[] = ['newest', 'bestSeller', 'favorite', 'priceAsc', 'priceDesc'];
-const gridSizes: GridSize[] = [3, 4, 5];
 
 const gridClassName: Record<GridSize, string> = {
   3: 'lg:grid-cols-3',
@@ -75,6 +67,7 @@ export function ProductsCollection({ initialCategory, initialQuery }: ProductsCo
     visibleProducts,
     pageCount,
     safePage,
+    pageSize,
     resetPageAndScroll,
     setPageAndScroll,
     toggleValue,
@@ -130,23 +123,54 @@ export function ProductsCollection({ initialCategory, initialQuery }: ProductsCo
     );
   };
 
+  // Props bộ lọc dùng chung cho cột lọc desktop, sheet lọc mobile và chip ở trạng thái rỗng
+  const filterProps = {
+    locale,
+    selectedCollections,
+    setSelectedCollections,
+    selectedPurchaseTypes,
+    setSelectedPurchaseTypes,
+    selectedColors,
+    setSelectedColors,
+    selectedMaterials,
+    setSelectedMaterials,
+    priceLimit,
+    setPriceLimit,
+    onFilterChange: resetPageAndScroll,
+    productCatalog,
+    toggleValue,
+  };
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+    resetPageAndScroll();
+  };
+
+  const listControls = (
+    <ProductListControls
+      sortKey={sortKey}
+      onSortChange={(key) => {
+        setSortKey(key);
+        resetPageAndScroll();
+      }}
+      gridSize={gridSize}
+      onGridSizeChange={(size) => {
+        setGridSize(size);
+        resetPageAndScroll();
+      }}
+    />
+  );
+
+  // "1–16 / 72 sản phẩm": biết ngay đang xem tới đâu khi có nhiều trang
+  const totalCount = filteredProducts.length;
+  const rangeFrom = (safePage - 1) * pageSize + 1;
+  const rangeTo = Math.min(safePage * pageSize, totalCount);
+
   return (
-    <div className="mt-8 grid gap-10 sm:mt-14 lg:grid-cols-[230px_1fr] lg:gap-14">
+    <div className="mt-8 grid gap-10 sm:mt-14 lg:grid-cols-[260px_1fr] lg:gap-12 xl:gap-14">
       <FilterSidebar
-        locale={locale}
-        selectedCollections={selectedCollections}
-        setSelectedCollections={setSelectedCollections}
-        selectedPurchaseTypes={selectedPurchaseTypes}
-        setSelectedPurchaseTypes={setSelectedPurchaseTypes}
-        selectedColors={selectedColors}
-        setSelectedColors={setSelectedColors}
-        selectedMaterials={selectedMaterials}
-        setSelectedMaterials={setSelectedMaterials}
-        priceLimit={priceLimit}
-        setPriceLimit={setPriceLimit}
-        onFilterChange={resetPageAndScroll}
-        productCatalog={productCatalog}
-        toggleValue={toggleValue}
+        {...filterProps}
+        searchQuery={searchQuery}
+        onSearchChange={handleSearchChange}
         activeFilterCount={activeFilterCount}
         onClearAll={clearFilters}
       />
@@ -156,102 +180,37 @@ export function ProductsCollection({ initialCategory, initialQuery }: ProductsCo
         <div id="product-list" ref={productListTopRef} className="scroll-mt-20" />
         <ProductsToolbar
           searchQuery={searchQuery}
-          onSearchChange={(query) => {
-            setSearchQuery(query);
-            resetPageAndScroll();
-          }}
+          onSearchChange={handleSearchChange}
           tabs={categoryTabs}
           isTabActive={(value) =>
             value === null ? selectedCategories.length === 0 : selectedCategories.length === 1 && selectedCategories[0] === value
           }
           onSelectTab={selectCategory}
+          endSlot={listControls}
           filterSlot={
             <ProductMobileFilterSheet
-              locale={locale}
-              selectedCollections={selectedCollections}
-              setSelectedCollections={setSelectedCollections}
-              selectedPurchaseTypes={selectedPurchaseTypes}
-              setSelectedPurchaseTypes={setSelectedPurchaseTypes}
-              selectedColors={selectedColors}
-              setSelectedColors={setSelectedColors}
-              selectedMaterials={selectedMaterials}
-              setSelectedMaterials={setSelectedMaterials}
-              priceLimit={priceLimit}
-              setPriceLimit={setPriceLimit}
-              onFilterChange={resetPageAndScroll}
-              productCatalog={productCatalog}
-              toggleValue={toggleValue}
+              {...filterProps}
               activeFilterCount={activeFilterCount}
               onClearAll={clearFilters}
-              resultCount={filteredProducts.length}
+              resultCount={totalCount}
             />
           }
         />
 
-        <div>
-          <div className="flex items-center justify-between gap-4 py-5">
-            <p className="text-sm text-[var(--text-light)]">
-              {t('collection.foundCount', { count: filteredProducts.length })}
-            </p>
-
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2">
-                <span className="hidden text-xs uppercase tracking-[2px] text-[var(--text-light)] sm:inline">{t('collection.sortByLabel')}</span>
-                <Select
-                  value={sortKey}
-                  onValueChange={(value) => {
-                    if (value) {
-                      setSortKey(value as SortKey);
-                      resetPageAndScroll();
-                    }
-                  }}
-                >
-                  <SelectTrigger className="h-9 min-w-[150px] cursor-pointer rounded-none border-0 border-b border-[var(--border)] bg-transparent px-0 text-sm text-[var(--text-main)] shadow-none hover:border-[var(--primary-color)] focus-visible:ring-0">
-                    <SelectValue placeholder={t('collection.sortByPlaceholder')}>
-                      {(value: SortKey) => t(`collection.sortOptions.${value}`)}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent className="w-52 rounded-none border border-[var(--border)] bg-[var(--bg-main)] text-[var(--text-main)] shadow-md">
-                    <SelectGroup>
-                      {sortKeys.map((key) => (
-                        <SelectItem key={key} value={key} className="cursor-pointer rounded-none">
-                          {t(`collection.sortOptions.${key}`)}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Số cột lưới (chỉ desktop) */}
-              <div className="hidden items-center gap-1 lg:flex" role="group" aria-label={t('collection.columnsLabel')}>
-                <span className="mr-1 text-xs uppercase tracking-[2px] text-[var(--text-light)]">{t('collection.columnsLabel')}</span>
-                {gridSizes.map((size) => (
-                  <button
-                    key={size}
-                    type="button"
-                    aria-pressed={gridSize === size}
-                    onClick={() => {
-                      setGridSize(size);
-                      resetPageAndScroll();
-                    }}
-                    className={cn(
-                      'grid size-7 cursor-pointer place-items-center text-sm tabular-nums transition-colors',
-                      gridSize === size ? 'text-[var(--primary-ink)] shadow-[inset_0_-1px_0_var(--primary-color)]' : 'text-[var(--text-light)] hover:text-[var(--text-main)]'
-                    )}
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
+        {/* Hàng kết quả: số lượng (mọi màn hình) + sắp xếp (mobile — desktop đã nằm trong thanh ghim) */}
+        <div className="flex min-h-14 items-center justify-between gap-4 py-3 lg:min-h-0 lg:py-4">
+          <p className="text-sm text-[var(--text-light)]">
+            {totalCount > pageSize
+              ? t('collection.showingRange', { from: rangeFrom, to: rangeTo, total: totalCount })
+              : t('collection.foundCount', { count: totalCount })}
+          </p>
+          <div className="lg:hidden">{listControls}</div>
         </div>
 
         {visibleProducts.length > 0 ? (
           // Đổi bộ lọc / sắp xếp / số cột: thẻ cũ mờ đi, thẻ còn lại trượt mượt về vị trí mới (layout), thẻ mới hiện lần lượt
           <MotionConfig reducedMotion="user">
-          <motion.div layout className={cn('grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 sm:gap-y-12', gridClassName[gridSize])}>
+          <motion.div layout className={cn('grid grid-cols-2 gap-x-3 gap-y-9 sm:gap-x-6 sm:gap-y-12', gridClassName[gridSize])}>
             <AnimatePresence mode="popLayout" initial={false}>
             {visibleProducts.map((product, index) => (
               <motion.div
@@ -292,13 +251,13 @@ export function ProductsCollection({ initialCategory, initialQuery }: ProductsCo
           <div className="border-y border-[var(--border)] py-20 text-center">
             <p className="font-[family-name:var(--font-playfair)] text-2xl font-semibold text-[var(--text-main)]">{t('collection.emptyTitle')}</p>
             <p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-[var(--text-light)]">{t('collection.emptyDescription')}</p>
-            <button
-              type="button"
-              onClick={clearFilters}
-              className="mt-8 inline-flex min-h-11 cursor-pointer items-center bg-[var(--primary-color)] px-7 text-xs font-semibold uppercase tracking-[2px] text-white transition-colors hover:bg-[#2A0A12]"
-            >
+            {/* Bỏ từng bộ lọc đang chặn kết quả, hoặc xóa hết một lần */}
+            <div className="mx-auto mt-6 max-w-md [&_ul]:justify-center">
+              <ActiveFilters {...filterProps} searchQuery={searchQuery} onSearchChange={handleSearchChange} />
+            </div>
+            <ActionButton variant="confirm" size="md" onClick={clearFilters} className="mt-8">
               {t('collection.clearFilters')}
-            </button>
+            </ActionButton>
           </div>
         )}
 

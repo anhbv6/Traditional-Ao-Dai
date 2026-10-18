@@ -8,7 +8,8 @@ import { cn } from "@/lib/utils";
 /**
  * Nút yêu thích dùng chung (thẻ sản phẩm, chi tiết sản phẩm, danh sách yêu thích…).
  *
- * - Chỉ có icon (không nền): chưa thích = viền trắng + bóng mờ để nổi trên mọi ảnh; đã thích = tô đỏ.
+ * - Chỉ có icon (không nền, không viền). tone="onImage" (mặc định): chưa thích = viền trắng + bóng mờ để nổi trên ảnh.
+ *   tone="onSurface": đặt trên nền sáng (VD trang chi tiết) — chưa thích = màu chữ chính, không bóng. Đã thích = tô đỏ.
  * - Bấm thích: tim "nảy" (phóng → co → về), tô đỏ, toả vòng sóng + 6 hạt ra xung quanh.
  * - Bỏ thích: tim co nhẹ rồi về, chỉ còn viền.
  * - Rê chuột: tim phồng nhẹ, viền chuyển đỏ. Tắt chuyển động khi người dùng bật "giảm chuyển động".
@@ -23,13 +24,17 @@ interface HeartToggleProps {
   labelOn: string;
   /** Nhãn khi chưa thích (bấm để thích) */
   labelOff: string;
+  /** Nền đặt nút: "onImage" (mặc định, trên ảnh) | "onSurface" (trên nền kem / trắng) */
+  tone?: "onImage" | "onSurface";
+  /** Cỡ icon (px) — mặc định 20 */
+  iconSize?: number;
   className?: string;
 }
 
 const HEART_RED = "#E11D48";
 const PARTICLES = Array.from({ length: 6 }, (_, i) => (i * Math.PI * 2) / 6 - Math.PI / 2);
 
-export function HeartToggle({ active, onToggle, labelOn, labelOff, className }: HeartToggleProps) {
+export function HeartToggle({ active, onToggle, labelOn, labelOff, tone = "onImage", iconSize = 20, className }: HeartToggleProps) {
   /* Mỗi lần bấm THÍCH tăng bộ đếm → hạt / vòng sóng gắn key mới nên chạy lại hiệu ứng */
   const [burst, setBurst] = useState(0);
 
@@ -80,11 +85,13 @@ export function HeartToggle({ active, onToggle, labelOn, labelOff, className }: 
           transition={{ duration: active ? 0.6 : 0.35, ease: "easeOut" }}
         >
           <Heart
-            size={20}
+            size={iconSize}
             strokeWidth={1.7}
             className={cn(
-              "transition-[color,fill] duration-500 ease-out [filter:drop-shadow(0_1px_2px_rgba(0,0,0,0.45))]",
-              !active && "text-white group-hover/heart:text-[#E11D48]",
+              "transition-[color,fill] duration-500 ease-out",
+              tone === "onImage" && "[filter:drop-shadow(0_1px_2px_rgba(0,0,0,0.45))]",
+              !active && (tone === "onImage" ? "text-white" : "text-[var(--text-main)]"),
+              !active && "group-hover/heart:text-[#E11D48]",
             )}
             style={{
               color: active ? HEART_RED : undefined,

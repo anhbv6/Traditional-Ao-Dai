@@ -47,6 +47,7 @@
   "switchLang": "Tiếng Việt",
   "previous": "Previous",
   "next": "Next",
+  "back": "Back",
   "continueShopping": "Continue shopping",
   "checkoutErrors": {
     "fullNameRequired": "Please enter your full name",
@@ -79,5 +80,16 @@
     "cancel": "Cancel",
     "close": "Close"
   },
-  "adminDashboard": "Go to admin"
+  "adminDashboard": "Go to admin",
+  "mediaUploader": {
+    "dropTitle": "Add photos or videos",
+    "dropTitleImage": "Add photos",
+    "dropHint": "Drag and drop or click to choose · Photos ≤ {image}MB, videos ≤ {video}MB · Up to {max} files",
+    "dropHintImage": "Drag and drop or click to choose · Photos ≤ {image}MB · Up to {max} files",
+    "add": "Add",
+    "remove": "Remove {name}",
+    "invalidType": "Only image or video files are accepted",
+    "tooLarge": "{name} is larger than {max}MB",
+    "tooMany": "You can choose up to {max} files"
+  }
 }

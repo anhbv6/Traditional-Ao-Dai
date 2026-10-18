@@ -14,10 +14,22 @@ interface EmptyStateProps {
   action: string;
   /** Đích của nút kêu gọi hành động */
   href?: string;
+  /** Truyền vào thì nút thành <button> gọi hàm này (VD xoá bộ lọc) thay vì chuyển trang */
+  onAction?: () => void;
 }
 
+const ACTION_CLASS =
+  "group inline-flex min-h-10 cursor-pointer items-center gap-2 bg-[var(--primary-color)] px-6 text-[11px] font-semibold uppercase tracking-[2px] text-white transition-colors duration-300 hover:bg-[var(--bg-wine)]";
+
 /** Trạng thái trống dùng chung: khung vuông viền mảnh vẽ dần, icon "thở" nhẹ, chữ hiện lần lượt */
-export function EmptyState({ icon: Icon, title, description, action, href = "/products" }: EmptyStateProps) {
+export function EmptyState({ icon: Icon, title, description, action, href = "/products", onAction }: EmptyStateProps) {
+  const actionContent = (
+    <>
+      {action}
+      <ArrowRight size={14} className="transition-transform duration-300 group-hover:translate-x-1" />
+    </>
+  );
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -76,13 +88,15 @@ export function EmptyState({ icon: Icon, title, description, action, href = "/pr
         transition={{ duration: 0.7, delay: 0.45, ease: EASE }}
         className="mt-7"
       >
-        <Link
-          href={href}
-          className="group inline-flex min-h-10 items-center gap-2 bg-[var(--primary-color)] px-6 text-[11px] font-semibold uppercase tracking-[2px] text-white transition-colors duration-300 hover:bg-[#2A0A12]"
-        >
-          {action}
-          <ArrowRight size={14} className="transition-transform duration-300 group-hover:translate-x-1" />
-        </Link>
+        {onAction ? (
+          <button type="button" onClick={onAction} className={ACTION_CLASS}>
+            {actionContent}
+          </button>
+        ) : (
+          <Link href={href} className={ACTION_CLASS}>
+            {actionContent}
+          </Link>
+        )}
       </motion.div>
     </motion.div>
   );

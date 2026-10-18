@@ -5,7 +5,8 @@ import Image from 'next/image';
 import { AnimatePresence, motion, useReducedMotion, type Variants } from 'motion/react';
 import { useTranslations } from 'next-intl';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
-import { Link } from '@/i18n/routing';
+import { ActionLink } from '@/components/shared/ActionLink';
+import { ON_PRIMARY_COLORS } from '@/components/shared/ActionButton';
 import { cn } from '@/lib/utils';
 import { EVENT_SLIDE_SECONDS, productEvents, type ProductEvent } from '../data/productEvents';
 
@@ -45,7 +46,7 @@ export function ProductEventBanner() {
     <motion.section
       aria-roledescription="carousel"
       aria-label={t('label')}
-      className="group/banner relative h-[560px] touch-pan-y overflow-hidden text-white transition-colors duration-1000 ease-out lg:h-[500px]"
+      className="group/banner relative h-[600px] touch-pan-y overflow-hidden text-white transition-colors duration-1000 ease-out lg:h-[500px]"
       style={{ backgroundColor: event.panelColor }}
       onPanEnd={(_, info) => {
         if (info.offset.x < -60) step(1);
@@ -93,33 +94,67 @@ export function ProductEventBanner() {
         />
       </div>
 
-      {/* Thanh điều hướng: CTA + nav số — absolute góc dưới phải */}
-      <div className="absolute bottom-5 right-5 z-10 flex items-end gap-4 sm:right-8 lg:bottom-8 lg:right-10 xl:right-16">
-        {/* Nút CTA — đổi theo slide, fade in/out mượt */}
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={event.id}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1, transition: { duration: 0.5, ease: 'easeOut' } }}
-            exit={{ opacity: 0, transition: { duration: 0.3, ease: 'easeIn' } }}
-          >
-            <Link
-              href={`/products?category=${event.collection}#product-list`}
-              scroll={false}
-              className="group/cta inline-flex min-h-10 items-center gap-3 bg-[var(--bg-card)] px-6 text-xs font-semibold uppercase tracking-[2px] text-[var(--text-main)] transition-colors duration-300 hover:bg-[var(--accent-color)] hover:text-white"
+      {/* Khối nội dung: chữ + CTA đi cùng nhau, thanh số ở đáy — tất cả nằm trong luồng nên không đè lên nhau */}
+      <div className="relative mx-auto flex h-full w-full max-w-[1440px] flex-col px-5 pb-6 sm:px-8 lg:px-10 lg:pb-8 xl:px-16">
+        <div className="flex flex-1 flex-col justify-end lg:justify-center lg:pt-6">
+          <AnimatePresence mode="wait" initial={false} custom={direction}>
+            <motion.div
+              key={event.id}
+              custom={direction}
+              variants={reduceMotion ? undefined : textVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              aria-live="polite"
+              // Desktop: không vượt quá phần nền màu (ảnh chiếm 58% bên phải)
+              className="max-w-[520px] lg:max-w-[min(460px,36vw)]"
             >
-              {t(`items.${event.id}.cta`)}
-              <ArrowRight size={13} strokeWidth={1.6} className="transition-transform duration-300 group-hover/cta:translate-x-1" />
-            </Link>
-          </motion.div>
-        </AnimatePresence>
+              <motion.p
+                variants={lineVariants}
+                className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[3px] text-[var(--accent-color)]"
+              >
+                <span aria-hidden="true" className="size-1.5 rounded-full bg-[var(--accent-color)]" />
+                {t(`items.${event.id}.tag`)}
+              </motion.p>
+              <motion.h2
+                variants={lineVariants}
+                className="mt-3 line-clamp-2 text-balance font-[family-name:var(--font-playfair)] text-[1.75rem] font-semibold leading-[1.15] text-white sm:mt-4 sm:text-[2.375rem] lg:text-[2.25rem] xl:text-[2.5rem] 2xl:text-[2.75rem]"
+              >
+                {t(`items.${event.id}.title`)}
+              </motion.h2>
+              {/* Ưu đãi: mức giảm nổi bật + số ngày còn lại */}
+              <motion.div variants={lineVariants} className="mt-4 flex items-baseline gap-4 sm:mt-5">
+                <p className="font-[family-name:var(--font-playfair)] text-[2.5rem] font-semibold italic leading-none text-[var(--accent-color)] sm:text-[3.25rem]">
+                  {t(`items.${event.id}.discount`)}
+                </p>
+                <EventCountdown endsAt={event.endsAt} />
+              </motion.div>
+              {/* CTA ngay dưới ưu đãi, đổi cùng slide */}
+              <motion.div variants={lineVariants} className="mt-6 sm:mt-8">
+                {/* Nền banner là tông tối → bộ màu ON_PRIMARY_COLORS (đồng bộ khối May đo trang chủ) */}
+                <ActionLink
+                  href={`/products?category=${event.collection}#product-list`}
+                  scroll={false}
+                  variant="custom"
+                  size="md"
+                  colors={ON_PRIMARY_COLORS.solid}
+                  icon={<ArrowRight strokeWidth={1.6} />}
+                  iconPosition="end"
+                  className="whitespace-nowrap"
+                >
+                  {t(`items.${event.id}.cta`)}
+                </ActionLink>
+              </motion.div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
 
-        {/* Nav số 01 / 02 / 03 */}
-        <ol className="flex gap-3">
+        {/* Nav số 01 / 02 / 03 — hàng riêng ở đáy cột chữ (luôn trên nền màu, dễ đọc) */}
+        <ol className="mt-6 flex gap-3 lg:mt-0">
           {productEvents.map((item, i) => {
             const isActive = i === index;
             return (
-              <li key={item.id} className="w-16 sm:w-20">
+              <li key={item.id} className="w-14 sm:w-20">
                 <button
                   type="button"
                   onClick={() => goTo(i)}
@@ -145,46 +180,6 @@ export function ProductEventBanner() {
             );
           })}
         </ol>
-      </div>
-
-
-      <div className="relative mx-auto flex h-full w-full max-w-[1440px] flex-col px-5 pb-5 sm:px-8 lg:px-10 lg:pb-8 xl:px-16">
-        <div className="flex flex-1 flex-col justify-end lg:justify-center lg:pt-6">
-          <AnimatePresence mode="wait" initial={false} custom={direction}>
-            <motion.div
-              key={event.id}
-              custom={direction}
-              variants={reduceMotion ? undefined : textVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              aria-live="polite"
-              className="max-w-[540px] lg:max-w-[460px] xl:max-w-[540px]"
-            >
-              <motion.p
-                variants={lineVariants}
-                className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[3px] text-[var(--accent-color)]"
-              >
-                <span aria-hidden="true" className="size-1.5 rounded-full bg-[var(--accent-color)]" />
-                {t(`items.${event.id}.tag`)}
-              </motion.p>
-              <motion.h2
-                variants={lineVariants}
-                className="mt-3 line-clamp-2 font-[family-name:var(--font-playfair)] text-[30px] font-semibold leading-[1.12] text-white sm:mt-4 sm:text-[40px] xl:text-[48px]"
-              >
-                {t(`items.${event.id}.title`)}
-              </motion.h2>
-              {/* Ưu đãi: mức giảm nổi bật + số ngày còn lại */}
-              <motion.div variants={lineVariants} className="mt-4 flex items-baseline gap-4 sm:mt-5">
-                <p className="font-[family-name:var(--font-playfair)] text-[44px] font-semibold italic leading-none text-[var(--accent-color)] sm:text-[56px]">
-                  {t(`items.${event.id}.discount`)}
-                </p>
-                <EventCountdown endsAt={event.endsAt} />
-              </motion.div>
-
-            </motion.div>
-          </AnimatePresence>
-        </div>
 
         {/* Nút trước / sau — góc dưới phải */}
         {/* <div className="mt-6 flex items-end justify-end gap-2 lg:mt-0">
@@ -230,5 +225,5 @@ function EventCountdown({ endsAt }: { endsAt: ProductEvent['endsAt'] }) {
   const days = Math.floor(remainingMs / 86_400_000);
   const label = remainingMs <= 0 ? t('ended') : days >= 1 ? t('daysLeft', { days }) : t('endsToday');
 
-  return <p className="text-xs uppercase tracking-[2px] text-white/70">{label}</p>;
+  return <p className="whitespace-nowrap text-xs uppercase tracking-[2px] text-white/70">{label}</p>;
 }

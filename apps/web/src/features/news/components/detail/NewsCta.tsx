@@ -33,7 +33,7 @@ export function NewsCta({ categoryKey }: NewsCtaProps) {
       <span aria-hidden="true" className="absolute -right-4 -top-4 size-28 rotate-45 border border-white/10" />
 
       <p className="text-[10px] uppercase tracking-[3px] text-white/70">{t(`cta.${categoryKey}.eyebrow`)}</p>
-      <h2 className="mt-3 max-w-lg text-[22px] font-semibold leading-snug text-white sm:text-[28px]">{t(`cta.${categoryKey}.title`)}</h2>
+      <h2 className="mt-3 max-w-lg text-[1.375rem] font-semibold leading-snug text-white sm:text-[1.75rem]">{t(`cta.${categoryKey}.title`)}</h2>
       <p className="mt-3 max-w-lg text-[13px] leading-6 text-white/80 sm:text-sm">{t(`cta.${categoryKey}.description`)}</p>
       <Link
         href={href}

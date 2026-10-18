@@ -101,7 +101,7 @@ export function PromoteFeedBack() {
 
           <figure aria-live="polite">
             {/* Dấu ngoặc kép trang trí */}
-            <span aria-hidden="true" className="block h-10 font-[family-name:var(--font-playfair)] text-[88px] leading-none text-[var(--accent-color)]/60">
+            <span aria-hidden="true" className="block h-10 font-[family-name:var(--font-playfair)] text-[5.5rem] leading-none text-[var(--accent-color)]/60">
               &ldquo;
             </span>
 
@@ -113,7 +113,7 @@ export function PromoteFeedBack() {
                 exit={{ opacity: 0, y: reduceMotion ? 0 : -12 }}
                 transition={{ duration: 0.6, ease: EASE }}
               >
-                <blockquote className="min-h-[9.5rem] font-[family-name:var(--font-playfair)] text-xl italic leading-[1.65] text-[var(--text-main)] sm:min-h-[11rem] sm:text-[25px]">
+                <blockquote className="min-h-[9.5rem] font-[family-name:var(--font-playfair)] text-xl italic leading-[1.65] text-[var(--text-main)] sm:min-h-[11rem] sm:text-[1.5625rem]">
                   {t(`reviews.${review.key}.content`)}
                 </blockquote>
                 <figcaption className="mt-7 flex items-center gap-4">

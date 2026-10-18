@@ -1,7 +1,9 @@
 import { useTranslations } from 'next-intl';
 import { ArrowRight, Plus } from 'lucide-react';
 import { Link } from '@/i18n/routing';
+import { Container } from '@/components/ui/container';
 import { Reveal } from '@/components/shared/Reveal';
+import { SectionIntro } from '@/components/shared/SectionIntro';
 import { faqKeys } from '../types/contact.types';
 
 /**
@@ -12,15 +14,12 @@ export function ContactFaq() {
   const t = useTranslations('ContactPage.faq');
 
   return (
-    <section className="mx-auto grid w-full max-w-[1440px] gap-10 px-5 py-16 sm:px-8 sm:py-24 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20 lg:px-10 xl:px-16">
+    <Container as="section" className="grid gap-8 py-14 sm:py-20 lg:grid-cols-[0.8fr_1.2fr] lg:gap-12 xl:gap-20 xl:px-16 2xl:py-24">
       <Reveal>
-        <p className="text-[11px] font-semibold uppercase tracking-[3px] text-[var(--primary-ink)]">{t('eyebrow')}</p>
-        <h2 className="mt-4 max-w-sm font-[family-name:var(--font-playfair)] text-[30px] font-semibold leading-tight text-[var(--text-main)] sm:text-[38px]">
-          {t('title')}
-        </h2>
+        <SectionIntro eyebrow={t('eyebrow')} title={t('title')} />
         <Link
           href="/faqs"
-          className="group mt-8 inline-flex items-center gap-3 border-b border-[var(--text-main)]/40 pb-1.5 text-xs font-semibold uppercase tracking-[2px] text-[var(--text-main)] transition-colors hover:border-[var(--primary-color)] hover:text-[var(--primary-ink)]"
+          className="group mt-6 inline-flex items-center gap-3 border-b border-[var(--text-main)]/40 pb-1.5 text-xs font-semibold uppercase tracking-[2px] text-[var(--text-main)] transition-colors hover:border-[var(--primary-color)] hover:text-[var(--primary-ink)] sm:mt-8"
         >
           {t('viewAll')}
           <ArrowRight size={15} strokeWidth={1.6} className="transition-transform duration-300 group-hover:translate-x-1" />
@@ -30,7 +29,7 @@ export function ContactFaq() {
       <Reveal delay={0.12} className="border-t border-[var(--text-main)]/80">
         {faqKeys.map((key) => (
           <details key={key} className="group border-b border-[var(--border)]">
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-6 text-left font-[family-name:var(--font-playfair)] text-lg font-semibold text-[var(--text-main)] transition-colors hover:text-[var(--primary-ink)] sm:text-xl [&::-webkit-details-marker]:hidden">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-5 text-left font-[family-name:var(--font-playfair)] text-[1.0625rem] font-semibold text-[var(--text-main)] transition-colors hover:text-[var(--primary-ink)] sm:py-6 sm:text-lg 2xl:text-xl [&::-webkit-details-marker]:hidden">
               {t(`items.${key}.question`)}
               <Plus
                 size={20}
@@ -38,10 +37,10 @@ export function ContactFaq() {
                 className="shrink-0 text-[var(--primary-ink)] transition-transform duration-300 group-open:rotate-45"
               />
             </summary>
-            <p className="max-w-2xl pb-6 pr-10 text-[15px] leading-7 text-[var(--text-light)]">{t(`items.${key}.answer`)}</p>
+            <p className="max-w-2xl pb-5 pr-8 text-[15px] leading-7 text-[var(--text-light)] sm:pb-6 sm:pr-10">{t(`items.${key}.answer`)}</p>
           </details>
         ))}
       </Reveal>
-    </section>
+    </Container>
   );
 }

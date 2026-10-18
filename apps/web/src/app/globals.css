@@ -63,6 +63,7 @@
   --bg-card: #FFFFFF;           /* Trắng — card, bảng, ô nhập khi focus */
   --bg-popover: #FAF7F5;        /* Nền dropdown, popover */
   --bg-inverse: #2A2525;        /* Nền tối cố định có chữ trắng (snackbar, nút đen) */
+  --bg-wine: #2A0A12;           /* Đỏ thẫm — dải nền tối chữ trắng (Liên hệ, CTA), lớp phủ ảnh */
 
   /* Chữ */
   --text-main: #2A2525;         /* Chữ chính — dễ đọc, không mỏi mắt */
@@ -102,6 +103,7 @@
   --bg-secondary: #2B2427;      /* Làm sáng nền menu active bên trái */
   --bg-popover: #241E20;
   --bg-inverse: #3D3235;
+  --bg-wine: #2A0A12;
 
   /* Chữ */
   --text-main: #F2ECE9;
@@ -295,6 +297,24 @@
     min-height: 100%;
   }
 
+  /*
+   * MỐC MÀN HÌNH (dùng breakpoint mặc định của Tailwind — media query tính theo 16px trình duyệt,
+   * nên đổi font-size gốc bên dưới KHÔNG làm lệch mốc):
+   *   Mobile  : < 640px          (không tiền tố)
+   *   Tablet  : 640px – 1023px   (sm:, md:)
+   *   Laptop  : 1024px – 1535px  (lg:, xl:)
+   *   PC      : ≥ 1536px         (2xl:) — thiết kế gốc
+   *
+   * Font-size gốc co theo mốc: mọi khoảng cách / cỡ chữ đơn vị rem (p-*, gap-*, text-sm, text-[2rem]...)
+   * tự nhỏ lại tương ứng nên các khối gọn hơn trên laptop, tablet, mobile mà PC giữ nguyên.
+   * Tiêu đề lớn hãy dùng rem (text-[2.375rem]) thay vì px để được co theo; nhãn nhỏ 10–15px giữ px.
+   */
+  html { font-size: 14.5px; }
+  @media (min-width: 64rem) { html { font-size: 15px; } }
+  @media (min-width: 96rem) { html { font-size: 16px; } }
+  /* Admin dùng thang riêng, không co theo storefront */
+  html:has(.admin-shell) { font-size: 16px; }
+
   /* Khóa cuộn trang khi mở overlay / drawer */
   html.is-scroll-locked,
   html.is-scroll-locked body {
@@ -304,7 +324,7 @@
 
   body {
     font-family: var(--font-lora), 'Lora', serif;
-    font-size: 16px;
+    font-size: 1rem;
     font-weight: 400;
     line-height: 1.75; /* Tăng độ thoáng cho font Lora */
     color: var(--text-main);
@@ -318,18 +338,17 @@
     line-height: 1.3;
   }
 
-  h1 { font-size: 48px; font-weight: 600; }
-  h2 { font-size: 32px; font-weight: 600; }
-  h3 { font-size: 20px; font-weight: 500; }
+  h1 { font-size: 3rem; font-weight: 600; }
+  h2 { font-size: 2rem; font-weight: 600; }
+  h3 { font-size: 1.25rem; font-weight: 500; }
 
   p, h1, h2, h3, h4, h5, h6 {
     overflow-wrap: break-word;
   }
 
-  @media (max-width: 768px) {
-    h1 { font-size: 32px; }
-    h2 { font-size: 24px; }
-    body { font-size: 15px; }
+  @media (max-width: 47.99rem) {
+    h1 { font-size: 2.25rem; }
+    h2 { font-size: 1.625rem; }
   }
 }
 

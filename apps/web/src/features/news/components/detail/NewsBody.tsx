@@ -20,7 +20,7 @@ export function NewsBody({ content }: NewsBodyProps) {
   return (
     <div className="text-[15px] leading-8 text-[var(--text-main)] sm:text-[17px] sm:leading-9">
       <Reveal>
-        <p className="first-letter:float-left first-letter:mr-3 first-letter:mt-1 first-letter:font-[family-name:var(--font-playfair)] first-letter:text-[60px] first-letter:font-semibold first-letter:leading-[0.85] first-letter:text-[var(--primary-ink)]">
+        <p className="first-letter:float-left first-letter:mr-3 first-letter:mt-1 first-letter:font-[family-name:var(--font-playfair)] first-letter:text-[3.75rem] first-letter:font-semibold first-letter:leading-[0.85] first-letter:text-[var(--primary-ink)]">
           {content.intro}
         </p>
       </Reveal>
@@ -31,7 +31,7 @@ export function NewsBody({ content }: NewsBodyProps) {
             <Reveal>
               <h2
                 id={`${section.id}-heading`}
-                className="flex items-baseline gap-3 text-[21px] font-semibold leading-snug text-[var(--text-main)] sm:text-[26px]"
+                className="flex items-baseline gap-3 text-[21px] font-semibold leading-snug text-[var(--text-main)] sm:text-[1.625rem]"
               >
                 <span className="font-[family-name:var(--font-lora)] text-[13px] font-normal tracking-[2px] text-[var(--primary-ink)]">
                   {String(index + 1).padStart(2, "0")}
@@ -74,7 +74,7 @@ export function NewsBody({ content }: NewsBodyProps) {
             <figure className="relative my-12 border-y border-[var(--border)] py-8 text-center sm:my-14 sm:py-10">
               <motion.span
                 aria-hidden="true"
-                className="absolute -top-7 left-1/2 -translate-x-1/2 bg-[var(--bg-main)] px-3 font-[family-name:var(--font-playfair)] text-[64px] leading-none text-[var(--accent-color)]"
+                className="absolute -top-7 left-1/2 -translate-x-1/2 bg-[var(--bg-main)] px-3 font-[family-name:var(--font-playfair)] text-[4rem] leading-none text-[var(--accent-color)]"
                 initial={{ opacity: 0, y: 12 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -83,7 +83,7 @@ export function NewsBody({ content }: NewsBodyProps) {
                 &ldquo;
               </motion.span>
               <Reveal>
-                <blockquote className="mx-auto max-w-xl font-[family-name:var(--font-playfair)] text-[20px] italic leading-snug text-[var(--primary-ink)] sm:text-[26px]">
+                <blockquote className="mx-auto max-w-xl font-[family-name:var(--font-playfair)] text-[20px] italic leading-snug text-[var(--primary-ink)] sm:text-[1.625rem]">
                   {content.quote.text}
                 </blockquote>
                 <figcaption className="mt-4 text-[11px] uppercase tracking-[2.5px] text-[var(--text-light)]">

@@ -17,17 +17,22 @@
     "priceRange": "Price: {min}đ - {max}đ",
     "clearAll": "Clear all ({count})",
     "clear": "Clear",
-    "priceUpTo": "Up to {max}",
+    "priceUpTo": "Up to {max}đ",
     "clearSearch": "Clear search",
     "sheetDescription": "Narrow the list by collection, purchase type, colour, material and price.",
     "clearAllShort": "Clear all",
-    "showResults": "Show {count} products"
+    "showResults": "Show {count} products",
+    "activeTitle": "Active filters",
+    "removeFilter": "Remove filter: {label}",
+    "priceAll": "All"
   },
   "collection": {
     "foundCount": "{count} products",
+    "showingRange": "{from}–{to} of {total} products",
     "sortByLabel": "Sort",
     "sortByPlaceholder": "Sort by",
     "columnsLabel": "Columns",
+    "columnsOption": "{count} columns",
     "sortOptions": {
       "all": "Show all",
       "newest": "Newest",

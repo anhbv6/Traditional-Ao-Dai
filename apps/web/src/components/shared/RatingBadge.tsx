@@ -68,7 +68,7 @@ export function RatingBadge({ score, max = 5, label, caption, className }: Ratin
           ) : null}
 
           <p className={cn("flex items-baseline gap-1 font-[family-name:var(--font-playfair)]", label ? "mt-2" : undefined)}>
-            <motion.span className="text-[40px] font-semibold leading-none tabular-nums text-[var(--primary-ink)]">
+            <motion.span className="text-[2.5rem] font-semibold leading-none tabular-nums text-[var(--primary-ink)]">
               {countText}
             </motion.span>
             <span className="text-sm text-[var(--text-light)]">/ {max}</span>

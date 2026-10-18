@@ -14,7 +14,7 @@ type NewsDetailPageProps = {
   }>;
 };
 
-const SIMILAR_LIMIT = 3;
+const SIMILAR_LIMIT = 6;
 
 const findArticle = (slug: string) => mockArticles.find((item) => item.slug === decodeURIComponent(slug));
 

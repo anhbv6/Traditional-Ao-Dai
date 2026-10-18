@@ -31,9 +31,8 @@ export interface CartTotals {
   subtotal: number;
   discountAmount: number;
   shippingCost: number;
-  freeShippingThreshold: number;
-  /** Số tiền còn thiếu để được miễn phí vận chuyển (0 khi đã đạt hoặc có mã freeship) */
-  freeShippingRemaining: number;
+  /** Tiết kiệm nhờ giá khuyến mãi so với giá gốc (chỉ để hiển thị) */
+  savings: number;
   total: number;
   totalQuantity: number;
 }

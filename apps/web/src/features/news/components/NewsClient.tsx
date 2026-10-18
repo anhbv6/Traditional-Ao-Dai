@@ -7,7 +7,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
 import { Reveal } from '@/components/shared/Reveal';
-import { SectionOrnament } from '@/components/shared/SectionOrnament';
+import { PageIntro } from '@/components/shared/PageIntro';
 
 import { useNews } from '../hooks/useNews';
 import { categoryKeys, getAuthor } from '../types/news.types';
@@ -35,7 +35,7 @@ function MetaLine({ items, className }: { items: string[]; className?: string })
 function SectionTitle({ title, actionLabel, onAction }: { title: string; actionLabel: string; onAction: () => void }) {
   return (
     <div className="mb-8 flex items-end justify-between gap-4 border-b border-[var(--text-main)]/80 pb-3">
-      <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-semibold text-[var(--primary-ink)] sm:text-[28px]">{title}</h2>
+      <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-semibold text-[var(--primary-ink)] sm:text-[1.75rem]">{title}</h2>
       <button
         type="button"
         onClick={onAction}
@@ -65,15 +65,8 @@ export function NewsClient() {
 
   return (
     <div>
-      {/* Đầu trang: cùng kiểu tiêu đề căn giữa + hoạ tiết hình thoi như trang chủ */}
-      <section className="mx-auto mb-10 mt-6 flex max-w-3xl flex-col items-center text-center">
-        <p className="text-[11px] font-semibold uppercase tracking-[3px] text-[var(--primary-ink)]">{t('eyebrow')}</p>
-        <h1 className="mt-3 font-[family-name:var(--font-playfair)] text-[32px] font-semibold leading-tight text-[var(--primary-ink)] sm:text-[44px]">
-          {t('title')}
-        </h1>
-        <SectionOrnament className="mt-5" />
-        <p className="mt-5 text-sm leading-7 text-[var(--text-light)] sm:text-base">{t('subtitle')}</p>
-      </section>
+      {/* Đầu trang: tiêu đề căn trái kiểu biên tập — đồng bộ Cửa hàng / Liên hệ */}
+      <PageIntro eyebrow={t('eyebrow')} title={t('title')} subtitle={t('subtitle')} className="mb-12 pt-4 sm:mb-16 sm:pt-8" />
 
       {/* Tab danh mục: vạch đỏ đô chạy ra dưới mục đang chọn */}
       <nav aria-label={t('eyebrow')} className="mb-12 border-y border-[var(--border)]">
@@ -134,7 +127,7 @@ export function NewsClient() {
                       className="text-[var(--text-light)]"
                       items={[heroArticle.category[locale], getAuthor(heroArticle.id), heroArticle.dateLong[locale], heroArticle.readTime[locale]]}
                     />
-                    <h2 className="mt-3 max-w-4xl font-[family-name:var(--font-playfair)] text-2xl font-semibold leading-tight text-[var(--primary-ink)] decoration-[var(--accent-color)] decoration-1 underline-offset-[6px] group-hover:underline sm:text-3xl lg:text-[40px]">
+                    <h2 className="mt-3 max-w-4xl font-[family-name:var(--font-playfair)] text-2xl font-semibold leading-tight text-[var(--primary-ink)] decoration-[var(--accent-color)] decoration-1 underline-offset-[6px] group-hover:underline sm:text-3xl lg:text-[2.5rem]">
                       {heroArticle.title[locale]}
                     </h2>
                   </div>

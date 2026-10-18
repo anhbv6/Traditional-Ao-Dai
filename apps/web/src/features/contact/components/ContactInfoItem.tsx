@@ -15,10 +15,10 @@ interface ContactInfoItemProps {
  */
 export function ContactInfoItem({ label, value, note, href, external }: ContactInfoItemProps) {
   const valueClass =
-    'mt-3 block font-[family-name:var(--font-playfair)] text-[22px] font-semibold leading-snug text-[var(--text-main)] sm:text-[26px]';
+    'mt-2 block font-[family-name:var(--font-playfair)] text-[1.25rem] font-semibold leading-snug text-[var(--text-main)] md:text-[1.375rem] xl:text-[1.5rem] 2xl:text-[1.625rem]';
 
   return (
-    <div className="py-6 sm:px-8 sm:first:pl-0 sm:last:pr-0">
+    <div className="py-5 sm:px-5 sm:py-6 sm:first:pl-0 sm:last:pr-0 lg:px-8">
       <dt className="text-[11px] font-semibold uppercase tracking-[3px] text-[var(--text-light)]">{label}</dt>
       <dd>
         {href ? (

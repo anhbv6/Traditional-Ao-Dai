@@ -16,7 +16,7 @@ import {
 } from "../validations/newsletter.validation";
 
 /* Ô Newsletter cao bằng nút "Đăng ký" (min-h-12), lề trong rộng hơn mặc định */
-const NEWSLETTER_FIELD_CLASS = "min-h-12 px-4";
+const NEWSLETTER_FIELD_CLASS = "px-4";
 
 /**
  * Form Newsletter / VIP Club (nền đỏ đô ở Footer trang chủ).
@@ -60,6 +60,7 @@ export function NewsletterForm() {
         placeholder={t("emailPlaceholder")}
         tone="onPrimary"
         appearance="outline"
+        size="lg"
         prefix={<Mail strokeWidth={1.6} />}
         fieldClassName={NEWSLETTER_FIELD_CLASS}
         error={errors.email && notify.translateError(errors.email.message)}

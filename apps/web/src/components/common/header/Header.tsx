@@ -34,14 +34,14 @@ export async function Header({ sticky = true }: HeaderProps) {
 
   return (
     <HeaderWrapper sticky={sticky}>
-      <header className="relative mx-auto flex h-20 w-full items-center justify-between px-5 sm:px-8 lg:px-12">
+      <header className="relative mx-auto flex h-16 w-full items-center justify-between gap-4 px-5 sm:px-8 lg:h-[4.5rem] lg:px-6 xl:px-8 2xl:h-20 2xl:px-12">
         <Logo textLogo/>
         <DesktopNav items={desktopNavItems} />
         <div className="flex items-center gap-1 sm:gap-2">
           <SearchOverlay label={t('search')} placeholder={t('searchPlaceholder')} />
 
           {/* PC Desktop Header Items */}
-          <div className="hidden lg:flex lg:items-center lg:gap-2">
+          <div className="hidden lg:flex lg:items-center lg:gap-1 xl:gap-2">
             <WishlistButton label={t('wishlist')} />
             <CartButton label={t('cart')} preview />
             <LanguageSwitcher />

@@ -58,20 +58,20 @@ export function NewsCard({
           <div aria-hidden="true" className="absolute inset-3 border border-white/0 transition-colors duration-500 group-hover:border-white/60" />
         </div>
 
-        <div className="flex flex-1 flex-col p-5 sm:p-7">
+        <div className="flex flex-1 flex-col p-5 lg:p-6">
           <p className="flex flex-wrap items-center gap-x-2 text-[11px] font-semibold uppercase tracking-[2px] text-[var(--accent-color)]">
             <span className="text-[var(--primary-ink)]">{category}</span>
             <span aria-hidden="true" className="size-1 rotate-45 bg-[var(--accent-color)]" />
             <span>{readTime}</span>
           </p>
 
-          <h3 className="mt-3 line-clamp-2 min-h-[2.6em] font-[family-name:var(--font-playfair)] text-lg font-semibold leading-[1.3] text-[var(--primary-ink)] sm:text-xl">
+          <h3 className="mt-3 line-clamp-2 min-h-[2.6em] font-[family-name:var(--font-playfair)] text-lg font-semibold leading-[1.3] text-[var(--primary-ink)] xl:text-xl">
             {title}
           </h3>
 
           <p className="mt-3 line-clamp-2 flex-1 text-sm leading-7 text-[var(--text-light)]">{description}</p>
 
-          <div className="mt-6 flex items-center justify-between border-t border-[var(--border)] pt-4 text-xs">
+          <div className="mt-5 flex items-center justify-between border-t border-[var(--border)] pt-4 text-xs">
             <time className="text-[var(--text-light)]">
               <span className="sm:hidden">{dateShort}</span>
               <span className="hidden sm:inline">{dateLong}</span>

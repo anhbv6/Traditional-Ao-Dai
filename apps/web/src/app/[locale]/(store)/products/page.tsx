@@ -1,5 +1,6 @@
 import { Container } from '@/components/ui/container';
-import { ProductsCollection, ProductBanner, ProductEventBanner } from '@/features/products';
+import { PageIntro } from '@/components/shared/PageIntro';
+import { ProductsCollection, ProductEventBanner } from '@/features/products';
 import { getTranslations } from 'next-intl/server';
 
 interface PageProps {
@@ -16,7 +17,7 @@ async function Products({ searchParams }: PageProps) {
     <>
       <ProductEventBanner />
       <Container as="section" className="py-12">
-        <ProductBanner eyebrow={t('banner.eyebrow')} title={t('banner.title')} subtitle={t('banner.subtitle')} />
+        <PageIntro eyebrow={t('banner.eyebrow')} title={t('banner.title')} subtitle={t('banner.subtitle')} className="pt-4 sm:pt-8" />
         {/* key theo danh mục + từ khóa: đổi ?category= (CTA banner) hoặc ?q= (tìm kiếm trên header) sẽ dựng lại bộ lọc */}
         <ProductsCollection
           key={`${initialCategory ?? 'all'}|${initialQuery}`}

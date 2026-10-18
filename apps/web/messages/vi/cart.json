@@ -18,15 +18,14 @@
     "increase": "Tăng số lượng",
     "quantity": "Số lượng",
     "maxReached": "Tối đa {max} sản phẩm mỗi loại",
-    "remove": "Xóa khỏi giỏ"
-  },
-  "shipping": {
-    "remaining": "Mua thêm <b>{amount}</b> để được miễn phí vận chuyển",
-    "unlocked": "Đơn hàng của bạn được miễn phí vận chuyển"
+    "remove": "Xóa khỏi giỏ",
+    "removeShort": "Xóa",
+    "off": "-{percent}%",
+    "unitPrice": "{price} / sản phẩm"
   },
   "promo": {
     "title": "Mã giảm giá",
-    "placeholder": "Nhập mã (VD: GIAM10)",
+    "placeholder": "VD: GIAM10",
     "apply": "Áp dụng",
     "remove": "Gỡ mã",
     "required": "Vui lòng nhập mã giảm giá",
@@ -43,7 +42,11 @@
     "total": "Tổng cộng",
     "vatNote": "Đã bao gồm VAT",
     "checkout": "Tiến hành thanh toán",
-    "customNote": "Sản phẩm may đo cần 7–10 ngày hoàn thiện và không áp dụng đổi trả (trừ lỗi kỹ thuật)."
+    "customNote": "Sản phẩm may đo cần 7–10 ngày hoàn thiện và không áp dụng đổi trả (trừ lỗi kỹ thuật).",
+    "items": "Tạm tính ({count} sản phẩm)",
+    "savings": "Bạn tiết kiệm",
+    "shippingNote": "Miễn phí khi dùng mã FREESHIP",
+    "mobileTotal": "Tổng cộng"
   },
   "actions": {
     "clearAll": "Xóa giỏ hàng",
@@ -71,5 +74,10 @@
   },
   "toast": {
     "cleared": "Đã xóa toàn bộ giỏ hàng"
+  },
+  "trust": {
+    "returns": "Đổi size miễn phí trong 7 ngày (hàng may sẵn)",
+    "payment": "Thanh toán an toàn: COD, chuyển khoản, ví, thẻ",
+    "packaging": "Đóng hộp lụa, kèm thiệp viết tay"
   }
 }

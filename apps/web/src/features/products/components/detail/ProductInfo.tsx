@@ -7,11 +7,10 @@ import { Check, Ruler, ShoppingBag } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Rating, RoundedStar } from '@smastrom/react-rating';
 import '@smastrom/react-rating/style.css';
-import UseAnimations from 'react-useanimations';
-import heart from 'react-useanimations/lib/heart';
 import { formatVnd } from '@repo/shared';
 
 import { QuantitySelector } from '@/components/shared/QuantitySelector';
+import { HeartToggle } from '@/components/shared/HeartToggle';
 import { MAX_LINE_QUANTITY } from '@/features/cart';
 import { DisplayProduct } from '../../types/products.types';
 
@@ -150,7 +149,7 @@ export default function ProductInfo({
     <div className="min-w-0 lg:pt-1">
       <motion.div variants={stagger} initial="hidden" animate="show">
         <motion.div variants={rise} className="flex items-start justify-between gap-6">
-          <h1 className="text-[26px] font-semibold leading-tight text-[var(--primary-ink)] sm:text-4xl">{product.name}</h1>
+          <h1 className="text-[1.625rem] font-semibold leading-tight text-[var(--primary-ink)] sm:text-4xl">{product.name}</h1>
           <span className="mt-1.5 shrink-0 bg-[var(--bg-secondary)] px-3 py-1 text-xs font-semibold text-[var(--primary-ink)]">
             {product.stock}
           </span>
@@ -339,18 +338,16 @@ export default function ProductInfo({
           {addButtonContent}
         </motion.button>
 
-        <motion.button
-          type="button"
-          whileTap={{ scale: 0.9 }}
-          aria-label={isWishlisted ? t('removeFromWishlist') : t('addToWishlist')}
-          aria-pressed={isWishlisted}
-          onClick={onWishlistToggle}
-          className={`flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center border transition-colors duration-300 sm:h-12 sm:w-12 ${
-            isWishlisted ? 'border-[var(--primary-color)] text-[var(--primary-ink)]' : 'border-[var(--border)] text-[var(--text-main)] hover:border-[var(--primary-color)]'
-          }`}
-        >
-          <UseAnimations animation={heart} size={20} reverse={isWishlisted} strokeColor="currentColor" fillColor="currentColor" />
-        </motion.button>
+        {/* Yêu thích: chỉ icon (không viền), tim nảy + toả hạt khi bấm — HeartToggle dùng chung */}
+        <HeartToggle
+          active={isWishlisted}
+          onToggle={onWishlistToggle}
+          labelOn={t('removeFromWishlist')}
+          labelOff={t('addToWishlist')}
+          tone="onSurface"
+          iconSize={24}
+          className="size-11 shrink-0 sm:size-12"
+        />
       </motion.div>
 
       {/* Thông số */}

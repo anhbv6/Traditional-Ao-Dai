@@ -1,5 +1,7 @@
 import { useTranslations } from 'next-intl';
+import { Container } from '@/components/ui/container';
 import { Reveal } from '@/components/shared/Reveal';
+import { SectionIntro } from '@/components/shared/SectionIntro';
 import { stepKeys } from '../types/contact.types';
 import { ContactForm } from './ContactForm';
 
@@ -12,17 +14,13 @@ export function ContactMessage() {
 
   return (
     <section className="bg-[var(--bg-secondary)]">
-      <div className="mx-auto grid w-full max-w-[1440px] gap-12 px-5 py-16 sm:px-8 sm:py-24 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20 lg:px-10 xl:px-16">
+      <Container className="grid gap-10 bg-transparent py-14 sm:py-20 lg:grid-cols-[0.8fr_1.2fr] lg:gap-12 xl:gap-20 xl:px-16 2xl:py-24">
         <Reveal>
-          <p className="text-[11px] font-semibold uppercase tracking-[3px] text-[var(--primary-ink)]">{t('eyebrow')}</p>
-          <h2 className="mt-4 max-w-md font-[family-name:var(--font-playfair)] text-[30px] font-semibold leading-tight text-[var(--text-main)] sm:text-[38px]">
-            {t('title')}
-          </h2>
-          <p className="mt-5 max-w-md text-[15px] leading-7 text-[var(--text-light)]">{t('description')}</p>
+          <SectionIntro eyebrow={t('eyebrow')} title={t('title')} description={t('description')} />
 
-          <ol className="mt-10 border-t border-[var(--text-main)]/80">
+          <ol className="mt-8 border-t border-[var(--text-main)]/80 sm:mt-10">
             {stepKeys.map((key, index) => (
-              <li key={key} className="grid grid-cols-[2.5rem_1fr] gap-2 border-b border-[var(--border)] py-5">
+              <li key={key} className="grid grid-cols-[2.25rem_1fr] gap-2 border-b border-[var(--border)] py-4 sm:py-5">
                 <span className="font-[family-name:var(--font-playfair)] text-lg italic text-[var(--primary-ink)]">{index + 1}.</span>
                 <div>
                   <p className="font-semibold text-[var(--text-main)]">{t(`steps.${key}.title`)}</p>
@@ -36,7 +34,7 @@ export function ContactMessage() {
         <Reveal delay={0.12}>
           <ContactForm />
         </Reveal>
-      </div>
+      </Container>
     </section>
   );
 }

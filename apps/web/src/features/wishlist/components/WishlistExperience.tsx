@@ -6,6 +6,7 @@ import { formatVnd } from "@repo/shared";
 import { useWishlist } from "../hooks/useWishlist";
 import { WishlistCard } from "./WishlistCard";
 import { Heart } from "lucide-react";
+import { BackButton } from "@/components/shared/BackButton";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { WishlistToolbar } from "./WishlistToolbar";
 import { UndoSnackbar } from "@/components/shared/UndoSnackbar";
@@ -61,11 +62,12 @@ export function WishlistExperience() {
       <div className="font-[family-name:var(--font-lora)] text-[var(--text-main)]">
         {/* Tiêu đề */}
         <header className="mb-6 sm:mb-8">
+          <BackButton fallbackHref="/products" />
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6 }}
-            className="flex items-center gap-3 text-[10px] uppercase tracking-[3px] text-[var(--text-light)] sm:text-[11px]"
+            className="mt-4 flex items-center gap-3 text-[10px] uppercase tracking-[3px] text-[var(--text-light)] sm:text-[11px]"
           >
             <motion.span
               aria-hidden="true"
