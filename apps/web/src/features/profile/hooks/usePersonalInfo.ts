@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useAuthStore } from "@/features/auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useShallow } from "zustand/react/shallow";
@@ -55,8 +55,9 @@ export function usePersonalInfo() {
     },
   });
 
-  const handleSubmit = (e: React.FormEvent, overrideAvatarUrl?: string) => {
-    e.preventDefault();
+  /** Gửi cập nhật — `overrides` dùng cho giá trị vừa tính trong handler (avatar vừa tải lên, ngày sinh vừa chuẩn hoá) */
+  const handleSubmit = (overrides: { avatarUrl?: string; dob?: string } = {}) => {
+    const overrideAvatarUrl = overrides.avatarUrl;
     let genderNumeric = 2;
     if (form.gender === "male" || form.gender === "0") genderNumeric = 0;
     else if (form.gender === "female" || form.gender === "1") genderNumeric = 1;
@@ -66,7 +67,7 @@ export function usePersonalInfo() {
       name: form.fullName,
       // Email & SĐT không gửi ở đây: đổi qua luồng xác minh mã (useContactVerification)
       avatar: overrideAvatarUrl !== undefined ? overrideAvatarUrl : (form.avatarUrl || undefined),
-      dob: form.dob || undefined,
+      dob: (overrides.dob ?? form.dob) || undefined,
       gender: genderNumeric,
     });
   };

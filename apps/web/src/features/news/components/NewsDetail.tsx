@@ -36,7 +36,8 @@ export function NewsDetail({ article, similarArticles, previousArticle, nextArti
 
       <NewsHeader article={article} authorName={authorName} fullDate={fullDate} loc={loc} />
 
-      <div ref={bodyRef} className="grid gap-10 lg:grid-cols-[200px_minmax(0,1fr)] lg:gap-14">
+      {/* Khung bài cùng bề rộng các trang khác; cột chữ giới hạn ~75 ký tự/dòng và căn giữa phần còn lại cạnh mục lục */}
+      <div ref={bodyRef} className="grid gap-10 lg:grid-cols-[200px_minmax(0,1fr)] lg:gap-14 xl:grid-cols-[220px_minmax(0,1fr)] xl:gap-16">
         <aside className="hidden lg:block">
           <div className="sticky top-28 space-y-8">
             <NewsToc sections={content.sections} variant="sidebar" />
@@ -44,7 +45,7 @@ export function NewsDetail({ article, similarArticles, previousArticle, nextArti
           </div>
         </aside>
 
-        <div className="mx-auto w-full max-w-2xl lg:mx-0">
+        <div className="mx-auto w-full max-w-3xl">
           <div className="lg:hidden">
             <NewsToc sections={content.sections} variant="inline" />
           </div>

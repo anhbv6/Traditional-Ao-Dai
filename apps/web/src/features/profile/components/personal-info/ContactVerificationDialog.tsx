@@ -1,16 +1,22 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Mail, Phone } from "lucide-react";
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { Mail, Phone, Send, ShieldCheck } from "lucide-react";
+import { VIETNAM_PHONE_REGEX, emailSchema } from "@repo/shared";
+import { ActionButton } from "@/components/shared/ActionButton";
+import { AppDialog } from "@/components/shared/AppDialog";
 import { OtpInput } from "@/components/shared/OtpInput";
+import { TextField } from "@/components/shared/TextField";
 import { type useContactVerification } from "../../hooks/useContactVerification";
 
 type ContactVerificationDialogProps = ReturnType<typeof useContactVerification>;
 
+const FORM_ID = "contact-verification-form";
+
 /**
- * Hộp thoại xác minh / đổi Email & SĐT bằng mã 6 số
+ * Hộp thoại thêm / đổi / xác minh Email & SĐT bằng mã 6 số (2 bước: nhập địa chỉ → nhập mã).
+ * Định dạng email / SĐT được kiểm tra ngay dưới ô trước khi gọi API gửi mã.
  */
 export function ContactVerificationDialog({
   contactType,
@@ -30,93 +36,109 @@ export function ContactVerificationDialog({
 }: ContactVerificationDialogProps) {
   const t = useTranslations("ProfilePage.personal");
   const isEmail = contactType === "email";
-  const Icon = isEmail ? Mail : Phone;
+  const [error, setError] = useState("");
+  const [submitCount, setSubmitCount] = useState(0);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitCount((count) => count + 1);
+
     if (step === "input") {
+      const trimmed = value.trim();
+      const valid = isEmail ? emailSchema.safeParse(trimmed).success : VIETNAM_PHONE_REGEX.test(trimmed);
+      if (!valid) {
+        setError(isEmail ? t("emailInvalid") : t("phoneInvalid"));
+        return;
+      }
       sendCode();
-    } else {
+    } else if (code.length === 6) {
       confirm();
     }
   };
 
+  const handleClose = () => {
+    setError("");
+    close();
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && close()}>
-      <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-[420px] rounded-2xl bg-[var(--bg-card)] p-5 sm:p-6">
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="space-y-1.5">
-            <DialogTitle className="text-base sm:text-lg font-bold text-[var(--text-main)] font-[family-name:var(--font-playfair)]">
-              {isEmail ? t("verifyEmailTitle") : t("verifyPhoneTitle")}
-            </DialogTitle>
-            <DialogDescription className="text-xs sm:text-sm text-[var(--text-light)]">
-              {step === "input"
-                ? isEmail
-                  ? t("verifyEmailDesc")
-                  : t("verifyPhoneDesc")
-                : t("enterCodeDesc", { target: value })}
-            </DialogDescription>
-          </div>
-
+    <AppDialog
+      open={isOpen}
+      onOpenChange={(open) => !open && handleClose()}
+      icon={isEmail ? Mail : Phone}
+      title={isEmail ? t("verifyEmailTitle") : t("verifyPhoneTitle")}
+      description={
+        step === "input" ? (isEmail ? t("verifyEmailDesc") : t("verifyPhoneDesc")) : t("enterCodeDesc", { target: value })
+      }
+      size="sm"
+      dismissible={!isSending && !isConfirming}
+      footer={
+        <div className="flex w-full flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+          <ActionButton variant="cancel" onClick={handleClose} disabled={isSending || isConfirming}>
+            {t("cancelBtn")}
+          </ActionButton>
           {step === "input" ? (
-            <div className="relative">
-              <Icon className="absolute left-3 sm:left-3.5 top-1/2 size-3.5 sm:size-4 -translate-y-1/2 text-[var(--primary-ink)]/50 pointer-events-none" />
-              <input
-                type={isEmail ? "email" : "tel"}
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-                required
-                autoFocus
-                className="w-full h-10 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] pl-10 pr-3 sm:pl-11 sm:pr-4 text-xs sm:text-sm text-[var(--text-main)] outline-none transition-all duration-300 focus:border-[var(--primary-color)] focus:ring-1 focus:ring-[var(--primary-color)] hover:border-[var(--primary-color)]/30 shadow-xs"
-              />
-            </div>
+            <ActionButton type="submit" form={FORM_ID} variant="confirm" icon={<Send />} loading={isSending}>
+              {isSending ? t("sendingCode") : t("sendCodeBtn")}
+            </ActionButton>
           ) : (
-            <div className="space-y-3">
-              <OtpInput value={code} onChange={setCode} disabled={isConfirming} />
-              <div className="flex items-center justify-between text-[11px] sm:text-xs">
-                <button
-                  type="button"
-                  onClick={backToInput}
-                  className="text-[var(--text-light)] hover:text-[var(--primary-ink)] cursor-pointer"
-                >
-                  {t("changeTarget")}
-                </button>
-                <button
-                  type="button"
-                  onClick={sendCode}
-                  disabled={cooldown > 0 || isSending}
-                  className="font-semibold text-[var(--primary-ink)] hover:underline cursor-pointer disabled:cursor-not-allowed disabled:text-[var(--text-light)] disabled:no-underline"
-                >
-                  {cooldown > 0 ? t("resendIn", { seconds: cooldown }) : t("resendCode")}
-                </button>
-              </div>
-            </div>
-          )}
-
-          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
-            <button
-              type="button"
-              onClick={close}
-              className="w-full sm:w-auto inline-flex h-9 sm:h-10 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--bg-card)] px-5 text-xs font-semibold uppercase tracking-[1px] text-gray-700 transition-all hover:bg-gray-50 cursor-pointer"
-            >
-              {t("cancelBtn")}
-            </button>
-            <button
+            <ActionButton
               type="submit"
-              disabled={step === "input" ? isSending || !value.trim() : isConfirming || code.length !== 6}
-              className="w-full sm:w-auto inline-flex h-9 sm:h-10 items-center justify-center rounded-lg bg-[var(--primary-color)] px-5 text-xs font-semibold uppercase tracking-[1px] text-white transition-all hover:bg-[var(--primary-color)]/90 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              form={FORM_ID}
+              variant="confirm"
+              icon={<ShieldCheck />}
+              loading={isConfirming}
+              disabled={code.length !== 6}
             >
-              {step === "input"
-                ? isSending
-                  ? t("sendingCode")
-                  : t("sendCodeBtn")
-                : isConfirming
-                  ? t("verifying")
-                  : t("confirmBtn")}
-            </button>
+              {isConfirming ? t("verifying") : t("confirmBtn")}
+            </ActionButton>
+          )}
+        </div>
+      }
+    >
+      <form id={FORM_ID} onSubmit={handleSubmit} noValidate>
+        {step === "input" ? (
+          <TextField
+            appearance="outline"
+            size="md"
+            type={isEmail ? "email" : "tel"}
+            label={isEmail ? t("email") : t("phone")}
+            prefix={isEmail ? <Mail /> : <Phone />}
+            autoComplete={isEmail ? "email" : "tel"}
+            placeholder={isEmail ? t("emailPlaceholder") : t("phonePlaceholder")}
+            value={value}
+            onValueChange={(next) => {
+              setValue(next);
+              if (error) setError("");
+            }}
+            error={error || undefined}
+            shakeKey={submitCount}
+            disabled={isSending}
+            autoFocus
+          />
+        ) : (
+          <div className="space-y-3">
+            <OtpInput value={code} onChange={setCode} disabled={isConfirming} inputClassName="rounded-none" />
+            <div className="flex items-center justify-between text-xs">
+              <button
+                type="button"
+                onClick={backToInput}
+                className="cursor-pointer text-[var(--text-light)] underline-offset-4 transition-colors hover:text-[var(--primary-ink)] hover:underline"
+              >
+                {t("changeTarget")}
+              </button>
+              <button
+                type="button"
+                onClick={sendCode}
+                disabled={cooldown > 0 || isSending}
+                className="cursor-pointer font-semibold text-[var(--primary-ink)] underline-offset-4 hover:underline disabled:cursor-not-allowed disabled:text-[var(--text-light)] disabled:no-underline"
+              >
+                {cooldown > 0 ? t("resendIn", { seconds: cooldown }) : t("resendCode")}
+              </button>
+            </div>
           </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+        )}
+      </form>
+    </AppDialog>
   );
 }

@@ -62,8 +62,8 @@ export async function Footer() {
         { label: t('company.story'), href: '/about' },
         { label: t('company.careers'), href: '/about#careers' },
         { label: t('company.partners'), href: '/contact#agency' },
-        { label: t('legal.privacy'), href: '/faqs#privacy' },
-        { label: t('legal.terms'), href: '/faqs#terms' },
+        { label: t('legal.privacy'), href: '/terms#privacy' },
+        { label: t('legal.terms'), href: '/terms' },
       ],
     },
     {

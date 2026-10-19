@@ -1,0 +1,59 @@
+{
+  "meta": {
+    "title": "Thông báo",
+    "description": "Cập nhật đơn hàng, tiến độ may đo và ưu đãi dành riêng cho bạn."
+  },
+  "eyebrow": "Tài khoản",
+  "title": "Thông báo",
+  "subtitle": "Theo dõi đơn hàng, tiến độ may đo và những ưu đãi dành riêng cho bạn.",
+  "label": "Thông báo",
+  "unreadCount": "{count} chưa đọc",
+  "resultCount": "{count} thông báo",
+  "markAllRead": "Đánh dấu tất cả đã đọc",
+  "viewAll": "Xem tất cả thông báo",
+  "unread": "Chưa đọc",
+  "filters": {
+    "all": "Tất cả",
+    "unread": "Chưa đọc",
+    "order": "Đơn hàng",
+    "tailoring": "May đo",
+    "promotion": "Ưu đãi",
+    "system": "Hệ thống"
+  },
+  "emptyTitle": "Chưa có thông báo",
+  "emptyDescription": "Khi đơn hàng được cập nhật hoặc có ưu đãi mới, chúng tôi sẽ báo cho bạn tại đây.",
+  "emptyFilteredTitle": "Không có thông báo phù hợp",
+  "emptyFilteredDescription": "Bạn đã xem hết thông báo trong mục này.",
+  "emptyAction": "Tiếp tục mua sắm",
+  "showAll": "Xem tất cả",
+  "items": {
+    "orderShipped": {
+      "title": "Đơn hàng đang được giao",
+      "body": "Đơn hàng #AD10293 đã rời kho và sẽ đến tay bạn trong 1–2 ngày tới."
+    },
+    "tailoringReady": {
+      "title": "Áo dài may đo đã hoàn thiện",
+      "body": "Áo dài lụa tơ tằm may theo số đo của bạn đã hoàn tất khâu kiểm tra và sẵn sàng giao."
+    },
+    "flashSale": {
+      "title": "Ưu đãi cuối tuần -20%",
+      "body": "Giảm 20% cho bộ sưu tập Gấm Xuân đến hết Chủ nhật. Số lượng có hạn!"
+    },
+    "orderConfirmed": {
+      "title": "Đơn hàng đã được xác nhận",
+      "body": "Cảm ơn bạn! Đơn hàng #AD10293 đã được xác nhận và đang được chuẩn bị."
+    },
+    "measurementReminder": {
+      "title": "Nhắc cập nhật số đo",
+      "body": "Số đo của bạn được lưu đã hơn 6 tháng. Cập nhật để áo may đo vừa vặn nhất."
+    },
+    "newCollection": {
+      "title": "Bộ sưu tập mới: Sen Hạ",
+      "body": "Khám phá 12 thiết kế áo dài lấy cảm hứng từ sắc sen mùa hạ."
+    },
+    "securityLogin": {
+      "title": "Đăng nhập trên thiết bị mới",
+      "body": "Tài khoản của bạn vừa đăng nhập trên một thiết bị mới. Nếu không phải bạn, hãy đổi mật khẩu ngay."
+    }
+  }
+}

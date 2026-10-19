@@ -116,5 +116,6 @@
     "adminLogin": "Admin sign-in",
     "suggestions": "You might like",
     "metaTitle": "Access denied — AODAI"
-  }
+  },
+  "notifications": "Notifications"
 }

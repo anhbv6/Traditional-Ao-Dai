@@ -1,7 +1,8 @@
 import type { CSSProperties } from 'react';
 
 /**
- * Cánh hoa rơi theo gió — lớp trang trí phủ toàn khối Hero.
+ * Cánh hoa rơi theo gió — lớp trang trí phủ toàn khối chứa (Hero trang chủ, banner màn Đăng ký...).
+ * Khối cha cần `relative` (hoặc absolute/fixed) để lớp phủ `absolute inset-0` bám đúng.
  *
  * CSS thuần (keyframes petal-drift / petal-sway / petal-flutter trong globals.css):
  * không cần JS phía client, chạy trên GPU (chỉ animate transform + opacity), không lệch hydrate.
@@ -114,7 +115,7 @@ const PETALS = buildPetals();
 
 const round = (n: number) => Math.round(n * 100) / 100;
 
-interface HeroPetalsProps {
+interface FallingPetalsProps {
   /**
    * `back` (mặc định): tầng xa + giữa, nằm SAU nội dung.
    * `front`: tầng gần (cánh to), nằm TRƯỚC nội dung — bay qua cả ảnh slider để cột phải không bị trống hoa.
@@ -123,7 +124,7 @@ interface HeroPetalsProps {
   className?: string;
 }
 
-export function HeroPetals({ depth = 'back', className }: HeroPetalsProps) {
+export function FallingPetals({ depth = 'back', className }: FallingPetalsProps) {
   const petals = PETALS.filter((petal) => petal.depth === depth);
   /* Gradient chỉ khai báo một lần (ở tầng sau) — id dùng chung toàn trang */
   const withGradients = depth === 'back';

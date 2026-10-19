@@ -3,7 +3,7 @@ import { ArrowRight } from 'lucide-react';
 import { type HeroMetric } from '../types/home.types';
 import { SectionOrnament } from '@/components/shared/SectionOrnament';
 import { ActionLink } from '@/components/shared/ActionLink';
-import { HeroPetals } from './HeroPetals';
+import { FallingPetals } from '@/components/effects/FallingPetals';
 import { containerClassName } from '@/components/ui/container';
 
 interface HeroBannerProps {
@@ -20,7 +20,7 @@ interface HeroBannerProps {
 
 /**
  * Hero dạng "trang tạp chí": chữ bên trái, cột phải dành cho ảnh / minh hoạ (truyền qua `media`).
- * Nền có cánh hoa rơi theo gió (HeroPetals); 2 CTA tách rõ mua sẵn / may đo.
+ * Nền có cánh hoa rơi theo gió (FallingPetals); 2 CTA tách rõ mua sẵn / may đo.
  */
 export function HeroBanner({
   eyebrow,
@@ -34,7 +34,7 @@ export function HeroBanner({
 }: HeroBannerProps) {
   return (
     <section className="relative overflow-hidden bg-[var(--bg-main)]">
-      <HeroPetals />
+      <FallingPetals />
 
       <div className={containerClassName({ className: 'relative grid items-center gap-12 pb-16 pt-10 lg:min-h-[calc(100svh-80px)] lg:grid-cols-[1fr_0.9fr] lg:gap-16 lg:py-14' })}>
         <div className="relative z-10 flex max-w-2xl flex-col animate-fade-in-up">
@@ -87,7 +87,7 @@ export function HeroBanner({
       </div>
 
       {/* Cánh hoa tầng gần bay TRƯỚC nội dung (kể cả ảnh slider) */}
-      <HeroPetals depth="front" className="z-20" />
+      <FallingPetals depth="front" className="z-20" />
 
       <div className="pointer-events-none absolute bottom-6 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 text-[10px] uppercase tracking-[3px] text-[var(--text-light)] lg:flex">
         {scrollLabel}

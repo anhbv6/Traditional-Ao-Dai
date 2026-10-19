@@ -1,29 +1,24 @@
 "use client";
 
-import React from "react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import React, { useState } from "react";
 import { useTranslations } from "next-intl";
-import { FormInput } from "@/components/shared/FormInput";
-import { PopupDialog } from "@/components/shared/PopupDialog";
-import { Building2, Check, Home, MapPin, Navigation, Phone, Tag, User } from "lucide-react";
+import { Building2, Home, MapPin, Navigation, Phone, Save, Tag, UserRound } from "lucide-react";
+import { VIETNAM_PHONE_REGEX } from "@repo/shared";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ActionButton } from "@/components/shared/ActionButton";
+import { AppDialog } from "@/components/shared/AppDialog";
+import { SelectField } from "@/components/shared/SelectField";
+import { TextField } from "@/components/shared/TextField";
 import { useAddressForm, useVietnamAddress } from "../../../hooks/useProfile";
 
-const LABEL_CLASS =
-  "block font-[family-name:var(--font-lora)] text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[var(--text-light)]";
+const FORM_ID = "address-action-form";
 
-const INPUT_CLASS =
-  "!h-9 sm:!h-10 text-sm leading-[1.15] sm:leading-normal text-[var(--text-main)] bg-[var(--bg-card)] border border-[var(--border)] rounded-lg focus:border-[var(--primary-color)] focus:ring-2 focus:ring-[var(--primary-color)]/20 hover:border-[var(--primary-color)]/30 transition-colors placeholder:text-[var(--text-light)]/50 placeholder:text-[11px] sm:placeholder:text-xs !pl-8 sm:!pl-9 !pr-3";
+type FieldKey = "name" | "phone" | "province" | "district" | "ward" | "detail";
 
-const SELECT_TRIGGER_CLASS =
-  "!w-full !h-9 sm:!h-10 !rounded-lg border border-[var(--border)] bg-[var(--bg-card)] text-xs sm:text-sm leading-[1.15] sm:leading-normal text-[var(--text-main)] outline-none transition-colors focus:border-[var(--primary-color)] focus:bg-[var(--bg-card)] focus:ring-2 focus:ring-[var(--primary-color)]/20 hover:border-[var(--primary-color)]/30 shadow-none cursor-pointer disabled:opacity-50 !pl-8 sm:!pl-9 !pr-3 data-placeholder:text-[var(--text-light)]/50 data-placeholder:text-[11px] sm:data-placeholder:text-xs";
-
+/**
+ * Hộp thoại thêm / sửa địa chỉ: TextField + SelectField chung (Tỉnh → Quận → Phường chọn lần lượt),
+ * kiểm tra bắt buộc + định dạng SĐT khi bấm Lưu, lỗi hiện ngay dưới từng ô.
+ */
 export function ActionForm() {
   const t = useTranslations("ProfilePage.address");
   const {
@@ -44,7 +39,6 @@ export function ActionForm() {
     setFormDistrictCode,
     formWardName,
     setFormWardName,
-    formWardCode,
     setFormWardCode,
     formAddressLine,
     setFormAddressLine,
@@ -56,358 +50,197 @@ export function ActionForm() {
     isMutating,
   } = useAddressForm();
 
-  const {
-    provinces,
-    districts,
-    wards,
-    isLoadingProvinces,
-    isLoadingDistricts,
-    isLoadingWards,
-  } = useVietnamAddress(formProvinceName || formProvinceCode, formDistrictName || formDistrictCode);
+  const { provinces, districts, wards, isLoadingProvinces, isLoadingDistricts, isLoadingWards } = useVietnamAddress(
+    formProvinceName || formProvinceCode,
+    formDistrictName || formDistrictCode,
+  );
 
-  // ─── Cascading handlers ─────────────────────────────────────────────────────
-  const handleProvinceChange = (value: string | null) => {
-    if (!value) return;
-    const province = provinces.find((p) => p.name === value || String(p.code) === value);
-    if (province) {
-      setFormProvinceCode(String(province.code));
-      setFormProvinceName(province.name);
-    } else {
-      setFormProvinceName(value);
-      setFormProvinceCode("");
-    }
-    // Reset district & ward
+  const [errors, setErrors] = useState<Partial<Record<FieldKey, string>>>({});
+  const [submitCount, setSubmitCount] = useState(0);
+  const clearError = (key: FieldKey) => {
+    if (errors[key]) setErrors((prev) => ({ ...prev, [key]: undefined }));
+  };
+
+  const handleProvinceChange = (value: string) => {
+    const province = provinces.find((p) => p.name === value);
+    setFormProvinceName(value);
+    setFormProvinceCode(province ? String(province.code) : "");
+    // Đổi tỉnh → xoá quận / phường đã chọn
     setFormDistrictCode("");
     setFormDistrictName("");
     setFormWardCode("");
     setFormWardName("");
+    clearError("province");
   };
 
-  const handleDistrictChange = (value: string | null) => {
-    if (!value) return;
-    const district = districts.find((d) => d.name === value || String(d.code) === value);
-    if (district) {
-      setFormDistrictCode(String(district.code));
-      setFormDistrictName(district.name);
-    } else {
-      setFormDistrictName(value);
-      setFormDistrictCode("");
-    }
-    // Reset ward
+  const handleDistrictChange = (value: string) => {
+    const district = districts.find((d) => d.name === value);
+    setFormDistrictName(value);
+    setFormDistrictCode(district ? String(district.code) : "");
     setFormWardCode("");
     setFormWardName("");
+    clearError("district");
   };
 
-  const handleWardChange = (value: string | null) => {
-    if (!value) return;
-    const ward = wards.find((w) => w.name === value || String(w.code) === value);
-    if (ward) {
-      setFormWardCode(String(ward.code));
-      setFormWardName(ward.name);
-    } else {
-      setFormWardName(value);
-      setFormWardCode("");
-    }
+  const handleWardChange = (value: string) => {
+    const ward = wards.find((w) => w.name === value);
+    setFormWardName(value);
+    setFormWardCode(ward ? String(ward.code) : "");
+    clearError("ward");
   };
 
-  const isFormValid =
-    Boolean(formName?.trim()) &&
-    Boolean(formPhone?.trim()) &&
-    Boolean(formProvinceName || formProvinceCode) &&
-    Boolean(formDistrictName || formDistrictCode) &&
-    Boolean(formWardName || formWardCode) &&
-    Boolean(formAddressLine?.trim());
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitCount((count) => count + 1);
+    const required = t("requiredField");
+    const phone = formPhone.trim();
+    const nextErrors: Partial<Record<FieldKey, string>> = {
+      name: formName.trim() ? undefined : required,
+      phone: !phone ? required : VIETNAM_PHONE_REGEX.test(phone) ? undefined : t("phoneInvalid"),
+      province: formProvinceName ? undefined : required,
+      district: formDistrictName ? undefined : required,
+      ward: formWardName ? undefined : required,
+      detail: formAddressLine.trim() ? undefined : required,
+    };
+    setErrors(nextErrors);
+    if (Object.values(nextErrors).some(Boolean)) return;
+    handleSubmit(e);
+  };
+
+  const close = (open: boolean) => {
+    if (open) return;
+    setIsEditing(false);
+    setErrors({});
+  };
+
+  const toOptions = (items: { name: string }[]) => items.map((item) => ({ value: item.name, label: item.name }));
 
   return (
-    <PopupDialog
+    <AppDialog
       open={isEditing}
-      onOpenChange={setIsEditing}
-      title={
-        <span className="font-[family-name:var(--font-playfair)] text-base sm:text-lg font-bold text-[var(--primary-ink)] block">
-          {editingAddress ? t("editTitle") : t("addBtn")}
-        </span>
-      }
-      description={
-        <span className="text-[11px] sm:text-xs text-[var(--text-light)] block">
-          {t("subtitle")}
-        </span>
-      }
-      size="xl"
-      scrollable
+      onOpenChange={close}
+      icon={MapPin}
+      title={editingAddress ? t("editTitle") : t("addBtn")}
+      description={t("subtitle")}
+      size="lg"
+      dismissible={!isMutating}
       footer={
-        <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-2.5 w-full pt-1.5 sm:pt-2 border-t border-[var(--border)]/60">
-          <button
-            type="button"
-            onClick={() => setIsEditing(false)}
-            className="w-full sm:w-auto inline-flex h-8 sm:h-9 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--bg-card)] px-4 sm:px-5 text-[11px] sm:text-xs font-semibold uppercase tracking-[0.5px] text-[var(--text-light)] transition-all hover:bg-gray-50 cursor-pointer active:scale-95 duration-200"
-          >
+        <div className="flex w-full flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+          <ActionButton variant="cancel" onClick={() => close(false)} disabled={isMutating}>
             {t("form.cancelBtn")}
-          </button>
-          <button
-            type="submit"
-            form="address-action-form"
-            disabled={isMutating || !isFormValid}
-            className="w-full sm:w-auto inline-flex h-8 sm:h-9 items-center justify-center rounded-lg bg-[var(--primary-color)] px-4 sm:px-5 text-[11px] sm:text-xs font-semibold uppercase tracking-[0.5px] text-white transition-all hover:bg-[var(--primary-color)]/90 cursor-pointer active:scale-95 duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isMutating ? (
-              <span className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
-            ) : (
-              t("form.submitBtn")
-            )}
-          </button>
+          </ActionButton>
+          <ActionButton type="submit" form={FORM_ID} variant="confirm" icon={<Save />} loading={isMutating}>
+            {t("form.submitBtn")}
+          </ActionButton>
         </div>
       }
     >
-      <form id="address-action-form" onSubmit={handleSubmit} className="space-y-3 sm:space-y-4 pt-1" data-lenis-prevent>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-3.5 gap-y-2.5 sm:gap-x-4 sm:gap-y-3.5">
-          {/* Receiver Name */}
-          <FormInput
-            id="receiverName"
+      <form id={FORM_ID} onSubmit={onSubmit} noValidate className="space-y-5">
+        <div className="grid gap-5 sm:grid-cols-2">
+          <TextField
+            appearance="outline"
+            size="md"
             label={t("form.receiverName")}
-            startIcon={<User size={14} className="text-[var(--text-light)]/60" />}
-            type="text"
             required
-            value={formName}
-            onChange={(e) => setFormName(e.target.value)}
+            prefix={<UserRound />}
+            autoComplete="name"
             placeholder={t("form.placeholderName")}
-            className={INPUT_CLASS}
-            containerClassName="space-y-1"
-            labelClassName={LABEL_CLASS}
+            value={formName}
+            onValueChange={(value) => {
+              setFormName(value);
+              clearError("name");
+            }}
+            error={errors.name}
+            shakeKey={submitCount}
           />
-
-          {/* Receiver Phone */}
-          <FormInput
-            id="receiverPhone"
-            label={t("form.receiverPhone")}
-            startIcon={<Phone size={14} className="text-[var(--text-light)]/60" />}
+          <TextField
+            appearance="outline"
+            size="md"
             type="tel"
+            label={t("form.receiverPhone")}
             required
-            value={formPhone}
-            onChange={(e) => setFormPhone(e.target.value)}
+            prefix={<Phone />}
+            autoComplete="tel"
             placeholder={t("form.placeholderPhone")}
-            className={INPUT_CLASS}
-            containerClassName="space-y-1"
-            labelClassName={LABEL_CLASS}
+            value={formPhone}
+            onValueChange={(value) => {
+              setFormPhone(value.replace(/[^\d+]/g, ""));
+              clearError("phone");
+            }}
+            error={errors.phone}
+            shakeKey={submitCount}
           />
 
-          {/* Province Select */}
-          <div className="space-y-1 flex flex-col">
-            <label htmlFor="province" className={LABEL_CLASS}>
-              {t("form.province")}
-            </label>
-            <div className="relative w-full">
-              <div className="absolute left-2.5 top-1/2 -translate-y-1/2 flex items-center text-[var(--text-light)]/60 z-10 pointer-events-none">
-                <MapPin size={14} />
-              </div>
-              <Select
-                value={formProvinceName || formProvinceCode || undefined}
-                onValueChange={handleProvinceChange}
-                disabled={isLoadingProvinces}
-              >
-                <SelectTrigger
-                  id="province"
-                  className={SELECT_TRIGGER_CLASS}
-                >
-                  <SelectValue placeholder={isLoadingProvinces ? t("form.loading") : t("form.placeholderProvince")} />
-                </SelectTrigger>
-                <SelectContent className="bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-main)] shadow-lg rounded-xl overflow-hidden font-medium z-[100] max-h-60 overscroll-contain">
-                  {provinces.map((p) => (
-                    <SelectItem
-                      key={p.code || p.name}
-                      value={p.name}
-                      className="cursor-pointer text-xs sm:text-sm font-medium data-[highlighted]:bg-[var(--primary-color)]/10 data-[highlighted]:text-[var(--primary-ink)] data-[selected]:bg-[var(--primary-color)] data-[selected]:text-white"
-                    >
-                      {p.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {/* District Select */}
-          <div className="space-y-1 flex flex-col">
-            <label htmlFor="district" className={LABEL_CLASS}>
-              {t("form.district")}
-            </label>
-            <div className="relative w-full">
-              <div className="absolute left-2.5 top-1/2 -translate-y-1/2 flex items-center text-[var(--text-light)]/60 z-10 pointer-events-none">
-                <Building2 size={14} />
-              </div>
-              <Select
-                value={formDistrictName || formDistrictCode || undefined}
-                onValueChange={handleDistrictChange}
-                disabled={(!formProvinceName && !formProvinceCode) || isLoadingDistricts}
-              >
-                <SelectTrigger
-                  id="district"
-                  className={SELECT_TRIGGER_CLASS}
-                >
-                  <SelectValue placeholder={isLoadingDistricts ? t("form.loading") : t("form.placeholderDistrict")} />
-                </SelectTrigger>
-                <SelectContent className="bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-main)] shadow-lg rounded-xl overflow-hidden font-medium z-[100] max-h-60 overscroll-contain">
-                  {districts.map((d) => (
-                    <SelectItem
-                      key={d.code || d.name}
-                      value={d.name}
-                      className="cursor-pointer text-xs sm:text-sm font-medium data-[highlighted]:bg-[var(--primary-color)]/10 data-[highlighted]:text-[var(--primary-ink)] data-[selected]:bg-[var(--primary-color)] data-[selected]:text-white"
-                    >
-                      {d.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {/* Ward Select */}
-          <div className="space-y-1 flex flex-col">
-            <label htmlFor="ward" className={LABEL_CLASS}>
-              {t("form.ward")}
-            </label>
-            <div className="relative w-full">
-              <div className="absolute left-2.5 top-1/2 -translate-y-1/2 flex items-center text-[var(--text-light)]/60 z-10 pointer-events-none">
-                <Navigation size={14} />
-              </div>
-              <Select
-                value={formWardName || formWardCode || undefined}
-                onValueChange={handleWardChange}
-                disabled={(!formDistrictName && !formDistrictCode) || isLoadingWards}
-              >
-                <SelectTrigger
-                  id="ward"
-                  className={SELECT_TRIGGER_CLASS}
-                >
-                  <SelectValue placeholder={isLoadingWards ? t("form.loading") : t("form.placeholderWard")} />
-                </SelectTrigger>
-                <SelectContent className="bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-main)] shadow-lg rounded-xl overflow-hidden font-medium z-[100] max-h-60 overscroll-contain">
-                  {wards.map((w) => (
-                    <SelectItem
-                      key={w.code || w.name}
-                      value={w.name}
-                      className="cursor-pointer text-xs sm:text-sm font-medium data-[highlighted]:bg-[var(--primary-color)]/10 data-[highlighted]:text-[var(--primary-ink)] data-[selected]:bg-[var(--primary-color)] data-[selected]:text-white"
-                    >
-                      {w.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {/* Address Label */}
-          <FormInput
-            id="addressLabel"
-            label={t("form.label")}
-            startIcon={<Tag size={14} className="text-[var(--text-light)]/60" />}
-            type="text"
-            value={formLabel}
-            onChange={(e) => setFormLabel(e.target.value)}
-            placeholder={t("form.placeholderLabel")}
-            className={INPUT_CLASS}
-            containerClassName="space-y-1"
-            labelClassName={LABEL_CLASS}
-          />
-
-          {/* Detail Address - full width */}
-          <FormInput
-            id="addressDetail"
-            label={t("form.detail")}
-            startIcon={<Home size={14} className="text-[var(--text-light)]/60" />}
-            type="text"
+          <SelectField
+            label={t("form.province")}
             required
-            value={formAddressLine}
-            onChange={(e) => setFormAddressLine(e.target.value)}
+            prefix={<MapPin />}
+            placeholder={t("form.placeholderProvince")}
+            options={toOptions(provinces)}
+            value={formProvinceName || null}
+            onValueChange={handleProvinceChange}
+            loading={isLoadingProvinces}
+            error={errors.province}
+          />
+          <SelectField
+            label={t("form.district")}
+            required
+            prefix={<Building2 />}
+            placeholder={t("form.placeholderDistrict")}
+            options={toOptions(districts)}
+            value={formDistrictName || null}
+            onValueChange={handleDistrictChange}
+            loading={isLoadingDistricts}
+            disabled={!formProvinceName}
+            error={errors.district}
+          />
+          <SelectField
+            label={t("form.ward")}
+            required
+            prefix={<Navigation />}
+            placeholder={t("form.placeholderWard")}
+            options={toOptions(wards)}
+            value={formWardName || null}
+            onValueChange={handleWardChange}
+            loading={isLoadingWards}
+            disabled={!formDistrictName}
+            error={errors.ward}
+          />
+          <TextField
+            appearance="outline"
+            size="md"
+            label={t("form.label")}
+            prefix={<Tag />}
+            placeholder={t("form.placeholderLabel")}
+            maxLength={30}
+            value={formLabel}
+            onValueChange={setFormLabel}
+          />
+          <TextField
+            appearance="outline"
+            size="md"
+            label={t("form.detail")}
+            required
+            prefix={<Home />}
+            autoComplete="street-address"
             placeholder={t("form.placeholderDetail")}
-            className={INPUT_CLASS}
-            containerClassName="space-y-1 sm:col-span-2"
-            labelClassName={LABEL_CLASS}
+            value={formAddressLine}
+            onValueChange={(value) => {
+              setFormAddressLine(value);
+              clearError("detail");
+            }}
+            error={errors.detail}
+            shakeKey={submitCount}
+            className="sm:col-span-2"
           />
         </div>
 
-        {/* Set Default */}
-        <div className="flex items-center gap-2 pt-0.5">
-          <Checkbox
-            id="isDefault"
-            checked={formIsDefault}
-            onCheckedChange={(checked) => setFormIsDefault(!!checked)}
-          />
-          <label
-            htmlFor="isDefault"
-            className="cursor-pointer text-xs sm:text-sm font-medium text-[var(--text-light)] select-none"
-          >
-            {t("form.isDefault")}
-          </label>
-        </div>
-
-        {/* Address Preview */}
-        <div className="pt-0.5">
-          <div className="flex items-center justify-between pb-1">
-            <span className={LABEL_CLASS}>
-              {t("form.previewTitle")}
-            </span>
-          </div>
-
-          <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-main)]/70 p-3 sm:p-4 transition-all">
-            <div className="flex items-start justify-between gap-2">
-              <div className="flex items-center gap-1.5 font-[family-name:var(--font-playfair)] text-sm sm:text-base font-bold text-[var(--primary-ink)] min-w-0">
-                <User size={13} className="shrink-0 text-[var(--primary-ink)]" />
-                <span className="truncate">
-                  {formName?.trim() || (
-                    <span className="text-[var(--text-light)]/50 italic text-xs sm:text-sm font-normal">
-                      {t("form.placeholderName")}
-                    </span>
-                  )}
-                </span>
-              </div>
-              <div className="flex gap-1.5 items-center shrink-0">
-                {formLabel?.trim() && (
-                  <span className="inline-flex items-center rounded bg-[var(--bg-card)] border border-[var(--border)] px-2 py-0.5 text-[10px] font-semibold text-[var(--text-light)]">
-                    {formLabel.trim()}
-                  </span>
-                )}
-                {formIsDefault && (
-                  <span className="inline-flex items-center gap-1 rounded bg-[var(--primary-color)]/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[var(--primary-ink)]">
-                    <Check size={11} />
-                    {t("default")}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            <div className="mt-2 space-y-1 text-xs text-[var(--text-light)]">
-              <p className="flex items-center gap-2">
-                <Phone size={12} className="shrink-0 text-[var(--text-light)]/70" />
-                <span>
-                  {formPhone?.trim() || (
-                    <span className="text-[var(--text-light)]/50 italic">
-                      {t("form.placeholderPhone")}
-                    </span>
-                  )}
-                </span>
-              </p>
-              <p className="flex items-start gap-2">
-                <MapPin size={12} className="shrink-0 mt-0.5 text-[var(--text-light)]/70" />
-                <span className="leading-relaxed">
-                  {[
-                    formAddressLine?.trim(),
-                    formWardName?.trim(),
-                    formDistrictName?.trim(),
-                    formProvinceName?.trim(),
-                  ]
-                    .filter(Boolean)
-                    .join(", ") || (
-                    <span className="text-[var(--text-light)]/50 italic">
-                      {t("form.placeholderDetail")}
-                    </span>
-                  )}
-                </span>
-              </p>
-            </div>
-          </div>
-        </div>
+        <label htmlFor="isDefault" className="flex w-fit cursor-pointer items-center gap-2.5 text-[13px] text-[var(--text-main)] select-none">
+          <Checkbox id="isDefault" checked={formIsDefault} onCheckedChange={(checked) => setFormIsDefault(checked === true)} />
+          {t("form.isDefault")}
+        </label>
       </form>
-    </PopupDialog>
+    </AppDialog>
   );
 }
 

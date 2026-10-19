@@ -1,0 +1,109 @@
+{
+  "meta": {
+    "title": "Điều khoản & Chính sách dịch vụ",
+    "description": "Điều khoản sử dụng, chính sách đặt hàng, may đo, thanh toán, giao nhận, đổi trả và bảo mật thông tin của AODAI Heritage."
+  },
+  "eyebrow": "Pháp lý",
+  "title": "Điều khoản & Chính sách dịch vụ",
+  "subtitle": "Vui lòng đọc kỹ các điều khoản dưới đây trước khi tạo tài khoản, đặt mua hoặc đặt may áo dài tại AODAI Heritage.",
+  "lastUpdated": "Cập nhật lần cuối: {date}",
+  "updatedDate": "19/10/2026",
+  "tocLabel": "Mục lục",
+  "contactTitle": "Còn thắc mắc về điều khoản?",
+  "contactText": "Đội ngũ chăm sóc khách hàng luôn sẵn sàng giải đáp mọi câu hỏi của bạn.",
+  "contactCta": "Liên hệ với chúng tôi",
+  "sections": [
+    {
+      "id": "general",
+      "title": "1. Điều khoản chung",
+      "paragraphs": [
+        "Khi truy cập website, tạo tài khoản hoặc đặt hàng tại AODAI Heritage, bạn xác nhận đã đọc, hiểu và đồng ý với toàn bộ điều khoản trong trang này.",
+        "Chúng tôi có thể cập nhật điều khoản theo thời gian để phù hợp với quy định pháp luật và hoạt động kinh doanh. Phiên bản mới có hiệu lực kể từ khi được đăng tải; việc bạn tiếp tục sử dụng dịch vụ đồng nghĩa với việc chấp nhận các thay đổi đó."
+      ]
+    },
+    {
+      "id": "account",
+      "title": "2. Tài khoản thành viên",
+      "paragraphs": [
+        "Bạn có thể đăng ký bằng email, số điện thoại hoặc tài khoản Google. Thông tin đăng ký cần chính xác, đầy đủ và được cập nhật khi có thay đổi."
+      ],
+      "items": [
+        "Bạn chịu trách nhiệm bảo mật mật khẩu và mã OTP; không chia sẻ cho bất kỳ ai, kể cả người tự xưng là nhân viên của chúng tôi.",
+        "Mọi hoạt động phát sinh từ tài khoản được xem là do chính chủ tài khoản thực hiện.",
+        "Hãy thông báo ngay cho chúng tôi nếu phát hiện tài khoản bị truy cập trái phép.",
+        "Chúng tôi có quyền tạm khóa tài khoản có dấu hiệu gian lận, lạm dụng khuyến mãi hoặc vi phạm điều khoản."
+      ]
+    },
+    {
+      "id": "orders",
+      "title": "3. Đặt hàng & Giá cả",
+      "paragraphs": [
+        "Giá sản phẩm được niêm yết bằng Việt Nam Đồng (VND) và đã bao gồm thuế giá trị gia tăng, chưa bao gồm phí vận chuyển (nếu có).",
+        "Đơn hàng chỉ được xác nhận khi bạn nhận được thông báo xác nhận từ hệ thống. Trong trường hợp sản phẩm hết hàng hoặc có sai sót về giá, chúng tôi sẽ liên hệ để bạn lựa chọn điều chỉnh hoặc hủy đơn và hoàn tiền đầy đủ."
+      ]
+    },
+    {
+      "id": "tailoring",
+      "title": "4. Dịch vụ may đo theo số đo",
+      "paragraphs": [
+        "Áo dài may đo được cắt may riêng theo số đo bạn cung cấp hoặc số đo do thợ may của chúng tôi trực tiếp lấy."
+      ],
+      "items": [
+        "Bạn chịu trách nhiệm về độ chính xác của số đo tự gửi. Hãy làm theo hướng dẫn đo hoặc liên hệ tư vấn viên nếu chưa chắc chắn.",
+        "Thời gian hoàn thiện thông thường từ 7 đến 14 ngày làm việc kể từ khi chốt số đo, mẫu và chất liệu; mùa cao điểm (Tết, mùa cưới) có thể kéo dài hơn.",
+        "Đơn may đo cần đặt cọc tối thiểu 50% giá trị trước khi cắt vải. Tiền cọc không hoàn lại sau khi vải đã được cắt.",
+        "Mỗi đơn may đo được chỉnh sửa miễn phí tối đa 2 lần trong vòng 15 ngày kể từ khi nhận hàng nếu chưa vừa vặn."
+      ]
+    },
+    {
+      "id": "payment",
+      "title": "5. Thanh toán",
+      "paragraphs": [
+        "Chúng tôi chấp nhận thanh toán khi nhận hàng (COD), chuyển khoản ngân hàng và các cổng thanh toán trực tuyến được hiển thị tại bước thanh toán.",
+        "Chúng tôi không lưu trữ thông tin thẻ của bạn; mọi giao dịch trực tuyến được xử lý qua đối tác thanh toán đạt chuẩn bảo mật."
+      ]
+    },
+    {
+      "id": "shipping",
+      "title": "6. Giao hàng & Nhận hàng",
+      "paragraphs": [
+        "Thời gian giao hàng dự kiến từ 2 đến 5 ngày làm việc tùy khu vực đối với sản phẩm may sẵn. Phí và thời gian giao cụ thể được hiển thị trước khi bạn xác nhận đơn.",
+        "Vui lòng kiểm tra tình trạng gói hàng khi nhận. Nếu gói hàng có dấu hiệu bị móp, rách hoặc không đúng sản phẩm, bạn có thể từ chối nhận và báo ngay cho chúng tôi."
+      ]
+    },
+    {
+      "id": "returns",
+      "title": "7. Đổi trả & Hoàn tiền",
+      "items": [
+        "Sản phẩm may sẵn được đổi size hoặc đổi mẫu trong vòng 7 ngày kể từ khi nhận hàng, còn nguyên tem mác, chưa qua sử dụng hoặc giặt ủi.",
+        "Sản phẩm lỗi do sản xuất được đổi mới hoặc hoàn tiền 100%, chúng tôi chịu phí vận chuyển hai chiều.",
+        "Sản phẩm may đo theo số đo riêng và sản phẩm khuyến mãi xả kho không áp dụng đổi trả, trừ trường hợp lỗi từ phía chúng tôi.",
+        "Tiền hoàn được chuyển về phương thức thanh toán ban đầu trong vòng 5 đến 10 ngày làm việc sau khi xác nhận đổi trả."
+      ]
+    },
+    {
+      "id": "privacy",
+      "title": "8. Bảo mật thông tin cá nhân",
+      "paragraphs": [
+        "Chúng tôi chỉ thu thập thông tin cần thiết (họ tên, liên hệ, địa chỉ giao hàng, số đo cơ thể) để xử lý đơn hàng, may đo và chăm sóc khách hàng.",
+        "Thông tin của bạn không được bán hoặc chia sẻ cho bên thứ ba, ngoại trừ đối tác vận chuyển, thanh toán phục vụ trực tiếp đơn hàng, hoặc khi cơ quan nhà nước có yêu cầu theo quy định pháp luật.",
+        "Bạn có thể xem, cập nhật hoặc yêu cầu xóa thông tin cá nhân trong trang Tài khoản hoặc bằng cách liên hệ với chúng tôi."
+      ]
+    },
+    {
+      "id": "intellectual",
+      "title": "9. Quyền sở hữu trí tuệ",
+      "paragraphs": [
+        "Toàn bộ hình ảnh, thiết kế, họa tiết, bài viết và nhận diện thương hiệu trên website thuộc quyền sở hữu của AODAI Heritage. Mọi hình thức sao chép, sử dụng cho mục đích thương mại khi chưa có sự đồng ý bằng văn bản đều bị nghiêm cấm."
+      ]
+    },
+    {
+      "id": "liability",
+      "title": "10. Giới hạn trách nhiệm & Giải quyết tranh chấp",
+      "paragraphs": [
+        "Màu sắc sản phẩm thực tế có thể chênh lệch nhẹ so với hình ảnh do điều kiện ánh sáng và thiết bị hiển thị; đây không được xem là lỗi sản phẩm.",
+        "Mọi tranh chấp phát sinh sẽ được ưu tiên giải quyết bằng thương lượng. Trường hợp không đạt được thỏa thuận, tranh chấp được giải quyết theo pháp luật nước Cộng hòa Xã hội Chủ nghĩa Việt Nam."
+      ]
+    }
+  ]
+}

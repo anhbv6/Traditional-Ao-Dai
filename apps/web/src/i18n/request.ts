@@ -26,6 +26,8 @@ export default getRequestConfig(async ({requestLocale}) => {
       profile,
       faqs,
       wishlist,
+      terms,
+      notifications,
       admin,
       errors
     ] = await Promise.all([
@@ -45,6 +47,8 @@ export default getRequestConfig(async ({requestLocale}) => {
       import(`../../messages/${locale}/profile.json`).then(m => m.default),
       import(`../../messages/${locale}/faqs.json`).then(m => m.default),
       import(`../../messages/${locale}/wishlist.json`).then(m => m.default),
+      import(`../../messages/${locale}/terms.json`).then(m => m.default),
+      import(`../../messages/${locale}/notifications.json`).then(m => m.default),
       import(`../../messages/${locale}/admin.json`).then(m => m.default),
       import(`../../messages/${locale}/errors.json`).then(m => m.default),
     ]);
@@ -86,6 +90,8 @@ export default getRequestConfig(async ({requestLocale}) => {
             },
             FaqsPage: faqs,
             WishlistPage: wishlist,
+            TermsPage: terms,
+            NotificationsPage: notifications,
             AdminPage: {
               ...admin,
               login: {

@@ -85,8 +85,12 @@ export default function proxy(request: NextRequest) {
     return intlMiddleware(request);
   }
 
-  // 4. Bảo vệ trang cá nhân khách hàng (/profile, /profile/orders...)
-  if (pathWithoutLocale === '/profile' || pathWithoutLocale.startsWith('/profile/')) {
+  // 4. Bảo vệ trang cá nhân khách hàng (/profile, /profile/orders..., /notifications)
+  if (
+    pathWithoutLocale === '/profile' ||
+    pathWithoutLocale.startsWith('/profile/') ||
+    pathWithoutLocale === '/notifications'
+  ) {
     if (!userLoggedIn) {
       const loginUrl = new URL(`/${currentLocale}/login`, request.url);
       loginUrl.searchParams.set('redirect', pathname);

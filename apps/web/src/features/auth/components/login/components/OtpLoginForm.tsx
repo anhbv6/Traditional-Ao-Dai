@@ -1,87 +1,89 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { FormInput } from '@/components/shared/FormInput';
+import { ActionButton } from '@/components/shared/ActionButton';
+import { TextField } from '@/components/shared/TextField';
+import { AuthOtpField } from '../../AuthOtpField';
+import { AUTH_FIELD_PROPS, sanitizePhoneChange } from '../../authField';
 
 interface OtpLoginFormProps {
   phone: string;
   setPhone: (val: string) => void;
   otpSent: boolean;
-  otpDigits: string[];
-  inputRefs: React.MutableRefObject<HTMLInputElement[]>;
-  otpError: string | null;
-  handleOtpDigitChange: (value: string, index: number) => void;
-  handleOtpDigitKeyDown: (e: React.KeyboardEvent<HTMLInputElement>, index: number) => void;
-  handleOtpDigitPaste: (e: React.ClipboardEvent) => void;
-  sendOtpCode: (phone: string) => void;
-  isLoading: boolean;
-  t: (key: string) => string;
+  otpValue: string;
+  setOtpValue: (val: string) => void;
+  /** Lỗi ô SĐT (trống / sai định dạng) */
+  phoneError?: string;
+  otpError: string;
+  /** Đổi giá trị để lỗi rung lại khi bấm lần nữa */
+  shakeKey?: number;
+  /** Gửi lại mã (LoginForm kiểm tra SĐT trước khi gọi API) */
+  onSendOtp: () => void;
+  isSendingOtp: boolean;
+  /** Số giây còn lại trước khi được gửi lại mã */
+  resendSeconds: number;
+  disabled?: boolean;
+  t: (key: string, values?: Record<string, string | number>) => string;
 }
 
 export function OtpLoginForm({
   phone,
   setPhone,
   otpSent,
-  otpDigits,
-  inputRefs,
-  handleOtpDigitChange,
-  handleOtpDigitKeyDown,
-  handleOtpDigitPaste,
-  sendOtpCode,
-  isLoading,
+  otpValue,
+  setOtpValue,
+  phoneError,
+  otpError,
+  shakeKey,
+  onSendOtp,
+  isSendingOtp,
+  resendSeconds,
+  disabled = false,
   t,
 }: OtpLoginFormProps) {
-  const sendOtpButton = (
-    <button
-      type="button"
-      onClick={() => sendOtpCode(phone)}
-      disabled={isLoading || !phone}
-      className="mr-3 px-1 bg-transparent text-[11px] font-bold select-none transition-all duration-200 shrink-0 border-none outline-none focus:outline-none disabled:cursor-not-allowed cursor-pointer text-[var(--primary-ink)] hover:text-[var(--primary-ink)]/80 disabled:text-[var(--text-light)]/40"
+  const canSend = !!phone.trim() && !disabled && resendSeconds === 0;
+
+  // Nút gửi lại mã trong ô SĐT — chỉ hiện khi đã gửi lần đầu (lần đầu dùng nút chính bên dưới)
+  const resendButton = otpSent ? (
+    <ActionButton
+      variant="dialog"
+      size="sm"
+      disabled={!canSend}
+      loading={isSendingOtp}
+      onClick={onSendOtp}
+      className="-mr-1.5 tabular-nums"
     >
-      {otpSent ? t('resendOtp') : t('sendOtp')}
-    </button>
-  );
+      {resendSeconds > 0 ? t('resendShort', { timer: resendSeconds }) : t('resendOtp')}
+    </ActionButton>
+  ) : undefined;
 
   return (
     <>
       {/* Phone OTP Field */}
-      <FormInput
+      <TextField
+        {...AUTH_FIELD_PROPS}
         id="phone"
         type="tel"
-        required
+        autoComplete="tel"
         label={t('phone')}
         placeholder={t('loginPhonePlaceholder')}
         value={phone}
-        onChange={(e) => setPhone(e.target.value)}
-        rightElement={sendOtpButton}
+        disabled={disabled}
+        onChange={sanitizePhoneChange((e) => setPhone(e.target.value))}
+        suffix={resendButton}
+        error={phoneError}
+        shakeKey={shakeKey}
       />
 
       {/* 6-digit OTP inputs block */}
       {otpSent && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="space-y-3"
-        >
-          <label className="block font-[family-name:var(--font-lora)] text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[var(--text-main)]">
-            {t('otpCode')}
-          </label>
-          <div className="flex justify-between gap-1.5 sm:gap-3">
-            {otpDigits.map((digit, idx) => (
-              <input
-                key={idx}
-                type="text"
-                maxLength={1}
-                value={digit}
-                ref={(el) => {
-                  if (el) inputRefs.current[idx] = el;
-                }}
-                onChange={(e) => handleOtpDigitChange(e.target.value, idx)}
-                onKeyDown={(e) => handleOtpDigitKeyDown(e, idx)}
-                onPaste={idx === 0 ? handleOtpDigitPaste : undefined}
-                className="w-[calc((100%-1.25rem)/6)] max-w-14 aspect-square sm:h-16 text-center text-lg sm:text-xl font-semibold rounded-lg border border-[var(--border)] bg-background text-[var(--text-main)] shadow-none outline-none transition-all focus:border-[var(--primary-color)] focus:bg-[var(--bg-card)] focus:ring-2 focus:ring-[var(--ring)]/30"
-              />
-            ))}
-          </div>
+        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
+          <AuthOtpField
+            label={t('otpCode')}
+            value={otpValue}
+            onChange={setOtpValue}
+            error={otpError || undefined}
+            disabled={disabled}
+          />
         </motion.div>
       )}
     </>

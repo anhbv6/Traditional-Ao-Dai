@@ -3,7 +3,7 @@
 import React from "react";
 import { GoogleLogin } from "@react-oauth/google";
 import { FcGoogle } from "react-icons/fc";
-import { Button } from "@/components/ui/button";
+import { ActionButton } from "@/components/shared/ActionButton";
 import { cn } from "@/lib/utils";
 
 interface GoogleAuthButtonProps {
@@ -11,18 +11,26 @@ interface GoogleAuthButtonProps {
   onCredential: (credential: string) => void;
   onError: () => void;
   disabled?: boolean;
+  /** Đang xử lý đăng nhập Google: hiện spinner, khóa nút */
+  loading?: boolean;
   className?: string;
 }
 
+/**
+ * Nút "Tiếp tục với Google": giao diện là ActionButton `dialog` (đồng bộ storefront),
+ * nút thật của Google Identity Services phủ trong suốt lên trên để nhận click.
+ */
 export function GoogleAuthButton({
   label,
   onCredential,
   onError,
   disabled = false,
+  loading = false,
   className,
 }: GoogleAuthButtonProps) {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const [buttonWidth, setButtonWidth] = React.useState("400");
+  const isLocked = disabled || loading;
 
   React.useEffect(() => {
     const container = containerRef.current;
@@ -44,19 +52,22 @@ export function GoogleAuthButton({
   }, []);
 
   return (
-    <div ref={containerRef} className={cn("group/google relative w-full", className)}>
-      <Button
-        type="button"
-        variant="outline"
+    /* `group/action` ở khung ngoài: lớp phủ Google nhận hover thay nút, vẫn kích hoạt hiệu ứng quét của ActionButton */
+    <div ref={containerRef} className={cn("relative w-full", !isLocked && "group/action", className)}>
+      <ActionButton
+        variant="dialog"
+        size="md"
+        fullWidth
         disabled={disabled}
-        className="h-10 w-full rounded-lg border border-[var(--primary-color)]/25 bg-[var(--bg-card)] px-4 font-[family-name:var(--font-lora)] text-[11px] font-bold uppercase tracking-wider text-[var(--primary-ink)] shadow-[0_10px_26px_rgba(128,0,32,0.10)] transition-all group-hover/google:border-[var(--primary-color)]/55 group-hover/google:bg-[var(--bg-card)] group-hover/google:shadow-[0_14px_30px_rgba(128,0,32,0.16)] sm:h-11 sm:text-xs"
+        loading={loading}
+        icon={<FcGoogle aria-hidden="true" />}
+        tabIndex={-1}
       >
-        <FcGoogle className="size-5" aria-hidden="true" />
-        <span>{label}</span>
-      </Button>
+        {label}
+      </ActionButton>
 
-      {!disabled && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center opacity-0 overflow-hidden">
+      {!isLocked && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center overflow-hidden opacity-0">
           <GoogleLogin
             onSuccess={(credentialResponse) => {
               if (credentialResponse.credential) {

@@ -105,7 +105,23 @@
     "unverified": "Unverified",
     "verifyError": "Unable to verify. Please try again.",
     "codeSent": "Verification code sent.",
-    "verifySuccess": "Verified successfully!"
+    "verifySuccess": "Verified successfully!",
+    "basicTitle": "Basic information",
+    "basicDesc": "Your name, birthday and gender help us recommend styles that suit you.",
+    "contactTitle": "Contact details",
+    "contactDesc": "Used to sign in and receive order updates. Every change requires a 6-digit verification code.",
+    "avatarHint": "A square, clear photo looks best.",
+    "changeAvatar": "Change photo",
+    "fullNamePlaceholder": "Please enter your full name",
+    "fullNameRequired": "Please enter your full name.",
+    "dobPlaceholder": "DD/MM/YYYY",
+    "dobInvalid": "Invalid date of birth.",
+    "saving": "Saving...",
+    "notProvided": "Not provided",
+    "emailPlaceholder": "Please enter your email",
+    "phonePlaceholder": "Please enter your phone number",
+    "emailInvalid": "Invalid email format.",
+    "phoneInvalid": "Invalid phone number."
   },
   "orders": {
     "title": "Order History",
@@ -122,7 +138,16 @@
     "statusProcessing": "Processing",
     "statusShipped": "Shipped",
     "statusDelivered": "Delivered",
-    "statusCancelled": "Cancelled"
+    "statusCancelled": "Cancelled",
+    "dateFilter": "Filter by order date",
+    "selectDateRange": "Select date range",
+    "clearDateFilter": "Clear date filter",
+    "itemCount": "{count, plural, one {# item} other {# items}}",
+    "detailTitle": "Order #{id}",
+    "quantity": "Qty: {count}",
+    "emptyFiltered": "No orders match your filters.",
+    "shopNow": "Shop now",
+    "showAll": "Show all orders"
   },
   "address": {
     "title": "Manage Address",
@@ -155,99 +180,118 @@
       "loading": "Loading...",
       "placeholderName": "Please enter receiver name",
       "placeholderPhone": "Please enter receiver phone number",
-      "placeholderProvince": "Please enter province/city",
-      "placeholderDistrict": "Please enter district",
-      "placeholderWard": "Please enter ward",
+      "placeholderProvince": "Please select a province/city",
+      "placeholderDistrict": "Please select a district",
+      "placeholderWard": "Please select a ward",
       "placeholderDetail": "Please enter detail address",
       "placeholderLabel": "Please enter address label",
       "previewTitle": "Address Preview"
-    }
+    },
+    "count": "{count}/10 addresses",
+    "emptyDesc": "Save an address to check out faster next time.",
+    "requiredField": "This field is required.",
+    "phoneInvalid": "Invalid phone number."
   },
   "payment": {
     "title": "Manage Payment",
     "subtitle": "Manage your credit cards and other payment accounts.",
     "empty": "You have no saved payment methods.",
-    "addBtn": "Add Payment Method",
     "cardEnding": "Card ending in",
     "expiry": "Expires",
     "default": "Default",
     "setAsDefault": "Set as default",
-    "form": {
-      "cardHolder": "Cardholder Name",
-      "cardNumber": "Card Number",
-      "expiryDate": "Expiry Date (MM/YY)",
-      "cvv": "CVV/CVC",
-      "cancelBtn": "Cancel",
-      "submitBtn": "Save Card"
-    }
+    "secureTitle": "Secure payments",
+    "secureNote": "For your security, AODAI never collects full card numbers or CVV codes on the account page. New cards are saved through the payment gateway when you check out.",
+    "cardholder": "Cardholder",
+    "expires": "Expires",
+    "remove": "Remove card",
+    "removeDialog": {
+      "title": "Remove saved card",
+      "message": "This card will be removed from your account. You can add it again at checkout.",
+      "confirmBtn": "Remove card"
+    },
+    "emptyDesc": "Cards are saved automatically when you tick \"Save card\" at checkout."
   },
   "setting": {
     "title": "Account Settings",
-    "subtitle": "Configure your security settings and notifications.",
+    "subtitle": "Customise the appearance and language on this device.",
     "appearance": {
       "title": "Appearance",
-      "description": "Customize how your theme looks on your device"
+      "description": "Customize how your theme looks on your device",
+      "light": "Light",
+      "dark": "Dark"
     },
     "language": {
       "title": "Language",
-      "description": "Select your language"
-    },
-    "twoFactor": {
-      "title": "Two-factor Authentication",
-      "description": "Keep your account secure by enabling 2FA via mail"
-    },
-    "push": {
-      "title": "Push Notifications",
-      "description": "Receive push notification"
-    },
-    "desktop": {
-      "title": "Desktop Notification",
-      "description": "Receive push notification in desktop"
-    },
-    "email": {
-      "title": "Email Notifications",
-      "description": "Receive email notification"
+      "description": "Select your language",
+      "vi": "Tiếng Việt",
+      "en": "English"
     }
   },
   "security": {
     "title": "Account Security",
-    "subtitle": "Update your password, activate two-factor authentication, and manage active sessions.",
+    "subtitle": "Change your password, link Google and manage signed-in devices.",
     "password": {
       "title": "Change Password",
-      "subtitle": "To secure your account, use a strong password with at least 8 characters.",
+      "subtitle": "Passwords need at least 6 characters. Other devices are signed out after a change.",
       "current": "Current Password",
       "new": "New Password",
       "confirm": "Confirm New Password",
       "submit": "Update Password",
-      "success": "Password changed successfully!"
-    },
-    "twoFactor": {
-      "title": "Two-Factor Authentication (2FA)",
-      "subtitle": "Activate OTP codes to secure your account from unauthorized access.",
-      "statusEnabled": "Activated",
-      "statusDisabled": "Not Activated",
-      "setupTitle": "Set Up Two-Factor Authentication",
-      "setupSubtitle": "Scan the QR code below using Google Authenticator and enter the 6-digit code to activate.",
-      "verifyBtn": "Verify & Activate",
-      "success": "Two-factor authentication activated successfully!"
+      "success": "Password changed successfully!",
+      "currentHint": "Leave blank if you signed up with Google and never set a password.",
+      "currentPlaceholder": "Please enter your current password",
+      "newPlaceholder": "Please enter a new password",
+      "confirmPlaceholder": "Please re-enter the new password",
+      "newRequired": "Please enter a new password.",
+      "confirmRequired": "Please confirm your new password.",
+      "saving": "Updating..."
     },
     "sessions": {
       "title": "Login History",
       "subtitle": "Manage active sessions and browsers currently logged into your account.",
       "revokeBtn": "Log Out Device",
-      "revokeAll": "Log Out All Other Devices"
+      "revokeAll": "Log Out All Other Devices",
+      "current": "This device",
+      "active": "Active now",
+      "signedInAt": "Signed in at {time}",
+      "unknownDevice": "Unknown device",
+      "unknownBrowser": "Unknown browser",
+      "computer": "Computer",
+      "empty": "No other active sessions.",
+      "revokeDialog": {
+        "title": "Sign out device",
+        "message": "This device will be signed out of your account immediately.",
+        "confirmBtn": "Sign out device"
+      }
     },
     "toasts": {
       "passwordChangeSuccess": "Password changed! Other devices have been signed out.",
       "passwordChangeError": "An error occurred while changing your password.",
       "passwordMismatch": "Password confirmation does not match.",
-      "otpInvalid": "Invalid OTP code.",
       "revokeSuccess": "Device signed out successfully!",
       "revokeError": "An error occurred while revoking the session.",
       "linkGoogleSuccess": "Google account linked successfully!",
       "linkGoogleError": "An error occurred while linking your Google account.",
       "unlinkGoogleSuccess": "Google account unlinked successfully!",
       "unlinkGoogleError": "An error occurred while unlinking your Google account."
+    },
+    "google": {
+      "title": "Sign in with Google",
+      "desc": "Link your Google account to sign in with one tap.",
+      "linked": "Linked",
+      "unlinked": "Not linked",
+      "linkBtn": "Link Google",
+      "unlinkBtn": "Unlink",
+      "error": "Google sign-in is currently unavailable. Please try again later.",
+      "unlinkDialog": {
+        "title": "Unlink Google",
+        "message": "You won't be able to sign in with Google until you link it again. Continue?",
+        "confirmBtn": "Unlink"
+      }
     }
-  }
+  },
+  "eyebrow": "Account",
+  "navLabel": "Account sections",
+  "memberSince": "AODAI member"
 }

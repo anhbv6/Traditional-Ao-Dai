@@ -5,6 +5,7 @@ import { HeaderWrapper } from './HeaderWrapper';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { Logo } from './Logo';
 import { MobileMenu } from './MobileMenu';
+import { NotificationButton } from './NotificationButton';
 import { SearchOverlay } from './SearchOverlay';
 import { UserMenu } from './UserMenu';
 import { WishlistButton } from './WishlistButton';
@@ -44,12 +45,14 @@ export async function Header({ sticky = true }: HeaderProps) {
           <div className="hidden lg:flex lg:items-center lg:gap-1 xl:gap-2">
             <WishlistButton label={t('wishlist')} />
             <CartButton label={t('cart')} preview />
+            <NotificationButton label={t('notifications')} preview />
             <LanguageSwitcher />
             <UserMenu loginLabel={t('login')} profileLabel={t('profile')} ordersLabel={t('orders')} logoutLabel={t('logout')} />
           </div>
 
           {/* Mobile Header Items: Cart icon + Mobile Menu Drawer */}
           <div className="flex items-center gap-1 lg:hidden">
+            <NotificationButton label={t('notifications')} />
             <CartButton label={t('cart')} />
             <MobileMenu
               items={mobileNavItems}

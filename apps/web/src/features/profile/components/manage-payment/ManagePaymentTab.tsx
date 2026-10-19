@@ -1,257 +1,120 @@
 "use client";
 
-import React from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { CreditCard, Plus, Trash2, Check, Sparkles } from "lucide-react";
+import { Check, CreditCard, LockKeyhole, Trash2 } from "lucide-react";
+import { ActionButton } from "@/components/shared/ActionButton";
+import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { cn } from "@/lib/utils";
 import { useManagePayment } from "../../hooks/useProfile";
 import { type PaymentCard } from "../../types/profile.types";
-import { Input } from "@/components/ui/input";
+import { ProfileSection } from "../ProfileSection";
 
+const BRAND_LABEL: Record<PaymentCard["type"], string> = { visa: "Visa", mastercard: "Mastercard" };
+
+/**
+ * Phương thức thanh toán: chỉ quản lý thẻ đã lưu (đặt mặc định / gỡ thẻ có xác nhận).
+ * Vì an toàn (PCI-DSS) trang tài khoản không nhận số thẻ đầy đủ hay CVV — thẻ mới lưu qua cổng thanh toán khi thanh toán.
+ */
 export function ManagePaymentTab() {
   const t = useTranslations("ProfilePage.payment");
-  const {
-    cards,
-    isAdding,
-    setIsAdding,
-    holder,
-    setHolder,
-    number,
-    setNumber,
-    expiry,
-    setExpiry,
-    cvv,
-    setCvv,
-    handleStartAdd,
-    handleDelete,
-    handleSetDefault,
-    handleSubmit,
-  } = useManagePayment();
-
-  const getCardBg = (type: PaymentCard["type"]) => {
-    if (type === "visa") {
-      return "bg-gradient-to-br from-[#1a1c24] via-[#2d3142] to-[#121319] text-white";
-    }
-    return "bg-gradient-to-br from-[var(--primary-color)] via-[#5c0017] to-[#3a000e] text-white";
-  };
+  const tProfile = useTranslations("ProfilePage");
+  const { cards, handleDelete, handleSetDefault } = useManagePayment();
+  const [removingId, setRemovingId] = useState<string | null>(null);
 
   return (
-    <div className="rounded-2xl border border-[var(--primary-color)]/10 bg-[var(--bg-card)] p-5 shadow-sm sm:p-8 animate-fade-in">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--border)]/60 pb-5">
+    <>
+      {/* Ghi chú bảo mật */}
+      <div className="flex gap-4 border border-[var(--border)] bg-[var(--bg-card)] p-5 sm:px-6">
+        <span className="relative grid size-10 shrink-0 place-items-center text-[var(--primary-ink)]">
+          <span aria-hidden="true" className="absolute inset-1.5 rotate-45 border border-[var(--primary-color)]/35" />
+          <LockKeyhole size={16} strokeWidth={1.5} className="relative" aria-hidden="true" />
+        </span>
         <div>
-          <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-[var(--primary-ink)]">
-            {t("title")}
-          </h2>
-          <p className="mt-1 text-sm text-[var(--text-light)]">
-            {t("subtitle")}
-          </p>
+          <p className="font-[family-name:var(--font-playfair)] text-[16px] font-semibold text-[var(--text-main)]">{t("secureTitle")}</p>
+          <p className="mt-1 text-[13px] leading-6 text-[var(--text-light)]">{t("secureNote")}</p>
         </div>
-        <button
-          onClick={handleStartAdd}
-          className="w-full sm:w-auto inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg bg-[var(--primary-color)] px-4 text-xs font-semibold uppercase tracking-wider text-white transition-all hover:bg-[var(--primary-color)]/90 cursor-pointer active:scale-95 duration-200"
-        >
-          <Plus size={15} />
-          {t("addBtn")}
-        </button>
       </div>
 
-      {cards.length === 0 ? (
-        <div className="my-16 flex flex-col items-center justify-center text-center animate-fade-in">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--bg-main)] text-[var(--text-light)]/40 border border-[var(--border)]/30">
-            <CreditCard size={28} />
-          </div>
-          <p className="mt-4 text-[var(--text-light)] font-medium">{t("empty")}</p>
-        </div>
-      ) : (
-        <div className="mt-6 grid gap-6 md:grid-cols-2">
-          {cards.map((card) => (
-            <div
-              key={card.id}
-              className={`relative rounded-2xl border p-4 sm:p-6 flex flex-col justify-between min-h-[190px] sm:min-h-[200px] overflow-hidden shadow-md select-none transition-all hover:shadow-lg ${getCardBg(
-                card.type
-              )}`}
-            >
-              {/* Card Header */}
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-[8px] sm:text-[10px] uppercase tracking-[1.5px] sm:tracking-[2px] opacity-75 font-semibold">
-                    {card.type === "visa" ? "Visa Signature" : "Mastercard World"}
-                  </p>
-                  {card.isDefault && (
-                    <span className="mt-1 inline-flex items-center gap-0.5 rounded bg-white/20 px-2 py-0.5 text-[8px] sm:text-[9px] font-bold uppercase tracking-wider backdrop-blur-sm">
-                      <Check size={9} />
+      <ProfileSection>
+        {cards.length === 0 ? (
+          <EmptyState icon={CreditCard} title={t("empty")} description={t("emptyDesc")} action={tProfile("orders.shopNow")} href="/products" className="py-10" />
+        ) : (
+          <ul className="grid gap-4 md:grid-cols-2">
+            {cards.map((card) => (
+              <li
+                key={card.id}
+                className={cn(
+                  "flex flex-col border p-5",
+                  card.isDefault
+                    ? "border-[var(--primary-color)] bg-[color-mix(in_oklab,var(--primary-color)_4%,var(--bg-card))]"
+                    : "border-[var(--border)]",
+                )}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <span className="grid h-9 w-14 place-items-center border border-[var(--border)] bg-[var(--bg-main)] font-[family-name:var(--font-playfair)] text-[13px] font-semibold italic text-[var(--primary-ink)]">
+                      {BRAND_LABEL[card.type]}
+                    </span>
+                    <p className="font-semibold tracking-[2px] text-[var(--text-main)] tabular-nums">{card.number.slice(-9)}</p>
+                  </div>
+                  {card.isDefault ? (
+                    <span className="inline-flex items-center gap-1 bg-[var(--primary-color)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[1px] text-white">
+                      <Check size={11} strokeWidth={2.5} aria-hidden="true" />
                       {t("default")}
                     </span>
-                  )}
-                </div>
-                <div className="font-[family-name:var(--font-playfair)] text-base sm:text-xl italic font-bold">
-                  {card.type === "visa" ? "Visa" : "Mastercard"}
-                </div>
-              </div>
-
-              {/* Card Number */}
-              <div className="mt-4 sm:mt-6 text-base tracking-[3px] sm:text-xl sm:tracking-[4px] font-medium font-mono text-center">
-                {card.number}
-              </div>
-
-              {/* Card Footer */}
-              <div className="mt-4 sm:mt-6 flex items-end justify-between">
-                <div>
-                  <p className="text-[8px] sm:text-[9px] uppercase tracking-wider opacity-60">
-                    Cardholder
-                  </p>
-                  <p className="text-xs sm:text-sm font-semibold tracking-wider">
-                    {card.holder}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-[8px] sm:text-[9px] uppercase tracking-wider opacity-60">
-                    Expires
-                  </p>
-                  <p className="text-xs sm:text-sm font-semibold">{card.expiry}</p>
-                </div>
-              </div>
-
-              {/* Overlay elements for card texture */}
-              <div className="absolute -right-10 -bottom-10 size-40 rounded-full bg-white/5 pointer-events-none" />
-              <div className="absolute -left-10 -top-10 size-40 rounded-full bg-white/5 pointer-events-none" />
-
-              {/* Action buttons (inline footer) */}
-              <div className="mt-4 border-t border-white/10 pt-3 flex items-center justify-between text-[11px] sm:text-xs text-white/80">
-                {!card.isDefault ? (
-                  <button
-                    onClick={() => handleSetDefault(card.id)}
-                    className="hover:text-white hover:underline font-semibold cursor-pointer active:scale-95 duration-200"
-                  >
-                    {t("setAsDefault")}
-                  </button>
-                ) : (
-                  <span className="flex items-center gap-1 opacity-75 font-semibold">
-                    <Sparkles size={11} />
-                    {t("default")}
-                  </span>
-                )}
-                <button
-                  onClick={() => handleDelete(card.id)}
-                  className="hover:text-rose-300 flex items-center gap-1 transition-colors cursor-pointer active:scale-95 duration-200"
-                  title="Remove card"
-                >
-                  <Trash2 size={12} />
-                  <span>Xóa</span>
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Modal Dialog Form */}
-      {isAdding && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm animate-fade-in">
-          <div className="w-full max-w-[92%] sm:max-w-[420px] max-h-[85vh] flex flex-col overflow-hidden rounded-2xl border border-[var(--primary-color)]/10 bg-[var(--bg-card)] shadow-xl animate-scale-up">
-            {/* Header */}
-            <div className="border-b border-[var(--border)]/60 bg-[var(--bg-main)] px-4 py-3 flex items-center justify-between shrink-0">
-              <h3 className="font-[family-name:var(--font-playfair)] text-sm sm:text-base font-bold text-[var(--primary-ink)]">
-                {t("addBtn")}
-              </h3>
-              <button
-                type="button"
-                onClick={() => setIsAdding(false)}
-                className="rounded-lg p-1 text-[var(--text-light)] hover:bg-[var(--border)]/40 transition-colors cursor-pointer text-xs"
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 space-y-4">
-              <div className="flex flex-col gap-3.5">
-                {/* Card Holder */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[var(--text-light)]">
-                    {t("form.cardHolder")}
-                  </label>
-                  <Input
-                    type="text"
-                    required
-                    placeholder="NGUYEN THI AN"
-                    value={holder}
-                    onChange={(e) => setHolder(e.target.value)}
-                    className="h-10 text-xs"
-                  />
+                  ) : null}
                 </div>
 
-                {/* Card Number */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[var(--text-light)]">
-                    {t("form.cardNumber")}
-                  </label>
-                  <div className="relative">
-                    <CreditCard className="absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-[var(--text-light)]/60 z-10" />
-                    <Input
-                      type="text"
-                      required
-                      maxLength={16}
-                      placeholder="4123 4567 8901 2345"
-                      value={number}
-                      onChange={(e) => setNumber(e.target.value.replace(/\D/g, ""))}
-                      className="pl-9 h-10 text-xs"
-                    />
+                <dl className="mt-4 grid grid-cols-2 gap-3 text-[13px]">
+                  <div>
+                    <dt className="text-[11px] uppercase tracking-[1.5px] text-[var(--text-light)]">{t("cardholder")}</dt>
+                    <dd className="mt-0.5 truncate font-medium text-[var(--text-main)]">{card.holder}</dd>
                   </div>
-                </div>
+                  <div>
+                    <dt className="text-[11px] uppercase tracking-[1.5px] text-[var(--text-light)]">{t("expires")}</dt>
+                    <dd className="mt-0.5 font-medium text-[var(--text-main)] tabular-nums">{card.expiry}</dd>
+                  </div>
+                </dl>
 
-                {/* Expiry Date */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[var(--text-light)]">
-                    {t("form.expiryDate")}
-                  </label>
-                  <Input
-                    type="text"
-                    required
-                    maxLength={5}
-                    placeholder="MM/YY"
-                    value={expiry}
-                    onChange={(e) => setExpiry(e.target.value)}
-                    className="h-10 text-xs"
-                  />
+                <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-[var(--border)] pt-4">
+                  {!card.isDefault ? (
+                    <ActionButton variant="dialog" size="sm" onClick={() => handleSetDefault(card.id)}>
+                      {t("setAsDefault")}
+                    </ActionButton>
+                  ) : null}
+                  <ActionButton
+                    variant="cancel"
+                    size="sm"
+                    icon={<Trash2 />}
+                    colors={{ text: "var(--destructive)" }}
+                    onClick={() => setRemovingId(card.id)}
+                    className="ml-auto"
+                  >
+                    {t("remove")}
+                  </ActionButton>
                 </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </ProfileSection>
 
-                {/* CVV */}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[var(--text-light)]">
-                    {t("form.cvv")}
-                  </label>
-                  <Input
-                    type="password"
-                    required
-                    maxLength={4}
-                    placeholder="•••"
-                    value={cvv}
-                    onChange={(e) => setCvv(e.target.value.replace(/\D/g, ""))}
-                    className="h-10 text-xs"
-                  />
-                </div>
-              </div>
-
-              {/* Form Actions */}
-              <div className="flex flex-col sm:flex-row justify-end gap-2.5 pt-3 border-t border-[var(--border)]/40 mt-4 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => setIsAdding(false)}
-                  className="w-full sm:w-auto inline-flex h-9 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--bg-card)] px-5 text-[11px] font-semibold uppercase tracking-[0.5px] text-[var(--text-light)] transition-all hover:bg-gray-50 cursor-pointer active:scale-95 duration-200"
-                >
-                  {t("form.cancelBtn")}
-                </button>
-                <button
-                  type="submit"
-                  className="w-full sm:w-auto inline-flex h-9 items-center justify-center rounded-lg bg-[var(--primary-color)] px-5 text-[11px] font-semibold uppercase tracking-[0.5px] text-white transition-all hover:bg-[var(--primary-color)]/95 cursor-pointer active:scale-95 duration-200"
-                >
-                  {t("form.submitBtn")}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-    </div>
+      <ConfirmDialog
+        open={removingId !== null}
+        onOpenChange={(open) => !open && setRemovingId(null)}
+        confirmVariant="destructive"
+        title={t("removeDialog.title")}
+        description={t("removeDialog.message")}
+        confirmText={t("removeDialog.confirmBtn")}
+        cancelText={tProfile("logoutDialog.cancelBtn")}
+        customTitle="text-lg sm:text-2xl"
+        onConfirm={() => {
+          if (removingId) handleDelete(removingId);
+          setRemovingId(null);
+        }}
+      />
+    </>
   );
 }

@@ -1,0 +1,109 @@
+{
+  "meta": {
+    "title": "Terms & Service Policies",
+    "description": "Terms of use and policies for ordering, bespoke tailoring, payment, delivery, returns and data privacy at AODAI Heritage."
+  },
+  "eyebrow": "Legal",
+  "title": "Terms & Service Policies",
+  "subtitle": "Please read these terms carefully before creating an account, placing an order or booking a bespoke ao dai at AODAI Heritage.",
+  "lastUpdated": "Last updated: {date}",
+  "updatedDate": "October 19, 2026",
+  "tocLabel": "Contents",
+  "contactTitle": "Questions about our terms?",
+  "contactText": "Our customer care team is always happy to help.",
+  "contactCta": "Contact us",
+  "sections": [
+    {
+      "id": "general",
+      "title": "1. General terms",
+      "paragraphs": [
+        "By visiting the website, creating an account or placing an order at AODAI Heritage, you confirm that you have read, understood and agreed to all of the terms on this page.",
+        "We may update these terms from time to time to reflect legal requirements and our business operations. A new version takes effect once published; continuing to use our services means you accept those changes."
+      ]
+    },
+    {
+      "id": "account",
+      "title": "2. Member accounts",
+      "paragraphs": [
+        "You can sign up with an email address, a phone number or a Google account. Your registration details must be accurate, complete and kept up to date."
+      ],
+      "items": [
+        "You are responsible for keeping your password and OTP codes secret; never share them with anyone, including people claiming to be our staff.",
+        "All activity on your account is deemed to be carried out by the account owner.",
+        "Let us know immediately if you notice any unauthorised access to your account.",
+        "We may suspend accounts showing signs of fraud, promotion abuse or breach of these terms."
+      ]
+    },
+    {
+      "id": "orders",
+      "title": "3. Orders & Pricing",
+      "paragraphs": [
+        "Prices are listed in Vietnamese Dong (VND), include VAT and exclude shipping fees (if any).",
+        "An order is only confirmed once you receive a confirmation from our system. If a product is out of stock or a pricing error occurs, we will contact you to adjust or cancel the order with a full refund."
+      ]
+    },
+    {
+      "id": "tailoring",
+      "title": "4. Bespoke tailoring",
+      "paragraphs": [
+        "Bespoke ao dai are cut and sewn individually from the measurements you provide or that our tailors take in person."
+      ],
+      "items": [
+        "You are responsible for the accuracy of self-submitted measurements. Follow our measuring guide or contact a consultant if you are unsure.",
+        "Standard completion time is 7 to 14 working days after measurements, design and fabric are finalised; peak seasons (Tet, wedding season) may take longer.",
+        "Bespoke orders require a deposit of at least 50% before the fabric is cut. The deposit is non-refundable once cutting has begun.",
+        "Each bespoke order includes up to 2 free alterations within 15 days of delivery if the fit is not right."
+      ]
+    },
+    {
+      "id": "payment",
+      "title": "5. Payment",
+      "paragraphs": [
+        "We accept cash on delivery (COD), bank transfer and the online payment gateways shown at checkout.",
+        "We never store your card details; all online transactions are processed by certified, secure payment partners."
+      ]
+    },
+    {
+      "id": "shipping",
+      "title": "6. Delivery",
+      "paragraphs": [
+        "Ready-to-wear items are usually delivered within 2 to 5 working days depending on your area. Exact fees and timing are shown before you confirm your order.",
+        "Please check the package on delivery. If it appears dented, torn or contains the wrong item, you may refuse it and notify us right away."
+      ]
+    },
+    {
+      "id": "returns",
+      "title": "7. Returns & Refunds",
+      "items": [
+        "Ready-to-wear items can be exchanged for another size or design within 7 days of delivery, with tags attached and unworn, unwashed and unironed.",
+        "Items with manufacturing defects are replaced or refunded in full, and we cover shipping both ways.",
+        "Bespoke items made to your measurements and clearance items are not eligible for return, except for faults on our side.",
+        "Refunds are sent to the original payment method within 5 to 10 working days after the return is approved."
+      ]
+    },
+    {
+      "id": "privacy",
+      "title": "8. Personal data privacy",
+      "paragraphs": [
+        "We only collect the information we need (name, contact details, delivery address, body measurements) to process orders, tailor garments and support you.",
+        "Your data is never sold or shared with third parties, except shipping and payment partners directly serving your order, or when required by the authorities under law.",
+        "You can view, update or request deletion of your personal data in your Account page or by contacting us."
+      ]
+    },
+    {
+      "id": "intellectual",
+      "title": "9. Intellectual property",
+      "paragraphs": [
+        "All images, designs, patterns, articles and brand assets on this website belong to AODAI Heritage. Copying or commercial use without our written consent is strictly prohibited."
+      ]
+    },
+    {
+      "id": "liability",
+      "title": "10. Limitation of liability & Disputes",
+      "paragraphs": [
+        "Actual product colours may differ slightly from photos due to lighting and display settings; this is not considered a product defect.",
+        "Any dispute will first be resolved through negotiation. If no agreement is reached, it will be settled under the laws of the Socialist Republic of Vietnam."
+      ]
+    }
+  ]
+}

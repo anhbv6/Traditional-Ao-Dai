@@ -1,386 +1,241 @@
 "use client";
 
-import React, { useState } from "react";
-import { useTranslations, useLocale } from "next-intl";
-import { ShoppingBag, Eye, Calendar as CalendarIcon } from "lucide-react";
+import { useState } from "react";
 import Image from "next/image";
-import { useOrderHistory } from "../../hooks/useProfile";
-import { mockOrders } from "../../data/mockProfile";
-import { type Order } from "../../types/profile.types";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
+import { useFormatter, useLocale, useTranslations } from "next-intl";
+import { CalendarDays, Eye, Package, X } from "lucide-react";
 import { type DateRange } from "react-day-picker";
+import { formatVnd, type Locale } from "@repo/shared";
+import { Calendar } from "@/components/ui/calendar";
+import { ActionButton } from "@/components/shared/ActionButton";
+import { AppDialog } from "@/components/shared/AppDialog";
+import { AppPopover } from "@/components/shared/AppPopover";
+import { ChoiceGroup } from "@/components/shared/ChoiceGroup";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { cn } from "@/lib/utils";
+import { mockOrders } from "../../data/mockProfile";
+import { useOrderHistory } from "../../hooks/useProfile";
+import { type Order } from "../../types/profile.types";
+import { ProfileSection } from "../ProfileSection";
 
-export function OrderHistoryTab() {
-  const t = useTranslations("ProfilePage.orders");
-  const locale = useLocale() as "vi" | "en";
-  const { selectedOrder, setSelectedOrder } = useOrderHistory();
-  const [activeStatus, setActiveStatus] = useState<"all" | Order["status"]>("all");
-  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+type StatusFilter = "all" | Order["status"];
 
-  const getStatusColor = (status: Order["status"]) => {
-    switch (status) {
-      case "delivered":
-        return "bg-green-50 text-green-700 border-green-200";
-      case "shipped":
-        return "bg-blue-50 text-blue-700 border-blue-200";
-      case "processing":
-        return "bg-amber-50 text-amber-700 border-amber-200";
-      case "pending":
-        return "bg-gray-50 text-gray-700 border-gray-200";
-      case "cancelled":
-        return "bg-rose-50 text-rose-700 border-rose-200";
-    }
-  };
+const STATUS_FILTERS: StatusFilter[] = ["all", "pending", "processing", "shipped", "delivered", "cancelled"];
 
-  const getStatusText = (status: Order["status"]) => {
-    switch (status) {
-      case "delivered":
-        return t("statusDelivered");
-      case "shipped":
-        return t("statusShipped");
-      case "processing":
-        return t("statusProcessing");
-      case "pending":
-        return t("statusPending");
-      case "cancelled":
-        return t("statusCancelled");
-    }
-  };
+const STATUS_KEY: Record<Order["status"], string> = {
+  pending: "statusPending",
+  processing: "statusProcessing",
+  shipped: "statusShipped",
+  delivered: "statusDelivered",
+  cancelled: "statusCancelled",
+};
 
-  const getOrderDate = (dateStr: string) => {
-    return new Date(dateStr + "T00:00:00");
-  };
+/* Nhãn trạng thái: chấm màu + chữ — phân biệt được cả khi không nhìn màu */
+const STATUS_TONE: Record<Order["status"], { text: string; dot: string }> = {
+  pending: { text: "text-amber-700 dark:text-amber-400", dot: "bg-amber-500" },
+  processing: { text: "text-sky-700 dark:text-sky-400", dot: "bg-sky-500" },
+  shipped: { text: "text-indigo-700 dark:text-indigo-400", dot: "bg-indigo-500" },
+  delivered: { text: "text-emerald-700 dark:text-emerald-400", dot: "bg-emerald-500" },
+  cancelled: { text: "text-[var(--text-light)]", dot: "bg-[var(--text-light)]" },
+};
 
-  const getOrderCountByStatus = (status: "all" | Order["status"]) => {
-    return mockOrders.filter((order) => {
-      const matchesStatus = status === "all" || order.status === status;
-      let matchesDate = true;
-      if (dateRange) {
-        const orderTime = getOrderDate(order.date).getTime();
-        if (dateRange.from) {
-          const fromDateCopy = new Date(dateRange.from);
-          const fromTime = fromDateCopy.setHours(0, 0, 0, 0);
-          matchesDate = matchesDate && orderTime >= fromTime;
-        }
-        if (dateRange.to) {
-          const toDateCopy = new Date(dateRange.to);
-          const toTime = toDateCopy.setHours(23, 59, 59, 999);
-          matchesDate = matchesDate && orderTime <= toTime;
-        }
-      }
-      return matchesStatus && matchesDate;
-    }).length;
-  };
+const toDate = (iso: string) => new Date(`${iso}T00:00:00`);
 
-  const filterTabs: { id: "all" | Order["status"]; label: string }[] = [
-    { id: "all", label: t("statusAll") },
-    { id: "pending", label: t("statusPending") },
-    { id: "processing", label: t("statusProcessing") },
-    { id: "shipped", label: t("statusShipped") },
-    { id: "delivered", label: t("statusDelivered") },
-    { id: "cancelled", label: t("statusCancelled") },
-  ];
+function inRange(order: Order, range?: DateRange) {
+  if (!range?.from) return true;
+  const time = toDate(order.date).getTime();
+  const from = new Date(range.from).setHours(0, 0, 0, 0);
+  const to = new Date(range.to ?? range.from).setHours(23, 59, 59, 999);
+  return time >= from && time <= to;
+}
 
-  const filteredOrders = mockOrders.filter((order) => {
-    // 1. Status Filter
-    const matchesStatus = activeStatus === "all" || order.status === activeStatus;
-
-    // 2. Date Range Filter
-    let matchesDate = true;
-    if (dateRange) {
-      const orderTime = getOrderDate(order.date).getTime();
-      if (dateRange.from) {
-        const fromDateCopy = new Date(dateRange.from);
-        const fromTime = fromDateCopy.setHours(0, 0, 0, 0);
-        matchesDate = matchesDate && orderTime >= fromTime;
-      }
-      if (dateRange.to) {
-        const toDateCopy = new Date(dateRange.to);
-        const toTime = toDateCopy.setHours(23, 59, 59, 999);
-        matchesDate = matchesDate && orderTime <= toTime;
-      }
-    }
-
-    return matchesStatus && matchesDate;
-  });
-
-  const formatDateRange = (range: DateRange | undefined) => {
-    if (!range) return locale === "vi" ? "Chọn khoảng ngày" : "Select date range";
-    
-    const formatDate = (d: Date | undefined) => {
-      if (!d) return "";
-      const yyyy = d.getFullYear();
-      const mm = String(d.getMonth() + 1).padStart(2, "0");
-      const dd = String(d.getDate()).padStart(2, "0");
-      return `${dd}/${mm}/${yyyy}`;
-    };
-
-    if (range.from && range.to) {
-      return `${formatDate(range.from)} - ${formatDate(range.to)}`;
-    }
-    if (range.from) {
-      return `${formatDate(range.from)} - ...`;
-    }
-    return locale === "vi" ? "Chọn khoảng ngày" : "Select date range";
-  };
-
+function StatusBadge({ status, label }: { status: Order["status"]; label: string }) {
   return (
-    <div className="space-y-6 animate-fade-in">
-      {/* List / Main Panel */}
-      <div className="rounded-2xl border border-[var(--primary-color)]/10 bg-[var(--bg-card)] p-5 shadow-sm sm:p-8">
-        <div className="border-b border-[var(--border)]/40 pb-5">
-          <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-[var(--primary-ink)]">
-            {t("title")}
-          </h2>
-          <p className="mt-1 text-sm text-[var(--text-light)]">
-            {t("subtitle")}
-          </p>
-        </div>
-
-        {/* Filter Tabs */}
-        <div className="mt-5 flex items-center gap-1.5 overflow-x-auto border-b border-[var(--border)]/40 pb-px scrollbar-none select-none">
-          {filterTabs.map((tab) => {
-            const isActive = activeStatus === tab.id;
-            const count = getOrderCountByStatus(tab.id);
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveStatus(tab.id)}
-                className={`relative pb-3 pt-1.5 px-2.5 text-xs sm:text-sm font-semibold transition-all duration-300 whitespace-nowrap flex items-center gap-1.5 border-b-2 -mb-px hover:text-[var(--primary-ink)] cursor-pointer ${
-                  isActive
-                    ? "text-[var(--primary-ink)] border-[var(--primary-color)]"
-                    : "text-[var(--text-light)] border-transparent"
-                }`}
-              >
-                <span>{tab.label}</span>
-                <span
-                  className={`rounded-full px-1.5 py-0.5 text-[10px] sm:text-xs font-medium transition-colors ${
-                    isActive
-                      ? "bg-[var(--primary-color)]/10 text-[var(--primary-ink)]"
-                      : "bg-[var(--bg-main)] text-[var(--text-light)] border border-[var(--border)]/40"
-                  }`}
-                >
-                  {count}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Date Range Picker Row */}
-        <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-2 border-b border-[var(--border)]/20">
-          <div className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[var(--text-light)]/80">
-            {locale === "vi" ? "Bộ lọc thời gian" : "Date Filter"}
-          </div>
-          <div className="flex items-center gap-2 z-20">
-            <Popover>
-              <PopoverTrigger render={
-                <button
-                  type="button"
-                  className="flex h-9 items-center gap-2 rounded-lg border border-[var(--border)] bg-[var(--bg-card)] px-3 text-[11px] sm:text-xs font-semibold text-[var(--text-light)] hover:border-[var(--primary-color)] hover:text-[var(--primary-ink)] transition-colors cursor-pointer outline-none shadow-xs"
-                >
-                  <CalendarIcon size={12} className="text-[var(--primary-ink)]" />
-                  <span>{formatDateRange(dateRange)}</span>
-                </button>
-              } />
-              <PopoverContent className="w-auto p-0 bg-[var(--bg-card)] border border-[var(--border)] rounded-xl shadow-lg z-50">
-                <Calendar
-                  mode="range"
-                  selected={dateRange}
-                  onSelect={setDateRange}
-                />
-              </PopoverContent>
-            </Popover>
-
-            {dateRange && (dateRange.from || dateRange.to) && (
-              <button
-                onClick={() => setDateRange(undefined)}
-                className="flex size-9 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-light)] hover:border-rose-300 hover:text-rose-600 transition-colors cursor-pointer text-xs"
-                title="Xóa lọc ngày"
-              >
-                ✕
-              </button>
-            )}
-          </div>
-        </div>
-
-        {filteredOrders.length === 0 ? (
-          <div className="my-16 flex flex-col items-center justify-center text-center animate-fade-in">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--bg-main)] text-[var(--text-light)]/40 border border-[var(--border)]/30">
-              <ShoppingBag size={24} />
-            </div>
-            <p className="mt-4 text-xs sm:text-sm text-[var(--text-light)] font-medium">{t("empty")}</p>
-          </div>
-        ) : (
-          <>
-            {/* Desktop Table View */}
-            <div className="mt-6 hidden sm:block overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-[var(--border)]/60 text-xs font-semibold uppercase tracking-wider text-[var(--text-light)]">
-                    <th className="pb-4 pr-4">{t("orderId")}</th>
-                    <th className="pb-4 pr-4">{t("date")}</th>
-                    <th className="pb-4 pr-4">{t("status")}</th>
-                    <th className="pb-4 pr-4">{t("total")}</th>
-                    <th className="pb-4 text-right">{t("action")}</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[var(--border)]/40 text-sm text-[var(--text-main)]">
-                  {filteredOrders.map((order) => (
-                    <tr key={order.id} className="hover:bg-[var(--bg-main)]/30">
-                      <td className="py-4 pr-4 font-semibold text-[var(--primary-ink)]">
-                        #{order.id}
-                      </td>
-                      <td className="py-4 pr-4 text-[var(--text-light)]">{order.date}</td>
-                      <td className="py-4 pr-4">
-                        <span
-                          className={`inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-medium ${getStatusColor(
-                            order.status
-                          )}`}
-                        >
-                          {getStatusText(order.status)}
-                        </span>
-                      </td>
-                      <td className="py-4 pr-4 font-medium">{order.total}</td>
-                      <td className="py-4 text-right">
-                        <button
-                          onClick={() => setSelectedOrder(order)}
-                          className="inline-flex size-9 items-center justify-center rounded-lg border border-[var(--primary-color)]/15 text-[var(--primary-ink)] hover:bg-[var(--primary-color)] hover:text-white transition-colors cursor-pointer"
-                          title={t("viewDetail")}
-                        >
-                          <Eye size={16} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Mobile Card List View */}
-            <div className="mt-4 space-y-3 sm:hidden">
-              {filteredOrders.map((order) => (
-                <div 
-                  key={order.id}
-                  onClick={() => setSelectedOrder(order)}
-                  className="rounded-xl border border-[var(--border)]/60 bg-[var(--bg-main)]/30 p-4 hover:border-[var(--primary-color)]/30 transition-all duration-300 space-y-3 active:scale-[0.99]"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-[var(--primary-ink)] text-xs">#{order.id}</span>
-                    <span
-                      className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[9px] font-semibold tracking-wide uppercase ${getStatusColor(
-                        order.status
-                      )}`}
-                    >
-                      {getStatusText(order.status)}
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2 text-xs">
-                    <div>
-                      <span className="block text-[9px] uppercase tracking-wider text-[var(--text-light)]/60 mb-0.5">{t("date")}</span>
-                      <span className="font-medium text-[var(--text-main)]">{order.date}</span>
-                    </div>
-                    <div className="text-right">
-                      <span className="block text-[9px] uppercase tracking-wider text-[var(--text-light)]/60 mb-0.5">{t("total")}</span>
-                      <span className="font-bold text-[var(--primary-ink)]">{order.total}</span>
-                    </div>
-                  </div>
-
-                  <div className="pt-2 border-t border-[var(--border)]/30 flex justify-end">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedOrder(order);
-                      }}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-[var(--primary-color)]/20 bg-[var(--bg-card)] text-[11px] font-semibold text-[var(--primary-ink)] hover:bg-[var(--primary-color)] hover:text-white transition-all duration-200 cursor-pointer"
-                    >
-                      <Eye size={12} />
-                      <span>{t("viewDetail")}</span>
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-      </div>
-
-      {/* Modal / Detail View */}
-      {selectedOrder && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm animate-fade-in">
-          <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-[var(--primary-color)]/10 bg-[var(--bg-card)] shadow-xl animate-scale-up">
-            {/* Header */}
-            <div className="border-b border-[var(--border)]/60 bg-[var(--bg-main)] px-4 py-3 sm:px-6 sm:py-4 flex items-center justify-between">
-              <div>
-                <h3 className="font-[family-name:var(--font-playfair)] text-base sm:text-lg font-bold text-[var(--primary-ink)]">
-                  {t("orderId")}: #{selectedOrder.id}
-                </h3>
-                <p className="mt-0.5 flex items-center gap-1.5 text-[10px] sm:text-xs text-[var(--text-light)]">
-                  <CalendarIcon size={12} />
-                  {selectedOrder.date}
-                </p>
-              </div>
-              <button
-                onClick={() => setSelectedOrder(null)}
-                className="rounded-lg p-1.5 text-[var(--text-light)] hover:bg-[var(--border)]/40 transition-colors cursor-pointer text-xs"
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* Items */}
-            <div className="p-4 sm:p-6 space-y-3 max-h-[300px] sm:max-h-[350px] overflow-y-auto">
-              {selectedOrder.items.map((item, index) => (
-                <div
-                  key={index}
-                  className="flex gap-3 sm:gap-4 rounded-xl border border-[var(--border)]/50 p-2.5 sm:p-3 hover:border-[var(--primary-color)]/20 transition-colors"
-                >
-                  <div className="relative size-12 sm:size-16 shrink-0 overflow-hidden rounded-lg bg-[var(--bg-main)]">
-                    <Image
-                      src={item.image}
-                      alt={item.name[locale]}
-                      fill
-                      sizes="(max-width: 640px) 48px, 64px"
-                      className="object-cover"
-                      unoptimized
-                    />
-                  </div>
-                  <div className="flex flex-1 flex-col justify-center min-w-0">
-                    <h4 className="font-[family-name:var(--font-playfair)] text-xs sm:text-sm font-semibold text-[var(--primary-ink)] truncate">
-                      {item.name[locale]}
-                    </h4>
-                    <p className="mt-0.5 text-[10px] sm:text-xs text-[var(--text-light)]">
-                      {item.price} x {item.quantity}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Footer Summary */}
-            <div className="border-t border-[var(--border)]/60 bg-[var(--bg-main)] p-4 sm:p-6 flex flex-row items-center justify-between gap-4">
-              <div className="flex items-center">
-                <span
-                  className={`inline-flex items-center rounded-md border px-2.5 py-0.5 text-[10px] sm:text-xs font-semibold uppercase tracking-wider ${getStatusColor(
-                    selectedOrder.status
-                  )}`}
-                >
-                  {getStatusText(selectedOrder.status)}
-                </span>
-              </div>
-              <div className="text-right">
-                <p className="text-[10px] sm:text-xs text-[var(--text-light)]">{t("total")}</p>
-                <p className="mt-0.5 font-[family-name:var(--font-playfair)] text-lg sm:text-2xl font-bold text-[var(--primary-ink)]">
-                  {selectedOrder.total}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+    <span className={cn("inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[1.5px]", STATUS_TONE[status].text)}>
+      <span aria-hidden="true" className={cn("size-1.5 rounded-full", STATUS_TONE[status].dot)} />
+      {label}
+    </span>
   );
 }
+
+/**
+ * Lịch sử đơn hàng (dữ liệu mẫu — chưa có API đơn hàng):
+ * lọc theo trạng thái (kèm số lượng) + khoảng ngày đặt; mỗi đơn là một thẻ (mã · ngày · trạng thái · ảnh sản phẩm · tổng tiền);
+ * "Chi tiết" mở hộp thoại liệt kê sản phẩm.
+ */
+export function OrderHistoryTab() {
+  const t = useTranslations("ProfilePage.orders");
+  const locale = useLocale() as Locale;
+  const format = useFormatter();
+  const { selectedOrder, setSelectedOrder } = useOrderHistory();
+  const [status, setStatus] = useState<StatusFilter>("all");
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+
+  const formatDate = (date: Date) => format.dateTime(date, { day: "2-digit", month: "2-digit", year: "numeric" });
+  const statusLabel = (value: StatusFilter) => (value === "all" ? t("statusAll") : t(STATUS_KEY[value]));
+
+  const ordersInRange = mockOrders.filter((order) => inRange(order, dateRange));
+  const visible = ordersInRange.filter((order) => status === "all" || order.status === status);
+  const countOf = (value: StatusFilter) =>
+    value === "all" ? ordersInRange.length : ordersInRange.filter((order) => order.status === value).length;
+
+  const rangeLabel = dateRange?.from
+    ? `${formatDate(dateRange.from)} – ${dateRange.to ? formatDate(dateRange.to) : "…"}`
+    : t("selectDateRange");
+
+  return (
+    <>
+      <ProfileSection flush>
+        {/* Bộ lọc */}
+        <div className="space-y-4 border-b border-[var(--border)] px-5 py-4 sm:px-6">
+          <div className="-mx-1 overflow-x-auto px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <ChoiceGroup<StatusFilter>
+              label={t("status")}
+              variant="chip"
+              value={status}
+              onChange={setStatus}
+              className="[&>div]:flex-nowrap [&_label]:shrink-0"
+              options={STATUS_FILTERS.map((value) => ({ value, label: `${statusLabel(value)} (${countOf(value)})` }))}
+            />
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="mr-1 text-[11px] font-semibold uppercase tracking-[2px] text-[var(--text-light)]">{t("dateFilter")}</span>
+            <AppPopover
+              title={t("dateFilter")}
+              align="start"
+              width={320}
+              nativeButton
+              trigger={
+                <ActionButton variant={dateRange?.from ? "dialog" : "cancel"} size="sm" icon={<CalendarDays />} className="normal-case tracking-normal">
+                  {rangeLabel}
+                </ActionButton>
+              }
+            >
+              <div className="flex justify-center p-2">
+                <Calendar mode="range" selected={dateRange} onSelect={setDateRange} disabled={{ after: new Date() }} />
+              </div>
+            </AppPopover>
+            {dateRange?.from ? (
+              <ActionButton variant="cancel" size="sm" icon={<X />} onClick={() => setDateRange(undefined)} aria-label={t("clearDateFilter")}>
+                {t("clearDateFilter")}
+              </ActionButton>
+            ) : null}
+          </div>
+        </div>
+
+        {/* Danh sách đơn */}
+        {visible.length === 0 ? (
+          <EmptyState
+            icon={Package}
+            title={mockOrders.length ? t("emptyFiltered") : t("empty")}
+            description={t("subtitle")}
+            action={mockOrders.length ? t("showAll") : t("shopNow")}
+            {...(mockOrders.length
+              ? {
+                  onAction: () => {
+                    setStatus("all");
+                    setDateRange(undefined);
+                  },
+                }
+              : { href: "/products" })}
+            className="py-12"
+          />
+        ) : (
+          <ul className="divide-y divide-[var(--border)]">
+            {visible.map((order) => {
+              const itemCount = order.items.reduce((sum, item) => sum + item.quantity, 0);
+              return (
+                <li key={order.id} className="px-5 py-5 sm:px-6">
+                  <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5">
+                    <p className="text-[13px] text-[var(--text-light)]">
+                      <span className="font-semibold text-[var(--primary-ink)]">#{order.id}</span>
+                      {" · "}
+                      {formatDate(toDate(order.date))}
+                    </p>
+                    <StatusBadge status={order.status} label={t(STATUS_KEY[order.status])} />
+                  </div>
+
+                  <div className="mt-4 flex flex-wrap items-center gap-4">
+                    <div className="flex -space-x-3">
+                      {order.items.slice(0, 3).map((item, index) => (
+                        <span key={index} className="relative size-14 overflow-hidden border-2 border-[var(--bg-card)] bg-[var(--bg-main)]">
+                          <Image src={item.image} alt={item.name[locale]} fill sizes="56px" className="object-cover" unoptimized />
+                        </span>
+                      ))}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-[family-name:var(--font-playfair)] text-[15px] font-semibold text-[var(--text-main)]">
+                        {order.items[0]?.name[locale]}
+                      </p>
+                      <p className="mt-0.5 text-xs text-[var(--text-light)]">{t("itemCount", { count: itemCount })}</p>
+                    </div>
+                    <div className="flex w-full items-center justify-between gap-4 sm:w-auto sm:justify-end">
+                      <div className="text-right">
+                        <p className="text-[11px] uppercase tracking-[1.5px] text-[var(--text-light)]">{t("total")}</p>
+                        <p className="font-[family-name:var(--font-playfair)] text-lg font-semibold text-[var(--primary-ink)] [font-variant-numeric:lining-nums]">
+                          {formatVnd(order.total, locale)}
+                        </p>
+                      </div>
+                      <ActionButton variant="dialog" size="sm" icon={<Eye />} onClick={() => setSelectedOrder(order)}>
+                        {t("viewDetail")}
+                      </ActionButton>
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </ProfileSection>
+
+      {/* Chi tiết đơn */}
+      <AppDialog
+        open={selectedOrder !== null}
+        onOpenChange={(open) => !open && setSelectedOrder(null)}
+        icon={Package}
+        title={selectedOrder ? t("detailTitle", { id: selectedOrder.id }) : ""}
+        description={selectedOrder ? formatDate(toDate(selectedOrder.date)) : undefined}
+        size="md"
+        cancel={false}
+        footer={
+          selectedOrder ? (
+            <div className="flex w-full items-center justify-between gap-4">
+              <StatusBadge status={selectedOrder.status} label={t(STATUS_KEY[selectedOrder.status])} />
+              <div className="text-right">
+                <p className="text-[11px] uppercase tracking-[1.5px] text-[var(--text-light)]">{t("total")}</p>
+                <p className="font-[family-name:var(--font-playfair)] text-xl font-semibold text-[var(--primary-ink)] [font-variant-numeric:lining-nums]">
+                  {formatVnd(selectedOrder.total, locale)}
+                </p>
+              </div>
+            </div>
+          ) : null
+        }
+      >
+        {selectedOrder ? (
+          <ul className="divide-y divide-[var(--border)] border-y border-[var(--border)]">
+            {selectedOrder.items.map((item, index) => (
+              <li key={index} className="flex items-center gap-4 py-3">
+                <span className="relative size-16 shrink-0 overflow-hidden bg-[var(--bg-main)]">
+                  <Image src={item.image} alt={item.name[locale]} fill sizes="64px" className="object-cover" unoptimized />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-[family-name:var(--font-playfair)] text-[15px] font-semibold text-[var(--text-main)]">
+                    {item.name[locale]}
+                  </p>
+                  <p className="mt-0.5 text-xs text-[var(--text-light)]">
+                    {formatVnd(item.price, locale)} · {t("quantity", { count: item.quantity })}
+                  </p>
+                </div>
+                <p className="shrink-0 text-sm font-semibold text-[var(--text-main)] [font-variant-numeric:lining-nums]">
+                  {formatVnd(item.price * item.quantity, locale)}
+                </p>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </AppDialog>
+
+    </>
+  );
+}
+

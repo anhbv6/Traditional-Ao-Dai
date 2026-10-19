@@ -56,7 +56,7 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
   const loc = locale === 'en' ? 'en' : 'vi';
 
   return (
-    <Container as="article" width="narrow">
+    <Container as="article">
       <Breadcrumbs lastLabel={article.title[loc]} />
       <div className="mt-6 sm:mt-8">
         <NewsDetail

@@ -1,25 +1,29 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useCountdown } from '../../hooks/useCountdown';
 
 // Sub-components
 import { EnterForgotForm } from './components/EnterForgotForm';
 import { VerifyOtpForm } from './components/VerifyOtpForm';
 import { ChangePasswordForm } from './components/ChangePasswordForm';
 
+type ForgotType = 'email' | 'phone';
+
 export function ForgotForm() {
   const [step, setStep] = useState<'forgot' | 'verify' | 'reset'>('forgot');
-  const [forgotType, setForgotType] = useState<'email' | 'phone'>('email');
+  const [forgotType, setForgotType] = useState<ForgotType>('email');
   const [target, setTarget] = useState('');
   const [resetToken, setResetToken] = useState('');
+  // Đặt ở cấp cha để quay lại bước nhập rồi vào lại bước OTP vẫn giữ đúng thời gian chờ
+  const resendCountdown = useCountdown();
 
-  const handleForgotSubmit = (submittedTarget: string, type: 'email' | 'phone') => {
+  const handleForgotSubmit = (submittedTarget: string, type: ForgotType) => {
     setTarget(submittedTarget);
     setForgotType(type);
     setResetToken('');
-    setTimeout(() => {
-      setStep('verify');
-    }, 400);
+    resendCountdown.start();
+    setStep('verify');
   };
 
   const handleBackToForgot = () => {
@@ -45,6 +49,8 @@ export function ForgotForm() {
         <VerifyOtpForm
           forgotType={forgotType}
           target={target}
+          resendSeconds={resendCountdown.seconds}
+          onResent={() => resendCountdown.start()}
           onVerifySuccess={handleVerifySuccess}
           onBack={handleBackToForgot}
         />

@@ -1,11 +1,17 @@
 import React from 'react';
-import { FormInput } from '@/components/shared/FormInput';
+import { TextField } from '@/components/shared/TextField';
+import { AUTH_FIELD_PROPS } from '../../authField';
 
 interface PasswordLoginFormProps {
   emailOrPhone: string;
   setEmailOrPhone: (val: string) => void;
   password: string;
   setPassword: (val: string) => void;
+  disabled?: boolean;
+  /** Lỗi nhập liệu hiển thị dưới từng ô */
+  errors?: { emailOrPhone?: string; password?: string };
+  /** Đổi giá trị để lỗi rung lại khi bấm Đăng nhập lần nữa */
+  shakeKey?: number;
   t: (key: string) => string;
 }
 
@@ -14,34 +20,41 @@ export function PasswordLoginForm({
   setEmailOrPhone,
   password,
   setPassword,
+  disabled = false,
+  errors = {},
+  shakeKey,
   t,
 }: PasswordLoginFormProps) {
   return (
     <>
       {/* Email or Phone Field */}
-      <FormInput
+      <TextField
+        {...AUTH_FIELD_PROPS}
         id="emailOrPhone"
-        type="text"
-        required
+        autoComplete="username"
         label={t('emailOrPhone')}
         placeholder={t('loginEmailOrPhonePlaceholder')}
         value={emailOrPhone}
-        onChange={(e) => setEmailOrPhone(e.target.value)}
+        disabled={disabled}
+        error={errors.emailOrPhone}
+        shakeKey={shakeKey}
+        onValueChange={setEmailOrPhone}
       />
 
       {/* Password Field */}
-      <FormInput
+      <TextField
+        {...AUTH_FIELD_PROPS}
         id="password"
         type="password"
-        required
+        passwordToggle
+        autoComplete="current-password"
         label={t('password')}
         placeholder={t('loginPasswordPlaceholder')}
         value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        passwordToggleLabels={{
-          show: t('showPassword'),
-          hide: t('hidePassword'),
-        }}
+        disabled={disabled}
+        error={errors.password}
+        shakeKey={shakeKey}
+        onValueChange={setPassword}
       />
     </>
   );

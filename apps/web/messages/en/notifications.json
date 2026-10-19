@@ -1,0 +1,59 @@
+{
+  "meta": {
+    "title": "Notifications",
+    "description": "Order updates, tailoring progress and offers made just for you."
+  },
+  "eyebrow": "Account",
+  "title": "Notifications",
+  "subtitle": "Follow your orders, tailoring progress and offers made just for you.",
+  "label": "Notifications",
+  "unreadCount": "{count} unread",
+  "resultCount": "{count, plural, one {# notification} other {# notifications}}",
+  "markAllRead": "Mark all as read",
+  "viewAll": "View all notifications",
+  "unread": "Unread",
+  "filters": {
+    "all": "All",
+    "unread": "Unread",
+    "order": "Orders",
+    "tailoring": "Tailoring",
+    "promotion": "Offers",
+    "system": "System"
+  },
+  "emptyTitle": "No notifications yet",
+  "emptyDescription": "When your orders are updated or new offers arrive, we will let you know here.",
+  "emptyFilteredTitle": "Nothing here",
+  "emptyFilteredDescription": "You have seen every notification in this category.",
+  "emptyAction": "Continue shopping",
+  "showAll": "Show all",
+  "items": {
+    "orderShipped": {
+      "title": "Your order is on its way",
+      "body": "Order #AD10293 has left our warehouse and will reach you within 1–2 days."
+    },
+    "tailoringReady": {
+      "title": "Your bespoke ao dai is ready",
+      "body": "Your silk ao dai made to your measurements has passed final checks and is ready to ship."
+    },
+    "flashSale": {
+      "title": "Weekend offer -20%",
+      "body": "20% off the Spring Brocade collection until Sunday. Limited stock!"
+    },
+    "orderConfirmed": {
+      "title": "Order confirmed",
+      "body": "Thank you! Order #AD10293 has been confirmed and is being prepared."
+    },
+    "measurementReminder": {
+      "title": "Time to update your measurements",
+      "body": "Your saved measurements are over 6 months old. Update them for the perfect bespoke fit."
+    },
+    "newCollection": {
+      "title": "New collection: Summer Lotus",
+      "body": "Discover 12 ao dai designs inspired by the colours of summer lotus."
+    },
+    "securityLogin": {
+      "title": "Sign-in on a new device",
+      "body": "Your account was just signed in on a new device. If this wasn't you, change your password now."
+    }
+  }
+}

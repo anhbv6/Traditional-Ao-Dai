@@ -255,7 +255,7 @@
   to { transform: scaleX(1); }
 }
 
-/* Cánh hoa rơi theo gió ở banner trang chủ (HeroPetals, inline style).
+/* Cánh hoa rơi theo gió (components/effects/FallingPetals, inline style).
    Mỗi cánh gồm 3 lớp lồng nhau, mỗi lớp một chuyển động riêng → quỹ đạo tự nhiên, không lặp đều:
    - petal-drift   : rơi xuống hết lớp chứa + bị gió đẩy chéo (--petal-drift). Đơn vị cqh/cqw theo lớp chứa
                      (lớp chứa đặt container-type: size).

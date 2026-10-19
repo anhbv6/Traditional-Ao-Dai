@@ -60,7 +60,8 @@ export interface PaymentCard {
 
 export interface OrderItem {
   name: { vi: string; en: string };
-  price: string;
+  /** Đơn giá (VND) */
+  price: number;
   quantity: number;
   image: string;
 }
@@ -69,8 +70,8 @@ export interface Order {
   id: string;
   date: string;
   status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
-  total: string;
+  /** Tổng tiền đơn (VND) */
+  total: number;
   items: OrderItem[];
 }
 
-export type TabId = "personal" | "orders" | "address" | "payment" | "security" | "setting";

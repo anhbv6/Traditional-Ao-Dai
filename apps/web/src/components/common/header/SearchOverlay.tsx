@@ -433,7 +433,6 @@ export function SearchOverlay({ label, placeholder }: SearchOverlayProps) {
         aria-label={label}
         aria-haspopup="dialog"
         aria-expanded={open}
-        title={`${label} ( / )`}
         className="grid h-11 w-11 cursor-pointer place-items-center text-primary-ink transition-opacity hover:opacity-75"
       >
         <Search size={22} strokeWidth={1.5} aria-hidden="true" />

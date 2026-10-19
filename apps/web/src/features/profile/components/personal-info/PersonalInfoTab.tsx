@@ -2,25 +2,56 @@
 
 import React, { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { User, Mail, Phone, Calendar as CalendarIcon, Camera, Smile, BadgeCheck, type LucideIcon } from "lucide-react";
+import { BadgeCheck, Camera, Mail, PencilLine, Phone, Save, UserRound, type LucideIcon } from "lucide-react";
+import { uploadImageApi } from "@/features/upload";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { showToast as toast } from "@/components/ui/toast";
+import { ActionButton } from "@/components/shared/ActionButton";
+import { AppDialog } from "@/components/shared/AppDialog";
+import { ChoiceGroup } from "@/components/shared/ChoiceGroup";
+import { TextField } from "@/components/shared/TextField";
+import { cn } from "@/lib/utils";
 import { usePersonalInfo } from "../../hooks/useProfile";
 import { useContactVerification } from "../../hooks/useContactVerification";
+import { usePersonalInfoStore } from "../../store/personalInfoStore";
+import { ProfileSection } from "../ProfileSection";
 import { ContactVerificationDialog } from "./ContactVerificationDialog";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { uploadImageApi } from "@/features/upload";
-import { showToast as toast } from "@/components/ui/toast";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
+type Gender = "male" | "female" | "other";
+
+/** "1990-05-20" → "20/05/1990" */
+function isoToDisplay(iso: string) {
+  const [y, m, d] = iso.split("-");
+  return y && m && d ? `${d}/${m}/${y}` : "";
+}
+
+/** "20/05/1990" → "1990-05-20"; ngày không tồn tại / ở tương lai / trước 1900 → null */
+function displayToIso(display: string): string | null {
+  const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(display);
+  if (!match) return null;
+  const [, dd, mm, yyyy] = match;
+  const date = new Date(Number(yyyy), Number(mm) - 1, Number(dd));
+  const valid =
+    date.getFullYear() === Number(yyyy) &&
+    date.getMonth() === Number(mm) - 1 &&
+    date.getDate() === Number(dd) &&
+    Number(yyyy) >= 1900 &&
+    date.getTime() <= Date.now();
+  return valid ? `${yyyy}-${mm}-${dd}` : null;
+}
+
+function getInitials(name?: string | null) {
+  if (!name?.trim()) return null;
+  const [first, second] = name.trim().split(/\s+/);
+  return `${first?.[0] ?? ""}${second?.[0] ?? ""}`.toUpperCase();
+}
+
+/**
+ * Thông tin cá nhân:
+ * - Khối "Thông tin cơ bản": xem dạng danh sách; bấm "Thay đổi thông tin" → form (ảnh đại diện, họ tên, ngày sinh, giới tính).
+ *   Họ tên bắt buộc; ngày sinh tuỳ chọn nhưng nếu nhập phải là ngày hợp lệ trong quá khứ.
+ * - Khối "Thông tin liên hệ": email / SĐT không sửa trực tiếp — thêm, đổi hay xác minh đều qua hộp thoại mã 6 số.
+ */
 export function PersonalInfoTab() {
   const t = useTranslations("ProfilePage.personal");
   const {
@@ -29,7 +60,6 @@ export function PersonalInfoTab() {
     gender,
     setGender,
     dob,
-    setDob,
     avatarUrl,
     setAvatarUrl,
     isEditing,
@@ -42,337 +72,255 @@ export function PersonalInfoTab() {
   const contactVerification = useContactVerification();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [dobInput, setDobInput] = useState("");
+  const [errors, setErrors] = useState<{ fullName?: string; dob?: string }>({});
+  const [submitCount, setSubmitCount] = useState(0);
 
-  const handleCancel = () => {
+  const isSaving = isLoading || isUploadingAvatar;
+  const displayAvatar = (avatarPreview || avatarUrl || "").trim();
+  const displayName = user?.name || fullName;
+  const genderLabel: Record<Gender, string> = {
+    male: t("genderMale"),
+    female: t("genderFemale"),
+    other: t("genderOther"),
+  };
+
+  const startEdit = () => {
+    handleStartEdit();
+    // Store đã nạp lại dữ liệu người dùng đồng bộ → đọc ngay để điền ô ngày sinh
+    setDobInput(isoToDisplay(usePersonalInfoStore.getState().dob));
+    setErrors({});
+  };
+
+  const cancelEdit = () => {
     handleCancelEdit();
     setSelectedFile(null);
     setAvatarPreview(null);
+    setErrors({});
   };
 
-  const onSaveSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    let finalAvatarUrl = avatarUrl;
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAvatarPreview(URL.createObjectURL(file));
+    setSelectedFile(file);
+    e.target.value = "";
+  };
 
+  const onSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isSaving) return;
+    setSubmitCount((count) => count + 1);
+
+    const isoDob = dobInput ? displayToIso(dobInput) : "";
+    const nextErrors = {
+      fullName: fullName.trim() ? undefined : t("fullNameRequired"),
+      dob: isoDob === null ? t("dobInvalid") : undefined,
+    };
+    setErrors(nextErrors);
+    if (nextErrors.fullName || nextErrors.dob) return;
+
+    let finalAvatarUrl = avatarUrl;
     if (selectedFile) {
+      setIsUploadingAvatar(true);
       try {
-        setIsUploadingAvatar(true);
         const response = await uploadImageApi(selectedFile, "avatars");
-        if (response.data?.url) {
-          finalAvatarUrl = response.data.url;
-          setAvatarUrl(finalAvatarUrl);
-        } else {
+        if (!response.data?.url) {
           toast.error(t("avatarUrlInvalid"));
-          setIsUploadingAvatar(false);
           return;
         }
+        finalAvatarUrl = response.data.url;
+        setAvatarUrl(finalAvatarUrl);
       } catch (error) {
         console.error("Lỗi tải ảnh đại diện:", error);
         toast.error(t("avatarUploadFailed"));
-        setIsUploadingAvatar(false);
         return;
       } finally {
         setIsUploadingAvatar(false);
       }
     }
 
-    handleSubmit(e, finalAvatarUrl);
+    handleSubmit({ avatarUrl: finalAvatarUrl, dob: isoDob ?? "" });
     setSelectedFile(null);
     setAvatarPreview(null);
   };
 
-  const triggerFileSelect = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const localUrl = URL.createObjectURL(file);
-      setAvatarPreview(localUrl);
-      setSelectedFile(file);
-    }
-  };
-
-  const handleDobSelect = (date: Date | undefined) => {
-    if (date) {
-      const yyyy = date.getFullYear();
-      const mm = String(date.getMonth() + 1).padStart(2, "0");
-      const dd = String(date.getDate()).padStart(2, "0");
-      setDob(`${yyyy}-${mm}-${dd}`);
-    }
-  };
-
-  const getLocalDate = (dateStr: string) => {
-    if (!dateStr) return undefined;
-    return new Date(dateStr + "T00:00:00");
-  };
-
-  const formatLocalDate = (dateStr: string) => {
-    const date = getLocalDate(dateStr);
-    if (!date) return isEditing ? t("selectDate") : "-";
-    const yyyy = date.getFullYear();
-    const mm = String(date.getMonth() + 1).padStart(2, "0");
-    const dd = String(date.getDate()).padStart(2, "0");
-    return `${dd}/${mm}/${yyyy}`;
-  };
-
-  const displayAvatar = (avatarPreview || avatarUrl || "").trim();
+  const avatar = (
+    <div className="relative shrink-0">
+      <button
+        type="button"
+        onClick={() => displayAvatar && setIsPreviewOpen(true)}
+        disabled={!displayAvatar}
+        aria-label={t("previewAvatar")}
+        className="block cursor-pointer rounded-full outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] disabled:cursor-default"
+      >
+        <Avatar size="xl" className="size-20 border border-[var(--border)] sm:size-24">
+          {displayAvatar ? <AvatarImage src={displayAvatar} alt={displayName ?? ""} className="object-cover" /> : null}
+          <AvatarFallback className="bg-[var(--bg-main)] text-xl font-semibold uppercase text-[var(--primary-ink)]">
+            {getInitials(displayName) || <UserRound size={28} strokeWidth={1.4} aria-hidden="true" />}
+          </AvatarFallback>
+        </Avatar>
+      </button>
+      {isUploadingAvatar ? (
+        <span className="absolute inset-0 grid place-items-center rounded-full bg-black/40">
+          <span className="size-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+        </span>
+      ) : null}
+    </div>
+  );
 
   return (
-    <div className="rounded-2xl border border-[var(--primary-color)]/10 bg-[var(--bg-card)] p-4 shadow-sm sm:p-8">
-      <form onSubmit={onSaveSubmit} className="space-y-6">
-        {/* Avatar Section */}
-        <div className="flex flex-col sm:flex-row items-center gap-4 pb-4 sm:gap-6 sm:pb-6 border-b border-[var(--primary-color)]/10">
-          <div className="relative group">
-            <Avatar 
-              size="xl" 
-              onClick={() => {
-                if (displayAvatar && !isUploadingAvatar) {
-                  setIsModalOpen(true);
-                }
-              }}
-              className={`size-20 sm:size-24 border-2 border-[var(--border)] transition-all duration-300 shadow-sm ${
-                displayAvatar && !isUploadingAvatar
-                  ? "hover:border-[var(--primary-color)] cursor-pointer hover:shadow-md" 
-                  : "cursor-default"
-              }`}
-            >
-              {displayAvatar ? (
-                <AvatarImage src={displayAvatar} alt={fullName} className="object-cover" />
-              ) : null}
-              <AvatarFallback className="bg-[var(--bg-main)] text-[var(--primary-ink)] font-bold text-xl sm:text-2xl uppercase">
-                {fullName ? fullName.slice(0, 2) : "US"}
-              </AvatarFallback>
-            </Avatar>
-
-            {/* Uploading Spinner */}
-            {isUploadingAvatar && (
-              <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center z-10">
-                <span className="w-5 h-5 rounded-full border-2 border-white border-t-transparent animate-spin" />
+    <>
+      <ProfileSection
+        title={t("basicTitle")}
+        description={t("basicDesc")}
+        action={
+          !isEditing ? (
+            <ActionButton variant="dialog" size="sm" icon={<PencilLine />} onClick={startEdit}>
+              {t("changeInfoBtn")}
+            </ActionButton>
+          ) : undefined
+        }
+      >
+        {!isEditing ? (
+          /* ---------- Chế độ xem ---------- */
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-8">
+            {avatar}
+            <dl className="grid flex-1 gap-x-8 gap-y-5 sm:grid-cols-2">
+              <InfoItem label={t("fullName")} value={user?.name} emptyLabel={t("notProvided")} />
+              <InfoItem label={t("dob")} value={isoToDisplay(dob)} emptyLabel={t("notProvided")} />
+              <InfoItem label={t("gender")} value={genderLabel[(gender as Gender) ?? "other"] ?? genderLabel.other} emptyLabel={t("notProvided")} />
+            </dl>
+          </div>
+        ) : (
+          /* ---------- Chế độ sửa ---------- */
+          <form onSubmit={onSave} noValidate className="space-y-6">
+            <div className="flex items-center gap-5">
+              {avatar}
+              <div className="space-y-2">
+                <ActionButton
+                  variant="cancel"
+                  size="sm"
+                  icon={<Camera />}
+                  disabled={isSaving}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  {t("changeAvatar")}
+                </ActionButton>
+                <p className="text-xs text-[var(--text-light)]">{t("avatarHint")}</p>
               </div>
-            )}
-            
-            {/* Edit Button */}
-            {isEditing && (
-              <button
-                type="button"
-                onClick={triggerFileSelect}
-                className="absolute bottom-0 right-0 p-2 sm:p-2.5 rounded-full bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/95 shadow-md border-2 border-white flex items-center justify-center transition-all duration-300 cursor-pointer hover:scale-105 active:scale-95"
-                aria-label={t("editAvatar")}
-                title={t("editAvatar")}
-              >
-                <Camera size={12} className="text-white sm:hidden" />
-                <Camera size={14} className="text-white hidden sm:block" />
-              </button>
-            )}
-          </div>
-          
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            accept="image/*"
-            className="hidden"
-          />
+              <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+            </div>
 
-          <div className="flex-1 text-center sm:text-left space-y-1">
-            <h3 className="text-base sm:text-lg font-bold text-[var(--text-main)] font-[family-name:var(--font-playfair)]">
-              {user?.name || "-"}
-            </h3>
-            {user?.email && <p className="text-[11px] sm:text-xs text-[var(--text-light)]">
-              {user.email}
-            </p>}
-          </div>
-
-          <div className="w-full sm:w-auto flex justify-center">
-            {!isEditing && (
-              <button
-                type="button"
-                onClick={handleStartEdit}
-                className="w-full sm:w-auto inline-flex h-9 sm:h-10 items-center justify-center rounded-lg border border-[var(--primary-color)] bg-[var(--bg-card)] px-4 sm:px-5 text-[11px] sm:text-xs font-semibold uppercase tracking-[1px] text-[var(--primary-ink)] transition-all hover:bg-[var(--primary-color)] hover:text-white cursor-pointer shadow-sm hover:shadow-md active:scale-95 duration-200"
-              >
-                {t("changeInfoBtn")}
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Modal Popup to view full-size avatar */}
-        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-          <DialogContent className="max-w-[280px] sm:max-w-[360px] !p-0 overflow-hidden rounded-2xl shadow-2xl !border-none">
-            {displayAvatar ? (
-              // eslint-disable-next-line @next/next/no-img-element -- ảnh từ URL tùy ý (blob xem trước / avatar / ảnh do admin nhập), không tối ưu được bằng next/image
-              <img 
-                src={displayAvatar} 
-                alt={fullName} 
-                className="w-full aspect-square object-cover block" 
+            <div className="grid gap-5 sm:grid-cols-2">
+              <TextField
+                appearance="outline"
+                size="md"
+                label={t("fullName")}
+                required
+                autoComplete="name"
+                placeholder={t("fullNamePlaceholder")}
+                value={fullName}
+                onValueChange={(value) => {
+                  setFullName(value);
+                  if (errors.fullName) setErrors((prev) => ({ ...prev, fullName: undefined }));
+                }}
+                error={errors.fullName}
+                shakeKey={submitCount}
+                disabled={isSaving}
               />
-            ) : null}
-          </DialogContent>
-        </Dialog>
+              <TextField
+                appearance="outline"
+                size="md"
+                label={t("dob")}
+                mask="date"
+                autoComplete="bday"
+                placeholder={t("dobPlaceholder")}
+                value={dobInput}
+                onValueChange={(value) => {
+                  setDobInput(value);
+                  if (errors.dob) setErrors((prev) => ({ ...prev, dob: undefined }));
+                }}
+                error={errors.dob}
+                shakeKey={submitCount}
+                disabled={isSaving}
+              />
+            </div>
 
-        <div className="grid gap-6 sm:grid-cols-2">
-          {/* Full Name */}
-          <div className="space-y-2">
-            <label className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-[var(--text-light)]">
-              {t("fullName")}
-            </label>
-            {!isEditing ? (
-              <div className="flex items-center gap-2.5 sm:gap-3.5 w-full h-10 rounded-xl border border-[var(--primary-color)]/5 bg-gradient-to-r from-[var(--bg-main)]/40 to-white px-3 sm:px-4 text-xs sm:text-sm text-[var(--text-main)] font-semibold shadow-xs hover:border-[var(--primary-color)]/10 transition-all duration-300">
-                <User size={14} className="text-[var(--primary-ink)]/70 sm:hidden shrink-0" />
-                <User size={16} className="text-[var(--primary-ink)]/70 hidden sm:block shrink-0" />
-                <span>{fullName || "-"}</span>
-              </div>
-            ) : (
-              <div className="relative">
-                <User className="absolute left-3 sm:left-3.5 top-1/2 size-3.5 sm:size-4 -translate-y-1/2 text-[var(--primary-ink)]/50 pointer-events-none" />
-                <input
-                  type="text"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  required
-                  className="w-full h-10 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] pl-10 pr-3 sm:pl-11 sm:pr-4 text-xs sm:text-sm text-[var(--text-main)] outline-none transition-all duration-300 focus:border-[var(--primary-color)] focus:ring-1 focus:ring-[var(--primary-color)] hover:border-[var(--primary-color)]/30 shadow-xs"
-                />
-              </div>
-            )}
-          </div>
+            <div>
+              <p className="mb-2 text-[11px] font-semibold uppercase tracking-[2.5px] text-[var(--text-light)]">{t("gender")}</p>
+              <ChoiceGroup<Gender>
+                label={t("gender")}
+                variant="chip"
+                value={(gender as Gender) || "other"}
+                onChange={setGender}
+                options={[
+                  { value: "female", label: t("genderFemale") },
+                  { value: "male", label: t("genderMale") },
+                  { value: "other", label: t("genderOther") },
+                ]}
+              />
+            </div>
 
-          {/* Email */}
-          <ContactField
+            <div className="flex flex-col-reverse gap-3 border-t border-[var(--border)] pt-5 sm:flex-row sm:justify-end">
+              <ActionButton variant="cancel" onClick={cancelEdit} disabled={isSaving}>
+                {t("cancelBtn")}
+              </ActionButton>
+              <ActionButton type="submit" variant="confirm" icon={<Save />} loading={isSaving}>
+                {isSaving ? t("saving") : t("saveBtn")}
+              </ActionButton>
+            </div>
+          </form>
+        )}
+      </ProfileSection>
+
+      <ProfileSection title={t("contactTitle")} description={t("contactDesc")} flush>
+        <ul className="divide-y divide-[var(--border)]">
+          <ContactRow
             label={t("email")}
             icon={Mail}
-            value={user?.email || ""}
+            value={user?.email ?? ""}
             isVerified={Boolean(user?.isEmailVerified)}
             onAction={() => contactVerification.open("email")}
           />
-
-          {/* Phone */}
-          <ContactField
+          <ContactRow
             label={t("phone")}
             icon={Phone}
-            value={user?.phone || ""}
+            value={user?.phone ?? ""}
             isVerified={Boolean(user?.isPhoneVerified)}
             onAction={() => contactVerification.open("phone")}
           />
+        </ul>
+      </ProfileSection>
 
-          {/* DOB */}
-          <div className="space-y-2">
-            <label className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-[var(--text-light)]">
-              {t("dob")}
-            </label>
-            {!isEditing ? (
-              <div className="flex items-center gap-2.5 sm:gap-3.5 w-full h-10 rounded-xl border border-[var(--primary-color)]/5 bg-gradient-to-r from-[var(--bg-main)]/40 to-white px-3 sm:px-4 text-xs sm:text-sm text-[var(--text-main)] font-semibold shadow-xs hover:border-[var(--primary-color)]/10 transition-all duration-300">
-                <CalendarIcon size={14} className="text-[var(--primary-ink)]/70 sm:hidden shrink-0" />
-                <CalendarIcon size={16} className="text-[var(--primary-ink)]/70 hidden sm:block shrink-0" />
-                <span>{formatLocalDate(dob)}</span>
-              </div>
-            ) : (
-              <div className="relative">
-                <Popover>
-                  <PopoverTrigger render={
-                    <button
-                      type="button"
-                      className="w-full h-10 text-left rounded-xl border border-[var(--border)] bg-[var(--bg-card)] pl-10 pr-3 sm:pl-11 sm:pr-4 text-xs sm:text-sm text-[var(--text-main)] outline-none transition-all duration-300 focus:border-[var(--primary-color)] focus:ring-1 focus:ring-[var(--primary-color)] cursor-pointer hover:border-[var(--primary-color)]/30 shadow-xs"
-                    >
-                      {formatLocalDate(dob)}
-                    </button>
-                  } />
-                  <CalendarIcon className="absolute left-3 sm:left-3.5 top-1/2 size-3.5 sm:size-4 -translate-y-1/2 text-[var(--primary-ink)]/50 pointer-events-none" />
-                  <PopoverContent className="w-auto p-0 bg-[var(--bg-card)] border border-[var(--border)] rounded-xl shadow-lg z-50">
-                    <Calendar
-                      mode="single"
-                      selected={getLocalDate(dob)}
-                      onSelect={handleDobSelect}
-                      captionLayout="dropdown"
-                      startMonth={new Date(1930, 0)}
-                      endMonth={new Date()}
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Gender */}
-        <div className="space-y-2 w-full sm:max-w-[calc(50%-12px)]">
-          <label className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-[var(--text-light)]">
-            {t("gender")}
-          </label>
-          {!isEditing ? (
-              <div className="flex items-center gap-2.5 sm:gap-3.5 w-full h-10 rounded-xl border border-[var(--primary-color)]/5 bg-gradient-to-r from-[var(--bg-main)]/40 to-white px-3 sm:px-4 text-xs sm:text-sm text-[var(--text-main)] font-semibold shadow-xs hover:border-[var(--primary-color)]/10 transition-all duration-300 capitalize">
-              <Smile size={14} className="text-[var(--primary-ink)]/70 sm:hidden shrink-0" />
-              <Smile size={16} className="text-[var(--primary-ink)]/70 hidden sm:block shrink-0" />
-              <span>
-                {gender === "male"
-                  ? t("genderMale")
-                  : gender === "female"
-                  ? t("genderFemale")
-                  : t("genderOther")}
-              </span>
-            </div>
-          ) : (
-            <div className="relative w-full">
-              <Select 
-                value={gender} 
-                onValueChange={(val) => setGender(val || "other")}
-              >
-                <SelectTrigger
-                  className="!w-full !h-10 !rounded-xl flex items-center justify-between border border-[var(--border)] bg-[var(--bg-card)] pl-10 pr-3 sm:pl-11 sm:pr-4 text-xs sm:text-sm text-[var(--text-main)] outline-none transition-all duration-300 focus-visible:border-[var(--primary-color)] focus-visible:ring-1 focus-visible:ring-[var(--primary-color)] hover:border-[var(--primary-color)]/30 shadow-xs cursor-pointer"
-                >
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-main)] shadow-lg rounded-xl overflow-hidden font-medium">
-                  <SelectGroup>
-                    <SelectItem value="male" className="cursor-pointer font-medium hover:bg-[var(--primary-color)]/5 focus:bg-[var(--primary-color)]/5 focus:text-[var(--primary-ink)]">
-                      {t("genderMale")}
-                    </SelectItem>
-                    <SelectItem value="female" className="cursor-pointer font-medium hover:bg-[var(--primary-color)]/5 focus:bg-[var(--primary-color)]/5 focus:text-[var(--primary-ink)]">
-                      {t("genderFemale")}
-                    </SelectItem>
-                    <SelectItem value="other" className="cursor-pointer font-medium hover:bg-[var(--primary-color)]/5 focus:bg-[var(--primary-color)]/5 focus:text-[var(--primary-ink)]">
-                      {t("genderOther")}
-                    </SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-              <Smile className="absolute left-3 sm:left-3.5 top-1/2 size-3.5 sm:size-4 -translate-y-1/2 text-[var(--primary-ink)]/50 pointer-events-none" />
-            </div>
-          )}
-        </div>
-
-        {/* Submit */}
-        {isEditing && (
-          <div className="pt-4 animate-fade-in flex flex-col justify-end sm:flex-row gap-3">
-            <button
-              type="submit"
-              disabled={isLoading || isUploadingAvatar || !fullName.trim() || !dob.trim()}
-              className="w-full sm:w-auto inline-flex h-9 sm:h-11 items-center justify-center rounded-lg bg-[var(--primary-color)] px-6 sm:px-8 text-xs font-semibold uppercase tracking-[1.5px] text-white transition-all hover:bg-[var(--primary-color)]/90 focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] focus:ring-offset-2 cursor-pointer shadow-sm hover:shadow-md duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading || isUploadingAvatar ? "Đang lưu..." : t("saveBtn")}
-            </button>
-            <button
-              type="button"
-              onClick={handleCancel}
-              disabled={isLoading || isUploadingAvatar}
-              className="w-full sm:w-auto inline-flex h-9 sm:h-11 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--bg-card)] px-6 sm:px-8 text-xs font-semibold uppercase tracking-[1.5px] text-gray-700 transition-all hover:bg-gray-50 cursor-pointer shadow-sm hover:shadow-md duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {t("cancelBtn")}
-            </button>
-          </div>
-        )}
-      </form>
+      <AppDialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen} title={t("previewAvatar")} size="sm" cancel={false}>
+        {displayAvatar ? (
+          // eslint-disable-next-line @next/next/no-img-element -- ảnh blob xem trước / URL avatar tuỳ ý, không tối ưu được bằng next/image
+          <img src={displayAvatar} alt={displayName ?? ""} className="block aspect-square w-full object-cover" />
+        ) : null}
+      </AppDialog>
 
       <ContactVerificationDialog {...contactVerification} />
+    </>
+  );
+}
+
+function InfoItem({ label, value, emptyLabel }: { label: string; value?: string | null; emptyLabel: string }) {
+  return (
+    <div>
+      <dt className="text-[11px] font-semibold uppercase tracking-[2px] text-[var(--text-light)]">{label}</dt>
+      <dd className={cn("mt-1.5 text-[15px]", value ? "text-[var(--text-main)]" : "italic text-[var(--text-light)]")}>
+        {value || emptyLabel}
+      </dd>
     </div>
   );
 }
 
-interface ContactFieldProps {
+interface ContactRowProps {
   label: string;
   icon: LucideIcon;
   value: string;
@@ -380,39 +328,37 @@ interface ContactFieldProps {
   onAction: () => void;
 }
 
-/**
- * Hiển thị Email/SĐT kèm trạng thái xác minh. Không sửa trực tiếp — mọi thay đổi đi qua hộp thoại xác minh mã.
- */
-function ContactField({ label, icon: Icon, value, isVerified, onAction }: ContactFieldProps) {
+/** Một dòng liên hệ: icon · nhãn + giá trị · trạng thái xác minh · nút Thêm / Xác minh / Đổi */
+function ContactRow({ label, icon: Icon, value, isVerified, onAction }: ContactRowProps) {
   const t = useTranslations("ProfilePage.personal");
   const actionLabel = !value ? t("addBtn") : isVerified ? t("changeBtn") : t("verifyBtn");
 
   return (
-    <div className="space-y-2">
-      <label className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-[var(--text-light)]">
-        {label}
-      </label>
-      <div className="flex items-center gap-2.5 sm:gap-3.5 w-full h-10 rounded-xl border border-[var(--primary-color)]/5 bg-gradient-to-r from-[var(--bg-main)]/40 to-white pl-3 pr-1.5 sm:pl-4 text-xs sm:text-sm text-[var(--text-main)] font-semibold shadow-xs hover:border-[var(--primary-color)]/10 transition-all duration-300">
-        <Icon className="size-3.5 sm:size-4 text-[var(--primary-ink)]/70 shrink-0" />
-        <span className="min-w-0 flex-1 truncate">{value || "-"}</span>
-        {value && (
-          <span
-            className={`hidden sm:inline-flex items-center gap-1 shrink-0 text-[10px] font-semibold uppercase tracking-wide ${
-              isVerified ? "text-emerald-700" : "text-amber-700"
-            }`}
-          >
-            {isVerified && <BadgeCheck className="size-3.5" />}
-            {isVerified ? t("verified") : t("unverified")}
-          </span>
-        )}
-        <button
-          type="button"
-          onClick={onAction}
-          className="shrink-0 h-7 rounded-lg border border-[var(--primary-color)]/30 px-2.5 text-[10px] sm:text-[11px] font-semibold uppercase tracking-wide text-[var(--primary-ink)] transition-all hover:bg-[var(--primary-color)] hover:text-white cursor-pointer"
-        >
-          {actionLabel}
-        </button>
+    <li className="flex flex-wrap items-center gap-x-4 gap-y-3 px-5 py-4 sm:px-6">
+      <span className="relative grid size-10 shrink-0 place-items-center text-[var(--primary-ink)]">
+        <span aria-hidden="true" className="absolute inset-1.5 rotate-45 border border-[var(--primary-color)]/35" />
+        <Icon size={16} strokeWidth={1.5} className="relative" aria-hidden="true" />
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="text-[11px] font-semibold uppercase tracking-[2px] text-[var(--text-light)]">{label}</p>
+        <p className={cn("mt-1 truncate text-[15px]", value ? "text-[var(--text-main)]" : "italic text-[var(--text-light)]")}>
+          {value || t("notProvided")}
+        </p>
       </div>
-    </div>
+      {value ? (
+        <span
+          className={cn(
+            "inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-[1px]",
+            isVerified ? "text-emerald-700 dark:text-emerald-400" : "text-amber-700 dark:text-amber-400",
+          )}
+        >
+          {isVerified ? <BadgeCheck className="size-3.5" aria-hidden="true" /> : null}
+          {isVerified ? t("verified") : t("unverified")}
+        </span>
+      ) : null}
+      <ActionButton variant={!value || !isVerified ? "confirm" : "dialog"} size="sm" onClick={onAction}>
+        {actionLabel}
+      </ActionButton>
+    </li>
   );
 }

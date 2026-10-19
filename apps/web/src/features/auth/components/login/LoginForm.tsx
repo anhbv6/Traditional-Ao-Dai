@@ -1,16 +1,17 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { VIETNAM_PHONE_REGEX } from '@repo/shared';
 import { useTranslations } from 'next-intl';
 import { motion } from 'motion/react';
-import { ArrowRight, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { ArrowRight, Send } from 'lucide-react';
 import { showToast } from '@/components/ui/toast';
 import { useLogin } from '../../hooks/useLogin';
 
 // Shared Components
 import { AuthHeader } from '../AuthHeader';
-import { AppLoading } from '@/components/shared/AppLoading';
+import { AuthFormShell, authItemVariants } from '../AuthFormShell';
+import { AuthSubmitButton } from '../AuthSubmitButton';
 
 // Sub-components
 import { LoginTabs } from './components/LoginTabs';
@@ -27,12 +28,16 @@ export function LoginForm() {
     loginWithOtp,
     loginWithGoogle,
     isLoading,
+    isSendingOtp,
     isOtpMode,
     setIsOtpMode,
     otpSent,
+    otpInput,
     setOtpInput,
     otpError,
+    resetOtp,
     sendOtpCode,
+    resendSeconds,
   } = useLogin();
 
   const [emailOrPhone, setEmailOrPhone] = useState('');
@@ -40,18 +45,27 @@ export function LoginForm() {
   const [phone, setPhone] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
 
-  // 6-digit OTP States & Refs
-  const [otpDigits, setOtpDigits] = useState<string[]>(Array(6).fill(''));
-  const inputRefs = useRef<HTMLInputElement[]>([]);
-  const otpCode = otpDigits.join('');
-  const isPasswordLoginIncomplete = !emailOrPhone.trim() || !password;
-  const isOtpLoginIncomplete = !phone.trim() || !otpSent || otpCode.length < 6;
-  const isSubmitDisabled = isLoading || (isOtpMode ? isOtpLoginIncomplete : isPasswordLoginIncomplete);
+  // Lỗi nhập liệu hiển thị ngay dưới từng ô (luồng của TextField), submitCount để lỗi rung lại khi bấm lần nữa
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<'emailOrPhone' | 'password' | 'phone' | 'otp', string>>>({});
+  const [submitCount, setSubmitCount] = useState(0);
 
-  // Synchronize 6-digit array into hook's OTP input string
-  useEffect(() => {
-    setOtpInput(otpDigits.join(''));
-  }, [otpDigits, setOtpInput]);
+  const isBusy = isLoading || isSendingOtp;
+
+  const clearFieldError = (field: keyof typeof fieldErrors) => {
+    if (fieldErrors[field]) setFieldErrors((prev) => ({ ...prev, [field]: undefined }));
+  };
+
+  /** Kiểm tra SĐT trước khi gửi mã — sai thì báo dưới ô, không gọi API */
+  const handleSendOtp = () => {
+    const value = phone.trim();
+    const phoneError = !value ? t('phoneRequired') : !VIETNAM_PHONE_REGEX.test(value) ? t('invalidPhone') : undefined;
+    if (phoneError) {
+      setFieldErrors({ phone: phoneError });
+      setSubmitCount((count) => count + 1);
+      return;
+    }
+    sendOtpCode(value);
+  };
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -63,158 +77,102 @@ export function LoginForm() {
     showToast.error(t('sessionExpired'));
   }, [t]);
 
-  // Focus the first input automatically when OTP sent is triggered
-  useEffect(() => {
-    if (otpSent) {
-      setTimeout(() => {
-        inputRefs.current[0]?.focus();
-      }, 100);
-    }
-  }, [otpSent]);
-
-  const handleOtpDigitChange = (value: string, index: number) => {
-    if (value && !/^\d+$/.test(value)) return;
-
-    const newOtp = [...otpDigits];
-    newOtp[index] = value.substring(value.length - 1);
-    setOtpDigits(newOtp);
-
-    if (value && index < 5) {
-      inputRefs.current[index + 1]?.focus();
-    }
-  };
-
-  const handleOtpDigitKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
-    if (e.key === 'Backspace') {
-      if (!otpDigits[index] && index > 0) {
-        const newOtp = [...otpDigits];
-        newOtp[index - 1] = '';
-        setOtpDigits(newOtp);
-        inputRefs.current[index - 1]?.focus();
-      } else {
-        const newOtp = [...otpDigits];
-        newOtp[index] = '';
-        setOtpDigits(newOtp);
-      }
-    }
-  };
-
-  const handleOtpDigitPaste = (e: React.ClipboardEvent) => {
-    e.preventDefault();
-    const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').substring(0, 6);
-    if (!pastedData) return;
-
-    const newOtp = [...otpDigits];
-    for (let i = 0; i < 6; i++) {
-      if (pastedData[i]) {
-        newOtp[i] = pastedData[i];
-      }
-    }
-    setOtpDigits(newOtp);
-
-    const focusIndex = Math.min(pastedData.length, 5);
-    inputRefs.current[focusIndex]?.focus();
+  const handlePhoneChange = (value: string) => {
+    setPhone(value);
+    clearFieldError('phone');
+    if (otpSent) resetOtp();
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (isBusy) return;
+
     if (!isOtpMode) {
+      const errors = {
+        emailOrPhone: emailOrPhone.trim() ? undefined : t('emailOrPhoneRequired'),
+        password: password ? undefined : t('passwordRequired'),
+      };
+      setFieldErrors(errors);
+      setSubmitCount((count) => count + 1);
+      if (errors.emailOrPhone || errors.password) return;
       login(emailOrPhone, password, rememberMe);
+    } else if (!otpSent) {
+      handleSendOtp();
+    } else if (otpInput.length < 6) {
+      setFieldErrors({ otp: t('otpRequired') });
+      setSubmitCount((count) => count + 1);
     } else {
       loginWithOtp(phone);
     }
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.08,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 15 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.25, 1, 0.5, 1] as const } },
-  };
+  const submitLabel = !isOtpMode ? t('login') : otpSent ? t('verifyAndLogin') : t('sendOtp');
+  const submitIcon = isOtpMode && !otpSent ? <Send /> : <ArrowRight />;
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-[var(--bg-main)] px-3.5 py-6 sm:px-8 sm:py-12 lg:px-16 relative">
-      <AppLoading visible={isLoading} />
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        className="w-full max-w-[560px] space-y-5 sm:space-y-8 rounded-2xl p-5 sm:p-10"
-      >
-        <AuthHeader
-          title={t('welcomeBack')}
-          subtitle={t('pleaseLogin')}
-          itemVariants={itemVariants}
-        />
-        <LoginTabs isOtpMode={isOtpMode} setIsOtpMode={setIsOtpMode} t={t} itemVariants={itemVariants} />
+    <AuthFormShell loading={isLoading}>
+      <AuthHeader title={t('welcomeBack')} subtitle={t('pleaseLogin')} />
+      <LoginTabs isOtpMode={isOtpMode} setIsOtpMode={setIsOtpMode} disabled={isBusy} t={t} />
 
-        {/* Form */}
-        <motion.form variants={itemVariants} onSubmit={handleSubmit} className="space-y-5">
-          <div className="space-y-4">
-            {!isOtpMode ? (
-              <PasswordLoginForm
-                emailOrPhone={emailOrPhone}
-                setEmailOrPhone={setEmailOrPhone}
-                password={password}
-                setPassword={setPassword}
-                t={t}
-              />
-            ) : (
-              <OtpLoginForm
-                phone={phone}
-                setPhone={setPhone}
-                otpSent={otpSent}
-                otpDigits={otpDigits}
-                inputRefs={inputRefs as React.MutableRefObject<HTMLInputElement[]>}
-                otpError={otpError}
-                handleOtpDigitChange={handleOtpDigitChange}
-                handleOtpDigitKeyDown={handleOtpDigitKeyDown}
-                handleOtpDigitPaste={handleOtpDigitPaste}
-                sendOtpCode={sendOtpCode}
-                isLoading={isLoading}
-                t={t}
-              />
-            )}
-          </div>
-
-          {!isOtpMode && (
-            <LoginRememberForgot
-              rememberMe={rememberMe}
-              setRememberMe={setRememberMe}
+      {/* Form */}
+      <motion.form variants={authItemVariants} onSubmit={handleSubmit} className="space-y-5" noValidate>
+        <div className="space-y-4">
+          {!isOtpMode ? (
+            <PasswordLoginForm
+              emailOrPhone={emailOrPhone}
+              setEmailOrPhone={(value) => {
+                setEmailOrPhone(value);
+                clearFieldError('emailOrPhone');
+              }}
+              password={password}
+              setPassword={(value) => {
+                setPassword(value);
+                clearFieldError('password');
+              }}
+              errors={fieldErrors}
+              shakeKey={submitCount}
+              disabled={isLoading}
+              t={t}
+            />
+          ) : (
+            <OtpLoginForm
+              phone={phone}
+              setPhone={handlePhoneChange}
+              otpSent={otpSent}
+              otpValue={otpInput}
+              setOtpValue={(value) => {
+                setOtpInput(value);
+                clearFieldError('otp');
+              }}
+              phoneError={fieldErrors.phone}
+              otpError={fieldErrors.otp || otpError}
+              shakeKey={submitCount}
+              onSendOtp={handleSendOtp}
+              isSendingOtp={isSendingOtp}
+              resendSeconds={resendSeconds}
+              disabled={isLoading}
               t={t}
             />
           )}
+        </div>
 
-          {/* Action Button */}
-          <Button
-            type="submit"
-            disabled={isSubmitDisabled}
-            className="w-full h-10 sm:h-11 bg-[var(--primary-color)] text-white hover:bg-[var(--primary-color)]/95 shadow-sm transition-all hover:shadow duration-300 flex items-center justify-center gap-2 group/btn font-semibold tracking-wider text-[11px] sm:text-xs uppercase rounded-lg disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-          >
-            {isLoading ? (
-              <Loader2 size={15} className="animate-spin" />
-            ) : (
-              <>
-                <span>{isOtpMode ? t('verifyAndLogin') : t('login')}</span>
-                <ArrowRight size={13} className="transition-transform group-hover/btn:translate-x-1" />
-              </>
-            )}
-          </Button>
+        {!isOtpMode && (
+          <LoginRememberForgot rememberMe={rememberMe} setRememberMe={setRememberMe} t={t} />
+        )}
 
-          <LoginSocial isLoading={isLoading} loginWithGoogle={loginWithGoogle} t={t} />
-        </motion.form>
+        {/* Action Button */}
+        <AuthSubmitButton
+          loading={isLoading || (isOtpMode && !otpSent && isSendingOtp)}
+          icon={submitIcon}
+        >
+          {submitLabel}
+        </AuthSubmitButton>
 
-        <LoginFooter t={t} itemVariants={itemVariants} />
-      </motion.div>
-    </div>
+        <LoginSocial isLoading={isBusy} loginWithGoogle={loginWithGoogle} t={t} />
+      </motion.form>
+
+      <LoginFooter t={t} />
+    </AuthFormShell>
   );
 }
 export default LoginForm;
