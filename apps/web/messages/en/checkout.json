@@ -1,0 +1,130 @@
+{
+  "eyebrow": "Checkout",
+  "title": "Complete your order",
+  "subtitle": "Just three steps: shipping details, payment method and confirmation.",
+  "backToCart": "Back to cart",
+  "steps": {
+    "label": "Checkout steps",
+    "shipping": "Shipping",
+    "payment": "Payment",
+    "review": "Review",
+    "stepNumber": "Step {number}"
+  },
+  "shipping": {
+    "title": "Shipping details",
+    "description": "Used to deliver your Ao Dai and to contact you about measurements or alterations.",
+    "receiverGroup": "Recipient",
+    "addressGroup": "Delivery address",
+    "fullName": "Full name",
+    "fullNamePlaceholder": "Jane Nguyen",
+    "phone": "Phone number",
+    "phonePlaceholder": "0901 234 567",
+    "email": "Email",
+    "emailPlaceholder": "you@email.com",
+    "emailHint": "For order confirmation and delivery updates",
+    "province": "Province / City",
+    "provincePlaceholder": "Ha Noi",
+    "district": "District",
+    "districtPlaceholder": "Cau Giay",
+    "ward": "Ward",
+    "wardPlaceholder": "Dich Vong",
+    "address": "Street address",
+    "addressPlaceholder": "House number, street, building…",
+    "notes": "Order notes",
+    "notesPlaceholder": "E.g. deliver during office hours, call before delivery…"
+  },
+  "payment": {
+    "title": "Payment method",
+    "description": "Choose how you would like to pay for your order.",
+    "methods": {
+      "cod": {
+        "title": "Cash on delivery (COD)",
+        "description": "Pay the courier in cash after receiving and checking your Ao Dai."
+      },
+      "bank": {
+        "title": "Bank transfer",
+        "description": "Account details are shown at the review step. Your order is processed once payment arrives."
+      },
+      "card": {
+        "title": "Credit / debit card",
+        "description": "Visa, Mastercard, JCB and domestic cards."
+      }
+    },
+    "cardNote": "After placing your order you will be redirected to a secure payment gateway to enter your card. AODAI never stores your card number."
+  },
+  "review": {
+    "title": "Review your order",
+    "description": "Please check your details before placing the order.",
+    "shippingTitle": "Deliver to",
+    "paymentTitle": "Payment",
+    "notes": "Notes",
+    "edit": "Edit",
+    "bank": {
+      "title": "Bank transfer details",
+      "bankName": "Bank",
+      "accountNumber": "Account number",
+      "accountHolder": "Account holder",
+      "content": "Transfer reference",
+      "contentHint": "Use this exact reference so we can confirm your order quickly"
+    },
+    "customNote": "Your order includes made-to-measure items: our tailor will call to confirm measurements before cutting (7–10 days to complete).",
+    "agreement": "By clicking “Place order”, you agree to AODAI's purchase and return policies."
+  },
+  "actions": {
+    "back": "Back",
+    "toPayment": "Continue to payment",
+    "toReview": "Review order",
+    "placeOrder": "Place order",
+    "placing": "Placing order…"
+  },
+  "summary": {
+    "title": "Your order",
+    "editCart": "Edit cart",
+    "variant": "Size {size}",
+    "quantity": "× {count}",
+    "custom": "Made to measure",
+    "items": "Subtotal ({count} items)",
+    "discount": "Discount",
+    "shipping": "Shipping",
+    "free": "Free",
+    "total": "Total",
+    "vatNote": "VAT included",
+    "savings": "You save",
+    "receipt": "Sales receipt",
+    "brandLine": "Traditional & made-to-measure Ao Dai",
+    "orderNo": "Order no.",
+    "date": "Date",
+    "customer": "Customer",
+    "payment": "Payment",
+    "pending": "—",
+    "itemColumn": "Item",
+    "amountColumn": "Amount",
+    "lineQuantity": "{count} × {price}",
+    "grandTotal": "Grand total",
+    "thanks": "Thank you for choosing AODAI"
+  },
+  "empty": {
+    "title": "Nothing to check out yet",
+    "description": "Your cart is empty. Pick the designs you love before checking out.",
+    "action": "Explore the collection"
+  },
+  "success": {
+    "eyebrow": "Order placed",
+    "title": "Thank you for choosing AODAI",
+    "description": "Your order has been received and is being prepared.",
+    "orderId": "Order number",
+    "total": "Total",
+    "method": "Payment",
+    "emailNote": "An order confirmation has been sent to {email}.",
+    "bankReminder": "Please transfer using the reference below so we can process your order as soon as possible.",
+    "cardReminder": "You will receive an email with instructions to complete your card payment through our secure gateway.",
+    "nextTitle": "What happens next",
+    "next": {
+      "confirm": "We call to confirm your order within 24 business hours.",
+      "prepare": "Your Ao Dai is inspected, pressed and gift-boxed.",
+      "ship": "Delivery in 2–4 days (7–10 days for made-to-measure)."
+    },
+    "continue": "Continue shopping",
+    "viewOrders": "View my orders"
+  }
+}

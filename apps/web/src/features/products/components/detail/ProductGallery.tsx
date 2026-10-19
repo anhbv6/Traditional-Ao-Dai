@@ -1,28 +1,28 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Image from 'next/image';
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, motion, useMotionValue, useReducedMotion, useSpring, useTransform } from 'motion/react';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 /**
- * Chuyển động zoom: khung chọn và ảnh phóng to "đuổi theo" con trỏ bằng transition left/top (mỗi lần rê chuột
- * transition khởi động lại từ vị trí đang chạy → trượt êm, hơi trễ); bảng zoom hiện / ẩn chậm.
+ * Chuyển động zoom: vị trí con trỏ lưu bằng motion value (KHÔNG setState mỗi lần rê chuột → không re-render),
+ * khung chọn và ảnh phóng to đuổi theo bằng spring trên `transform` (chạy GPU, không tính lại layout).
+ * Bảng zoom / khung chọn chỉ hiện – ẩn bằng opacity.
  */
-const FOLLOW_CLASS = 'transition-[left,top] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]';
-const FADE_CLASS = 'transition-[opacity,visibility] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]';
-/** Khung chọn: vừa đuổi theo con trỏ vừa mờ dần — gộp chung một transition */
-const LENS_CLASS = 'transition-[left,top,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]';
+const FADE_CLASS = 'transition-[opacity,visibility] duration-300 ease-out';
+const LENS_FADE_CLASS = 'transition-opacity duration-300 ease-out';
+/** Spring đuổi theo con trỏ: mềm để trượt chậm, êm; giảm chấn hơi cao hơn mức tới hạn để không nảy / rung */
+const FOLLOW_SPRING = { stiffness: 150, damping: 26, mass: 0.8 };
 
 /** Độ phóng của bảng zoom — khung chọn trên ảnh chiếm 1/ZOOM chiều rộng / cao của ảnh */
 const ZOOM = 2.5;
 const LENS = 1 / ZOOM;
 
-/** Vị trí góc trên-trái của khung chọn, tính theo tỉ lệ 0..1 của khung ảnh */
-type ZoomPoint = { x: number; y: number };
-
 const toPercent = (value: number) => `${value * 100}%`;
+/** Vị trí góc trên-trái của khung chọn (tỉ lệ 0..1 của khung ảnh), giữ khung chọn nằm trọn trong ảnh */
+const clampLens = (value: number) => Math.min(Math.max(value - LENS / 2, 0), 1 - LENS);
 
 interface ProductGalleryProps {
   galleryImages: string[];
@@ -53,24 +53,53 @@ export default function ProductGallery({
   imageFrameRef,
 }: ProductGalleryProps) {
   const currentSrc = galleryImages[activeImageIndex] || defaultImageSrc;
-  // Vị trí giữ lại sau khi rời chuột để khung chọn / bảng zoom mờ dần tại chỗ (không nhảy về góc)
-  const [zoomPoint, setZoomPoint] = useState<ZoomPoint>({ x: 0.3, y: 0.3 });
+  const reduceMotion = useReducedMotion();
+  // Chỉ bật / tắt zoom mới re-render; vị trí con trỏ đi qua motion value
   const [isZooming, setIsZooming] = useState(false);
+  // Khung ảnh đo một lần khi rê vào (tránh getBoundingClientRect + matchMedia ở mọi pointermove)
+  const frameRectRef = useRef<DOMRect | null>(null);
 
-  /** Chỉ zoom bằng chuột trên desktop */
+  // Vị trí giữ lại sau khi rời chuột để khung chọn / bảng zoom mờ dần tại chỗ (không nhảy về góc)
+  const pointX = useMotionValue(0.3);
+  const pointY = useMotionValue(0.3);
+  const springX = useSpring(pointX, FOLLOW_SPRING);
+  const springY = useSpring(pointY, FOLLOW_SPRING);
+  const followX = reduceMotion ? pointX : springX;
+  const followY = reduceMotion ? pointY : springY;
+  // Khung chọn rộng LENS khung ảnh → dịch x khung ảnh = x / LENS = x * ZOOM lần bề rộng của chính nó
+  const lensX = useTransform(followX, (v) => toPercent(v * ZOOM));
+  const lensY = useTransform(followY, (v) => toPercent(v * ZOOM));
+  // Ảnh phóng rộng ZOOM bảng zoom → dịch -x * ZOOM bảng = -x lần bề rộng của chính nó
+  const zoomX = useTransform(followX, (v) => toPercent(-v));
+  const zoomY = useTransform(followY, (v) => toPercent(-v));
+
+  const updatePoint = (event: React.PointerEvent<HTMLDivElement>, rect: DOMRect) => {
+    pointX.set(clampLens((event.clientX - rect.left) / rect.width));
+    pointY.set(clampLens((event.clientY - rect.top) / rect.height));
+  };
+
+  /** Chỉ zoom bằng chuột trên desktop — rê vào: đo khung, đặt khung chọn ngay tại con trỏ (không trượt từ chỗ cũ) */
+  const handlePointerEnter = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType !== 'mouse' || !window.matchMedia('(min-width: 1024px)').matches) return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    frameRectRef.current = rect;
+    updatePoint(event, rect);
+    springX.jump(pointX.get());
+    springY.jump(pointY.get());
+    setIsZooming(true);
+  };
+
   const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
-    const isDesktop = window.matchMedia('(min-width: 1024px)').matches;
-    if (event.pointerType !== 'mouse' || !isDesktop) {
-      setIsZooming(false);
+    if (!frameRectRef.current) {
+      handlePointerEnter(event);
       return;
     }
-    const rect = event.currentTarget.getBoundingClientRect();
-    const clamp = (value: number) => Math.min(Math.max(value - LENS / 2, 0), 1 - LENS);
-    setZoomPoint({
-      x: clamp((event.clientX - rect.left) / rect.width),
-      y: clamp((event.clientY - rect.top) / rect.height),
-    });
-    setIsZooming(true);
+    updatePoint(event, frameRectRef.current);
+  };
+
+  const handlePointerLeave = () => {
+    frameRectRef.current = null;
+    setIsZooming(false);
   };
 
   return (
@@ -83,8 +112,9 @@ export default function ProductGallery({
           initial={{ clipPath: 'inset(100% 0% 0% 0%)' }}
           animate={{ clipPath: 'inset(0% 0% 0% 0%)' }}
           transition={{ duration: 1.2, ease: EASE }}
+          onPointerEnter={handlePointerEnter}
           onPointerMove={handlePointerMove}
-          onPointerLeave={() => setIsZooming(false)}
+          onPointerLeave={handlePointerLeave}
         >
           <div className={`relative aspect-[1.05/1] overflow-hidden bg-[var(--bg-secondary)] ${isZooming ? 'cursor-crosshair' : ''}`}>
             <AnimatePresence initial={false} mode="popLayout">
@@ -101,12 +131,12 @@ export default function ProductGallery({
             </AnimatePresence>
 
             {/* Khung chọn vùng đang phóng to — trượt êm theo con trỏ, mờ dần khi vào / ra */}
-            <div
+            <motion.div
               aria-hidden="true"
-              className={`pointer-events-none absolute z-[5] hidden border border-[var(--primary-color)]/50 bg-white/25 lg:block ${LENS_CLASS} ${
+              className={`pointer-events-none absolute left-0 top-0 z-[5] hidden border border-[var(--primary-color)]/50 bg-white/25 will-change-transform lg:block ${LENS_FADE_CLASS} ${
                 isZooming ? 'opacity-100' : 'opacity-0'
               }`}
-              style={{ left: toPercent(zoomPoint.x), top: toPercent(zoomPoint.y), width: toPercent(LENS), height: toPercent(LENS) }}
+              style={{ x: lensX, y: lensY, width: toPercent(LENS), height: toPercent(LENS) }}
             />
           </div>
 
@@ -120,17 +150,12 @@ export default function ProductGallery({
             isZooming ? 'visible opacity-100' : 'invisible opacity-0'
           }`}
         >
-          <div
-            className={`absolute ${FOLLOW_CLASS}`}
-            style={{
-              width: toPercent(ZOOM),
-              height: toPercent(ZOOM),
-              left: toPercent(-zoomPoint.x * ZOOM),
-              top: toPercent(-zoomPoint.y * ZOOM),
-            }}
+          <motion.div
+            className="absolute left-0 top-0 will-change-transform"
+            style={{ x: zoomX, y: zoomY, width: toPercent(ZOOM), height: toPercent(ZOOM) }}
           >
             <Image src={currentSrc} alt="" fill sizes="1600px" quality={90} loading="lazy" className="object-cover" />
-          </div>
+          </motion.div>
         </div>
       </div>
 

@@ -1,0 +1,266 @@
+{
+  "meta": {
+    "title": "Made-to-measure Ao Dai — AODAI",
+    "description": "Design your own Ao Dai: choose the occasion, silhouette, fabric, colour, collar, sleeves, embroidery and measurements — with a live preview and instant quote."
+  },
+  "eyebrow": "Made to measure",
+  "title": "Design your own Ao Dai",
+  "subtitle": "Choose the occasion, silhouette, fabric and every detail — AODAI tailors finish it to your exact measurements.",
+  "backToShop": "Back to shop",
+  "sections": {
+    "occasion": {
+      "title": "Occasion",
+      "description": "Pick an occasion and we pre-select a fitting silhouette, fabric and colour — you can still change everything below."
+    },
+    "style": {
+      "title": "Silhouette",
+      "description": "The cut defines how it feels to wear and the tailoring price."
+    },
+    "fabric": {
+      "title": "Fabric",
+      "description": "Sourced from craft villages — each fabric drapes and shines differently."
+    },
+    "color": {
+      "title": "Colour",
+      "description": "Trousers are matched in a softer tone to flatter the dress."
+    },
+    "details": {
+      "title": "Collar, sleeves & length",
+      "description": "The small details that make the silhouette yours."
+    },
+    "decoration": {
+      "title": "Pattern & embellishment",
+      "description": "Hand embroidery and beading are handmade and take extra time."
+    },
+    "pants": {
+      "title": "Trousers / skirt",
+      "description": "Tailored in a matching fabric and tone."
+    },
+    "measurements": {
+      "title": "Measurements",
+      "description": "Choose how you would like to give your measurements."
+    },
+    "timeline": {
+      "title": "Timing & notes",
+      "description": "Timing includes one fitting and alterations."
+    }
+  },
+  "labels": {
+    "collar": "Collar",
+    "sleeve": "Sleeves",
+    "length": "Panel length",
+    "motif": "Embroidery motif",
+    "size": "Standard size",
+    "notes": "Notes for the tailor",
+    "notesPlaceholder": "E.g. a more fitted waist, lower side slits, initials embroidered on the cuff…",
+    "unit": "cm",
+    "measureHint": "Measure close to the body over light clothing. Not sure? Choose “Book a fitting”.",
+    "studioNote": "We will call within 24 business hours to book a fitting at our showroom or at your home (inner city, free).",
+    "sizeGuide": "Size guide",
+    "extraDays": "+{days} days"
+  },
+  "options": {
+    "occasion": {
+      "wedding": {
+        "label": "Wedding · engagement",
+        "description": "Burgundy brocade, phoenix embroidery, high collar"
+      },
+      "tet": {
+        "label": "Tet · festivals",
+        "description": "Warm vermilion velvet with apricot blossoms"
+      },
+      "graduation": {
+        "label": "Graduation · yearbook",
+        "description": "Soft ivory chiffon in a traditional cut"
+      },
+      "gala": {
+        "label": "Gala · events",
+        "description": "Modern black silk, boat neck, beading"
+      },
+      "daily": {
+        "label": "Office · everyday",
+        "description": "Loose satin, 3/4 sleeves, easy to wear"
+      }
+    },
+    "style": {
+      "traditional": {
+        "label": "Traditional",
+        "description": "Long panels, fitted, high side slits — flatters every curve."
+      },
+      "modern": {
+        "label": "Modern",
+        "description": "Mid-calf panels, youthful and easy to move in."
+      },
+      "loose": {
+        "label": "Loose fit",
+        "description": "No waist darts, relaxed and forgiving around the waist."
+      },
+      "fivePanel": {
+        "label": "Five-panel",
+        "description": "Five panels, standing collar, classic straight cut — the most formal."
+      }
+    },
+    "fabric": {
+      "chiffon": {
+        "label": "Chiffon",
+        "description": "Soft, light and airy — great for graduation and outings."
+      },
+      "satin": {
+        "label": "Satin silk",
+        "description": "Gentle sheen, wrinkle-resistant, affordable."
+      },
+      "silk": {
+        "label": "Mulberry silk",
+        "description": "Cool, fluid drape, handwoven — quietly luxurious."
+      },
+      "velvet": {
+        "label": "Velvet",
+        "description": "Rich and warm with deep colour — perfect for Tet and winter."
+      },
+      "brocade": {
+        "label": "Brocade",
+        "description": "Woven motifs, holds its shape — the classic wedding fabric."
+      }
+    },
+    "color": {
+      "burgundy": "Burgundy",
+      "vermilion": "Vermilion",
+      "ochre": "Ochre gold",
+      "blush": "Blush pink",
+      "ivory": "Ivory",
+      "jade": "Jade",
+      "indigo": "Indigo",
+      "black": "Jet black"
+    },
+    "collar": {
+      "high": "High collar 4cm",
+      "low": "Low collar 2cm",
+      "boat": "Boat neck",
+      "sweetheart": "Sweetheart"
+    },
+    "sleeve": {
+      "long": "Long raglan",
+      "threeQuarter": "3/4 sleeves",
+      "short": "Short sleeves"
+    },
+    "length": {
+      "ankle": "Ankle",
+      "midCalf": "Mid-calf",
+      "knee": "Below the knee"
+    },
+    "decoration": {
+      "plain": {
+        "label": "Plain",
+        "description": "Lets the fabric speak, elegant."
+      },
+      "print": {
+        "label": "Printed motif",
+        "description": "Crisp printed patterns."
+      },
+      "embroidery": {
+        "label": "Hand embroidery",
+        "description": "Stitched by artisans, one thread at a time."
+      },
+      "beading": {
+        "label": "Beading",
+        "description": "Hand-sewn beads and pearls."
+      }
+    },
+    "motif": {
+      "lotus": "Lotus",
+      "apricot": "Apricot blossom",
+      "peach": "Peach blossom",
+      "phoenix": "Phoenix"
+    },
+    "pants": {
+      "silk": {
+        "label": "Silk trousers",
+        "description": "Traditional straight leg."
+      },
+      "wide": {
+        "label": "Wide-leg trousers",
+        "description": "Comfortable and modern."
+      },
+      "skirt": {
+        "label": "Skirt",
+        "description": "Pairs with the modern cut."
+      },
+      "none": {
+        "label": "Dress only",
+        "description": "You already have trousers."
+      }
+    },
+    "measureMode": {
+      "standard": {
+        "label": "Standard size",
+        "description": "Choose S–XXL from the size guide."
+      },
+      "custom": {
+        "label": "Enter my measurements",
+        "description": "8 measurements — our tailor calls to confirm before cutting."
+      },
+      "studio": {
+        "label": "Book a fitting",
+        "description": "Measured in person by our tailor, free of charge."
+      }
+    },
+    "measurement": {
+      "height": "Height",
+      "bust": "Bust",
+      "waist": "Waist",
+      "hip": "Hips",
+      "shoulder": "Shoulder width",
+      "sleeveLength": "Sleeve length",
+      "armhole": "Armhole",
+      "dressLength": "Dress length"
+    },
+    "timeline": {
+      "standard": {
+        "label": "Standard",
+        "description": "{min}–{max} days"
+      },
+      "rush": {
+        "label": "Rush",
+        "description": "{days} days · 30% surcharge"
+      }
+    }
+  },
+  "summary": {
+    "title": "Your design",
+    "previewLabel": "Illustration of the Ao Dai with your selections",
+    "specs": {
+      "style": "Silhouette",
+      "fabric": "Fabric",
+      "color": "Colour",
+      "collar": "Collar",
+      "sleeve": "Sleeves",
+      "length": "Length",
+      "decoration": "Embellishment",
+      "pants": "Trousers",
+      "measurements": "Measurements",
+      "timeline": "Timing"
+    },
+    "customMeasurements": "Custom measurements",
+    "price": {
+      "base": "Tailoring",
+      "fabric": "Fabric surcharge",
+      "decoration": "Embellishment",
+      "pants": "Trousers / skirt",
+      "rush": "Rush surcharge",
+      "total": "Estimated total"
+    },
+    "estimate": "Ready in {min}–{max} days",
+    "note": "Estimated price — our tailor calls to confirm measurements before cutting.",
+    "notes": "Notes"
+  },
+  "actions": {
+    "addToCart": "Add to cart",
+    "bookFitting": "Need advice? Talk to a tailor",
+    "reset": "Start over"
+  },
+  "cart": {
+    "name": "Made-to-measure Ao Dai · {style}",
+    "added": "Your design has been added to the cart",
+    "invalid": "Please check your measurements"
+  }
+}

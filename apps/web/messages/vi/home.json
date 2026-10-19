@@ -166,7 +166,7 @@
     "eyebrow": "Dịch vụ may đo",
     "title": "Một tà áo chỉ dành cho bạn",
     "description": "Bốn bước đơn giản để có chiếc áo dài vừa vặn tuyệt đối — tại cửa hàng hoặc trực tuyến.",
-    "primaryAction": "Đặt lịch may đo",
+    "primaryAction": "Tự thiết kế áo dài",
     "secondaryAction": "Câu hỏi thường gặp",
     "note": "Tư vấn miễn phí · Chỉnh sửa miễn phí lần đầu",
     "steps": {
@@ -191,7 +191,7 @@
   },
   "stages": {
     "label": "Các phần của trang chủ",
-    "hero": "Banner",
+    "hero": "Đầu trang",
     "collections": "Bộ sưu tập",
     "bestSellers": "Bán chạy",
     "craft": "Thủ công",

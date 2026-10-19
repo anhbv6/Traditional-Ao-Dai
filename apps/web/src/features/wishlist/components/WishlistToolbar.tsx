@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { ShoppingBag, Trash2 } from "lucide-react";
+import { ActionButton } from "@/components/shared/ActionButton";
 import { type WishlistSortKey } from "../types/wishlist.types";
 
 const SORT_KEYS: WishlistSortKey[] = ["recent", "priceAsc", "priceDesc"];
@@ -26,6 +27,7 @@ interface WishlistToolbarProps {
 
 /**
  * Thanh công cụ: sắp xếp (gạch chân trượt theo lựa chọn) + thêm tất cả vào giỏ + xóa tất cả (xác nhận tại chỗ, không mở hộp thoại).
+ * Nút hành động dùng ActionButton chung (màu / hiệu ứng quét đồng bộ toàn storefront).
  */
 export function WishlistToolbar({ sortKey, onSortChange, readyCount, onAddAll, onClearAll, labels }: WishlistToolbarProps) {
   const [confirming, setConfirming] = useState(false);
@@ -73,23 +75,20 @@ export function WishlistToolbar({ sortKey, onSortChange, readyCount, onAddAll, o
               transition={{ duration: 0.25, ease: EASE }}
               className="flex items-center gap-2"
             >
-              <button
-                type="button"
-                onClick={() => setConfirming(false)}
-                className="min-h-8 cursor-pointer border border-[var(--border)] px-3 text-[10px] font-semibold uppercase tracking-[1.5px] text-[var(--text-light)] transition-colors hover:border-[var(--text-main)] hover:text-[var(--text-main)] sm:text-[11px]"
-              >
+              <ActionButton variant="cancel" size="sm" onClick={() => setConfirming(false)}>
                 {labels.cancel}
-              </button>
-              <button
-                type="button"
+              </ActionButton>
+              <ActionButton
+                variant="custom"
+                size="sm"
+                colors={{ bg: "var(--destructive)", text: "#FFFFFF", border: "var(--destructive)" }}
                 onClick={() => {
                   setConfirming(false);
                   onClearAll();
                 }}
-                className="min-h-8 cursor-pointer bg-[var(--destructive)] px-3 text-[10px] font-semibold uppercase tracking-[1.5px] text-white transition-opacity hover:opacity-90 sm:text-[11px]"
               >
                 {labels.confirmClear}
-              </button>
+              </ActionButton>
             </motion.div>
           ) : (
             <motion.div
@@ -100,23 +99,13 @@ export function WishlistToolbar({ sortKey, onSortChange, readyCount, onAddAll, o
               transition={{ duration: 0.25, ease: EASE }}
               className="flex items-center gap-2"
             >
-              <button
-                type="button"
-                onClick={() => setConfirming(true)}
-                className="inline-flex min-h-8 cursor-pointer items-center gap-1.5 px-2 text-[10px] font-semibold uppercase tracking-[1.5px] text-[var(--text-light)] transition-colors hover:text-[var(--destructive)] sm:text-[11px]"
-              >
-                <Trash2 size={12} strokeWidth={1.6} />
+              <ActionButton variant="cancel" size="sm" icon={<Trash2 strokeWidth={1.6} />} onClick={() => setConfirming(true)}>
                 {labels.clearAll}
-              </button>
+              </ActionButton>
               {readyCount > 0 ? (
-                <button
-                  type="button"
-                  onClick={onAddAll}
-                  className="inline-flex min-h-8 cursor-pointer items-center gap-1.5 bg-[var(--primary-color)] px-3.5 text-[10px] font-semibold uppercase tracking-[1.5px] text-white transition-colors duration-300 hover:bg-[#2A0A12] active:scale-[0.98] sm:text-[11px]"
-                >
-                  <ShoppingBag size={12} strokeWidth={1.6} />
+                <ActionButton variant="confirm" size="sm" icon={<ShoppingBag strokeWidth={1.6} />} onClick={onAddAll}>
                   {labels.addAll}
-                </button>
+                </ActionButton>
               ) : null}
             </motion.div>
           )}

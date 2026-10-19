@@ -6,6 +6,7 @@ import { Link } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
 import { SectionHeading } from './SectionHeading';
 import { Reveal } from '@/components/shared/Reveal';
+import { containerClassName } from '@/components/ui/container';
 
 const COLLECTIONS = [
   { key: 'tet', image: '/images/login1.jpg', position: 'object-[50%_35%]', featured: true },
@@ -21,7 +22,7 @@ export function FeaturedCollections() {
   const t = useTranslations('HomePage.featuredCollections');
 
   return (
-    <section className="mx-auto w-full max-w-[1440px] px-5 py-20 sm:px-8 sm:py-28 lg:px-10 xl:px-16">
+    <section className={containerClassName({ spacing: 'section' })}>
       <SectionHeading index="01" eyebrow={t('eyebrow')} title={t('title')} description={t('description')} />
 
       <div className="grid gap-5 lg:grid-cols-[1.15fr_1fr] lg:grid-rows-2 lg:gap-6">

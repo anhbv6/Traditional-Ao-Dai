@@ -13,7 +13,7 @@ export function ContactIntro() {
   const t = useTranslations('ContactPage.intro');
 
   return (
-    <Container as="section" className="pb-14 pt-10 sm:pb-20 sm:pt-16 xl:px-16 2xl:pt-20">
+    <Container as="section" spacing="section" className="pt-(--page-y)">
       <PageIntro eyebrow={t('eyebrow')} title={t('title')} subtitle={t('subtitle')} />
 
       <Reveal delay={0.12}>

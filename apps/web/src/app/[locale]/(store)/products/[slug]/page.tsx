@@ -54,7 +54,7 @@ export default async function DetailProductsPage({ params }: DetailProductsProps
   }
 
   return (
-    <Container as="section" className="py-10 sm:py-12">
+    <Container as="section">
       <Breadcrumbs lastLabel={productName} />
       <ProductDetail slug={slug} locale={locale} />
     </Container>

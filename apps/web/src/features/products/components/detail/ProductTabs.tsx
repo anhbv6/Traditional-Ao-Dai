@@ -45,11 +45,11 @@ export default function ProductTabs({ product, locale }: ProductTabsProps) {
           <TabsTrigger
             key={key}
             value={key}
-            className="relative flex-none shrink-0 items-baseline gap-1.5 rounded-none border-0 px-0 pb-3 font-[family-name:var(--font-playfair)] text-[17px] font-medium normal-case tracking-normal text-[var(--text-light)] transition-colors duration-300 after:hidden hover:text-[var(--text-main)] data-active:text-[var(--primary-ink)] sm:text-[1.375rem]"
+            className="relative flex-none shrink-0 items-baseline gap-1.5 rounded-none border-0 px-0 pb-3 font-[family-name:var(--font-playfair)] text-base font-medium normal-case tracking-normal text-[var(--text-light)] transition-colors duration-300 after:hidden hover:text-[var(--text-main)] data-active:text-[var(--primary-ink)] sm:text-lg"
           >
             {t(`details.${key}`)}
             {key === 'reviews' ? (
-              <span className="font-[family-name:var(--font-lora)] text-xs font-normal tabular-nums text-[var(--sale-gold)] sm:text-sm">({REVIEW_TOTAL})</span>
+              <span className="font-[family-name:var(--font-lora)] text-xs font-normal tabular-nums text-[var(--sale-gold)]">({REVIEW_TOTAL})</span>
             ) : null}
             {/* Gạch chân đỏ đô trượt theo tab đang chọn */}
             {tab === key ? (
@@ -62,13 +62,14 @@ export default function ProductTabs({ product, locale }: ProductTabsProps) {
           </TabsTrigger>
         ))}
       </TabsList>
-      <TabsContent value="description" className="w-full pt-8 text-[15px] leading-8 text-[var(--text-main)]">
+      {/* Chữ nội dung tab: cỡ đọc chuẩn (text-base), giới hạn ~75 ký tự/dòng cho dễ đọc */}
+      <TabsContent value="description" className="w-full max-w-[75ch] pt-8 text-base leading-8 text-[var(--text-main)]">
         <TabPanelMotion>
         <p>{product.longDescription}</p>
         <p className="mt-4">{product.secondaryDescription}</p>
         </TabPanelMotion>
       </TabsContent>
-      <TabsContent value="information" className="w-full pt-8 text-[15px] leading-8 text-[var(--text-main)]">
+      <TabsContent value="information" className="w-full pt-8 text-base leading-8 text-[var(--text-main)]">
         <TabPanelMotion>
         <div className="max-w-2xl pb-4">
           {product.colors && product.colors.length > 0 && (
@@ -102,7 +103,7 @@ export default function ProductTabs({ product, locale }: ProductTabsProps) {
         </div>
         </TabPanelMotion>
       </TabsContent>
-      <TabsContent value="reviews" className="w-full pt-8 text-sm text-[var(--text-main)]">
+      <TabsContent value="reviews" className="w-full pt-8 text-[0.9375rem] text-[var(--text-main)]">
         <TabPanelMotion>
           <ProductReviews locale={locale} />
         </TabPanelMotion>

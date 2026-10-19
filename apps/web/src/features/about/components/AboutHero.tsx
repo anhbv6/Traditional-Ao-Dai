@@ -5,7 +5,8 @@ import Image from "next/image";
 import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { useTranslations } from "next-intl";
 import { ArrowRight } from "lucide-react";
-import { Link } from "@/i18n/routing";
+import { ActionLink } from "@/components/shared/ActionLink";
+import { ON_PRIMARY_COLORS } from "@/components/shared/ActionButton";
 
 const HERO_BADGES = ["armhole", "belly", "realFit"] as const;
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -29,7 +30,7 @@ export function AboutHero() {
   const imageY = useTransform(scrollYProgress, [0, 1], reduceMotion ? ["0%", "0%"] : ["0%", "12%"]);
 
   return (
-    <section ref={sectionRef} className="grid overflow-hidden bg-[#2A0A12] text-white lg:min-h-[calc(100svh-150px)] lg:grid-cols-2">
+    <section ref={sectionRef} className="grid overflow-hidden bg-(--bg-wine) text-white lg:min-h-[calc(100svh-150px)] lg:grid-cols-2">
       <div className="relative min-h-[420px] overflow-hidden sm:min-h-[520px]">
         <motion.div
           style={{ y: imageY }}
@@ -49,7 +50,7 @@ export function AboutHero() {
             className="object-cover object-[50%_30%]"
           />
         </motion.div>
-        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#2A0A12]/70 via-transparent to-transparent lg:bg-gradient-to-r lg:from-transparent lg:via-transparent lg:to-[#2A0A12]/40" />
+        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-(--bg-wine)/70 via-transparent to-transparent lg:bg-gradient-to-r lg:from-transparent lg:via-transparent lg:to-(--bg-wine)/40" />
         <p className="absolute bottom-5 left-5 text-[10px] uppercase tracking-[3px] text-white/70 sm:left-8">{t("since")}</p>
       </div>
 
@@ -76,13 +77,17 @@ export function AboutHero() {
         </motion.ul>
 
         <motion.div {...fadeUp(0.68)} className="mt-10">
-          <Link
+          {/* Nền tối → bộ màu ON_PRIMARY_COLORS (đồng bộ CTA banner Cửa hàng, khối May đo trang chủ) */}
+          <ActionLink
             href="/contact"
-            className="group inline-flex min-h-12 items-center gap-4 border-b border-white/40 pb-2 text-xs font-semibold uppercase tracking-[2.5px] text-white transition-colors duration-300 hover:border-[var(--accent-color)] hover:text-[var(--accent-color)]"
+            variant="custom"
+            size="lg"
+            colors={ON_PRIMARY_COLORS.outline}
+            icon={<ArrowRight strokeWidth={1.6} />}
+            iconPosition="end"
           >
             {t("primaryAction")}
-            <ArrowRight size={16} strokeWidth={1.4} className="transition-transform duration-500 group-hover:translate-x-1.5" />
-          </Link>
+          </ActionLink>
         </motion.div>
       </div>
     </section>

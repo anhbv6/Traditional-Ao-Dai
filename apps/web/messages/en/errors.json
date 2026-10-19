@@ -123,5 +123,8 @@
   "VOUCHER_UPDATE_FAILED": "Unable to update the voucher.",
   "WARD_NAME_REQUIRED": "Please select ward.",
   "INVENTORY_LIST_FAILED": "Unable to load inventory.",
-  "STAFF_CREATE_FAILED": "Unable to create the staff account."
+  "STAFF_CREATE_FAILED": "Unable to create the staff account.",
+  "PHONE_REQUIRED": "Please enter your phone number",
+  "MEASUREMENT_REQUIRED": "Please enter this measurement",
+  "MEASUREMENT_OUT_OF_RANGE": "This measurement looks off, please check it"
 }

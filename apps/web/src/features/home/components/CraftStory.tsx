@@ -9,6 +9,7 @@ import { ArrowRight } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
 import { SectionHeading } from './SectionHeading';
+import { containerClassName } from '@/components/ui/container';
 
 const CRAFT_STEPS = [
   { key: '1', image: '/images/login2.jpg', imageClass: 'object-[50%_40%]' },
@@ -66,7 +67,7 @@ export function CraftStory() {
   );
 
   return (
-    <section className="mx-auto w-full max-w-[1440px] px-5 py-20 sm:px-8 sm:py-28 lg:px-10 xl:px-16">
+    <section className={containerClassName({ spacing: 'section' })}>
       <SectionHeading index="03" eyebrow={t('eyebrow')} title={t('title')} description={t('description')} />
 
       <div ref={gridRef} className="grid gap-12 lg:grid-cols-2 lg:gap-20">

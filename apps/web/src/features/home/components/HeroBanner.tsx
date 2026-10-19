@@ -4,6 +4,7 @@ import { type HeroMetric } from '../types/home.types';
 import { SectionOrnament } from '@/components/shared/SectionOrnament';
 import { ActionLink } from '@/components/shared/ActionLink';
 import { HeroPetals } from './HeroPetals';
+import { containerClassName } from '@/components/ui/container';
 
 interface HeroBannerProps {
   eyebrow: string;
@@ -35,7 +36,7 @@ export function HeroBanner({
     <section className="relative overflow-hidden bg-[var(--bg-main)]">
       <HeroPetals />
 
-      <div className="relative mx-auto grid w-full max-w-[1440px] items-center gap-12 px-5 pb-16 pt-10 sm:px-8 lg:min-h-[calc(100svh-80px)] lg:grid-cols-[1fr_0.9fr] lg:gap-16 lg:px-10 lg:py-14 xl:px-16">
+      <div className={containerClassName({ className: 'relative grid items-center gap-12 pb-16 pt-10 lg:min-h-[calc(100svh-80px)] lg:grid-cols-[1fr_0.9fr] lg:gap-16 lg:py-14' })}>
         <div className="relative z-10 flex max-w-2xl flex-col animate-fade-in-up">
           <p className="text-[11px] font-semibold uppercase tracking-[3.5px] text-[var(--primary-ink)]">
             {eyebrow}

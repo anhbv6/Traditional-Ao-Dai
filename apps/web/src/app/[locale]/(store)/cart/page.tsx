@@ -4,7 +4,7 @@ import { CartExperience } from '@/features/cart';
 
 export default function CartPage() {
   return (
-    <Container as="section" className="py-8 sm:py-12">
+    <Container as="section" width="full">
       <CartExperience />
     </Container>
   );

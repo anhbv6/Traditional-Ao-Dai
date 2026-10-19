@@ -56,5 +56,7 @@
     "description": "Leave a message or call our hotline — during opening hours you will hear back within 15–30 minutes.",
     "contact": "Send a message",
     "call": "Call 0909 000 000"
-  }
+  },
+  "noResultsEyebrow": "No matches",
+  "askTailor": "Ask our tailors"
 }

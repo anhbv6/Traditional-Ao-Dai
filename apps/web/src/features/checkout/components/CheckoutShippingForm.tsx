@@ -1,161 +1,151 @@
+"use client";
+
 import React from "react";
-import { MapPin, ArrowRight } from "lucide-react";
-import { type ShippingData } from "../types/checkout.types";
+import { type UseFormReturn } from "react-hook-form";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { ActionButton } from "@/components/shared/ActionButton";
+import { ActionLink } from "@/components/shared/ActionLink";
+import { TextField } from "@/components/shared/TextField";
+import { TextAreaField } from "@/components/shared/TextAreaField";
+import { useNotify } from "@/hooks/useNotify";
+import { ORDER_NOTES_MAX_LENGTH } from "../validations/checkout.validation";
+import { type ShippingData, type ShippingFormInput } from "../types/checkout.types";
+import { StepPanel } from "@/components/shared/StepPanel";
+
+/** Nhãn nhóm ô nhập — cùng kiểu nhãn của TextField */
+const LEGEND_CLASS = "mb-5 text-[11px] font-semibold uppercase tracking-[2.5px] text-[var(--primary-ink)]";
 
 interface CheckoutShippingFormProps {
-  shipping: ShippingData;
-  setShipping: React.Dispatch<React.SetStateAction<ShippingData>>;
-  shippingErrors: Partial<ShippingData>;
-  handleNextStep: () => void;
+  form: UseFormReturn<ShippingFormInput, unknown, ShippingData>;
+  onSubmit: (event?: React.BaseSyntheticEvent) => Promise<void>;
 }
 
-export function CheckoutShippingForm({
-  shipping,
-  setShipping,
-  shippingErrors,
-  handleNextStep,
-}: CheckoutShippingFormProps) {
+/**
+ * Bước 1 — thông tin giao hàng (React Hook Form + TextField dùng chung, kiểu gạch chân như trang Liên hệ):
+ * nhóm "Người nhận" (tên, SĐT có mask, email) → nhóm "Địa chỉ" (tỉnh / quận / phường, địa chỉ chi tiết) → ghi chú.
+ * Lỗi là mã KEY, dịch qua `useNotify().translateError`; bấm tiếp tục khi còn lỗi thì ô lỗi rung nhẹ.
+ */
+export function CheckoutShippingForm({ form, onSubmit }: CheckoutShippingFormProps) {
+  const t = useTranslations("CheckoutPage");
+  const notify = useNotify();
+  const {
+    register,
+    formState: { errors, submitCount },
+  } = form;
+
+  const errorOf = (key: keyof ShippingFormInput) => (errors[key] ? notify.translateError(errors[key]?.message) : undefined);
+
   return (
-    <div className="rounded-2xl border border-[var(--primary-color)]/10 bg-[var(--bg-card)] p-5 sm:p-6 shadow-xs animate-fade-in">
-      <h2 className="font-[family-name:var(--font-playfair)] text-xl font-bold text-[var(--primary-ink)] border-b border-[var(--border)]/60 pb-3 flex items-center gap-2">
-        <MapPin size={18} />
-        Thông Tin Giao Hàng
-      </h2>
-      
-      <div className="mt-6 flex flex-col gap-4">
-        {/* Full name & Phone */}
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-1.5">
-            <label className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-light)]">
-              Họ và tên <span className="text-rose-500">*</span>
-            </label>
-            <input
-              type="text"
-              placeholder="Nguyễn Văn A"
-              value={shipping.fullName}
-              onChange={(e) => setShipping(prev => ({ ...prev, fullName: e.target.value }))}
-              className="w-full h-10 rounded-lg border border-[var(--border)] px-3 text-xs bg-[var(--bg-main)] focus:bg-[var(--bg-card)] focus:border-[var(--primary-color)]/50 outline-none text-[var(--text-main)] transition-colors"
+    <form onSubmit={onSubmit} noValidate>
+      <StepPanel
+        index={1}
+        title={t("shipping.title")}
+        description={t("shipping.description")}
+        actions={
+          <>
+            <ActionLink href="/cart" variant="cancel" size="md" icon={<ArrowLeft />}>
+              {t("backToCart")}
+            </ActionLink>
+            <ActionButton type="submit" variant="confirm" size="md" icon={<ArrowRight />} iconPosition="end">
+              {t("actions.toPayment")}
+            </ActionButton>
+          </>
+        }
+      >
+        <fieldset>
+          <legend className={LEGEND_CLASS}>{t("shipping.receiverGroup")}</legend>
+          <div className="grid gap-7 sm:grid-cols-2 sm:gap-x-8">
+            <TextField
+              required
+              label={t("shipping.fullName")}
+              placeholder={t("shipping.fullNamePlaceholder")}
+              autoComplete="name"
+              error={errorOf("fullName")}
+              shakeKey={submitCount}
+              {...register("fullName")}
             />
-            {shippingErrors.fullName && <p className="text-[10px] text-rose-500">✕ {shippingErrors.fullName}</p>}
-          </div>
-          
-          <div className="space-y-1.5">
-            <label className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-light)]">
-              Số điện thoại <span className="text-rose-500">*</span>
-            </label>
-            <input
-              type="text"
-              placeholder="0901234567"
-              value={shipping.phone}
-              onChange={(e) => setShipping(prev => ({ ...prev, phone: e.target.value }))}
-              className="w-full h-10 rounded-lg border border-[var(--border)] px-3 text-xs bg-[var(--bg-main)] focus:bg-[var(--bg-card)] focus:border-[var(--primary-color)]/50 outline-none text-[var(--text-main)] transition-colors"
+            <TextField
+              required
+              type="tel"
+              mask="phone"
+              label={t("shipping.phone")}
+              placeholder={t("shipping.phonePlaceholder")}
+              autoComplete="tel"
+              inputMode="numeric"
+              error={errorOf("phone")}
+              shakeKey={submitCount}
+              {...register("phone")}
             />
-            {shippingErrors.phone && <p className="text-[10px] text-rose-500">✕ {shippingErrors.phone}</p>}
-          </div>
-        </div>
-
-        {/* Email address */}
-        <div className="space-y-1.5">
-          <label className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-light)]">
-            Địa chỉ email <span className="text-rose-500">*</span>
-          </label>
-          <input
-            type="email"
-            placeholder="nguyenvana@gmail.com"
-            value={shipping.email}
-            onChange={(e) => setShipping(prev => ({ ...prev, email: e.target.value }))}
-            className="w-full h-10 rounded-lg border border-[var(--border)] px-3 text-xs bg-[var(--bg-main)] focus:bg-[var(--bg-card)] focus:border-[var(--primary-color)]/50 outline-none text-[var(--text-main)] transition-colors"
-          />
-          {shippingErrors.email && <p className="text-[10px] text-rose-500">✕ {shippingErrors.email}</p>}
-        </div>
-
-        {/* Province / District / Ward */}
-        <div className="grid gap-4 sm:grid-cols-3">
-          <div className="space-y-1.5">
-            <label className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-light)]">
-              Tỉnh / Thành phố <span className="text-rose-500">*</span>
-            </label>
-            <input
-              type="text"
-              placeholder="Hà Nội"
-              value={shipping.province}
-              onChange={(e) => setShipping(prev => ({ ...prev, province: e.target.value }))}
-              className="w-full h-10 rounded-lg border border-[var(--border)] px-3 text-xs bg-[var(--bg-main)] focus:bg-[var(--bg-card)] focus:border-[var(--primary-color)]/50 outline-none text-[var(--text-main)] transition-colors"
+            <TextField
+              required
+              type="email"
+              label={t("shipping.email")}
+              placeholder={t("shipping.emailPlaceholder")}
+              autoComplete="email"
+              helperText={errors.email ? undefined : t("shipping.emailHint")}
+              error={errorOf("email")}
+              shakeKey={submitCount}
+              className="sm:col-span-2"
+              {...register("email")}
             />
-            {shippingErrors.province && <p className="text-[10px] text-rose-500">✕ {shippingErrors.province}</p>}
           </div>
+        </fieldset>
 
-          <div className="space-y-1.5">
-            <label className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-light)]">
-              Quận / Huyện <span className="text-rose-500">*</span>
-            </label>
-            <input
-              type="text"
-              placeholder="Cầu Giấy"
-              value={shipping.district}
-              onChange={(e) => setShipping(prev => ({ ...prev, district: e.target.value }))}
-              className="w-full h-10 rounded-lg border border-[var(--border)] px-3 text-xs bg-[var(--bg-main)] focus:bg-[var(--bg-card)] focus:border-[var(--primary-color)]/50 outline-none text-[var(--text-main)] transition-colors"
+        <fieldset className="mt-10">
+          <legend className={LEGEND_CLASS}>{t("shipping.addressGroup")}</legend>
+          <div className="grid gap-7 sm:grid-cols-3 sm:gap-x-8">
+            <TextField
+              required
+              label={t("shipping.province")}
+              placeholder={t("shipping.provincePlaceholder")}
+              autoComplete="address-level1"
+              error={errorOf("province")}
+              shakeKey={submitCount}
+              {...register("province")}
             />
-            {shippingErrors.district && <p className="text-[10px] text-rose-500">✕ {shippingErrors.district}</p>}
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-light)]">
-              Phường / Xã <span className="text-rose-500">*</span>
-            </label>
-            <input
-              type="text"
-              placeholder="Dịch Vọng"
-              value={shipping.ward}
-              onChange={(e) => setShipping(prev => ({ ...prev, ward: e.target.value }))}
-              className="w-full h-10 rounded-lg border border-[var(--border)] px-3 text-xs bg-[var(--bg-main)] focus:bg-[var(--bg-card)] focus:border-[var(--primary-color)]/50 outline-none text-[var(--text-main)] transition-colors"
+            <TextField
+              required
+              label={t("shipping.district")}
+              placeholder={t("shipping.districtPlaceholder")}
+              autoComplete="address-level2"
+              error={errorOf("district")}
+              shakeKey={submitCount}
+              {...register("district")}
             />
-            {shippingErrors.ward && <p className="text-[10px] text-rose-500">✕ {shippingErrors.ward}</p>}
+            <TextField
+              required
+              label={t("shipping.ward")}
+              placeholder={t("shipping.wardPlaceholder")}
+              autoComplete="address-level3"
+              error={errorOf("ward")}
+              shakeKey={submitCount}
+              {...register("ward")}
+            />
+            <TextField
+              required
+              label={t("shipping.address")}
+              placeholder={t("shipping.addressPlaceholder")}
+              autoComplete="street-address"
+              error={errorOf("address")}
+              shakeKey={submitCount}
+              className="sm:col-span-3"
+              {...register("address")}
+            />
           </div>
-        </div>
+        </fieldset>
 
-        {/* Specific address */}
-        <div className="space-y-1.5">
-          <label className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-light)]">
-            Địa chỉ chi tiết <span className="text-rose-500">*</span>
-          </label>
-          <input
-            type="text"
-            placeholder="Số 10, ngõ 100 Trần Thái Tông"
-            value={shipping.address}
-            onChange={(e) => setShipping(prev => ({ ...prev, address: e.target.value }))}
-            className="w-full h-10 rounded-lg border border-[var(--border)] px-3 text-xs bg-[var(--bg-main)] focus:bg-[var(--bg-card)] focus:border-[var(--primary-color)]/50 outline-none text-[var(--text-main)] transition-colors"
-          />
-          {shippingErrors.address && <p className="text-[10px] text-rose-500">✕ {shippingErrors.address}</p>}
-        </div>
-
-        {/* Order notes */}
-        <div className="space-y-1.5">
-          <label className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-light)]">
-            Ghi chú đơn hàng (Tùy chọn)
-          </label>
-          <textarea
-            placeholder="Ví dụ: Giao giờ hành chính, gọi trước khi giao..."
-            value={shipping.notes}
-            onChange={(e) => setShipping(prev => ({ ...prev, notes: e.target.value }))}
-            rows={3}
-            className="w-full py-2.5 rounded-lg border border-[var(--border)] px-3 text-xs bg-[var(--bg-main)] focus:bg-[var(--bg-card)] focus:border-[var(--primary-color)]/50 outline-none text-[var(--text-main)] transition-colors resize-none"
-          />
-        </div>
-      </div>
-
-      {/* Action Button */}
-      <div className="mt-8 flex justify-end">
-        <button
-          type="button"
-          onClick={handleNextStep}
-          className="inline-flex min-h-10 items-center gap-1.5 rounded-lg bg-[var(--primary-color)] px-6 text-xs font-semibold uppercase tracking-wider text-white transition-all hover:bg-[var(--primary-color)]/90 cursor-pointer active:scale-95 duration-200"
-        >
-          Tiếp Tục Thanh Toán
-          <ArrowRight size={14} />
-        </button>
-      </div>
-    </div>
+        <TextAreaField
+          className="mt-10"
+          label={t("shipping.notes")}
+          placeholder={t("shipping.notesPlaceholder")}
+          rows={3}
+          maxLength={ORDER_NOTES_MAX_LENGTH}
+          showCount
+          {...register("notes")}
+        />
+      </StepPanel>
+    </form>
   );
 }
 export default CheckoutShippingForm;

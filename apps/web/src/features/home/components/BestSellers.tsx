@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { SectionHeading } from './SectionHeading';
 import { ProductCard, mockProducts, productCatalog } from '@/features/products';
 import { parseVndString } from '@/features/cart';
+import { containerClassName } from '@/components/ui/container';
 
 /** Tab theo dịp mặc → danh mục sản phẩm tương ứng (null = tất cả) */
 const OCCASION_TABS = [
@@ -43,8 +44,8 @@ export function BestSellers() {
     .slice(0, VISIBLE_COUNT);
 
   return (
-    <section className="bg-[var(--bg-card)] py-20 sm:py-28">
-      <div className="mx-auto w-full max-w-[1440px] px-5 sm:px-8 lg:px-10 xl:px-16">
+    <section className="bg-[var(--bg-card)] py-(--section-y)">
+      <div className={containerClassName()}>
         <SectionHeading index="02" eyebrow={t('eyebrow')} title={t('title')} description={t('description')} />
 
         <div role="tablist" aria-label={t('eyebrow')} className="-mt-2 mb-10 flex justify-center gap-1 sm:gap-2">

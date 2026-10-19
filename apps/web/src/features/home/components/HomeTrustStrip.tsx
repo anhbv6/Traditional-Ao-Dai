@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslations } from 'next-intl';
 import { Feather, Gift, Ruler, Scissors } from 'lucide-react';
+import { containerClassName } from '@/components/ui/container';
 
 const TRUST_ITEMS = [
   { key: 'silk', Icon: Feather },
@@ -15,7 +16,7 @@ export function HomeTrustStrip() {
 
   return (
     <section className="border-y border-[var(--border)] bg-[var(--bg-card)]">
-      <ul className="mx-auto grid max-w-[1440px] grid-cols-2 px-5 sm:px-8 lg:grid-cols-4 lg:px-10 xl:px-16">
+      <ul className={containerClassName({ className: 'grid grid-cols-2 lg:grid-cols-4' })}>
         {TRUST_ITEMS.map(({ key, Icon }) => (
           <li
             key={key}

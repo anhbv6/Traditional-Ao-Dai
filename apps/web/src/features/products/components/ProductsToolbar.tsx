@@ -32,10 +32,10 @@ export function ProductsToolbar({ searchQuery, onSearchChange, tabs, isTabActive
   const t = useTranslations('ProductsPage');
 
   return (
-    <div className="sticky top-20 z-30 -mx-5 border-b border-[var(--border)] bg-[var(--bg-main)]/92 px-5 backdrop-blur-md sm:-mx-8 sm:px-8 lg:mx-0 lg:px-0">
+    <div className="sticky top-20 z-30 -mx-(--page-gutter) border-b border-[var(--border)] bg-[var(--bg-main)]/92 px-(--page-gutter) backdrop-blur-md lg:mx-0 lg:px-0">
       <div className="flex flex-col-reverse gap-x-8 lg:flex-row lg:items-center">
         {/* Danh mục: cuộn ngang trên mobile; vạch chân trượt sang mục được chọn */}
-        <nav aria-label={t('filter.categoryTitle')} className="-mx-5 min-w-0 flex-1 overflow-x-auto px-5 [mask-image:linear-gradient(to_right,transparent,black_20px,black_calc(100%-32px),transparent)] [scrollbar-width:none] sm:-mx-8 sm:px-8 lg:mx-0 lg:pl-0 lg:pr-8 lg:[mask-image:linear-gradient(to_right,black_calc(100%-32px),transparent)]">
+        <nav aria-label={t('filter.categoryTitle')} className="-mx-(--page-gutter) min-w-0 flex-1 overflow-x-auto px-(--page-gutter) [mask-image:linear-gradient(to_right,transparent,black_20px,black_calc(100%-32px),transparent)] [scrollbar-width:none] lg:mx-0 lg:pl-0 lg:pr-8 lg:[mask-image:linear-gradient(to_right,black_calc(100%-32px),transparent)]">
           <ul className="flex min-w-max gap-7">
             {tabs.map((tab) => {
               const isActive = isTabActive(tab.value);

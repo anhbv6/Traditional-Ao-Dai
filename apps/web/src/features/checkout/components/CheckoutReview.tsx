@@ -1,124 +1,136 @@
+"use client";
+
 import React from "react";
-import { Shield, CreditCard, ArrowLeft, Check } from "lucide-react";
-import { type ShippingData, type PaymentData } from "../types/checkout.types";
+import { ArrowLeft, Check, Info, PenLine } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { ActionButton } from "@/components/shared/ActionButton";
+import { TextField } from "@/components/shared/TextField";
+import { BANK_ACCOUNT, buildTransferContent } from "../data/bankAccount";
+import { type CheckoutStep, type PaymentMethod, type ShippingData } from "../types/checkout.types";
+import { StepPanel } from "@/components/shared/StepPanel";
+
+/** Tiêu đề khối nhỏ + nút "Sửa" quay về bước tương ứng */
+function ReviewBlock({
+  title,
+  editLabel,
+  onEdit,
+  children,
+}: {
+  title: string;
+  editLabel: string;
+  onEdit: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="border-t border-[var(--border)] pt-5 first:border-t-0 first:pt-0">
+      <div className="flex items-center justify-between gap-4">
+        <h3 className="m-0 text-[11px] font-semibold uppercase tracking-[2.5px] text-[var(--primary-ink)]">{title}</h3>
+        <button
+          type="button"
+          onClick={onEdit}
+          className="inline-flex cursor-pointer items-center gap-1.5 text-[11px] uppercase tracking-[1.5px] text-[var(--text-light)] transition-colors hover:text-[var(--primary-ink)]"
+        >
+          <PenLine size={12} strokeWidth={1.6} />
+          {editLabel}
+        </button>
+      </div>
+      <div className="mt-3 text-sm leading-6 text-[var(--text-main)]">{children}</div>
+    </div>
+  );
+}
 
 interface CheckoutReviewProps {
   shipping: ShippingData;
-  payment: PaymentData;
-  handlePrevStep: () => void;
-  handlePlaceOrder: () => void;
+  paymentMethod: PaymentMethod;
+  orderId: string;
+  hasCustomItems: boolean;
+  isPlacing: boolean;
+  onEdit: (step: CheckoutStep) => void;
+  onBack: () => void;
+  onPlaceOrder: () => void;
 }
 
+/**
+ * Bước 3 — xác nhận: người nhận + địa chỉ, phương thức thanh toán (mỗi khối có nút "Sửa" quay về đúng bước).
+ * Chuyển khoản → hiện tài khoản + nội dung CK (TextField chỉ đọc, sao chép một chạm).
+ * Nút "Đặt hàng" khoá + hiện spinner trong lúc gửi, tránh bấm nhiều lần tạo đơn trùng.
+ */
 export function CheckoutReview({
   shipping,
-  payment,
-  handlePrevStep,
-  handlePlaceOrder,
+  paymentMethod,
+  orderId,
+  hasCustomItems,
+  isPlacing,
+  onEdit,
+  onBack,
+  onPlaceOrder,
 }: CheckoutReviewProps) {
+  const t = useTranslations("CheckoutPage");
+  const address = [shipping.address, shipping.ward, shipping.district, shipping.province].join(", ");
+
   return (
-    <div className="rounded-2xl border border-[var(--primary-color)]/10 bg-[var(--bg-card)] p-5 sm:p-6 shadow-xs animate-fade-in space-y-6">
-      <h2 className="font-[family-name:var(--font-playfair)] text-xl font-bold text-[var(--primary-ink)] border-b border-[var(--border)]/60 pb-3 flex items-center gap-2">
-        <Shield size={18} />
-        Xác Nhận Thông Tin Đơn Hàng
-      </h2>
-
-      {/* Summary Cards */}
-      <div className="grid gap-6 sm:grid-cols-2">
-        {/* Shipping Summary */}
-        <div className="p-4 rounded-xl border border-[var(--border)]/50 bg-[var(--bg-main)]/30">
-          <h3 className="text-xs font-bold text-[var(--primary-ink)] uppercase tracking-wider border-b border-[var(--border)]/30 pb-2">
-            Địa chỉ nhận hàng
-          </h3>
-          <div className="mt-2 text-xs text-[var(--text-main)] space-y-1">
-            <p className="font-semibold text-sm">{shipping.fullName}</p>
-            <p>{shipping.phone}</p>
-            <p className="text-[var(--text-light)]">{shipping.email}</p>
-            <p className="mt-2 text-[var(--text-main)]/80 font-medium">
-              {shipping.address}, {shipping.ward}, {shipping.district}, {shipping.province}
+    <StepPanel
+      index={3}
+      title={t("review.title")}
+      description={t("review.description")}
+      actions={
+        <>
+          <ActionButton variant="cancel" size="md" icon={<ArrowLeft />} onClick={onBack} disabled={isPlacing}>
+            {t("actions.back")}
+          </ActionButton>
+          <ActionButton variant="confirm" size="lg" icon={<Check />} loading={isPlacing} onClick={onPlaceOrder}>
+            {isPlacing ? t("actions.placing") : t("actions.placeOrder")}
+          </ActionButton>
+        </>
+      }
+    >
+      <div className="space-y-5">
+        <ReviewBlock title={t("review.shippingTitle")} editLabel={t("review.edit")} onEdit={() => onEdit("shipping")}>
+          <p className="font-semibold">{shipping.fullName}</p>
+          <p className="text-[var(--text-light)]">
+            {shipping.phone} · {shipping.email}
+          </p>
+          <p className="mt-1">{address}</p>
+          {shipping.notes ? (
+            <p className="mt-2 text-[13px] italic text-[var(--text-light)]">
+              {t("review.notes")}: {shipping.notes}
             </p>
-            {shipping.notes && (
-              <p className="mt-3 text-[11px] italic text-[var(--text-light)] border-t border-[var(--border)]/20 pt-1.5">
-                Ghi chú: {shipping.notes}
-              </p>
-            )}
-          </div>
-        </div>
+          ) : null}
+        </ReviewBlock>
 
-        {/* Payment Summary */}
-        <div className="p-4 rounded-xl border border-[var(--border)]/50 bg-[var(--bg-main)]/30 flex flex-col justify-between">
-          <div>
-            <h3 className="text-xs font-bold text-[var(--primary-ink)] uppercase tracking-wider border-b border-[var(--border)]/30 pb-2">
-              Phương thức thanh toán
-            </h3>
-            <div className="mt-3 text-xs text-[var(--text-main)]">
-              {payment.method === "cod" && (
-                <div>
-                  <p className="font-bold text-xs uppercase tracking-wider text-[var(--primary-ink)]">Thanh toán khi nhận hàng (COD)</p>
-                  <p className="text-[10px] text-[var(--text-light)] mt-1 leading-relaxed">
-                    Khách hàng sẽ thanh toán tiền mặt trực tiếp cho bên vận chuyển sau khi nhận và kiểm hàng.
-                  </p>
-                </div>
-              )}
-              {payment.method === "bank" && (
-                <div className="space-y-1">
-                  <p className="font-bold text-xs uppercase tracking-wider text-[var(--primary-ink)]">Chuyển khoản ngân hàng</p>
-                  <div className="bg-[var(--bg-card)] p-2.5 rounded-lg border border-[var(--border)]/30 mt-2 space-y-1 text-[11px] text-[var(--text-light)]">
-                    <p>Ngân hàng: <strong>Techcombank</strong></p>
-                    <p>Số tài khoản: <strong>19034567891011</strong></p>
-                    <p>Chủ TK: <strong>CONG TY AO DAI SAC VIET</strong></p>
-                    <p className="italic text-[10px] text-rose-500 pt-1">Nội dung CK: Tên Khách Hàng - Số điện thoại</p>
-                  </div>
-                </div>
-              )}
-              {payment.method === "card" && (
-                <div>
-                  <p className="font-bold text-xs uppercase tracking-wider text-[var(--primary-ink)]">Thẻ tín dụng / ghi nợ</p>
-                  <div className="flex items-center gap-2.5 mt-2.5 p-2 bg-[var(--bg-card)] rounded-lg border border-[var(--border)]/30">
-                    <CreditCard size={18} className="text-[var(--primary-ink)]" />
-                    <div>
-                      <p className="font-mono text-xs text-[var(--text-main)] font-semibold">
-                        •••• •••• •••• {payment.cardNumber.slice(-4)}
-                      </p>
-                      <p className="text-[10px] text-[var(--text-light)] uppercase mt-0.5">
-                        {payment.cardHolder}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
+        <ReviewBlock title={t("review.paymentTitle")} editLabel={t("review.edit")} onEdit={() => onEdit("payment")}>
+          <p className="font-semibold">{t(`payment.methods.${paymentMethod}.title`)}</p>
+          {paymentMethod === "card" ? <p className="text-[13px] text-[var(--text-light)]">{t("payment.cardNote")}</p> : null}
+
+          {paymentMethod === "bank" ? (
+            <div className="mt-4 bg-[var(--bg-secondary)]/60 p-4 sm:p-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[2px] text-[var(--text-light)]">{t("review.bank.title")}</p>
+              <div className="mt-4 grid gap-5 sm:grid-cols-2">
+                <TextField readOnly label={t("review.bank.bankName")} value={BANK_ACCOUNT.bankName} />
+                <TextField readOnly copyable label={t("review.bank.accountNumber")} value={BANK_ACCOUNT.accountNumber} />
+                <TextField readOnly label={t("review.bank.accountHolder")} value={BANK_ACCOUNT.accountHolder} />
+                <TextField
+                  readOnly
+                  copyable
+                  label={t("review.bank.content")}
+                  value={buildTransferContent(orderId)}
+                  helperText={t("review.bank.contentHint")}
+                />
+              </div>
             </div>
-          </div>
-        </div>
-      </div>
+          ) : null}
+        </ReviewBlock>
 
-      {/* Security trust note */}
-      <div className="flex gap-2.5 items-start bg-emerald-50/50 border border-emerald-100 p-3 rounded-lg text-[10px] text-emerald-800">
-        <Shield size={14} className="shrink-0 text-emerald-600 mt-0.5" />
-        <p>
-          Đơn hàng của bạn được bảo mật hoàn toàn bởi hệ thống bảo mật SSL của chúng tôi. Bằng cách nhấp vào &ldquo;Đặt hàng ngay&rdquo;, bạn đồng ý với các chính sách mua hàng và điều khoản dịch vụ.
-        </p>
-      </div>
+        {hasCustomItems ? (
+          <p className="flex gap-2.5 border-l-2 border-[var(--accent-color)] bg-[var(--bg-secondary)]/70 px-4 py-3 text-xs leading-5 text-[var(--text-light)]">
+            <Info size={14} strokeWidth={1.6} className="mt-0.5 shrink-0 text-[var(--primary-ink)]" />
+            {t("review.customNote")}
+          </p>
+        ) : null}
 
-      {/* Action Buttons */}
-      <div className="mt-8 flex justify-between border-t border-[var(--border)]/40 pt-4">
-        <button
-          type="button"
-          onClick={handlePrevStep}
-          className="inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-[var(--border)] bg-[var(--bg-card)] px-5 text-xs font-semibold uppercase tracking-wider text-[var(--text-light)] transition-all hover:bg-gray-50 cursor-pointer active:scale-95 duration-200"
-        >
-          <ArrowLeft size={14} />
-          Quay Lại
-        </button>
-        <button
-          type="button"
-          onClick={handlePlaceOrder}
-          className="inline-flex min-h-10 items-center gap-1.5 rounded-lg bg-[var(--primary-color)] px-6 text-xs font-semibold uppercase tracking-wider text-white transition-all hover:bg-[var(--primary-color)]/90 cursor-pointer active:scale-95 duration-200"
-        >
-          <Check size={14} />
-          Đặt Hàng Ngay
-        </button>
+        <p className="text-xs leading-5 text-[var(--text-light)]">{t("review.agreement")}</p>
       </div>
-    </div>
+    </StepPanel>
   );
 }
 export default CheckoutReview;

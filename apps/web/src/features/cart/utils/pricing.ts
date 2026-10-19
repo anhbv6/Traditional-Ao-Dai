@@ -8,6 +8,9 @@ export const STANDARD_SHIPPING_FEE = 30_000;
  */
 export const MAX_LINE_QUANTITY = 10;
 
+/** Trang mở khi bấm vào một dòng giỏ hàng (sản phẩm thường → chi tiết; áo dài thiết kế riêng → `/custom`) */
+export const getCartItemHref = (item: { slug: string; href?: string }) => item.href ?? `/products/${item.slug}`;
+
 /**
  * Mã giảm giá demo phía client. Khi có module orders/vouchers, mã phải được xác thực ở Backend
  * (bảng Voucher) và Backend tính lại toàn bộ giá trị đơn — số liệu ở client chỉ để hiển thị.

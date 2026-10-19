@@ -91,5 +91,30 @@
     "invalidType": "Only image or video files are accepted",
     "tooLarge": "{name} is larger than {max}MB",
     "tooMany": "You can choose up to {max} files"
+  },
+  "notFound": {
+    "eyebrow": "Error 404",
+    "title": "This thread has lost its way",
+    "description": "The page you are looking for may have moved or no longer exists. Let us guide you back to the right seam.",
+    "home": "Back to home",
+    "shop": "Browse the collection",
+    "suggestions": "You might be looking for",
+    "links": {
+      "products": "Shop",
+      "custom": "Design your Ao Dai",
+      "about": "The AODAI story",
+      "faqs": "FAQs",
+      "contact": "Talk to a tailor"
+    },
+    "metaTitle": "Page not found — AODAI"
+  },
+  "forbidden": {
+    "eyebrow": "Error 403",
+    "title": "This area is for staff only",
+    "description": "Your customer account doesn't have access to the admin dashboard. Head back to shopping, or sign in with an admin account if you're on the AODAI team.",
+    "home": "Back to shopping",
+    "adminLogin": "Admin sign-in",
+    "suggestions": "You might like",
+    "metaTitle": "Access denied — AODAI"
   }
 }

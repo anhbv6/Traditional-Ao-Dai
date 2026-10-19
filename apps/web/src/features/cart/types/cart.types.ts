@@ -16,6 +16,8 @@ export interface CartItem {
   price: number;
   /** Giá gốc VND trước khuyến mãi (nếu có) — chỉ để hiển thị */
   originalPrice?: number;
+  /** Trang mở khi bấm vào dòng — mặc định `/products/<slug>`; áo dài thiết kế riêng trỏ về `/custom` */
+  href?: string;
   quantity: number;
 }
 

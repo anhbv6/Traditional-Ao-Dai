@@ -166,7 +166,7 @@
     "eyebrow": "Bespoke service",
     "title": "An Ao Dai made only for you",
     "description": "Four simple steps to a perfectly fitted Ao Dai — in store or online.",
-    "primaryAction": "Book a fitting",
+    "primaryAction": "Design your Ao Dai",
     "secondaryAction": "FAQs",
     "note": "Free consultation · First alteration free",
     "steps": {
@@ -191,7 +191,7 @@
   },
   "stages": {
     "label": "Home page sections",
-    "hero": "Banner",
+    "hero": "Top",
     "collections": "Collections",
     "bestSellers": "Best sellers",
     "craft": "Craft",

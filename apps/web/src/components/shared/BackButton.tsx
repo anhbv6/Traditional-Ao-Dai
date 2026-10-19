@@ -8,8 +8,15 @@ import { cn } from "@/lib/utils";
 interface BackButtonProps {
   /** Trang dự phòng khi không có màn trước (mở link trực tiếp / tab mới) — mặc định trang chủ */
   fallbackHref?: string;
-  /** Nhãn — mặc định "Quay lại" (namespace Common) */
+  /** Luôn sang trang này (không dùng lịch sử) — vd. mũi tên về Cửa hàng ở trang Yêu thích */
+  href?: string;
+  /** Nhãn — mặc định "Quay lại" (namespace Common). Biến thể `inline` chỉ dùng làm aria-label */
   label?: string;
+  /**
+   * - `default`: ô vuông viền + chữ "Quay lại", đặt trên cùng trang.
+   * - `inline` : chỉ mũi tên nhỏ, đặt cạnh eyebrow / tiêu đề.
+   */
+  variant?: "default" | "inline";
   className?: string;
 }
 
@@ -19,15 +26,34 @@ interface BackButtonProps {
  *
  * @example
  * <BackButton fallbackHref="/products" />
+ * <BackButton href="/products" variant="inline" />
  */
-export function BackButton({ fallbackHref = "/", label, className }: BackButtonProps) {
+export function BackButton({ fallbackHref = "/", href, label, variant = "default", className }: BackButtonProps) {
   const t = useTranslations("Common");
   const router = useRouter();
 
   const handleClick = () => {
-    if (window.history.length > 1) router.back();
+    if (href) router.push(href);
+    else if (window.history.length > 1) router.back();
     else router.push(fallbackHref);
   };
+
+  if (variant === "inline") {
+    return (
+      <button
+        type="button"
+        onClick={handleClick}
+        aria-label={label ?? t("back")}
+        title={label ?? t("back")}
+        className={cn(
+          "group -ml-1 inline-grid size-7 shrink-0 cursor-pointer place-items-center text-[var(--primary-ink)] transition-colors hover:text-[var(--primary-color)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]",
+          className
+        )}
+      >
+        <ArrowLeft size={16} strokeWidth={1.5} className="transition-transform duration-300 group-hover:-translate-x-1" />
+      </button>
+    );
+  }
 
   return (
     <button

@@ -44,6 +44,8 @@ type ProductCardProps = {
   purchaseType?: string;
   objectFit?: 'cover' | 'contain';
   productHref?: ProductHref;
+  /** Hiện nút yêu thích (tim) — tắt ở trang Yêu thích vì mọi thẻ ở đó đều đã thích */
+  showWishlist?: boolean;
 };
 
 const MAX_SWATCHES = 4;
@@ -75,6 +77,7 @@ export function ProductCard({
   purchaseType,
   objectFit,
   productHref,
+  showWishlist = true,
 }: ProductCardProps) {
   const t = useTranslations('Product');
   const fallbackImageSrc = '/logoPage.png';
@@ -193,15 +196,17 @@ export function ProductCard({
         {/* Nút yêu thích + giỏ (mobile). Desktop: trượt nhẹ từ phải vào khi rê chuột (đang thích thì luôn hiện) */}
         <div
           className={`absolute right-2.5 top-2.5 z-10 flex flex-col gap-2 transition-[opacity,translate] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] lg:group-hover:translate-x-0 lg:group-hover:opacity-100 ${
-            isWishlisted ? '' : 'lg:translate-x-2 lg:opacity-0'
+            isWishlisted && showWishlist ? '' : 'lg:translate-x-2 lg:opacity-0'
           }`}
         >
-          <HeartToggle
-            active={isWishlisted}
-            onToggle={handleToggleWishlist}
-            labelOn={t('removeFromWishlist')}
-            labelOff={t('addToWishlist')}
-          />
+          {showWishlist ? (
+            <HeartToggle
+              active={isWishlisted}
+              onToggle={handleToggleWishlist}
+              labelOn={t('removeFromWishlist')}
+              labelOff={t('addToWishlist')}
+            />
+          ) : null}
           <button
             type="button"
             onClick={handleAddToCart}

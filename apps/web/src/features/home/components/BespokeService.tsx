@@ -6,6 +6,7 @@ import { SectionHeading } from './SectionHeading';
 import { Reveal } from '@/components/shared/Reveal';
 import { ActionLink } from '@/components/shared/ActionLink';
 import { ON_PRIMARY_COLORS } from '@/components/shared/ActionButton';
+import { containerClassName } from '@/components/ui/container';
 
 const BESPOKE_STEPS = ['1', '2', '3', '4'] as const;
 
@@ -22,20 +23,21 @@ export function BespokeService() {
   const t = useTranslations('HomePage.bespoke');
 
   return (
-    <section className="relative overflow-hidden bg-[radial-gradient(ellipse_at_top_left,color-mix(in_oklab,var(--primary-color)_88%,white)_0%,var(--primary-color)_45%,color-mix(in_oklab,var(--primary-color)_72%,black)_100%)] py-20 text-white sm:py-28">
+    <section className="relative overflow-hidden bg-[radial-gradient(ellipse_at_top_left,color-mix(in_oklab,var(--primary-color)_88%,white)_0%,var(--primary-color)_45%,color-mix(in_oklab,var(--primary-color)_72%,black)_100%)] py-(--section-y) text-white">
       {/* Hoạ tiết vòng tròn mờ gợi hoa văn đồng tiền */}
       <div aria-hidden="true" className="pointer-events-none absolute -right-40 -top-40 size-[520px] rounded-full border border-white/10" />
       <div aria-hidden="true" className="pointer-events-none absolute -right-24 -top-24 size-[360px] rounded-full border border-white/10" />
 
-      <div className="relative mx-auto grid w-full max-w-[1440px] gap-14 px-5 sm:px-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-20 lg:px-10 xl:gap-28 xl:px-16">
+      <div className={containerClassName({ className: 'relative grid gap-14 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-20 xl:gap-28' })}>
         {/* ---------- Cột trái: tiêu đề + CTA + ảnh ---------- */}
         <div className="lg:sticky lg:top-28 lg:self-start">
           <SectionHeading index="04" tone="dark" align="left" eyebrow={t('eyebrow')} title={t('title')} description={t('description')} className="mb-8 sm:mb-8" />
 
           <div className="flex flex-col gap-3 sm:flex-row">
             {/* Nền khối là đỏ đô → dùng bộ màu dựng sẵn ON_PRIMARY_COLORS (đồng bộ với Newsletter ở footer) */}
+            {/* Mở màn tự thiết kế áo dài (chọn kiểu, vải, màu, số đo + báo giá) */}
             <ActionLink
-              href="/contact"
+              href="/custom"
               variant="custom"
               size="lg"
               icon={<ArrowRight strokeWidth={1.6} />}

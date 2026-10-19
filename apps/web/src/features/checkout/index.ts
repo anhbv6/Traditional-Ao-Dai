@@ -6,4 +6,5 @@ export * from "./components/CheckoutReview";
 export * from "./components/CheckoutSuccess";
 export * from "./components/CheckoutOrderSummary";
 export * from "./types/checkout.types";
+export * from "./validations/checkout.validation";
 export * from "./hooks/useCheckout";

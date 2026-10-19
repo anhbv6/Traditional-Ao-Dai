@@ -9,6 +9,7 @@ import { ActionLink } from '@/components/shared/ActionLink';
 import { ON_PRIMARY_COLORS } from '@/components/shared/ActionButton';
 import { cn } from '@/lib/utils';
 import { EVENT_SLIDE_SECONDS, productEvents, type ProductEvent } from '../data/productEvents';
+import { containerClassName } from '@/components/ui/container';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -95,7 +96,7 @@ export function ProductEventBanner() {
       </div>
 
       {/* Khối nội dung: chữ + CTA đi cùng nhau, thanh số ở đáy — tất cả nằm trong luồng nên không đè lên nhau */}
-      <div className="relative mx-auto flex h-full w-full max-w-[1440px] flex-col px-5 pb-6 sm:px-8 lg:px-10 lg:pb-8 xl:px-16">
+      <div className={containerClassName({ className: 'relative flex h-full flex-col pb-6 lg:pb-8' })}>
         <div className="flex flex-1 flex-col justify-end lg:justify-center lg:pt-6">
           <AnimatePresence mode="wait" initial={false} custom={direction}>
             <motion.div
@@ -111,9 +112,8 @@ export function ProductEventBanner() {
             >
               <motion.p
                 variants={lineVariants}
-                className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[3px] text-[var(--accent-color)]"
+                className="flex items-center text-[11px] font-semibold uppercase leading-none tracking-[3px] text-[var(--accent-color)]"
               >
-                <span aria-hidden="true" className="size-1.5 rounded-full bg-[var(--accent-color)]" />
                 {t(`items.${event.id}.tag`)}
               </motion.p>
               <motion.h2
@@ -149,8 +149,8 @@ export function ProductEventBanner() {
           </AnimatePresence>
         </div>
 
-        {/* Nav số 01 / 02 / 03 — hàng riêng ở đáy cột chữ (luôn trên nền màu, dễ đọc) */}
-        <ol className="mt-6 flex gap-3 lg:mt-0">
+        {/* Nav số 01 / 02 / 03 — hàng riêng ở đáy, căn phải */}
+        <ol className="mt-6 flex justify-end gap-3 lg:mt-0">
           {productEvents.map((item, i) => {
             const isActive = i === index;
             return (

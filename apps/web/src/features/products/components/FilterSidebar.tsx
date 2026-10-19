@@ -41,7 +41,7 @@ export const categoryKeys: Record<string, string> = {
   'Phụ kiện': 'accessories',
 };
 
-const colorKeys: Record<string, string> = {
+export const colorKeys: Record<string, string> = {
   'Đỏ': 'red',
   'Vàng': 'yellow',
   'Hồng': 'pink',
@@ -56,6 +56,10 @@ export const materialKeys: Record<string, string> = {
   'Tơ Nhung': 'velvet',
   'Voan': 'chiffon',
 };
+
+/** Tra ngược khóa URL (red, silk…) → giá trị gốc ('Đỏ', 'Lụa Tơ Tằm'…) */
+export const fromKey = (keys: Record<string, string>, key?: string) =>
+  key ? Object.keys(keys).find((name) => keys[name] === key) : undefined;
 
 export function formatPrice(value: number, locale: string) {
   return new Intl.NumberFormat(locale === 'vi' ? 'vi-VN' : 'en-US').format(value);
@@ -265,7 +269,8 @@ export function FilterGroups({
 
   return (
     <>
-      <FilterSection title={t('collectionTitle')} activeCount={selectedCollections.length} onClear={clearGroup(setSelectedCollections)}>
+      {/* Mặc định chỉ mở Bộ sưu tập; nhóm khác tự mở khi vào trang đã có lựa chọn (đến từ màn khác qua URL) */}
+      <FilterSection title={t('collectionTitle')} defaultOpen activeCount={selectedCollections.length} onClear={clearGroup(setSelectedCollections)}>
         <ChipGroup>
           {collectionOptions.map((col) => (
             <FilterChip
@@ -356,11 +361,14 @@ export function FilterGroups({
   );
 }
 
-/** Một nhóm lọc mở/đóng được; hiện số mục đang chọn và nút xóa riêng của nhóm */
+/**
+ * Một nhóm lọc mở/đóng được; hiện số mục đang chọn và nút xóa riêng của nhóm.
+ * Trạng thái mở ban đầu: `defaultOpen` HOẶC nhóm đang có lựa chọn lúc dựng (vd. vào từ `?color=red`).
+ */
 export function FilterSection({
   title,
   children,
-  defaultOpen = true,
+  defaultOpen = false,
   activeCount = 0,
   onClear,
 }: {
@@ -370,7 +378,7 @@ export function FilterSection({
   activeCount?: number;
   onClear?: () => void;
 }) {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
+  const [isOpen, setIsOpen] = useState(defaultOpen || activeCount > 0);
   const t = useTranslations('ProductsPage.filter');
 
   return (

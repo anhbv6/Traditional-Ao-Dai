@@ -123,5 +123,8 @@
   "VOUCHER_UPDATE_FAILED": "Không thể cập nhật voucher.",
   "WARD_NAME_REQUIRED": "Vui lòng chọn phường/xã.",
   "INVENTORY_LIST_FAILED": "Không thể tải danh sách tồn kho.",
-  "STAFF_CREATE_FAILED": "Không thể tạo tài khoản nhân viên."
+  "STAFF_CREATE_FAILED": "Không thể tạo tài khoản nhân viên.",
+  "PHONE_REQUIRED": "Vui lòng nhập số điện thoại",
+  "MEASUREMENT_REQUIRED": "Vui lòng nhập số đo",
+  "MEASUREMENT_OUT_OF_RANGE": "Số đo chưa hợp lý, vui lòng kiểm tra lại"
 }

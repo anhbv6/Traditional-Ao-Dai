@@ -3,9 +3,18 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocale } from "next-intl";
 import { useLenis } from "lenis/react";
-import { type GridSize, type SortKey, type Locale } from "../types/products.types";
+import { type GridSize, type SortKey, type Locale, type ProductFilterParams } from "../types/products.types";
 import { productCatalog } from "../data/mockProducts";
-import { maxPrice, matchCollection } from "../components/FilterSidebar";
+import {
+  colorKeys,
+  collectionOptions,
+  fromKey,
+  materialKeys,
+  maxPrice,
+  minPrice,
+  matchCollection,
+  purchaseOptions,
+} from "../components/FilterSidebar";
 import { scoreProduct } from "../utils/search";
 
 const pageSizeMap: Record<GridSize, number> = {
@@ -14,21 +23,35 @@ const pageSizeMap: Record<GridSize, number> = {
   5: 20,
 };
 
-export function useProducts(initialCategory?: string, initialQuery = "") {
+/** Đọc bộ lọc ban đầu từ URL — giá trị không hợp lệ thì bỏ qua (không lọc) */
+function parseFilterParams(params: ProductFilterParams) {
+  const color = fromKey(colorKeys, params.color);
+  const material = fromKey(materialKeys, params.material);
+  const price = Number(params.maxPrice);
+  return {
+    collections: collectionOptions.some((col) => col.id === params.category) ? [params.category as string] : [],
+    purchaseTypes: purchaseOptions.some((option) => option.id === params.type) ? [params.type as string] : [],
+    colors: color ? [color] : [],
+    materials: material ? [material] : [],
+    priceLimit: Number.isFinite(price) && price >= minPrice && price < maxPrice ? price : maxPrice,
+  };
+}
+
+export function useProducts(filterParams: ProductFilterParams = {}, initialQuery = "") {
   const locale = useLocale() as Locale;
   // Từ khóa ban đầu lấy từ `?q=` (ô tìm kiếm trên header)
   const [searchQuery, setSearchQuery] = useState(initialQuery);
 
   // Mặc định hiển thị toàn bộ sản phẩm — khách tự thu hẹp bằng bộ lọc
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedCollections, setSelectedCollections] = useState<string[]>(
-    initialCategory ? [initialCategory] : []
-  );
+  // Bộ lọc ban đầu từ URL (màn khác dẫn sang) — chỉ đọc lúc dựng; trang đổi URL thì ProductsCollection dựng lại theo `key`
+  const [initialFilters] = useState(() => parseFilterParams(filterParams));
+  const [selectedCollections, setSelectedCollections] = useState<string[]>(initialFilters.collections);
 
-  const [selectedPurchaseTypes, setSelectedPurchaseTypes] = useState<string[]>([]);
-  const [selectedColors, setSelectedColors] = useState<string[]>([]);
-  const [selectedMaterials, setSelectedMaterials] = useState<string[]>([]);
-  const [priceLimit, setPriceLimit] = useState(maxPrice);
+  const [selectedPurchaseTypes, setSelectedPurchaseTypes] = useState<string[]>(initialFilters.purchaseTypes);
+  const [selectedColors, setSelectedColors] = useState<string[]>(initialFilters.colors);
+  const [selectedMaterials, setSelectedMaterials] = useState<string[]>(initialFilters.materials);
+  const [priceLimit, setPriceLimit] = useState(initialFilters.priceLimit);
   const [sortKey, setSortKey] = useState<SortKey>("newest");
   const [gridSize, setGridSize] = useState<GridSize>(4);
   const [currentPage, setCurrentPage] = useState(1);

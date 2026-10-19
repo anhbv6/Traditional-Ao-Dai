@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { AdminQuickBar } from './AdminQuickBar';
+import { HeaderHeightSync } from './HeaderHeightSync';
 
 type HeaderWrapperProps = {
   children: ReactNode;
@@ -16,6 +17,7 @@ export function HeaderWrapper({ children, sticky = false }: HeaderWrapperProps) 
     >
       <AdminQuickBar />
       {children}
+      <HeaderHeightSync />
     </div>
   );
 }

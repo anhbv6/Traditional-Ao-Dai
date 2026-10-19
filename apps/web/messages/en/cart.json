@@ -1,6 +1,8 @@
 {
-  "eyebrow": "Shopping bag",
+  "eyebrow": "Your collection",
   "title": "Your Cart",
+  "subtitle": "Review your designs, sizes and quantities before checkout.",
+  "backToShop": "Back to shop",
   "itemCount": "{count} items",
   "continueShopping": "Continue shopping",
   "columns": {
@@ -61,7 +63,10 @@
   "empty": {
     "title": "Your cart is empty",
     "description": "Explore our Ao Dai designs and pick the one that suits you best.",
-    "action": "Shop now"
+    "action": "Shop now",
+    "eyebrow": "Cart",
+    "secondary": "View your wishlist",
+    "suggestions": "Featured collections"
   },
   "mini": {
     "title": "Cart",

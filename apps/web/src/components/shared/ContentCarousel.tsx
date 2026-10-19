@@ -5,6 +5,7 @@ import useEmblaCarousel from 'embla-carousel-react';
 import { useInView } from 'motion/react';
 import { cn } from '@/lib/utils';
 import { SliderNav } from '@/components/shared/SliderNav';
+import { SectionOrnament } from '@/components/shared/SectionOrnament';
 
 /** Thời gian dừng mặc định ở mỗi vị trí trước khi tự trôi sang thẻ kế tiếp */
 const DEFAULT_AUTOPLAY_MS = 4500;
@@ -89,12 +90,12 @@ export function ContentCarousel<T>({
       onFocusCapture={() => setIsPaused(true)}
       onBlurCapture={() => setIsPaused(false)}
     >
-      <div className="flex items-end justify-between gap-4 border-b border-[var(--text-main)]/80 pb-3">
+      <div className="flex items-end justify-between gap-4 pb-3">
         <div className="min-w-0">
           {eyebrow ? (
             <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[3px] text-[var(--accent-color)] sm:text-[11px]">{eyebrow}</p>
           ) : null}
-          <h2 className="font-[family-name:var(--font-playfair)] text-[1.375rem] font-semibold leading-tight text-[var(--primary-ink)] sm:text-2xl lg:text-[1.75rem]">
+          <h2 className="font-[family-name:var(--font-playfair)] text-[1.5rem] font-semibold leading-tight text-[var(--primary-ink)] sm:text-[1.75rem] lg:text-[2rem]">
             {title}
           </h2>
         </div>
@@ -110,6 +111,8 @@ export function ContentCarousel<T>({
           </div>
         ) : null}
       </div>
+      {/* Hoạ tiết phân cách dùng chung thay vạch kẻ đen — đồng bộ tiêu đề khối trang Tin tức */}
+      <SectionOrnament fullWidth />
 
       {/* Viewport: overflow ẩn; con trỏ "nắm" gợi ý kéo được */}
       <div

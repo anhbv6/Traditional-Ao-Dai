@@ -13,7 +13,7 @@ export function ContactVisit() {
 
   return (
     <section className="bg-[var(--bg-wine)] text-white">
-      <div className="mx-auto grid w-full max-w-[1440px] lg:grid-cols-2">
+      <div className="mx-auto grid w-full max-w-(--page-max-width) lg:grid-cols-2">
         <div className="relative min-h-[280px] sm:min-h-[380px]">
           <iframe
             title={t('mapTitle')}

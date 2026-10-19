@@ -91,5 +91,30 @@
     "invalidType": "Chỉ nhận tệp ảnh hoặc video",
     "tooLarge": "{name} vượt quá {max}MB",
     "tooMany": "Chỉ được chọn tối đa {max} tệp"
+  },
+  "notFound": {
+    "eyebrow": "Lỗi 404",
+    "title": "Đường chỉ này đã lạc lối",
+    "description": "Trang bạn tìm có thể đã đổi địa chỉ hoặc không còn nữa. Để chúng tôi dẫn bạn về đúng đường may nhé.",
+    "home": "Về trang chủ",
+    "shop": "Xem bộ sưu tập",
+    "suggestions": "Có thể bạn đang tìm",
+    "links": {
+      "products": "Cửa hàng",
+      "custom": "Tự thiết kế áo dài",
+      "about": "Câu chuyện AODAI",
+      "faqs": "Câu hỏi thường gặp",
+      "contact": "Liên hệ thợ may"
+    },
+    "metaTitle": "Không tìm thấy trang — AODAI"
+  },
+  "forbidden": {
+    "eyebrow": "Lỗi 403",
+    "title": "Khu vực này dành cho nhân viên",
+    "description": "Tài khoản khách hàng của bạn chưa có quyền vào trang quản trị. Mời bạn quay lại mua sắm, hoặc đăng nhập bằng tài khoản quản trị nếu bạn là nhân viên AODAI.",
+    "home": "Quay lại mua sắm",
+    "adminLogin": "Đăng nhập quản trị",
+    "suggestions": "Bạn có thể ghé",
+    "metaTitle": "Không có quyền truy cập — AODAI"
   }
 }

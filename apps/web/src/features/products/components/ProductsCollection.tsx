@@ -20,7 +20,7 @@ import { ProductListControls } from './ProductListControls';
 import { ActionButton } from '@/components/shared/ActionButton';
 import { ActiveFilters, FilterSidebar, categoryKeys, categoryOptions } from './FilterSidebar';
 import { useProducts } from '../hooks/useProducts';
-import { type GridSize } from '../types/products.types';
+import { type GridSize, type ProductFilterParams } from '../types/products.types';
 import { productCatalog } from '../data/mockProducts';
 import { parseVndString } from '@/features/cart';
 
@@ -32,12 +32,13 @@ const gridClassName: Record<GridSize, string> = {
 };
 
 interface ProductsCollectionProps {
-  initialCategory?: string;
+  /** Bộ lọc ban đầu từ URL (`?category=&type=&color=&material=&maxPrice=`) */
+  filterParams?: ProductFilterParams;
   /** Từ khóa từ `?q=` */
   initialQuery?: string;
 }
 
-export function ProductsCollection({ initialCategory, initialQuery }: ProductsCollectionProps) {
+export function ProductsCollection({ filterParams, initialQuery }: ProductsCollectionProps) {
   const t = useTranslations('ProductsPage');
   const tc = useTranslations('Common');
   const tp = useTranslations('Product');
@@ -73,7 +74,7 @@ export function ProductsCollection({ initialCategory, initialQuery }: ProductsCo
     toggleValue,
     activeFilterCount,
     clearFilters,
-  } = useProducts(initialCategory, initialQuery);
+  } = useProducts(filterParams, initialQuery);
 
   /** Thanh danh mục là chọn-một: bấm "Tất cả" bỏ lọc, bấm danh mục khác thay hẳn lựa chọn */
   const selectCategory = (category: string | null) => {

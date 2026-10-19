@@ -1,27 +1,36 @@
 import { Container } from '@/components/ui/container';
 import { PageIntro } from '@/components/shared/PageIntro';
-import { ProductsCollection, ProductEventBanner } from '@/features/products';
+import { ProductsCollection, ProductEventBanner, type ProductFilterParams } from '@/features/products';
 import { getTranslations } from 'next-intl/server';
 
 interface PageProps {
-  searchParams: Promise<{ category?: string; q?: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
+
+/** Lấy một giá trị chuỗi của tham số URL (bỏ qua dạng mảng `?a=1&a=2`) */
+const pickParam = (value: string | string[] | undefined) => (typeof value === 'string' ? value.slice(0, 100) : undefined);
 
 async function Products({ searchParams }: PageProps) {
   const params = await searchParams;
-  const initialCategory = params.category;
-  const initialQuery = typeof params.q === 'string' ? params.q.trim().slice(0, 100) : '';
+  const filterParams: ProductFilterParams = {
+    category: pickParam(params.category),
+    type: pickParam(params.type),
+    color: pickParam(params.color),
+    material: pickParam(params.material),
+    maxPrice: pickParam(params.maxPrice),
+  };
+  const initialQuery = pickParam(params.q)?.trim() ?? '';
   const t = await getTranslations('ProductsPage');
 
   return (
     <>
       <ProductEventBanner />
-      <Container as="section" className="py-12">
-        <PageIntro eyebrow={t('banner.eyebrow')} title={t('banner.title')} subtitle={t('banner.subtitle')} className="pt-4 sm:pt-8" />
-        {/* key theo danh mục + từ khóa: đổi ?category= (CTA banner) hoặc ?q= (tìm kiếm trên header) sẽ dựng lại bộ lọc */}
+      <Container as="section">
+        <PageIntro eyebrow={t('banner.eyebrow')} title={t('banner.title')} subtitle={t('banner.subtitle')} />
+        {/* key theo bộ lọc URL + từ khóa: đổi ?category= (CTA banner), ?q= (tìm kiếm header)… sẽ dựng lại bộ lọc */}
         <ProductsCollection
-          key={`${initialCategory ?? 'all'}|${initialQuery}`}
-          initialCategory={initialCategory}
+          key={`${Object.values(filterParams).join('|')}|${initialQuery}`}
+          filterParams={filterParams}
           initialQuery={initialQuery}
         />
       </Container>

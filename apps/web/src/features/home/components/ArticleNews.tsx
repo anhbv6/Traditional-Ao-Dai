@@ -9,6 +9,7 @@ import { SliderNav } from '@/components/shared/SliderNav';
 import { Link } from '@/i18n/routing';
 import { SectionHeading } from './SectionHeading';
 import { mockArticles, NewsCard } from '@/features/news';
+import { containerClassName } from '@/components/ui/container';
 
 const VISIBLE_COUNT = 8;
 /** Thời gian dừng ở mỗi slide trước khi tự trượt */
@@ -55,7 +56,7 @@ export function ArticleNews() {
   const pad = (value: number) => String(value).padStart(2, '0');
 
   return (
-    <section className="mx-auto w-full max-w-[1440px] overflow-hidden px-5 py-20 sm:px-8 sm:py-28 lg:px-10 xl:px-16">
+    <section className={containerClassName({ spacing: 'section', className: 'overflow-hidden' })}>
       <SectionHeading index="06" eyebrow={t('eyebrow')} title={t('title')} description={t('description')} />
 
       <div

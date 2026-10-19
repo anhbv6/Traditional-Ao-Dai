@@ -4,7 +4,7 @@ import { Container } from "@/components/ui/container";
 
 export default function WishlistPage() {
   return (
-    <Container as="section" className="py-8 sm:py-12">
+    <Container as="section" width="full">
       <WishlistExperience />
     </Container>
   );

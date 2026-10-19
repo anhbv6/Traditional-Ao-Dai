@@ -1,0 +1,266 @@
+{
+  "meta": {
+    "title": "May áo dài theo yêu cầu — AODAI",
+    "description": "Tự thiết kế áo dài: chọn dịp mặc, kiểu dáng, chất liệu, màu, cổ, tay, hoạ tiết thêu và số đo — xem trước và báo giá ngay."
+  },
+  "eyebrow": "May đo theo yêu cầu",
+  "title": "Thiết kế áo dài của riêng bạn",
+  "subtitle": "Chọn dịp mặc, kiểu dáng, chất liệu và từng chi tiết — thợ may AODAI hoàn thiện đúng theo số đo của bạn.",
+  "backToShop": "Quay lại Cửa hàng",
+  "sections": {
+    "occasion": {
+      "title": "Dịp mặc",
+      "description": "Chọn dịp để chúng tôi gợi ý sẵn kiểu dáng, chất liệu và màu hợp dịp — bạn vẫn đổi được từng mục bên dưới."
+    },
+    "style": {
+      "title": "Kiểu dáng",
+      "description": "Phom áo quyết định cảm giác khi mặc và giá may."
+    },
+    "fabric": {
+      "title": "Chất liệu",
+      "description": "Vải được chọn lọc từ làng nghề — mỗi loại có độ rủ, độ bóng riêng."
+    },
+    "color": {
+      "title": "Màu vải",
+      "description": "Màu quần sẽ được phối tông nhẹ hơn để tôn áo."
+    },
+    "details": {
+      "title": "Cổ, tay & độ dài tà",
+      "description": "Những chi tiết nhỏ làm nên dáng áo của riêng bạn."
+    },
+    "decoration": {
+      "title": "Hoạ tiết & trang trí",
+      "description": "Thêu tay và đính kết làm thủ công nên cần thêm thời gian."
+    },
+    "pants": {
+      "title": "Quần / chân váy",
+      "description": "May đồng bộ chất liệu, tông màu phối theo áo."
+    },
+    "measurements": {
+      "title": "Số đo",
+      "description": "Chọn cách bạn muốn cung cấp số đo."
+    },
+    "timeline": {
+      "title": "Thời gian & ghi chú",
+      "description": "Thời gian đã gồm một lần thử áo và chỉnh sửa."
+    }
+  },
+  "labels": {
+    "collar": "Kiểu cổ",
+    "sleeve": "Tay áo",
+    "length": "Độ dài tà",
+    "motif": "Hoạ tiết thêu",
+    "size": "Size chuẩn",
+    "notes": "Ghi chú cho thợ may",
+    "notesPlaceholder": "Ví dụ: muốn eo ôm hơn, tà xẻ thấp, thêu tên viết tắt ở cổ tay…",
+    "unit": "cm",
+    "measureHint": "Đo sát người khi mặc đồ mỏng. Không chắc số đo? Chọn “Hẹn đo tại tiệm”.",
+    "studioNote": "Chúng tôi sẽ gọi trong 24 giờ làm việc để hẹn lịch đo tại showroom hoặc tại nhà (nội thành, miễn phí).",
+    "sizeGuide": "Xem bảng size",
+    "extraDays": "+{days} ngày"
+  },
+  "options": {
+    "occasion": {
+      "wedding": {
+        "label": "Cưới · ăn hỏi",
+        "description": "Gấm đỏ đô, thêu phượng, cổ cao trang trọng"
+      },
+      "tet": {
+        "label": "Lễ · Tết",
+        "description": "Nhung đỏ son ấm áp, thêu hoa mai"
+      },
+      "graduation": {
+        "label": "Tốt nghiệp · kỷ yếu",
+        "description": "Voan trắng ngà nhẹ nhàng, dáng truyền thống"
+      },
+      "gala": {
+        "label": "Dạ tiệc · sự kiện",
+        "description": "Cách tân lụa đen, cổ thuyền, đính kết"
+      },
+      "daily": {
+        "label": "Công sở · thường ngày",
+        "description": "Áo suông satin, tay lửng, dễ mặc mỗi ngày"
+      }
+    },
+    "style": {
+      "traditional": {
+        "label": "Truyền thống",
+        "description": "Tà dài, ôm dáng, xẻ tà cao qua eo — tôn đường cong."
+      },
+      "modern": {
+        "label": "Cách tân",
+        "description": "Tà ngắn ngang bắp chân, phom trẻ trung, dễ vận động."
+      },
+      "loose": {
+        "label": "Áo dài suông",
+        "description": "Không chiết eo, rộng thoải mái, khéo che vòng bụng."
+      },
+      "fivePanel": {
+        "label": "Ngũ thân",
+        "description": "Năm thân áo, cổ đứng, dáng suông cổ điển — trang trọng nhất."
+      }
+    },
+    "fabric": {
+      "chiffon": {
+        "label": "Voan",
+        "description": "Mềm, nhẹ, bay theo gió — hợp áo tốt nghiệp, dạo phố."
+      },
+      "satin": {
+        "label": "Lụa satin",
+        "description": "Bóng nhẹ, ít nhăn, giá dễ chịu."
+      },
+      "silk": {
+        "label": "Lụa tơ tằm",
+        "description": "Mát, rủ mềm, dệt thủ công — sang trọng tinh tế."
+      },
+      "velvet": {
+        "label": "Nhung",
+        "description": "Dày, ấm, sắc màu sâu — hợp mùa Tết, thu đông."
+      },
+      "brocade": {
+        "label": "Gấm",
+        "description": "Dệt hoa văn chìm, đứng phom — chuẩn áo cưới."
+      }
+    },
+    "color": {
+      "burgundy": "Đỏ đô",
+      "vermilion": "Đỏ son",
+      "ochre": "Vàng hoàng thổ",
+      "blush": "Hồng phấn",
+      "ivory": "Trắng ngà",
+      "jade": "Xanh ngọc",
+      "indigo": "Xanh chàm",
+      "black": "Đen tuyền"
+    },
+    "collar": {
+      "high": "Cổ cao 4cm",
+      "low": "Cổ thấp 2cm",
+      "boat": "Cổ thuyền",
+      "sweetheart": "Cổ tim"
+    },
+    "sleeve": {
+      "long": "Tay dài raglan",
+      "threeQuarter": "Tay lửng",
+      "short": "Tay ngắn"
+    },
+    "length": {
+      "ankle": "Chấm gót",
+      "midCalf": "Ngang bắp chân",
+      "knee": "Qua gối"
+    },
+    "decoration": {
+      "plain": {
+        "label": "Trơn",
+        "description": "Tôn chất vải, thanh lịch."
+      },
+      "print": {
+        "label": "In hoạ tiết",
+        "description": "Hoạ tiết in sắc nét."
+      },
+      "embroidery": {
+        "label": "Thêu tay",
+        "description": "Nghệ nhân thêu từng mũi chỉ."
+      },
+      "beading": {
+        "label": "Đính kết",
+        "description": "Cườm, ngọc trai đính tay."
+      }
+    },
+    "motif": {
+      "lotus": "Hoa sen",
+      "apricot": "Hoa mai",
+      "peach": "Hoa đào",
+      "phoenix": "Phượng"
+    },
+    "pants": {
+      "silk": {
+        "label": "Quần lụa",
+        "description": "Ống suông truyền thống."
+      },
+      "wide": {
+        "label": "Quần ống rộng",
+        "description": "Thoải mái, hiện đại."
+      },
+      "skirt": {
+        "label": "Chân váy",
+        "description": "Hợp áo cách tân."
+      },
+      "none": {
+        "label": "Chỉ may áo",
+        "description": "Bạn đã có quần phối."
+      }
+    },
+    "measureMode": {
+      "standard": {
+        "label": "Size chuẩn",
+        "description": "Chọn size S–XXL theo bảng size."
+      },
+      "custom": {
+        "label": "Tự nhập số đo",
+        "description": "Nhập 8 số đo — thợ gọi xác nhận trước khi cắt."
+      },
+      "studio": {
+        "label": "Hẹn đo tại tiệm",
+        "description": "Thợ đo trực tiếp, miễn phí."
+      }
+    },
+    "measurement": {
+      "height": "Chiều cao",
+      "bust": "Vòng ngực",
+      "waist": "Vòng eo",
+      "hip": "Vòng mông",
+      "shoulder": "Rộng vai",
+      "sleeveLength": "Dài tay",
+      "armhole": "Vòng nách",
+      "dressLength": "Dài áo"
+    },
+    "timeline": {
+      "standard": {
+        "label": "Tiêu chuẩn",
+        "description": "{min}–{max} ngày"
+      },
+      "rush": {
+        "label": "May gấp",
+        "description": "{days} ngày · phụ phí 30%"
+      }
+    }
+  },
+  "summary": {
+    "title": "Thiết kế của bạn",
+    "previewLabel": "Hình minh hoạ áo dài theo lựa chọn",
+    "specs": {
+      "style": "Kiểu dáng",
+      "fabric": "Chất liệu",
+      "color": "Màu",
+      "collar": "Cổ",
+      "sleeve": "Tay",
+      "length": "Tà",
+      "decoration": "Trang trí",
+      "pants": "Quần",
+      "measurements": "Số đo",
+      "timeline": "Thời gian"
+    },
+    "customMeasurements": "Số đo riêng",
+    "price": {
+      "base": "Giá may",
+      "fabric": "Phụ phí chất liệu",
+      "decoration": "Phụ phí trang trí",
+      "pants": "Quần / chân váy",
+      "rush": "Phụ phí may gấp",
+      "total": "Tạm tính"
+    },
+    "estimate": "Hoàn thiện trong {min}–{max} ngày",
+    "note": "Giá tạm tính — thợ may gọi xác nhận số đo trước khi cắt vải.",
+    "notes": "Ghi chú"
+  },
+  "actions": {
+    "addToCart": "Thêm vào giỏ hàng",
+    "bookFitting": "Cần tư vấn? Liên hệ thợ may",
+    "reset": "Làm lại"
+  },
+  "cart": {
+    "name": "Áo dài may đo · {style}",
+    "added": "Đã thêm thiết kế vào giỏ hàng",
+    "invalid": "Vui lòng kiểm tra lại số đo"
+  }
+}

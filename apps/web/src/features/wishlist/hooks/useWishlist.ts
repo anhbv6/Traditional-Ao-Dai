@@ -1,12 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { type Locale } from "@repo/shared";
 import { useCartStore } from "@/features/cart";
-import { useRouter } from "@/i18n/routing";
 import { showToast } from "@/components/ui/toast";
-import { UNDO_TIMEOUT } from "@/components/shared/UndoSnackbar";
 import { useWishlistHydrated, useWishlistStore } from "../store/wishlistStore";
 import { type WishlistItem, type WishlistSortKey } from "../types/wishlist.types";
 
@@ -22,42 +20,15 @@ const sorters: Record<WishlistSortKey, (a: WishlistItem, b: WishlistItem) => num
 export function useWishlist() {
   const t = useTranslations("WishlistPage");
   const locale = useLocale() as Locale;
-  const router = useRouter();
   const isLoaded = useWishlistHydrated();
   const rawItems = useWishlistStore((state) => state.items);
-  const { remove, restore, clear } = useWishlistStore.getState();
 
   const [sortKey, setSortKey] = useState<WishlistSortKey>("recent");
-  const [lastRemoved, setLastRemoved] = useState<WishlistItem | null>(null);
-  const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => () => {
-    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
-  }, []);
 
   const items = useMemo(() => [...rawItems].sort(sorters[sortKey]), [rawItems, sortKey]);
-  const totalValue = useMemo(() => rawItems.reduce((sum, item) => sum + item.price, 0), [rawItems]);
-
-  const dismissUndo = () => {
-    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
-    setLastRemoved(null);
-  };
-
-  const handleRemove = (item: WishlistItem) => {
-    remove(item.slug);
-    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
-    setLastRemoved(item);
-    undoTimerRef.current = setTimeout(() => setLastRemoved(null), UNDO_TIMEOUT);
-  };
-
-  const handleUndo = () => {
-    if (lastRemoved) restore(lastRemoved);
-    dismissUndo();
-  };
 
   const handleClearAll = () => {
-    dismissUndo();
-    clear();
+    useWishlistStore.getState().clear();
     showToast.success(t("toast.cleared"));
   };
 
@@ -71,14 +42,19 @@ export function useWishlist() {
       size: QUICK_ADD_SIZE,
     });
 
-  /** Hàng may sẵn -> thêm thẳng vào giỏ; hàng may đo -> sang trang chi tiết để nhập số đo */
-  const handlePrimaryAction = (item: WishlistItem) => {
+  /**
+   * Thả thẻ vào khung giỏ hàng: hàng may sẵn -> thêm vào giỏ (size M);
+   * hàng may đo -> không thêm (cần nhập số đo ở trang chi tiết), chỉ nhắc khách.
+   * Trả về `true` khi đã thêm để khung giỏ hiện hiệu ứng xác nhận.
+   */
+  const handleDropToCart = (item: WishlistItem) => {
     if (item.purchaseType === "custom") {
-      router.push(`/products/${item.slug}`);
-      return;
+      showToast.info(t("toast.customDropped", { name: item.name }));
+      return false;
     }
     addToCart(item);
-    showToast.success(t("toast.addedToCart"), item.name);
+    showToast.success(t("toast.addedToCart"), `${item.name} · ${QUICK_ADD_SIZE}`);
+    return true;
   };
 
   const readyItems = rawItems.filter((item) => item.purchaseType === "ready");
@@ -97,16 +73,11 @@ export function useWishlist() {
     locale,
     isLoaded,
     items,
-    totalValue,
     readyCount: readyItems.length,
     sortKey,
     setSortKey,
-    lastRemoved,
-    handleRemove,
-    handleUndo,
-    dismissUndo,
     handleClearAll,
-    handlePrimaryAction,
+    handleDropToCart,
     handleAddAllToCart,
   };
 }

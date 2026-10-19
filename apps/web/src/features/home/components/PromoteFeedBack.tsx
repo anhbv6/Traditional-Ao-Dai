@@ -8,6 +8,7 @@ import { RatingBadge } from '@/components/shared/RatingBadge';
 import { SliderNav } from '@/components/shared/SliderNav';
 import { cn } from '@/lib/utils';
 import { SectionHeading } from './SectionHeading';
+import { containerClassName } from '@/components/ui/container';
 
 /** Mỗi đánh giá kèm ảnh khách diện áo — chữ ở messages HomePage.promoteFeedback.reviews.<key> */
 const REVIEWS = [
@@ -51,14 +52,14 @@ export function PromoteFeedBack() {
   const goTo = (index: number) => setCurrent((index + total) % total);
 
   return (
-    <section className="overflow-hidden bg-[var(--bg-secondary)] py-20 sm:py-28">
+    <section className="overflow-hidden bg-[var(--bg-secondary)] py-(--section-y)">
       <div
         ref={sectionRef}
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
         onFocus={() => setIsHovering(true)}
         onBlur={() => setIsHovering(false)}
-        className="mx-auto grid w-full max-w-[1440px] gap-14 px-5 sm:px-8 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:items-center lg:gap-20 lg:px-10 xl:gap-28 xl:px-16"
+        className={containerClassName({ className: 'grid gap-14 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:items-center lg:gap-20 xl:gap-28' })}
       >
         {/* ---------- Cột trái: ảnh khách + điểm đánh giá ---------- */}
         <div className="relative mx-auto w-full max-w-[420px] pb-6 pl-6 lg:mx-0 lg:max-w-none">

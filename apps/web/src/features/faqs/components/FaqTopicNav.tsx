@@ -56,7 +56,7 @@ export function FaqTopicNav({ topics, active, onSelect, label, variant, classNam
 
   return (
     <nav aria-label={label} className={cn("border-y border-[var(--border)]", className)}>
-      <div className="-mx-5 flex items-center gap-1 overflow-x-auto px-4 [scrollbar-width:none] sm:-mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden">
+      <div className="-mx-(--page-gutter) flex items-center gap-1 overflow-x-auto px-(--page-gutter) [scrollbar-width:none] sm:-mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden">
         {topics.map((topic) => {
           const isActive = topic.id === active;
           return (

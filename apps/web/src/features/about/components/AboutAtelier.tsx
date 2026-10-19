@@ -8,7 +8,8 @@ import { Reveal } from "@/components/shared/Reveal";
 import { ClipReveal } from "@/components/shared/ClipReveal";
 import { cn } from "@/lib/utils";
 import { AboutHeading } from "./AboutHeading";
-import { atelierStories } from "../types/about.types";
+import { atelierStories } from "../data/aboutContent";
+import { containerClassName } from "@/components/ui/container";
 
 const METRIC_KEYS = ["checks", "years", "consulting"] as const;
 
@@ -21,7 +22,7 @@ export function AboutAtelier() {
 
   return (
     <section>
-      <div className="mx-auto w-full max-w-[1440px] px-5 pb-20 sm:px-8 sm:pb-28 lg:px-10 xl:px-16">
+      <div className={containerClassName({ className: 'pb-(--section-y)' })}>
         <AboutHeading numeral="III" eyebrow={t("eyebrow")} title={t("title")} description={t("description")} />
 
         <div className="grid gap-10 md:grid-cols-3 md:gap-6 lg:gap-8">

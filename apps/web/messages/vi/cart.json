@@ -1,6 +1,8 @@
 {
-  "eyebrow": "Giỏ hàng",
+  "eyebrow": "Bộ sưu tập của bạn",
   "title": "Giỏ hàng của bạn",
+  "subtitle": "Kiểm tra lại thiết kế, size và số lượng trước khi thanh toán.",
+  "backToShop": "Quay lại Cửa hàng",
   "itemCount": "{count} sản phẩm",
   "continueShopping": "Tiếp tục mua sắm",
   "columns": {
@@ -61,7 +63,10 @@
   "empty": {
     "title": "Giỏ hàng đang trống",
     "description": "Hãy khám phá các thiết kế áo dài và chọn cho mình mẫu ưng ý nhất.",
-    "action": "Mua sắm ngay"
+    "action": "Mua sắm ngay",
+    "eyebrow": "Giỏ hàng",
+    "secondary": "Xem danh sách yêu thích",
+    "suggestions": "Bộ sưu tập nổi bật"
   },
   "mini": {
     "title": "Giỏ hàng",

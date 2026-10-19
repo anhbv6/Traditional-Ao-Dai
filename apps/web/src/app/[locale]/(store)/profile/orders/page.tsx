@@ -3,7 +3,7 @@ import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 
 export default function OrdersPage() {
   return (
-    <Container as="section" className="py-12">
+    <Container as="section">
       <Breadcrumbs />
       <h1>Lịch sử đơn hàng</h1>
       <p className="mt-3 max-w-2xl text-[var(--text-light)]">

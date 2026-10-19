@@ -6,6 +6,7 @@
  *
  * MỤC LỤC
  *   1. Khởi tạo Tailwind v4 + biến thể dark
+ *   1b. Token bố cục: khung nội dung (container), lề hai bên, khoảng cách dọc — responsive
  *   2. Token màu storefront — Light (mặc định)
  *   3. Token màu storefront — Dark
  *   4. Ánh xạ token sang Tailwind (@theme inline): màu, bo góc, font, animation
@@ -39,6 +40,53 @@
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark:not(:has(.admin-shell)) *));
+
+
+/* ============================================================================
+ * 1b. TOKEN BỐ CỤC — KHUNG NỘI DUNG & KHOẢNG CÁCH CHUNG (storefront)
+ * ----------------------------------------------------------------------------
+ * Nguồn DUY NHẤT cho lề trang. Đổi giá trị ở đây → mọi trang (trang chủ, cửa hàng, câu chuyện,
+ * liên hệ, tin tức, giỏ hàng…) đổi theo. Dùng qua component `Container` (components/ui/container)
+ * hoặc trực tiếp bằng class Tailwind: `px-(--page-gutter)`, `-mx-(--page-gutter)`, `py-(--section-y)`.
+ *
+ *   --page-max-width : bề rộng tối đa của khung nội dung (căn giữa).
+ *   --page-gutter    : lề trái/phải bên trong khung.
+ *   --page-y         : khoảng cách trên/dưới của trang nội dung (giỏ hàng, tin tức, chi tiết SP…).
+ *   --section-y      : khoảng cách trên/dưới giữa các khối kể chuyện (trang chủ, giới thiệu, liên hệ).
+ *
+ *              Mobile   sm ≥640   lg ≥1024   xl ≥1280   2xl ≥1536
+ *   gutter     1.25rem  2rem      2.5rem     4rem       4rem
+ *   page-y     2rem     3rem      3rem       3rem       3.5rem
+ *   section-y  4rem     5rem      6rem       6rem       7rem
+ *
+ *   --site-header-h : chiều cao khối header (mặc định theo breakpoint; HeaderHeightSync đo lại giá trị thật,
+ *                     gồm cả thanh admin) — dùng cho phần tử ghim dưới header / cao vừa màn hình.
+ *
+ * Đơn vị rem nên còn co theo font-size gốc ở mục 6 (14.5px → 15px → 16px).
+ * ============================================================================ */
+:root {
+  --page-max-width: 1440px;
+  --page-gutter: 1.25rem;
+  --page-y: 2rem;
+  --section-y: 4rem;
+  --site-header-h: 4rem;
+}
+
+@media (min-width: 40rem) {
+  :root { --page-gutter: 2rem; --page-y: 3rem; --section-y: 5rem; }
+}
+
+@media (min-width: 64rem) {
+  :root { --page-gutter: 2.5rem; --section-y: 6rem; --site-header-h: 4.5rem; }
+}
+
+@media (min-width: 80rem) {
+  :root { --page-gutter: 4rem; }
+}
+
+@media (min-width: 96rem) {
+  :root { --page-y: 3.5rem; --section-y: 7rem; --site-header-h: 5rem; }
+}
 
 
 /* ============================================================================

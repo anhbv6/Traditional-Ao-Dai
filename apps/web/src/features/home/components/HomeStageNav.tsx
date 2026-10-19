@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, MotionConfig, useMotionValue, useReducedMotion, useSpring, useTransform } from 'motion/react';
 import { useTranslations } from 'next-intl';
-import { OrnateFrame } from '@/components/shared/OrnateFrame';
 import { cn } from '@/lib/utils';
 import { HOME_STAGES, homeStageElementId } from '../constants/homeStages';
 
@@ -21,8 +20,8 @@ const pad = (value: number) => String(value).padStart(2, '0');
  * Thanh tiến trình trang chủ dạng các GIAI ĐOẠN — cố định giữa mép phải (chỉ desktop).
  * - Mỗi khối trang chủ (bọc bằng HomeStage) là một mốc thoi; đường nối tô vàng dần theo vị trí cuộn, có lò xo nên trượt mềm.
  * - Mốc đã qua: thoi vàng đặc. Mốc đang xem: thoi đỏ đô + vòng thoi vàng trượt theo và toả sóng nhẹ.
- * - Tương tác: rê chuột / focus vào mốc nào → chỉ hiện tên khối đó (khung OrnateFrame); bấm mốc hoặc bấm nhãn → cuộn mượt tới khối.
- * - Mốc đầu là banner (không đánh số), các mốc sau đánh số 01, 02… khớp số trên tiêu đề từng khối.
+ * - Tương tác: rê chuột / focus vào mốc nào → chỉ hiện tên khối đó (nhãn chữ gọn); bấm mốc hoặc bấm nhãn → cuộn mượt tới khối.
+ * - Mốc đầu là "Đầu trang" (không đánh số), các mốc sau đánh số 01, 02… khớp số trên tiêu đề từng khối.
  * - Đổi khối: tên khối mới hiện thoáng rồi ẩn, không che nội dung lâu.
  * - Tự giảm hiệu ứng khi người dùng bật "giảm chuyển động".
  */
@@ -159,7 +158,7 @@ export function HomeStageNav() {
                     )}
                   />
 
-                  {/* Nhãn: số thứ tự + tên khối, bọc khung viền gấm dùng chung (OrnateFrame).
+                  {/* Nhãn: số thứ tự + tên khối — chữ gọn trên nền mờ (đọc được cả trên khối nền đỏ đô).
                       Chỉ hiện cho mốc đang rê chuột / focus, hoặc thoáng qua lúc vừa tới khối.
                       Nằm TRONG nút → rê từ mốc sang nhãn vẫn giữ hover, bấm nhãn = bấm mốc.
                       pr-3 làm "cầu nối" lấp khoảng hở giữa mốc và nhãn để không mất hover khi rê ngang. */}
@@ -172,27 +171,22 @@ export function HomeStageNav() {
                       showLabel ? 'pointer-events-auto translate-x-0 opacity-100' : 'pointer-events-none translate-x-2 opacity-0',
                     )}
                   >
-                    <OrnateFrame
-                      size="sm"
-                      shimmer="hover"
-                      hoverLift
-                      contentClassName="flex items-center gap-2 whitespace-nowrap px-4 py-2.5 leading-none"
-                    >
-                      {/* Banner (mốc 0) không đánh số */}
+                    <span className="flex items-baseline gap-2 whitespace-nowrap bg-[var(--bg-card)]/90 px-3 py-1.5 leading-none shadow-[0_6px_18px_-10px_rgba(42,10,18,0.35)] backdrop-blur-sm">
+                      {/* Đầu trang (mốc 0) không đánh số */}
                       {index > 0 ? (
-                        <span className="font-[family-name:var(--font-playfair)] text-[11px] font-semibold text-[var(--accent-color)]">
+                        <span className="font-[family-name:var(--font-playfair)] text-[11px] font-semibold italic tabular-nums text-[var(--accent-color)]">
                           {pad(index)}
                         </span>
                       ) : null}
                       <span
                         className={cn(
-                          'text-[10px] font-semibold uppercase tracking-[2px] transition-colors group-hover/frame:text-[var(--primary-ink)]',
-                          isActive ? 'text-[var(--primary-ink)]' : 'text-[var(--text-light)]',
+                          'text-xs font-semibold transition-colors group-hover/stage:text-[var(--primary-ink)]',
+                          isActive ? 'text-[var(--primary-ink)]' : 'text-[var(--text-main)]',
                         )}
                       >
                         {t(id)}
                       </span>
-                    </OrnateFrame>
+                    </span>
                   </span>
                 </button>
               </li>

@@ -11,6 +11,7 @@ interface PageIntroProps {
 /**
  * Đầu trang kiểu biên tập dùng chung (Cửa hàng, Tin tức, Liên hệ...):
  * nhãn nhỏ + tiêu đề Playfair căn trái, mô tả đẩy sang phải trên màn hình lớn.
+ * KHÔNG thêm `pt-*` cho PageIntro: khoảng cách dưới header do Container (`--page-y`) lo — để mọi trang cách header bằng nhau.
  */
 export function PageIntro({ eyebrow, title, subtitle, className }: PageIntroProps) {
   return (

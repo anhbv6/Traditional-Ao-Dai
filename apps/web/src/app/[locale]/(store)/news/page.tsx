@@ -4,7 +4,7 @@ import { Container } from '@/components/ui/container';
 
 export default function NewsPage() {
   return (
-    <Container as="section" className="py-8 sm:py-12">
+    <Container as="section">
       <NewsClient />
     </Container>
   );

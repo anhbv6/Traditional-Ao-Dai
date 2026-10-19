@@ -8,6 +8,7 @@ import { Link } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
 import { Reveal } from '@/components/shared/Reveal';
 import { PageIntro } from '@/components/shared/PageIntro';
+import { SectionOrnament } from '@/components/shared/SectionOrnament';
 
 import { useNews } from '../hooks/useNews';
 import { categoryKeys, getAuthor } from '../types/news.types';
@@ -31,19 +32,22 @@ function MetaLine({ items, className }: { items: string[]; className?: string })
   );
 }
 
-/** Tiêu đề mỗi khối: chữ Playfair thường (không viết hoa đậm), vạch kẻ dưới, link "xem tất cả" gạch chân */
+/** Tiêu đề mỗi khối: chữ Playfair thường (không viết hoa đậm), hoạ tiết SectionOrnament bên dưới, link "xem tất cả" */
 function SectionTitle({ title, actionLabel, onAction }: { title: string; actionLabel: string; onAction: () => void }) {
   return (
-    <div className="mb-8 flex items-end justify-between gap-4 border-b border-[var(--text-main)]/80 pb-3">
-      <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-semibold text-[var(--primary-ink)] sm:text-[1.75rem]">{title}</h2>
-      <button
-        type="button"
-        onClick={onAction}
-        className="group inline-flex shrink-0 cursor-pointer items-center gap-2 pb-1 text-[11px] font-semibold uppercase tracking-[2px] text-[var(--text-light)] transition-colors hover:text-[var(--primary-ink)]"
-      >
-        {actionLabel}
-        <ArrowRight size={13} strokeWidth={1.6} className="transition-transform duration-300 group-hover:translate-x-1" />
-      </button>
+    <div className="mb-8">
+      <div className="flex items-end justify-between gap-4 pb-3">
+        <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-semibold text-[var(--primary-ink)] sm:text-[1.75rem]">{title}</h2>
+        <button
+          type="button"
+          onClick={onAction}
+          className="group inline-flex shrink-0 cursor-pointer items-center gap-2 pb-1 text-[11px] font-semibold uppercase tracking-[2px] text-[var(--text-light)] transition-colors hover:text-[var(--primary-ink)]"
+        >
+          {actionLabel}
+          <ArrowRight size={13} strokeWidth={1.6} className="transition-transform duration-300 group-hover:translate-x-1" />
+        </button>
+      </div>
+      <SectionOrnament fullWidth />
     </div>
   );
 }
@@ -66,7 +70,7 @@ export function NewsClient() {
   return (
     <div>
       {/* Đầu trang: tiêu đề căn trái kiểu biên tập — đồng bộ Cửa hàng / Liên hệ */}
-      <PageIntro eyebrow={t('eyebrow')} title={t('title')} subtitle={t('subtitle')} className="mb-12 pt-4 sm:mb-16 sm:pt-8" />
+      <PageIntro eyebrow={t('eyebrow')} title={t('title')} subtitle={t('subtitle')} className="mb-12 sm:mb-16" />
 
       {/* Tab danh mục: vạch đỏ đô chạy ra dưới mục đang chọn */}
       <nav aria-label={t('eyebrow')} className="mb-12 border-y border-[var(--border)]">
@@ -169,7 +173,7 @@ export function NewsClient() {
                   </Link>
                 )}
 
-                <div className="flex flex-col divide-y divide-[var(--border)] border-y border-[var(--border)]">
+                <div className="flex flex-col divide-y divide-[var(--border)]">
                   {rightLatestArticles.map((article) => (
                     <Link key={article.id} href={`/news/${article.slug}`} className="group flex flex-1 items-center gap-5 py-6">
                       <div className="min-w-0 flex-1">
@@ -228,9 +232,14 @@ export function NewsClient() {
             <Reveal className="mb-16">
               <SectionTitle title={t('sections.guidesLife')} actionLabel={t('viewAll')} onAction={() => handleCategoryChange('guide')} />
 
+              {/* Chỉ kẻ vạch GIỮA các hàng: mỗi bài kẻ vạch trên, bỏ vạch ở hàng đầu theo số cột (1 → 2 → 3 cột) */}
               <div className="grid gap-x-8 md:grid-cols-2 lg:grid-cols-3">
                 {guidesArticles.map((article) => (
-                  <Link key={article.id} href={`/news/${article.slug}`} className="group flex items-start gap-4 border-b border-[var(--border)] py-6">
+                  <Link
+                    key={article.id}
+                    href={`/news/${article.slug}`}
+                    className="group flex items-start gap-4 border-t border-[var(--border)] py-6 first:border-t-0 md:nth-2:border-t-0 lg:nth-3:border-t-0"
+                  >
                     <div className="relative aspect-square w-20 shrink-0 overflow-hidden bg-[var(--bg-secondary)] sm:w-24">
                       <Image src={article.imageSrc} alt={article.title[locale]} fill sizes="100px" className={IMAGE_HOVER} />
                     </div>

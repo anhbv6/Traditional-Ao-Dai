@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { motion, useScroll, useTransform, type MotionValue } from "motion/react";
 import { useTranslations } from "next-intl";
+import { containerClassName } from "@/components/ui/container";
 
 /**
  * Câu triết lý căn trái, nhãn chữ dọc bên cạnh: từng chữ sáng dần theo nhịp cuộn —
@@ -17,7 +18,7 @@ export function AboutManifesto() {
   const words = t("text").split(" ");
 
   return (
-    <section className="mx-auto grid w-full max-w-[1440px] gap-6 px-5 py-20 sm:px-8 sm:py-28 lg:grid-cols-[80px_1fr] lg:gap-10 lg:px-10 xl:px-16">
+    <section className={containerClassName({ spacing: 'section', className: 'grid gap-6 lg:grid-cols-[80px_1fr] lg:gap-10' })}>
       <p className="text-[11px] font-semibold uppercase tracking-[3px] text-[var(--accent-color)] lg:mt-3 lg:[writing-mode:vertical-rl] lg:rotate-180">
         {t("eyebrow")}
       </p>

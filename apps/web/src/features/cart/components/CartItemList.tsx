@@ -7,7 +7,7 @@ import { X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { formatVnd, type Locale } from "@repo/shared";
 import { Link } from "@/i18n/routing";
-import { MAX_LINE_QUANTITY, getDiscountPercent } from "../utils/pricing";
+import { MAX_LINE_QUANTITY, getCartItemHref, getDiscountPercent } from "../utils/pricing";
 import { type CartItem } from "../types/cart.types";
 import { QuantityStepper } from "./QuantityStepper";
 
@@ -25,7 +25,7 @@ function CartLineImage({ item }: { item: CartItem }) {
   const [failed, setFailed] = useState(false);
   return (
     <Link
-      href={`/products/${item.slug}`}
+      href={getCartItemHref(item)}
       className="group/img relative block aspect-[3/4] w-24 shrink-0 overflow-hidden bg-[var(--bg-secondary)] sm:w-28 xl:w-32"
     >
       <Image
@@ -55,7 +55,7 @@ export function CartItemList({ cartItems, locale, handleQuantityChange, handleRe
   };
 
   return (
-    <ul className="border-t border-[var(--text-main)]/80">
+    <ul className="border-t border-[var(--border)]">
       <AnimatePresence initial={false}>
         {cartItems.map((item, index) => {
           const lineTotal = item.price * item.quantity;
@@ -70,7 +70,7 @@ export function CartItemList({ cartItems, locale, handleQuantityChange, handleRe
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0, transition: { duration: 0.35, ease: EASE } }}
               transition={{ duration: 0.5, ease: EASE, delay: Math.min(index, 6) * 0.04 }}
-              className="overflow-hidden border-b border-[var(--border)]"
+              className="overflow-hidden border-b border-[var(--border)] last:border-b-0"
             >
               <article className="flex gap-4 py-5 sm:gap-6 sm:py-6">
                 <CartLineImage item={item} />
@@ -83,7 +83,7 @@ export function CartItemList({ cartItems, locale, handleQuantityChange, handleRe
                       ) : null}
                       <h3 className="m-0 text-[15px] leading-snug sm:text-base lg:text-[1.0625rem]">
                         <Link
-                          href={`/products/${item.slug}`}
+                          href={getCartItemHref(item)}
                           className="line-clamp-2 font-[family-name:var(--font-playfair)] font-semibold text-[var(--text-main)] transition-colors hover:text-[var(--primary-ink)]"
                         >
                           {item.name}

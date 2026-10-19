@@ -58,10 +58,12 @@ export function FaqsExperience() {
             <div className="mt-8">
               <EmptyState
                 icon={MessageCircleQuestion}
+                eyebrow={t("noResultsEyebrow")}
                 title={t("noResultsTitle")}
                 description={t("noResults")}
                 action={t("resetFilters")}
                 onAction={resetFilters}
+                secondaryAction={{ label: t("askTailor"), href: "/contact" }}
               />
             </div>
           ) : (

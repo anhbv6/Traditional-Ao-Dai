@@ -3,6 +3,8 @@
   "title": "Danh sách yêu thích",
   "subtitle": "Lưu lại những thiết kế áo dài bạn thương để xem lại, đặt may hoặc mua bất cứ lúc nào.",
   "itemCount": "{count} thiết kế",
+  "itemsLabel": "Thiết kế",
+  "backToShop": "Quay lại Cửa hàng",
   "totalValue": "Tổng giá trị",
   "sort": {
     "label": "Sắp xếp",
@@ -13,7 +15,10 @@
   "empty": {
     "title": "Chưa có thiết kế nào",
     "description": "Chạm vào biểu tượng trái tim trên sản phẩm để lưu những mẫu áo dài bạn yêu thích vào đây.",
-    "action": "Khám phá bộ sưu tập"
+    "action": "Khám phá bộ sưu tập",
+    "eyebrow": "Danh sách yêu thích",
+    "secondary": "May áo theo số đo",
+    "suggestions": "Bắt đầu từ bộ sưu tập"
   },
   "actions": {
     "addAll": "Thêm tất cả vào giỏ",
@@ -37,6 +42,14 @@
     "cleared": "Đã xóa toàn bộ danh sách yêu thích!",
     "addedToCart": "Đã thêm sản phẩm vào giỏ hàng!",
     "addedAllToCart": "Đã thêm {count} sản phẩm vào giỏ hàng!",
-    "nothingToAdd": "Các thiết kế may đo cần chọn số đo ở trang chi tiết."
+    "nothingToAdd": "Các thiết kế may đo cần chọn số đo ở trang chi tiết.",
+    "customDropped": "“{name}” là mẫu may đo — hãy nhập số đo ở trang chi tiết."
+  },
+  "cartPanel": {
+    "title": "Giỏ hàng",
+    "hint": "Kéo thiết kế vào đây để thêm vào giỏ",
+    "release": "Thả để thêm vào giỏ",
+    "empty": "Giỏ hàng đang trống",
+    "dragTip": "Mẹo: kéo thẻ sang giỏ hàng bên phải để thêm nhanh"
   }
 }

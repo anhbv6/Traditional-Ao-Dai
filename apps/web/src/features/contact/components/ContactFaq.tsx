@@ -14,7 +14,7 @@ export function ContactFaq() {
   const t = useTranslations('ContactPage.faq');
 
   return (
-    <Container as="section" className="grid gap-8 py-14 sm:py-20 lg:grid-cols-[0.8fr_1.2fr] lg:gap-12 xl:gap-20 xl:px-16 2xl:py-24">
+    <Container as="section" spacing="section" className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:gap-12 xl:gap-20">
       <Reveal>
         <SectionIntro eyebrow={t('eyebrow')} title={t('title')} />
         <Link

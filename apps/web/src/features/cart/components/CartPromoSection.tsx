@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useId } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Tag, X } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -33,6 +33,8 @@ export function CartPromoSection({
   promoDescription,
 }: CartPromoSectionProps) {
   const t = useTranslations("CartPage");
+  // id riêng mỗi lần dùng: khối tóm tắt có thể hiện 2 nơi (dưới danh sách trên mobile, cột phải trên desktop)
+  const inputId = useId();
 
   return (
     <AnimatePresence mode="wait" initial={false}>
@@ -74,12 +76,12 @@ export function CartPromoSection({
           exit={{ opacity: 0, y: -6 }}
           transition={{ duration: 0.25, ease: EASE }}
         >
-          <label htmlFor="cart-promo-code" className="block text-[11px] font-semibold uppercase tracking-[2.5px] text-[var(--text-light)]">
+          <label htmlFor={inputId} className="block text-[11px] font-semibold uppercase tracking-[2.5px] text-[var(--text-light)]">
             {t("promo.title")}
           </label>
           <div className="mt-2 flex items-start gap-2">
             <TextField
-              id="cart-promo-code"
+              id={inputId}
               className="min-w-0 flex-1"
               appearance="outline"
               size="md"

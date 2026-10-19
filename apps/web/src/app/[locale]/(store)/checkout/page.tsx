@@ -4,7 +4,7 @@ import { CheckoutExperience } from '@/features/checkout';
 
 export default function CheckoutPage() {
   return (
-    <Container as="section" className="py-12">
+    <Container as="section" width="full">
       <CheckoutExperience />
     </Container>
   );

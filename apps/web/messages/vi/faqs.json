@@ -56,5 +56,7 @@
     "description": "Gửi lời nhắn hoặc gọi hotline — trong giờ làm việc, bạn nhận phản hồi sau khoảng 15–30 phút.",
     "contact": "Gửi lời nhắn",
     "call": "Gọi 0909 000 000"
-  }
+  },
+  "noResultsEyebrow": "Không tìm thấy",
+  "askTailor": "Hỏi trực tiếp thợ may"
 }

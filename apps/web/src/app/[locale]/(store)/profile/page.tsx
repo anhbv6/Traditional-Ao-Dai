@@ -4,7 +4,7 @@ import { Container } from "@/components/ui/container";
 
 export default function ProfilePage() {
   return (
-    <Container as="section" className="bg-[var(--bg-main)] min-h-screen pb-12">
+    <Container as="section" className="min-h-screen">
       <ProfileExperience />
     </Container>
   );

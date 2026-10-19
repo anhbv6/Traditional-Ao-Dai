@@ -1,0 +1,130 @@
+{
+  "eyebrow": "Thanh toán",
+  "title": "Hoàn tất đơn hàng",
+  "subtitle": "Chỉ ba bước: thông tin giao hàng, phương thức thanh toán và xác nhận.",
+  "backToCart": "Quay lại giỏ hàng",
+  "steps": {
+    "label": "Các bước thanh toán",
+    "shipping": "Giao hàng",
+    "payment": "Thanh toán",
+    "review": "Xác nhận",
+    "stepNumber": "Bước {number}"
+  },
+  "shipping": {
+    "title": "Thông tin giao hàng",
+    "description": "Dùng để giao áo và liên hệ khi cần trao đổi về số đo, chỉnh may.",
+    "receiverGroup": "Người nhận",
+    "addressGroup": "Địa chỉ nhận hàng",
+    "fullName": "Họ và tên",
+    "fullNamePlaceholder": "Nguyễn Văn A",
+    "phone": "Số điện thoại",
+    "phonePlaceholder": "0901 234 567",
+    "email": "Email",
+    "emailPlaceholder": "ban@email.com",
+    "emailHint": "Nhận xác nhận đơn hàng và cập nhật giao hàng",
+    "province": "Tỉnh / Thành phố",
+    "provincePlaceholder": "Hà Nội",
+    "district": "Quận / Huyện",
+    "districtPlaceholder": "Cầu Giấy",
+    "ward": "Phường / Xã",
+    "wardPlaceholder": "Dịch Vọng",
+    "address": "Địa chỉ chi tiết",
+    "addressPlaceholder": "Số nhà, tên đường, toà nhà…",
+    "notes": "Ghi chú cho đơn hàng",
+    "notesPlaceholder": "Ví dụ: giao giờ hành chính, gọi trước khi giao…"
+  },
+  "payment": {
+    "title": "Phương thức thanh toán",
+    "description": "Chọn cách bạn muốn thanh toán cho đơn hàng.",
+    "methods": {
+      "cod": {
+        "title": "Thanh toán khi nhận hàng (COD)",
+        "description": "Trả tiền mặt cho nhân viên giao hàng sau khi nhận và kiểm tra áo."
+      },
+      "bank": {
+        "title": "Chuyển khoản ngân hàng",
+        "description": "Thông tin tài khoản hiển thị ở bước xác nhận. Đơn được xử lý khi nhận được tiền."
+      },
+      "card": {
+        "title": "Thẻ tín dụng / ghi nợ",
+        "description": "Visa, Mastercard, JCB và thẻ nội địa."
+      }
+    },
+    "cardNote": "Sau khi đặt hàng, bạn sẽ được chuyển tới cổng thanh toán bảo mật để nhập thông tin thẻ. AODAI không lưu số thẻ của bạn."
+  },
+  "review": {
+    "title": "Xác nhận đơn hàng",
+    "description": "Kiểm tra lại thông tin trước khi đặt hàng.",
+    "shippingTitle": "Giao đến",
+    "paymentTitle": "Thanh toán",
+    "notes": "Ghi chú",
+    "edit": "Sửa",
+    "bank": {
+      "title": "Thông tin chuyển khoản",
+      "bankName": "Ngân hàng",
+      "accountNumber": "Số tài khoản",
+      "accountHolder": "Chủ tài khoản",
+      "content": "Nội dung chuyển khoản",
+      "contentHint": "Ghi đúng nội dung để đơn được xác nhận nhanh"
+    },
+    "customNote": "Đơn có sản phẩm may đo: thợ sẽ gọi xác nhận số đo trước khi cắt vải (7–10 ngày hoàn thiện).",
+    "agreement": "Bằng việc bấm “Đặt hàng”, bạn đồng ý với chính sách mua hàng và đổi trả của AODAI."
+  },
+  "actions": {
+    "back": "Quay lại",
+    "toPayment": "Tiếp tục thanh toán",
+    "toReview": "Xem lại đơn hàng",
+    "placeOrder": "Đặt hàng",
+    "placing": "Đang đặt hàng…"
+  },
+  "summary": {
+    "title": "Đơn hàng của bạn",
+    "editCart": "Sửa giỏ hàng",
+    "variant": "Size {size}",
+    "quantity": "× {count}",
+    "custom": "May đo",
+    "items": "Tạm tính ({count} sản phẩm)",
+    "discount": "Giảm giá",
+    "shipping": "Phí vận chuyển",
+    "free": "Miễn phí",
+    "total": "Tổng thanh toán",
+    "vatNote": "Đã bao gồm VAT",
+    "savings": "Bạn tiết kiệm",
+    "receipt": "Hoá đơn bán hàng",
+    "brandLine": "Áo dài truyền thống & may đo",
+    "orderNo": "Số đơn",
+    "date": "Ngày",
+    "customer": "Khách hàng",
+    "payment": "Thanh toán",
+    "pending": "—",
+    "itemColumn": "Sản phẩm",
+    "amountColumn": "Thành tiền",
+    "lineQuantity": "{count} × {price}",
+    "grandTotal": "Tổng cộng",
+    "thanks": "Cảm ơn quý khách đã chọn AODAI"
+  },
+  "empty": {
+    "title": "Chưa có sản phẩm để thanh toán",
+    "description": "Giỏ hàng đang trống. Hãy chọn thiết kế bạn yêu thích trước khi thanh toán.",
+    "action": "Khám phá bộ sưu tập"
+  },
+  "success": {
+    "eyebrow": "Đặt hàng thành công",
+    "title": "Cảm ơn bạn đã chọn AODAI",
+    "description": "Đơn hàng đã được ghi nhận và đang được chuẩn bị.",
+    "orderId": "Mã đơn hàng",
+    "total": "Tổng thanh toán",
+    "method": "Thanh toán",
+    "emailNote": "Xác nhận đơn hàng đã được gửi tới {email}.",
+    "bankReminder": "Vui lòng chuyển khoản với nội dung bên dưới để đơn được xử lý sớm nhất.",
+    "cardReminder": "Bạn sẽ nhận email hướng dẫn hoàn tất thanh toán thẻ qua cổng bảo mật.",
+    "nextTitle": "Tiếp theo",
+    "next": {
+      "confirm": "Nhân viên gọi xác nhận đơn trong 24 giờ làm việc.",
+      "prepare": "Áo được kiểm tra, là phẳng và đóng hộp quà.",
+      "ship": "Giao hàng 2–4 ngày (may đo 7–10 ngày)."
+    },
+    "continue": "Tiếp tục mua sắm",
+    "viewOrders": "Xem đơn hàng của tôi"
+  }
+}

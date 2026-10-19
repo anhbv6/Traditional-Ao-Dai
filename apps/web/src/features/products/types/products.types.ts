@@ -8,6 +8,24 @@ import { type Locale } from "@repo/shared";
 export type { MockProduct } from "../data/mockProducts";
 export type { Locale };
 
+/**
+ * Bộ lọc ban đầu đọc từ URL trang Cửa hàng (chuỗi thô, `useProducts` tự kiểm tra hợp lệ):
+ * `?category=wedding&type=custom&color=red&material=silk&maxPrice=2000000`.
+ * Màn khác muốn mở sẵn bộ lọc nào thì gắn tham số tương ứng — nhóm lọc đó sẽ tự mở.
+ */
+export interface ProductFilterParams {
+  /** Bộ sưu tập — id trong `collectionOptions` (wedding, modern, silk…) */
+  category?: string;
+  /** Hình thức mua — `ready` | `custom` */
+  type?: string;
+  /** Màu — khóa tiếng Anh trong `colorKeys` (red, yellow, pink…) */
+  color?: string;
+  /** Chất liệu — khóa tiếng Anh trong `materialKeys` (silk, brocade, velvet, chiffon) */
+  material?: string;
+  /** Giá tối đa (VND) */
+  maxPrice?: string;
+}
+
 export interface DisplayColor {
   name: string;
   hex: string;

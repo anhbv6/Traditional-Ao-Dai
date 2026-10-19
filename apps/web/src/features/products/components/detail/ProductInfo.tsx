@@ -11,6 +11,8 @@ import { formatVnd } from '@repo/shared';
 
 import { QuantitySelector } from '@/components/shared/QuantitySelector';
 import { HeartToggle } from '@/components/shared/HeartToggle';
+import { ActionButton } from '@/components/shared/ActionButton';
+import { cn } from '@/lib/utils';
 import { MAX_LINE_QUANTITY } from '@/features/cart';
 import { DisplayProduct } from '../../types/products.types';
 
@@ -120,7 +122,7 @@ export default function ProductInfo({
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -14, opacity: 0 }}
           transition={{ duration: 0.25, ease: EASE }}
-          className="relative flex items-center gap-1.5"
+          className="flex items-center gap-1.5"
         >
           <Check size={15} strokeWidth={2} />
           {t('addedShort')}
@@ -132,7 +134,7 @@ export default function ProductInfo({
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -14, opacity: 0 }}
           transition={{ duration: 0.25, ease: EASE }}
-          className="relative flex items-center gap-1.5"
+          className="flex items-center gap-1.5"
         >
           <ShoppingBag size={15} strokeWidth={1.6} />
           {t('addToCart')}
@@ -141,21 +143,20 @@ export default function ProductInfo({
     </AnimatePresence>
   );
 
-  const addButtonClass = `group/add relative flex items-center justify-center overflow-hidden text-xs font-semibold uppercase tracking-[1.5px] text-white transition-colors duration-500 sm:text-[13px] ${
-    justAdded ? 'bg-emerald-800' : 'bg-[var(--primary-color)]'
-  }`;
+  /** Vừa thêm vào giỏ: nút chuyển xanh xác nhận trong chốc lát (ghi đè nền / viền của ActionButton) */
+  const addedClass = justAdded ? 'border-emerald-800 bg-emerald-800' : undefined;
 
   return (
     <div className="min-w-0 lg:pt-1">
       <motion.div variants={stagger} initial="hidden" animate="show">
         <motion.div variants={rise} className="flex items-start justify-between gap-6">
-          <h1 className="text-[1.625rem] font-semibold leading-tight text-[var(--primary-ink)] sm:text-4xl">{product.name}</h1>
+          <h1 className="text-[1.75rem] font-semibold leading-tight text-[var(--primary-ink)] sm:text-[2.25rem] lg:text-[2.5rem]">{product.name}</h1>
           <span className="mt-1.5 shrink-0 bg-[var(--bg-secondary)] px-3 py-1 text-xs font-semibold text-[var(--primary-ink)]">
             {product.stock}
           </span>
         </motion.div>
 
-        <motion.p variants={rise} className="mt-2 text-sm text-[var(--text-main)]">
+        <motion.p variants={rise} className="mt-2 text-base text-[var(--text-light)]">
           {product.description}
         </motion.p>
 
@@ -174,7 +175,7 @@ export default function ProductInfo({
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: '-100%', opacity: 0 }}
               transition={{ duration: 0.45, ease: EASE }}
-              className="text-2xl font-semibold text-[var(--primary-ink)]"
+              className="text-[1.625rem]/9 font-semibold text-[var(--primary-ink)]"
             >
               {priceText}
             </motion.span>
@@ -192,7 +193,7 @@ export default function ProductInfo({
           </AnimatePresence>
         </motion.div>
 
-        <motion.p variants={rise} className="mt-4 max-w-2xl text-sm leading-7 text-[var(--text-main)]">
+        <motion.p variants={rise} className="mt-4 max-w-2xl text-[0.9375rem] leading-7 text-[var(--text-main)]">
           {product.longDescription}
         </motion.p>
 
@@ -330,13 +331,9 @@ export default function ProductInfo({
           labels={{ decrease: t('quantity.decrease'), increase: t('quantity.increase') }}
         />
 
-        <motion.button type="button" onClick={handleAddToCart} whileTap={{ scale: 0.97 }} className={`h-11 flex-1 sm:h-12 ${addButtonClass}`}>
-          <span
-            aria-hidden="true"
-            className="absolute inset-0 origin-left scale-x-0 bg-[#2A0A12] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/add:scale-x-100"
-          />
+        <ActionButton variant="confirm" size="lg" onClick={handleAddToCart} className={cn('min-h-11 flex-1 sm:min-h-12', addedClass)}>
           {addButtonContent}
-        </motion.button>
+        </ActionButton>
 
         {/* Yêu thích: chỉ icon (không viền), tim nảy + toả hạt khi bấm — HeartToggle dùng chung */}
         <HeartToggle
@@ -392,9 +389,9 @@ export default function ProductInfo({
                 {selectedSize ? ` · ${t('sizeLabel')} ${selectedSize}` : ''}
               </p>
             </div>
-            <motion.button type="button" onClick={handleAddToCart} whileTap={{ scale: 0.96 }} className={`h-10 shrink-0 px-4 ${addButtonClass}`}>
+            <ActionButton variant="confirm" size="md" onClick={handleAddToCart} className={cn('shrink-0 px-4', addedClass)}>
               {addButtonContent}
-            </motion.button>
+            </ActionButton>
           </motion.div>
         ) : null}
       </AnimatePresence>

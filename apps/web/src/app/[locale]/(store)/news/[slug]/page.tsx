@@ -1,7 +1,5 @@
 import React from 'react';
-import { ArrowLeft } from 'lucide-react';
-import { getTranslations } from 'next-intl/server';
-import { Link } from '@/i18n/routing';
+import { notFound } from 'next/navigation';
 
 import { Container } from '@/components/ui/container';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
@@ -38,24 +36,10 @@ export async function generateMetadata({ params }: NewsDetailPageProps) {
 
 export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
   const { slug, locale } = await params;
-  const t = await getTranslations('NewsPage');
   const article = findArticle(slug);
 
-  if (!article) {
-    return (
-      <Container as="div" className="py-16 text-center">
-        <Breadcrumbs />
-        <h1 className="mt-8 text-2xl font-semibold text-[var(--primary-ink)]">{t('articleNotFound')}</h1>
-        <Link
-          href="/news"
-          className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[var(--primary-ink)] hover:underline"
-        >
-          <ArrowLeft size={16} />
-          {t('backToNews')}
-        </Link>
-      </Container>
-    );
-  }
+  // Bài không tồn tại → trang 404 chung của storefront (có header / footer, đã dịch)
+  if (!article) notFound();
 
   // Danh sách sắp mới -> cũ: bài trước = mới hơn, bài sau = cũ hơn
   const index = mockArticles.findIndex((item) => item.id === article.id);
@@ -72,7 +56,7 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
   const loc = locale === 'en' ? 'en' : 'vi';
 
   return (
-    <Container as="article" className="max-w-6xl py-8 sm:py-12">
+    <Container as="article" width="narrow">
       <Breadcrumbs lastLabel={article.title[loc]} />
       <div className="mt-6 sm:mt-8">
         <NewsDetail
