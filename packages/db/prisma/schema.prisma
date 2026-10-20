@@ -50,6 +50,19 @@ enum PaymentStatus {
   REFUNDED
 }
 
+enum AppointmentType {
+  MEASUREMENT       // Đến lấy số đo
+  FITTING           // Đến thử áo / sửa form
+  PICKUP            // Đến lấy áo
+}
+
+enum AppointmentStatus {
+  SCHEDULED         // Đã hẹn
+  DONE              // Khách đã đến
+  CANCELLED         // Huỷ hẹn
+  NO_SHOW           // Khách không đến
+}
+
 enum ApprovalStatus {
   PENDING
   APPROVED
@@ -87,6 +100,7 @@ model User {
   reviews           Review[]
   orders            Order[]           @relation("CustomerOrders")
   createdOrders     Order[]           @relation("StaffCreatedOrders")
+  appointments      Appointment[]     @relation("CustomerAppointments")
   assignedTasks     TailoringLog[]    @relation("TailorStaff")
 
   cart              Cart?
@@ -243,6 +257,7 @@ model Product {
   category    Category         @relation(fields: [categoryId], references: [id])
 
   variants    ProductVariant[]
+  fabrics     Fabric[]
   reviews     Review[]
   orderItems  OrderItem[]
   cartItems   CartItem[]
@@ -356,6 +371,8 @@ model Order {
   discountAmount  Decimal        @default(0) @db.Decimal(12, 2)
   shippingFee     Decimal        @default(0) @db.Decimal(12, 2)
   totalAmount     Decimal        @db.Decimal(12, 2)
+  paidAmount      Decimal        @default(0) @db.Decimal(12, 2) // Tiền đã thu (cọc / thanh toán) — còn nợ = totalAmount - paidAmount
+  dueDate         DateTime?      // Ngày hẹn trả áo cho khách (đơn may đo thường gắn ngày sự kiện)
 
   voucherId       String?
   voucher         Voucher?       @relation(fields: [voucherId], references: [id])
@@ -367,6 +384,7 @@ model Order {
 
   items           OrderItem[]
   tailoringLogs   TailoringLog[]
+  appointments    Appointment[]
 
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
@@ -374,6 +392,7 @@ model Order {
   @@index([orderNumber])
   @@index([userId])
   @@index([orderStatus])
+  @@index([dueDate])
 }
 
 model OrderItem {
@@ -558,4 +577,51 @@ model Faq {
   updatedAt DateTime @updatedAt
 
   @@index([category])
+}
+
+// Lịch hẹn khách đến tiệm: lấy số đo, thử áo, lấy áo
+model Appointment {
+  id            String            @id @default(uuid())
+  customerName  String
+  customerPhone String?
+  type          AppointmentType
+  status        AppointmentStatus @default(SCHEDULED)
+  scheduledAt   DateTime
+  note          String?           // VD: "Thử áo lụa hồng, sửa lại eo"
+
+  // Khách có tài khoản → mở hồ sơ số đo (UserMeasurement)
+  userId        String?
+  user          User?             @relation("CustomerAppointments", fields: [userId], references: [id], onDelete: SetNull)
+
+  // Hẹn gắn với đơn may đo → số đo snapshot trên đơn
+  orderId       String?
+  order         Order?            @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  @@index([scheduledAt])
+  @@index([userId])
+  @@index([orderId])
+}
+
+// Kho vải theo cây / cuộn (mét) — nguyên liệu may đo
+model Fabric {
+  id                String   @id @default(uuid())
+  code              String   @unique // Mã cây vải, VD: "LUA-HONG-01"
+  name              String   // VD: "Lụa tơ tằm hồng phấn"
+  color             String?
+  remainingMeters   Decimal  @db.Decimal(8, 2)
+  lowStockThreshold Decimal  @default(3) @db.Decimal(8, 2) // Dưới ngưỡng này thì cảnh báo (≈ 1 bộ áo dài)
+  isActive          Boolean  @default(true)
+
+  // Sản phẩm may từ cây vải này — để ẩn nhanh trên web khi sắp hết vải
+  productId         String?
+  product           Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([productId])
+  @@index([isActive, remainingMeters])
 }

@@ -82,7 +82,7 @@ export function AdminSegmentedControl<T extends string>({
           onClick={() => onChange(option.value)}
           disabled={disabled}
           className={cn(
-            "cursor-pointer rounded-md px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.5px] transition-all duration-200 disabled:cursor-default",
+            "cursor-pointer whitespace-nowrap rounded-md px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.5px] transition-all duration-200 disabled:cursor-default",
             value === option.value ? "bg-[#18181B] text-white shadow-2xs" : "text-[#71717A] hover:text-[#09090B]"
           )}
         >

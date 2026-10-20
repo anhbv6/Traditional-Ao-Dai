@@ -28,7 +28,6 @@
   },
   "header": {
     "systemTitle": "AODAI Admin",
-    "systemSubtitle": "Hệ thống quản lý",
     "viewStore": "Xem cửa hàng",
     "defaultAdminName": "Quản trị viên",
     "superAdminRole": "Super Admin",
@@ -61,92 +60,6 @@
   "loading": {
     "text": "Đang tải dữ liệu quản trị..."
   },
-  "title": "Bảng quản trị AODAI",
-  "subtitle": "Tổng quan hoạt động kinh doanh, tiến độ may đo và tình trạng kho vật liệu.",
-  "filters": {
-    "today": "Hôm nay",
-    "week": "Tuần này",
-    "month": "Tháng này"
-  },
-  "stats": {
-    "revenue": "Tổng doanh thu",
-    "orders": "Tổng đơn hàng",
-    "pending": "Đơn hàng chờ xử lý",
-    "ratio": "Tỷ lệ Đơn hàng",
-    "ratioCustom": "May đo",
-    "ratioReady": "May sẵn",
-    "comparedToBefore": "so với trước",
-    "urgentTailor": "Cần hoàn thiện may đo gấp"
-  },
-  "chart": {
-    "title": "Phân tích Bộ sưu tập Áo Dài bán chạy",
-    "subtitle": "Tỷ lệ đóng góp doanh thu theo từng dòng chất liệu.",
-    "overview": "Tổng quan",
-    "empty": "Chưa có đơn hàng trong kỳ để phân tích."
-  },
-  "alerts": {
-    "title": "Cảnh báo tồn kho",
-    "subtitle": "Các mã SKU sắp hết hàng cần bổ sung.",
-    "tailoring": "Tiến độ May đo",
-    "lowStock": "Sắp hết hàng",
-    "lowFabrics": "Vật liệu / Kho vải sắp hết",
-    "needImport": "Cần nhập gấp",
-    "tailorStep": {
-      "measuring": "Đo đạc & Lên rập",
-      "cutting": "Cắt vải",
-      "sewing": "Khâu ráp",
-      "embellishing": "Đính kết",
-      "finishing": "Hoàn thiện & Ủi phẳng"
-    },
-    "stockLeft": "Còn lại",
-    "empty": "Không có sản phẩm nào sắp hết hàng."
-  },
-  "tailoring": {
-    "title": "Theo dõi Tiến độ May đo (Bespoke Workflow)",
-    "subtitle": "Tiến độ cắt rập, ráp khâu thủ công của thợ may nghệ nhân.",
-    "measurementsText": "Số đo",
-    "bust": "Ngực",
-    "waist": "Eo",
-    "detailAction": "Chi tiết"
-  },
-  "orders": {
-    "title": "Hoạt động & Đơn hàng mới nhất",
-    "liveBadge": "Trực tiếp",
-    "orderId": "Mã đơn",
-    "customer": "Khách hàng",
-    "type": "Loại đơn",
-    "total": "Tổng tiền",
-    "status": "Trạng thái",
-    "action": "Xử lý",
-    "actionDetail": "Chi tiết",
-    "typeCustom": "Đặt may đo",
-    "typeReady": "Mua sẵn",
-    "detailTitle": "Chi tiết xử lý đơn hàng",
-    "updateStatus": "Cập nhật trạng thái",
-    "customerInfo": "Thông tin khách hàng",
-    "tailorSpecs": "Số đo may đo của khách",
-    "orderedProducts": "Sản phẩm đặt mua",
-    "totalRevenue": "Tổng tiền thu",
-    "fullName": "Họ tên:",
-    "phone": "SĐT:",
-    "address": "Địa chỉ:",
-    "height": "Chiều cao:",
-    "weight": "Cân nặng:",
-    "bust": "Vòng ngực:",
-    "waist": "Vòng eo:",
-    "hips": "Vòng hông:",
-    "customMade": "May đo riêng",
-    "noOrders": "Chưa có đơn hàng nào trong hệ thống.",
-    "updateSuccess": "Đã chuyển đơn hàng {id} sang trạng thái mới thành công!",
-    "updateError": "Không thể cập nhật trạng thái đơn hàng.",
-    "statusLabels": {
-      "pending_approval": "Chờ duyệt",
-      "cutting_fabric": "Đang cắt vải",
-      "sewing_job": "Đang khâu ráp",
-      "completed": "Hoàn thành",
-      "shipping": "Đang giao"
-    }
-  },
   "toasts": {
     "approveSuccess": "Đã phê duyệt yêu cầu thành công!",
     "rejectSuccess": "Đã từ chối yêu cầu thành công!",
@@ -162,11 +75,6 @@
     "permissionUpdateSuccess": "Đã cập nhật phân quyền nhân viên!",
     "staffUnlocked": "Đã mở khóa tài khoản nhân viên!",
     "staffLocked": "Đã khóa tài khoản nhân viên!"
-  },
-  "eyebrow": "Tổng quan vận hành",
-  "noAccess": {
-    "title": "Bạn chưa được cấp quyền xem dữ liệu trên bảng điều khiển",
-    "description": "Liên hệ Super Admin để được cấp quyền (đơn hàng, may đo, tồn kho hoặc báo cáo)."
   },
   "staff": {
     "eyebrow": "Nhân sự & Phân quyền",
@@ -204,6 +112,112 @@
       "email": "Email đăng nhập",
       "password": "Mật khẩu (tối thiểu 6 ký tự)",
       "permissions": "Quyền được cấp"
+    }
+  },
+  "dashboard": {
+    "greeting": "Xin chào, {name}",
+    "description": "Điều phối xưởng may, lịch hẹn tại tiệm và kho vải trong ngày.",
+    "noAccess": {
+      "title": "Chưa có quyền xem dashboard",
+      "description": "Liên hệ Super Admin để được cấp quyền xử lý đơn, may đo hoặc kho."
+    },
+    "kpi": {
+      "finance": "Doanh thu & cọc",
+      "today": "Hôm nay",
+      "month": "Tháng này",
+      "outstanding": "Khách còn nợ",
+      "outstandingOrders": "{count} đơn đã cọc, chờ lấy áo",
+      "tailoring": "Áo trên bàn may",
+      "waitingCut": "Chờ cắt",
+      "sewing": "Đang may",
+      "embroidery": "Thêu / đính",
+      "urgent": "Cần giao gấp",
+      "urgentHint": "Hẹn trả khách trong {days} ngày tới",
+      "overdue": "{count} đơn đã trễ hẹn",
+      "noOverdue": "Không có đơn trễ hẹn",
+      "appointments": "Lịch hẹn hôm nay",
+      "measurement": "Lấy số đo",
+      "fitting": "Thử áo",
+      "other": "Khác"
+    },
+    "pipeline": {
+      "title": "Bảng điều phối may đo",
+      "subtitle": "Kéo thẻ sang cột khác hoặc bấm nút để chuyển công đoạn. Đơn hẹn trả sớm nhất nằm trên cùng.",
+      "stages": {
+        "review": {
+          "title": "Chờ duyệt số đo & cọc",
+          "short": "Duyệt",
+          "hint": "Kiểm tra số đo khách tự đo, xác nhận đã cọc"
+        },
+        "cutting": {
+          "title": "Chờ cắt vải",
+          "short": "Cắt",
+          "hint": "Đã chốt số đo, chờ thợ chính cắt vải"
+        },
+        "sewing": {
+          "title": "Đang may / gia công",
+          "short": "May",
+          "hint": "Đang ở chỗ thợ may hoặc thợ thêu tay"
+        },
+        "fitting": {
+          "title": "Chờ thử áo / QC",
+          "short": "Thử áo",
+          "hint": "Đã lên phom, chờ khách thử hoặc kiểm tra đường kim"
+        },
+        "delivery": {
+          "title": "Chờ thu tiền & giao",
+          "short": "Giao",
+          "hint": "Hoàn tất, thu nốt tiền và giao áo"
+        }
+      },
+      "empty": "Không có đơn",
+      "noDue": "Chưa hẹn ngày trả",
+      "dueToday": "Hẹn trả hôm nay",
+      "dueInDays": "Còn {days} ngày",
+      "overdue": "Trễ {days} ngày",
+      "debt": "Còn nợ {amount}",
+      "paidInFull": "Đã thu đủ",
+      "movePrev": "Trả về: {stage}",
+      "tailoringStatus": {
+        "FABRIC_CUTTING": "Đang cắt vải",
+        "SEWING": "Đang may",
+        "EMBROIDERY_BEADING": "Thêu / đính kết"
+      }
+    },
+    "schedule": {
+      "title": "Lịch hẹn hôm nay",
+      "empty": "Hôm nay không có lịch hẹn.",
+      "types": {
+        "MEASUREMENT": "Lấy số đo",
+        "FITTING": "Thử áo",
+        "PICKUP": "Lấy áo"
+      },
+      "viewMeasurement": "Hồ sơ số đo",
+      "dialogTitle": "Số đo của {name}",
+      "source": "Theo: {source}",
+      "noMeasurement": "Khách chưa có số đo trong hệ thống.",
+      "note": "Ghi chú",
+      "fields": {
+        "height": "Chiều cao",
+        "weight": "Cân nặng",
+        "bust": "Vòng ngực",
+        "waist": "Vòng eo",
+        "hips": "Vòng mông",
+        "shoulder": "Rộng vai",
+        "armLength": "Dài tay",
+        "shirtLength": "Dài áo",
+        "pantsLength": "Dài quần"
+      }
+    },
+    "fabric": {
+      "title": "Cảnh báo kho vải",
+      "subtitle": "Cây vải dưới ngưỡng mét (mặc định 3 m ≈ một bộ áo dài)",
+      "empty": "Kho vải ổn định, chưa có cây nào sắp hết.",
+      "remaining": "{meters} m",
+      "hideOnWeb": "Ẩn trên web",
+      "hidden": "Đã ẩn trên web",
+      "noProduct": "Chưa gắn sản phẩm",
+      "restock": "Nhập thêm"
     }
   }
 }

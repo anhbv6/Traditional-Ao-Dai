@@ -194,7 +194,123 @@ async function main() {
     }
   }
 
+  await seedOperations()
+
   console.log('\n🎉 Seeding database successfully completed!')
+}
+
+/**
+ * Dữ liệu vận hành mẫu cho dashboard admin: đơn may đo ở từng công đoạn (có cọc + ngày hẹn trả),
+ * lịch hẹn trong hôm nay và các cây vải (có cây sắp hết). Ngày giờ tính theo thời điểm chạy seed.
+ * Idempotent: đơn theo orderNumber, vải theo code, lịch hẹn theo id cố định.
+ */
+async function seedOperations() {
+  console.log('\n🧵 Seeding dashboard operations (orders, appointments, fabrics)...')
+
+  const products = await prisma.product.findMany({
+    where: { slug: { in: ['ao-dai-gam-hoa-sen-co-dien', 'ao-dai-cach-tan-dang-suong-linen', 'ao-dai-cuoi-gam-do-phuong-hoang'] } },
+  })
+  const bySlug = (slug: string) => products.find((p) => p.slug === slug)
+  const gamHoaSen = bySlug('ao-dai-gam-hoa-sen-co-dien')
+  const linen = bySlug('ao-dai-cach-tan-dang-suong-linen')
+  const cuoi = bySlug('ao-dai-cuoi-gam-do-phuong-hoang')
+  if (!gamHoaSen || !linen || !cuoi) {
+    console.log('   ⚠️ Skipped: sample products not found.')
+    return
+  }
+
+  const DAY = 24 * 60 * 60 * 1000
+  const now = Date.now()
+  const inDays = (days: number) => new Date(now + days * DAY)
+  // Giờ hôm nay theo giờ Việt Nam (UTC+7), VD todayAt(9, 30) = 09:30 hôm nay
+  const todayAt = (hour: number, minute = 0) => {
+    const vn = new Date(now + 7 * 60 * 60 * 1000)
+    return new Date(Date.UTC(vn.getUTCFullYear(), vn.getUTCMonth(), vn.getUTCDate(), hour - 7, minute))
+  }
+
+  const measurements = { height: 160, weight: 48, bust: 82, waist: 64, hips: 88, shoulder: 36, shirtLength: 128, pantsLength: 102 }
+
+  const orders = [
+    { orderNumber: 'AD-SEED-0001', customerName: 'Nguyễn Thị Lan', customerPhone: '0901000001', product: cuoi, price: 2800000, orderStatus: 'PENDING', paymentStatus: 'UNPAID', paid: 0, tailoring: 'NOT_APPLICABLE', dueIn: 12 },
+    { orderNumber: 'AD-SEED-0002', customerName: 'Trần Thu Hà', customerPhone: '0901000002', product: gamHoaSen, price: 1200000, orderStatus: 'CONFIRMED', paymentStatus: 'PARTIALLY_PAID', paid: 600000, tailoring: 'WAITING_FABRIC', dueIn: 6 },
+    { orderNumber: 'AD-SEED-0003', customerName: 'Lê Minh Châu', customerPhone: '0901000003', product: linen, price: 850000, orderStatus: 'IN_PRODUCTION', paymentStatus: 'PARTIALLY_PAID', paid: 425000, tailoring: 'SEWING', dueIn: 2 },
+    { orderNumber: 'AD-SEED-0004', customerName: 'Phạm Ngọc Mai', customerPhone: '0901000004', product: cuoi, price: 2800000, orderStatus: 'IN_PRODUCTION', paymentStatus: 'PARTIALLY_PAID', paid: 1400000, tailoring: 'EMBROIDERY_BEADING', dueIn: 3 },
+    { orderNumber: 'AD-SEED-0005', customerName: 'Võ Thanh Tâm', customerPhone: '0901000005', product: gamHoaSen, price: 1200000, orderStatus: 'IN_PRODUCTION', paymentStatus: 'PARTIALLY_PAID', paid: 600000, tailoring: 'FITTING_IRONING', dueIn: 1 },
+    { orderNumber: 'AD-SEED-0006', customerName: 'Đặng Bảo Ngọc', customerPhone: '0901000006', product: linen, price: 850000, orderStatus: 'READY_TO_SHIP', paymentStatus: 'PARTIALLY_PAID', paid: 425000, tailoring: 'COMPLETED', dueIn: 2 },
+  ] as const
+
+  const createdOrders: Record<string, string> = {}
+  for (const o of orders) {
+    const order = await prisma.order.upsert({
+      where: { orderNumber: o.orderNumber },
+      update: {
+        orderStatus: o.orderStatus,
+        paymentStatus: o.paymentStatus,
+        paidAmount: o.paid,
+        dueDate: inDays(o.dueIn),
+      },
+      create: {
+        orderNumber: o.orderNumber,
+        customerName: o.customerName,
+        customerEmail: `${o.orderNumber.toLowerCase()}@example.com`,
+        customerPhone: o.customerPhone,
+        shippingAddress: 'Nhận tại tiệm',
+        subTotal: o.price,
+        totalAmount: o.price,
+        paidAmount: o.paid,
+        dueDate: inDays(o.dueIn),
+        orderStatus: o.orderStatus,
+        paymentStatus: o.paymentStatus,
+        paymentMethod: 'BANK_TRANSFER',
+        items: {
+          create: {
+            productId: o.product.id,
+            productName: o.product.name,
+            quantity: 1,
+            unitPrice: o.price,
+            totalPrice: o.price,
+            isCustomFit: true,
+            tailoringStatus: o.tailoring,
+            ...measurements,
+          },
+        },
+      },
+    })
+    createdOrders[o.orderNumber] = order.id
+    console.log(`   🧾 Order ${o.orderNumber} — ${o.orderStatus} / ${o.tailoring}`)
+  }
+
+  const appointments = [
+    { id: '7f1c2a10-0000-4000-8000-000000000001', customerName: 'Nguyễn Thị Lan', customerPhone: '0901000001', type: 'MEASUREMENT', at: todayAt(9, 30), note: 'Đo áo dài cưới', orderNumber: 'AD-SEED-0001' },
+    { id: '7f1c2a10-0000-4000-8000-000000000002', customerName: 'Phạm Ngọc Mai', customerPhone: '0901000004', type: 'FITTING', at: todayAt(14, 0), note: 'Thử áo lụa hồng, sửa lại eo', orderNumber: 'AD-SEED-0004' },
+    { id: '7f1c2a10-0000-4000-8000-000000000003', customerName: 'Võ Thanh Tâm', customerPhone: '0901000005', type: 'FITTING', at: todayAt(16, 30), note: 'Thử form lần cuối', orderNumber: 'AD-SEED-0005' },
+    { id: '7f1c2a10-0000-4000-8000-000000000004', customerName: 'Hoàng Kim Oanh', customerPhone: '0901000007', type: 'MEASUREMENT', at: todayAt(18, 0), note: 'Khách mới, may áo dài đi lễ', orderNumber: null },
+  ] as const
+
+  for (const a of appointments) {
+    const data = {
+      customerName: a.customerName,
+      customerPhone: a.customerPhone,
+      type: a.type,
+      status: 'SCHEDULED' as const,
+      scheduledAt: a.at,
+      note: a.note,
+      orderId: a.orderNumber ? createdOrders[a.orderNumber] : null,
+    }
+    await prisma.appointment.upsert({ where: { id: a.id }, update: data, create: { id: a.id, ...data } })
+  }
+  console.log(`   📅 Appointments today: ${appointments.length}`)
+
+  const fabrics = [
+    { code: 'LUA-HONG-01', name: 'Lụa tơ tằm hồng phấn', color: 'Hồng phấn', remainingMeters: 2.4, productId: gamHoaSen.id },
+    { code: 'GAM-DO-01', name: 'Gấm ruby đỏ nhung', color: 'Đỏ nhung', remainingMeters: 1.6, productId: cuoi.id },
+    { code: 'LINEN-VANG-01', name: 'Linen vàng cúc', color: 'Vàng cúc', remainingMeters: 14, productId: linen.id },
+    { code: 'VOAN-TRANG-01', name: 'Voan lụa trắng', color: 'Trắng', remainingMeters: 2.9, productId: null },
+  ]
+  for (const f of fabrics) {
+    await prisma.fabric.upsert({ where: { code: f.code }, update: f, create: f })
+  }
+  console.log(`   🧶 Fabrics: ${fabrics.length}`)
 }
 
 main()

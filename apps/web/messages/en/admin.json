@@ -28,7 +28,6 @@
   },
   "header": {
     "systemTitle": "AODAI Admin",
-    "systemSubtitle": "Management System",
     "viewStore": "View Storefront",
     "defaultAdminName": "Administrator",
     "superAdminRole": "Super Admin",
@@ -61,92 +60,6 @@
   "loading": {
     "text": "Loading admin data..."
   },
-  "title": "AODAI Admin Dashboard",
-  "subtitle": "Overview of sales activities, tailoring progress, and material stock levels.",
-  "filters": {
-    "today": "Today",
-    "week": "This Week",
-    "month": "This Month"
-  },
-  "stats": {
-    "revenue": "Total Revenue",
-    "orders": "Total Orders",
-    "pending": "Pending Orders",
-    "ratio": "Order Type Ratio",
-    "ratioCustom": "Custom Tailor",
-    "ratioReady": "Ready-to-wear",
-    "comparedToBefore": "vs previous period",
-    "urgentTailor": "Urgent tailoring required"
-  },
-  "chart": {
-    "title": "Best-selling Ao Dai Collections",
-    "subtitle": "Revenue share distribution by fabric line.",
-    "overview": "Overview",
-    "empty": "No orders in this period to analyze."
-  },
-  "alerts": {
-    "title": "Stock alerts",
-    "subtitle": "SKUs running low that need restocking.",
-    "tailoring": "Bespoke Tailoring Progress",
-    "lowStock": "Low stock",
-    "lowFabrics": "Low Stock Fabrics & Materials",
-    "needImport": "Need Import",
-    "tailorStep": {
-      "measuring": "Pattern Drafting",
-      "cutting": "Fabric Cutting",
-      "sewing": "Hand Sewing",
-      "embellishing": "Embellishment",
-      "finishing": "Pressing & Finishing"
-    },
-    "stockLeft": "In stock",
-    "empty": "No products are running low."
-  },
-  "tailoring": {
-    "title": "Bespoke Tailoring Workflow Monitor",
-    "subtitle": "Hand-cut patterns, stitching, and finishing by artisan tailors.",
-    "measurementsText": "Measurements",
-    "bust": "Bust",
-    "waist": "Waist",
-    "detailAction": "Detail"
-  },
-  "orders": {
-    "title": "Recent Activity & Live Orders",
-    "liveBadge": "Live",
-    "orderId": "Order ID",
-    "customer": "Customer",
-    "type": "Type",
-    "total": "Total",
-    "status": "Status",
-    "action": "Action",
-    "actionDetail": "Detail",
-    "typeCustom": "Custom Tailored",
-    "typeReady": "Ready-to-wear",
-    "detailTitle": "Order Processing Detail",
-    "updateStatus": "Update Status",
-    "customerInfo": "Customer Details",
-    "tailorSpecs": "Customer Tailoring Measurements",
-    "orderedProducts": "Ordered Products",
-    "totalRevenue": "Total Revenue Collected",
-    "fullName": "Full Name:",
-    "phone": "Phone:",
-    "address": "Address:",
-    "height": "Height:",
-    "weight": "Weight:",
-    "bust": "Bust:",
-    "waist": "Waist:",
-    "hips": "Hips:",
-    "customMade": "Custom Tailored",
-    "noOrders": "No orders found in the system.",
-    "updateSuccess": "Order #{id} status updated successfully!",
-    "updateError": "Failed to update order status.",
-    "statusLabels": {
-      "pending_approval": "Pending Approval",
-      "cutting_fabric": "Cutting Fabric",
-      "sewing_job": "Stitching",
-      "completed": "Completed",
-      "shipping": "Shipping"
-    }
-  },
   "toasts": {
     "approveSuccess": "Request approved successfully!",
     "rejectSuccess": "Request rejected successfully!",
@@ -162,11 +75,6 @@
     "permissionUpdateSuccess": "Staff permissions updated!",
     "staffUnlocked": "Staff account unlocked!",
     "staffLocked": "Staff account locked!"
-  },
-  "eyebrow": "Operations overview",
-  "noAccess": {
-    "title": "You have not been granted access to dashboard data",
-    "description": "Contact a Super Admin to request permissions (orders, tailoring, inventory or reports)."
   },
   "staff": {
     "eyebrow": "Staff & Permissions",
@@ -204,6 +112,112 @@
       "email": "Login email",
       "password": "Password (min 6 characters)",
       "permissions": "Granted permissions"
+    }
+  },
+  "dashboard": {
+    "greeting": "Hello, {name}",
+    "description": "Coordinate the atelier, in-store appointments and fabric stock for today.",
+    "noAccess": {
+      "title": "No dashboard access yet",
+      "description": "Ask a Super Admin for order, tailoring or inventory permissions."
+    },
+    "kpi": {
+      "finance": "Revenue & deposits",
+      "today": "Today",
+      "month": "This month",
+      "outstanding": "Still owed",
+      "outstandingOrders": "{count} deposit orders awaiting pickup",
+      "tailoring": "On the sewing table",
+      "waitingCut": "To cut",
+      "sewing": "Sewing",
+      "embroidery": "Embroidery",
+      "urgent": "Due soon",
+      "urgentHint": "Promised within the next {days} days",
+      "overdue": "{count} orders overdue",
+      "noOverdue": "No overdue orders",
+      "appointments": "Today's appointments",
+      "measurement": "Measuring",
+      "fitting": "Fitting",
+      "other": "Other"
+    },
+    "pipeline": {
+      "title": "Tailoring board",
+      "subtitle": "Drag a card to another column or use the buttons to change stage. Earliest due dates are on top.",
+      "stages": {
+        "review": {
+          "title": "Review measurements & deposit",
+          "short": "Review",
+          "hint": "Check self-measurements and confirm the deposit"
+        },
+        "cutting": {
+          "title": "Waiting to cut",
+          "short": "Cut",
+          "hint": "Measurements locked, waiting for the head tailor"
+        },
+        "sewing": {
+          "title": "Sewing / crafting",
+          "short": "Sew",
+          "hint": "With the tailor or hand embroiderer"
+        },
+        "fitting": {
+          "title": "Fitting / QC",
+          "short": "Fitting",
+          "hint": "Shaped, awaiting customer fitting or stitch QC"
+        },
+        "delivery": {
+          "title": "Collect balance & deliver",
+          "short": "Deliver",
+          "hint": "Done, collect the balance and hand over"
+        }
+      },
+      "empty": "No orders",
+      "noDue": "No due date",
+      "dueToday": "Due today",
+      "dueInDays": "{days} days left",
+      "overdue": "{days} days late",
+      "debt": "{amount} outstanding",
+      "paidInFull": "Paid in full",
+      "movePrev": "Move back: {stage}",
+      "tailoringStatus": {
+        "FABRIC_CUTTING": "Cutting",
+        "SEWING": "Sewing",
+        "EMBROIDERY_BEADING": "Embroidery / beading"
+      }
+    },
+    "schedule": {
+      "title": "Today's schedule",
+      "empty": "No appointments today.",
+      "types": {
+        "MEASUREMENT": "Measuring",
+        "FITTING": "Fitting",
+        "PICKUP": "Pickup"
+      },
+      "viewMeasurement": "Measurements",
+      "dialogTitle": "{name}'s measurements",
+      "source": "From: {source}",
+      "noMeasurement": "No measurements on file for this customer.",
+      "note": "Note",
+      "fields": {
+        "height": "Height",
+        "weight": "Weight",
+        "bust": "Bust",
+        "waist": "Waist",
+        "hips": "Hips",
+        "shoulder": "Shoulder",
+        "armLength": "Sleeve",
+        "shirtLength": "Dress length",
+        "pantsLength": "Pants length"
+      }
+    },
+    "fabric": {
+      "title": "Low fabric alert",
+      "subtitle": "Rolls below their metre threshold (default 3 m ≈ one áo dài)",
+      "empty": "Fabric stock is healthy.",
+      "remaining": "{meters} m",
+      "hideOnWeb": "Hide on web",
+      "hidden": "Hidden on web",
+      "noProduct": "No linked product",
+      "restock": "Restock"
     }
   }
 }

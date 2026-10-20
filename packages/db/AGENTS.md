@@ -24,13 +24,14 @@
 - Đọc `DATABASE_URL` từ `apps/api/.env` thông qua `dotenv-cli`.
 - Khi chạy lệnh Prisma trực tiếp trong `packages/db`, các script đã tự động load đúng `.env`.
 
-# 4. Schema hiện tại (22 models)
+# 4. Schema hiện tại (24 models)
 - **Auth & người dùng:** `User`, `AuthToken`, `SocialAccount`, `UserSession` (refresh token dạng hash, `familyId` phát hiện dùng lại), `UserAddress`, `UserMeasurement` (số đo áo dài).
 - **Catalog:** `Category`, `Product`, `ProductVariant`.
 - **Giỏ hàng & đơn hàng:** `Cart`, `CartItem`, `Voucher`, `Order`, `OrderItem` (snapshot sản phẩm + số đo), `TailoringLog` (nhật ký may đo).
 - **Đánh giá:** `Review`, `ReviewMedia`.
-- **Vận hành:** `StaffPermission`, `ApprovalRequest`, `Article`, `Faq`.
-- Enums: `Role`, `MediaType`, `OrderStatus`, `TailoringStatus`, `PaymentStatus`, `ApprovalStatus`, `DiscountType`.
+- **Vận hành:** `StaffPermission`, `ApprovalRequest`, `Article`, `Faq`, `Appointment` (lịch hẹn đo / thử áo tại tiệm), `Fabric` (kho vải theo mét, ngưỡng cảnh báo).
+- `Order.paidAmount` (tiền đã thu — còn nợ = `totalAmount - paidAmount`), `Order.dueDate` (ngày hẹn trả áo).
+- Enums: `Role`, `MediaType`, `OrderStatus`, `TailoringStatus`, `PaymentStatus`, `AppointmentType`, `AppointmentStatus`, `ApprovalStatus`, `DiscountType`.
 
 # 5. Seeding
 - Seed file: `prisma/seed.ts`. Chạy: `pnpm db:seed`.

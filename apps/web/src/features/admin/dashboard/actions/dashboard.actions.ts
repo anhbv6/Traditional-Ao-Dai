@@ -1,165 +1,150 @@
 "use server";
 
+import { type OrderStatus, type TailoringStatus } from "@repo/db";
+import { revalidatePath } from "next/cache";
 import { prisma } from "../../server/db.server";
 import { authorizeAdminAction } from "../../server/adminAuth.server";
-import { ADMIN_ACTION_ACCESS } from "../../session/permissions";
-import { type OrderStatus as DbOrderStatus } from "@repo/db";
-import { type CreateStaffOrderInput } from "../types/dashboard.types";
-import { getAdminOrdersQuery, getDashboardStatsQuery, getLowStockVariantsQuery } from "../queries/dashboard.queries";
+import { ADMIN_ACTION_ACCESS, canAccess } from "../../session/permissions";
+import { PIPELINE_STAGES, type PipelineStage } from "../types/dashboard.types";
+import { PIPELINE_STAGE_PERMISSION } from "../utils/pipeline";
+import {
+  getDashboardKpisQuery,
+  getLowFabricsQuery,
+  getPipelineQuery,
+  getTodayAppointmentsQuery,
+} from "../queries/dashboard.queries";
+
+/** Trạng thái đơn + công đoạn áo khi chuyển đơn sang một cột (bỏ trống tailoringStatus = giữ công đoạn hiện tại) */
+const STAGE_TRANSITIONS: Record<PipelineStage, { orderStatus: OrderStatus; tailoringStatus?: TailoringStatus }> = {
+  review: { orderStatus: "PENDING" },
+  cutting: { orderStatus: "CONFIRMED", tailoringStatus: "WAITING_FABRIC" },
+  sewing: { orderStatus: "IN_PRODUCTION", tailoringStatus: "SEWING" },
+  fitting: { orderStatus: "IN_PRODUCTION", tailoringStatus: "FITTING_IRONING" },
+  delivery: { orderStatus: "READY_TO_SHIP", tailoringStatus: "COMPLETED" },
+};
 
 /**
- * Server Action: Lấy thống kê số liệu Dashboard
+ * Server Action: 4 nhóm chỉ số vận hành — nhóm không có quyền trả null
  */
-export async function getDashboardStatsAction(filter: "today" | "week" | "month" = "week") {
-  // Doanh thu & thống kê kinh doanh: ADMIN hoặc STAFF có quyền xem báo cáo
-  const auth = await authorizeAdminAction(ADMIN_ACTION_ACCESS.viewReports);
+export async function getDashboardKpisAction() {
+  const auth = await authorizeAdminAction();
   if (!auth.success) return auth;
 
   try {
-    const stats = await getDashboardStatsQuery(filter);
-    return {
-      success: true,
-      data: stats,
-    };
+    const data = await getDashboardKpisQuery({
+      reports: canAccess(auth.user, ADMIN_ACTION_ACCESS.viewReports),
+      operations: canAccess(auth.user, ADMIN_ACTION_ACCESS.viewDashboardOrders),
+    });
+    return { success: true as const, data };
   } catch (error) {
-    console.error("Lỗi Action getDashboardStatsAction:", error);
-    return {
-      success: false,
-      error: "DASHBOARD_STATS_FAILED",
-    };
+    console.error("Lỗi Action getDashboardKpisAction:", error);
+    return { success: false as const, error: "DASHBOARD_STATS_FAILED" };
   }
 }
 
 /**
- * Server Action: Lấy danh sách đơn hàng cho Admin & Staff trực tiếp từ DB
+ * Server Action: Các đơn may đo đang mở cho bảng điều phối (Kanban)
  */
-export async function getAdminOrdersAction() {
+export async function getPipelineAction() {
   const auth = await authorizeAdminAction(ADMIN_ACTION_ACCESS.viewDashboardOrders);
   if (!auth.success) return auth;
 
   try {
-    const orders = await getAdminOrdersQuery();
-    return {
-      success: true,
-      data: orders,
-    };
+    return { success: true as const, data: await getPipelineQuery() };
   } catch (error) {
-    console.error("Lỗi Action getAdminOrdersAction:", error);
-    return {
-      success: false,
-      error: "ORDER_LIST_FAILED",
-    };
+    console.error("Lỗi Action getPipelineAction:", error);
+    return { success: false as const, error: "ORDER_LIST_FAILED" };
   }
 }
 
 /**
- * Server Action: Cập nhật trạng thái đơn hàng
+ * Server Action: Chuyển đơn sang cột Kanban — cập nhật trạng thái đơn, công đoạn áo may đo và ghi nhật ký may
  */
-export async function updateOrderStatusAction(orderId: string, status: DbOrderStatus) {
-  const auth = await authorizeAdminAction({ permission: "canManageOrders" });
+export async function moveOrderStageAction(orderId: string, stage: PipelineStage) {
+  if (!PIPELINE_STAGES.includes(stage)) return { success: false as const, error: "ORDER_STATUS_UPDATE_FAILED" };
+  const auth = await authorizeAdminAction(PIPELINE_STAGE_PERMISSION[stage]);
   if (!auth.success) return auth;
 
   try {
-    const updated = await prisma.order.update({
-      where: { id: orderId },
-      data: { orderStatus: status },
+    const target = STAGE_TRANSITIONS[stage];
+    const items = await prisma.orderItem.findMany({
+      where: { orderId, isCustomFit: true },
+      select: { id: true, tailoringStatus: true },
     });
+    const nextStatus = target.tailoringStatus;
+    // Vào cột "Đang may" mà áo đã ở cắt / may / thêu thì giữ nguyên công đoạn đó
+    const changedItems = nextStatus
+      ? items.filter((item) =>
+          stage === "sewing"
+            ? !["FABRIC_CUTTING", "SEWING", "EMBROIDERY_BEADING"].includes(item.tailoringStatus)
+            : item.tailoringStatus !== nextStatus
+        )
+      : [];
 
-    return {
-      success: true,
-      data: updated,
-    };
+    await prisma.$transaction([
+      prisma.order.update({ where: { id: orderId }, data: { orderStatus: target.orderStatus } }),
+      ...(nextStatus
+        ? changedItems.flatMap((item) => [
+            prisma.orderItem.update({ where: { id: item.id }, data: { tailoringStatus: nextStatus } }),
+            prisma.tailoringLog.create({
+              data: { orderId, orderItemId: item.id, status: nextStatus, staffId: auth.user.id },
+            }),
+          ])
+        : []),
+    ]);
+
+    revalidatePath("/admin/orders");
+    revalidatePath("/admin/tailoring");
+    return { success: true as const };
   } catch (error) {
-    console.error("Lỗi Action updateOrderStatusAction:", error);
-    return {
-      success: false,
-      error: "ORDER_STATUS_UPDATE_FAILED",
-    };
+    console.error("Lỗi Action moveOrderStageAction:", error);
+    return { success: false as const, error: "ORDER_STATUS_UPDATE_FAILED" };
   }
 }
 
 /**
- * Server Action: Nhân viên tạo đơn hàng đặt hộ khách hàng tại quầy hoặc qua hotline
+ * Server Action: Lịch hẹn tại tiệm trong hôm nay (kèm số đo để mở nhanh)
  */
-export async function createStaffOrderAction(input: CreateStaffOrderInput) {
-  const auth = await authorizeAdminAction({ permission: "canManageOrders" });
+export async function getTodayAppointmentsAction() {
+  const auth = await authorizeAdminAction(ADMIN_ACTION_ACCESS.viewDashboardOrders);
   if (!auth.success) return auth;
 
   try {
-    const orderNumber = `AD-${Date.now().toString().slice(-6)}`;
-    const subTotal = input.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const totalAmount = subTotal;
-
-    const order = await prisma.order.create({
-      data: {
-        orderNumber,
-        createdById: auth.user.id,
-        customerName: input.customerName,
-        customerEmail: input.customerEmail,
-        customerPhone: input.customerPhone,
-        shippingAddress: input.shippingAddress,
-        note: input.note,
-        subTotal,
-        discountAmount: 0,
-        shippingFee: 0,
-        totalAmount,
-        orderStatus: "PENDING",
-        paymentStatus: "UNPAID",
-        paymentMethod: input.paymentMethod,
-        items: {
-          create: input.items.map((item) => ({
-            productId: item.productId,
-            variantId: item.variantId,
-            productName: "Áo Dài Truyền Thống",
-            quantity: item.quantity,
-            unitPrice: item.price,
-            totalPrice: item.price * item.quantity,
-            isCustomFit: Boolean(item.isCustomFit),
-            height: item.measurements?.height,
-            weight: item.measurements?.weight,
-            bust: item.measurements?.bust,
-            waist: item.measurements?.waist,
-            hips: item.measurements?.hips,
-            shoulder: item.measurements?.shoulder,
-            armLength: item.measurements?.armLength,
-            shirtLength: item.measurements?.shirtLength,
-            pantsLength: item.measurements?.pantsLength,
-            customNote: item.measurements?.customNote,
-          })),
-        },
-      },
-      include: {
-        items: true,
-        createdBy: {
-          select: { id: true, name: true, email: true },
-        },
-      },
-    });
-
-    return {
-      success: true,
-      data: order,
-    };
+    return { success: true as const, data: await getTodayAppointmentsQuery() };
   } catch (error) {
-    console.error("Lỗi Action createStaffOrderAction:", error);
-    return {
-      success: false,
-      error: "ORDER_CREATE_FAILED",
-    };
+    console.error("Lỗi Action getTodayAppointmentsAction:", error);
+    return { success: false as const, error: "APPOINTMENT_LIST_FAILED" };
   }
 }
 
 /**
- * Server Action: Danh sách SKU sắp hết hàng cho khối cảnh báo dashboard
+ * Server Action: Cây vải sắp hết (dưới ngưỡng mét cảnh báo)
  */
-export async function getLowStockVariantsAction() {
+export async function getLowFabricsAction() {
   const auth = await authorizeAdminAction(ADMIN_ACTION_ACCESS.manageInventory);
   if (!auth.success) return auth;
 
   try {
-    return { success: true as const, data: await getLowStockVariantsQuery() };
+    return { success: true as const, data: await getLowFabricsQuery() };
   } catch (error) {
-    console.error("Lỗi Action getLowStockVariantsAction:", error);
+    console.error("Lỗi Action getLowFabricsAction:", error);
     return { success: false as const, error: "INVENTORY_LIST_FAILED" };
+  }
+}
+
+/**
+ * Server Action: Ẩn sản phẩm may từ cây vải sắp hết khỏi web (khách không đặt thêm được)
+ */
+export async function hideFabricProductAction(productId: string) {
+  const auth = await authorizeAdminAction(ADMIN_ACTION_ACCESS.manageInventory);
+  if (!auth.success) return auth;
+
+  try {
+    await prisma.product.update({ where: { id: productId }, data: { isActive: false } });
+    revalidatePath("/admin/products");
+    return { success: true as const };
+  } catch (error) {
+    console.error("Lỗi Action hideFabricProductAction:", error);
+    return { success: false as const, error: "PRODUCT_UPDATE_FAILED" };
   }
 }

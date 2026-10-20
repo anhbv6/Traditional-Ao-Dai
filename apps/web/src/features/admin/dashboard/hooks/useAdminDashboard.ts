@@ -1,186 +1,118 @@
 "use client";
 
-import { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useTranslations } from "next-intl";
-import { notifySuccess } from "@/lib/messages";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNotify } from "@/hooks/useNotify";
 import {
-  type FilterType,
-  type OrderItem,
-  type OrderStatus,
-  type StatItem,
-  type PieDataItem,
-  mapPrismaOrderToOrderItem,
-  mapUiStatusToDbStatus,
-} from "../types/dashboard.types";
-import {
-  getDashboardStatsAction,
-  getAdminOrdersAction,
-  getLowStockVariantsAction,
-  updateOrderStatusAction,
+  getDashboardKpisAction,
+  getLowFabricsAction,
+  getPipelineAction,
+  getTodayAppointmentsAction,
+  hideFabricProductAction,
+  moveOrderStageAction,
 } from "../actions/dashboard.actions";
-import { type AdminDashboardOrder } from "../queries/dashboard.queries";
+import { type LowFabric, type PipelineCard, type PipelineStage } from "../types/dashboard.types";
 
-const defaultStats: StatItem = {
-  revenue: "0 ₫",
-  revenueDiff: "0%",
-  orders: 0,
-  ordersDiff: "0 đơn",
-  pending: 0,
-  customRatio: 0,
-};
+// Số ngày còn lại / giờ hẹn đã qua tính lúc tải → làm mới định kỳ để luôn đúng trong ngày
+const REFRESH_MS = 5 * 60 * 1000;
 
-// Không hiển thị số liệu mẫu: chưa có đơn trong kỳ thì biểu đồ ở trạng thái trống
-const defaultPieData: PieDataItem[] = [];
+const KEYS = {
+  kpis: ["admin", "dashboard", "kpis"],
+  pipeline: ["admin", "dashboard", "pipeline"],
+  appointments: ["admin", "dashboard", "appointments"],
+  fabrics: ["admin", "dashboard", "fabrics"],
+} as const;
 
-const DASHBOARD_ORDERS_KEY = ["admin", "dashboard", "orders"] as const;
-const PIE_COLORS = ["#09090B", "#27272A", "#71717A", "#E4E4E7", "#A1A1AA"];
-
-/**
- * Tính phân bổ sản phẩm cho biểu đồ tròn từ danh sách đơn hàng (hàm thuần)
- */
-function buildPieData(rawOrders: AdminDashboardOrder[]): PieDataItem[] {
-  const productCounts: Record<string, number> = {};
-  let totalCount = 0;
-  rawOrders.forEach((order) => {
-    order.items.forEach((item) => {
-      const productName = item.productName || item.product?.name || "Áo Dài";
-      productCounts[productName] = (productCounts[productName] || 0) + (item.quantity || 1);
-      totalCount += item.quantity || 1;
-    });
-  });
-
-  if (totalCount === 0) return defaultPieData;
-
-  return Object.entries(productCounts)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 4)
-    .map(([name, count], idx) => ({
-      name,
-      value: Math.round((count / totalCount) * 100),
-      color: PIE_COLORS[idx % PIE_COLORS.length],
-    }));
+export interface DashboardAccess {
+  /** Kanban, đơn gấp, lịch hẹn, số áo trên bàn may */
+  operations: boolean;
+  /** Cảnh báo kho vải */
+  inventory: boolean;
 }
 
-interface DashboardAccess {
-  reports: boolean;
-  inventory: boolean;
-  tailoring: boolean;
-  orders: boolean;
+/** Kết quả Server Action → dữ liệu hoặc ném mã lỗi để React Query / useNotify xử lý */
+function unwrap<T>(res: { success: true; data: T } | { success: false; error?: string }): T {
+  if (!res.success) throw new Error(res.error || "DEFAULT_ERROR");
+  return res.data;
 }
 
 export function useAdminDashboard(access: DashboardAccess) {
-  const t = useTranslations("AdminPage");
   const queryClient = useQueryClient();
   const notify = useNotify();
-  const [filter, setFilter] = useState<FilterType>("week");
-  const [selectedOrder, setSelectedOrder] = useState<OrderItem | null>(null);
-  const [isUpdatingStatus, setIsUpdatingStatus] = useState<boolean>(false);
 
-  // 1. Số liệu thống kê (Server Action -> Prisma), cache theo bộ lọc thời gian
-  const statsQuery = useQuery({
-    queryKey: ["admin", "dashboard", "stats", filter],
-    // Không gọi action khi không có quyền (tránh lỗi STAFF_PERMISSION_DENIED)
-    enabled: access.reports,
-    queryFn: async () => {
-      const res = await getDashboardStatsAction(filter);
-      return res.success && res.data ? res.data : defaultStats;
-    },
+  const kpisQuery = useQuery({
+    queryKey: KEYS.kpis,
+    queryFn: async () => unwrap(await getDashboardKpisAction()),
   });
 
-  // 2. Danh sách đơn hàng + phân bổ sản phẩm cho biểu đồ
-  const ordersQuery = useQuery({
-    queryKey: DASHBOARD_ORDERS_KEY,
-    enabled: access.orders || access.tailoring,
-    queryFn: async () => {
-      const res = await getAdminOrdersAction();
-      if (!res.success || !Array.isArray(res.data)) {
-        return { orders: [] as OrderItem[], pieData: defaultPieData };
-      }
-      return { orders: res.data.map(mapPrismaOrderToOrderItem), pieData: buildPieData(res.data) };
-    },
+  const pipelineQuery = useQuery({
+    queryKey: KEYS.pipeline,
+    enabled: access.operations,
+    refetchInterval: REFRESH_MS,
+    queryFn: async () => unwrap(await getPipelineAction()),
   });
 
-  // 3. Sản phẩm sắp hết hàng (cảnh báo kho) — cần quyền tồn kho
-  const lowStockQuery = useQuery({
-    queryKey: ["admin", "dashboard", "low-stock"],
+  const appointmentsQuery = useQuery({
+    queryKey: KEYS.appointments,
+    enabled: access.operations,
+    refetchInterval: REFRESH_MS,
+    queryFn: async () => unwrap(await getTodayAppointmentsAction()),
+  });
+
+  const fabricsQuery = useQuery({
+    queryKey: KEYS.fabrics,
     enabled: access.inventory,
-    queryFn: async () => {
-      const res = await getLowStockVariantsAction();
-      return res.success ? res.data : [];
+    queryFn: async () => unwrap(await getLowFabricsAction()),
+  });
+
+  // Chuyển cột Kanban: cập nhật ngay trên giao diện, lỗi thì trả lại vị trí cũ
+  const moveStage = useMutation({
+    mutationFn: async ({ orderId, stage }: { orderId: string; stage: PipelineStage }) => {
+      const res = await moveOrderStageAction(orderId, stage);
+      if (!res.success) throw new Error(res.error);
+    },
+    onMutate: async ({ orderId, stage }) => {
+      await queryClient.cancelQueries({ queryKey: KEYS.pipeline });
+      const previous = queryClient.getQueryData<PipelineCard[]>(KEYS.pipeline);
+      queryClient.setQueryData<PipelineCard[]>(KEYS.pipeline, (cards) =>
+        cards?.map((card) => (card.orderId === orderId ? { ...card, stage } : card))
+      );
+      return { previous };
+    },
+    onError: (error, _vars, context) => {
+      queryClient.setQueryData(KEYS.pipeline, context?.previous);
+      notify.error(error, "ORDER_STATUS_UPDATE_FAILED");
+    },
+    onSettled: () => {
+      // Công đoạn áo + số liệu thẻ đổi theo → tải lại từ server
+      void queryClient.invalidateQueries({ queryKey: KEYS.pipeline });
+      void queryClient.invalidateQueries({ queryKey: KEYS.kpis });
     },
   });
 
-  const orders = ordersQuery.data?.orders ?? [];
-  const setOrders = (updater: (prev: OrderItem[]) => OrderItem[]) =>
-    queryClient.setQueryData<{ orders: OrderItem[]; pieData: PieDataItem[] }>(DASHBOARD_ORDERS_KEY, (prev) =>
-      prev ? { ...prev, orders: updater(prev.orders) } : prev
-    );
-
-  // 3. Cập nhật trạng thái đơn hàng (Optimistic UI, rollback khi lỗi)
-  const handleUpdateStatus = async (orderId: string, nextStatus: OrderStatus) => {
-    const targetOrder = orders.find((o) => o.id === orderId);
-    const dbOrderId = targetOrder?.rawId || orderId;
-    const dbStatus = mapUiStatusToDbStatus(nextStatus);
-
-    const prevOrders = [...orders];
-    setOrders((prev) => prev.map((order) => (order.id === orderId ? { ...order, status: nextStatus } : order)));
-    if (selectedOrder && selectedOrder.id === orderId) {
-      setSelectedOrder((prev) => (prev ? { ...prev, status: nextStatus } : null));
-    }
-
-    setIsUpdatingStatus(true);
-    try {
-      const res = await updateOrderStatusAction(dbOrderId, dbStatus);
-      if (!res.success) {
-        setOrders(() => prevOrders);
-        notify.error(res.error, "ORDER_STATUS_UPDATE_FAILED");
-        return;
-      }
-
-      notifySuccess(t("orders.updateSuccess", { id: orderId }));
-      // Tải lại thống kê để cập nhật số đơn chờ xử lý
-      void queryClient.invalidateQueries({ queryKey: ["admin", "dashboard", "stats"] });
-    } catch (err) {
-      setOrders(() => prevOrders);
-      notify.error(err, "ORDER_STATUS_UPDATE_FAILED");
-    } finally {
-      setIsUpdatingStatus(false);
-    }
-  };
-
-  const getStatusColor = (status: OrderStatus) => {
-    switch (status) {
-      case "pending_approval":
-        return "bg-amber-50/50 text-amber-800 border-amber-200";
-      case "cutting_fabric":
-        return "bg-blue-50/50 text-blue-800 border-blue-200";
-      case "sewing_job":
-        return "bg-indigo-50/50 text-indigo-800 border-indigo-200";
-      case "completed":
-        return "bg-emerald-50/50 text-emerald-800 border-emerald-200";
-      case "shipping":
-        return "bg-purple-50/50 text-purple-800 border-purple-200";
-    }
-  };
+  const hideProduct = useMutation({
+    mutationFn: async (productId: string) => {
+      const res = await hideFabricProductAction(productId);
+      if (!res.success) throw new Error(res.error);
+    },
+    onSuccess: (_data, productId) => {
+      queryClient.setQueryData<LowFabric[]>(KEYS.fabrics, (fabrics) =>
+        fabrics?.map((f) => (f.product?.id === productId ? { ...f, product: { ...f.product, isActive: false } } : f))
+      );
+    },
+    onError: (error) => notify.error(error, "PRODUCT_UPDATE_FAILED"),
+  });
 
   return {
-    filter,
-    setFilter,
-    orders,
-    selectedOrder,
-    setSelectedOrder,
-    stats: statsQuery.data ?? defaultStats,
-    pieData: ordersQuery.data?.pieData ?? defaultPieData,
-    isLoadingStats: statsQuery.isFetching,
-    isLoadingOrders: ordersQuery.isFetching,
-    isUpdatingStatus,
-    handleUpdateStatus,
-    getStatusColor,
-    refreshOrders: () => void ordersQuery.refetch(),
-    refreshStats: () => void statsQuery.refetch(),
-    lowStockItems: lowStockQuery.data ?? [],
-    isLoadingLowStock: lowStockQuery.isFetching,
+    kpis: kpisQuery.data,
+    isLoadingKpis: kpisQuery.isPending,
+    pipeline: pipelineQuery.data ?? [],
+    isLoadingPipeline: pipelineQuery.isPending && access.operations,
+    appointments: appointmentsQuery.data ?? [],
+    isLoadingAppointments: appointmentsQuery.isPending && access.operations,
+    fabrics: fabricsQuery.data ?? [],
+    isLoadingFabrics: fabricsQuery.isPending && access.inventory,
+    moveStage: (orderId: string, stage: PipelineStage) => moveStage.mutate({ orderId, stage }),
+    hideProduct: (productId: string) => hideProduct.mutate(productId),
+    hidingProductId: hideProduct.isPending ? hideProduct.variables : null,
   };
 }

@@ -126,5 +126,6 @@
   "STAFF_CREATE_FAILED": "Không thể tạo tài khoản nhân viên.",
   "PHONE_REQUIRED": "Vui lòng nhập số điện thoại",
   "MEASUREMENT_REQUIRED": "Vui lòng nhập số đo",
-  "MEASUREMENT_OUT_OF_RANGE": "Số đo chưa hợp lý, vui lòng kiểm tra lại"
+  "MEASUREMENT_OUT_OF_RANGE": "Số đo chưa hợp lý, vui lòng kiểm tra lại",
+  "APPOINTMENT_LIST_FAILED": "Không tải được lịch hẹn. Vui lòng thử lại."
 }

@@ -5,7 +5,7 @@ import { ADMIN_MODULE_ACCESS } from "@/features/admin/session/permissions";
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
-  await requireAdminPage(ADMIN_MODULE_ACCESS.dashboard);
+  const user = await requireAdminPage(ADMIN_MODULE_ACCESS.dashboard);
 
-  return <AdminDashboard />;
+  return <AdminDashboard user={user} />;
 }

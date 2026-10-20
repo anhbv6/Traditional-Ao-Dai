@@ -1,186 +1,294 @@
-import { formatVnd, toVnd } from "@repo/shared";
+import { type OrderStatus, type TailoringStatus } from "@repo/db";
+import { toVnd } from "@repo/shared";
 import { prisma } from "../../server/db.server";
-import { type FilterType, type StatItem} from "../types/dashboard.types";
+import {
+  type DashboardKpis,
+  type LowFabric,
+  type MeasurementSnapshot,
+  type PipelineCard,
+  type PipelineStage,
+  type TodayAppointment,
+  URGENT_DAYS,
+} from "../types/dashboard.types";
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+// Việt Nam cố định UTC+7 (không đổi giờ mùa hè) → tính mốc ngày/tháng không phụ thuộc múi giờ máy chủ
+const VN_OFFSET_MS = 7 * 60 * 60 * 1000;
+
+/** Mốc 00:00 hôm nay và ngày 1 của tháng này theo giờ Việt Nam */
+function getVnPeriodStarts(now: Date) {
+  const vn = new Date(now.getTime() + VN_OFFSET_MS);
+  const dayStart = new Date(Date.UTC(vn.getUTCFullYear(), vn.getUTCMonth(), vn.getUTCDate()) - VN_OFFSET_MS);
+  const monthStart = new Date(Date.UTC(vn.getUTCFullYear(), vn.getUTCMonth(), 1) - VN_OFFSET_MS);
+  return { dayStart, dayEnd: new Date(dayStart.getTime() + DAY_MS), monthStart };
+}
+
+/** Số ngày lịch theo giờ VN giữa hai thời điểm (to - from) */
+function vnDaysBetween(from: Date, to: Date): number {
+  const toVnDay = (date: Date) => Math.floor((date.getTime() + VN_OFFSET_MS) / DAY_MS);
+  return toVnDay(to) - toVnDay(from);
+}
+
+/** Đơn còn đang xử lý (chưa giao xong, chưa huỷ / hoàn tiền) */
+const OPEN_ORDER_STATUSES: OrderStatus[] = ["PENDING", "CONFIRMED", "IN_PRODUCTION", "READY_TO_SHIP", "SHIPPING"];
+
+/** Thứ tự công đoạn may — dùng để lấy công đoạn chậm nhất của một đơn nhiều áo */
+const TAILORING_ORDER: Record<TailoringStatus, number> = {
+  NOT_APPLICABLE: 0,
+  WAITING_FABRIC: 1,
+  FABRIC_CUTTING: 2,
+  SEWING: 3,
+  EMBROIDERY_BEADING: 4,
+  FITTING_IRONING: 5,
+  COMPLETED: 6,
+};
 
 /**
- * Lấy số liệu thống kê tổng quan (Doanh thu, số đơn, tỉ lệ may đo...) từ DB
+ * Quy đơn về cột Kanban: trạng thái đơn quyết định bước duyệt / giao hàng,
+ * còn giữa hai bước đó thì theo công đoạn may chậm nhất của các áo may đo
  */
-const PAID_STATUSES = ["PAID", "PARTIALLY_PAID"] as const;
-
-/** Mốc bắt đầu của kỳ thống kê */
-function getPeriodStart(filter: FilterType, now: Date): Date {
-  const start = new Date(now);
-  if (filter === "today") start.setHours(0, 0, 0, 0);
-  else if (filter === "week") start.setDate(now.getDate() - 7);
-  else start.setMonth(now.getMonth() - 1);
-  return start;
+function resolveStage(orderStatus: OrderStatus, tailoringStatus: TailoringStatus): PipelineStage {
+  if (orderStatus === "PENDING") return "review";
+  if (orderStatus === "READY_TO_SHIP" || orderStatus === "SHIPPING") return "delivery";
+  if (tailoringStatus === "COMPLETED") return "delivery";
+  if (tailoringStatus === "FITTING_IRONING") return "fitting";
+  if (tailoringStatus === "FABRIC_CUTTING" || tailoringStatus === "SEWING" || tailoringStatus === "EMBROIDERY_BEADING") {
+    return "sewing";
+  }
+  return "cutting";
 }
 
-/** Định dạng chênh lệch phần trăm so với kỳ trước (kỳ trước = 0 thì không so sánh được) */
-function formatPercentDiff(current: number, previous: number): string {
-  if (previous === 0) return current > 0 ? "Mới" : "0%";
-  const diff = ((current - previous) / previous) * 100;
-  return `${diff > 0 ? "+" : ""}${diff.toFixed(1)}%`;
+/* ============================================================================
+ * A. THẺ CHỈ SỐ
+ * ========================================================================== */
+
+interface KpiAccess {
+  reports: boolean;
+  operations: boolean;
 }
 
-async function sumPaidRevenue(from: Date, to: Date): Promise<number> {
-  const result = await prisma.order.aggregate({
-    where: { createdAt: { gte: from, lt: to }, paymentStatus: { in: [...PAID_STATUSES] } },
-    _sum: { totalAmount: true },
+/**
+ * 4 nhóm chỉ số vận hành. Nhóm nào người dùng không có quyền thì trả null (không truy vấn)
+ */
+export async function getDashboardKpisQuery(access: KpiAccess): Promise<DashboardKpis> {
+  const now = new Date();
+  const { dayStart, dayEnd, monthStart } = getVnPeriodStarts(now);
+  const urgentUntil = new Date(now.getTime() + URGENT_DAYS * DAY_MS);
+
+  const [finance, tailoringGroups, dueSoon, overdue, appointmentGroups] = await Promise.all([
+    access.reports
+      ? Promise.all([
+          prisma.order.aggregate({ where: { createdAt: { gte: dayStart } }, _sum: { paidAmount: true } }),
+          prisma.order.aggregate({ where: { createdAt: { gte: monthStart } }, _sum: { paidAmount: true } }),
+          prisma.order.findMany({
+            where: { paymentStatus: "PARTIALLY_PAID", orderStatus: { in: OPEN_ORDER_STATUSES } },
+            select: { totalAmount: true, paidAmount: true },
+          }),
+        ])
+      : null,
+    access.operations
+      ? prisma.orderItem.groupBy({
+          by: ["tailoringStatus"],
+          where: {
+            isCustomFit: true,
+            tailoringStatus: { in: ["WAITING_FABRIC", "FABRIC_CUTTING", "SEWING", "EMBROIDERY_BEADING"] },
+            // Đơn còn chờ duyệt chưa lên bàn may dù áo đã có công đoạn (VD bị kéo ngược về cột duyệt)
+            order: { orderStatus: { in: ["CONFIRMED", "IN_PRODUCTION"] } },
+          },
+          _sum: { quantity: true },
+        })
+      : null,
+    access.operations
+      ? prisma.order.count({ where: { orderStatus: { in: OPEN_ORDER_STATUSES }, dueDate: { gte: now, lte: urgentUntil } } })
+      : null,
+    access.operations
+      ? prisma.order.count({ where: { orderStatus: { in: OPEN_ORDER_STATUSES }, dueDate: { lt: now } } })
+      : null,
+    access.operations
+      ? prisma.appointment.groupBy({
+          by: ["type"],
+          where: { scheduledAt: { gte: dayStart, lt: dayEnd }, status: { not: "CANCELLED" } },
+          _count: { _all: true },
+        })
+      : null,
+  ]);
+
+  const sumTailoring = (...statuses: TailoringStatus[]) =>
+    (tailoringGroups ?? []).filter((g) => statuses.includes(g.tailoringStatus)).reduce((sum, g) => sum + (g._sum.quantity ?? 0), 0);
+  const countAppointments = (type?: string) =>
+    (appointmentGroups ?? []).filter((g) => !type || g.type === type).reduce((sum, g) => sum + g._count._all, 0);
+
+  return {
+    finance: finance
+      ? {
+          receivedToday: toVnd(finance[0]._sum.paidAmount),
+          receivedMonth: toVnd(finance[1]._sum.paidAmount),
+          outstanding: finance[2].reduce((sum, o) => sum + Math.max(0, toVnd(o.totalAmount) - toVnd(o.paidAmount)), 0),
+          outstandingOrders: finance[2].length,
+        }
+      : null,
+    tailoring: tailoringGroups
+      ? {
+          waitingCut: sumTailoring("WAITING_FABRIC"),
+          sewing: sumTailoring("FABRIC_CUTTING", "SEWING"),
+          embroidery: sumTailoring("EMBROIDERY_BEADING"),
+        }
+      : null,
+    urgent: dueSoon !== null && overdue !== null ? { dueSoon, overdue } : null,
+    appointments: appointmentGroups
+      ? { total: countAppointments(), measurement: countAppointments("MEASUREMENT"), fitting: countAppointments("FITTING") }
+      : null,
+  };
+}
+
+/* ============================================================================
+ * B. KANBAN MAY ĐO
+ * ========================================================================== */
+
+/**
+ * Các đơn may đo đang mở, đã quy về cột Kanban; sắp theo ngày hẹn trả gần nhất trước
+ */
+export async function getPipelineQuery(): Promise<PipelineCard[]> {
+  const now = new Date();
+  const orders = await prisma.order.findMany({
+    where: { orderStatus: { in: OPEN_ORDER_STATUSES }, items: { some: { isCustomFit: true } } },
+    select: {
+      id: true,
+      orderNumber: true,
+      customerName: true,
+      dueDate: true,
+      totalAmount: true,
+      paidAmount: true,
+      orderStatus: true,
+      items: { where: { isCustomFit: true }, select: { productName: true, tailoringStatus: true } },
+    },
+    orderBy: [{ dueDate: { sort: "asc", nulls: "last" } }, { createdAt: "asc" }],
+    take: 150,
   });
-  return toVnd(result._sum.totalAmount);
+
+  return orders.map((order) => {
+    const slowest = order.items.reduce<TailoringStatus>(
+      (min, item) => (TAILORING_ORDER[item.tailoringStatus] < TAILORING_ORDER[min] ? item.tailoringStatus : min),
+      "COMPLETED"
+    );
+    return {
+      orderId: order.id,
+      orderNumber: order.orderNumber,
+      customerName: order.customerName,
+      daysLeft: order.dueDate ? vnDaysBetween(now, order.dueDate) : null,
+      totalAmount: toVnd(order.totalAmount),
+      paidAmount: toVnd(order.paidAmount),
+      productNames: order.items.map((i) => i.productName),
+      tailoringStatus: slowest,
+      stage: resolveStage(order.orderStatus, slowest),
+    };
+  });
 }
 
+/* ============================================================================
+ * C. LỊCH HẸN HÔM NAY & KHO VẢI
+ * ========================================================================== */
+
+const MEASUREMENT_FIELDS = {
+  height: true,
+  weight: true,
+  bust: true,
+  waist: true,
+  hips: true,
+  shoulder: true,
+  armLength: true,
+  shirtLength: true,
+  pantsLength: true,
+} as const;
+
 /**
- * Lấy số liệu thống kê tổng quan (doanh thu, số đơn, tỉ lệ may đo...) và so sánh với kỳ trước cùng độ dài
+ * Lịch hẹn hôm nay (theo giờ VN) kèm số đo để mở nhanh: ưu tiên hồ sơ số đo mặc định của khách,
+ * không có thì lấy số đo đã chốt trên đơn may đo gắn với lịch hẹn
  */
-export async function getDashboardStatsQuery(filter: FilterType = "week"): Promise<StatItem> {
-  try {
-    const now = new Date();
-    const startDate = getPeriodStart(filter, now);
-    // Kỳ trước: cùng độ dài, kết thúc ngay trước kỳ hiện tại
-    const previousStart = new Date(startDate.getTime() - (now.getTime() - startDate.getTime()));
+export async function getTodayAppointmentsQuery(): Promise<TodayAppointment[]> {
+  const now = new Date();
+  const { dayStart, dayEnd } = getVnPeriodStarts(now);
 
-    const [revenue, previousRevenue, ordersCount, previousOrdersCount, pendingCount, customItemsCount, totalItemsCount] =
-      await Promise.all([
-        sumPaidRevenue(startDate, now),
-        sumPaidRevenue(previousStart, startDate),
-        prisma.order.count({ where: { createdAt: { gte: startDate } } }),
-        prisma.order.count({ where: { createdAt: { gte: previousStart, lt: startDate } } }),
-        prisma.order.count({ where: { orderStatus: "PENDING", createdAt: { gte: startDate } } }),
-        prisma.orderItem.count({ where: { isCustomFit: true, createdAt: { gte: startDate } } }),
-        prisma.orderItem.count({ where: { createdAt: { gte: startDate } } }),
-      ]);
+  const appointments = await prisma.appointment.findMany({
+    where: { scheduledAt: { gte: dayStart, lt: dayEnd }, status: { not: "CANCELLED" } },
+    orderBy: { scheduledAt: "asc" },
+    select: {
+      id: true,
+      scheduledAt: true,
+      customerName: true,
+      customerPhone: true,
+      type: true,
+      note: true,
+      user: {
+        select: {
+          measurements: {
+            orderBy: [{ isDefault: "desc" }, { updatedAt: "desc" }],
+            take: 1,
+            select: { profileName: true, note: true, ...MEASUREMENT_FIELDS },
+          },
+        },
+      },
+      order: {
+        select: {
+          orderNumber: true,
+          items: { where: { isCustomFit: true }, take: 1, select: { customNote: true, ...MEASUREMENT_FIELDS } },
+        },
+      },
+    },
+  });
 
-    const ordersDelta = ordersCount - previousOrdersCount;
+  return appointments.map((a) => {
+    const profile = a.user?.measurements[0];
+    const orderItem = a.order?.items[0];
+    let measurement: MeasurementSnapshot | null = null;
+    if (profile) {
+      const { profileName, note, ...values } = profile;
+      measurement = { source: profileName, note, ...values };
+    } else if (orderItem && a.order) {
+      const { customNote, ...values } = orderItem;
+      measurement = { source: a.order.orderNumber, note: customNote, ...values };
+    }
 
     return {
-      revenue: formatVnd(revenue),
-      revenueDiff: formatPercentDiff(revenue, previousRevenue),
-      orders: ordersCount,
-      ordersDiff: `${ordersDelta > 0 ? "+" : ""}${ordersDelta} đơn`,
-      pending: pendingCount,
-      customRatio: totalItemsCount > 0 ? Math.round((customItemsCount / totalItemsCount) * 100) : 0,
+      id: a.id,
+      scheduledAt: a.scheduledAt.toISOString(),
+      isPast: a.scheduledAt < now,
+      customerName: a.customerName,
+      customerPhone: a.customerPhone,
+      type: a.type,
+      note: a.note,
+      orderNumber: a.order?.orderNumber ?? null,
+      measurement,
     };
-  } catch (error) {
-    console.error("Lỗi khi query thống kê Dashboard:", error);
-    throw new Error("DASHBOARD_STATS_FAILED");
-  }
+  });
 }
 
 /**
- * Lấy danh sách toàn bộ đơn hàng quản trị từ cơ sở dữ liệu
+ * Cây vải đang dùng có số mét còn lại dưới ngưỡng cảnh báo của chính nó (mặc định 3 m)
  */
-export async function getAdminOrdersQuery() {
-  try {
-    const orders = await prisma.order.findMany({
-      include: {
-        items: {
-          include: {
-            product: { select: { id: true, name: true, images: true } },
-          },
-        },
-        createdBy: {
-          select: { id: true, name: true, email: true },
-        },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-      take: 50,
-    });
-
-    // Decimal của Prisma không serialize được qua Server Action -> chuyển về số nguyên VND
-    return orders.map((order) => ({
-      ...order,
-      subTotal: toVnd(order.subTotal),
-      discountAmount: toVnd(order.discountAmount),
-      shippingFee: toVnd(order.shippingFee),
-      totalAmount: toVnd(order.totalAmount),
-      items: order.items.map((item) => ({
-        ...item,
-        unitPrice: toVnd(item.unitPrice),
-        totalPrice: toVnd(item.totalPrice),
-      })),
-    }));
-  } catch (error) {
-    console.error("Lỗi khi query danh sách đơn hàng:", error);
-    throw new Error("ORDER_LIST_FAILED");
-  }
-}
-
-/**
- * Lấy danh sách tiến độ may đo (Custom-fit Tailoring Monitor)
- */
-export async function getTailoringMonitorQuery() {
-  try {
-    const customOrderItems = await prisma.orderItem.findMany({
-      where: {
-        isCustomFit: true,
-      },
-      include: {
-        order: {
-          select: {
-            id: true,
-            orderNumber: true,
-            customerName: true,
-            customerPhone: true,
-            shippingAddress: true,
-            orderStatus: true,
-          },
-        },
-        product: {
-          select: {
-            id: true,
-            name: true,
-            images: true,
-          },
-        },
-        tailoringLogs: {
-          include: {
-            staff: {
-              select: { id: true, name: true },
-            },
-          },
-          orderBy: { createdAt: "desc" },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-      take: 20,
-    });
-
-    return customOrderItems;
-  } catch (error) {
-    console.error("Lỗi khi query tiến độ may đo:", error);
-    return [];
-  }
-}
-
-/** Đơn hàng thô (đã chuẩn hóa tiền tệ) trả về từ getAdminOrdersQuery */
-export type AdminDashboardOrder = Awaited<ReturnType<typeof getAdminOrdersQuery>>[number];
-
-/** Ngưỡng tồn kho coi là "sắp hết hàng" */
-export const LOW_STOCK_THRESHOLD = 5;
-
-/**
- * Các biến thể (SKU) của sản phẩm đang bán có tồn kho thấp — dùng cho khối cảnh báo trên dashboard
- */
-export async function getLowStockVariantsQuery(limit = 6) {
-  const variants = await prisma.productVariant.findMany({
-    where: { stock: { lte: LOW_STOCK_THRESHOLD }, product: { isActive: true } },
-    orderBy: { stock: "asc" },
-    take: limit,
-    select: { id: true, sku: true, size: true, color: true, stock: true, product: { select: { name: true } } },
+export async function getLowFabricsQuery(): Promise<LowFabric[]> {
+  const fabrics = await prisma.fabric.findMany({
+    where: { isActive: true, remainingMeters: { lt: prisma.fabric.fields.lowStockThreshold } },
+    orderBy: { remainingMeters: "asc" },
+    take: 12,
+    select: {
+      id: true,
+      code: true,
+      name: true,
+      color: true,
+      remainingMeters: true,
+      lowStockThreshold: true,
+      product: { select: { id: true, name: true, isActive: true } },
+    },
   });
 
-  return variants.map((variant) => ({
-    id: variant.id,
-    sku: variant.sku,
-    size: variant.size,
-    color: variant.color,
-    stock: variant.stock,
-    productName: variant.product.name,
+  return fabrics.map((f) => ({
+    id: f.id,
+    code: f.code,
+    name: f.name,
+    color: f.color,
+    remainingMeters: Number(f.remainingMeters),
+    threshold: Number(f.lowStockThreshold),
+    product: f.product,
   }));
 }
-
-export type LowStockVariant = Awaited<ReturnType<typeof getLowStockVariantsQuery>>[number];

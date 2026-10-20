@@ -1,178 +1,102 @@
-import { type OrderStatus as DbOrderStatus } from "@repo/db";
-import { formatVnd } from "@repo/shared";
-import { type AdminDashboardOrder } from "../queries/dashboard.queries";
+import { type AppointmentType, type TailoringStatus } from "@repo/db";
 
-export type FilterType = "today" | "week" | "month";
+/* ============================================================================
+ * A. THẺ CHỈ SỐ VẬN HÀNH
+ * ========================================================================== */
 
-export type OrderStatus =
-  | "pending_approval"
-  | "cutting_fabric"
-  | "sewing_job"
-  | "completed"
-  | "shipping";
+/** Đơn có ngày hẹn trả trong vòng số ngày này được coi là cần giao gấp */
+export const URGENT_DAYS = 3;
 
-export interface StatItem {
-  revenue: string;
-  revenueDiff: string;
-  orders: number;
-  ordersDiff: string;
-  pending: number;
-  customRatio: number;
+export interface DashboardKpis {
+  /** Doanh thu & công nợ cọc — chỉ có khi được xem báo cáo */
+  finance: {
+    /** Tiền đã thu (VND) của đơn tạo trong hôm nay / tháng này */
+    receivedToday: number;
+    receivedMonth: number;
+    /** Tiền khách còn nợ ở các đơn đã cọc, chưa giao */
+    outstanding: number;
+    outstandingOrders: number;
+  } | null;
+  /** Số áo đang trên bàn may theo công đoạn */
+  tailoring: {
+    waitingCut: number;
+    sewing: number;
+    embroidery: number;
+  } | null;
+  /** Đơn chưa giao có ngày hẹn trả trong URGENT_DAYS ngày tới / đã quá hạn */
+  urgent: {
+    dueSoon: number;
+    overdue: number;
+  } | null;
+  /** Lịch hẹn tại tiệm hôm nay (chưa huỷ) */
+  appointments: {
+    total: number;
+    measurement: number;
+    fitting: number;
+  } | null;
 }
 
-export interface Measurement {
-  height: string;
-  weight: string;
-  bust: string;
-  waist: string;
-  hips: string;
-  neckToWaist: string;
-}
+/* ============================================================================
+ * B. BẢNG ĐIỀU PHỐI TIẾN ĐỘ MAY
+ * ========================================================================== */
 
-export interface OrderItemProduct {
-  name: string;
-  price: string;
-  quantity: number;
-  size?: string;
-}
+/** 5 cột Kanban theo thứ tự xử lý */
+export const PIPELINE_STAGES = ["review", "cutting", "sewing", "fitting", "delivery"] as const;
+export type PipelineStage = (typeof PIPELINE_STAGES)[number];
 
-export interface OrderItem {
-  id: string;
-  rawId?: string;
-  customer: string;
-  type: "custom" | "ready";
-  total: string;
-  status: OrderStatus;
-  date: string;
-  items: OrderItemProduct[];
-  phone: string;
-  address: string;
-  measurements?: Measurement;
-}
-
-export interface PieDataItem {
-  name: string;
-  value: number;
-  color: string;
-}
-
-export interface CreateStaffOrderInput {
-  staffId: string;
-  customerName: string;
-  customerEmail: string;
-  customerPhone: string;
-  shippingAddress: string;
-  note?: string;
-  paymentMethod: "COD" | "VNPAY" | "MOMO" | "ZALOPAY" | "CASH_AT_STORE";
-  items: Array<{
-    productId: string;
-    variantId?: string;
-    quantity: number;
-    price: number;
-    isCustomFit?: boolean;
-    measurements?: {
-      height?: number;
-      weight?: number;
-      bust?: number;
-      waist?: number;
-      hips?: number;
-      shoulder?: number;
-      armLength?: number;
-      shirtLength?: number;
-      pantsLength?: number;
-      customNote?: string;
-    };
-  }>;
-}
-
-export interface UpdateOrderStatusInput {
+export interface PipelineCard {
   orderId: string;
-  status: DbOrderStatus;
+  orderNumber: string;
+  customerName: string;
+  /** Số ngày lịch (giờ VN) còn lại tới hạn trả lúc tải dữ liệu: 0 = hôm nay, âm = đã trễ; null = chưa hẹn ngày */
+  daysLeft: number | null;
+  totalAmount: number;
+  paidAmount: number;
+  productNames: string[];
+  /** Công đoạn chậm nhất trong các áo may đo của đơn (để hiện chi tiết ở cột "Đang may") */
+  tailoringStatus: TailoringStatus;
+  stage: PipelineStage;
 }
 
-/**
- * Chuyển đổi trạng thái đơn hàng từ Prisma DB sang UI
- */
-export function mapDbStatusToUiStatus(status: DbOrderStatus): OrderStatus {
-  switch (status) {
-    case "PENDING":
-      return "pending_approval";
-    case "CONFIRMED":
-      return "cutting_fabric";
-    case "IN_PRODUCTION":
-      return "sewing_job";
-    case "READY_TO_SHIP":
-    case "SHIPPING":
-      return "shipping";
-    case "DELIVERED":
-      return "completed";
-    default:
-      return "pending_approval";
-  }
+/* ============================================================================
+ * C. LỊCH HẸN & KHO VẢI
+ * ========================================================================== */
+
+export interface MeasurementSnapshot {
+  /** Tên hồ sơ số đo (khách có tài khoản) hoặc mã đơn (số đo lưu trên đơn) */
+  source: string;
+  height: number | null;
+  weight: number | null;
+  bust: number | null;
+  waist: number | null;
+  hips: number | null;
+  shoulder: number | null;
+  armLength: number | null;
+  shirtLength: number | null;
+  pantsLength: number | null;
+  note: string | null;
 }
 
-/**
- * Chuyển đổi trạng thái đơn hàng từ UI sang Prisma DB
- */
-export function mapUiStatusToDbStatus(status: OrderStatus): DbOrderStatus {
-  switch (status) {
-    case "pending_approval":
-      return "PENDING";
-    case "cutting_fabric":
-      return "CONFIRMED";
-    case "sewing_job":
-      return "IN_PRODUCTION";
-    case "shipping":
-      return "SHIPPING";
-    case "completed":
-      return "DELIVERED";
-    default:
-      return "PENDING";
-  }
+export interface TodayAppointment {
+  id: string;
+  /** ISO string */
+  scheduledAt: string;
+  /** Giờ hẹn đã qua (lúc tải dữ liệu) */
+  isPast: boolean;
+  customerName: string;
+  customerPhone: string | null;
+  type: AppointmentType;
+  note: string | null;
+  orderNumber: string | null;
+  measurement: MeasurementSnapshot | null;
 }
 
-/**
- * Chuyển đổi dữ liệu đơn hàng từ Prisma DB sang OrderItem cho giao diện Dashboard
- */
-export function mapPrismaOrderToOrderItem(order: AdminDashboardOrder): OrderItem {
-  const isCustom = order.items.some((i) => i.isCustomFit);
-  const customItem = order.items.find((i) => i.isCustomFit && (i.height || i.bust || i.waist));
-
-  const measurements: Measurement | undefined = customItem
-    ? {
-        height: customItem.height ? `${customItem.height} cm` : "—",
-        weight: customItem.weight ? `${customItem.weight} kg` : "—",
-        bust: customItem.bust ? `${customItem.bust} cm` : "—",
-        waist: customItem.waist ? `${customItem.waist} cm` : "—",
-        hips: customItem.hips ? `${customItem.hips} cm` : "—",
-        neckToWaist: customItem.shirtLength ? `${customItem.shirtLength} cm` : "—",
-      }
-    : undefined;
-
-  let dateStr = "—";
-  if (order.createdAt) {
-    try {
-      const d = new Date(order.createdAt);
-      dateStr = `${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")} ${d.toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit" })}`;
-    } catch {}
-  }
-
-  return {
-    id: order.orderNumber || order.id,
-    rawId: order.id,
-    customer: order.customerName || order.createdBy?.name || "Khách hàng",
-    type: isCustom ? "custom" : "ready",
-    total: formatVnd(order.totalAmount),
-    status: mapDbStatusToUiStatus(order.orderStatus),
-    date: dateStr,
-    phone: order.customerPhone || "—",
-    address: order.shippingAddress || "—",
-    items: order.items.map((item) => ({
-      name: item.productName || item.product?.name || "Áo Dài",
-      price: formatVnd(item.totalPrice || item.unitPrice),
-      quantity: item.quantity || 1,
-      size: item.isCustomFit ? undefined : "M",
-    })),
-    measurements,
-  };
+export interface LowFabric {
+  id: string;
+  code: string;
+  name: string;
+  color: string | null;
+  remainingMeters: number;
+  threshold: number;
+  product: { id: string; name: string; isActive: boolean } | null;
 }
