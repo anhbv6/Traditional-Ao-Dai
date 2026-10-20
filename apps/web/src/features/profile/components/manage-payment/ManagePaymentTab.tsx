@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Check, CreditCard, LockKeyhole, Trash2 } from "lucide-react";
+import { Check, CreditCard, Trash2 } from "lucide-react";
 import { ActionButton } from "@/components/shared/ActionButton";
-import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
+import { AppDialog } from "@/components/shared/AppDialog";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { cn } from "@/lib/utils";
 import { useManagePayment } from "../../hooks/useProfile";
@@ -25,19 +25,8 @@ export function ManagePaymentTab() {
 
   return (
     <>
-      {/* Ghi chú bảo mật */}
-      <div className="flex gap-4 border border-[var(--border)] bg-[var(--bg-card)] p-5 sm:px-6">
-        <span className="relative grid size-10 shrink-0 place-items-center text-[var(--primary-ink)]">
-          <span aria-hidden="true" className="absolute inset-1.5 rotate-45 border border-[var(--primary-color)]/35" />
-          <LockKeyhole size={16} strokeWidth={1.5} className="relative" aria-hidden="true" />
-        </span>
-        <div>
-          <p className="font-[family-name:var(--font-playfair)] text-[16px] font-semibold text-[var(--text-main)]">{t("secureTitle")}</p>
-          <p className="mt-1 text-[13px] leading-6 text-[var(--text-light)]">{t("secureNote")}</p>
-        </div>
-      </div>
-
-      <ProfileSection>
+      {/* Ghi chú bảo mật nằm ở đầu khối — không tách thành khung riêng */}
+      <ProfileSection title={t("secureTitle")} description={t("secureNote")}>
         {cards.length === 0 ? (
           <EmptyState icon={CreditCard} title={t("empty")} description={t("emptyDesc")} action={tProfile("orders.shopNow")} href="/products" className="py-10" />
         ) : (
@@ -85,10 +74,9 @@ export function ManagePaymentTab() {
                     </ActionButton>
                   ) : null}
                   <ActionButton
-                    variant="cancel"
+                    variant="danger"
                     size="sm"
                     icon={<Trash2 />}
-                    colors={{ text: "var(--destructive)" }}
                     onClick={() => setRemovingId(card.id)}
                     className="ml-auto"
                   >
@@ -101,19 +89,21 @@ export function ManagePaymentTab() {
         )}
       </ProfileSection>
 
-      <ConfirmDialog
+      <AppDialog
         open={removingId !== null}
         onOpenChange={(open) => !open && setRemovingId(null)}
-        confirmVariant="destructive"
+        tone="danger"
+        size="sm"
         title={t("removeDialog.title")}
         description={t("removeDialog.message")}
-        confirmText={t("removeDialog.confirmBtn")}
-        cancelText={tProfile("logoutDialog.cancelBtn")}
-        customTitle="text-lg sm:text-2xl"
-        onConfirm={() => {
-          if (removingId) handleDelete(removingId);
-          setRemovingId(null);
+        confirm={{
+          label: t("removeDialog.confirmBtn"),
+          icon: <Trash2 />,
+          onClick: () => {
+            if (removingId) handleDelete(removingId);
+          },
         }}
+        cancel={{ label: tProfile("logoutDialog.cancelBtn") }}
       />
     </>
   );

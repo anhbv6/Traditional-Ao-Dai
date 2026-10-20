@@ -55,5 +55,9 @@
       "title": "Sign-in on a new device",
       "body": "Your account was just signed in on a new device. If this wasn't you, change your password now."
     }
+  },
+  "undo": {
+    "markedAllRead": "Marked {count} notifications as read",
+    "action": "Undo"
   }
 }

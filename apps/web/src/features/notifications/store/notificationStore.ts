@@ -7,6 +7,8 @@ interface NotificationState {
   readIds: string[];
   markRead: (id: string) => void;
   markAllRead: () => void;
+  /** Trả lại danh sách đã đọc trước đó (hoàn tác "Đánh dấu tất cả đã đọc") */
+  restoreReadIds: (ids: string[]) => void;
 }
 
 /**
@@ -19,4 +21,5 @@ export const useNotificationStore = create<NotificationState>()((set) => ({
   markRead: (id) =>
     set((state) => (state.readIds.includes(id) ? state : { readIds: [...state.readIds, id] })),
   markAllRead: () => set((state) => ({ readIds: state.items.map((item) => item.id) })),
+  restoreReadIds: (ids) => set({ readIds: ids }),
 }));

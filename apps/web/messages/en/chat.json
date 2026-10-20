@@ -1,0 +1,19 @@
+{
+  "close": "Close chat",
+  "send": "Send message",
+  "switchTo": "Switch to {channel}",
+  "typing": "{name} is typing",
+  "shop": {
+    "open": "Chat with the shop",
+    "title": "Chat with the shop",
+    "status": "{name} · Stylist · Usually replies in a few minutes",
+    "placeholder": "Write a message to the shop..."
+  },
+  "ai": {
+    "open": "Ask the AI assistant",
+    "title": "AI assistant",
+    "status": "Virtual assistant · Instant replies",
+    "placeholder": "Ask about designs, sizing, fabrics...",
+    "disclaimer": "Answers are AI-generated and for reference only. For precise advice, switch to the shop chat."
+  }
+}

@@ -6,5 +6,6 @@ export * from "./components/CartSummary";
 export * from "./components/QuantityStepper";
 export * from "./types/cart.types";
 export * from "./hooks/useCart";
+export * from "./hooks/useCartUndo";
 export * from "./store/cartStore";
 export * from "./utils/pricing";

@@ -49,7 +49,7 @@ export function NewsBody({ content }: NewsBodyProps) {
 
             {section.highlights?.length ? (
               <Reveal delay={0.1}>
-                <ul className="mt-7 space-y-3.5 border-l-2 border-[var(--primary-color)] bg-[var(--bg-card)] py-5 pl-5 pr-4 text-[15px] leading-7 sm:pl-7 sm:text-base">
+                <ul className="mt-7 space-y-3.5 border-l-2 border-[var(--primary-color)] bg-[var(--bg-main)] py-5 pl-5 pr-4 text-[15px] leading-7 sm:pl-7 sm:text-base">
                   {section.highlights.map((item, hIndex) => (
                     <motion.li
                       key={hIndex}
@@ -74,7 +74,7 @@ export function NewsBody({ content }: NewsBodyProps) {
             <figure className="relative my-12 border-y border-[var(--border)] py-8 text-center sm:my-14 sm:py-10">
               <motion.span
                 aria-hidden="true"
-                className="absolute -top-7 left-1/2 -translate-x-1/2 bg-[var(--bg-main)] px-3 font-[family-name:var(--font-playfair)] text-[4rem] leading-none text-[var(--accent-color)]"
+                className="absolute -top-7 left-1/2 -translate-x-1/2 bg-[var(--bg-card)] px-3 font-[family-name:var(--font-playfair)] text-[4rem] leading-none text-[var(--accent-color)]"
                 initial={{ opacity: 0, y: 12 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}

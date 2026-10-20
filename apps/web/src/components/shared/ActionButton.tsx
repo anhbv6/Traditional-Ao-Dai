@@ -7,12 +7,13 @@ import { cn } from "@/lib/utils";
  * - `confirm`  : Đồng ý / Xác nhận — nền đỏ đô, chữ trắng.
  * - `dialog`   : Mở dialog / hành động phụ — viền đỏ đô mảnh, chữ đỏ đô.
  * - `cancel`   : Hủy bỏ — viền trung tính, chữ xám.
+ * - `danger`   : Hành động phá huỷ (xoá, gỡ, đăng xuất thiết bị) — viền + chữ đỏ cảnh báo.
  * - `disabled` : Vô hiệu — không bấm được, không hiệu ứng.
  * - `custom`   : Khung trung tính, tự truyền màu qua prop `colors`.
  *
  * Mọi trạng thái (trừ disabled) dùng chung một hiệu ứng: rê chuột thì lớp màu đậm hơn một chút quét từ trái sang, rời chuột thì rút về.
  */
-export type ActionButtonVariant = "confirm" | "dialog" | "cancel" | "disabled" | "custom";
+export type ActionButtonVariant = "confirm" | "dialog" | "cancel" | "danger" | "disabled" | "custom";
 export type ActionButtonSize = "sm" | "md" | "lg";
 
 /**
@@ -72,6 +73,12 @@ const VARIANT_COLORS: Record<ActionButtonVariant, Required<ActionColors>> = {
     text: "var(--text-light)",
     border: "var(--border)",
     hover: tint("var(--text-light)", 14),
+  },
+  danger: {
+    bg: "transparent",
+    text: "var(--destructive)",
+    border: tint("var(--destructive)", 45),
+    hover: tint("var(--destructive)", 12),
   },
   disabled: {
     bg: "var(--bg-secondary)",

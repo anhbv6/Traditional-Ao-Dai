@@ -73,6 +73,8 @@ export interface AppMenuProps {
   showArrow?: boolean;
   /** Không khoá cuộn / không chặn tương tác ngoài khi mở (menu nhỏ ở header) */
   modal?: boolean;
+  /** `default`: phong cách storefront (nền kem, đỏ đô). `admin`: đơn sắc khu quản trị (bo góc, không vạch / mũi tên) */
+  tone?: AppMenuTone;
 
   className?: string;
 }
@@ -80,6 +82,19 @@ export interface AppMenuProps {
 /* ============================================================================
  * CẤU HÌNH GIAO DIỆN
  * ========================================================================== */
+
+export type AppMenuTone = "default" | "admin";
+
+/*
+ * Tông admin: đổi lại token màu ngay trên Popup (mọi class bên dưới chỉ đọc biến) → đơn sắc theo admin/variables.md.
+ * Popup render qua portal nên tự gắn `admin-shell` để dùng font Inter và luôn sáng.
+ */
+const ADMIN_SURFACE_CLASS = cn(
+  "admin-shell rounded-xl p-1.5 font-(family-name:--font-admin) shadow-[0_12px_32px_-12px_rgba(9,9,11,0.2)]",
+  "[--bg-card:#FFFFFF] [--bg-secondary:#F4F4F5] [--border:#E4E4E7] [--text-main:#09090B] [--text-light:#71717A]",
+  "[--primary-ink:#09090B] [--primary-color:#18181B] [--accent-color:#71717A]",
+);
+const ADMIN_ITEM_CLASS = "min-h-9 rounded-lg px-3";
 
 const ITEM_CLASS = cn(
   "group/item relative flex min-h-10 w-full cursor-pointer select-none items-center gap-3 px-4 py-2 text-left text-[13px] leading-snug outline-none",
@@ -139,8 +154,10 @@ export function AppMenu({
   openOnHover = false,
   showArrow = true,
   modal = false,
+  tone = "default",
   className,
 }: AppMenuProps) {
+  const isAdmin = tone === "admin";
   const widthStyle: CSSProperties | undefined = typeof width === "number" ? { width } : undefined;
 
   const renderItemContent = (item: AppMenuItem, selectable: boolean) => {
@@ -148,13 +165,13 @@ export function AppMenu({
     return (
       <>
         {/* Vạch đỏ đô bên trái trượt vào khi mục được trỏ / chọn bằng phím */}
-        <span
+        {isAdmin ? null : <span
           aria-hidden="true"
           className={cn(
             "absolute inset-y-1.5 left-0 w-[2px] origin-center scale-y-0 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-data-highlighted/item:scale-y-100",
             item.tone === "danger" ? "bg-[#C81E3A]" : "bg-[var(--primary-color)]",
           )}
-        />
+        />}
         {Icon ? (
           <Icon
             size={16}
@@ -190,17 +207,23 @@ export function AppMenu({
 
   const renderEntry = (entry: AppMenuEntry) => {
     if (entry.type === "separator") {
-      return <Menu.Separator key={entry.key} className="mx-4 my-1.5 h-px bg-[var(--border)]" />;
+      return <Menu.Separator key={entry.key} className={cn("my-1.5 h-px bg-[var(--border)]", isAdmin ? "-mx-1.5" : "mx-4")} />;
     }
     if (entry.type === "label") {
       return (
-        <div key={entry.key} className="px-4 pb-1 pt-2.5 text-[10px] font-semibold uppercase tracking-[2px] text-[var(--accent-color)]">
+        <div
+          key={entry.key}
+          className={cn(
+            "pb-1 pt-2.5 text-[10px] font-semibold uppercase text-[var(--accent-color)]",
+            isAdmin ? "px-3 tracking-[0.5px]" : "px-4 tracking-[2px]",
+          )}
+        >
           {entry.label}
         </div>
       );
     }
 
-    const itemClass = cn(ITEM_CLASS, TONE_CLASS[entry.tone ?? "default"]);
+    const itemClass = cn(ITEM_CLASS, TONE_CLASS[entry.tone ?? "default"], isAdmin && ADMIN_ITEM_CLASS);
 
     if (selection) {
       return (
@@ -249,14 +272,19 @@ export function AppMenu({
               "py-1.5",
               width === "auto" && "min-w-56",
               width === "trigger" && "min-w-[var(--anchor-width)]",
+              isAdmin && ADMIN_SURFACE_CLASS,
               className,
             )}
           >
             {/* Vạch đỏ đô ở đỉnh + mũi tên thoi — khung chung floatingSurface (đồng bộ AppPopover / AppDialog) */}
-            <span aria-hidden="true" className={FLOATING_TOP_BAR_CLASS} />
-            {showArrow ? <Menu.Arrow className={FLOATING_ARROW_CLASS} /> : null}
+            {isAdmin ? null : <span aria-hidden="true" className={FLOATING_TOP_BAR_CLASS} />}
+            {showArrow && !isAdmin ? <Menu.Arrow className={FLOATING_ARROW_CLASS} /> : null}
 
-            {header ? <div className="border-b border-[var(--border)] px-4 pb-3 pt-2.5">{header}</div> : null}
+            {header ? (
+              <div className={cn("border-b border-[var(--border)]", isAdmin ? "-mx-1.5 mb-1.5 px-4 pb-3 pt-2" : "px-4 pb-3 pt-2.5")}>
+                {header}
+              </div>
+            ) : null}
 
             {selection ? (
               <Menu.RadioGroup value={selection.value} onValueChange={(value) => selection.onValueChange(String(value))}>

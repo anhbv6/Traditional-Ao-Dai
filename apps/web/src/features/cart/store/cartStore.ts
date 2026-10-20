@@ -15,6 +15,8 @@ interface CartState {
   removeItem: (id: string) => void;
   /** Khôi phục dòng vừa xóa về đúng vị trí cũ (hoàn tác) */
   restoreItem: (item: CartItem, index: number) => void;
+  /** Khôi phục toàn bộ giỏ (hoàn tác "Xóa giỏ hàng") */
+  restoreSnapshot: (items: CartItem[], discount: ActiveDiscount | null) => void;
   applyDiscount: (discount: ActiveDiscount | null) => void;
   clear: () => void;
 }
@@ -79,6 +81,8 @@ export const useCartStore = create<CartState>()(
           items.splice(Math.min(index, items.length), 0, item);
           return { items };
         }),
+
+      restoreSnapshot: (items, discount) => set({ items, discount }),
 
       applyDiscount: (discount) => set({ discount }),
 

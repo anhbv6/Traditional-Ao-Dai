@@ -2,15 +2,12 @@
 
 import { useState, type ReactNode } from "react";
 import { motion } from "motion/react";
-import { Bell, LogOut, UserRound } from "lucide-react";
+import { LogOut, UserRound } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/routing";
-import { useAuthStore, useCustomerLogout } from "@/features/auth";
-import { useNotifications } from "@/features/notifications";
+import { LogoutDialog, useAuthStore } from "@/features/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ActionButton } from "@/components/shared/ActionButton";
 import { BackButton } from "@/components/shared/BackButton";
-import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { cn } from "@/lib/utils";
 import { PROFILE_SECTIONS, getActiveSection } from "../constants/profileSections";
 
@@ -25,33 +22,31 @@ function getInitials(name?: string | null) {
 /**
  * Khung chung của mọi trang tài khoản (/profile/*):
  * - Tiêu đề cùng khuôn Yêu thích / Giỏ hàng / Thông báo: mũi tên quay lại + eyebrow → tên mục + mô tả mục.
- * - Desktop: menu trái (thẻ người dùng · các mục · Thông báo · Đăng xuất), bám khi cuộn; nội dung bên phải.
+ * - Desktop: menu trái (thẻ người dùng · các mục · Đăng xuất), bám khi cuộn; nội dung bên phải.
  * - Mobile: menu thành hàng chip cuộn ngang phía trên nội dung.
+ * - Đăng xuất là MỘT mục cuối menu (cùng kiểu với các mục khác), xác nhận qua LogoutDialog chung.
  * Mỗi mục là một route riêng → link từ header ("Đơn hàng") mở đúng mục, tải lại trang không mất vị trí.
  */
+/** Kiểu chung cho mọi mục menu (link mục + nút Đăng xuất) → các mục luôn đồng đều */
+const NAV_ITEM_CLASS = cn(
+  "flex cursor-pointer items-center gap-2 whitespace-nowrap border px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[1.5px] outline-none transition-colors",
+  "focus-visible:ring-2 focus-visible:ring-[var(--ring)]",
+  "lg:-ml-px lg:w-full lg:border-0 lg:border-l-2 lg:px-4 lg:py-3 lg:text-[13px] lg:normal-case lg:tracking-normal",
+);
+const NAV_ITEM_ACTIVE =
+  "border-[var(--primary-color)] bg-[var(--primary-color)] text-white lg:border-[var(--primary-color)] lg:bg-[color-mix(in_oklab,var(--primary-color)_6%,transparent)] lg:text-[var(--primary-ink)]";
+const NAV_ITEM_IDLE =
+  "border-transparent text-[var(--text-light)] hover:border-[var(--border)] hover:text-[var(--primary-ink)] lg:border-transparent lg:bg-transparent lg:text-[var(--text-main)] lg:hover:bg-[var(--bg-card)]";
+
 export function ProfileShell({ children }: { children: ReactNode }) {
   const t = useTranslations("ProfilePage");
   const tCommon = useTranslations("Common");
   const pathname = usePathname();
   const user = useAuthStore((state) => state.user);
-  const { unreadCount } = useNotifications();
   const [openLogout, setOpenLogout] = useState(false);
-  const { logout, isLoggingOut } = useCustomerLogout();
 
   const active = getActiveSection(pathname);
   const displayName = user?.name || user?.email || user?.phone || "";
-
-  const navItems = [
-    ...PROFILE_SECTIONS.map((section) => ({
-      key: section.id,
-      href: section.href,
-      icon: section.icon,
-      label: t(`tabs.${section.id}`),
-      active: section.id === active.id,
-      count: 0,
-    })),
-    { key: "notifications", href: "/notifications", icon: Bell, label: tCommon("notifications"), active: false, count: unreadCount },
-  ];
 
   return (
     <div className="font-[family-name:var(--font-lora)] text-[var(--text-main)]">
@@ -100,78 +95,46 @@ export function ProfileShell({ children }: { children: ReactNode }) {
             {/* Menu mục: dọc trên desktop, chip cuộn ngang trên mobile */}
             <nav aria-label={t("navLabel")}>
               <ul className="-mx-1 flex gap-1 overflow-x-auto px-1 [scrollbar-width:none] lg:mx-0 lg:flex-col lg:gap-0 lg:overflow-visible lg:border-l lg:border-[var(--border)] lg:px-0 [&::-webkit-scrollbar]:hidden">
-                {navItems.map(({ key, href, icon: Icon, label, active: isActive, count }) => (
-                  <li key={key} className={cn("shrink-0", key === "notifications" && "lg:mt-3 lg:border-t lg:border-[var(--border)] lg:pt-3")}>
-                    <Link
-                      href={href}
-                      aria-current={isActive ? "page" : undefined}
-                      className={cn(
-                        "flex items-center gap-2 whitespace-nowrap border text-[11px] font-semibold uppercase tracking-[1.5px] transition-colors",
-                        "px-3 py-1.5",
-                        isActive
-                          ? "border-[var(--primary-color)] bg-[var(--primary-color)] text-white"
-                          : "border-transparent text-[var(--text-light)] hover:border-[var(--border)] hover:text-[var(--primary-ink)]",
-                        "lg:-ml-px lg:w-full lg:border-0 lg:border-l-2 lg:bg-transparent lg:px-4 lg:py-3 lg:text-[13px] lg:normal-case lg:tracking-normal",
-                        isActive
-                          ? "lg:border-[var(--primary-color)] lg:bg-[color-mix(in_oklab,var(--primary-color)_6%,transparent)] lg:text-[var(--primary-ink)]"
-                          : "lg:border-transparent lg:text-[var(--text-main)] lg:hover:bg-[var(--bg-card)]",
-                      )}
-                    >
-                      <Icon aria-hidden="true" className="hidden size-4 shrink-0 text-[var(--primary-ink)] lg:block" strokeWidth={1.6} />
-                      <span className="lg:flex-1">{label}</span>
-                      {count > 0 ? (
-                        <span className="grid h-5 min-w-5 place-items-center rounded-full bg-[var(--primary-color)] px-1.5 text-[10px] font-bold text-white tabular-nums lg:ml-auto">
-                          {count > 99 ? "99+" : count}
-                        </span>
-                      ) : null}
-                    </Link>
-                  </li>
-                ))}
+                {PROFILE_SECTIONS.map(({ id, href, icon: Icon }) => {
+                  const isActive = id === active.id;
+                  return (
+                    <li key={id} className="shrink-0">
+                      <Link
+                        href={href}
+                        aria-current={isActive ? "page" : undefined}
+                        className={cn(NAV_ITEM_CLASS, isActive ? NAV_ITEM_ACTIVE : NAV_ITEM_IDLE)}
+                      >
+                        <Icon aria-hidden="true" className="hidden size-4 shrink-0 text-[var(--primary-ink)] lg:block" strokeWidth={1.6} />
+                        <span className="lg:flex-1">{t(`tabs.${id}`)}</span>
+                      </Link>
+                    </li>
+                  );
+                })}
+
+                {/* Đăng xuất: cùng kiểu mục menu, tách bằng vạch mảnh trên desktop */}
+                <li className="shrink-0 lg:mt-3 lg:border-t lg:border-[var(--border)] lg:pt-3">
+                  <button
+                    type="button"
+                    onClick={() => setOpenLogout(true)}
+                    className={cn(
+                      NAV_ITEM_CLASS,
+                      "border-transparent text-[var(--destructive)] hover:border-[color-mix(in_oklab,var(--destructive)_40%,transparent)]",
+                      "lg:border-transparent lg:text-[var(--destructive)] lg:hover:bg-[color-mix(in_oklab,var(--destructive)_6%,transparent)]",
+                    )}
+                  >
+                    <LogOut aria-hidden="true" className="hidden size-4 shrink-0 lg:block" strokeWidth={1.6} />
+                    <span className="lg:flex-1 lg:text-left">{tCommon("logout")}</span>
+                  </button>
+                </li>
               </ul>
             </nav>
-
-            <ActionButton
-              variant="cancel"
-              size="sm"
-              fullWidth
-              icon={<LogOut />}
-              onClick={() => setOpenLogout(true)}
-              className="mt-5 hidden lg:inline-flex"
-            >
-              {tCommon("logout")}
-            </ActionButton>
           </div>
         </aside>
 
-        <div className="min-w-0 space-y-6">
-          {children}
-
-          {/* Đăng xuất trên mobile: đặt cuối trang để không lẫn với các mục */}
-          <ActionButton
-            variant="cancel"
-            size="md"
-            fullWidth
-            icon={<LogOut />}
-            onClick={() => setOpenLogout(true)}
-            className="lg:hidden"
-          >
-            {tCommon("logout")}
-          </ActionButton>
-        </div>
+        <div className="min-w-0 space-y-6">{children}</div>
       </div>
 
-      <ConfirmDialog
-        open={openLogout}
-        onOpenChange={setOpenLogout}
-        confirmVariant="destructive"
-        title={t("logoutDialog.title")}
-        description={t("logoutDialog.message")}
-        confirmText={t("logoutDialog.confirmBtn")}
-        cancelText={t("logoutDialog.cancelBtn")}
-        isLoading={isLoggingOut}
-        customTitle="text-lg sm:text-2xl"
-        onConfirm={logout}
-      />
+      <LogoutDialog open={openLogout} onOpenChange={setOpenLogout} />
     </div>
   );
 }

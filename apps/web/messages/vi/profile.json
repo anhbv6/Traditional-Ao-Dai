@@ -214,18 +214,12 @@
   },
   "setting": {
     "title": "Cài đặt tài khoản",
-    "subtitle": "Tuỳ chỉnh giao diện và ngôn ngữ hiển thị trên thiết bị này.",
+    "subtitle": "Tuỳ chỉnh giao diện sáng / tối trên thiết bị này. Ngôn ngữ đổi ngay trên thanh đầu trang.",
     "appearance": {
       "title": "Giao diện",
       "description": "Tùy chỉnh giao diện hiển thị trên thiết bị của bạn",
       "light": "Sáng",
       "dark": "Tối"
-    },
-    "language": {
-      "title": "Ngôn ngữ",
-      "description": "Lựa chọn ngôn ngữ của bạn",
-      "vi": "Tiếng Việt",
-      "en": "English"
     }
   },
   "security": {

@@ -214,7 +214,7 @@ export function useDeleteAddress() {
   });
 
   return {
-    handleDelete: deleteAddressMutation.mutate,
+    handleDelete: deleteAddressMutation.mutateAsync,
     isDeleting: deleteAddressMutation.isPending,
   };
 }

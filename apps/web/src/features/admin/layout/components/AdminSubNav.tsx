@@ -1,29 +1,39 @@
 "use client";
 
-import React from "react";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
+import { cn } from "@/lib/utils";
 import { type AdminSubNavProps } from "../types";
 
+/** Thanh tab điều hướng module (desktop) — tab đang mở có gạch chân đen */
 export function AdminSubNav({ items }: AdminSubNavProps) {
+  const t = useTranslations("AdminPage.header");
+
   return (
-    <div className="bg-zinc-50/80 border-t border-[#E4E4E7] px-5 sm:px-8 lg:px-12 py-2 flex items-center gap-1 overflow-x-auto">
-      {items.map((item) => {
-        const Icon = item.icon;
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
-              item.active
-                ? "bg-[#18181B] text-white shadow-2xs"
-                : "text-zinc-600 hover:text-[#09090B] hover:bg-zinc-200/60"
-            }`}
-          >
-            <Icon size={13} />
-            <span>{item.label}</span>
-          </Link>
-        );
-      })}
-    </div>
+    <nav
+      aria-label={t("navigation")}
+      className="hidden overflow-x-auto [mask-image:linear-gradient(to_right,black_calc(100%-32px),transparent)] [scrollbar-width:none] lg:block [&::-webkit-scrollbar]:hidden"
+    >
+      <ul className="flex items-center gap-1 pr-8">
+        {items.map(({ href, icon: Icon, label, active }) => (
+          <li key={href}>
+            <Link
+              href={href}
+              aria-current={active ? "page" : undefined}
+              className={cn(
+                "relative flex h-11 items-center gap-2 whitespace-nowrap rounded-t-lg px-3 text-[13px] font-medium transition-colors",
+                "after:absolute after:inset-x-2 after:bottom-0 after:h-0.5 after:rounded-full after:transition-colors",
+                active
+                  ? "text-[#09090B] after:bg-[#09090B]"
+                  : "text-[#71717A] after:bg-transparent hover:text-[#09090B] hover:after:bg-[#E4E4E7]"
+              )}
+            >
+              <Icon size={15} strokeWidth={active ? 2.2 : 1.8} />
+              {label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </nav>
   );
 }

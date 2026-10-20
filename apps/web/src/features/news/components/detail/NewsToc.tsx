@@ -102,7 +102,7 @@ export function NewsToc({ sections, variant }: NewsTocProps) {
   }
 
   return (
-    <nav aria-label={t("toc")} className="mb-8 border border-[var(--border)] bg-[var(--bg-card)]">
+    <nav aria-label={t("toc")} className="mb-8 border border-[var(--border)] bg-[var(--bg-main)]">
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}

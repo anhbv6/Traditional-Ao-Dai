@@ -58,7 +58,8 @@
     "close": "Close"
   },
   "undo": {
-    "removed": "Removed “{name}” from your cart"
+    "removed": "Removed “{name}” from your cart",
+    "cleared": "Removed {count} items from your cart"
   },
   "empty": {
     "title": "Your cart is empty",

@@ -6,7 +6,7 @@ import { Scissors, ShoppingBag } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/routing';
 import { parseVndString, useCartStore } from '@/features/cart';
-import { useIsWishlisted, useWishlistStore } from '@/features/wishlist';
+import { useIsWishlisted, useWishlistUndo } from '@/features/wishlist';
 import { showToast } from '@/components/ui/toast';
 import { flyToCart } from '@/components/shared/flyToCart';
 import { AppTooltip } from '@/components/shared/AppTooltip';
@@ -80,6 +80,7 @@ export function ProductCard({
   showWishlist = true,
 }: ProductCardProps) {
   const t = useTranslations('Product');
+  const { toggleWithUndo } = useWishlistUndo();
   const fallbackImageSrc = '/logoPage.png';
   const [failedImageSrc, setFailedImageSrc] = useState<string | null>(null);
   const [hoverImageFailed, setHoverImageFailed] = useState(false);
@@ -151,7 +152,7 @@ export function ProductCard({
     e.preventDefault();
     e.stopPropagation();
 
-    useWishlistStore.getState().toggle({
+    toggleWithUndo({
       slug: itemSlug,
       name,
       image: imageSrc,

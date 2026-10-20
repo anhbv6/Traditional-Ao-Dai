@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion, useScroll, useTransform } from "motion/react";
 import { useTranslations } from "next-intl";
 import { type MockArticle } from "../../types/news.types";
+import { NEWS_BLOCK_CLASS } from "./newsBlock";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -18,6 +19,7 @@ interface NewsHeaderProps {
 /**
  * Đầu bài kiểu tạp chí:
  * - Danh mục có vạch kẻ chạy ra, tiêu đề hiện lần lượt TỪNG CHỮ trồi lên từ dưới mặt nạ.
+ * - Nằm trong khối có khung như các phần khác của trang (xem NEWS_BLOCK_CLASS).
  * - Ảnh bìa hé lộ như kéo tấm màn, khi cuộn ảnh trôi chậm hơn trang (parallax nhẹ).
  */
 export function NewsHeader({ article, authorName, fullDate, loc }: NewsHeaderProps) {
@@ -28,7 +30,7 @@ export function NewsHeader({ article, authorName, fullDate, loc }: NewsHeaderPro
   const words = article.title[loc].split(" ");
 
   return (
-    <header className="mb-10 sm:mb-14">
+    <header className={NEWS_BLOCK_CLASS}>
       <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
         <motion.p
           initial={{ opacity: 0 }}
@@ -53,7 +55,7 @@ export function NewsHeader({ article, authorName, fullDate, loc }: NewsHeaderPro
           />
         </motion.p>
 
-        <h1 className="mt-4 text-[1.625rem] font-semibold leading-tight text-[var(--primary-ink)] sm:text-[2.25rem] md:text-[2.625rem]">
+        <h1 className="mt-4 text-[1.5rem] font-semibold leading-tight text-[var(--primary-ink)] sm:text-[2rem] xl:text-[2.25rem]">
           <span className="sr-only">{article.title[loc]}</span>
           <span aria-hidden="true">
             {words.map((word, index) => (
@@ -103,7 +105,7 @@ export function NewsHeader({ article, authorName, fullDate, loc }: NewsHeaderPro
         initial={{ clipPath: "inset(100% 0% 0% 0%)" }}
         animate={{ clipPath: "inset(0% 0% 0% 0%)" }}
         transition={{ duration: 1.3, delay: 0.35, ease: EASE }}
-        className="relative mt-8 aspect-[16/10] w-full overflow-hidden bg-[var(--bg-secondary)] sm:mt-10 md:aspect-[21/9]"
+        className="relative mt-6 aspect-[16/10] w-full overflow-hidden bg-[var(--bg-secondary)] sm:mt-8 sm:aspect-[16/9]"
       >
         <motion.div className="absolute inset-[-8%_0]" style={{ y: coverY }}>
           <motion.div
@@ -118,7 +120,7 @@ export function NewsHeader({ article, authorName, fullDate, loc }: NewsHeaderPro
               fill
               loading="eager"
               fetchPriority="high"
-              sizes="(max-width: 1200px) 100vw, 1100px"
+              sizes="(max-width: 1024px) 100vw, 760px"
               className="object-cover"
             />
           </motion.div>

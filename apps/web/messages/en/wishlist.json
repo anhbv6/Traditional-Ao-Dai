@@ -36,7 +36,8 @@
     "sale": "Sale"
   },
   "undo": {
-    "removed": "Removed “{name}” from your wishlist"
+    "removed": "Removed “{name}” from your wishlist",
+    "cleared": "Removed {count} designs from your wishlist"
   },
   "toast": {
     "cleared": "Cleared all items from your wishlist!",

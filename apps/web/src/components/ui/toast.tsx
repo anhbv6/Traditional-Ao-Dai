@@ -5,9 +5,25 @@ import { Toast as ToastPrimitive } from "@base-ui/react/toast"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { XIcon, CircleCheckIcon, InfoIcon, TriangleAlertIcon, OctagonXIcon, Loader2Icon } from "lucide-react"
+import { XIcon, CircleCheckIcon, InfoIcon, TriangleAlertIcon, OctagonXIcon, Loader2Icon, Undo2Icon } from "lucide-react"
 
 const toast = ToastPrimitive.createToastManager()
+
+/**
+ * Thời gian hiển thị (ms). Đủ đọc 1–2 dòng rồi tự tắt; rê chuột vào vùng thông báo thì tạm dừng đếm.
+ * - Thành công / thông tin: ngắn. Lỗi: dài hơn để kịp đọc. Hoàn tác: đủ thời gian bấm.
+ */
+export const TOAST_DURATION = {
+  success: 3500,
+  info: 3500,
+  warning: 4500,
+  error: 5000,
+  loading: 8000,
+  undo: 5000,
+} as const
+
+/** Thời gian (ms) cho phép hoàn tác — dùng chung cho mọi thao tác có nút "Hoàn tác" */
+export const UNDO_TIMEOUT = TOAST_DURATION.undo
 
 function ToastProvider({ ...props }: ToastPrimitive.Provider.Props) {
   return <ToastPrimitive.Provider {...props} />
@@ -24,14 +40,20 @@ function resolveClassName<T>(
   return typeof className === "function" ? className(state) : className
 }
 
-/* Vùng hiện toast: ngay DƯỚI header dính (h-20 = 5rem) + 1rem khoảng thở → không che logo / icon / nút đăng nhập */
+/**
+ * Vùng hiện toast (góc trên bên phải):
+ * - Trang CÓ header dính: nằm ngay dưới header — `HeaderHeightSync` gắn `data-site-header` lên <html> và ghi chiều cao
+ *   thật vào `--site-header-h`, nên không che logo / giỏ hàng / nút đăng nhập dù header đổi cao theo breakpoint.
+ * - Trang KHÔNG có header (đăng nhập, 403…): sát góc trên như thông thường.
+ */
 function ToastViewport({ className, ...props }: ToastPrimitive.Viewport.Props) {
   return (
     <ToastPrimitive.Viewport
       data-slot="toast-viewport"
       className={(state) =>
         cn(
-          "pointer-events-none fixed right-[2rem] top-[calc(5rem+1rem)] z-[9999] w-[calc(100vw-4rem)] sm:w-[22.5rem] outline-none",
+          "pointer-events-none fixed inset-x-3 top-3 z-[9999] outline-none sm:left-auto sm:right-6 sm:top-5 sm:w-[22rem]",
+          "[html[data-site-header]_&]:top-[calc(var(--site-header-h)+0.75rem)]",
           resolveClassName(className, state)
         )
       }
@@ -46,13 +68,14 @@ function Toast({ className, ...props }: ToastPrimitive.Root.Props) {
       data-slot="toast"
       className={(state) =>
         cn(
-          "group/toast pointer-events-auto absolute right-0 top-0 z-[calc(1000-var(--toast-index))] w-full origin-top rounded-2xl border bg-[var(--bg-card)] dark:bg-zinc-950 text-black dark:text-zinc-50 border-zinc-200 dark:border-zinc-800 shadow-lg outline-none select-none",
-          "[--gap:0.75rem] [--height:var(--toast-frontmost-height,var(--toast-height))] [--offset-y:calc(var(--toast-offset-y)*1+calc(var(--toast-index)*var(--gap)*1)+var(--toast-swipe-movement-y))] [--peek:0.75rem] [--scale:calc(max(0,1-(var(--toast-index)*0.1)))] [--shrink:calc(1-var(--scale))]",
-          "h-(--height) [transform:translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)+(var(--toast-index)*var(--peek))+(var(--shrink)*var(--height))))_scale(var(--scale))] [transition:transform_500ms_cubic-bezier(0.22,1,0.36,1),opacity_500ms,height_150ms]",
+          "group/toast pointer-events-auto absolute right-0 top-0 z-[calc(1000-var(--toast-index))] w-full origin-top overflow-hidden border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-main)] shadow-[0_14px_36px_-18px_rgba(42,37,37,0.32)] outline-none select-none",
+          "[--gap:0.5rem] [--height:var(--toast-frontmost-height,var(--toast-height))] [--offset-y:calc(var(--toast-offset-y)*1+calc(var(--toast-index)*var(--gap)*1)+var(--toast-swipe-movement-y))] [--peek:0.75rem] [--scale:calc(max(0,1-(var(--toast-index)*0.1)))] [--shrink:calc(1-var(--scale))]",
+          "h-(--height) [transform:translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)+(var(--toast-index)*var(--peek))+(var(--shrink)*var(--height))))_scale(var(--scale))] [transition:transform_400ms_cubic-bezier(0.22,1,0.36,1),opacity_400ms,height_150ms]",
           "after:absolute after:top-full after:left-0 after:h-[calc(var(--gap)+1px)] after:w-full after:content-['']",
           "data-expanded:h-(--toast-height) data-expanded:[transform:translateX(var(--toast-swipe-movement-x))_translateY(var(--offset-y))]",
-          "data-limited:opacity-0 data-starting-style:[transform:translateY(-150%)]",
-          "[&[data-ending-style]:not([data-limited]):not([data-swipe-direction])]:[transform:translateY(-150%)]",
+          /* Vào: nhích nhẹ xuống + hiện dần (không bay từ ngoài màn hình). Ra: mờ dần + nhích lên */
+          "data-limited:opacity-0 data-starting-style:opacity-0 data-starting-style:[transform:translateY(-0.75rem)_scale(0.98)]",
+          "[&[data-ending-style]:not([data-limited]):not([data-swipe-direction])]:opacity-0 [&[data-ending-style]:not([data-limited]):not([data-swipe-direction])]:[transform:translateY(-0.5rem)_scale(0.98)]",
           "data-ending-style:data-[swipe-direction=down]:[transform:translateY(calc(var(--toast-swipe-movement-y)+150%))]",
           "data-ending-style:data-[swipe-direction=left]:[transform:translateX(calc(var(--toast-swipe-movement-x)-150%))_translateY(var(--offset-y))]",
           "data-ending-style:data-[swipe-direction=right]:[transform:translateX(calc(var(--toast-swipe-movement-x)+150%))_translateY(var(--offset-y))]",
@@ -75,7 +98,7 @@ function ToastContent({ className, ...props }: ToastPrimitive.Content.Props) {
       data-slot="toast-content"
       className={(state) =>
         cn(
-          "flex items-center gap-3 overflow-hidden p-4 h-full",
+          "flex h-full items-start gap-3 overflow-hidden py-3 pl-4 pr-2",
           resolveClassName(className, state)
         )
       }
@@ -89,7 +112,7 @@ function ToastTitle({ className, ...props }: ToastPrimitive.Title.Props) {
     <ToastPrimitive.Title
       data-slot="toast-title"
       className={(state) =>
-        cn("text-xs font-semibold leading-relaxed text-black dark:text-white", resolveClassName(className, state))
+        cn("text-[13px] font-semibold leading-5 text-[var(--text-main)]", resolveClassName(className, state))
       }
       {...props}
     />
@@ -104,23 +127,24 @@ function ToastDescription({
     <ToastPrimitive.Description
       data-slot="toast-description"
       className={(state) =>
-        cn("text-[10px] text-zinc-500 dark:text-zinc-400 leading-normal", resolveClassName(className, state))
+        cn("text-xs leading-5 text-[var(--text-light)]", resolveClassName(className, state))
       }
       {...props}
     />
   )
 }
 
-function ToastAction({
-  className,
-  render = <Button variant="outline" size="sm" />,
-  ...props
-}: ToastPrimitive.Action.Props) {
+/** Nút hành động trong toast (VD "Hoàn tác") — dạng chữ, không viền, để không giành chú ý với nội dung */
+function ToastAction({ className, ...props }: ToastPrimitive.Action.Props) {
   return (
     <ToastPrimitive.Action
       data-slot="toast-action"
-      render={render}
-      className={(state) => cn("shrink-0", resolveClassName(className, state))}
+      className={(state) =>
+        cn(
+          "-my-0.5 inline-flex h-7 shrink-0 cursor-pointer items-center gap-1 px-2 text-[11px] font-semibold uppercase tracking-[1.5px] text-[var(--primary-ink)] transition-colors hover:bg-[var(--bg-secondary)]",
+          resolveClassName(className, state)
+        )
+      }
       {...props}
     />
   )
@@ -139,7 +163,7 @@ function ToastClose({
       render={render}
       className={(state) =>
         cn(
-          "relative shrink-0 text-zinc-400 hover:text-black dark:text-zinc-500 dark:hover:text-zinc-300 after:absolute after:-inset-2 after:content-[''] transition-colors",
+          "relative -my-0.5 size-7 shrink-0 rounded-none text-[var(--text-light)] transition-colors hover:bg-transparent hover:text-[var(--text-main)] after:absolute after:-inset-1 after:content-['']",
           resolveClassName(className, state)
         )
       }
@@ -152,49 +176,24 @@ function ToastClose({
   )
 }
 
+/** Biểu tượng + màu nhấn theo loại thông báo — tông trầm, chỉ icon và vạch trái có màu (không tô cả nền) */
+const TOAST_TONES: Record<string, { icon: React.ComponentType<{ className?: string }>; color: string; bar: string }> = {
+  success: { icon: CircleCheckIcon, color: "text-emerald-700 dark:text-emerald-400", bar: "bg-emerald-700/70 dark:bg-emerald-400/70" },
+  info: { icon: InfoIcon, color: "text-[var(--primary-ink)]", bar: "bg-[var(--primary-color)]/60" },
+  warning: { icon: TriangleAlertIcon, color: "text-amber-700 dark:text-amber-400", bar: "bg-amber-600/70" },
+  error: { icon: OctagonXIcon, color: "text-[var(--destructive)]", bar: "bg-[var(--destructive)]/70" },
+  loading: { icon: Loader2Icon, color: "text-[var(--text-light)]", bar: "bg-[var(--border)]" },
+  undo: { icon: Undo2Icon, color: "text-[var(--text-light)]", bar: "bg-[var(--text-light)]/40" },
+}
+
 function ToastIcon({ type }: { type: string | undefined }) {
-  let icon: React.ReactNode = null
-
-  if (type === "success") {
-    icon = (
-      <CircleCheckIcon className="text-black dark:text-white size-4 shrink-0" aria-hidden="true" />
-    )
-  }
-
-  if (type === "info") {
-    icon = (
-      <InfoIcon className="text-black dark:text-white size-4 shrink-0" aria-hidden="true" />
-    )
-  }
-
-  if (type === "warning") {
-    icon = (
-      <TriangleAlertIcon className="text-black dark:text-white size-4 shrink-0" aria-hidden="true" />
-    )
-  }
-
-  if (type === "error") {
-    icon = (
-      <OctagonXIcon className="text-black dark:text-white size-4 shrink-0" aria-hidden="true" />
-    )
-  }
-
-  if (type === "loading") {
-    icon = (
-      <Loader2Icon className="animate-spin text-black dark:text-white size-4 shrink-0" aria-hidden="true" />
-    )
-  }
-
-  if (!icon) {
-    return null
-  }
+  const tone = TOAST_TONES[type ?? ""]
+  if (!tone) return null
+  const Icon = tone.icon
 
   return (
-    <span
-      data-slot="toast-icon"
-      className="shrink-0 flex items-center"
-    >
-      {icon}
+    <span data-slot="toast-icon" className="flex h-5 shrink-0 items-center">
+      <Icon className={cn("size-4", tone.color, type === "loading" && "animate-spin")} aria-hidden="true" />
     </span>
   )
 }
@@ -202,18 +201,32 @@ function ToastIcon({ type }: { type: string | undefined }) {
 function ToastList() {
   const { toasts } = ToastPrimitive.useToastManager()
 
-  return toasts.map((toastItem) => (
-    <Toast key={toastItem.id} toast={toastItem}>
-      <ToastContent>
-        <ToastIcon type={toastItem.type} />
-        <div className="flex min-w-0 flex-1 flex-col gap-0.5 select-none">
-          {toastItem.title && <ToastTitle className="text-xs font-bold font-[family-name:var(--font-lora)] text-black dark:text-white" />}
-          {toastItem.description && <ToastDescription className="text-[11px] text-muted-foreground font-[family-name:var(--font-lora)]" />}
-        </div>
-        <ToastClose />
-      </ToastContent>
-    </Toast>
-  ))
+  return toasts.map((toastItem) => {
+    const tone = TOAST_TONES[toastItem.type ?? ""]
+    return (
+      <Toast key={toastItem.id} toast={toastItem}>
+        {/* Vạch màu mảnh bên trái cho biết loại thông báo */}
+        {tone ? <span aria-hidden="true" className={cn("absolute inset-y-0 left-0 w-0.5", tone.bar)} /> : null}
+        <ToastContent>
+          <ToastIcon type={toastItem.type} />
+          <div className="flex min-w-0 flex-1 flex-col select-none">
+            {toastItem.title && <ToastTitle />}
+            {toastItem.description && <ToastDescription />}
+          </div>
+          {toastItem.actionProps ? <ToastAction /> : null}
+          <ToastClose />
+        </ToastContent>
+        {/* Thông báo có hoàn tác: vạch đếm ngược co dần ở đáy (tạm dừng khi rê chuột vào vùng thông báo) */}
+        {toastItem.type === "undo" && toastItem.timeout ? (
+          <span
+            aria-hidden="true"
+            className="absolute inset-x-0 bottom-0 h-0.5 origin-left bg-[var(--primary-color)]/40 [[data-slot=toast-viewport]:hover_&]:[animation-play-state:paused]"
+            style={{ animation: `progress-fill ${toastItem.timeout}ms linear reverse forwards` }}
+          />
+        ) : null}
+      </Toast>
+    )
+  })
 }
 
 function Toaster({
@@ -236,59 +249,68 @@ function Toaster({
 const createToastManager = ToastPrimitive.createToastManager
 const useToastManager = ToastPrimitive.useToastManager
 
-// Compatibility layer for showToast calls with 20 second timeout
-interface ShowToast {
-  (message: string, description?: string): void;
-  success: (message: string, description?: string) => void;
-  error: (message: string, description?: string) => void;
-  info: (message: string, description?: string) => void;
-  loading: (message: string, description?: string) => void;
+export interface UndoToastOptions {
+  /** Nội dung chính, VD "Đã xóa “Áo dài Hoa Sen” khỏi giỏ hàng" */
+  title: string
+  description?: string
+  /** Chữ trên nút — truyền nhãn đã dịch (VD t("actions.undo")) */
+  actionLabel: string
+  /** Khôi phục lại trạng thái trước thao tác */
+  onUndo: () => void
+  timeout?: number
 }
 
-export const showToast = Object.assign(
-  (message: string, description?: string) => {
-    toast.add({
-      title: message,
+interface ShowToast {
+  (message: string, description?: string): string
+  success: (message: string, description?: string) => string
+  error: (message: string, description?: string) => string
+  info: (message: string, description?: string) => string
+  warning: (message: string, description?: string) => string
+  loading: (message: string, description?: string) => string
+  /**
+   * Thông báo kèm nút "Hoàn tác" cho thao tác đảo ngược được (xóa khỏi giỏ, bỏ yêu thích, đánh dấu đã đọc…).
+   * Bấm "Hoàn tác" -> gọi `onUndo` rồi đóng thông báo. Trả về id để tự đóng sớm khi cần.
+   */
+  undo: (options: UndoToastOptions) => string
+  /** Đóng một thông báo theo id */
+  dismiss: (id: string) => void
+}
+
+const addToast = (type: Exclude<keyof typeof TOAST_DURATION, "undo">) => (message: string, description?: string) =>
+  toast.add({ title: message, description, type, timeout: TOAST_DURATION[type] })
+
+export const showToast: ShowToast = Object.assign(addToast("info"), {
+  success: addToast("success"),
+  error: addToast("error"),
+  info: addToast("info"),
+  warning: addToast("warning"),
+  loading: addToast("loading"),
+  undo: ({ title, description, actionLabel, onUndo, timeout = TOAST_DURATION.undo }: UndoToastOptions) => {
+    // Gán id trước để nút hoàn tác đóng đúng thông báo của nó
+    const id = `undo-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
+    return toast.add({
+      id,
+      title,
       description,
-      type: 'info',
-      timeout: 20000,
-    });
+      type: "undo",
+      timeout,
+      priority: "high",
+      actionProps: {
+        children: (
+          <>
+            <Undo2Icon className="size-3.5" aria-hidden="true" />
+            {actionLabel}
+          </>
+        ),
+        onClick: () => {
+          onUndo()
+          toast.close(id)
+        },
+      },
+    })
   },
-  {
-    success: (message: string, description?: string) => {
-      toast.add({
-        title: message,
-        description,
-        type: 'success',
-        timeout: 20000,
-      });
-    },
-    error: (message: string, description?: string) => {
-      toast.add({
-        title: message,
-        description,
-        type: 'error',
-        timeout: 20000,
-      });
-    },
-    info: (message: string, description?: string) => {
-      toast.add({
-        title: message,
-        description,
-        type: 'info',
-        timeout: 20000,
-      });
-    },
-    loading: (message: string, description?: string) => {
-      toast.add({
-        title: message,
-        description,
-        type: 'loading',
-        timeout: 20000,
-      });
-    },
-  }
-) as ShowToast;
+  dismiss: (id: string) => toast.close(id),
+})
 
 export {
   Toaster,

@@ -36,6 +36,8 @@ interface ProductInfoProps {
   selectedPrice: { price: number; originalPrice?: number };
   /** Ảnh đại diện cho thanh mua nhanh trên mobile */
   currentImageSrc: string;
+  /** Bấm số lượt đánh giá -> chuyển sang tab "Đánh giá" */
+  onShowReviews?: () => void;
 }
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -75,6 +77,7 @@ export default function ProductInfo({
   selectedPrice,
   locale,
   currentImageSrc,
+  onShowReviews,
 }: ProductInfoProps) {
   const t = useTranslations('Product');
   const [justAdded, setJustAdded] = useState(false);
@@ -163,7 +166,17 @@ export default function ProductInfo({
         <motion.div variants={rise} className="mt-4 flex flex-wrap items-center gap-2 text-sm text-[var(--text-light)]">
           <Rating style={{ maxWidth: 85 }} value={parseFloat(product.rating) || 5} itemStyles={ratingStyles} readOnly />
           <span className="font-semibold text-[var(--text-main)]">{product.rating}</span>
-          <span>({product.reviewCount})</span>
+          {onShowReviews ? (
+            <button
+              type="button"
+              onClick={onShowReviews}
+              className="cursor-pointer underline-offset-4 transition-colors hover:text-[var(--primary-ink)] hover:underline"
+            >
+              ({product.reviewCount})
+            </button>
+          ) : (
+            <span>({product.reviewCount})</span>
+          )}
         </motion.div>
 
         {/* Giá: đổi size có giá khác -> giá mới "lăn" lên */}

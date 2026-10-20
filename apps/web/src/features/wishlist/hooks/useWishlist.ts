@@ -6,6 +6,7 @@ import { type Locale } from "@repo/shared";
 import { useCartStore } from "@/features/cart";
 import { showToast } from "@/components/ui/toast";
 import { useWishlistHydrated, useWishlistStore } from "../store/wishlistStore";
+import { useWishlistUndo } from "./useWishlistUndo";
 import { type WishlistItem, type WishlistSortKey } from "../types/wishlist.types";
 
 /** Size mặc định khi thêm nhanh vào giỏ (đồng bộ với ProductCard) — khách đổi size ở trang giỏ / chi tiết */
@@ -24,13 +25,12 @@ export function useWishlist() {
   const rawItems = useWishlistStore((state) => state.items);
 
   const [sortKey, setSortKey] = useState<WishlistSortKey>("recent");
+  const { clearWithUndo } = useWishlistUndo();
 
   const items = useMemo(() => [...rawItems].sort(sorters[sortKey]), [rawItems, sortKey]);
 
-  const handleClearAll = () => {
-    useWishlistStore.getState().clear();
-    showToast.success(t("toast.cleared"));
-  };
+  // Xóa toàn bộ có "Hoàn tác" (useWishlistUndo)
+  const handleClearAll = clearWithUndo;
 
   const addToCart = (item: WishlistItem) =>
     useCartStore.getState().addItem({

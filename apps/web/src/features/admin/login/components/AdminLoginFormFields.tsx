@@ -1,88 +1,84 @@
 "use client";
 
-import React from "react";
-import { Mail, Lock } from "lucide-react";
+import { Controller, type UseFormReturn } from "react-hook-form";
 import { showToast } from "@/components/ui/toast";
-import { FormInput } from "@/components/shared/FormInput";
+import { TextField, type TextFieldProps } from "@/components/shared/TextField";
 import { Checkbox } from "@/components/ui/checkbox";
+import { type AdminLoginFormValues } from "../validations/adminLogin.validation";
+
+// Ô nhập dùng chung theo tông admin: viền hộp, nhãn thường (không in hoa kiểu storefront)
+const FIELD_PROPS = {
+  appearance: "outline",
+  tone: "admin",
+  size: "md",
+  fieldClassName: "rounded-xl",
+  labelClassName: "text-xs font-medium normal-case tracking-normal",
+} satisfies Partial<TextFieldProps>;
 
 interface AdminLoginFormFieldsProps {
-  email: string;
-  setEmail: (val: string) => void;
-  password: string;
-  setPassword: (val: string) => void;
-  rememberMe: boolean;
-  setRememberMe: (val: boolean) => void;
-  errors?: {
+  form: UseFormReturn<AdminLoginFormValues>;
+  /** Lỗi đã dịch theo từng ô */
+  errors: {
     email?: string;
     password?: string;
   };
+  disabled?: boolean;
   t: (key: string) => string;
 }
 
-export function AdminLoginFormFields({
-  email,
-  setEmail,
-  password,
-  setPassword,
-  rememberMe,
-  setRememberMe,
-  errors,
-  t,
-}: AdminLoginFormFieldsProps) {
+export function AdminLoginFormFields({ form, errors, disabled, t }: AdminLoginFormFieldsProps) {
+  const submitCount = form.formState.submitCount;
+
   return (
     <div className="space-y-4">
-      {/* Email address field with FormInput */}
-      <FormInput
+      <TextField
         id="admin-email"
         type="email"
+        {...FIELD_PROPS}
+        {...form.register("email")}
         label={t("emailLabel")}
         placeholder={t("emailPlaceholder")}
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        error={errors?.email}
-        startIcon={<Mail size={16} />}
+        error={errors.email}
+        shakeKey={submitCount}
+        readOnly={disabled}
         required
         autoComplete="email"
-        containerClassName="space-y-1.5"
-        labelClassName="text-xs font-semibold text-zinc-700 tracking-normal font-sans !normal-case"
-        className="w-full bg-white/80 hover:bg-white focus:bg-white border-zinc-200/80 rounded-xl text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 shadow-2xs font-normal"
       />
 
-      {/* Password field with FormInput */}
-      <FormInput
+      <TextField
         id="admin-password"
         type="password"
+        {...FIELD_PROPS}
+        {...form.register("password")}
         label={t("passwordLabel")}
         placeholder={t("passwordPlaceholder")}
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        error={errors?.password}
-        startIcon={<Lock size={16} />}
-        passwordToggle={true}
-        passwordToggleLabels={{
-          show: t("showPassword"),
-          hide: t("hidePassword"),
-        }}
+        error={errors.password}
+        shakeKey={submitCount}
+        readOnly={disabled}
+        passwordToggle
         required
         autoComplete="current-password"
-        containerClassName="space-y-1.5"
-        labelClassName="text-xs font-semibold text-zinc-700 tracking-normal font-sans !normal-case"
-        className="w-full bg-white/80 hover:bg-white focus:bg-white border-zinc-200/80 rounded-xl text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 shadow-2xs font-normal"
       />
 
-      {/* Remember me option & Forgot password */}
+      {/* Ghi nhớ đăng nhập & Quên mật khẩu */}
       <div className="flex items-center justify-between pt-0.5">
         <div className="flex items-center gap-2">
-          <Checkbox
-            id="admin-remember"
-            checked={rememberMe}
-            onCheckedChange={(checked) => setRememberMe(!!checked)}
-            className="size-4.5 rounded-[5px] border-zinc-300 data-checked:border-zinc-900 data-checked:bg-zinc-900 data-checked:text-white"
+          <Controller
+            control={form.control}
+            name="rememberMe"
+            render={({ field }) => (
+              <Checkbox
+                id="admin-remember"
+                checked={field.value}
+                onCheckedChange={(checked) => field.onChange(Boolean(checked))}
+                disabled={disabled}
+                className="size-4.5 rounded-[5px] border-[#D4D4D8] data-checked:border-[#18181B] data-checked:bg-[#18181B] data-checked:text-white"
+              />
+            )}
           />
           <label
             htmlFor="admin-remember"
-            className="cursor-pointer text-xs text-zinc-600 hover:text-zinc-900 transition-colors select-none font-medium"
+            className="cursor-pointer select-none text-xs font-medium text-[#71717A] transition-colors hover:text-[#09090B]"
           >
             {t("rememberMe")}
           </label>
@@ -91,7 +87,7 @@ export function AdminLoginFormFields({
         <button
           type="button"
           onClick={() => showToast(t("forgotPasswordNotice"))}
-          className="text-[11px] sm:text-xs text-zinc-500 hover:text-zinc-900 hover:underline transition-colors cursor-pointer font-medium"
+          className="cursor-pointer text-xs font-medium text-[#71717A] transition-colors hover:text-[#09090B] hover:underline"
         >
           {t("forgotPassword")}
         </button>

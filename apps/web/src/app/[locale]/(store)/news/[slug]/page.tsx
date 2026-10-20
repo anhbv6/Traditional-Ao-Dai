@@ -12,7 +12,7 @@ type NewsDetailPageProps = {
   }>;
 };
 
-const SIMILAR_LIMIT = 6;
+const SIMILAR_LIMIT = 5;
 
 const findArticle = (slug: string) => mockArticles.find((item) => item.slug === decodeURIComponent(slug));
 
@@ -56,7 +56,7 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
   const loc = locale === 'en' ? 'en' : 'vi';
 
   return (
-    <Container as="article">
+    <Container as="article" width="full">
       <Breadcrumbs lastLabel={article.title[loc]} />
       <div className="mt-6 sm:mt-8">
         <NewsDetail

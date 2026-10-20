@@ -21,21 +21,27 @@ const router = Router()
 
 // ─── Rate limits (chống brute-force mật khẩu/OTP, spam email, dò tài khoản) ─────
 const MINUTE = 60
-const byIp = (name: string, max: number, windowSec: number) => rateLimit({ name, max, windowSec })
-const byBody = (name: string, field: string, max: number, windowSec: number) =>
+const byIp = (name: string, max: number, windowSec: number, skipSuccessfulRequests = false) =>
+  rateLimit({ name, max, windowSec, skipSuccessfulRequests })
+const byBody = (name: string, field: string, max: number, windowSec: number, skipSuccessfulRequests = false) =>
   rateLimit({
     name,
     max,
     windowSec,
+    skipSuccessfulRequests,
     key: (req) => {
       const value = req.body?.[field]
       return typeof value === 'string' ? value.trim() : undefined
     },
   })
 
-const loginLimits = [byIp('login-ip', 20, 15 * MINUTE), byBody('login-account', 'email', 10, 15 * MINUTE)]
+// Đăng nhập bằng mật khẩu: chỉ đếm lần sai (đăng nhập đúng được hoàn lượt)
+const loginLimits = [byIp('login-ip', 20, 15 * MINUTE, true), byBody('login-account', 'email', 10, 15 * MINUTE, true)]
 const otpLoginLimits = [byIp('login-otp-ip', 20, 15 * MINUTE), byBody('login-otp-phone', 'phone', 10, 15 * MINUTE)]
-const adminLoginLimits = [byIp('admin-login-ip', 10, 15 * MINUTE), byBody('admin-login-account', 'email', 5, 15 * MINUTE)]
+const adminLoginLimits = [
+  byIp('admin-login-ip', 10, 15 * MINUTE, true),
+  byBody('admin-login-account', 'email', 5, 15 * MINUTE, true),
+]
 const verifyCodeLimits = [byIp('verify-code-ip', 20, 15 * MINUTE)]
 
 /**
@@ -162,7 +168,7 @@ router.post('/register', validate(registerSchema), byIp('register-ip', 10, 60 * 
  *       403:
  *         description: ACCOUNT_DEACTIVATED
  *       429:
- *         description: TOO_MANY_REQUESTS (20 lần/15 phút/IP, 10 lần/15 phút/tài khoản)
+ *         description: TOO_MANY_REQUESTS (20 lần sai/15 phút/IP, 10 lần sai/15 phút/tài khoản — đăng nhập đúng không bị tính)
  */
 router.post('/login', validate(loginSchema), ...loginLimits, clientAuthController.login)
 
@@ -757,7 +763,7 @@ router.post('/logout', clientAuthController.logout)
  *       401:
  *         description: INVALID_CREDENTIALS
  *       429:
- *         description: TOO_MANY_REQUESTS (10 lần/15 phút/IP, 5 lần/15 phút/tài khoản)
+ *         description: TOO_MANY_REQUESTS (10 lần sai/15 phút/IP, 5 lần sai/15 phút/tài khoản — đăng nhập đúng không bị tính)
  *     x-notes: Thành công thì token được đặt vào cookie httpOnly `admin_token` (SameSite=Strict) + cookie `admin_session` (vai trò, chỉ để hiển thị UI). Body chỉ có `data.user`.
  */
 router.post('/admin/login', validate(loginSchema), ...adminLoginLimits, adminAuthController.loginAdmin)

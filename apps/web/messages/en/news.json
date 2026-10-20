@@ -73,5 +73,41 @@
       "action": "Book a fitting",
       "keyword": "Custom tailor"
     }
+  },
+  "feedback": {
+    "title": "Ratings & comments",
+    "helpfulQuestion": "Was this article helpful to you?",
+    "like": "Helpful",
+    "dislike": "Not helpful",
+    "voteThanks": "Thanks for your feedback!",
+    "ratingCount": "{count} ratings",
+    "yourRating": "Your rating",
+    "ratePrompt": "Tap a star to rate this article",
+    "rated": "You rated {score}/5 stars — tap another star to change"
+  },
+  "comments": {
+    "title": "Comments",
+    "sortLabel": "Sort comments",
+    "sortNewest": "Newest",
+    "sortTop": "Most liked",
+    "postingAs": "Commenting as <b>{name}</b>",
+    "nameLabel": "Display name",
+    "namePlaceholder": "Enter your name",
+    "nameRequired": "Please enter a display name",
+    "contentLabel": "Comment",
+    "placeholder": "Share your thoughts on this article...",
+    "contentRequired": "Please enter your comment",
+    "submit": "Post comment",
+    "submitted": "Your comment has been posted",
+    "empty": "No comments yet. Be the first to share!",
+    "showMore": "Show {count} more comments",
+    "like": "Like",
+    "reply": "Reply",
+    "replyPlaceholder": "Reply to {name}...",
+    "replyRequired": "Please enter your reply",
+    "replyCancel": "Cancel",
+    "replySubmit": "Send",
+    "you": "You",
+    "authorBadge": "Author"
   }
 }

@@ -44,7 +44,7 @@ export interface TextFieldProps
   appearance?: "underline" | "outline";
   /** true (mặc định): giãn 100% khung chứa. false: co giãn theo độ dài nội dung */
   fullWidth?: boolean;
-  /** Tông màu theo nền đặt ô: `default` (nền kem/trắng) | `onPrimary` (khối nền đỏ đô như Newsletter) */
+  /** Tông màu theo nền đặt ô: `default` (nền kem/trắng) | `onPrimary` (khối nền đỏ đô như Newsletter) | `admin` (đơn sắc khu quản trị) */
   tone?: TextFieldTone;
   /**
    * Chiều cao cố định khớp với ActionButton cùng `size` (sm 36px · md 40px · lg 48px theo rem) —
@@ -122,7 +122,7 @@ export interface TextFieldProps
  * Mọi class bên dưới chỉ đọc biến --tf-*, nên thêm tone mới chỉ cần thêm một bộ màu.
  * -------------------------------------------------------------------------- */
 
-export type TextFieldTone = "default" | "onPrimary";
+export type TextFieldTone = "default" | "onPrimary" | "admin";
 
 type ToneColors = Record<
   | "label" | "labelFocus" | "text" | "placeholder" | "muted"
@@ -162,6 +162,21 @@ const TONE_COLORS: Record<TextFieldTone, ToneColors> = {
     invalid: "var(--accent-on-primary)",
     autofillText: "#FFFFFF",
   },
+  /* Khu vực admin: đơn sắc, luôn sáng — màu theo app/[locale]/(admin)/admin/variables.md */
+  admin: {
+    label: "#09090B",
+    labelFocus: "#09090B",
+    text: "#09090B",
+    placeholder: "#A1A1AA",
+    muted: "#71717A",
+    border: "#E4E4E7",
+    borderHover: "#D4D4D8",
+    borderFocus: "#18181B",
+    fieldBg: "#FFFFFF",
+    ring: "rgb(24 24 27 / 0.08)",
+    invalid: "#E11D48",
+    autofillText: "#09090B",
+  },
 };
 
 /* Nền dùng để che màu autofill — phải là màu ĐẶC trùng với nền thật phía sau ô */
@@ -171,6 +186,7 @@ const AUTOFILL_BG: Record<TextFieldTone, Record<NonNullable<TextFieldProps["appe
     underline: "var(--primary-color)",
     outline: "color-mix(in oklab, white 10%, var(--primary-color))",
   },
+  admin: { underline: "#FAFAFA", outline: "#FFFFFF" },
 };
 
 /* ----------------------------------------------------------------------------

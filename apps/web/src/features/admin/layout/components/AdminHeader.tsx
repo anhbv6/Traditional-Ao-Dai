@@ -1,56 +1,60 @@
 "use client";
 
-import React from "react";
-import { Shield, Store } from "lucide-react";
+import Image from "next/image";
+import { Store } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
-import { AdminUserMenu } from "./AdminUserMenu";
+import { ActionLink, AppTooltip, type ActionColors } from "@/components/shared";
+import { HeaderHeightSync } from "@/components/common/header/HeaderHeightSync";
+import { AdminMobileNav } from "./AdminMobileNav";
 import { AdminSubNav } from "./AdminSubNav";
+import { AdminUserMenu } from "./AdminUserMenu";
 import { type AdminHeaderProps } from "../types";
 
-export function AdminHeader({
-  user,
-  isSuperAdmin,
-  navLinks,
-  isLoggingOut,
-  onOpenProfile,
-  onLogout,
-}: AdminHeaderProps) {
+// Lề ngang trùng với AdminPage để header thẳng hàng nội dung trang
+const SHELL_X = "mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12";
+// Nút phụ đơn sắc cho ActionLink dùng chung
+const GHOST_COLORS: ActionColors = { bg: "#FFFFFF", text: "#3F3F46", border: "#E4E4E7", hover: "#F4F4F5" };
+
+export function AdminHeader({ user, isSuperAdmin, navLinks, isLoggingOut, onOpenProfile, onLogout }: AdminHeaderProps) {
   const t = useTranslations("AdminPage.header");
 
   return (
-    <header className="bg-white border-b border-[#E4E4E7] sticky top-0 z-40 select-none">
-      <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12 h-16 flex items-center justify-between">
-        {/* Brand Logo & Tiêu đề hệ thống */}
-        <Link href="/admin/dashboard" className="flex items-center gap-3">
-          <div className="grid size-9 place-items-center rounded-lg bg-[#09090B] text-white">
-            <Shield size={18} />
-          </div>
-          <div>
-            <h1 className="font-semibold text-sm text-[#09090B] uppercase tracking-wider">
-              {t("systemTitle")}
-            </h1>
-            <p className="text-[10px] text-[#71717A] font-medium tracking-wider uppercase">
-              {t("systemSubtitle")}
-            </p>
-          </div>
-        </Link>
+    <header className="sticky top-0 z-40 select-none border-b border-[#E4E4E7] bg-white/90 backdrop-blur-md">
+      <div className={`${SHELL_X} flex h-14 items-center justify-between gap-3`}>
+        <div className="flex min-w-0 items-center gap-2">
+          <AdminMobileNav items={navLinks} />
 
-        {/* Action Buttons & Profile Menu */}
-        <div className="flex items-center gap-3 text-xs font-medium">
-          {/* Nút về trang khách hàng (Client store) */}
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 transition-all border border-[#E4E4E7] bg-white shadow-2xs"
-            title={t("viewStore")}
-          >
-            <Store size={14} className="text-zinc-600" />
-            <span className="hidden sm:inline">{t("viewStore")}</span>
+          <Link href="/admin/dashboard" className="flex min-w-0 items-center gap-2.5">
+            <span className="size-8 shrink-0 overflow-hidden rounded-lg border border-[#E4E4E7] bg-white">
+              <Image src="/logoPage.png" alt="" width={64} height={64} priority className="size-full scale-125 object-cover" />
+            </span>
+            <span className="truncate text-sm font-semibold text-[#09090B]">{t("systemTitle")}</span>
           </Link>
 
-          <span className="h-4 w-px bg-zinc-200" />
+          <span className="hidden rounded-md border border-[#E4E4E7] bg-[#FAFAFA] px-1.5 py-0.5 text-[11px] font-medium text-[#71717A] sm:inline">
+            {isSuperAdmin ? t("superAdminRole") : t("staffRole")}
+          </span>
+        </div>
 
-          {/* Menu tài khoản quản trị viên */}
+        <div className="flex items-center gap-2">
+          <AppTooltip content={t("viewStore")}>
+            <ActionLink
+              href="/"
+              target="_blank"
+              variant="custom"
+              size="sm"
+              colors={GHOST_COLORS}
+              icon={<Store />}
+              aria-label={t("viewStore")}
+              className="rounded-lg px-2.5 font-(family-name:--font-admin) text-xs normal-case tracking-normal sm:px-3"
+            >
+              <span className="hidden sm:inline">{t("viewStore")}</span>
+            </ActionLink>
+          </AppTooltip>
+
+          <span aria-hidden className="mx-1 h-5 w-px bg-[#E4E4E7]" />
+
           <AdminUserMenu
             user={user}
             isSuperAdmin={isSuperAdmin}
@@ -61,8 +65,12 @@ export function AdminHeader({
         </div>
       </div>
 
-      {/* Sub-bar thanh điều hướng danh mục quản trị */}
-      <AdminSubNav items={navLinks} />
+      <div className={SHELL_X}>
+        <AdminSubNav items={navLinks} />
+      </div>
+
+      {/* Đo chiều cao header để thông báo (toast) hiện ngay dưới header */}
+      <HeaderHeightSync />
     </header>
   );
 }

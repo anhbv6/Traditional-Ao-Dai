@@ -26,7 +26,7 @@ export function NewsCta({ categoryKey }: NewsCtaProps) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "0px 0px -10% 0px" }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-      className="relative mt-14 overflow-hidden bg-[var(--primary-color)] px-6 py-9 text-white sm:px-10 sm:py-11"
+      className="relative overflow-hidden bg-[var(--primary-color)] px-6 py-9 text-white sm:px-10 sm:py-11"
     >
       {/* Hoa văn hình thoi mờ trang trí góc phải */}
       <span aria-hidden="true" className="absolute -right-10 -top-10 size-40 rotate-45 border border-white/15" />

@@ -59,7 +59,7 @@ Tài liệu tổng hợp các mã phản hồi (`message` key) của Module Auth
 | KEY | HTTP Status | Tiếng Việt (Vietnamese) | English Meaning | Ngữ cảnh sử dụng / Description |
 | :--- | :---: | :--- | :--- | :--- |
 | `INVALID_CREDENTIALS` | 401 | Tài khoản hoặc mật khẩu không chính xác | Invalid credentials | Thay cho `USER_NOT_FOUND` / `INCORRECT_PASSWORD` (khách) và `ADMIN_UNAUTHORIZED` (admin) để chống dò tài khoản |
-| `TOO_MANY_REQUESTS` | 429 | Thao tác quá nhanh | Too many requests | Vượt rate-limit (login 20/15p/IP + 10/15p/tài khoản; admin 10/15p/IP + 5/15p/tài khoản; register 10/giờ/IP; check-account 30/5p/IP...). Header `Retry-After` kèm số giây |
+| `TOO_MANY_REQUESTS` | 429 | Thao tác quá nhanh | Too many requests | Vượt rate-limit (login 20 lần sai/15p/IP + 10 lần sai/15p/tài khoản; admin 10 lần sai/15p/IP + 5 lần sai/15p/tài khoản — đăng nhập đúng không bị tính; register 10/giờ/IP; check-account 30/5p/IP...). Header `Retry-After` kèm số giây |
 | `PHONE_NOT_VERIFIED` | 400 | SĐT chưa được xác minh | Phone not verified | Đăng nhập OTP / đặt lại mật khẩu qua SĐT chỉ dành cho SĐT đã xác minh |
 | `VERIFICATION_TOO_MANY_ATTEMPTS` | 429 | Nhập sai mã quá nhiều lần | Too many attempts | Sai 5 lần mã email bị hủy, phải yêu cầu mã mới |
 | `EMAIL_DAILY_LIMIT_REACHED` | 429 | Vượt hạn mức email trong ngày | Daily email limit reached | Tối đa 10 email mã xác minh / địa chỉ / ngày |

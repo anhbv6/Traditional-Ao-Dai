@@ -36,7 +36,8 @@
     "sale": "Giảm giá"
   },
   "undo": {
-    "removed": "Đã bỏ “{name}” khỏi danh sách"
+    "removed": "Đã bỏ “{name}” khỏi danh sách",
+    "cleared": "Đã xóa {count} mẫu khỏi danh sách yêu thích"
   },
   "toast": {
     "cleared": "Đã xóa toàn bộ danh sách yêu thích!",

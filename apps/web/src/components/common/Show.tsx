@@ -3,7 +3,7 @@
 import { useSyncExternalStore, type ReactNode } from "react";
 import { usePathname } from "@/i18n/routing";
 import { useAuthStore } from "@/features/auth";
-import { useAdminSession } from "@/features/admin";
+import { useAdminSession } from "@/features/admin/session";
 import { hasCustomerSession } from "@/lib/api-client";
 
 /**

@@ -1,108 +1,70 @@
 "use client";
 
-import React from "react";
-import { ChevronDown, UserCog, Store, LogOut } from "lucide-react";
+import { ChevronDown, LogOut, Store, UserCog } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useRouter } from "@/i18n/routing";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
-import { Spinner } from "@/components/ui/spinner";
+import { AppMenu, type AppMenuEntry } from "@/components/shared/AppMenu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { type AdminUserMenuProps } from "../types";
 
-export function AdminUserMenu({
-  user,
-  isSuperAdmin,
-  isLoggingOut,
-  onOpenProfile,
-  onLogout,
-}: AdminUserMenuProps) {
-  const router = useRouter();
+export function AdminUserMenu({ user, isSuperAdmin, isLoggingOut, onOpenProfile, onLogout }: AdminUserMenuProps) {
   const t = useTranslations("AdminPage.header");
 
   const displayName = user?.name || user?.email || t("defaultAdminName");
   const displayRole = isSuperAdmin ? t("superAdminRole") : t("staffRole");
+  const initial = displayName.charAt(0).toUpperCase();
+
+  const items: AppMenuEntry[] = [
+    { key: "profile", label: t("editProfile"), icon: UserCog, onSelect: onOpenProfile },
+    { key: "store", label: t("backToStore"), icon: Store, href: "/" },
+    { type: "separator", key: "sep" },
+    {
+      key: "logout",
+      label: isLoggingOut ? t("loggingOut") : t("logout"),
+      icon: LogOut,
+      tone: "danger",
+      disabled: isLoggingOut,
+      onSelect: onLogout,
+    },
+  ];
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger className="flex items-center gap-2 p-1 pl-1.5 pr-2.5 rounded-full hover:bg-zinc-100 transition-all border border-[#E4E4E7] bg-white cursor-pointer select-none outline-none shadow-2xs">
-        <div className="size-7 rounded-full overflow-hidden border border-[#E4E4E7] bg-[#18181B] text-white flex items-center justify-center font-bold text-xs">
-          {user?.avatar ? (
-            // eslint-disable-next-line @next/next/no-img-element -- ảnh từ URL tùy ý (blob xem trước / avatar / ảnh do admin nhập), không tối ưu được bằng next/image
-            <img
-              src={user.avatar}
-              alt={displayName}
-              className="size-full object-cover"
-            />
-          ) : (
-            <span>{(user?.name || user?.email || "A")[0]?.toUpperCase()}</span>
-          )}
+    <AppMenu
+      tone="admin"
+      width={240}
+      sideOffset={8}
+      items={items}
+      header={
+        <div className="flex items-center gap-3">
+          <UserAvatar src={user?.avatar} alt={displayName} initial={initial} className="size-9" />
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold text-[#09090B]">{displayName}</p>
+            <p className="truncate text-xs text-[#71717A]">{user?.email || "—"}</p>
+          </div>
         </div>
-        <div className="hidden sm:flex flex-col text-left">
-          <span className="font-semibold text-xs leading-tight text-[#09090B] max-w-[120px] truncate">
-            {displayName}
-          </span>
-          <span className="text-[10px] text-[#71717A] font-medium">
-            {displayRole}
-          </span>
-        </div>
-        <ChevronDown size={13} className="text-zinc-400" />
-      </DropdownMenuTrigger>
-
-      <DropdownMenuContent
-        align="end"
-        className="admin-shell w-56 p-1.5 shadow-lg rounded-xl border border-[#E4E4E7] bg-white"
-      >
-        <div className="px-3 py-2 border-b border-zinc-100">
-          <p className="font-semibold text-xs text-[#09090B] truncate">
-            {displayName}
-          </p>
-          <p className="text-[11px] text-[#71717A] truncate">{user?.email || "—"}</p>
-          <span className="mt-1.5 inline-block px-2 py-0.5 rounded-md bg-zinc-100 text-[10px] font-semibold text-zinc-700">
-            {displayRole}
-          </span>
-        </div>
-
-        <DropdownMenuItem
-          onClick={onOpenProfile}
-          className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 rounded-lg cursor-pointer transition-colors mt-1"
+      }
+      trigger={
+        <button
+          type="button"
+          aria-label={t("accountMenu")}
+          className="flex cursor-pointer items-center gap-2.5 rounded-xl py-1 pl-1 pr-2 outline-none transition-colors hover:bg-[#F4F4F5] focus-visible:ring-2 focus-visible:ring-[#18181B]/15 data-popup-open:bg-[#F4F4F5]"
         >
-          <UserCog size={14} className="text-[#71717A]" />
-          <span>{t("editProfile")}</span>
-        </DropdownMenuItem>
+          <UserAvatar src={user?.avatar} alt={displayName} initial={initial} className="size-8" />
+          <span className="hidden min-w-0 flex-col text-left leading-tight md:flex">
+            <span className="max-w-[140px] truncate text-[13px] font-semibold text-[#09090B]">{displayName}</span>
+            <span className="text-[11px] text-[#71717A]">{displayRole}</span>
+          </span>
+          <ChevronDown size={14} className="text-[#A1A1AA]" />
+        </button>
+      }
+    />
+  );
+}
 
-        <DropdownMenuItem
-          onClick={() => router.push("/")}
-          className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 rounded-lg cursor-pointer transition-colors"
-        >
-          <Store size={14} className="text-[#71717A]" />
-          <span>{t("backToStore")}</span>
-        </DropdownMenuItem>
-
-        <DropdownMenuSeparator className="my-1 border-zinc-100" />
-
-        <DropdownMenuItem
-          onClick={onLogout}
-          disabled={isLoggingOut}
-          className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-lg cursor-pointer transition-colors disabled:opacity-60"
-        >
-          {isLoggingOut ? (
-            <>
-              <Spinner className="size-3.5 text-rose-600" />
-              <span>{t("loggingOut")}</span>
-            </>
-          ) : (
-            <>
-              <LogOut size={14} className="text-rose-500" />
-              <span>{t("logout")}</span>
-            </>
-          )}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+function UserAvatar({ src, alt, initial, className }: { src?: string | null; alt: string; initial: string; className?: string }) {
+  return (
+    <Avatar className={className}>
+      <AvatarImage src={src ?? undefined} alt={alt} />
+      <AvatarFallback className="bg-[#18181B] text-xs font-semibold text-white">{initial}</AvatarFallback>
+    </Avatar>
   );
 }

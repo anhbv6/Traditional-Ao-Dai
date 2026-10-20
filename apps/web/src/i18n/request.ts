@@ -28,6 +28,7 @@ export default getRequestConfig(async ({requestLocale}) => {
       wishlist,
       terms,
       notifications,
+      chat,
       admin,
       errors
     ] = await Promise.all([
@@ -49,6 +50,7 @@ export default getRequestConfig(async ({requestLocale}) => {
       import(`../../messages/${locale}/wishlist.json`).then(m => m.default),
       import(`../../messages/${locale}/terms.json`).then(m => m.default),
       import(`../../messages/${locale}/notifications.json`).then(m => m.default),
+      import(`../../messages/${locale}/chat.json`).then(m => m.default),
       import(`../../messages/${locale}/admin.json`).then(m => m.default),
       import(`../../messages/${locale}/errors.json`).then(m => m.default),
     ]);
@@ -92,6 +94,7 @@ export default getRequestConfig(async ({requestLocale}) => {
             WishlistPage: wishlist,
             TermsPage: terms,
             NotificationsPage: notifications,
+            Chat: chat,
             AdminPage: {
               ...admin,
               login: {

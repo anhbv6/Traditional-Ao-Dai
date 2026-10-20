@@ -4,14 +4,13 @@ import { useState } from 'react';
 import { Bell, ChevronRight, Heart, LayoutDashboard, LogOut, Package, UserRound, type LucideIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/routing';
-import { useAuthStore, useCustomerLogout } from '@/features/auth';
-import { executeAdminLogout, useAdminSession, useAdminSessionCache } from '@/features/admin';
+import { LogoutDialog, useAuthStore } from '@/features/auth';
+import { executeAdminLogout, useAdminSession, useAdminSessionCache } from '@/features/admin/session';
 import { useNotifications } from '@/features/notifications';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { ActionButton } from '@/components/shared/ActionButton';
 import { ActionLink } from '@/components/shared/ActionLink';
 import { AppPopover, AppPopoverTitle } from '@/components/shared/AppPopover';
-import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { cn } from '@/lib/utils';
 
 type UserMenuProps = {
@@ -61,14 +60,13 @@ export function UserMenu({
   const avatarFallback = getUserInitials(user?.name || user?.email || userName);
   const [isOpen, setIsOpen] = useState(false);
   const [openConfirm, setOpenConfirm] = useState(false);
-  const { logout: handleLogout, isLoggingOut } = useCustomerLogout(async () => {
+  const logoutAdminToo = async () => {
     if (isAdmin) {
       await executeAdminLogout();
       adminSessionCache.clear();
     }
-  });
+  };
   const { unreadCount } = useNotifications();
-  const t = useTranslations('ProfilePage');
   const tCommon = useTranslations('Common');
   const pathname = usePathname();
 
@@ -190,18 +188,7 @@ export function UserMenu({
         </div>
       </AppPopover>
 
-      <ConfirmDialog
-        open={openConfirm}
-        onOpenChange={setOpenConfirm}
-        confirmVariant="destructive"
-        title={t('logoutDialog.title')}
-        description={t('logoutDialog.message')}
-        confirmText={t('logoutDialog.confirmBtn')}
-        cancelText={t('logoutDialog.cancelBtn')}
-        isLoading={isLoggingOut}
-        customTitle={'text-lg sm:text-2xl'}
-        onConfirm={handleLogout}
-      />
+      <LogoutDialog open={openConfirm} onOpenChange={setOpenConfirm} beforeRedirect={logoutAdminToo} />
     </>
   );
 }

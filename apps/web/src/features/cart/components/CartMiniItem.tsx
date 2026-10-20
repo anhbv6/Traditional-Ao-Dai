@@ -8,6 +8,7 @@ import { formatVnd, type Locale } from "@repo/shared";
 import { Link } from "@/i18n/routing";
 import { QuantitySelector } from "@/components/shared/QuantitySelector";
 import { useCartStore } from "../store/cartStore";
+import { useCartUndo } from "../hooks/useCartUndo";
 import { MAX_LINE_QUANTITY, getCartItemHref } from "../utils/pricing";
 import { type CartItem } from "../types/cart.types";
 
@@ -27,7 +28,8 @@ interface CartMiniItemProps {
  */
 export function CartMiniItem({ item, locale, onNavigate }: CartMiniItemProps) {
   const t = useTranslations('CartPage');
-  const { updateQuantity, removeItem } = useCartStore.getState();
+  const { updateQuantity } = useCartStore.getState();
+  const { removeWithUndo } = useCartUndo();
   const lineTotal = item.price * item.quantity;
   const variant = [item.color, `${t('item.size')} ${item.size}`, item.measurements ? t('item.custom') : null].filter(Boolean).join(' · ');
 
@@ -60,7 +62,7 @@ export function CartMiniItem({ item, locale, onNavigate }: CartMiniItemProps) {
           {/* Xoá: hiện khi rê chuột vào dòng (luôn hiện khi focus bằng phím) */}
           <button
             type="button"
-            onClick={() => removeItem(item.id)}
+            onClick={() => removeWithUndo(item.id)}
             aria-label={t('item.remove')}
             title={t('item.remove')}
             className="-mr-1 -mt-0.5 grid size-6 shrink-0 cursor-pointer place-items-center text-[var(--text-light)]/70 opacity-0 transition-[opacity,color] hover:text-[var(--destructive)] focus-visible:opacity-100 group-hover:opacity-100"

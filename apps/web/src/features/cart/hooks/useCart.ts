@@ -1,18 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { type Locale } from "@repo/shared";
-import { showToast } from "@/components/ui/toast";
-import { UNDO_TIMEOUT } from "@/components/shared/UndoSnackbar";
 import { useCartHydrated, useCartStore } from "../store/cartStore";
 import { calculateCartTotals, findDemoDiscount } from "../utils/pricing";
-import { type CartItem } from "../types/cart.types";
-
-interface RemovedLine {
-  item: CartItem;
-  index: number;
-}
+import { useCartUndo } from "./useCartUndo";
 
 export function useCart() {
   const t = useTranslations("CartPage");
@@ -20,43 +13,16 @@ export function useCart() {
   const isLoaded = useCartHydrated();
   const cartItems = useCartStore((state) => state.items);
   const activeDiscount = useCartStore((state) => state.discount);
-  const { updateQuantity, removeItem, restoreItem, applyDiscount, clear } = useCartStore.getState();
+  const { updateQuantity, applyDiscount } = useCartStore.getState();
+  const { removeWithUndo, clearWithUndo } = useCartUndo();
 
   const [promoCode, setPromoCode] = useState("");
   const [promoError, setPromoError] = useState<string | null>(null);
-  const [lastRemoved, setLastRemoved] = useState<RemovedLine | null>(null);
-  const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => () => {
-    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
-  }, []);
-
-  const dismissUndo = () => {
-    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
-    setLastRemoved(null);
-  };
-
-  const handleRemoveItem = (id: string) => {
-    const index = cartItems.findIndex((item) => item.id === id);
-    if (index === -1) return;
-    // Hoàn tác không khôi phục mã giảm giá đã bị gỡ khi giỏ trống — khách nhập lại nếu cần
-    removeItem(id);
-    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
-    setLastRemoved({ item: cartItems[index], index });
-    undoTimerRef.current = setTimeout(() => setLastRemoved(null), UNDO_TIMEOUT);
-  };
-
-  const handleUndo = () => {
-    if (lastRemoved) restoreItem(lastRemoved.item, lastRemoved.index);
-    dismissUndo();
-  };
-
+  // Xóa dòng / xóa cả giỏ đều hiện thông báo có "Hoàn tác" (useCartUndo)
   const handleClearAll = () => {
-    dismissUndo();
-    clear();
+    clearWithUndo();
     setPromoCode("");
     setPromoError(null);
-    showToast.success(t("toast.cleared"));
   };
 
   const handleApplyPromo = (e: React.FormEvent) => {
@@ -110,10 +76,7 @@ export function useCart() {
     handleApplyPromo,
     handleRemovePromo,
     handleQuantityChange: updateQuantity,
-    handleRemoveItem,
+    handleRemoveItem: removeWithUndo,
     handleClearAll,
-    lastRemoved,
-    handleUndo,
-    dismissUndo,
   };
 }

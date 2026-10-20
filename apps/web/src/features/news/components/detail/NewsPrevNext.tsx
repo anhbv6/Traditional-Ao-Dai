@@ -58,7 +58,7 @@ export function NewsPrevNext({ previous, next, loc }: NewsPrevNextProps) {
 
   return (
     <Reveal>
-      <nav aria-label={t("articleNavigation")} className="mt-12 grid gap-3 sm:grid-cols-2">
+      <nav aria-label={t("articleNavigation")} className="grid gap-3 sm:grid-cols-2">
         <div>{previous ? card(previous, "previous") : null}</div>
         <div>{next ? card(next, "next") : null}</div>
       </nav>

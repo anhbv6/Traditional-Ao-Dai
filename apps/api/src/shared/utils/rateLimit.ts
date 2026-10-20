@@ -39,6 +39,17 @@ export async function consumeRateLimit(
 }
 
 /**
+ * Hoàn lại 1 lượt đã đếm (dùng khi request thành công không nên tính vào hạn mức)
+ */
+async function refundRateLimit(key: string): Promise<void> {
+  try {
+    await redis.decr(`ratelimit:${key}`)
+  } catch (error) {
+    console.error('[RateLimit] Redis error khi hoàn lượt:', error)
+  }
+}
+
+/**
  * Ném lỗi 429 nếu vượt hạn mức (dùng bên trong service, ví dụ hạn mức gửi SMS/Email theo ngày)
  */
 export async function assertRateLimit(
@@ -63,6 +74,11 @@ interface RateLimitOptions {
    * Middleware nên đặt SAU `validate` để `req.body` đã được chuẩn hóa.
    */
   key?: (req: Request) => string | undefined
+  /**
+   * Chỉ tính các request thất bại (status >= 400): request thành công được hoàn lượt khi phản hồi xong.
+   * Dùng cho đăng nhập — chặn dò mật khẩu mà không khóa người dùng đăng nhập đúng nhiều lần.
+   */
+  skipSuccessfulRequests?: boolean
 }
 
 /**
@@ -75,15 +91,18 @@ export function rateLimit(options: RateLimitOptions) {
       return next()
     }
 
-    const result = await consumeRateLimit(
-      `${options.name}:${identifier.toLowerCase()}`,
-      options.max,
-      options.windowSec
-    )
+    const key = `${options.name}:${identifier.toLowerCase()}`
+    const result = await consumeRateLimit(key, options.max, options.windowSec)
 
     if (!result.allowed) {
       res.setHeader('Retry-After', String(result.retryAfter))
       return next(new AppError(429, 'TOO_MANY_REQUESTS'))
+    }
+
+    if (options.skipSuccessfulRequests) {
+      res.once('finish', () => {
+        if (res.statusCode < 400) void refundRateLimit(key)
+      })
     }
 
     return next()

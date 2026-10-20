@@ -102,10 +102,9 @@ export function ManageAddressTab() {
                     {t("edit")}
                   </ActionButton>
                   <ActionButton
-                    variant="cancel"
+                    variant="danger"
                     size="sm"
                     icon={<Trash2 />}
-                    colors={{ text: "var(--destructive)" }}
                     onClick={() => setDeletingId(addr.id)}
                   >
                     {t("delete")}

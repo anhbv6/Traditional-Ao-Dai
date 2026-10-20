@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useAdminSession } from '../hooks/useAdminSession';
-import { type StaffPermissionField } from '../../server/adminAuth.server';
+import { type StaffPermissionField } from '../permissions';
 
 interface PermissionGateProps {
   permission?: StaffPermissionField;

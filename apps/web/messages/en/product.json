@@ -54,7 +54,8 @@
     "replyCancel": "Cancel",
     "replyRequired": "Please write a reply",
     "replyYou": "You",
-    "shopBadge": "Shop"
+    "shopBadge": "Shop",
+    "productInfo": "Product information"
   },
   "addToCart": "Add to Cart",
   "cartAdded": "Added to cart",

@@ -356,7 +356,7 @@ function ContactRow({ label, icon: Icon, value, isVerified, onAction }: ContactR
           {isVerified ? t("verified") : t("unverified")}
         </span>
       ) : null}
-      <ActionButton variant={!value || !isVerified ? "confirm" : "dialog"} size="sm" onClick={onAction}>
+      <ActionButton variant="dialog" size="sm" onClick={onAction}>
         {actionLabel}
       </ActionButton>
     </li>

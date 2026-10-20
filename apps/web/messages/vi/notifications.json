@@ -55,5 +55,9 @@
       "title": "Đăng nhập trên thiết bị mới",
       "body": "Tài khoản của bạn vừa đăng nhập trên một thiết bị mới. Nếu không phải bạn, hãy đổi mật khẩu ngay."
     }
+  },
+  "undo": {
+    "markedAllRead": "Đã đánh dấu {count} thông báo là đã đọc",
+    "action": "Hoàn tác"
   }
 }

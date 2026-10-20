@@ -2,12 +2,12 @@
 
 import React, { useState } from "react";
 import { useFormatter, useTranslations } from "next-intl";
-import { KeyRound, Laptop, LogOut, Monitor, Smartphone, Tablet, type LucideIcon } from "lucide-react";
+import { KeyRound, Laptop, LogOut, Monitor, Smartphone, Tablet, Unlink, type LucideIcon } from "lucide-react";
 import { GoogleAuthButton } from "@/features/auth";
 import { showToast as toast } from "@/components/ui/toast";
 import { ActionButton } from "@/components/shared/ActionButton";
 import { AppLoadingSpinner } from "@/components/shared/AppLoading";
-import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
+import { AppDialog } from "@/components/shared/AppDialog";
 import { TextField } from "@/components/shared/TextField";
 import { cn } from "@/lib/utils";
 import { useSecurity, type DeviceKind } from "../../hooks/useProfile";
@@ -115,12 +115,7 @@ export function SecurityTab() {
           </div>
           <div className="w-full sm:w-64">
             {security.isGoogleLinked ? (
-              <ActionButton
-                variant="cancel"
-                fullWidth
-                colors={{ text: "var(--destructive)" }}
-                onClick={() => setConfirmUnlink(true)}
-              >
+              <ActionButton variant="danger" fullWidth icon={<Unlink />} onClick={() => setConfirmUnlink(true)}>
                 {t("google.unlinkBtn")}
               </ActionButton>
             ) : (
@@ -178,7 +173,7 @@ export function SecurityTab() {
                   </div>
                   {!session.isCurrent ? (
                     <ActionButton
-                      variant="cancel"
+                      variant="danger"
                       size="sm"
                       icon={<LogOut />}
                       aria-label={t("sessions.revokeBtn")}
@@ -197,47 +192,33 @@ export function SecurityTab() {
         )}
       </ProfileSection>
 
-      <ConfirmDialog
+      <AppDialog
         open={revokingId !== null}
         onOpenChange={(open) => !open && setRevokingId(null)}
-        confirmVariant="destructive"
+        tone="danger"
+        size="sm"
         title={t("sessions.revokeDialog.title")}
         description={t("sessions.revokeDialog.message")}
-        confirmText={t("sessions.revokeDialog.confirmBtn")}
-        cancelText={tProfile("logoutDialog.cancelBtn")}
-        isLoading={security.isRevoking}
-        customTitle="text-lg sm:text-2xl"
-        onConfirm={async () => {
-          if (!revokingId) return;
-          try {
-            await security.revokeSession(revokingId);
-          } catch {
-            /* Lỗi đã được báo bằng toast trong onError của mutation */
-          } finally {
-            setRevokingId(null);
-          }
+        confirm={{
+          label: t("sessions.revokeDialog.confirmBtn"),
+          icon: <LogOut />,
+          // Lỗi đã báo bằng toast trong onError của mutation → hộp thoại giữ mở để thử lại
+          onClick: async () => {
+            if (revokingId) await security.revokeSession(revokingId);
+          },
         }}
+        cancel={{ label: tProfile("logoutDialog.cancelBtn") }}
       />
 
-      <ConfirmDialog
+      <AppDialog
         open={confirmUnlink}
         onOpenChange={setConfirmUnlink}
-        confirmVariant="destructive"
+        tone="danger"
+        size="sm"
         title={t("google.unlinkDialog.title")}
         description={t("google.unlinkDialog.message")}
-        confirmText={t("google.unlinkDialog.confirmBtn")}
-        cancelText={tProfile("logoutDialog.cancelBtn")}
-        isLoading={security.isUnlinking}
-        customTitle="text-lg sm:text-2xl"
-        onConfirm={async () => {
-          try {
-            await security.unlinkGoogle();
-          } catch {
-            /* Lỗi đã được báo bằng toast trong onError của mutation */
-          } finally {
-            setConfirmUnlink(false);
-          }
-        }}
+        confirm={{ label: t("google.unlinkDialog.confirmBtn"), icon: <Unlink />, onClick: security.unlinkGoogle }}
+        cancel={{ label: tProfile("logoutDialog.cancelBtn") }}
       />
     </>
   );

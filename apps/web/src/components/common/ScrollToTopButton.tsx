@@ -2,7 +2,9 @@
 
 import { useSyncExternalStore } from 'react';
 import { ArrowUp } from 'lucide-react';
-import { usePathname } from '@/i18n/routing';
+import { useHasBottomBar } from '@/hooks/useHasBottomBar';
+import { cn } from '@/lib/utils';
+import { FLOATING_BUTTON_CLASS } from './floatingButton';
 
 const SCROLL_THRESHOLD = 320;
 const SCROLL_DURATION = 1800;
@@ -33,9 +35,8 @@ function easeInOutCubic(progress: number) {
 
 export function ScrollToTopButton() {
   const isVisible = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  const pathname = usePathname();
   /** Trang có thanh cố định ở đáy (mobile / tablet) — đẩy nút lên để không đè */
-  const hasBottomBar = pathname === '/products' || pathname === '/cart';
+  const hasBottomBar = useHasBottomBar();
 
   function handleClick() {
     const startY = window.scrollY;
@@ -61,18 +62,18 @@ export function ScrollToTopButton() {
       type="button"
       aria-label="Scroll to top"
       onClick={handleClick}
-      className={[
-        'cursor-pointer fixed z-40 grid size-8 place-items-center rounded-full bg-[var(--primary-color)] text-white shadow-[0_14px_35px_rgba(42,37,37,0.18)] transition duration-300 sm:size-10',
-        hasBottomBar
-          ? 'bottom-24 right-5 sm:bottom-24 sm:right-7 lg:bottom-7'
-          : 'bottom-7 right-5 sm:right-7 lg:bottom-7',
-        'hover:bg-[var(--bg-inverse)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent-color)]',
+      className={cn(
+        FLOATING_BUTTON_CLASS,
+        // Ghi đè transition chung: thêm mờ + trượt khi hiện / ẩn
+        'fixed z-40 transition-[opacity,translate,background-color] duration-300',
+        // Nằm ngay trên cụm nút chat (ChatDock: 2 nút cùng cỡ + khoảng cách 0.75rem), cùng lề phải
+        hasBottomBar ? 'bottom-[12.25rem] right-5 sm:right-7 lg:bottom-[8rem]' : 'bottom-[8rem] right-5 sm:right-7',
         isVisible
           ? 'translate-y-0 opacity-100'
-          : 'pointer-events-none translate-y-4 opacity-0',
-      ].join(' ')}
+          : 'pointer-events-none translate-y-4 opacity-0'
+      )}
     >
-      <ArrowUp size={18} strokeWidth={2} />
+      <ArrowUp size={18} strokeWidth={1.8} />
     </button>
   );
 }

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useCartStore } from "@/features/cart";
-import { useIsWishlisted, useWishlistStore } from "@/features/wishlist";
+import { useIsWishlisted, useWishlistUndo } from "@/features/wishlist";
 import { showToast } from "@/components/ui/toast";
 import { type DisplayProduct } from "../types/products.types";
 import { type MeasurementField } from "../data/detailMockProduct";
@@ -14,6 +14,7 @@ export function useProductDetail(
   measurementFields: MeasurementField[] = []
 ) {
   const t = useTranslations('Product');
+  const { toggleWithUndo } = useWishlistUndo();
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [selectedColor, setSelectedColor] = useState(product.colors[0]?.name || '');
   const [selectedSize, setSelectedSize] = useState(product.sizes[0] || '');
@@ -39,7 +40,7 @@ export function useProductDetail(
   };
 
   const onWishlistToggle = () => {
-    useWishlistStore.getState().toggle({
+    toggleWithUndo({
       slug: product.slug,
       name: product.name,
       image: product.imageSrc,

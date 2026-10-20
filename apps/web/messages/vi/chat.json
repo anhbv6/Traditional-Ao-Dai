@@ -1,0 +1,19 @@
+{
+  "close": "Đóng khung chat",
+  "send": "Gửi tin nhắn",
+  "switchTo": "Chuyển sang {channel}",
+  "typing": "{name} đang soạn tin",
+  "shop": {
+    "open": "Chat với cửa hàng",
+    "title": "Chat với cửa hàng",
+    "status": "{name} · Tư vấn viên · Thường trả lời trong vài phút",
+    "placeholder": "Nhập tin nhắn cho cửa hàng..."
+  },
+  "ai": {
+    "open": "Hỏi trợ lý AI",
+    "title": "Trợ lý AI",
+    "status": "Trợ lý ảo · Trả lời tức thì",
+    "placeholder": "Hỏi về mẫu áo, size, chất liệu...",
+    "disclaimer": "Câu trả lời do AI tạo, chỉ mang tính tham khảo. Cần tư vấn chính xác, hãy chuyển sang chat với cửa hàng."
+  }
+}

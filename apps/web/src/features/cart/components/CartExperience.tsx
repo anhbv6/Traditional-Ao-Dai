@@ -10,7 +10,6 @@ import { ActionLink } from "@/components/shared/ActionLink";
 import { BackButton } from "@/components/shared/BackButton";
 import { EmptyState, EmptyStateLinks } from "@/components/shared/EmptyState";
 import { FEATURED_COLLECTION_IDS } from "@/lib/catalog";
-import { UndoSnackbar } from "@/components/shared/UndoSnackbar";
 import { useCart } from "../hooks/useCart";
 import { CartItemList } from "./CartItemList";
 import { CartPromoSection } from "./CartPromoSection";
@@ -61,9 +60,6 @@ export function CartExperience() {
     handleQuantityChange,
     handleRemoveItem,
     handleClearAll,
-    lastRemoved,
-    handleUndo,
-    dismissUndo,
   } = useCart();
   const tp = useTranslations("Product");
   const [confirmingClear, setConfirmingClear] = useState(false);
@@ -252,14 +248,6 @@ export function CartExperience() {
           ) : null}
         </AnimatePresence>
 
-        <UndoSnackbar
-          activeKey={lastRemoved?.item.id ?? null}
-          message={lastRemoved ? t("undo.removed", { name: lastRemoved.item.name }) : ""}
-          undoLabel={t("actions.undo")}
-          closeLabel={t("actions.close")}
-          onUndo={handleUndo}
-          onDismiss={dismissUndo}
-        />
       </div>
     </MotionConfig>
   );

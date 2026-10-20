@@ -9,7 +9,7 @@ export const adminLoginSchema = z.object({
     .string()
     .min(1, "passwordRequired")
     .min(6, "passwordMin"),
-  rememberMe: z.boolean().default(true),
+  rememberMe: z.boolean(),
 });
 
 export type AdminLoginFormValues = z.infer<typeof adminLoginSchema>;

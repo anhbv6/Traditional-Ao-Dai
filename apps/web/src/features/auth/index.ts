@@ -1,6 +1,7 @@
 // Public API của feature auth (khách hàng) — bên ngoài chỉ import từ "@/features/auth"
 export * from "./components/AuthImageBanner";
 export * from "./components/GoogleAuthButton";
+export * from "./components/LogoutDialog";
 export { LoginForm } from "./components/login/LoginForm";
 export { RegisterForm } from "./components/register/RegisterForm";
 export { ForgotForm } from "./components/forgot/ForgotForm";

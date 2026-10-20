@@ -12,21 +12,19 @@
     "submit": "Log in to portal",
     "submitting": "Authenticating...",
     "backToStore": "Storefront",
-    "securityBadge": "256-bit SSL encryption • Authorized Personnel Only",
     "emailRequired": "Email is required",
     "invalidEmail": "Please enter a valid email address!",
     "passwordRequired": "Password is required",
     "passwordMin": "Password must be at least 6 characters!",
     "loginSuccess": "Admin login successful!",
     "loginError": "Login failed. Please check your credentials!",
-    "showPassword": "Show password",
-    "hidePassword": "Hide password",
     "ADMIN_UNAUTHORIZED": "Unauthorized access to admin portal.",
     "INCORRECT_PASSWORD": "Incorrect password.",
     "ACCOUNT_DEACTIVATED": "Admin account has been deactivated or locked.",
     "USER_NOT_FOUND": "Admin account not found in system.",
     "ADMIN_LOGIN_SUCCESS": "Admin login successful!",
-    "ADMIN_LOGOUT_SUCCESS": "Admin logout successful!"
+    "ADMIN_LOGOUT_SUCCESS": "Admin logout successful!",
+    "brand": "AODAI Admin"
   },
   "header": {
     "systemTitle": "AODAI Admin",
@@ -38,7 +36,10 @@
     "editProfile": "Edit Account Profile",
     "backToStore": "Back to Storefront",
     "logout": "Sign Out",
-    "loggingOut": "Signing out..."
+    "loggingOut": "Signing out...",
+    "accountMenu": "Admin account",
+    "openMenu": "Open admin menu",
+    "navigation": "Admin navigation"
   },
   "nav": {
     "dashboard": "Dashboard",

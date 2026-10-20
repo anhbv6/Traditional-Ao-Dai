@@ -17,10 +17,12 @@ import {
 import { SearchBar } from './SearchBar';
 import { Logo } from './Logo';
 import type { NavItem } from './types';
-import { useAuthStore, useCustomerLogout } from '@/features/auth';
+import { LogoutDialog, useAuthStore } from '@/features/auth';
+import { ActionButton } from '@/components/shared/ActionButton';
+import { ActionLink } from '@/components/shared/ActionLink';
 import { useWishlistStore } from '@/features/wishlist';
 import { useSearchHistoryStore } from '@/features/products';
-import { executeAdminLogout, useAdminSession, useAdminSessionCache } from '@/features/admin';
+import { executeAdminLogout, useAdminSession, useAdminSessionCache } from '@/features/admin/session';
 
 type MobileMenuProps = {
   items: NavItem[];
@@ -54,12 +56,13 @@ export function MobileMenu({
   const { user: adminUser, isAdminOrStaff: isAdmin } = useAdminSession();
   const adminSessionCache = useAdminSessionCache();
   const user = customer ?? adminUser;
-  const { logout } = useCustomerLogout(async () => {
+  const [isLogoutOpen, setIsLogoutOpen] = useState(false);
+  const logoutAdminToo = async () => {
     if (isAdmin) {
       await executeAdminLogout();
       adminSessionCache.clear();
     }
-  });
+  };
   const userName = user?.name || user?.email || (isAuthenticated ? 'Account' : undefined);
 
   const handleSelectLanguage = (newLocale: string) => {
@@ -79,11 +82,10 @@ export function MobileMenu({
     router.push(`/products?q=${encodeURIComponent(keyword)}#product-list`);
   };
 
+  /** Đóng menu rồi mở hộp thoại xác nhận đăng xuất chung (đặt ngoài Drawer nên không bị đóng theo) */
   const handleLogout = () => {
     setIsDrawerOpen(false);
-    startTransition(async () => {
-      await logout();
-    });
+    setIsLogoutOpen(true);
   };
 
   return (
@@ -183,56 +185,40 @@ export function MobileMenu({
               </nav>
             </div>
 
-            {/* Account / Login & Shop Now */}
+            {/* Tài khoản / Đăng nhập & Mua sắm — nút chung ActionLink / ActionButton */}
             <div className="mt-6 grid gap-3">
               {userName ? (
                 <>
                   <DrawerClose asChild>
-                    <Link
-                      href={isAdmin ? "/admin/dashboard" : "/profile"}
-                      className="flex min-h-12 items-center justify-center gap-2 rounded-md bg-primary px-4 text-xs font-semibold uppercase tracking-wider text-white transition-colors hover:bg-[#111018]"
-                    >
-                      <UserRound size={16} strokeWidth={1.5} />
-                      {isAdmin ? "Về trang quản trị" : profileLabel}
-                    </Link>
+                    <ActionLink href={isAdmin ? '/admin/dashboard' : '/profile'} variant="confirm" size="lg" fullWidth icon={<UserRound />}>
+                      {isAdmin ? 'Về trang quản trị' : profileLabel}
+                    </ActionLink>
                   </DrawerClose>
                   {!isAdmin && (
-                    <button
-                      type="button"
-                      onClick={handleLogout}
-                      disabled={isPending}
-                      className="flex min-h-12 items-center justify-center gap-2 rounded-md border border-secondary px-4 text-xs font-semibold uppercase tracking-wider text-foreground transition-colors hover:text-primary-ink disabled:opacity-60"
-                    >
-                      <LogOut size={16} strokeWidth={1.5} />
+                    <ActionButton variant="cancel" size="lg" fullWidth icon={<LogOut />} onClick={handleLogout}>
                       {logoutLabel}
-                    </button>
+                    </ActionButton>
                   )}
                 </>
               ) : (
                 <DrawerClose asChild>
-                  <Link
-                    href="/login"
-                    className="flex min-h-12 items-center justify-center gap-2 rounded-md bg-primary px-4 text-xs font-semibold uppercase tracking-wider text-white transition-colors hover:bg-[#111018]"
-                  >
-                    <UserRound size={16} strokeWidth={1.5} />
+                  <ActionLink href="/login" variant="confirm" size="lg" fullWidth icon={<UserRound />}>
                     {loginLabel}
-                  </Link>
+                  </ActionLink>
                 </DrawerClose>
               )}
 
               <DrawerClose asChild>
-                <Link
-                  href="/products"
-                  className="flex min-h-12 items-center justify-between rounded-md bg-[#111018] px-4 text-xs font-semibold uppercase tracking-wider text-white transition-colors hover:bg-primary"
-                >
+                <ActionLink href="/products" variant="dialog" size="lg" fullWidth icon={<ArrowRight />} iconPosition="end">
                   Shop now
-                  <ArrowRight size={16} strokeWidth={1.8} />
-                </Link>
+                </ActionLink>
               </DrawerClose>
             </div>
           </div>
         </DrawerContent>
       </Drawer>
+
+      <LogoutDialog open={isLogoutOpen} onOpenChange={setIsLogoutOpen} beforeRedirect={logoutAdminToo} />
     </div>
   );
 }

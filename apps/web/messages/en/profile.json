@@ -214,18 +214,12 @@
   },
   "setting": {
     "title": "Account Settings",
-    "subtitle": "Customise the appearance and language on this device.",
+    "subtitle": "Choose light or dark appearance on this device. Language can be changed from the site header.",
     "appearance": {
       "title": "Appearance",
       "description": "Customize how your theme looks on your device",
       "light": "Light",
       "dark": "Dark"
-    },
-    "language": {
-      "title": "Language",
-      "description": "Select your language",
-      "vi": "Tiếng Việt",
-      "en": "English"
     }
   },
   "security": {

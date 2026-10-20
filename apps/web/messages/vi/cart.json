@@ -58,7 +58,8 @@
     "close": "Đóng"
   },
   "undo": {
-    "removed": "Đã xóa “{name}” khỏi giỏ hàng"
+    "removed": "Đã xóa “{name}” khỏi giỏ hàng",
+    "cleared": "Đã xóa {count} sản phẩm khỏi giỏ hàng"
   },
   "empty": {
     "title": "Giỏ hàng đang trống",
