@@ -1,6 +1,6 @@
 import { Response, NextFunction } from 'express'
-import { AuthenticatedRequest } from '../../shared/middlewares/authGuard'
-import { sendSuccess } from '../../shared/utils/response'
+import { AuthenticatedRequest } from '../../core/middlewares/authGuard'
+import { sendSuccess } from '../../core/http/response'
 import * as userService from './user.service'
 
 /**

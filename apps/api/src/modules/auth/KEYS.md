@@ -49,6 +49,11 @@ Tài liệu tổng hợp các mã phản hồi (`message` key) của Module Auth
 | `VERIFICATION_CODE_OR_RESET_TOKEN_REQUIRED` | 400 | Yêu cầu cung cấp mã xác minh hoặc Reset Token | Code or reset token is required | Thiếu tham số xác thực khi đặt lại mật khẩu qua email / Missing code or reset token |
 | `OTP_CODE_OR_RESET_TOKEN_REQUIRED` | 400 | Yêu cầu cung cấp mã OTP hoặc Reset Token | OTP code or reset token is required | Thiếu tham số xác thực khi đặt lại mật khẩu qua SĐT / Missing OTP code or reset token |
 | `UNAUTHORIZED` | 401 | Chưa xác thực hoặc không có quyền | Unauthorized access | Thiếu access token hoặc token không hợp lệ / Missing or invalid access token |
+| `EMAIL_OR_PHONE_REQUIRED` | 400 | Vui lòng nhập email hoặc số điện thoại. | Please enter your email or phone number. | Thiếu email hoặc số điện thoại (schema / service) |
+| `NAME_MIN_LENGTH` | 400 | Họ tên phải có ít nhất 2 ký tự. | Name must be at least 2 characters. | Họ tên khi đăng ký quá ngắn (`auth.schema.ts`) |
+| `GOOGLE_CREDENTIAL_REQUIRED` | 400 | Vui lòng cung cấp mã xác thực Google. | Google credential token is required. | Thiếu credential Google khi đăng nhập Google |
+| `REFRESH_TOKEN_REQUIRED` | 400 / 401 | Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại. | Your session has expired. Please sign in again. | Không có refresh token (body hoặc cookie) |
+| `REFRESH_TOKEN_REUSED` | 401 | Phiên đăng nhập không còn hợp lệ. Vui lòng đăng nhập lại. | Your session is no longer valid. Please sign in again. | Refresh token đã xoay vòng bị dùng lại ngoài thời gian ân hạn -> thu hồi cả họ phiên |
 
 ---
 

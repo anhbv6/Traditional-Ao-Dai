@@ -1,10 +1,10 @@
 import { Router } from 'express'
 import multer from 'multer'
-import { requireAuth } from '../../shared/middlewares/authGuard'
-import { validate } from '../../shared/middlewares/validate'
+import { requireAuth } from '../../core/middlewares/authGuard'
+import { validate } from '../../core/middlewares/validate'
 import { uploadSingleImage } from './upload.controller'
 import { uploadQuerySchema } from './upload.schema'
-import { AppError } from '../../shared/middlewares/errorHandler'
+import { AppError } from '../../core/http/AppError'
 
 const router = Router()
 
@@ -20,7 +20,7 @@ const fileFilter = (
   if (file.mimetype.startsWith('image/')) {
     callback(null, true)
   } else {
-    callback(new AppError(400, 'ONLY_IMAGE_FILES_ALLOWED') as any)
+    callback(new AppError(400, 'ONLY_IMAGE_FILES_ALLOWED'))
   }
 }
 
@@ -96,7 +96,7 @@ const upload = multer({
  */
 router.post(
   '/',
-  requireAuth as any,
+  requireAuth,
   validate(uploadQuerySchema),
   upload.single('image'),
   uploadSingleImage

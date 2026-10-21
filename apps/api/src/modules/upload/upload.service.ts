@@ -1,5 +1,5 @@
-import { uploadToCloudinary } from '../../shared/utils/cloudinary'
-import { AppError } from '../../shared/middlewares/errorHandler'
+import { uploadToCloudinary } from '../../infra/cloudinary'
+import { AppError } from '../../core/http/AppError'
 
 export interface UploadResult {
   url: string

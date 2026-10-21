@@ -1,12 +1,12 @@
-import { prisma } from '@repo/db'
-import { AppError } from '../../shared/middlewares/errorHandler'
-import { hashPassword, comparePassword } from '../../shared/utils/password'
-import { normalizeVietnamPhone } from '../../shared/utils/phone'
-import { revokeAllUserSessions } from '../../shared/utils/session'
-import { redis } from '../../shared/utils/redis'
-import { assertRateLimit } from '../../shared/utils/rateLimit'
-import { sendVerificationCodeEmail } from '../../shared/utils/mail'
-import { issueVerificationCode, verifyVerificationCode } from '../../shared/utils/verificationCode'
+import { prisma, type Prisma } from '@repo/db'
+import { AppError } from '../../core/http/AppError'
+import { hashPassword, comparePassword } from '../../core/security/password'
+import { normalizeVietnamPhone } from '../../core/utils/phone'
+import { revokeAllUserSessions } from '../../core/security/session'
+import { redis } from '../../infra/redis'
+import { assertRateLimit } from '../../core/security/rateLimit'
+import { sendVerificationCodeEmail } from '../../infra/mailer'
+import { issueVerificationCode, verifyVerificationCode } from '../../core/security/verificationCode'
 import { verifyGoogleCredential } from '../auth/client/auth.service'
 import { deliverOtp, verifyOtp } from '../otp/otp.service'
 
@@ -62,7 +62,7 @@ export async function updateUserProfile(
 ) {
   const user = await getActiveCustomer(userId)
 
-  const updateData: any = {}
+  const updateData: Prisma.UserUpdateInput = {}
   if (payload.name !== undefined) updateData.name = payload.name
   if (payload.avatar !== undefined) updateData.avatar = payload.avatar
 

@@ -1,10 +1,10 @@
 import { prisma, type User } from '@repo/db'
 import { randomBytes, randomUUID } from 'crypto'
 import { OAuth2Client, type TokenPayload } from 'google-auth-library'
-import { comparePassword, hashPassword } from '../../../shared/utils/password'
-import { generateAccessToken, generateRefreshToken, JWTPayload, verifyToken } from '../../../shared/utils/jwt'
-import { AppError } from '../../../shared/middlewares/errorHandler'
-import { env } from '../../../shared/config/env'
+import { comparePassword, hashPassword } from '../../../core/security/password'
+import { generateAccessToken, generateRefreshToken, JWTPayload, verifyToken } from '../../../core/security/jwt'
+import { AppError } from '../../../core/http/AppError'
+import { env } from '../../../config/env'
 import {
   LoginInput,
   RefreshTokenInput,
@@ -16,15 +16,15 @@ import {
   VerifyResetPasswordEmailInput,
   VerifyResetPasswordPhoneInput,
 } from '../auth.schema'
-import { durationToMs } from '../../../shared/utils/time'
-import { normalizeVietnamPhone } from '../../../shared/utils/phone'
+import { durationToMs } from '../../../core/utils/time'
+import { normalizeVietnamPhone } from '../../../core/utils/phone'
 import { CheckAccountResult, SessionMeta } from '../auth.types'
 import { verifyOtp } from '../../otp/otp.service'
-import { sendVerificationCodeEmail } from '../../../shared/utils/mail'
-import { redis } from '../../../shared/utils/redis'
-import { assertRateLimit } from '../../../shared/utils/rateLimit'
-import { issueVerificationCode, verifyVerificationCode } from '../../../shared/utils/verificationCode'
-import { cleanupUserSessions, hashToken } from '../../../shared/utils/session'
+import { sendVerificationCodeEmail } from '../../../infra/mailer'
+import { redis } from '../../../infra/redis'
+import { assertRateLimit } from '../../../core/security/rateLimit'
+import { issueVerificationCode, verifyVerificationCode } from '../../../core/security/verificationCode'
+import { cleanupUserSessions, hashToken } from '../../../core/security/session'
 
 const SESSION_REFRESH_EXPIRES_IN = '24h'
 const REMEMBER_REFRESH_EXPIRES_IN = '7d'
@@ -311,7 +311,7 @@ export async function refreshClientToken(input: RefreshTokenInput['body']) {
   let decoded: JWTPayload
   try {
     decoded = verifyToken(input.refreshToken)
-  } catch (error) {
+  } catch {
     throw new AppError(401, 'INVALID_REFRESH_TOKEN')
   }
 
@@ -433,7 +433,7 @@ export async function logoutClientByRefreshToken(refreshToken: string) {
   let decoded: JWTPayload
   try {
     decoded = verifyToken(refreshToken)
-  } catch (error) {
+  } catch {
     return
   }
 

@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import * as adminAuthController from './admin/auth.controller'
 import * as clientAuthController from './client/auth.controller'
-import { validate } from '../../shared/middlewares/validate'
+import { validate } from '../../core/middlewares/validate'
 import {
   loginSchema,
   registerSchema,
@@ -14,8 +14,8 @@ import {
   verifyResetPasswordEmailSchema,
   verifyResetPasswordPhoneSchema,
 } from './auth.schema'
-import { requireAuth } from '../../shared/middlewares/authGuard'
-import { rateLimit } from '../../shared/utils/rateLimit'
+import { requireAuth } from '../../core/middlewares/authGuard'
+import { rateLimit } from '../../core/middlewares/rateLimit'
 
 const router = Router()
 

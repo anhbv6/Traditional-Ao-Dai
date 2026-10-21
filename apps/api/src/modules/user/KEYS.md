@@ -42,6 +42,17 @@ Tài liệu tổng hợp các mã phản hồi (`message` key) của Module User
 | `SESSION_NOT_FOUND` | 404 | Không tìm thấy phiên đăng nhập | Session not found | Mã phiên làm việc cần thu hồi không tồn tại / Session ID to revoke not found |
 | `MAX_ADDRESS_LIMIT_REACHED` | 400 | Đã đạt số lượng địa chỉ tối đa (Tối đa 10) | Maximum address limit reached (10) | Mỗi người dùng chỉ được lưu tối đa 10 địa chỉ / Maximum 10 shipping addresses allowed |
 | `ADDRESS_NOT_FOUND` | 404 | Không tìm thấy địa chỉ | Address not found | Mã địa chỉ không tồn tại hoặc không thuộc quyền sở hữu / Address ID not found or unauthorized |
+| `NAME_REQUIRED` | 400 | Tên không được để trống. | Name is required. | Cập nhật hồ sơ với họ tên rỗng |
+| `DOB_INVALID` | 400 | Ngày sinh không đúng định dạng (YYYY-MM-DD). | Invalid date of birth format (YYYY-MM-DD). | Ngày sinh sai định dạng hoặc ở tương lai |
+| `GOOGLE_CREDENTIAL_REQUIRED` | 400 | Vui lòng cung cấp mã xác thực Google. | Google credential token is required. | Thiếu credential Google khi liên kết tài khoản |
+| `PROVIDER_ID_REQUIRED` | 400 | Thiếu mã nhà cung cấp liên kết. | Provider ID is required. | Thiếu providerId khi hủy liên kết |
+| `SESSION_ID_REQUIRED` | 400 | Thiếu mã phiên đăng nhập. | Session ID is required. | Thiếu sessionId khi thu hồi phiên |
+| `RECEIVER_NAME_REQUIRED` | 400 | Vui lòng nhập tên người nhận. | Please enter receiver name. | Sổ địa chỉ: thiếu tên người nhận |
+| `RECEIVER_PHONE_INVALID` | 400 | Số điện thoại người nhận không hợp lệ. | Receiver phone number is invalid. | Sổ địa chỉ: SĐT người nhận không hợp lệ |
+| `ADDRESS_LINE_REQUIRED` | 400 | Vui lòng nhập địa chỉ chi tiết. | Please enter detail address. | Sổ địa chỉ: thiếu địa chỉ chi tiết |
+| `PROVINCE_NAME_REQUIRED` | 400 | Vui lòng chọn tỉnh/thành phố. | Please select province/city. | Sổ địa chỉ: thiếu tỉnh / thành phố |
+| `DISTRICT_NAME_REQUIRED` | 400 | Vui lòng chọn quận/huyện. | Please select district. | Sổ địa chỉ: thiếu quận / huyện |
+| `WARD_NAME_REQUIRED` | 400 | Vui lòng chọn phường/xã. | Please select ward. | Sổ địa chỉ: thiếu phường / xã |
 
 ---
 

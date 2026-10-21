@@ -1,8 +1,8 @@
 import { Router } from 'express'
 import * as otpController from './otp.controller'
-import { validate } from '../../shared/middlewares/validate'
+import { validate } from '../../core/middlewares/validate'
 import { sendOtpSchema } from './otp.schema'
-import { rateLimit } from '../../shared/utils/rateLimit'
+import { rateLimit } from '../../core/middlewares/rateLimit'
 
 const router = Router()
 

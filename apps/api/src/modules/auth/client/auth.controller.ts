@@ -2,9 +2,9 @@ import { Request, Response, NextFunction } from 'express'
 import { AUTH_COOKIES } from '@repo/shared'
 import * as authService from './auth.service'
 import * as userService from '../../user/user.service'
-import { AuthenticatedRequest } from '../../../shared/middlewares/authGuard'
-import { sendSuccess, sendError } from '../../../shared/utils/response'
-import { clearCustomerSessionCookies, setCustomerSessionCookies } from '../../../shared/utils/authCookies'
+import { AuthenticatedRequest } from '../../../core/middlewares/authGuard'
+import { sendSuccess, sendError } from '../../../core/http/response'
+import { clearCustomerSessionCookies, setCustomerSessionCookies } from '../../../core/security/authCookies'
 
 function getClientIp(req: Request): string | undefined {
   // `trust proxy` đã được cấu hình ở index.ts nên req.ip là IP thật (không tự đọc X-Forwarded-For vì client có thể giả mạo)
@@ -19,7 +19,7 @@ function getRefreshTokenCookie(req: Request): string | undefined {
 /**
  * Controller handler for Client Registration
  */
-export async function register(req: Request, res: Response, next: NextFunction): Promise<any> {
+export async function register(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     await authService.clientRegister(req.body)
     return sendSuccess(res, {
@@ -35,7 +35,7 @@ export async function register(req: Request, res: Response, next: NextFunction):
 /**
  * Controller handler for Client Login
  */
-export async function login(req: Request, res: Response, next: NextFunction): Promise<any> {
+export async function login(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const result = await authService.clientLogin(req.body, {
       deviceInfo: req.headers['user-agent'],
@@ -56,7 +56,7 @@ export async function login(req: Request, res: Response, next: NextFunction): Pr
 /**
  * Controller handler for refreshing client access token.
  */
-export async function refreshToken(req: Request, res: Response, next: NextFunction): Promise<any> {
+export async function refreshToken(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const refreshToken = getRefreshTokenCookie(req)
     if (!refreshToken) {
@@ -86,7 +86,7 @@ export async function refreshToken(req: Request, res: Response, next: NextFuncti
 /**
  * Controller handler to check duplicate email and phone number in real-time
  */
-export async function checkAccount(req: Request, res: Response, next: NextFunction): Promise<any> {
+export async function checkAccount(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { email, phone } = req.query as { email?: string; phone?: string }
     const result = await authService.checkAccountAvailability(email, phone)
@@ -102,7 +102,7 @@ export async function checkAccount(req: Request, res: Response, next: NextFuncti
 /**
  * Controller handler for revoking the current client session.
  */
-export async function logout(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<any> {
+export async function logout(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
   try {
     const refreshToken = getRefreshTokenCookie(req)
     if (refreshToken) {
@@ -122,7 +122,7 @@ export async function logout(req: AuthenticatedRequest, res: Response, next: Nex
 /**
  * Controller handler to fetch logged in user profile (me)
  */
-export async function getMe(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<any> {
+export async function getMe(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
   try {
     const userId = req.user?.userId
     if (!userId) {
@@ -147,7 +147,7 @@ export async function getMe(req: AuthenticatedRequest, res: Response, next: Next
 /**
  * Controller handler for client login with OTP
  */
-export async function loginWithOtp(req: Request, res: Response, next: NextFunction): Promise<any> {
+export async function loginWithOtp(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const result = await authService.clientLoginWithOtp(req.body, {
       deviceInfo: req.headers['user-agent'],
@@ -168,7 +168,7 @@ export async function loginWithOtp(req: Request, res: Response, next: NextFuncti
 /**
  * Controller handler for client login/registration with Google OAuth
  */
-export async function loginWithGoogle(req: Request, res: Response, next: NextFunction): Promise<any> {
+export async function loginWithGoogle(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { credential, rememberMe = true } = req.body
     const result = await authService.clientLoginWithGoogle(
@@ -194,9 +194,9 @@ export async function loginWithGoogle(req: Request, res: Response, next: NextFun
 /**
  * Controller handler for forgot password via Email
  */
-export async function forgotPasswordEmail(req: Request, res: Response, next: NextFunction): Promise<any> {
+export async function forgotPasswordEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const result = await authService.sendForgotPasswordEmail(req.body)
+    await authService.sendForgotPasswordEmail(req.body)
     return sendSuccess(res, {
       message: 'VERIFICATION_CODE_SENT',
     })
@@ -208,7 +208,7 @@ export async function forgotPasswordEmail(req: Request, res: Response, next: Nex
 /**
  * Controller handler for verifying Email reset code before password change
  */
-export async function verifyResetPasswordEmail(req: Request, res: Response, next: NextFunction): Promise<any> {
+export async function verifyResetPasswordEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const result = await authService.verifyResetPasswordEmailCode(req.body)
     return sendSuccess(res, {
@@ -223,7 +223,7 @@ export async function verifyResetPasswordEmail(req: Request, res: Response, next
 /**
  * Controller handler for verifying SMS reset OTP before password change
  */
-export async function verifyResetPasswordPhone(req: Request, res: Response, next: NextFunction): Promise<any> {
+export async function verifyResetPasswordPhone(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const result = await authService.verifyResetPasswordPhoneCode(req.body)
     return sendSuccess(res, {
@@ -238,7 +238,7 @@ export async function verifyResetPasswordPhone(req: Request, res: Response, next
 /**
  * Controller handler for reset password via Email code
  */
-export async function resetPasswordEmail(req: Request, res: Response, next: NextFunction): Promise<any> {
+export async function resetPasswordEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     await authService.resetPasswordByEmail(req.body)
     return sendSuccess(res, {
@@ -252,7 +252,7 @@ export async function resetPasswordEmail(req: Request, res: Response, next: Next
 /**
  * Controller handler for reset password via SMS OTP
  */
-export async function resetPasswordPhone(req: Request, res: Response, next: NextFunction): Promise<any> {
+export async function resetPasswordPhone(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     await authService.resetPasswordByPhone(req.body)
     return sendSuccess(res, {

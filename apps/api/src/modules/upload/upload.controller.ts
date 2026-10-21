@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import * as uploadService from './upload.service'
-import { sendSuccess } from '../../shared/utils/response'
+import { sendSuccess } from '../../core/http/response'
 
 /**
  * Controller handler for uploading a single image
@@ -9,7 +9,7 @@ export async function uploadSingleImage(
   req: Request,
   res: Response,
   next: NextFunction
-): Promise<any> {
+): Promise<void> {
   try {
     const folder = (req.query.folder as string) || 'general'
     const result = await uploadService.uploadImage(req.file, folder)

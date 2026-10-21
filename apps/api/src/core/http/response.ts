@@ -3,7 +3,7 @@ import { Response } from 'express'
 /**
  * Standard API Response structure
  */
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   status: 'success' | 'error'
   statusCode: number
   message?: string
@@ -13,7 +13,7 @@ export interface ApiResponse<T = any> {
     limit?: number
     totalItems?: number
     totalPages?: number
-    [key: string]: any
+    [key: string]: unknown
   }
   stack?: string
 }
@@ -29,7 +29,7 @@ export function sendSuccess<T>(
     statusCode?: number
     meta?: ApiResponse['meta']
   }
-): Response {
+): void {
   const { data, message, statusCode = 200, meta } = options
 
   const responseBody: ApiResponse<T> = {
@@ -40,7 +40,7 @@ export function sendSuccess<T>(
     ...(meta && { meta }),
   }
 
-  return res.status(statusCode).json(responseBody)
+  res.status(statusCode).json(responseBody)
 }
 
 /**
@@ -53,7 +53,7 @@ export function sendError(
     statusCode?: number
     stack?: string
   }
-): Response {
+): void {
   const { message, statusCode = 500, stack } = options
 
   const responseBody: ApiResponse = {
@@ -63,5 +63,5 @@ export function sendError(
     ...(process.env.NODE_ENV === 'development' && stack && { stack }),
   }
 
-  return res.status(statusCode).json(responseBody)
+  res.status(statusCode).json(responseBody)
 }

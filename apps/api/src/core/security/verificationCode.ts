@@ -1,7 +1,7 @@
 import { timingSafeEqual } from 'crypto'
-import { redis } from './redis'
-import { generateOtp } from './phone'
-import { AppError } from '../middlewares/errorHandler'
+import { redis } from '../../infra/redis'
+import { generateOtp } from '../utils/phone'
+import { AppError } from '../http/AppError'
 
 /** Số lần nhập sai tối đa cho mỗi mã trước khi mã bị hủy */
 export const MAX_VERIFICATION_ATTEMPTS = 5

@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from 'express'
 import * as otpService from './otp.service'
-import { sendSuccess } from '../../shared/utils/response'
+import { sendSuccess } from '../../core/http/response'
 
 /**
  * Controller handler for sending OTP
  */
-export async function sendOtp(req: Request, res: Response, next: NextFunction): Promise<any> {
+export async function sendOtp(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { phone, purpose } = req.body
     const result = await otpService.sendOtp(phone, purpose)

@@ -1,5 +1,5 @@
-import jwt from 'jsonwebtoken'
-import { env } from '../config/env'
+import jwt, { type SignOptions } from 'jsonwebtoken'
+import { env } from '../../config/env'
 import { Role } from '@repo/db'
 
 export interface JWTPayload {
@@ -43,7 +43,7 @@ const publicKey = parseJwtKey(env.JWT_PUBLIC_KEY)
  * Generates a JWT token for a given user payload.
  */
 export function generateToken(payload: JWTPayload, expiresIn: string = env.JWT_EXPIRES_IN): string {
-  return jwt.sign(payload, privateKey, { algorithm: 'RS256', expiresIn: expiresIn as any })
+  return jwt.sign(payload, privateKey, { algorithm: 'RS256', expiresIn: expiresIn as SignOptions['expiresIn'] })
 }
 
 export function generateAccessToken(payload: Omit<JWTPayload, 'tokenType'>): string {

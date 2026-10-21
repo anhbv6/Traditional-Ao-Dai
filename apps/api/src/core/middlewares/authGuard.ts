@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from 'express'
+import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken'
 import { prisma, Role } from '@repo/db'
 import { AUTH_COOKIES } from '@repo/shared'
-import { verifyToken, JWTPayload } from '../utils/jwt'
-import { AppError } from './errorHandler'
+import { verifyToken, JWTPayload } from '../security/jwt'
+import { AppError } from '../http/AppError'
 
 /**
  * Extend Express Request to include decoded JWT user payload
@@ -94,11 +95,12 @@ export async function requireAuth(
   try {
     req.user = await resolveAccessToken(token)
     return next()
-  } catch (error: any) {
-    if (error.name === 'TokenExpiredError') {
+  } catch (error) {
+    // TokenExpiredError kế thừa JsonWebTokenError -> kiểm tra hết hạn trước
+    if (error instanceof TokenExpiredError) {
       return next(new AppError(401, 'TOKEN_EXPIRED'))
     }
-    if (error.name === 'JsonWebTokenError') {
+    if (error instanceof JsonWebTokenError) {
       return next(new AppError(401, 'INVALID_TOKEN'))
     }
     return next(error)

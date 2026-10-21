@@ -1,11 +1,11 @@
 import { prisma } from '@repo/db'
-import { redis } from '../../shared/utils/redis'
-import { smsProvider } from '../../shared/utils/sms'
-import { env } from '../../shared/config/env'
-import { AppError } from '../../shared/middlewares/errorHandler'
-import { normalizeVietnamPhone } from '../../shared/utils/phone'
-import { assertRateLimit } from '../../shared/utils/rateLimit'
-import { issueVerificationCode, verifyVerificationCode } from '../../shared/utils/verificationCode'
+import { redis } from '../../infra/redis'
+import { smsProvider } from '../../infra/sms'
+import { env } from '../../config/env'
+import { AppError } from '../../core/http/AppError'
+import { normalizeVietnamPhone } from '../../core/utils/phone'
+import { assertRateLimit } from '../../core/security/rateLimit'
+import { issueVerificationCode, verifyVerificationCode } from '../../core/security/verificationCode'
 
 export type OtpPurpose = 'REGISTER' | 'LOGIN' | 'RESET_PASSWORD' | 'VERIFY_PHONE'
 

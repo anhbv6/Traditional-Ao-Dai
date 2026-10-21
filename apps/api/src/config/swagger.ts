@@ -116,7 +116,7 @@ const options: swaggerJSDoc.Options = {
   },
   // Paths to files containing OpenAPI definitions (both js/ts extensions)
   apis: [
-    './src/index.ts',
+    './src/app.ts',
     './src/routes.ts',
     './src/modules/**/*.routes.ts',
     './src/modules/**/*.schema.ts',

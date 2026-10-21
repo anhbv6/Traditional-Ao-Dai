@@ -1,14 +1,14 @@
 import { Request, Response, NextFunction } from 'express'
 import { AUTH_COOKIES } from '@repo/shared'
 import * as authService from './auth.service'
-import { sendSuccess } from '../../../shared/utils/response'
-import { clearAdminSessionCookies, setAdminSessionCookies } from '../../../shared/utils/authCookies'
+import { sendSuccess } from '../../../core/http/response'
+import { clearAdminSessionCookies, setAdminSessionCookies } from '../../../core/security/authCookies'
 
 /**
  * Controller handler for Admin and Staff Login.
  * Token được đặt vào cookie httpOnly `admin_token` (SameSite=Strict); body chỉ trả thông tin người dùng.
  */
-export async function loginAdmin(req: Request, res: Response, next: NextFunction): Promise<any> {
+export async function loginAdmin(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const result = await authService.adminLogin(req.body, {
       deviceInfo: req.headers['user-agent'],
@@ -29,7 +29,7 @@ export async function loginAdmin(req: Request, res: Response, next: NextFunction
 /**
  * Controller handler for Admin and Staff Logout (luôn xóa cookie, kể cả khi phiên đã hết hạn / bị thu hồi)
  */
-export async function logoutAdmin(req: Request, res: Response, next: NextFunction): Promise<any> {
+export async function logoutAdmin(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     await authService.adminLogout(req.cookies?.[AUTH_COOKIES.adminToken])
     clearAdminSessionCookies(res)

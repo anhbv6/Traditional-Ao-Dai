@@ -1,4 +1,4 @@
-import { AppError } from "../middlewares/errorHandler"
+import { AppError } from "../http/AppError"
 
 export function durationToMs(duration: string): number {
   const match = duration.trim().match(/^(\d+)(ms|s|m|h|d|w)?$/)
