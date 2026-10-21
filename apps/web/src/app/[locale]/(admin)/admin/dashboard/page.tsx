@@ -1,6 +1,6 @@
-import { AdminDashboard } from "@/features/admin/dashboard";
-import { requireAdminPage } from "@/features/admin/server/adminAuth.server";
-import { ADMIN_MODULE_ACCESS } from "@/features/admin/session/permissions";
+import { AdminDashboard } from "@/features/admin/modules/dashboard";
+import { requireAdminPage } from "@/features/admin/core/server/adminAuth.server";
+import { ADMIN_MODULE_ACCESS } from "@/features/admin/core/session/permissions";
 
 export const dynamic = "force-dynamic";
 

@@ -3,7 +3,7 @@
 import React from 'react';
 import { Shield, ArrowRight } from 'lucide-react';
 import { Link } from '@/i18n/routing';
-import { useAdminSession } from '@/features/admin/session';
+import { useAdminSession } from '@/features/admin/core/session';
 
 export function AdminQuickBar() {
   // Phiên quản trị lấy từ server, chỉ hỏi khi trình duyệt có cờ `admin_session`

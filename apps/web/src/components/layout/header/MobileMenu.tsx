@@ -22,7 +22,8 @@ import { ActionButton } from '@/components/shared/ActionButton';
 import { ActionLink } from '@/components/shared/ActionLink';
 import { useWishlistStore } from '@/features/wishlist';
 import { useSearchHistoryStore } from '@/features/products';
-import { executeAdminLogout, useAdminSession, useAdminSessionCache } from '@/features/admin/session';
+import { executeAdminLogout } from '@/features/admin/core/auth';
+import { useAdminSession, useAdminSessionCache } from '@/features/admin/core/session';
 
 type MobileMenuProps = {
   items: NavItem[];

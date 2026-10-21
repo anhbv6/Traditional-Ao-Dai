@@ -5,7 +5,8 @@ import { Bell, ChevronRight, Heart, LayoutDashboard, LogOut, Package, UserRound,
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/routing';
 import { LogoutDialog, useAuthStore } from '@/features/auth';
-import { executeAdminLogout, useAdminSession, useAdminSessionCache } from '@/features/admin/session';
+import { executeAdminLogout } from '@/features/admin/core/auth';
+import { useAdminSession, useAdminSessionCache } from '@/features/admin/core/session';
 import { useNotifications } from '@/features/notifications';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { ActionButton } from '@/components/shared/ActionButton';

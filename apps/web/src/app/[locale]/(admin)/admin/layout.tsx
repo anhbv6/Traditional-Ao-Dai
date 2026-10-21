@@ -5,8 +5,8 @@ import {
   AdminHeader,
   AdminAccessDenied,
   useAdminLayout,
-} from "@/features/admin/layout";
-import { AdminProfileDialog } from "@/features/admin/session";
+} from "@/features/admin/core/layout";
+import { AdminProfileDialog } from "@/features/admin/core/session";
 import { AppLoading } from "@/components/shared/AppLoading";
 
 

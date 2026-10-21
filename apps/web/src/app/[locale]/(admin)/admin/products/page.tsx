@@ -1,9 +1,9 @@
 import React from "react";
 import { Shirt } from "lucide-react";
-import { getAdminProductsListQuery, ProductsList } from "@/features/admin/products";
-import { requireAdminPage } from "@/features/admin/server/adminAuth.server";
-import { ADMIN_MODULE_ACCESS } from "@/features/admin/session/permissions";
-import { AdminMetaValue, AdminPage, AdminPageHeader } from "@/features/admin/ui";
+import { getAdminProductsListQuery, ProductsList } from "@/features/admin/modules/products";
+import { requireAdminPage } from "@/features/admin/core/server/adminAuth.server";
+import { ADMIN_MODULE_ACCESS } from "@/features/admin/core/session/permissions";
+import { AdminMetaValue, AdminPage, AdminPageHeader } from "@/features/admin/core/ui";
 
 export const dynamic = "force-dynamic";
 

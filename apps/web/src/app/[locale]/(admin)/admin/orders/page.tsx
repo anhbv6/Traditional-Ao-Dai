@@ -1,9 +1,9 @@
 import React from "react";
 import { ShoppingBag } from "lucide-react";
-import { getAdminOrdersListQuery, OrdersList } from "@/features/admin/orders";
-import { requireAdminPage } from "@/features/admin/server/adminAuth.server";
-import { ADMIN_MODULE_ACCESS } from "@/features/admin/session/permissions";
-import { AdminMetaValue, AdminPage, AdminPageHeader } from "@/features/admin/ui";
+import { getAdminOrdersListQuery, OrdersList } from "@/features/admin/modules/orders";
+import { requireAdminPage } from "@/features/admin/core/server/adminAuth.server";
+import { ADMIN_MODULE_ACCESS } from "@/features/admin/core/session/permissions";
+import { AdminMetaValue, AdminPage, AdminPageHeader } from "@/features/admin/core/ui";
 
 export const dynamic = "force-dynamic";
 

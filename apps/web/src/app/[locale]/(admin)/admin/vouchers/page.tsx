@@ -1,9 +1,9 @@
 import React from "react";
 import { Ticket } from "lucide-react";
-import { getAdminVouchersQuery, VouchersList } from "@/features/admin/vouchers";
-import { requireAdminPage } from "@/features/admin/server/adminAuth.server";
-import { ADMIN_MODULE_ACCESS } from "@/features/admin/session/permissions";
-import { AdminMetaValue, AdminPage, AdminPageHeader } from "@/features/admin/ui";
+import { getAdminVouchersQuery, VouchersList } from "@/features/admin/modules/vouchers";
+import { requireAdminPage } from "@/features/admin/core/server/adminAuth.server";
+import { ADMIN_MODULE_ACCESS } from "@/features/admin/core/session/permissions";
+import { AdminMetaValue, AdminPage, AdminPageHeader } from "@/features/admin/core/ui";
 
 export const dynamic = "force-dynamic";
 
