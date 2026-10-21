@@ -2,6 +2,7 @@ import { Container } from '@/components/ui/container';
 import { PageIntro } from '@/components/shared/PageIntro';
 import { ProductsCollection, ProductEventBanner, type ProductFilterParams } from '@/features/products';
 import { getTranslations } from 'next-intl/server';
+import { ClientMessages, CLIENT_NAMESPACES } from '@/i18n/ClientMessages';
 
 interface PageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -23,7 +24,7 @@ async function Products({ searchParams }: PageProps) {
   const t = await getTranslations('ProductsPage');
 
   return (
-    <>
+    <ClientMessages namespaces={CLIENT_NAMESPACES.products}>
       <ProductEventBanner />
       <Container as="section">
         <PageIntro eyebrow={t('banner.eyebrow')} title={t('banner.title')} subtitle={t('banner.subtitle')} />
@@ -34,7 +35,7 @@ async function Products({ searchParams }: PageProps) {
           initialQuery={initialQuery}
         />
       </Container>
-    </>
+    </ClientMessages>
   );
 }
 

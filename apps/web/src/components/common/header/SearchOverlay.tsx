@@ -7,11 +7,12 @@ import { AnimatePresence, MotionConfig, motion } from 'motion/react';
 import { useLenis } from 'lenis/react';
 import { ArrowRight, Clock3, Search, X } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
+import { useQuery } from '@tanstack/react-query';
 import { type Locale } from '@repo/shared';
 import {
   MIN_SEARCH_LENGTH,
   getHighlightParts,
-  productCatalog,
+  loadProductCatalog,
   searchProducts,
   useSearchHistoryStore,
   type MockProduct,
@@ -77,9 +78,17 @@ export function SearchOverlay({ label, placeholder }: SearchOverlayProps) {
   const { add: addHistory, remove: removeHistory, clear: clearHistory } = useSearchHistoryStore.getState();
   const keywords = t.raw('searchPanel.keywords') as string[];
 
+  // Danh mục chỉ tải sau lần mở bảng đầu tiên (chunk riêng) -> trang nào cũng không phải mang dữ liệu mock trong bundle header
+  const { data: catalog } = useQuery({
+    queryKey: ['search-product-catalog'],
+    queryFn: loadProductCatalog,
+    enabled: hasOpened,
+    staleTime: Infinity,
+  });
+
   const matches = useMemo(
-    () => (canSuggest ? searchProducts(productCatalog, trimmed, locale) : []),
-    [canSuggest, trimmed, locale]
+    () => (canSuggest && catalog ? searchProducts(catalog, trimmed, locale) : []),
+    [canSuggest, catalog, trimmed, locale]
   );
   // Dữ liệu mock lặp lại cùng tên ở nhiều trang -> gợi ý chỉ lấy mỗi tên một lần cho dễ nhìn
   const suggestions = useMemo(() => {

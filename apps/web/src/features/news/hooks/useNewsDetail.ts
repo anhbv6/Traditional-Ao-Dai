@@ -1,24 +1,19 @@
 "use client";
 
-import { useMemo } from "react";
 import { useLocale } from "next-intl";
 import { type MockArticle, getAuthor } from "../types/news.types";
-import { getArticleCategoryKey, getArticleContent } from "../data/articleContent";
 
+/**
+ * Thông tin hiển thị của bài viết theo ngôn ngữ hiện tại.
+ * Thân bài (`content`) được dựng sẵn ở server (page.tsx) và truyền vào qua props —
+ * kho nội dung mock của mọi bài (`data/articleContent`) không bị đưa xuống trình duyệt.
+ */
 export function useNewsDetail(article: MockArticle) {
   const loc: "vi" | "en" = useLocale() === "en" ? "en" : "vi";
-  const categoryKey = getArticleCategoryKey(article.category.en);
-
-  const content = useMemo(
-    () => getArticleContent(categoryKey, article.description[loc], loc),
-    [categoryKey, article.description, loc]
-  );
 
   return {
     loc,
-    categoryKey,
     authorName: getAuthor(article.id),
     fullDate: article.dateLong[loc],
-    content,
   };
 }

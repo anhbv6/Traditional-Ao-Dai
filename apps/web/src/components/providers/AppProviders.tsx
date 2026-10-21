@@ -2,51 +2,12 @@
 
 import React, { ReactNode, useState, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { GoogleOAuthProvider } from '@react-oauth/google';
 import { Toaster } from '@/components/ui/toast';
 import { SmoothScrollProvider } from './SmoothScrollProvider';
 import { useAuthStore, establishCustomerSession } from '@/features/auth';
 import { rehydrateCart } from '@/features/cart';
 import { rehydrateWishlist } from '@/features/wishlist';
 import { hasCustomerSession, refreshBrowserToken, HttpError } from '@/lib/api-client';
-
-interface GoogleAccountsId {
-  initialize: (config: Record<string, unknown>) => void;
-  [key: string]: unknown;
-}
-
-/**
- * Ngăn chặn cảnh báo [GSI_LOGGER] khi google.accounts.id.initialize() bị gọi nhiều lần do
- * React StrictMode, Next.js page navigation hoặc re-renders của @react-oauth/google.
- * Giữ nguyên callback mới nhất từ component con mà chỉ khởi tạo Google SDK một lần duy nhất.
- */
-function patchGsiInitialize() {
-  if (typeof window === 'undefined') return;
-
-  const accountsId = (window as unknown as { google?: { accounts?: { id?: GoogleAccountsId } } })?.google?.accounts?.id;
-  if (!accountsId || (accountsId.initialize as { __isPatched?: boolean }).__isPatched) return;
-
-  const originalInitialize = accountsId.initialize;
-
-  const patchedInitialize = function (config: Record<string, unknown>) {
-    (window as unknown as { __gsi_active_callback?: ((res: unknown) => void) | null }).__gsi_active_callback =
-      typeof config?.callback === 'function' ? (config.callback as (res: unknown) => void) : null;
-
-    const win = window as unknown as { __gsi_initialized?: boolean };
-    if (!win.__gsi_initialized) {
-      win.__gsi_initialized = true;
-      originalInitialize.call(accountsId, {
-        ...config,
-        callback: (response: unknown) => {
-          (window as unknown as { __gsi_active_callback?: ((res: unknown) => void) | null }).__gsi_active_callback?.(response);
-        },
-      });
-    }
-  };
-
-  (patchedInitialize as { __isPatched?: boolean }).__isPatched = true;
-  accountsId.initialize = patchedInitialize;
-}
 
 export function AppProviders({ children }: { children: ReactNode }) {
   const [queryClient] = useState(
@@ -63,7 +24,6 @@ export function AppProviders({ children }: { children: ReactNode }) {
   );
 
   useEffect(() => {
-    patchGsiInitialize();
     // Nạp giỏ hàng & danh sách yêu thích từ localStorage sau khi hydrate (store dùng skipHydration để tránh lệch SSR)
     rehydrateCart();
     rehydrateWishlist();
@@ -107,16 +67,12 @@ export function AppProviders({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || 'placeholder-id';
-
   return (
     <QueryClientProvider client={queryClient}>
-      <GoogleOAuthProvider clientId={googleClientId} onScriptLoadSuccess={patchGsiInitialize}>
-        <SmoothScrollProvider>
-          {children}
-          <Toaster />
-        </SmoothScrollProvider>
-      </GoogleOAuthProvider>
+      <SmoothScrollProvider>
+        {children}
+        <Toaster />
+      </SmoothScrollProvider>
     </QueryClientProvider>
   );
 }

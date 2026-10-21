@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import dynamic from "next/dynamic";
 import { AnimatePresence, motion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { MessageCircle, Sparkles } from "lucide-react";
@@ -10,7 +11,9 @@ import { useHasBottomBar } from "@/hooks/useHasBottomBar";
 import { FLOATING_BUTTON_CLASS } from "@/components/common/floatingButton";
 import { useChatStore } from "../store/chatStore";
 import { type ChatChannel } from "../types/chat.types";
-import { ChatPanel } from "./ChatPanel";
+
+// Khung chat (kèm kịch bản trả lời mẫu) chỉ tải khi khách mở một kênh -> không nằm trong bundle chung của storefront
+const ChatPanel = dynamic(() => import("./ChatPanel").then((module) => module.ChatPanel), { ssr: false });
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 

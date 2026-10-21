@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Dancing_Script, Inter, Lora, Playfair_Display } from "next/font/google";
 import "../globals.css";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
-import { getMessages, setRequestLocale } from "next-intl/server";
+import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { AppProviders } from "@/components/providers/AppProviders";
@@ -68,8 +68,6 @@ export default async function LocaleLayout({
 
   setRequestLocale(locale);
 
-  const messages = await getMessages();
-
   return (
     <html
       lang={locale}
@@ -77,7 +75,9 @@ export default async function LocaleLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
-        <NextIntlClientProvider messages={messages}>
+        {/* Không gửi bản dịch ở gốc: từng nhóm route tự gửi đúng namespace client cần qua <ClientMessages> (i18n/ClientMessages.tsx).
+            messages={{}} bắt buộc — bỏ trống thì next-intl tự gửi TOÀN BỘ bản dịch xuống trình duyệt. */}
+        <NextIntlClientProvider messages={{}}>
           <AppProviders>
             {children}
           </AppProviders>

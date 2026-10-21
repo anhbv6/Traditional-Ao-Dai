@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatVnd } from '@repo/shared';
 import { notFound } from 'next/navigation';
 import { ProductDetailClient } from './ProductDetailClient';
 import { type DisplayProduct, type RelatedProductItem } from '../types/products.types';
@@ -44,12 +45,12 @@ export function ProductDetail({ slug, locale }: ProductDetailProps) {
       slug: mock.slug,
       name: mock.name,
       description: mock.short_description,
-      price: baseVariant.price.toLocaleString('vi-VN') + 'đ',
+      price: formatVnd(baseVariant.price, locale),
       priceValue: baseVariant.price,
       originalPriceValue: baseVariant.compare_at_price || undefined,
       sizePrices,
       originalPrice: baseVariant.compare_at_price
-        ? baseVariant.compare_at_price.toLocaleString('vi-VN') + 'đ'
+        ? formatVnd(baseVariant.compare_at_price, locale)
         : undefined,
       imageSrc: mock.gallery[0].url,
       hoverImageSrc: mock.gallery[1]?.url || mock.gallery[0].url,
@@ -81,7 +82,7 @@ export function ProductDetail({ slug, locale }: ProductDetailProps) {
         imageAlt: p.name,
         name: p.name,
         description: catalogItem?.description[locale] || p.name,
-        price: p.price.toLocaleString('vi-VN') + 'đ',
+        price: formatVnd(p.price, locale),
         priceValue: p.price,
         originalPrice: undefined,
         colors: catalogItem?.colors.map(c => ({ name: c.name, hex: c.hex, imageSrc: c.imageSrc })) || [],

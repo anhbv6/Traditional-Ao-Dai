@@ -211,8 +211,6 @@
   /* --- Animation: dùng class animate-* --- */
   --animate-fade-in-up: fade-in-up 0.8s cubic-bezier(0.25, 1, 0.5, 1) both;   /* Hiện dần từ dưới (hero) */
   --animate-fade-in-soft: fade-in-soft 1s cubic-bezier(0.22, 1, 0.36, 1) both; /* Hiện dần nhẹ (đổi tab sản phẩm ở home) */
-  --animate-marquee: marquee var(--duration) infinite linear;                  /* components/ui/marquee */
-  --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
   --animate-shake: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;       /* Rung nhẹ ngang (thông báo lỗi TextField) */
 
   @keyframes fade-in-up {
@@ -223,16 +221,6 @@
   @keyframes fade-in-soft {
     from { opacity: 0; transform: translateY(12px); }
     to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes marquee {
-    from { transform: translateX(0); }
-    to { transform: translateX(calc(-100% - var(--gap))); }
-  }
-
-  @keyframes marquee-vertical {
-    from { transform: translateY(0); }
-    to { transform: translateY(calc(-100% - var(--gap))); }
   }
 
   @keyframes shake {

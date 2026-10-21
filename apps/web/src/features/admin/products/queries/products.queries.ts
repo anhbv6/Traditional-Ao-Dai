@@ -1,6 +1,6 @@
 import { type Prisma } from "@repo/db";
 import { prisma } from "../../server/db.server";
-import { type AdminProductItem, type CategoryOption } from "../types/products.types";
+import { type AdminProductItem } from "../types/products.types";
 
 /**
  * Query: Lấy danh sách sản phẩm Áo Dài kèm số lượng tồn kho theo biến thể
@@ -52,22 +52,6 @@ export async function getAdminProductsListQuery(search?: string): Promise<AdminP
     });
   } catch (error) {
     console.error("Lỗi khi query danh sách sản phẩm Admin:", error);
-    return [];
-  }
-}
-
-/**
- * Query: Lấy danh sách danh mục để lọc / chọn khi tạo áo dài
- */
-export async function getCategoriesOptionQuery(): Promise<CategoryOption[]> {
-  try {
-    const categories = await prisma.category.findMany({
-      select: { id: true, name: true },
-      orderBy: { name: "asc" },
-    });
-    return categories;
-  } catch (error) {
-    console.error("Lỗi khi query danh mục:", error);
     return [];
   }
 }

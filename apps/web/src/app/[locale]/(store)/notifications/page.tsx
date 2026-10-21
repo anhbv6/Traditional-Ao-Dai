@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Container } from "@/components/ui/container";
 import { NotificationsExperience } from "@/features/notifications";
+import { ClientMessages, CLIENT_NAMESPACES } from "@/i18n/ClientMessages";
 
 interface NotificationsPageProps {
   params: Promise<{ locale: string }>;
@@ -16,8 +17,10 @@ export async function generateMetadata({ params }: NotificationsPageProps): Prom
 /** Trang Thông báo của khách hàng — khung giống Yêu thích / Giỏ hàng; proxy đã chặn khi chưa đăng nhập (giống /profile) */
 export default function NotificationsPage() {
   return (
-    <Container as="section" width="full">
-      <NotificationsExperience />
-    </Container>
+    <ClientMessages namespaces={CLIENT_NAMESPACES.notifications}>
+      <Container as="section" width="full">
+        <NotificationsExperience />
+      </Container>
+    </ClientMessages>
   );
 }

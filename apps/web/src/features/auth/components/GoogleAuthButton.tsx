@@ -1,10 +1,13 @@
 "use client";
 
 import React from "react";
-import { GoogleLogin } from "@react-oauth/google";
+import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 import { FcGoogle } from "react-icons/fc";
 import { ActionButton } from "@/components/shared/ActionButton";
 import { cn } from "@/lib/utils";
+import { patchGsiInitialize } from "../utils/googleIdentity";
+
+const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "placeholder-id";
 
 interface GoogleAuthButtonProps {
   label: string;
@@ -19,6 +22,8 @@ interface GoogleAuthButtonProps {
 /**
  * Nút "Tiếp tục với Google": giao diện là ActionButton `dialog` (đồng bộ storefront),
  * nút thật của Google Identity Services phủ trong suốt lên trên để nhận click.
+ * Provider (nạp script accounts.google.com/gsi/client) đặt ngay tại nút — chỉ trang có nút Google mới tải script,
+ * không bọc toàn ứng dụng ở AppProviders.
  */
 export function GoogleAuthButton({
   label,
@@ -52,40 +57,42 @@ export function GoogleAuthButton({
   }, []);
 
   return (
-    /* `group/action` ở khung ngoài: lớp phủ Google nhận hover thay nút, vẫn kích hoạt hiệu ứng quét của ActionButton */
-    <div ref={containerRef} className={cn("relative w-full", !isLocked && "group/action", className)}>
-      <ActionButton
-        variant="dialog"
-        size="md"
-        fullWidth
-        disabled={disabled}
-        loading={loading}
-        icon={<FcGoogle aria-hidden="true" />}
-        tabIndex={-1}
-      >
-        {label}
-      </ActionButton>
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID} onScriptLoadSuccess={patchGsiInitialize}>
+      {/* `group/action` ở khung ngoài: lớp phủ Google nhận hover thay nút, vẫn kích hoạt hiệu ứng quét của ActionButton */}
+      <div ref={containerRef} className={cn("relative w-full", !isLocked && "group/action", className)}>
+        <ActionButton
+          variant="dialog"
+          size="md"
+          fullWidth
+          disabled={disabled}
+          loading={loading}
+          icon={<FcGoogle aria-hidden="true" />}
+          tabIndex={-1}
+        >
+          {label}
+        </ActionButton>
 
-      {!isLocked && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center overflow-hidden opacity-0">
-          <GoogleLogin
-            onSuccess={(credentialResponse) => {
-              if (credentialResponse.credential) {
-                onCredential(credentialResponse.credential);
-              } else {
-                onError();
-              }
-            }}
-            onError={onError}
-            theme="outline"
-            size="large"
-            text="continue_with"
-            shape="rectangular"
-            logo_alignment="left"
-            width={buttonWidth}
-          />
-        </div>
-      )}
-    </div>
+        {!isLocked && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center overflow-hidden opacity-0">
+            <GoogleLogin
+              onSuccess={(credentialResponse) => {
+                if (credentialResponse.credential) {
+                  onCredential(credentialResponse.credential);
+                } else {
+                  onError();
+                }
+              }}
+              onError={onError}
+              theme="outline"
+              size="large"
+              text="continue_with"
+              shape="rectangular"
+              logo_alignment="left"
+              width={buttonWidth}
+            />
+          </div>
+        )}
+      </div>
+    </GoogleOAuthProvider>
   );
 }

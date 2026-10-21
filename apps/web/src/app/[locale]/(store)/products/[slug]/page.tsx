@@ -2,6 +2,7 @@ import React from 'react';
 import { ProductDetail, mockDetailProducts, productCatalog } from '@/features/products';
 import { Container } from '@/components/ui/container';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
+import { ClientMessages, CLIENT_NAMESPACES } from '@/i18n/ClientMessages';
 
 type Locale = 'vi' | 'en';
 
@@ -54,9 +55,11 @@ export default async function DetailProductsPage({ params }: DetailProductsProps
   }
 
   return (
-    <Container as="section" width="full">
-      <Breadcrumbs lastLabel={productName} />
-      <ProductDetail slug={slug} locale={locale} />
-    </Container>
+    <ClientMessages namespaces={CLIENT_NAMESPACES.productDetail}>
+      <Container as="section" width="full">
+        <Breadcrumbs lastLabel={productName} />
+        <ProductDetail slug={slug} locale={locale} />
+      </Container>
+    </ClientMessages>
   );
 }

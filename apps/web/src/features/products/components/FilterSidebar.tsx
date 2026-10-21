@@ -3,6 +3,7 @@
 import { ReactNode, useState } from 'react';
 import { ChevronDown, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { formatVnd } from '@repo/shared';
 import { cn } from '@/lib/utils';
 import type { MockProduct } from '../data/mockProducts';
 import { ProductSearchInput } from './ProductSearchInput';
@@ -60,10 +61,6 @@ export const materialKeys: Record<string, string> = {
 /** Tra ngược khóa URL (red, silk…) → giá trị gốc ('Đỏ', 'Lụa Tơ Tằm'…) */
 export const fromKey = (keys: Record<string, string>, key?: string) =>
   key ? Object.keys(keys).find((name) => keys[name] === key) : undefined;
-
-export function formatPrice(value: number, locale: string) {
-  return new Intl.NumberFormat(locale === 'vi' ? 'vi-VN' : 'en-US').format(value);
-}
 
 // Collection match helper
 export const matchCollection = (product: MockProduct, colId: string) => {
@@ -207,7 +204,7 @@ export function ActiveFilters({
       ? [
           {
             key: 'price',
-            label: t('priceUpTo', { max: formatPrice(priceLimit, locale) }),
+            label: t('priceUpTo', { max: formatVnd(priceLimit, locale) }),
             onRemove: () => {
               setPriceLimit(maxPrice);
               onFilterChange();
@@ -351,9 +348,9 @@ export function FilterGroups({
           className="mt-4 h-1 w-full cursor-pointer accent-[var(--primary-color)]"
         />
         <p className="mt-2 flex justify-between text-xs text-[var(--text-light)]">
-          <span>{formatPrice(minPrice, locale)}đ</span>
+          <span>{formatVnd(minPrice, locale)}</span>
           <span className="font-semibold text-[var(--text-main)]">
-            {priceLimit < maxPrice ? t('priceUpTo', { max: formatPrice(priceLimit, locale) }) : t('priceAll')}
+            {priceLimit < maxPrice ? t('priceUpTo', { max: formatVnd(priceLimit, locale) }) : t('priceAll')}
           </span>
         </p>
       </FilterSection>

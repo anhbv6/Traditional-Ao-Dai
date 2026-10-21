@@ -5,7 +5,6 @@ import Image from 'next/image';
 import useEmblaCarousel from 'embla-carousel-react';
 import { useInView } from 'motion/react';
 import { useTranslations } from 'next-intl';
-import { SliderNav } from '@/components/shared/SliderNav';
 import { cn } from '@/lib/utils';
 
 /**
@@ -21,8 +20,6 @@ const HERO_SLIDES = [
 
 /** Thời gian dừng ở mỗi ảnh trước khi tự trượt */
 const AUTOPLAY_MS = 6000;
-
-const pad = (value: number) => String(value).padStart(2, '0');
 
 /**
  * Slider ảnh cột phải của Hero: vuốt / kéo được, tự trượt, có nút Trước / Sau.
@@ -40,9 +37,7 @@ export function HeroSlider() {
   const isPlaying = isInView && !isHovering;
 
   const total = HERO_SLIDES.length;
-  const current = HERO_SLIDES[selectedIndex];
 
-  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
   const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
   useEffect(() => {
@@ -133,19 +128,6 @@ export function HeroSlider() {
           ))}
         </div>
       </div>
-
-      {/* Thẻ chú thích đè mép trái — đổi theo ảnh đang chọn */}
-      {/* <div className="absolute -left-3 top-10 z-10 max-w-[230px] bg-[var(--bg-card)] px-5 py-4 shadow-[0_18px_40px_-20px_rgba(128,0,32,0.35)] sm:-left-10">
-        <p className="font-[family-name:var(--font-playfair)] text-xs text-[var(--text-light)]">
-          <span className="text-base font-semibold text-[var(--primary-ink)]">{pad(selectedIndex + 1)}</span> / {pad(total)}
-        </p>
-        <p key={current.key} className="mt-1 font-[family-name:var(--font-playfair)] text-sm italic leading-6 text-[var(--primary-ink)] animate-fade-in-soft">
-          {t(`${current.key}.caption`)}
-        </p>
-      </div> */}
-
-      {/* Nút Trước / Sau — đặt dưới góc phải, ngoài khung ảnh */}
-      {/* <SliderNav onPrev={scrollPrev} onNext={scrollNext} className="absolute -bottom-6 right-6 z-10 bg-[var(--bg-main)] sm:right-8" /> */}
     </div>
   );
 }

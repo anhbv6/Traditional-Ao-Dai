@@ -17,7 +17,7 @@
     "priceRange": "Price: {min}đ - {max}đ",
     "clearAll": "Clear all ({count})",
     "clear": "Clear",
-    "priceUpTo": "Up to {max}đ",
+    "priceUpTo": "Up to {max}",
     "clearSearch": "Clear search",
     "sheetDescription": "Narrow the list by collection, purchase type, colour, material and price.",
     "clearAllShort": "Clear all",

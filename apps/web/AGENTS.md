@@ -48,7 +48,7 @@
 - **Màu storefront:** dùng token trong `src/app/globals.css` (`var(--text-main)`, `var(--bg-card)`, `text-primary-ink`...), KHÔNG viết cứng hex — dark mode chỉ đổi biến gốc. Chữ thương hiệu dùng `--primary-ink`, nền/viền thương hiệu dùng `--primary-color`. Admin luôn sáng, màu theo `variables.md`.
 - **Khung & lề trang storefront:** dùng `Container` (`components/ui/container`, prop `spacing` = `page` | `section` | `none`, `width` = `default` | `narrow`) hoặc `containerClassName()` cho motion/Reveal/phần tử cần `ref`. KHÔNG tự viết `max-w-[1440px] px-5 sm:px-8…`; giá trị lề/khoảng cách dọc chỉnh tại token `--page-max-width`, `--page-gutter`, `--page-y`, `--section-y` (mục 1b `globals.css`). Phần tử tràn mép dùng `-mx-(--page-gutter)`.
 - **Nút hành động storefront:** dùng `ActionButton` (`components/shared`) với `variant` = `confirm` | `dialog` | `cancel` | `disabled` | `custom` (+ `colors` để đổi màu, `loading`, `icon`, `size`); link chuyển trang dùng `ActionLink`. Màu mặc định cấu hình tại `VARIANT_COLORS` trong `ActionButton.tsx`. Server Component import trực tiếp `@/components/shared/ActionButton` (barrel `shared/index` chứa component client).
-- **Ô nhập storefront:** dùng `TextField` (`components/shared/TextField`) — mặc định kiểu gạch chân như màn Liên hệ; có `label`, `prefix`/`suffix`, `clearable`, `passwordToggle`, `copyable`, `loading`, `helperText`/`error`/`success`, `showCount`, `layout`, `appearance`, `mask` (currency/phone/card/date), `debounceMs`. Hàm mask thuần ở `lib/input-mask.ts`. `FormInput` cũ vẫn giữ cho các form auth/admin.
+- **Ô nhập storefront:** dùng `TextField` (`components/shared/TextField`) — mặc định kiểu gạch chân như màn Liên hệ; có `label`, `prefix`/`suffix`, `clearable`, `passwordToggle`, `copyable`, `loading`, `helperText`/`error`/`success`, `showCount`, `layout`, `appearance`, `mask` (currency/phone/card/date), `debounceMs`. Hàm mask thuần ở `lib/input-mask.ts`.
 - **shadcn/ui** (style: base-vega) — Thêm component mới qua CLI. Config tại `components.json`.
 - **Base UI (@base-ui/react)** — className dạng hàm dùng `resolveClassName()`.
 - `cn()` đã tích hợp `tailwind-merge`. **Icons:** lucide-react (primary) + react-icons.
@@ -67,7 +67,7 @@
 - Config: `src/i18n/request.ts` và `src/i18n/routing.ts`.
 
 # 10. Animations
-- **Motion 12** (import từ `motion/react`), **Lenis** (smooth scroll, tắt ở admin), **OGL** (WebGL), **Lottie** (`@lottiefiles/dotlottie-react`).
+- **Motion 12** (import từ `motion/react`), **Lenis** (smooth scroll, tắt ở admin), **embla-carousel** (carousel).
 
 # 11. Scripts & Lệnh
 - `pnpm --filter @repo/web dev` — Chạy Next.js dev server.

@@ -23,5 +23,3 @@ const measurementShape = Object.fromEntries(MEASUREMENT_FIELDS.map((field) => [f
 /** Số đo riêng — chỉ kiểm tra khi khách chọn "Tự nhập số đo" */
 export const measurementsSchema = z.object(measurementShape);
 export type MeasurementsInput = z.input<typeof measurementsSchema>;
-
-export const notesSchema = z.string().trim().max(BESPOKE_NOTES_MAX_LENGTH);

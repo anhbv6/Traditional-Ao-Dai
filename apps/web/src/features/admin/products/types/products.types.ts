@@ -15,8 +15,3 @@ export interface AdminProductItem {
   totalStock: number;
   createdAt: Date | string;
 }
-
-export interface CategoryOption {
-  id: string;
-  name: string;
-}

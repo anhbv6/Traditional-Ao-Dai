@@ -35,27 +35,3 @@ export async function getApprovalRequestsQuery(
     throw new Error("APPROVAL_LIST_FAILED");
   }
 }
-
-/**
- * Đọc chi tiết 1 yêu cầu phê duyệt theo ID
- */
-export async function getApprovalRequestByIdQuery(requestId: string): Promise<ApprovalRequestItem | null> {
-  try {
-    const request = await prisma.approvalRequest.findUnique({
-      where: { id: requestId },
-      include: {
-        requestedBy: {
-          select: { id: true, name: true, email: true },
-        },
-        reviewedBy: {
-          select: { id: true, name: true, email: true },
-        },
-      },
-    });
-
-    return request as ApprovalRequestItem | null;
-  } catch (error) {
-    console.error(`Lỗi khi query yêu cầu phê duyệt ${requestId}:`, error);
-    throw new Error("Không thể tải thông tin yêu cầu phê duyệt.");
-  }
-}

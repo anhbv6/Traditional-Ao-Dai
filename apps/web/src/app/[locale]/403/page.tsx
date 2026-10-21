@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { Container } from '@/components/ui/container';
 import { ForbiddenView } from '@/components/common/ForbiddenView';
+import { ClientMessages, CLIENT_NAMESPACES } from '@/i18n/ClientMessages';
 
 interface ForbiddenPageProps {
   params: Promise<{ locale: string }>;
@@ -20,10 +21,12 @@ export async function generateMetadata({ params }: ForbiddenPageProps): Promise<
  */
 export default function ForbiddenPage() {
   return (
-    <main className="grid min-h-svh place-items-center bg-[var(--bg-main)] font-[family-name:var(--font-lora)] text-[var(--text-main)]">
-      <Container as="section" spacing="none">
-        <ForbiddenView />
-      </Container>
-    </main>
+    <ClientMessages namespaces={CLIENT_NAMESPACES.forbidden}>
+      <main className="grid min-h-svh place-items-center bg-[var(--bg-main)] font-[family-name:var(--font-lora)] text-[var(--text-main)]">
+        <Container as="section" spacing="none">
+          <ForbiddenView />
+        </Container>
+      </main>
+    </ClientMessages>
   );
 }

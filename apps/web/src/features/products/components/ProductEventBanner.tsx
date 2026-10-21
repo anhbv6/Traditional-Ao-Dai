@@ -4,7 +4,7 @@ import { useState, useSyncExternalStore } from 'react';
 import Image from 'next/image';
 import { AnimatePresence, motion, useReducedMotion, type Variants } from 'motion/react';
 import { useTranslations } from 'next-intl';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { ActionLink } from '@/components/shared/ActionLink';
 import { ON_PRIMARY_COLORS } from '@/components/shared/ActionButton';
 import { cn } from '@/lib/utils';
@@ -180,27 +180,8 @@ export function ProductEventBanner() {
             );
           })}
         </ol>
-
-        {/* Nút trước / sau — góc dưới phải */}
-        {/* <div className="mt-6 flex items-end justify-end gap-2 lg:mt-0">
-          {[
-            { delta: -1, label: t('prev'), Icon: ArrowLeft },
-            { delta: 1, label: t('next'), Icon: ArrowRight },
-          ].map(({ delta, label, Icon }) => (
-            <button
-              key={delta}
-              type="button"
-              onClick={() => step(delta)}
-              aria-label={label}
-              className="grid size-10 cursor-pointer place-items-center border border-white/25 bg-black/10 text-white backdrop-blur-sm transition-colors duration-300 hover:border-white hover:bg-[var(--bg-card)] hover:text-[var(--text-main)]"
-            >
-              <Icon size={16} strokeWidth={1.6} />
-            </button>
-          ))}
-        </div> */}
       </div>
     </motion.section>
-
   );
 }
 

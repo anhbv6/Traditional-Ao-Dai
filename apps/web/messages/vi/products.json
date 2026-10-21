@@ -17,7 +17,7 @@
     "priceRange": "Giá: {min}đ - {max}đ",
     "clearAll": "Xóa tất cả ({count})",
     "clear": "Xóa",
-    "priceUpTo": "Đến {max}đ",
+    "priceUpTo": "Đến {max}",
     "clearSearch": "Xóa từ khóa",
     "sheetDescription": "Thu hẹp danh sách theo bộ sưu tập, hình thức mua, màu sắc, chất liệu và giá.",
     "clearAllShort": "Xóa tất cả",

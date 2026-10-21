@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { Container } from '@/components/ui/container';
 import { BespokeExperience } from '@/features/bespoke';
+import { ClientMessages, CLIENT_NAMESPACES } from '@/i18n/ClientMessages';
 
 interface CustomPageProps {
   params: Promise<{ locale: string }>;
@@ -21,8 +22,10 @@ export async function generateMetadata({ params }: CustomPageProps): Promise<Met
 /** May áo dài theo yêu cầu — tràn màn như Giỏ hàng / Thanh toán (cột tóm tắt bên phải) */
 export default function CustomPage() {
   return (
-    <Container as="section" width="full">
-      <BespokeExperience />
-    </Container>
+    <ClientMessages namespaces={CLIENT_NAMESPACES.custom}>
+      <Container as="section" width="full">
+        <BespokeExperience />
+      </Container>
+    </ClientMessages>
   );
 }

@@ -26,8 +26,6 @@ export interface LoginResponse {
   };
 }
 
-export type RefreshTokenResponse = LoginResponse;
-
 export interface MeResponse {
   status: string;
   statusCode: number;

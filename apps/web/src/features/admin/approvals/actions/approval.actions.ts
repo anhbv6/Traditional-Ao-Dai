@@ -3,8 +3,8 @@
 import { prisma } from "../../server/db.server";
 import { authorizeAdminAction } from "../../server/adminAuth.server";
 import { ADMIN_ACTION_ACCESS, canAccess } from "../../session/permissions";
-import { type ApprovalStatus, type Prisma } from "@repo/db";
-import { type CreateApprovalInput, type ReviewApprovalInput } from "../types/approval.types";
+import { type ApprovalStatus } from "@repo/db";
+import { type ReviewApprovalInput } from "../types/approval.types";
 import { getApprovalRequestsQuery } from "../queries/approval.queries";
 
 /**
@@ -27,43 +27,6 @@ export async function getApprovalRequestsAction(statusFilter?: ApprovalStatus) {
     return {
       success: false,
       error: "APPROVAL_LIST_FAILED",
-    };
-  }
-}
-
-/**
- * Server Action: Nhân viên tạo yêu cầu gửi lên Admin phê duyệt
- */
-export async function createApprovalRequestAction(input: CreateApprovalInput) {
-  const auth = await authorizeAdminAction();
-  if (!auth.success) return auth;
-
-  try {
-    const request = await prisma.approvalRequest.create({
-      data: {
-        actionType: input.actionType,
-        description: input.description,
-        payload: input.payload as Prisma.InputJsonValue,
-        status: "PENDING",
-        // Luôn lấy người gửi từ phiên đăng nhập, không tin giá trị client gửi lên
-        requestedById: auth.user.id,
-      },
-      include: {
-        requestedBy: {
-          select: { id: true, name: true, email: true },
-        },
-      },
-    });
-
-    return {
-      success: true,
-      data: request,
-    };
-  } catch (error) {
-    console.error("Lỗi Action createApprovalRequestAction:", error);
-    return {
-      success: false,
-      error: "APPROVAL_CREATE_FAILED",
     };
   }
 }

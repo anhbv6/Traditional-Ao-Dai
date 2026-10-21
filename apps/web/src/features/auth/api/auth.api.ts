@@ -1,7 +1,6 @@
 import { apiClient } from '@/lib/api-client';
 import {
   LoginResponse,
-  RefreshTokenResponse,
   MeResponse,
   OtpSendResponse,
 } from '../types/auth.types';
@@ -15,13 +14,6 @@ export const loginApi = async (data: {
   rememberMe: boolean;
 }): Promise<LoginResponse> => {
   return apiClient.post<LoginResponse>('/api/auth/login', data, { skipAuth: true, retryOnUnauthorized: false });
-};
-
-export const refreshTokenApi = async (): Promise<RefreshTokenResponse> => {
-  return apiClient.post<RefreshTokenResponse>('/api/auth/refresh-token', {}, {
-    skipAuth: true,
-    retryOnUnauthorized: false,
-  });
 };
 
 /**

@@ -3,6 +3,7 @@
 import React, { useRef } from "react";
 import { MotionConfig } from "motion/react";
 import { type MockArticle } from "../types/news.types";
+import { type ArticleCategoryKey, type ArticleContent } from "../data/articleContent";
 import { useNewsDetail } from "../hooks/useNewsDetail";
 import { useArticleEngagement } from "../hooks/useArticleEngagement";
 import { NewsHeader } from "./detail/NewsHeader";
@@ -22,6 +23,9 @@ interface NewsDetailProps {
   /** Bài mới hơn / cũ hơn trong danh sách */
   previousArticle: MockArticle | null;
   nextArticle: MockArticle | null;
+  /** Thân bài đã dựng sẵn ở server theo ngôn ngữ hiện tại (getArticleContent) */
+  content: ArticleContent;
+  categoryKey: ArticleCategoryKey;
 }
 
 /**
@@ -30,8 +34,8 @@ interface NewsDetailProps {
  * - Giữa: đầu bài → thân bài → lời kêu gọi → đánh giá & bình luận (chung một khối) → bài trước / sau.
  * - Phải (lg+): bài viết liên quan (không khung), ghim khi cuộn. Trên mobile xếp xuống cuối trang.
  */
-export function NewsDetail({ article, similarArticles, previousArticle, nextArticle }: NewsDetailProps) {
-  const { loc, categoryKey, authorName, fullDate, content } = useNewsDetail(article);
+export function NewsDetail({ article, similarArticles, previousArticle, nextArticle, content, categoryKey }: NewsDetailProps) {
+  const { loc, authorName, fullDate } = useNewsDetail(article);
   const engagement = useArticleEngagement(article.id);
   const bodyRef = useRef<HTMLDivElement>(null);
   const title = article.title[loc];

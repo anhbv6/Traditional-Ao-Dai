@@ -277,21 +277,3 @@ export function notifySuccess(keyOrMessage: string, fallback?: string, t?: Trans
   showToast.success(message);
   return message;
 }
-
-/**
- * Hook tiện ích cho component đã có hàm `t`
- */
-export function useErrorMessage(t?: Translator) {
-  const showError = (err: unknown, fallback?: string) => notifyError(err, fallback, t);
-  const getError = (err: unknown, fallback?: string) => resolveErrorMessage(err, fallback, t);
-  const showSuccess = (keyOrMessage: string, fallback?: string) => notifySuccess(keyOrMessage, fallback, t);
-
-  return {
-    notifyError: showError,
-    showError,
-    getError,
-    resolveErrorMessage: getError,
-    notifySuccess: showSuccess,
-    showSuccess,
-  };
-}

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { AboutExperience } from '@/features/about';
+import { ClientMessages, CLIENT_NAMESPACES } from '@/i18n/ClientMessages';
 
 interface AboutPageProps {
   params: Promise<{ locale: string }>;
@@ -23,5 +24,9 @@ export async function generateMetadata({ params }: AboutPageProps): Promise<Meta
 
 /** Trang cấp 1 (ngay dưới trang chủ) — không cần breadcrumb, hero bắt đầu ngay dưới header */
 export default function AboutPage() {
-  return <AboutExperience />;
+  return (
+    <ClientMessages namespaces={CLIENT_NAMESPACES.about}>
+      <AboutExperience />
+    </ClientMessages>
+  );
 }

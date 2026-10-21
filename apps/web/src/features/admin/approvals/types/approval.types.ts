@@ -1,18 +1,5 @@
 import { type ApprovalStatus } from "@repo/db";
 
-export type ApprovalActionType =
-  | "CANCEL_ORDER"
-  | "SPECIAL_DISCOUNT"
-  | "PRICE_OVERRIDE"
-  | "REFUND";
-
-export interface CreateApprovalInput {
-  actionType: ApprovalActionType;
-  description: string;
-  payload: Record<string, unknown>;
-  requestedById: string;
-}
-
 export interface ReviewApprovalInput {
   requestId: string;
   status: "APPROVED" | "REJECTED";

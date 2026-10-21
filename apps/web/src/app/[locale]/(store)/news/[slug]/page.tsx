@@ -3,7 +3,8 @@ import { notFound } from 'next/navigation';
 
 import { Container } from '@/components/ui/container';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
-import { mockArticles, NewsDetail } from '@/features/news';
+import { getArticleCategoryKey, getArticleContent, mockArticles, NewsDetail } from '@/features/news';
+import { ClientMessages, CLIENT_NAMESPACES } from '@/i18n/ClientMessages';
 
 type NewsDetailPageProps = {
   params: Promise<{
@@ -54,19 +55,26 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
   ].slice(0, SIMILAR_LIMIT);
 
   const loc = locale === 'en' ? 'en' : 'vi';
+  // Dựng thân bài ở server -> client chỉ nhận nội dung của đúng bài này
+  const categoryKey = getArticleCategoryKey(article.category.en);
+  const content = getArticleContent(categoryKey, article.description[loc], loc);
 
   return (
-    <Container as="article" width="full">
-      <Breadcrumbs lastLabel={article.title[loc]} />
-      <div className="mt-6 sm:mt-8">
-        <NewsDetail
-          key={article.id}
-          article={article}
-          similarArticles={similarArticles}
-          previousArticle={previousArticle}
-          nextArticle={nextArticle}
-        />
-      </div>
-    </Container>
+    <ClientMessages namespaces={CLIENT_NAMESPACES.newsDetail}>
+      <Container as="article" width="full">
+        <Breadcrumbs lastLabel={article.title[loc]} />
+        <div className="mt-6 sm:mt-8">
+          <NewsDetail
+            key={article.id}
+            article={article}
+            similarArticles={similarArticles}
+            previousArticle={previousArticle}
+            nextArticle={nextArticle}
+            content={content}
+            categoryKey={categoryKey}
+          />
+        </div>
+      </Container>
+    </ClientMessages>
   );
 }

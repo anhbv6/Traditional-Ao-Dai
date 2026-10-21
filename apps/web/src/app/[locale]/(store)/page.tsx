@@ -13,6 +13,7 @@ import {
   PromoteFeedBack,
   ArticleNews,
 } from "@/features/home";
+import { ClientMessages, CLIENT_NAMESPACES } from "@/i18n/ClientMessages";
 
 /**
  * Trình tự màn home theo mạch kể chuyện:
@@ -24,7 +25,7 @@ export default async function Home() {
   const t = await getTranslations('HomePage');
 
   return (
-    <>
+    <ClientMessages namespaces={CLIENT_NAMESPACES.home}>
       <HomeStage id="hero">
         <HeroBanner
           eyebrow={t('hero.eyebrow')}
@@ -61,6 +62,6 @@ export default async function Home() {
         <ArticleNews />
       </HomeStage>
       <HomeStageNav />
-    </>
+    </ClientMessages>
   );
 }
