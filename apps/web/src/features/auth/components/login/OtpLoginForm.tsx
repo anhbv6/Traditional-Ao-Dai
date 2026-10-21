@@ -2,8 +2,8 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { ActionButton } from '@/components/shared/ActionButton';
 import { TextField } from '@/components/shared/TextField';
-import { AuthOtpField } from '../../AuthOtpField';
-import { AUTH_FIELD_PROPS, sanitizePhoneChange } from '../../authField';
+import { AuthOtpField } from '../AuthOtpField';
+import { AUTH_FIELD_PROPS, sanitizePhoneChange } from '../authField';
 
 interface OtpLoginFormProps {
   phone: string;

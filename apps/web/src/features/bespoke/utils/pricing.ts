@@ -7,7 +7,7 @@ import {
   RUSH_RATE,
   STYLES,
   type BespokeConfig,
-} from "../data/bespokeOptions";
+} from "../constants/bespokeOptions";
 
 export interface BespokeQuote {
   basePrice: number;

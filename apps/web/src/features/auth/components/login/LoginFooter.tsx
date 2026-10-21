@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from '@/i18n/routing';
 import { motion } from 'motion/react';
-import { authItemVariants } from '../../AuthFormShell';
+import { authItemVariants } from '../AuthFormShell';
 
 interface LoginFooterProps {
   t: (key: string) => string;

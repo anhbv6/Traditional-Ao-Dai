@@ -2,8 +2,8 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import { useRegister } from '../../hooks/useRegister';
-import { RegisterFormStep } from './components/RegisterFormStep';
-import { RegisterOtpStep } from './components/RegisterOtpStep';
+import { RegisterFormStep } from './RegisterFormStep';
+import { RegisterOtpStep } from './RegisterOtpStep';
 import { AuthFormShell, authItemVariants } from '../AuthFormShell';
 
 import { Volume2, VolumeOff } from 'lucide-react';

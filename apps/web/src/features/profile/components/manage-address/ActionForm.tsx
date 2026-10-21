@@ -9,7 +9,7 @@ import { ActionButton } from "@/components/shared/ActionButton";
 import { AppDialog } from "@/components/shared/AppDialog";
 import { SelectField } from "@/components/shared/SelectField";
 import { TextField } from "@/components/shared/TextField";
-import { useAddressForm, useVietnamAddress } from "../../../hooks/useProfile";
+import { useAddressForm, useVietnamAddress } from "../../hooks/useProfile";
 
 const FORM_ID = "address-action-form";
 

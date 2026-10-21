@@ -2,7 +2,7 @@ import React from 'react';
 import { Key, Smartphone } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'motion/react';
-import { authItemVariants } from '../../AuthFormShell';
+import { authItemVariants } from '../AuthFormShell';
 
 interface LoginTabsProps {
   isOtpMode: boolean;

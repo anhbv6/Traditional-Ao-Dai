@@ -16,7 +16,7 @@ import {
   STYLE_IMAGES,
   type BespokeConfig,
   type Occasion,
-} from "../data/bespokeOptions";
+} from "../constants/bespokeOptions";
 import { quoteBespoke } from "../utils/pricing";
 import { measurementsSchema, type MeasurementsInput } from "../validations/bespoke.validation";
 

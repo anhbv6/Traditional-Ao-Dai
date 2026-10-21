@@ -2,7 +2,7 @@
 
 import React, { useId } from "react";
 import { motion } from "motion/react";
-import { COLORS, type BespokeConfig } from "../data/bespokeOptions";
+import { COLORS, type BespokeConfig } from "../constants/bespokeOptions";
 
 /**
  * Đổi dáng (tay, tà, ống quần) bằng CSS `transition: d` — trình duyệt hỗ trợ thì hình "biến" mượt, không hỗ trợ thì đổi ngay.

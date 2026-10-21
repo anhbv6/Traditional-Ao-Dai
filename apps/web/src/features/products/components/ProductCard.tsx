@@ -12,13 +12,8 @@ import { flyToCart } from '../utils/flyToCart';
 import { AppTooltip } from '@/components/shared/AppTooltip';
 import { HeartToggle } from './HeartToggle';
 import { SaleGlow } from './SaleGlow';
-import { materialKeys } from './FilterSidebar';
-
-export type ProductColorSwatch = {
-  name: string;
-  hex: string;
-  imageSrc?: string;
-};
+import { materialKeys } from '../constants/filters';
+import type { ProductColorSwatch } from '../types/products.types';
 
 /** Dùng chung cho Link ở tiêu đề và router.push khi bấm thẻ (kiểu của router hẹp hơn Link) */
 type ProductHref = Parameters<ReturnType<typeof useRouter>['push']>[0];

@@ -14,7 +14,7 @@ import { showToast } from '@/components/ui/toast';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Camera, PenLine } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { FilterChip } from '../FilterSidebar';
+import { FilterChip } from '../FilterChip';
 import { productReviews } from '../../data/productReviews';
 import { ReviewItem, reviewRatingStyles } from './ReviewItem';
 

@@ -8,7 +8,7 @@ import { Reveal } from "@/components/shared/Reveal";
 import { ClipReveal } from "./ClipReveal";
 import { cn } from "@/lib/utils";
 import { AboutHeading } from "./AboutHeading";
-import { atelierStories } from "../data/aboutContent";
+import { atelierStories } from "../constants/aboutContent";
 import { containerClassName } from "@/components/layout/Container";
 
 const METRIC_KEYS = ["checks", "years", "consulting"] as const;

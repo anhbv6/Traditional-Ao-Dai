@@ -4,9 +4,9 @@ import React, { useState } from 'react';
 import { useCountdown } from '../../hooks/useCountdown';
 
 // Sub-components
-import { EnterForgotForm } from './components/EnterForgotForm';
-import { VerifyOtpForm } from './components/VerifyOtpForm';
-import { ChangePasswordForm } from './components/ChangePasswordForm';
+import { EnterForgotForm } from './EnterForgotForm';
+import { VerifyOtpForm } from './VerifyOtpForm';
+import { ChangePasswordForm } from './ChangePasswordForm';
 
 type ForgotType = 'email' | 'phone';
 

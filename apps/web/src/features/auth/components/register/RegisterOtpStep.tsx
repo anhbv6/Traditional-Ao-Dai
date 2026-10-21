@@ -1,12 +1,12 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { ShieldCheck } from 'lucide-react';
-import { AuthHeader } from '../../AuthHeader';
-import { authItemVariants } from '../../AuthFormShell';
-import { AuthSubmitButton } from '../../AuthSubmitButton';
-import { AuthBackAction } from '../../AuthBackAction';
-import { AuthResendRow } from '../../AuthResendRow';
-import { AuthOtpField } from '../../AuthOtpField';
+import { AuthHeader } from '../AuthHeader';
+import { authItemVariants } from '../AuthFormShell';
+import { AuthSubmitButton } from '../AuthSubmitButton';
+import { AuthBackAction } from '../AuthBackAction';
+import { AuthResendRow } from '../AuthResendRow';
+import { AuthOtpField } from '../AuthOtpField';
 
 export interface RegisterOtpStepProps {
   phoneValue: string;

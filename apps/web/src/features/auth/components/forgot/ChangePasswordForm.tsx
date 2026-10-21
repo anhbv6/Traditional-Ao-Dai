@@ -8,14 +8,14 @@ import { CheckCircle2, ArrowRight, KeyRound, ShieldAlert } from 'lucide-react';
 import { ActionLink } from '@/components/shared/ActionLink';
 import { TextField } from '@/components/shared/TextField';
 import { notifyError, notifySuccess } from '@/lib/messages';
-import { resetPasswordEmailApi, resetPasswordPhoneApi } from '../../../api/forgot.api';
+import { resetPasswordEmailApi, resetPasswordPhoneApi } from '../../api/forgot.api';
 
 // Shared Components
-import { AuthHeader } from '../../AuthHeader';
-import { AuthFormShell, authItemVariants } from '../../AuthFormShell';
-import { AuthSubmitButton } from '../../AuthSubmitButton';
-import { AuthBackAction } from '../../AuthBackAction';
-import { AUTH_FIELD_PROPS } from '../../authField';
+import { AuthHeader } from '../AuthHeader';
+import { AuthFormShell, authItemVariants } from '../AuthFormShell';
+import { AuthSubmitButton } from '../AuthSubmitButton';
+import { AuthBackAction } from '../AuthBackAction';
+import { AUTH_FIELD_PROPS } from '../authField';
 
 type ChangePasswordFormProps = {
   forgotType?: 'email' | 'phone';

@@ -2,7 +2,7 @@ import { useTranslations } from 'next-intl';
 import { ArrowUpRight } from 'lucide-react';
 import { Reveal } from '@/components/shared/Reveal';
 import { SectionIntro } from '@/components/shared/SectionIntro';
-import { CONTACT_MAP } from '../data/contact.data';
+import { CONTACT_MAP } from '../constants/contactInfo';
 
 /**
  * Dải nền đỏ thẫm (cùng tông với hero/CTA trang Câu chuyện): bản đồ một bên,

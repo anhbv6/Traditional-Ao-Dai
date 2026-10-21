@@ -9,7 +9,8 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { cn } from "@/lib/utils";
 import { useManageAddress } from "../../hooks/useProfile";
 import { ProfileSection } from "../ProfileSection";
-import { ActionForm, DeleteForm } from "./components";
+import { ActionForm } from "./ActionForm";
+import { DeleteForm } from "./DeleteForm";
 
 /** Backend giới hạn mỗi tài khoản 10 địa chỉ (MAX_ADDRESS_LIMIT_REACHED) */
 const MAX_ADDRESSES = 10;

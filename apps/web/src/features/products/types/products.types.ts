@@ -13,6 +13,13 @@ export type { Locale };
  * `?category=wedding&type=custom&color=red&material=silk&maxPrice=2000000`.
  * Màn khác muốn mở sẵn bộ lọc nào thì gắn tham số tương ứng — nhóm lọc đó sẽ tự mở.
  */
+/** Ô màu trên thẻ sản phẩm (bấm để đổi ảnh theo màu) */
+export type ProductColorSwatch = {
+  name: string;
+  hex: string;
+  imageSrc?: string;
+};
+
 export interface ProductFilterParams {
   /** Bộ sưu tập — id trong `collectionOptions` (wedding, modern, silk…) */
   category?: string;

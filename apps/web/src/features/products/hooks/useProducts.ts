@@ -14,7 +14,7 @@ import {
   minPrice,
   matchCollection,
   purchaseOptions,
-} from "../components/FilterSidebar";
+} from "../constants/filters";
 import { scoreProduct } from "../utils/search";
 
 const pageSizeMap: Record<GridSize, number> = {

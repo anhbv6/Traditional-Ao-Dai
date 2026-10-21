@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl";
 import { formatVnd, type Locale } from "@repo/shared";
 import { Link } from "@/i18n/routing";
 import { ActionButton } from "@/components/shared/ActionButton";
-import { type BespokeConfig } from "../data/bespokeOptions";
+import { type BespokeConfig } from "../constants/bespokeOptions";
 import { type BespokeQuote } from "../utils/pricing";
 import { AoDaiPreview } from "./AoDaiPreview";
 

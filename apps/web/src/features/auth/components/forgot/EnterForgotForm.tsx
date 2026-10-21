@@ -9,15 +9,15 @@ import { ActionButton } from '@/components/shared/ActionButton';
 import { TextField } from '@/components/shared/TextField';
 import { showToast } from '@/components/ui/toast';
 import { notifyError } from '@/lib/messages';
-import { forgotPasswordEmailApi } from '../../../api/forgot.api';
-import { sendOtpApi } from '../../../api/auth.api';
+import { forgotPasswordEmailApi } from '../../api/forgot.api';
+import { sendOtpApi } from '../../api/auth.api';
 
 // Shared Components
-import { AuthHeader } from '../../AuthHeader';
-import { AuthFormShell, authItemVariants } from '../../AuthFormShell';
-import { AuthSubmitButton } from '../../AuthSubmitButton';
-import { AuthBackAction } from '../../AuthBackAction';
-import { AUTH_FIELD_PROPS } from '../../authField';
+import { AuthHeader } from '../AuthHeader';
+import { AuthFormShell, authItemVariants } from '../AuthFormShell';
+import { AuthSubmitButton } from '../AuthSubmitButton';
+import { AuthBackAction } from '../AuthBackAction';
+import { AUTH_FIELD_PROPS } from '../authField';
 
 type EnterForgotFormProps = {
   defaultIdentifier?: string;

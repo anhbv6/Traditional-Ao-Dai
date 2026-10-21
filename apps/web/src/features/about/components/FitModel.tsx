@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import { ClipReveal } from "./ClipReveal";
 import { AboutHeading } from "./AboutHeading";
 import { type FitProfile } from "../types/about.types";
-import { fitProfiles } from "../data/aboutContent";
+import { fitProfiles } from "../constants/aboutContent";
 import { containerClassName } from "@/components/layout/Container";
 
 const STAT_KEYS: Record<FitProfile["id"], readonly string[]> = {

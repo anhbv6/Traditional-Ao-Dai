@@ -28,7 +28,7 @@ import {
   STANDARD_SIZES,
   STYLES,
   TIMELINES,
-} from "../data/bespokeOptions";
+} from "../constants/bespokeOptions";
 import { quoteBespoke } from "../utils/pricing";
 import { MEASUREMENTS_SECTION_ID, useBespoke } from "../hooks/useBespoke";
 import { BESPOKE_NOTES_MAX_LENGTH } from "../validations/bespoke.validation";

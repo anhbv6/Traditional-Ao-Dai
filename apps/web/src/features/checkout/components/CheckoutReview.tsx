@@ -5,7 +5,7 @@ import { ArrowLeft, Check, Info, PenLine } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { ActionButton } from "@/components/shared/ActionButton";
 import { TextField } from "@/components/shared/TextField";
-import { BANK_ACCOUNT, buildTransferContent } from "../data/bankAccount";
+import { BANK_ACCOUNT, buildTransferContent } from "../constants/bankAccount";
 import { type CheckoutStep, type PaymentMethod, type ShippingData } from "../types/checkout.types";
 import { StepPanel } from "@/components/shared/StepPanel";
 

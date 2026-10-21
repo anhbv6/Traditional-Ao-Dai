@@ -5,16 +5,16 @@ import { useTranslations } from 'next-intl';
 import { motion } from 'motion/react';
 import { ShieldCheck } from 'lucide-react';
 import { notifyError, notifySuccess } from '@/lib/messages';
-import { forgotPasswordEmailApi, verifyResetPasswordEmailApi, verifyResetPasswordPhoneApi } from '../../../api/forgot.api';
-import { sendOtpApi } from '../../../api/auth.api';
+import { forgotPasswordEmailApi, verifyResetPasswordEmailApi, verifyResetPasswordPhoneApi } from '../../api/forgot.api';
+import { sendOtpApi } from '../../api/auth.api';
 
 // Shared Components
-import { AuthHeader } from '../../AuthHeader';
-import { AuthFormShell, authItemVariants } from '../../AuthFormShell';
-import { AuthSubmitButton } from '../../AuthSubmitButton';
-import { AuthBackAction } from '../../AuthBackAction';
-import { AuthResendRow } from '../../AuthResendRow';
-import { AuthOtpField } from '../../AuthOtpField';
+import { AuthHeader } from '../AuthHeader';
+import { AuthFormShell, authItemVariants } from '../AuthFormShell';
+import { AuthSubmitButton } from '../AuthSubmitButton';
+import { AuthBackAction } from '../AuthBackAction';
+import { AuthResendRow } from '../AuthResendRow';
+import { AuthOtpField } from '../AuthOtpField';
 
 type VerifyOtpFormProps = {
   forgotType: 'email' | 'phone';

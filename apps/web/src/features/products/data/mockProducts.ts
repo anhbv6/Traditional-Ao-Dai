@@ -1,4 +1,4 @@
-import type { ProductColorSwatch } from '../components/ProductCard';
+import type { ProductColorSwatch } from '../types/products.types';
 
 export interface MockProduct {
   id: string;

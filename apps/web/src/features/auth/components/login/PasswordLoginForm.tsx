@@ -1,6 +1,6 @@
 import React from 'react';
 import { TextField } from '@/components/shared/TextField';
-import { AUTH_FIELD_PROPS } from '../../authField';
+import { AUTH_FIELD_PROPS } from '../authField';
 
 interface PasswordLoginFormProps {
   emailOrPhone: string;

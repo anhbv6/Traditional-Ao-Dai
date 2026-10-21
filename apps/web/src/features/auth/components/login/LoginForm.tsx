@@ -14,12 +14,12 @@ import { AuthFormShell, authItemVariants } from '../AuthFormShell';
 import { AuthSubmitButton } from '../AuthSubmitButton';
 
 // Sub-components
-import { LoginTabs } from './components/LoginTabs';
-import { PasswordLoginForm } from './components/PasswordLoginForm';
-import { OtpLoginForm } from './components/OtpLoginForm';
-import { LoginRememberForgot } from './components/LoginRememberForgot';
-import { LoginSocial } from './components/LoginSocial';
-import { LoginFooter } from './components/LoginFooter';
+import { LoginTabs } from './LoginTabs';
+import { PasswordLoginForm } from './PasswordLoginForm';
+import { OtpLoginForm } from './OtpLoginForm';
+import { LoginRememberForgot } from './LoginRememberForgot';
+import { LoginSocial } from './LoginSocial';
+import { LoginFooter } from './LoginFooter';
 
 export function LoginForm() {
   const t = useTranslations('Auth');

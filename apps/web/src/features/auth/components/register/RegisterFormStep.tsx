@@ -7,11 +7,11 @@ import { Link } from '@/i18n/routing';
 import { TextField } from '@/components/shared/TextField';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
-import type { RegisterFormData } from '../../../types/register.types';
-import { AuthHeader } from '../../AuthHeader';
-import { AuthSubmitButton } from '../../AuthSubmitButton';
-import { LoginSocial } from '../../login/components/LoginSocial';
-import { AUTH_FIELD_PROPS, sanitizePhoneChange } from '../../authField';
+import type { RegisterFormData } from '../../types/register.types';
+import { AuthHeader } from '../AuthHeader';
+import { AuthSubmitButton } from '../AuthSubmitButton';
+import { LoginSocial } from '../login/LoginSocial';
+import { AUTH_FIELD_PROPS, sanitizePhoneChange } from '../authField';
 
 /** Kết quả kiểm tra email / SĐT đã tồn tại hay chưa */
 function CheckStatus({ result }: { result: 'available' | 'taken' | null }) {

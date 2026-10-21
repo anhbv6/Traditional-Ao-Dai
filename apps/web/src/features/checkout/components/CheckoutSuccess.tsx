@@ -9,7 +9,7 @@ import { Link } from "@/i18n/routing";
 import { ActionLink } from "@/components/shared/ActionLink";
 import { SectionOrnament } from "@/components/shared/SectionOrnament";
 import { TextField } from "@/components/shared/TextField";
-import { BANK_ACCOUNT, buildTransferContent } from "../data/bankAccount";
+import { BANK_ACCOUNT, buildTransferContent } from "../constants/bankAccount";
 import { type PlacedOrder } from "../types/checkout.types";
 
 const EASE = [0.22, 1, 0.36, 1] as const;

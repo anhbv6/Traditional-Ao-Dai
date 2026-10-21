@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { MEASUREMENT_FIELDS, type MeasurementId } from "../data/bespokeOptions";
+import { MEASUREMENT_FIELDS, type MeasurementId } from "../constants/bespokeOptions";
 
 /** Ghi chú cho thợ may (ký tự) — đồng bộ maxLength của ô nhập */
 export const BESPOKE_NOTES_MAX_LENGTH = 400;

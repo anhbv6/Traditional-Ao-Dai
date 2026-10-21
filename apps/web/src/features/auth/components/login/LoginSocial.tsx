@@ -1,7 +1,7 @@
 import React from 'react';
 import { showToast } from '@/components/ui/toast';
-import { GoogleAuthButton } from '../../GoogleAuthButton';
-import { AuthDivider } from '../../AuthDivider';
+import { GoogleAuthButton } from '../GoogleAuthButton';
+import { AuthDivider } from '../AuthDivider';
 
 interface LoginSocialProps {
   isLoading: boolean;

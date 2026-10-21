@@ -2,7 +2,7 @@ import { useTranslations } from 'next-intl';
 import { Container } from '@/components/layout/Container';
 import { PageIntro } from '@/components/shared/PageIntro';
 import { Reveal } from '@/components/shared/Reveal';
-import { CONTACT_CHANNELS } from '../data/contact.data';
+import { CONTACT_CHANNELS } from '../constants/contactInfo';
 import { ContactInfoItem } from './ContactInfoItem';
 
 /**
