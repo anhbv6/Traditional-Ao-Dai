@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { VIETNAM_PHONE_REGEX } from '@repo/shared';
+import { VIETNAM_PHONE_REGEX } from '@repo/shared/validation';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/routing';
 import { loginApi, sendOtpApi, loginWithOtpApi, loginWithGoogleApi } from '../api/auth.api';

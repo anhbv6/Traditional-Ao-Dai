@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { vietnamPhoneSchema } from '@repo/shared'
+import { vietnamPhoneSchema } from '@repo/shared/validation'
 
 export const sendOtpSchema = z.object({
   body: z.object({

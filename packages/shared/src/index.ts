@@ -6,9 +6,9 @@
  * - Giữ dạng 1 file entry, KHÔNG import tương đối giữa các file (Node chạy thẳng file .ts bằng type-stripping,
  *   cần đuôi .ts cho import tương đối — xung đột với tsc của API). Nếu cần tách, dùng `exports` map trong package.json.
  * - Không dùng `enum` / `namespace` (không tương thích type-stripping) — dùng `as const` + union type.
- * - Thông điệp lỗi của Zod schema luôn là MÃ KEY viết hoa (FE tra bản dịch trong messages/<locale>/errors.json).
+ * - Validator Zod nằm ở `@repo/shared/validation` (src/validation.ts) — entry này KHÔNG import zod để trang không validate
+ *   không phải tải zod xuống trình duyệt.
  */
-import { z } from 'zod'
 
 // ─── Locale ────────────────────────────────────────────────────────────────────
 
@@ -111,24 +111,7 @@ export interface UserDto {
   socialAccounts?: SocialAccountDto[]
 }
 
-// ─── Validation ────────────────────────────────────────────────────────────────
-
-export const VIETNAM_PHONE_REGEX = /^(0|\+84)[35789][0-9]{8}$/
-export const PASSWORD_MIN_LENGTH = 6
-/** bcrypt chỉ dùng 72 byte đầu */
-export const PASSWORD_MAX_LENGTH = 72
-export const VERIFICATION_CODE_LENGTH = 6
-
-export const vietnamPhoneSchema = z.string().trim().regex(VIETNAM_PHONE_REGEX, 'INVALID_PHONE_NUMBER')
-export const emailSchema = z.string().trim().email('EMAIL_INVALID')
-/** Dùng khi ĐẶT mật khẩu mới (đăng ký, đổi, đặt lại) */
-export const newPasswordSchema = z
-  .string()
-  .min(PASSWORD_MIN_LENGTH, 'PASSWORD_MIN_LENGTH')
-  .max(PASSWORD_MAX_LENGTH, 'PASSWORD_MAX_LENGTH')
-/** Dùng khi ĐĂNG NHẬP (không giới hạn trên để không chặn mật khẩu cũ) */
-export const loginPasswordSchema = z.string().min(PASSWORD_MIN_LENGTH, 'PASSWORD_MIN_LENGTH')
-export const verificationCodeSchema = z.string().regex(/^\d{6}$/, 'VERIFICATION_CODE_INVALID')
+// ─── Phone ─────────────────────────────────────────────────────────────────────
 
 /** Chuẩn hóa SĐT Việt Nam về dạng 0xxxxxxxxx */
 export function normalizeVietnamPhone(phone?: string | null): string | null | undefined {

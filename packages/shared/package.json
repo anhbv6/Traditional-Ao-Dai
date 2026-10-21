@@ -2,8 +2,20 @@
   "name": "@repo/shared",
   "version": "0.0.0",
   "private": true,
+  "sideEffects": false,
   "main": "./src/index.ts",
   "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./validation": "./src/validation.ts"
+  },
+  "typesVersions": {
+    "*": {
+      "validation": [
+        "./src/validation.ts"
+      ]
+    }
+  },
   "scripts": {
     "typecheck": "tsc --noEmit -p ."
   },

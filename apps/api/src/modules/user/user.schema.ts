@@ -5,7 +5,7 @@ import {
   newPasswordSchema,
   verificationCodeSchema,
   vietnamPhoneSchema as contactPhoneSchema,
-} from '@repo/shared'
+} from '@repo/shared/validation'
 
 /** SĐT người nhận hàng: dùng mã lỗi riêng để FE hiển thị đúng ngữ cảnh form địa chỉ */
 const vietnamPhoneSchema = z.string().trim().regex(VIETNAM_PHONE_REGEX, 'RECEIVER_PHONE_INVALID')

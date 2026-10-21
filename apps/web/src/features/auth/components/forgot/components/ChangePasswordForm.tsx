@@ -1,6 +1,6 @@
 'use client';
 
-import { newPasswordSchema } from '@repo/shared';
+import { newPasswordSchema } from '@repo/shared/validation';
 import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { motion } from 'motion/react';

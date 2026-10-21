@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Building2, Home, MapPin, Navigation, Phone, Save, Tag, UserRound } from "lucide-react";
-import { VIETNAM_PHONE_REGEX } from "@repo/shared";
+import { VIETNAM_PHONE_REGEX } from "@repo/shared/validation";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ActionButton } from "@/components/shared/ActionButton";
 import { AppDialog } from "@/components/shared/AppDialog";

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { VIETNAM_PHONE_REGEX } from '@repo/shared';
+import { VIETNAM_PHONE_REGEX } from '@repo/shared/validation';
 import { useTranslations } from 'next-intl';
 import { motion } from 'motion/react';
 import { ArrowRight, Send } from 'lucide-react';

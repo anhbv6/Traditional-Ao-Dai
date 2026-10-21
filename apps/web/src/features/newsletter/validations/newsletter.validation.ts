@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { emailSchema } from "@repo/shared";
+import { emailSchema } from "@repo/shared/validation";
 
 /**
  * Form đăng ký Newsletter / VIP Club — chỉ thu EMAIL (kênh gửi BST mới & mã giảm giá).

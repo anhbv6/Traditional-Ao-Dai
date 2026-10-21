@@ -2,7 +2,8 @@
 
 import bcrypt from "bcryptjs";
 import { z } from "zod";
-import { newPasswordSchema, normalizeVietnamPhone, vietnamPhoneSchema } from "@repo/shared";
+import { normalizeVietnamPhone } from "@repo/shared";
+import { newPasswordSchema, vietnamPhoneSchema } from "@repo/shared/validation";
 import { prisma } from "../../server/db.server";
 import {
   ADMIN_SESSION_USER_SELECT,

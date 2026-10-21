@@ -1,4 +1,4 @@
-import { VIETNAM_PHONE_REGEX } from '@repo/shared';
+import { VIETNAM_PHONE_REGEX } from '@repo/shared/validation';
 import * as z from 'zod';
 
 type RegisterTranslation = (key: string) => string;

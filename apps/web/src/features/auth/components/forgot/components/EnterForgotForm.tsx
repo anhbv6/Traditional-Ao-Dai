@@ -1,6 +1,6 @@
 'use client';
 
-import { emailSchema, vietnamPhoneSchema } from '@repo/shared';
+import { emailSchema, vietnamPhoneSchema } from '@repo/shared/validation';
 import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { motion } from 'motion/react';

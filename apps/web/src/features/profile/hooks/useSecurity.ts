@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { newPasswordSchema } from "@repo/shared";
+import { newPasswordSchema } from "@repo/shared/validation";
 import { useAuthStore, type AuthUser } from "@/features/auth";
 import { apiClient } from "@/lib/api-client";
 import { getErrorMessage, translateMessage } from "@/lib/messages";

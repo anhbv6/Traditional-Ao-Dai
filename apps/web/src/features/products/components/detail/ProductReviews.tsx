@@ -4,7 +4,7 @@ import { useState, type FormEvent } from 'react';
 import { useTranslations } from 'next-intl';
 import { Rating } from '@smastrom/react-rating';
 import '@smastrom/react-rating/style.css';
-import { emailSchema } from '@repo/shared';
+import { emailSchema } from '@repo/shared/validation';
 import { ActionButton } from '@/components/shared/ActionButton';
 import { AppDialog } from '@/components/shared/AppDialog';
 import { TextField } from '@/components/shared/TextField';

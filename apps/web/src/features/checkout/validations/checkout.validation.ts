@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { emailSchema, vietnamPhoneSchema } from "@repo/shared";
+import { emailSchema, vietnamPhoneSchema } from "@repo/shared/validation";
 
 /** Giới hạn ghi chú đơn hàng (ký tự) — đồng bộ maxLength của ô nhập */
 export const ORDER_NOTES_MAX_LENGTH = 500;

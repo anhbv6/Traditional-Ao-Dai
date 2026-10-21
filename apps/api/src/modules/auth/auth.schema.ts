@@ -5,7 +5,7 @@ import {
   newPasswordSchema,
   verificationCodeSchema,
   vietnamPhoneSchema,
-} from '@repo/shared'
+} from '@repo/shared/validation'
 
 // Mọi thông điệp lỗi là MÃ KEY viết hoa — FE dịch qua messages/<locale>/errors.json
 

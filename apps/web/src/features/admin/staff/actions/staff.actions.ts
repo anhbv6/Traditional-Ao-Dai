@@ -5,7 +5,8 @@ import { authorizeAdminAction } from "../../server/adminAuth.server";
 import { ADMIN_MODULE_ACCESS } from "../../session/permissions";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
-import { emailSchema, newPasswordSchema, normalizeVietnamPhone, vietnamPhoneSchema } from "@repo/shared";
+import { normalizeVietnamPhone } from "@repo/shared";
+import { emailSchema, newPasswordSchema, vietnamPhoneSchema } from "@repo/shared/validation";
 import { type CreateStaffInput, type StaffPermissionInput } from "../types/staff.types";
 import { getStaffListQuery } from "../queries/staff.queries";
 
