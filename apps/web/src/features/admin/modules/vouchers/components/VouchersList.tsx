@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useTransition } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { formatVnd, type Locale } from "@repo/shared";
 import { type AdminVoucherItem } from "../types/vouchers.types";
 import { toggleVoucherActiveAction } from "../actions/vouchers.actions";
 import {
@@ -19,6 +21,8 @@ interface VouchersListProps {
 }
 
 export function VouchersList({ initialVouchers }: VouchersListProps) {
+  const t = useTranslations("AdminPage.vouchers");
+  const locale = useLocale() as Locale;
   const [vouchers, setVouchers] = useState<AdminVoucherItem[]>(initialVouchers);
   const [searchTerm, setSearchTerm] = useState("");
   const [isPending, startTransition] = useTransition();
@@ -49,7 +53,7 @@ export function VouchersList({ initialVouchers }: VouchersListProps) {
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
           <input
             type="text"
-            placeholder="Tìm theo mã voucher, mô tả..."
+            placeholder={t("searchPlaceholder")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-9 pr-4 py-2 bg-zinc-50 border border-[#E4E4E7] rounded-lg text-sm focus:outline-none focus:border-zinc-900 transition-colors"
@@ -59,7 +63,7 @@ export function VouchersList({ initialVouchers }: VouchersListProps) {
         <button
           className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-[#18181B] hover:bg-[#09090B] text-white rounded-lg text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
         >
-          <Plus size={14} /> Tạo mã Voucher mới
+          <Plus size={14} /> {t("add")}
         </button>
       </div>
 
@@ -69,12 +73,12 @@ export function VouchersList({ initialVouchers }: VouchersListProps) {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-[#E4E4E7] bg-zinc-50/50 text-[11px] font-semibold text-[#71717A] uppercase tracking-wider">
-                <th className="py-3 px-4">Mã Voucher</th>
-                <th className="py-3 px-4">Mức giảm</th>
-                <th className="py-3 px-4">Đơn tối thiểu</th>
-                <th className="py-3 px-4">Đã dùng / Giới hạn</th>
-                <th className="py-3 px-4">Hiệu lực</th>
-                <th className="py-3 px-4">Trạng thái</th>
+                <th className="py-3 px-4">{t("colCode")}</th>
+                <th className="py-3 px-4">{t("colDiscount")}</th>
+                <th className="py-3 px-4">{t("colMinOrder")}</th>
+                <th className="py-3 px-4">{t("colUsage")}</th>
+                <th className="py-3 px-4">{t("colValidity")}</th>
+                <th className="py-3 px-4">{t("colStatus")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#E4E4E7] text-sm">
@@ -82,7 +86,7 @@ export function VouchersList({ initialVouchers }: VouchersListProps) {
                 <tr>
                   <td colSpan={6} className="py-12 text-center text-[#71717A]">
                     <Ticket className="mx-auto size-8 text-zinc-300 mb-2" />
-                    Chưa có mã giảm giá nào.
+                    {t("empty")}
                   </td>
                 </tr>
               ) : (
@@ -108,14 +112,14 @@ export function VouchersList({ initialVouchers }: VouchersListProps) {
                           </span>
                         ) : (
                           <span className="inline-flex items-center gap-1 text-emerald-700 font-mono">
-                            <DollarSign size={13} /> {voucher.value.toLocaleString("vi-VN")} ₫
+                            <DollarSign size={13} /> {formatVnd(voucher.value, locale)}
                           </span>
                         )}
                       </td>
                       <td className="py-3.5 px-4 font-mono text-xs text-zinc-700">
                         {voucher.minOrderValue
-                          ? `${voucher.minOrderValue.toLocaleString("vi-VN")} ₫`
-                          : "Không yêu cầu"}
+                          ? formatVnd(voucher.minOrderValue, locale)
+                          : t("noMinimum")}
                       </td>
                       <td className="py-3.5 px-4 font-mono text-xs text-zinc-800">
                         <span className="font-bold">{voucher.usedCount}</span>
@@ -129,7 +133,7 @@ export function VouchersList({ initialVouchers }: VouchersListProps) {
                         </div>
                         {isExpired && (
                           <span className="text-[10px] text-rose-600 font-semibold block mt-0.5">
-                            Đã hết hạn
+                            {t("expired")}
                           </span>
                         )}
                       </td>
@@ -145,11 +149,11 @@ export function VouchersList({ initialVouchers }: VouchersListProps) {
                         >
                           {voucher.isActive ? (
                             <>
-                              <CheckCircle size={12} /> Đang mở
+                              <CheckCircle size={12} /> {t("active")}
                             </>
                           ) : (
                             <>
-                              <XCircle size={12} /> Đang tắt
+                              <XCircle size={12} /> {t("inactive")}
                             </>
                           )}
                         </button>

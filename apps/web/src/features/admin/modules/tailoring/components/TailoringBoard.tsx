@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { type TailoringItemData, type TailoringStatus } from "../types/tailoring.types";
 import { updateTailoringStatusAction } from "../actions/tailoring.actions";
 import { useAdminSession } from "@/features/admin/core/session";
@@ -24,16 +25,18 @@ interface TailoringBoardProps {
   initialItems: TailoringItemData[];
 }
 
-const tailoringSteps: { status: TailoringStatus; label: string; icon: LucideIcon; color: string }[] = [
-  { status: "WAITING_FABRIC", label: "Chờ xuất vải", icon: Clock, color: "text-amber-600 bg-amber-50 border-amber-200" },
-  { status: "FABRIC_CUTTING", label: "Đang cắt rập", icon: Scissors, color: "text-blue-600 bg-blue-50 border-blue-200" },
-  { status: "SEWING", label: "May ráp tà & cổ", icon: Layers, color: "text-purple-600 bg-purple-50 border-purple-200" },
-  { status: "EMBROIDERY_BEADING", label: "Thêu & Đính kết", icon: Sparkles, color: "text-pink-600 bg-pink-50 border-pink-200" },
-  { status: "FITTING_IRONING", label: "Kiểm form & Ủi", icon: Ruler, color: "text-indigo-600 bg-indigo-50 border-indigo-200" },
-  { status: "COMPLETED", label: "Hoàn tất xưởng", icon: CheckCircle2, color: "text-emerald-600 bg-emerald-50 border-emerald-200" },
+const tailoringSteps: { status: TailoringStatus; icon: LucideIcon; color: string }[] = [
+  { status: "WAITING_FABRIC", icon: Clock, color: "text-amber-600 bg-amber-50 border-amber-200" },
+  { status: "FABRIC_CUTTING", icon: Scissors, color: "text-blue-600 bg-blue-50 border-blue-200" },
+  { status: "SEWING", icon: Layers, color: "text-purple-600 bg-purple-50 border-purple-200" },
+  { status: "EMBROIDERY_BEADING", icon: Sparkles, color: "text-pink-600 bg-pink-50 border-pink-200" },
+  { status: "FITTING_IRONING", icon: Ruler, color: "text-indigo-600 bg-indigo-50 border-indigo-200" },
+  { status: "COMPLETED", icon: CheckCircle2, color: "text-emerald-600 bg-emerald-50 border-emerald-200" },
 ];
 
 export function TailoringBoard({ initialItems }: TailoringBoardProps) {
+  const t = useTranslations("AdminPage.tailoring");
+  const tm = useTranslations("AdminPage.measurements");
   const [items, setItems] = useState<TailoringItemData[]>(initialItems);
   const [selectedItem, setSelectedItem] = useState<TailoringItemData | null>(null);
   const [filterStep, setFilterStep] = useState<string>("ALL");
@@ -80,7 +83,7 @@ export function TailoringBoard({ initialItems }: TailoringBoardProps) {
               : "bg-white text-zinc-600 border border-[#E4E4E7] hover:bg-zinc-50"
           }`}
         >
-          Tất cả công đoạn ({items.length})
+          {t("allStages", { count: items.length })}
         </button>
         {tailoringSteps.map((step) => {
           const count = items.filter((i) => i.tailoringStatus === step.status).length;
@@ -94,7 +97,7 @@ export function TailoringBoard({ initialItems }: TailoringBoardProps) {
                   : "bg-white text-zinc-600 border border-[#E4E4E7] hover:bg-zinc-50"
               }`}
             >
-              {step.label} ({count})
+              {t(`stage.${step.status}`)} ({count})
             </button>
           );
         })}
@@ -105,7 +108,7 @@ export function TailoringBoard({ initialItems }: TailoringBoardProps) {
         {filteredItems.length === 0 ? (
           <div className="col-span-full py-16 text-center bg-white rounded-xl border border-[#E4E4E7] text-[#71717A]">
             <Scissors className="mx-auto size-10 text-zinc-300 mb-2" />
-            Không có mẫu áo dài nào trong công đoạn này.
+            {t("empty")}
           </div>
         ) : (
           filteredItems.map((item) => {
@@ -134,7 +137,7 @@ export function TailoringBoard({ initialItems }: TailoringBoardProps) {
                       }`}
                     >
                       <StepIcon size={12} />
-                      {currentStepObj?.label || item.tailoringStatus}
+                      {currentStepObj ? t(`stage.${currentStepObj.status}`) : item.tailoringStatus}
                     </span>
                   </div>
 
@@ -153,7 +156,7 @@ export function TailoringBoard({ initialItems }: TailoringBoardProps) {
                   {/* Quick measurements preview */}
                   <div className="grid grid-cols-4 gap-1.5 bg-zinc-50 p-2.5 rounded-lg border border-[#E4E4E7] text-[11px] mb-3">
                     <div>
-                      <span className="text-zinc-400 block text-[9px]">Ngực</span>
+                      <span className="text-zinc-400 block text-[9px]">{tm("bustShort")}</span>
                       <span className="font-mono font-semibold text-zinc-800">{item.bust || "--"} cm</span>
                     </div>
                     <div>
@@ -161,20 +164,20 @@ export function TailoringBoard({ initialItems }: TailoringBoardProps) {
                       <span className="font-mono font-semibold text-zinc-800">{item.waist || "--"} cm</span>
                     </div>
                     <div>
-                      <span className="text-zinc-400 block text-[9px]">Mông</span>
+                      <span className="text-zinc-400 block text-[9px]">{tm("hipsShort")}</span>
                       <span className="font-mono font-semibold text-zinc-800">{item.hips || "--"} cm</span>
                     </div>
                     <div>
-                      <span className="text-zinc-400 block text-[9px]">Dài áo</span>
+                      <span className="text-zinc-400 block text-[9px]">{tm("shirtLength")}</span>
                       <span className="font-mono font-semibold text-zinc-800">{item.shirtLength || "--"} cm</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between pt-3 border-t border-[#E4E4E7] text-xs text-[#71717A]">
-                  <span>{item.latestLog?.staffName ? `Thợ: ${item.latestLog.staffName}` : "Chưa phân công"}</span>
+                  <span>{item.latestLog?.staffName ? t("tailor", { name: item.latestLog.staffName }) : t("unassigned")}</span>
                   <span className="inline-flex items-center gap-1 font-semibold text-[#09090B] hover:underline">
-                    Xem hồ sơ đo <ChevronRight size={14} />
+                    {t("viewMeasurements")} <ChevronRight size={14} />
                   </span>
                 </div>
               </div>
@@ -190,7 +193,7 @@ export function TailoringBoard({ initialItems }: TailoringBoardProps) {
             <div className="flex items-center justify-between border-b border-[#E4E4E7] pb-4">
               <div>
                 <div className="text-xs font-semibold text-[#71717A] uppercase tracking-wider">
-                  Phiếu cắt may Áo Dài • {selectedItem.orderNumber}
+                  {t("ticketTitle", { number: selectedItem.orderNumber })}
                 </div>
                 <h3 className="text-lg font-bold text-[#09090B]">{selectedItem.productName}</h3>
               </div>
@@ -199,7 +202,7 @@ export function TailoringBoard({ initialItems }: TailoringBoardProps) {
                   onClick={() => window.print()}
                   className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-[#E4E4E7] text-xs font-semibold text-zinc-700 hover:bg-zinc-50 cursor-pointer"
                 >
-                  <Printer size={14} /> In phiếu cắt
+                  <Printer size={14} /> {t("print")}
                 </button>
                 <button
                   onClick={() => setSelectedItem(null)}
@@ -213,22 +216,22 @@ export function TailoringBoard({ initialItems }: TailoringBoardProps) {
             {/* Bảng chi tiết 12 thông số vàng của Áo Dài */}
             <div>
               <h4 className="text-xs font-semibold uppercase tracking-wider text-[#71717A] mb-3 flex items-center gap-1.5">
-                <Ruler size={14} /> Thông số may đo chuẩn (cm / kg)
+                <Ruler size={14} /> {t("measurementsTitle")}
               </h4>
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 bg-zinc-50 p-4 rounded-xl border border-[#E4E4E7]">
                 {[
-                  { label: "Chiều cao", val: selectedItem.height ? `${selectedItem.height} cm` : "--" },
-                  { label: "Cân nặng", val: selectedItem.weight ? `${selectedItem.weight} kg` : "--" },
-                  { label: "Vòng ngực", val: selectedItem.bust ? `${selectedItem.bust} cm` : "--" },
-                  { label: "Vòng eo", val: selectedItem.waist ? `${selectedItem.waist} cm` : "--" },
-                  { label: "Vòng mông", val: selectedItem.hips ? `${selectedItem.hips} cm` : "--" },
-                  { label: "Rộng vai", val: selectedItem.shoulder ? `${selectedItem.shoulder} cm` : "--" },
-                  { label: "Dài tay", val: selectedItem.armLength ? `${selectedItem.armLength} cm` : "--" },
-                  { label: "Vòng nách", val: selectedItem.armpit ? `${selectedItem.armpit} cm` : "--" },
-                  { label: "Vòng cổ", val: selectedItem.neck ? `${selectedItem.neck} cm` : "--" },
-                  { label: "Dài áo", val: selectedItem.shirtLength ? `${selectedItem.shirtLength} cm` : "--" },
-                  { label: "Dài quần", val: selectedItem.pantsLength ? `${selectedItem.pantsLength} cm` : "--" },
-                  { label: "Vòng đùi", val: selectedItem.thigh ? `${selectedItem.thigh} cm` : "--" },
+                  { label: tm("height"), val: selectedItem.height ? `${selectedItem.height} cm` : "--" },
+                  { label: tm("weight"), val: selectedItem.weight ? `${selectedItem.weight} kg` : "--" },
+                  { label: tm("bust"), val: selectedItem.bust ? `${selectedItem.bust} cm` : "--" },
+                  { label: tm("waist"), val: selectedItem.waist ? `${selectedItem.waist} cm` : "--" },
+                  { label: tm("hips"), val: selectedItem.hips ? `${selectedItem.hips} cm` : "--" },
+                  { label: tm("shoulder"), val: selectedItem.shoulder ? `${selectedItem.shoulder} cm` : "--" },
+                  { label: tm("armLength"), val: selectedItem.armLength ? `${selectedItem.armLength} cm` : "--" },
+                  { label: tm("armpit"), val: selectedItem.armpit ? `${selectedItem.armpit} cm` : "--" },
+                  { label: tm("neck"), val: selectedItem.neck ? `${selectedItem.neck} cm` : "--" },
+                  { label: tm("shirtLength"), val: selectedItem.shirtLength ? `${selectedItem.shirtLength} cm` : "--" },
+                  { label: tm("pantsLength"), val: selectedItem.pantsLength ? `${selectedItem.pantsLength} cm` : "--" },
+                  { label: tm("thigh"), val: selectedItem.thigh ? `${selectedItem.thigh} cm` : "--" },
                 ].map((stat, idx) => (
                   <div key={idx} className="bg-white p-2.5 rounded-lg border border-[#E4E4E7]">
                     <span className="text-[10px] text-[#71717A] block uppercase font-medium">{stat.label}</span>
@@ -238,16 +241,16 @@ export function TailoringBoard({ initialItems }: TailoringBoardProps) {
               </div>
               {selectedItem.customNote && (
                 <div className="mt-3 p-3 bg-amber-50 rounded-lg border border-amber-200 text-xs text-amber-900">
-                  <span className="font-semibold">Ghi chú vóc dáng của khách: </span>
+                  <span className="font-semibold">{t("bodyNote")}</span>
                   {selectedItem.customNote}
                 </div>
               )}
             </div>
 
-            {/* Chuyển công đoạn xưởng may */}
+            {/* {t("moveStage")} may */}
             <div className="space-y-3">
               <h4 className="text-xs font-semibold uppercase tracking-wider text-[#71717A] flex items-center gap-1.5">
-                <Scissors size={14} /> Chuyển công đoạn xưởng
+                <Scissors size={14} /> {t("moveStage")}
               </h4>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {tailoringSteps.map((step) => {
@@ -265,7 +268,7 @@ export function TailoringBoard({ initialItems }: TailoringBoardProps) {
                       }`}
                     >
                       <Icon size={16} />
-                      <div className="text-xs font-semibold">{step.label}</div>
+                      <div className="text-xs font-semibold">{t(`stage.${step.status}`)}</div>
                     </button>
                   );
                 })}

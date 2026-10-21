@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useTransition } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { formatVnd, type Locale } from "@repo/shared";
 import { type AdminProductItem } from "../types/products.types";
 import { toggleProductActiveAction, toggleProductCustomFitAction } from "../actions/products.actions";
 import {
@@ -17,6 +19,8 @@ interface ProductsListProps {
 }
 
 export function ProductsList({ initialProducts }: ProductsListProps) {
+  const t = useTranslations("AdminPage.products");
+  const locale = useLocale() as Locale;
   const [products, setProducts] = useState<AdminProductItem[]>(initialProducts);
   const [searchTerm, setSearchTerm] = useState("");
   const [isPending, startTransition] = useTransition();
@@ -59,7 +63,7 @@ export function ProductsList({ initialProducts }: ProductsListProps) {
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
           <input
             type="text"
-            placeholder="Tìm theo tên áo dài, chất liệu..."
+            placeholder={t("searchPlaceholder")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-9 pr-4 py-2 bg-zinc-50 border border-[#E4E4E7] rounded-lg text-sm focus:outline-none focus:border-zinc-900 transition-colors"
@@ -69,7 +73,7 @@ export function ProductsList({ initialProducts }: ProductsListProps) {
         <button
           className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-[#18181B] hover:bg-[#09090B] text-white rounded-lg text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
         >
-          <Plus size={14} /> Thêm Áo Dài mới
+          <Plus size={14} /> {t("add")}
         </button>
       </div>
 
@@ -79,13 +83,13 @@ export function ProductsList({ initialProducts }: ProductsListProps) {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-[#E4E4E7] bg-zinc-50/50 text-[11px] font-semibold text-[#71717A] uppercase tracking-wider">
-                <th className="py-3 px-4">Sản phẩm</th>
-                <th className="py-3 px-4">Danh mục & Chất liệu</th>
-                <th className="py-3 px-4">Giá niêm yết</th>
-                <th className="py-3 px-4">Tồn kho / Size</th>
-                <th className="py-3 px-4">May đo riêng</th>
-                <th className="py-3 px-4">Trạng thái</th>
-                <th className="py-3 px-4 text-right">Đã bán</th>
+                <th className="py-3 px-4">{t("colProduct")}</th>
+                <th className="py-3 px-4">{t("colCategory")}</th>
+                <th className="py-3 px-4">{t("colPrice")}</th>
+                <th className="py-3 px-4">{t("colStock")}</th>
+                <th className="py-3 px-4">{t("colCustomFit")}</th>
+                <th className="py-3 px-4">{t("colStatus")}</th>
+                <th className="py-3 px-4 text-right">{t("colSold")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#E4E4E7] text-sm">
@@ -93,7 +97,7 @@ export function ProductsList({ initialProducts }: ProductsListProps) {
                 <tr>
                   <td colSpan={7} className="py-12 text-center text-[#71717A]">
                     <Shirt className="mx-auto size-8 text-zinc-300 mb-2" />
-                    Chưa có sản phẩm nào.
+                    {t("empty")}
                   </td>
                 </tr>
               ) : (
@@ -120,18 +124,18 @@ export function ProductsList({ initialProducts }: ProductsListProps) {
                       </div>
                     </td>
                     <td className="py-3.5 px-4">
-                      <div className="font-medium text-zinc-800">{product.categoryName}</div>
-                      <div className="text-xs text-[#71717A]">{product.material || "Lụa truyền thống"}</div>
+                      <div className="font-medium text-zinc-800">{product.categoryName ?? t("uncategorized")}</div>
+                      <div className="text-xs text-[#71717A]">{product.material || t("defaultMaterial")}</div>
                     </td>
                     <td className="py-3.5 px-4 font-mono font-semibold text-[#09090B]">
-                      {Number(product.basePrice).toLocaleString("vi-VN")} ₫
+                      {formatVnd(Number(product.basePrice), locale)}
                     </td>
                     <td className="py-3.5 px-4">
                       <div className="font-mono font-medium text-[#09090B]">
-                        {product.totalStock} cái
+                        {t("units", { count: product.totalStock })}
                       </div>
                       <div className="text-xs text-[#71717A]">
-                        {product.variantsCount} biến thể
+                        {t("variantsCount", { count: product.variantsCount })}
                       </div>
                     </td>
                     <td className="py-3.5 px-4">
@@ -145,7 +149,7 @@ export function ProductsList({ initialProducts }: ProductsListProps) {
                         }`}
                       >
                         <Scissors size={12} />
-                        {product.isCustomFit ? "Hỗ trợ may đo" : "Chỉ bán sẵn"}
+                        {product.isCustomFit ? t("customFitOn") : t("customFitOff")}
                       </button>
                     </td>
                     <td className="py-3.5 px-4">
@@ -160,11 +164,11 @@ export function ProductsList({ initialProducts }: ProductsListProps) {
                       >
                         {product.isActive ? (
                           <>
-                            <CheckCircle size={12} /> Đang mở bán
+                            <CheckCircle size={12} /> {t("active")}
                           </>
                         ) : (
                           <>
-                            <XCircle size={12} /> Đang ẩn
+                            <XCircle size={12} /> {t("hidden")}
                           </>
                         )}
                       </button>

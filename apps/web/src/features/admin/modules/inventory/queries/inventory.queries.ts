@@ -43,7 +43,7 @@ export async function getAdminInventoryQuery(search?: string): Promise<AdminInve
       productId: v.productId,
       productName: v.product.name,
       productImage: v.product.images?.[0] || null,
-      categoryName: v.product.category?.name || "Áo Dài",
+      categoryName: v.product.category?.name ?? null,
       updatedAt: v.updatedAt,
     }));
   } catch (error) {

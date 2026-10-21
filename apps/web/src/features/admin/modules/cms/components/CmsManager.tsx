@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { type AdminArticleItem, type AdminFaqItem } from "../types/cms.types";
 import { toggleArticlePublishAction, toggleFaqActiveAction } from "../actions/cms.actions";
 import {
@@ -18,6 +19,7 @@ interface CmsManagerProps {
 }
 
 export function CmsManager({ initialArticles, initialFaqs }: CmsManagerProps) {
+  const t = useTranslations("AdminPage.cms");
   const [activeTab, setActiveTab] = useState<"articles" | "faqs">("articles");
   const [articles, setArticles] = useState<AdminArticleItem[]>(initialArticles);
   const [faqs, setFaqs] = useState<AdminFaqItem[]>(initialFaqs);
@@ -58,7 +60,7 @@ export function CmsManager({ initialArticles, initialFaqs }: CmsManagerProps) {
                 : "bg-white text-zinc-600 hover:bg-zinc-100"
             }`}
           >
-            <FileText size={14} /> Bài viết & Cẩm nang ({articles.length})
+            <FileText size={14} /> {t("tabArticles", { count: articles.length })}
           </button>
           <button
             onClick={() => setActiveTab("faqs")}
@@ -68,14 +70,14 @@ export function CmsManager({ initialArticles, initialFaqs }: CmsManagerProps) {
                 : "bg-white text-zinc-600 hover:bg-zinc-100"
             }`}
           >
-            <HelpCircle size={14} /> Câu hỏi thường gặp FAQs ({faqs.length})
+            <HelpCircle size={14} /> {t("tabFaqs", { count: faqs.length })}
           </button>
         </div>
 
         <button
           className="inline-flex items-center gap-1 px-3 py-1.5 bg-[#18181B] text-white rounded-lg text-xs font-semibold hover:bg-black transition-colors cursor-pointer"
         >
-          <Plus size={13} /> {activeTab === "articles" ? "Viết bài mới" : "Thêm câu hỏi"}
+          <Plus size={13} /> {activeTab === "articles" ? t("newArticle") : t("newFaq")}
         </button>
       </div>
 
@@ -85,10 +87,10 @@ export function CmsManager({ initialArticles, initialFaqs }: CmsManagerProps) {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-[#E4E4E7] bg-zinc-50/50 text-[11px] font-semibold text-[#71717A] uppercase tracking-wider">
-                <th className="py-3 px-4">Tiêu đề bài viết</th>
-                <th className="py-3 px-4">Tác giả</th>
-                <th className="py-3 px-4">Ngày đăng</th>
-                <th className="py-3 px-4 text-right">Trạng thái xuất bản</th>
+                <th className="py-3 px-4">{t("colTitle")}</th>
+                <th className="py-3 px-4">{t("colAuthor")}</th>
+                <th className="py-3 px-4">{t("colDate")}</th>
+                <th className="py-3 px-4 text-right">{t("colStatus")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#E4E4E7] text-sm">
@@ -96,7 +98,7 @@ export function CmsManager({ initialArticles, initialFaqs }: CmsManagerProps) {
                 <tr>
                   <td colSpan={4} className="py-12 text-center text-[#71717A]">
                     <FileText className="mx-auto size-8 text-zinc-300 mb-2" />
-                    Chưa có bài viết nào.
+                    {t("emptyArticles")}
                   </td>
                 </tr>
               ) : (
@@ -127,11 +129,11 @@ export function CmsManager({ initialArticles, initialFaqs }: CmsManagerProps) {
                       >
                         {article.isPublished ? (
                           <>
-                            <CheckCircle size={12} /> Đã đăng
+                            <CheckCircle size={12} /> {t("published")}
                           </>
                         ) : (
                           <>
-                            <XCircle size={12} /> Bản nháp
+                            <XCircle size={12} /> {t("draft")}
                           </>
                         )}
                       </button>
@@ -150,7 +152,7 @@ export function CmsManager({ initialArticles, initialFaqs }: CmsManagerProps) {
           {faqs.length === 0 ? (
             <div className="bg-white p-12 text-center rounded-xl border border-[#E4E4E7] text-[#71717A]">
               <HelpCircle className="mx-auto size-8 text-zinc-300 mb-2" />
-              Chưa có câu hỏi FAQ nào.
+              {t("emptyFaqs")}
             </div>
           ) : (
             faqs.map((faq) => (
@@ -175,7 +177,7 @@ export function CmsManager({ initialArticles, initialFaqs }: CmsManagerProps) {
                   }`}
                 >
                   {faq.isActive ? <CheckCircle size={12} /> : <XCircle size={12} />}
-                  {faq.isActive ? "Hiển thị" : "Ẩn"}
+                  {faq.isActive ? t("visible") : t("hidden")}
                 </button>
               </div>
             ))

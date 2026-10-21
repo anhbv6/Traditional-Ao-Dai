@@ -44,7 +44,7 @@ export async function getAdminProductsListQuery(search?: string): Promise<AdminP
         isActive: p.isActive,
         isFeatured: p.isFeatured,
         categoryId: p.categoryId,
-        categoryName: p.category?.name || "Chưa phân loại",
+        categoryName: p.category?.name ?? null,
         variantsCount: p.variants.length,
         totalStock,
         createdAt: p.createdAt,

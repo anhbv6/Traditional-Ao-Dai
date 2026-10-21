@@ -21,6 +21,7 @@ export function AdminApprovalsList() {
   const canReview = canAccess(user, ADMIN_ACTION_ACCESS.reviewApproval);
   const notify = useNotify();
   const tToast = useTranslations("AdminPage.toasts");
+  const t = useTranslations("AdminPage.approvals");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [rejectingId, setRejectingId] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState("");
@@ -84,13 +85,13 @@ export function AdminApprovalsList() {
   const getActionBadge = (action: string) => {
     switch (action) {
       case "CANCEL_ORDER":
-        return <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">Hủy đơn hàng</span>;
+        return <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">{t("action.CANCEL_ORDER")}</span>;
       case "SPECIAL_DISCOUNT":
-        return <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">Giảm giá vượt trần</span>;
+        return <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">{t("action.SPECIAL_DISCOUNT")}</span>;
       case "PRICE_OVERRIDE":
-        return <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">Chỉnh sửa đơn giá</span>;
+        return <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">{t("action.PRICE_OVERRIDE")}</span>;
       case "REFUND":
-        return <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-purple-50 text-purple-700 border border-purple-200">Hoàn tiền khách</span>;
+        return <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-purple-50 text-purple-700 border border-purple-200">{t("action.REFUND")}</span>;
       default:
         return <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-zinc-100 text-zinc-700">{action}</span>;
     }
@@ -102,21 +103,21 @@ export function AdminApprovalsList() {
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
             <Clock size={12} />
-            <span>Chờ duyệt</span>
+            <span>{t("filter.PENDING")}</span>
           </span>
         );
       case "APPROVED":
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
             <CheckCircle2 size={12} />
-            <span>Đã duyệt</span>
+            <span>{t("filter.APPROVED")}</span>
           </span>
         );
       case "REJECTED":
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
             <XCircle size={12} />
-            <span>Từ chối</span>
+            <span>{t("filter.REJECTED")}</span>
           </span>
         );
       default:
@@ -128,12 +129,12 @@ export function AdminApprovalsList() {
     <div className="space-y-6">
       <AdminPageHeader
         icon={UserCheck}
-        eyebrow="Kiểm soát nội bộ"
-        title={canReview ? "Hàng Đợi Phê Duyệt" : "Yêu Cầu Phê Duyệt Của Tôi"}
+        eyebrow={t("eyebrow")}
+        title={canReview ? t("titleReviewer") : t("titleRequester")}
         description={
           canReview
-            ? "Duyệt các thao tác nhạy cảm do nhân viên gửi lên (hủy đơn, giảm giá đặc biệt, hoàn tiền)."
-            : "Theo dõi trạng thái các yêu cầu hủy đơn / hoàn tiền / giảm giá bạn đã gửi lên Super Admin."
+            ? t("descriptionReviewer")
+            : t("descriptionRequester")
         }
         actions={
           <>
@@ -141,15 +142,15 @@ export function AdminApprovalsList() {
               value={statusFilter}
               onChange={setStatusFilter}
               options={[
-                { value: "ALL", label: "Tất cả" },
-                { value: "PENDING", label: "Chờ duyệt" },
-                { value: "APPROVED", label: "Đã duyệt" },
-                { value: "REJECTED", label: "Từ chối" },
+                { value: "ALL", label: t("filter.ALL") },
+                { value: "PENDING", label: t("filter.PENDING") },
+                { value: "APPROVED", label: t("filter.APPROVED") },
+                { value: "REJECTED", label: t("filter.REJECTED") },
               ]}
             />
-            <AdminSecondaryButton onClick={fetchRequests} disabled={isLoading} title="Làm mới">
+            <AdminSecondaryButton onClick={fetchRequests} disabled={isLoading} title={t("refresh")}>
               <RefreshCw size={14} className={isLoading ? "animate-spin" : ""} />
-              <span>Làm mới</span>
+              <span>{t("refresh")}</span>
             </AdminSecondaryButton>
           </>
         }
@@ -159,13 +160,13 @@ export function AdminApprovalsList() {
       {isLoading ? (
         <div className="bg-white rounded-xl border border-[#E4E4E7] p-12 text-center text-sm text-[#71717A]">
           <RefreshCw size={24} className="animate-spin mx-auto text-zinc-400 mb-3" />
-          <p>Đang tải dữ liệu hàng đợi phê duyệt...</p>
+          <p>{t("loading")}</p>
         </div>
       ) : requests.length === 0 ? (
         <div className="bg-white rounded-xl border border-[#E4E4E7] p-12 text-center text-[#71717A]">
           <FileText size={32} className="mx-auto text-zinc-300 mb-3" />
-          <p className="text-sm font-medium text-zinc-700">Không có yêu cầu phê duyệt nào</p>
-          <p className="text-xs text-zinc-400 mt-1">Các thao tác do nhân viên gửi lên sẽ xuất hiện tại đây.</p>
+          <p className="text-sm font-medium text-zinc-700">{t("emptyTitle")}</p>
+          <p className="text-xs text-zinc-400 mt-1">{t("emptyDescription")}</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -184,7 +185,7 @@ export function AdminApprovalsList() {
                 </div>
 
                 <div className="text-xs text-zinc-600">
-                  Người yêu cầu: <strong className="text-[#09090B] font-semibold">{req.requestedBy?.name || req.requestedBy?.email}</strong>
+                  {t("requestedBy")} <strong className="text-[#09090B] font-semibold">{req.requestedBy?.name || req.requestedBy?.email}</strong>
                 </div>
               </div>
 
@@ -200,7 +201,7 @@ export function AdminApprovalsList() {
               {req.status === "REJECTED" && req.rejectReason && (
                 <div className="p-3 bg-rose-50/60 border border-rose-100 rounded-xl text-xs text-rose-700 flex items-start gap-2 mb-3">
                   <AlertTriangle size={14} className="shrink-0 mt-0.5" />
-                  <span><strong>Lý do từ chối:</strong> {req.rejectReason}</span>
+                  <span><strong>{t("rejectReason")}</strong> {req.rejectReason}</span>
                 </div>
               )}
 
@@ -211,7 +212,7 @@ export function AdminApprovalsList() {
                     <div className="flex items-center gap-2 w-full sm:w-auto">
                       <input
                         type="text"
-                        placeholder="Nhập lý do từ chối..."
+                        placeholder={t("rejectReasonPlaceholder")}
                         value={rejectReason}
                         onChange={(e) => setRejectReason(e.target.value)}
                         className="text-xs border border-zinc-300 rounded-lg px-3 py-1.5 w-full sm:w-64 focus:border-rose-500 outline-none"
@@ -221,13 +222,13 @@ export function AdminApprovalsList() {
                         disabled={isProcessing}
                         className="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-semibold cursor-pointer disabled:opacity-50"
                       >
-                        Xác nhận
+                        {t("confirm")}
                       </button>
                       <button
                         onClick={() => { setRejectingId(null); setRejectReason(""); }}
                         className="px-3 py-1.5 border border-[#E4E4E7] text-zinc-600 hover:bg-zinc-100 rounded-lg text-xs cursor-pointer"
                       >
-                        Hủy
+                        {t("cancel")}
                       </button>
                     </div>
                   ) : (
@@ -237,14 +238,14 @@ export function AdminApprovalsList() {
                         disabled={isProcessing}
                         className="px-4 py-2 border border-rose-200 text-rose-600 hover:bg-rose-50 rounded-xl text-xs font-semibold transition-colors cursor-pointer"
                       >
-                        Từ chối
+                        {t("reject")}
                       </button>
                       <button
                         onClick={() => handleApprove(req.id)}
                         disabled={isProcessing}
                         className="px-4 py-2 bg-[#18181B] hover:bg-black text-white rounded-xl text-xs font-semibold shadow-2xs transition-all cursor-pointer"
                       >
-                        Phê duyệt yêu cầu
+                        {t("approve")}
                       </button>
                     </>
                   )}

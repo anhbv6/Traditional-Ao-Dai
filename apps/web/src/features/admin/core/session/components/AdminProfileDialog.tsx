@@ -39,6 +39,7 @@ export function AdminProfileDialog({
   const sessionCache = useAdminSessionCache();
   const notify = useNotify();
   const tToast = useTranslations("AdminPage.toasts");
+  const t = useTranslations("AdminPage.profileDialog");
   const [activeTab, setActiveTab] = useState<"info" | "security">("info");
 
   // Info tab form state
@@ -171,10 +172,10 @@ export function AdminProfileDialog({
             </div>
             <div>
               <DialogTitle className="text-base font-bold text-[#09090B]">
-                Hồ sơ tài khoản Quản trị
+                {t("title")}
               </DialogTitle>
               <DialogDescription className="text-xs text-[#71717A] mt-0.5">
-                Cập nhật thông tin nhận diện cá nhân và bảo mật tài khoản
+                {t("subtitle")}
               </DialogDescription>
             </div>
           </div>
@@ -190,7 +191,7 @@ export function AdminProfileDialog({
                   : "text-zinc-600 hover:text-[#09090B]"
               }`}
             >
-              Thông tin cá nhân
+              {t("tabProfile")}
             </button>
             <button
               type="button"
@@ -201,7 +202,7 @@ export function AdminProfileDialog({
                   : "text-zinc-600 hover:text-[#09090B]"
               }`}
             >
-              Đổi mật khẩu
+              {t("tabPassword")}
             </button>
           </div>
         </DialogHeader>
@@ -229,7 +230,7 @@ export function AdminProfileDialog({
                   disabled={isUploadingAvatar}
                   onClick={() => fileInputRef.current?.click()}
                   className="absolute bottom-0 right-0 p-1.5 rounded-full bg-[#18181B] text-white hover:bg-[#09090B] shadow-md cursor-pointer transition-transform hover:scale-105"
-                  title="Thay đổi ảnh đại diện"
+                  title={t("changeAvatar")}
                 >
                   {isUploadingAvatar ? (
                     <Loader2 size={12} className="animate-spin" />
@@ -248,17 +249,17 @@ export function AdminProfileDialog({
 
               <div>
                 <p className="text-xs font-semibold text-[#09090B]">
-                  Ảnh đại diện
+                  {t("avatar")}
                 </p>
                 <p className="text-[11px] text-[#71717A] mt-0.5">
-                  Định dạng PNG, JPG, WEBP (Tối đa 5MB)
+                  {t("avatarHint")}
                 </p>
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   className="mt-1 text-xs font-medium text-zinc-700 hover:text-[#09090B] underline underline-offset-2"
                 >
-                  Chọn ảnh mới
+                  {t("chooseAvatar")}
                 </button>
               </div>
             </div>
@@ -267,7 +268,7 @@ export function AdminProfileDialog({
             <div className="space-y-3">
               <div>
                 <label className="block text-xs font-semibold text-zinc-700 mb-1">
-                  Họ và tên <span className="text-rose-500">*</span>
+                  {t("fullName")} <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
                   <User
@@ -279,7 +280,7 @@ export function AdminProfileDialog({
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
-                    placeholder="Nhập họ và tên..."
+                    placeholder={t("fullNamePlaceholder")}
                     className="w-full h-9 pl-9 pr-3 text-xs rounded-lg border border-[#E4E4E7] bg-white text-[#09090B] placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                   />
                 </div>
@@ -287,7 +288,7 @@ export function AdminProfileDialog({
 
               <div>
                 <label className="block text-xs font-semibold text-zinc-700 mb-1">
-                  Email đăng nhập
+                  {t("loginEmail")}
                 </label>
                 <div className="relative">
                   <Mail
@@ -302,13 +303,13 @@ export function AdminProfileDialog({
                   />
                 </div>
                 <p className="text-[10px] text-zinc-400 mt-1">
-                  Email là định danh hệ thống, không thể thay đổi trực tiếp.
+                  {t("emailReadonly")}
                 </p>
               </div>
 
               <div>
                 <label className="block text-xs font-semibold text-zinc-700 mb-1">
-                  Số điện thoại liên hệ
+                  {t("phone")}
                 </label>
                 <div className="relative">
                   <Phone
@@ -319,7 +320,7 @@ export function AdminProfileDialog({
                     type="tel"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    placeholder="Ví dụ: 0987654321"
+                    placeholder={t("phonePlaceholder")}
                     className="w-full h-9 pl-9 pr-3 text-xs rounded-lg border border-[#E4E4E7] bg-white text-[#09090B] placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                   />
                 </div>
@@ -327,12 +328,12 @@ export function AdminProfileDialog({
 
               <div>
                 <label className="block text-xs font-semibold text-zinc-700 mb-1">
-                  Vai trò phân quyền
+                  {t("role")}
                 </label>
                 <div className="flex items-center gap-2 p-2 rounded-lg bg-zinc-50 border border-[#E4E4E7] text-xs">
                   <ShieldCheck size={16} className="text-zinc-700" />
                   <span className="font-semibold text-[#09090B]">
-                    {isAdmin ? "Quản trị viên tối cao (Super Admin)" : "Nhân viên vận hành (Staff)"}
+                    {isAdmin ? t("roleAdmin") : t("roleStaff")}
                   </span>
                 </div>
               </div>
@@ -344,7 +345,7 @@ export function AdminProfileDialog({
                 onClick={() => onOpenChange(false)}
                 className="px-3.5 py-2 text-xs font-medium text-zinc-600 hover:text-[#09090B] hover:bg-zinc-100 rounded-lg transition-colors cursor-pointer"
               >
-                Hủy bỏ
+                {t("cancel")}
               </button>
               <button
                 type="submit"
@@ -354,10 +355,10 @@ export function AdminProfileDialog({
                 {isSavingInfo ? (
                   <>
                     <Loader2 size={13} className="animate-spin" />
-                    <span>Đang lưu...</span>
+                    <span>{t("saving")}</span>
                   </>
                 ) : (
-                  <span>Lưu thay đổi</span>
+                  <span>{t("save")}</span>
                 )}
               </button>
             </div>
@@ -366,7 +367,7 @@ export function AdminProfileDialog({
           <form onSubmit={handleSaveSecurity} className="p-6 space-y-3.5">
             <div>
               <label className="block text-xs font-semibold text-zinc-700 mb-1">
-                Mật khẩu hiện tại
+                {t("currentPassword")}
               </label>
               <div className="relative">
                 <Lock
@@ -377,7 +378,7 @@ export function AdminProfileDialog({
                   type={showCurrentPass ? "text" : "password"}
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
-                  placeholder="Nhập mật khẩu hiện tại..."
+                  placeholder={t("currentPasswordPlaceholder")}
                   className="w-full h-9 pl-9 pr-9 text-xs rounded-lg border border-[#E4E4E7] bg-white text-[#09090B] placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                 />
                 <button
@@ -392,7 +393,7 @@ export function AdminProfileDialog({
 
             <div>
               <label className="block text-xs font-semibold text-zinc-700 mb-1">
-                Mật khẩu mới <span className="text-rose-500">*</span>
+                {t("newPassword")} <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
                 <Lock
@@ -404,7 +405,7 @@ export function AdminProfileDialog({
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   required
-                  placeholder="Tối thiểu 6 ký tự..."
+                  placeholder={t("newPasswordPlaceholder")}
                   className="w-full h-9 pl-9 pr-9 text-xs rounded-lg border border-[#E4E4E7] bg-white text-[#09090B] placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                 />
                 <button
@@ -419,7 +420,7 @@ export function AdminProfileDialog({
 
             <div>
               <label className="block text-xs font-semibold text-zinc-700 mb-1">
-                Xác nhận mật khẩu mới <span className="text-rose-500">*</span>
+                {t("confirmPassword")} <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
                 <Lock
@@ -431,7 +432,7 @@ export function AdminProfileDialog({
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
-                  placeholder="Nhập lại mật khẩu mới..."
+                  placeholder={t("confirmPasswordPlaceholder")}
                   className="w-full h-9 pl-9 pr-9 text-xs rounded-lg border border-[#E4E4E7] bg-white text-[#09090B] placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                 />
                 <button
@@ -450,7 +451,7 @@ export function AdminProfileDialog({
                 onClick={() => onOpenChange(false)}
                 className="px-3.5 py-2 text-xs font-medium text-zinc-600 hover:text-[#09090B] hover:bg-zinc-100 rounded-lg transition-colors cursor-pointer"
               >
-                Hủy bỏ
+                {t("cancel")}
               </button>
               <button
                 type="submit"
@@ -460,10 +461,10 @@ export function AdminProfileDialog({
                 {isSavingSecurity ? (
                   <>
                     <Loader2 size={13} className="animate-spin" />
-                    <span>Đang cập nhật...</span>
+                    <span>{t("updating")}</span>
                   </>
                 ) : (
-                  <span>Cập nhật mật khẩu</span>
+                  <span>{t("updatePassword")}</span>
                 )}
               </button>
             </div>

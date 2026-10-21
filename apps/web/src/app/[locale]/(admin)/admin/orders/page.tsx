@@ -1,6 +1,7 @@
 import React from "react";
 import { ShoppingBag } from "lucide-react";
 import { getAdminOrdersListQuery, OrdersList } from "@/features/admin/modules/orders";
+import { getTranslations } from "next-intl/server";
 import { requireAdminPage } from "@/features/admin/core/server/adminAuth.server";
 import { ADMIN_MODULE_ACCESS } from "@/features/admin/core/session/permissions";
 import { AdminMetaValue, AdminPage, AdminPageHeader } from "@/features/admin/core/ui";
@@ -9,6 +10,7 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminOrdersPage() {
   await requireAdminPage(ADMIN_MODULE_ACCESS.orders);
+  const t = await getTranslations("AdminPage.pages.orders");
 
   const orders = await getAdminOrdersListQuery();
 
@@ -16,10 +18,10 @@ export default async function AdminOrdersPage() {
     <AdminPage>
       <AdminPageHeader
         icon={ShoppingBag}
-        eyebrow="Quản lý bán hàng"
-        title="Đơn Hàng Áo Dài"
-        description="Cập nhật trạng thái xử lý, thanh toán và theo dõi đơn may sẵn / may đo."
-        meta={<>Tổng số <AdminMetaValue>{orders.length}</AdminMetaValue> đơn hàng</>}
+        eyebrow={t("eyebrow")}
+        title={t("title")}
+        description={t("description")}
+        meta={t.rich("meta", { count: orders.length, value: (chunks) => <AdminMetaValue>{chunks}</AdminMetaValue> })}
       />
 
       <OrdersList initialOrders={orders} />

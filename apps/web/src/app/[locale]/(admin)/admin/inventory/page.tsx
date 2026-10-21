@@ -1,6 +1,7 @@
 import React from "react";
 import { Boxes } from "lucide-react";
 import { getAdminInventoryQuery, InventoryList } from "@/features/admin/modules/inventory";
+import { getTranslations } from "next-intl/server";
 import { requireAdminPage } from "@/features/admin/core/server/adminAuth.server";
 import { ADMIN_MODULE_ACCESS } from "@/features/admin/core/session/permissions";
 import { AdminMetaValue, AdminPage, AdminPageHeader } from "@/features/admin/core/ui";
@@ -9,6 +10,7 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminInventoryPage() {
   await requireAdminPage(ADMIN_MODULE_ACCESS.inventory);
+  const t = await getTranslations("AdminPage.pages.inventory");
 
   const variants = await getAdminInventoryQuery();
 
@@ -16,10 +18,10 @@ export default async function AdminInventoryPage() {
     <AdminPage>
       <AdminPageHeader
         icon={Boxes}
-        eyebrow="Kho vận & Biến thể"
-        title="Quản Lý Tồn Kho"
-        description="Theo dõi và điều chỉnh số lượng tồn của từng mã SKU (size, màu)."
-        meta={<>Tổng cộng <AdminMetaValue>{variants.length}</AdminMetaValue> mã SKU biến thể</>}
+        eyebrow={t("eyebrow")}
+        title={t("title")}
+        description={t("description")}
+        meta={t.rich("meta", { count: variants.length, value: (chunks) => <AdminMetaValue>{chunks}</AdminMetaValue> })}
       />
 
       <InventoryList initialVariants={variants} />

@@ -1,4 +1,5 @@
 import { type Prisma } from "@repo/db";
+import { toVnd } from "@repo/shared";
 import { prisma } from "../../../core/server/db.server";
 import { type AdminOrderItem, type OrderFilterParams } from "../types/orders.types";
 
@@ -60,55 +61,20 @@ export async function getAdminOrdersListQuery(
 
     return orders.map((o) => ({
       ...o,
-      subTotal: Number(o.subTotal),
-      discountAmount: Number(o.discountAmount),
-      shippingFee: Number(o.shippingFee),
-      totalAmount: Number(o.totalAmount),
+      // Decimal của Prisma không truyền được qua Server -> Client Component: đổi hết sang số nguyên VND
+      subTotal: toVnd(o.subTotal),
+      discountAmount: toVnd(o.discountAmount),
+      shippingFee: toVnd(o.shippingFee),
+      totalAmount: toVnd(o.totalAmount),
+      paidAmount: toVnd(o.paidAmount),
       items: o.items.map((item) => ({
         ...item,
-        unitPrice: Number(item.unitPrice),
-        totalPrice: Number(item.totalPrice),
+        unitPrice: toVnd(item.unitPrice),
+        totalPrice: toVnd(item.totalPrice),
       })),
     })) as AdminOrderItem[];
   } catch (error) {
     console.error("Lỗi khi query danh sách đơn hàng Admin:", error);
     return [];
-  }
-}
-
-/**
- * Query: Lấy chi tiết một đơn hàng theo ID
- */
-export async function getAdminOrderDetailQuery(orderId: string) {
-  try {
-    const order = await prisma.order.findUnique({
-      where: { id: orderId },
-      include: {
-        items: {
-          include: {
-            product: true,
-            variant: true,
-            tailoringLogs: {
-              include: {
-                staff: { select: { id: true, name: true, email: true } },
-              },
-              orderBy: { createdAt: "desc" },
-            },
-          },
-        },
-        user: {
-          select: { id: true, name: true, email: true, phone: true },
-        },
-        createdBy: {
-          select: { id: true, name: true, email: true },
-        },
-        voucher: true,
-      },
-    });
-
-    return order;
-  } catch (error) {
-    console.error(`Lỗi khi query chi tiết đơn hàng ${orderId}:`, error);
-    return null;
   }
 }

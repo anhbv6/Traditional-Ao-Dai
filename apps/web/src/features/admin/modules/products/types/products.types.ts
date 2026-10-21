@@ -10,7 +10,7 @@ export interface AdminProductItem {
   isActive: boolean;
   isFeatured: boolean;
   categoryId: string;
-  categoryName?: string;
+  categoryName?: string | null;
   variantsCount: number;
   totalStock: number;
   createdAt: Date | string;
