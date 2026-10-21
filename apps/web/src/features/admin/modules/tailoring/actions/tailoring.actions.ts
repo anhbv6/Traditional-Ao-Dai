@@ -2,21 +2,21 @@
 
 import { prisma } from "../../../core/server/db.server";
 import { authorizeAdminAction } from "../../../core/server/adminAuth.server";
-import { type TailoringStatus } from "../types/tailoring.types";
 import { revalidatePath } from "next/cache";
+import { type z } from "zod";
+import { parseActionInput } from "@/features/admin/core/server/actionInput";
+import { updateTailoringStatusSchema } from "../schemas/tailoring.schemas";
 
 /**
  * Server Action: Cập nhật công đoạn may đo và ghi nhật ký TailoringLog
  */
-export async function updateTailoringStatusAction(params: {
-  orderItemId: string;
-  orderId: string;
-  status: TailoringStatus;
-  staffId: string;
-  note?: string;
-}) {
+export async function updateTailoringStatusAction(raw: z.input<typeof updateTailoringStatusSchema>) {
   const auth = await authorizeAdminAction({ permission: "canUpdateTailoring" });
   if (!auth.success) return auth;
+
+  const parsed = parseActionInput(updateTailoringStatusSchema, raw);
+  if (!parsed.success) return parsed;
+  const params = parsed.data;
 
   try {
     const [updatedItem, log] = await prisma.$transaction([

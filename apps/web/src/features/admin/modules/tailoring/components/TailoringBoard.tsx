@@ -52,8 +52,7 @@ export function TailoringBoard({ initialItems }: TailoringBoardProps) {
       const res = await updateTailoringStatusAction({
         orderItemId: item.id,
         orderId: item.orderId,
-        status: newStatus,
-        staffId: user.id,
+        status: newStatus,
         note: noteText || undefined,
       });
 

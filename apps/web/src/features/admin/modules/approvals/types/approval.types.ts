@@ -1,12 +1,5 @@
 import { type ApprovalStatus } from "@repo/db";
 
-export interface ReviewApprovalInput {
-  requestId: string;
-  status: "APPROVED" | "REJECTED";
-  reviewedById: string;
-  rejectReason?: string;
-}
-
 export interface ApprovalRequestItem {
   id: string;
   actionType: string;

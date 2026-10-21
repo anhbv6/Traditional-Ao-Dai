@@ -46,8 +46,7 @@ export function AdminApprovalsList() {
     setIsProcessing(true);
     const res = await reviewApprovalRequestAction({
       requestId: id,
-      status: "APPROVED",
-      reviewedById: user.id,
+      status: "APPROVED",
     });
 
     if (res.success) {
@@ -67,8 +66,7 @@ export function AdminApprovalsList() {
     setIsProcessing(true);
     const res = await reviewApprovalRequestAction({
       requestId: id,
-      status: "REJECTED",
-      reviewedById: user.id,
+      status: "REJECTED",
       rejectReason: rejectReason.trim(),
     });
 

@@ -4,11 +4,11 @@ import { prisma } from "../../../core/server/db.server";
 import { authorizeAdminAction } from "../../../core/server/adminAuth.server";
 import { ADMIN_MODULE_ACCESS } from "../../../core/session/permissions";
 import bcrypt from "bcryptjs";
-import { z } from "zod";
 import { normalizeVietnamPhone } from "@repo/shared";
-import { emailSchema, newPasswordSchema, vietnamPhoneSchema } from "@repo/shared/validation";
 import { type CreateStaffInput, type StaffPermissionInput } from "../types/staff.types";
 import { getStaffListQuery } from "../queries/staff.queries";
+import { parseActionInput } from "@/features/admin/core/server/actionInput";
+import { createStaffSchema, toggleStaffActiveSchema, updateStaffPermissionSchema } from "../schemas/staff.schemas";
 
 /**
  * Server Action: Lấy danh sách nhân viên kèm theo phân quyền chi tiết
@@ -41,6 +41,9 @@ export async function updateStaffPermissionAction(
 ) {
   const auth = await authorizeAdminAction(ADMIN_MODULE_ACCESS.staff);
   if (!auth.success) return auth;
+
+  const input = parseActionInput(updateStaffPermissionSchema, { userId, permissions });
+  if (!input.success) return input;
 
   try {
     // Chỉ cấp quyền chi tiết cho tài khoản STAFF
@@ -88,6 +91,9 @@ export async function toggleStaffActiveAction(userId: string, isActive: boolean)
   const auth = await authorizeAdminAction(ADMIN_MODULE_ACCESS.staff);
   if (!auth.success) return auth;
 
+  const input = parseActionInput(toggleStaffActiveSchema, { userId, isActive });
+  if (!input.success) return input;
+
   try {
     // Không cho phép tự khóa tài khoản của chính mình, và chỉ tác động lên tài khoản STAFF
     if (userId === auth.user.id) {
@@ -117,20 +123,6 @@ export async function toggleStaffActiveAction(userId: string, isActive: boolean)
   }
 }
 
-const createStaffSchema = z.object({
-  name: z.string().trim().min(2, "NAME_MIN_LENGTH"),
-  email: emailSchema,
-  phone: vietnamPhoneSchema.optional().or(z.literal("")),
-  password: newPasswordSchema,
-  permissions: z.object({
-    canManageOrders: z.boolean(),
-    canUpdateTailoring: z.boolean(),
-    canManageInventory: z.boolean(),
-    canViewReports: z.boolean(),
-    canManageContent: z.boolean(),
-  }),
-});
-
 /**
  * Server Action: Super Admin tạo tài khoản nhân viên (role STAFF) kèm bộ quyền chi tiết ban đầu.
  * Luôn tạo bản ghi StaffPermission để quyền hiển thị trên UI trùng với quyền server kiểm tra.
@@ -139,10 +131,8 @@ export async function createStaffAction(input: CreateStaffInput) {
   const auth = await authorizeAdminAction(ADMIN_MODULE_ACCESS.staff);
   if (!auth.success) return auth;
 
-  const parsed = createStaffSchema.safeParse(input);
-  if (!parsed.success) {
-    return { success: false as const, error: parsed.error.issues[0]?.message || "VALIDATION_ERROR" };
-  }
+  const parsed = parseActionInput(createStaffSchema, input);
+  if (!parsed.success) return parsed;
 
   const { name, password, permissions } = parsed.data;
   const email = parsed.data.email.toLowerCase();

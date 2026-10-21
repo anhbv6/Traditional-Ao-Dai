@@ -3,6 +3,8 @@
 import { prisma } from "../../../core/server/db.server";
 import { authorizeAdminAction } from "../../../core/server/adminAuth.server";
 import { revalidatePath } from "next/cache";
+import { parseActionInput } from "@/features/admin/core/server/actionInput";
+import { toggleProductActiveSchema, toggleProductCustomFitSchema } from "../schemas/products.schemas";
 
 /**
  * Server Action: Bật/Tắt trạng thái hoạt động của sản phẩm
@@ -10,6 +12,9 @@ import { revalidatePath } from "next/cache";
 export async function toggleProductActiveAction(productId: string, isActive: boolean) {
   const auth = await authorizeAdminAction({ permission: "canManageInventory" });
   if (!auth.success) return auth;
+
+  const input = parseActionInput(toggleProductActiveSchema, { productId, isActive });
+  if (!input.success) return input;
 
   try {
     const updated = await prisma.product.update({
@@ -39,6 +44,9 @@ export async function toggleProductActiveAction(productId: string, isActive: boo
 export async function toggleProductCustomFitAction(productId: string, isCustomFit: boolean) {
   const auth = await authorizeAdminAction({ permission: "canManageInventory" });
   if (!auth.success) return auth;
+
+  const input = parseActionInput(toggleProductCustomFitSchema, { productId, isCustomFit });
+  if (!input.success) return input;
 
   try {
     const updated = await prisma.product.update({

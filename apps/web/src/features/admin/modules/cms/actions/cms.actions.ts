@@ -3,6 +3,8 @@
 import { prisma } from "../../../core/server/db.server";
 import { authorizeAdminAction } from "../../../core/server/adminAuth.server";
 import { revalidatePath } from "next/cache";
+import { parseActionInput } from "@/features/admin/core/server/actionInput";
+import { toggleArticlePublishSchema, toggleFaqActiveSchema } from "../schemas/cms.schemas";
 
 /**
  * Server Action: Bật/Tắt xuất bản bài viết
@@ -10,6 +12,9 @@ import { revalidatePath } from "next/cache";
 export async function toggleArticlePublishAction(articleId: string, isPublished: boolean) {
   const auth = await authorizeAdminAction({ permission: "canManageContent" });
   if (!auth.success) return auth;
+
+  const input = parseActionInput(toggleArticlePublishSchema, { articleId, isPublished });
+  if (!input.success) return input;
 
   try {
     const updated = await prisma.article.update({
@@ -38,6 +43,9 @@ export async function toggleArticlePublishAction(articleId: string, isPublished:
 export async function toggleFaqActiveAction(faqId: string, isActive: boolean) {
   const auth = await authorizeAdminAction({ permission: "canManageContent" });
   if (!auth.success) return auth;
+
+  const input = parseActionInput(toggleFaqActiveSchema, { faqId, isActive });
+  if (!input.success) return input;
 
   try {
     const updated = await prisma.faq.update({

@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "../../../core/server/db.server";
 import { authorizeAdminAction } from "../../../core/server/adminAuth.server";
 import { ADMIN_ACTION_ACCESS, canAccess } from "../../../core/session/permissions";
-import { PIPELINE_STAGES, type PipelineStage } from "../types/dashboard.types";
+import { type PipelineStage } from "../types/dashboard.types";
 import { PIPELINE_STAGE_PERMISSION } from "../utils/pipeline";
 import {
   getDashboardKpisQuery,
@@ -13,6 +13,8 @@ import {
   getPipelineQuery,
   getTodayAppointmentsQuery,
 } from "../queries/dashboard.queries";
+import { parseActionInput } from "@/features/admin/core/server/actionInput";
+import { hideFabricProductSchema, moveOrderStageSchema } from "../schemas/dashboard.schemas";
 
 /** Trạng thái đơn + công đoạn áo khi chuyển đơn sang một cột (bỏ trống tailoringStatus = giữ công đoạn hiện tại) */
 const STAGE_TRANSITIONS: Record<PipelineStage, { orderStatus: OrderStatus; tailoringStatus?: TailoringStatus }> = {
@@ -61,7 +63,9 @@ export async function getPipelineAction() {
  * Server Action: Chuyển đơn sang cột Kanban — cập nhật trạng thái đơn, công đoạn áo may đo và ghi nhật ký may
  */
 export async function moveOrderStageAction(orderId: string, stage: PipelineStage) {
-  if (!PIPELINE_STAGES.includes(stage)) return { success: false as const, error: "ORDER_STATUS_UPDATE_FAILED" };
+  // Quyền phụ thuộc cột đích -> phải kiểm tra tham số trước khi chọn quyền
+  const input = parseActionInput(moveOrderStageSchema, { orderId, stage });
+  if (!input.success) return input;
   const auth = await authorizeAdminAction(PIPELINE_STAGE_PERMISSION[stage]);
   if (!auth.success) return auth;
 
@@ -138,6 +142,9 @@ export async function getLowFabricsAction() {
 export async function hideFabricProductAction(productId: string) {
   const auth = await authorizeAdminAction(ADMIN_ACTION_ACCESS.manageInventory);
   if (!auth.success) return auth;
+
+  const input = parseActionInput(hideFabricProductSchema, { productId });
+  if (!input.success) return input;
 
   try {
     await prisma.product.update({ where: { id: productId }, data: { isActive: false } });

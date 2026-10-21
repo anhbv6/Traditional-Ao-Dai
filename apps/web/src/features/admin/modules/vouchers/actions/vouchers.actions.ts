@@ -3,6 +3,8 @@
 import { prisma } from "../../../core/server/db.server";
 import { authorizeAdminAction } from "../../../core/server/adminAuth.server";
 import { revalidatePath } from "next/cache";
+import { parseActionInput } from "@/features/admin/core/server/actionInput";
+import { toggleVoucherActiveSchema } from "../schemas/vouchers.schemas";
 
 /**
  * Server Action: Bật/Tắt hiệu lực của Voucher
@@ -10,6 +12,9 @@ import { revalidatePath } from "next/cache";
 export async function toggleVoucherActiveAction(voucherId: string, isActive: boolean) {
   const auth = await authorizeAdminAction({ role: "ADMIN" });
   if (!auth.success) return auth;
+
+  const input = parseActionInput(toggleVoucherActiveSchema, { voucherId, isActive });
+  if (!input.success) return input;
 
   try {
     const updated = await prisma.voucher.update({

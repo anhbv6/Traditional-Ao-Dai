@@ -4,8 +4,10 @@ import { prisma } from "../../../core/server/db.server";
 import { authorizeAdminAction } from "../../../core/server/adminAuth.server";
 import { ADMIN_ACTION_ACCESS, canAccess } from "../../../core/session/permissions";
 import { type ApprovalStatus } from "@repo/db";
-import { type ReviewApprovalInput } from "../types/approval.types";
 import { getApprovalRequestsQuery } from "../queries/approval.queries";
+import { type z } from "zod";
+import { parseActionInput } from "@/features/admin/core/server/actionInput";
+import { reviewApprovalSchema } from "../schemas/approval.schemas";
 
 /**
  * Server Action: Lấy danh sách yêu cầu phê duyệt
@@ -34,9 +36,13 @@ export async function getApprovalRequestsAction(statusFilter?: ApprovalStatus) {
 /**
  * Server Action: Admin phê duyệt hoặc từ chối yêu cầu của Staff
  */
-export async function reviewApprovalRequestAction(input: ReviewApprovalInput) {
+export async function reviewApprovalRequestAction(raw: z.input<typeof reviewApprovalSchema>) {
   const auth = await authorizeAdminAction(ADMIN_ACTION_ACCESS.reviewApproval);
   if (!auth.success) return auth;
+
+  const parsed = parseActionInput(reviewApprovalSchema, raw);
+  if (!parsed.success) return parsed;
+  const input = parsed.data;
 
   try {
     const existing = await prisma.approvalRequest.findUnique({
