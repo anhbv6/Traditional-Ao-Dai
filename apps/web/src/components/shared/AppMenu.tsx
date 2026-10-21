@@ -105,7 +105,7 @@ const ITEM_CLASS = cn(
 
 const TONE_CLASS = {
   default: "text-[var(--text-main)] data-highlighted:text-[var(--primary-ink)]",
-  danger: "text-[#C81E3A] data-highlighted:bg-[#C81E3A]/[0.07]",
+  danger: "text-(--danger) data-highlighted:bg-(--danger)/[0.07]",
 } as const;
 
 /* ============================================================================
@@ -169,7 +169,7 @@ export function AppMenu({
           aria-hidden="true"
           className={cn(
             "absolute inset-y-1.5 left-0 w-[2px] origin-center scale-y-0 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-data-highlighted/item:scale-y-100",
-            item.tone === "danger" ? "bg-[#C81E3A]" : "bg-[var(--primary-color)]",
+            item.tone === "danger" ? "bg-(--danger)" : "bg-[var(--primary-color)]",
           )}
         />}
         {Icon ? (

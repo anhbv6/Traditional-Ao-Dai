@@ -223,7 +223,7 @@ export function AppDialog({
         {/* Lớp phủ: đỏ đô rất sẫm + mờ nền → giữ tông ấm của thương hiệu thay vì đen xám */}
         <DialogPrimitive.Backdrop
           className={cn(
-            "fixed inset-0 z-50 bg-[#1F0A10]/45 backdrop-blur-[3px] transition-opacity duration-300",
+            "fixed inset-0 z-50 bg-(--overlay)/45 backdrop-blur-[3px] transition-opacity duration-300",
             EASE,
             "data-ending-style:opacity-0 data-starting-style:opacity-0",
           )}

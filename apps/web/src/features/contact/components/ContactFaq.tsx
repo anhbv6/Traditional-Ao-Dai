@@ -1,7 +1,7 @@
 import { useTranslations } from 'next-intl';
 import { ArrowRight, Plus } from 'lucide-react';
 import { Link } from '@/i18n/routing';
-import { Container } from '@/components/ui/container';
+import { Container } from '@/components/layout/Container';
 import { Reveal } from '@/components/shared/Reveal';
 import { SectionIntro } from '@/components/shared/SectionIntro';
 import { faqKeys } from '../types/contact.types';

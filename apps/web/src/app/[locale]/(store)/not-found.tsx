@@ -1,5 +1,5 @@
-import { Container } from '@/components/ui/container';
-import { NotFoundView } from '@/components/common/NotFoundView';
+import { Container } from '@/components/layout/Container';
+import { NotFoundView } from '@/components/feedback/NotFoundView';
 
 /**
  * 404 của storefront — hiện trong layout cửa hàng (có header / footer), đã dịch theo ngôn ngữ.

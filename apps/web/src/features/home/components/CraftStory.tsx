@@ -9,7 +9,7 @@ import { ArrowRight } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
 import { SectionHeading } from './SectionHeading';
-import { containerClassName } from '@/components/ui/container';
+import { containerClassName } from '@/components/layout/Container';
 
 const CRAFT_STEPS = [
   { key: '1', image: '/images/login2.jpg', imageClass: 'object-[50%_40%]' },

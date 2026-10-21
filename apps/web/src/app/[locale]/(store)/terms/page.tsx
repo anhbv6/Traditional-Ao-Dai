@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { Container } from "@/components/ui/container";
+import { Container } from "@/components/layout/Container";
 import { TermsContent } from "@/features/terms";
 
 interface TermsPageProps {

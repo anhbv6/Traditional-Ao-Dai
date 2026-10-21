@@ -9,7 +9,7 @@ import { ActionLink } from '@/components/shared/ActionLink';
 import { ON_PRIMARY_COLORS } from '@/components/shared/ActionButton';
 import { cn } from '@/lib/utils';
 import { EVENT_SLIDE_SECONDS, productEvents, type ProductEvent } from '../data/productEvents';
-import { containerClassName } from '@/components/ui/container';
+import { containerClassName } from '@/components/layout/Container';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 

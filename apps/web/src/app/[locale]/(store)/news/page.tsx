@@ -1,6 +1,6 @@
 import React from 'react';
 import { NewsClient } from '@/features/news';
-import { Container } from '@/components/ui/container';
+import { Container } from '@/components/layout/Container';
 import { ClientMessages, CLIENT_NAMESPACES } from '@/i18n/ClientMessages';
 
 export default function NewsPage() {

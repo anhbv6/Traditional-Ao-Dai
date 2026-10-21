@@ -3,7 +3,7 @@
 import React from "react";
 import { Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useDeleteAddress } from "@/features/profile/hooks/useManageAddress";
+import { useDeleteAddress } from "../../../hooks/useManageAddress";
 import { AppDialog } from "@/components/shared/AppDialog";
 
 export interface DeleteFormProps {

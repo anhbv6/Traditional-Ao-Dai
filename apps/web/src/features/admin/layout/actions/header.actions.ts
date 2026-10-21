@@ -1,4 +1,4 @@
-import { adminLogoutApi } from "@/features/admin/login";
+import { adminLogoutApi } from "../../login";
 
 /**
  * Đăng xuất quản trị viên: Backend thu hồi phiên và xóa cookie (admin_token, admin_session).

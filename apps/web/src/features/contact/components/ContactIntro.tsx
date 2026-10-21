@@ -1,5 +1,5 @@
 import { useTranslations } from 'next-intl';
-import { Container } from '@/components/ui/container';
+import { Container } from '@/components/layout/Container';
 import { PageIntro } from '@/components/shared/PageIntro';
 import { Reveal } from '@/components/shared/Reveal';
 import { CONTACT_CHANNELS } from '../data/contact.data';

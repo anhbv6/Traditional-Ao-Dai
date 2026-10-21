@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Container } from "@/components/ui/container";
+import { Container } from "@/components/layout/Container";
 import { ProfileShell } from "@/features/profile";
 import { ClientMessages, CLIENT_NAMESPACES } from "@/i18n/ClientMessages";
 

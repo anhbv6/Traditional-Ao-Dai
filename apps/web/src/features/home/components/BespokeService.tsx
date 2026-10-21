@@ -6,7 +6,7 @@ import { SectionHeading } from './SectionHeading';
 import { Reveal } from '@/components/shared/Reveal';
 import { ActionLink } from '@/components/shared/ActionLink';
 import { ON_PRIMARY_COLORS } from '@/components/shared/ActionButton';
-import { containerClassName } from '@/components/ui/container';
+import { containerClassName } from '@/components/layout/Container';
 
 const BESPOKE_STEPS = ['1', '2', '3', '4'] as const;
 

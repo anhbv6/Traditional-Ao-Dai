@@ -6,7 +6,7 @@ import { Link } from "@/i18n/routing";
 import { Reveal } from "@/components/shared/Reveal";
 import { ActionLink } from "@/components/shared/ActionLink";
 import { ON_PRIMARY_COLORS } from "@/components/shared/ActionButton";
-import { containerClassName } from "@/components/ui/container";
+import { containerClassName } from "@/components/layout/Container";
 
 /** Lời mời cuối trang dạng dải ngang gọn: tiêu đề một bên, hành động một bên */
 export function AboutCta() {

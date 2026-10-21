@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 import { SectionHeading } from './SectionHeading';
 import { ProductCard, mockProducts, productCatalog } from '@/features/products';
 import { parseVndString } from '@/features/cart';
-import { containerClassName } from '@/components/ui/container';
+import { containerClassName } from '@/components/layout/Container';
 
 /** Tab theo dịp mặc → danh mục sản phẩm tương ứng (null = tất cả) */
 const OCCASION_TABS = [

@@ -1,8 +1,8 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
 
-import { Container } from '@/components/ui/container';
-import { Breadcrumbs } from '@/components/common/Breadcrumbs';
+import { Container } from '@/components/layout/Container';
+import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
 import { getArticleCategoryKey, getArticleContent, mockArticles, NewsDetail } from '@/features/news';
 import { ClientMessages, CLIENT_NAMESPACES } from '@/i18n/ClientMessages';
 

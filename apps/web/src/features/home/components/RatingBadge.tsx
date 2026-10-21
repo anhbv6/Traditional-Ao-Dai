@@ -5,7 +5,7 @@ import { animate, motion, useInView, useMotionValue, useReducedMotion, useTransf
 import { Star } from "lucide-react";
 import { useLocale } from "next-intl";
 import { cn } from "@/lib/utils";
-import { OrnateFrame } from "./OrnateFrame";
+import { OrnateFrame } from "../../../components/shared/OrnateFrame";
 
 /**
  * Thẻ điểm đánh giá — nội dung đặt trong khung dùng chung OrnateFrame (viền gấm, vệt sáng, bồng bềnh, nhấc khi rê chuột).
@@ -87,7 +87,7 @@ export function RatingBadge({ score, max = 5, label, caption, className }: Ratin
                     animate={inView ? { width: `${fill * 100}%` } : undefined}
                     transition={{ delay: reduceMotion ? 0 : 0.35 + i * 0.14, duration: reduceMotion ? 0 : 0.45, ease: "easeOut" }}
                   >
-                    <Star size={14} fill="currentColor" stroke="none" className="max-w-none text-[#C9A227]" />
+                    <Star size={14} fill="currentColor" stroke="none" className="max-w-none text-(--rating)" />
                   </motion.span>
                 </span>
               );

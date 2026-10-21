@@ -6,11 +6,11 @@ import { useTranslations } from "next-intl";
 import { motion } from "motion/react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
-import { ClipReveal } from "@/components/shared/ClipReveal";
+import { ClipReveal } from "./ClipReveal";
 import { AboutHeading } from "./AboutHeading";
 import { type FitProfile } from "../types/about.types";
 import { fitProfiles } from "../data/aboutContent";
-import { containerClassName } from "@/components/ui/container";
+import { containerClassName } from "@/components/layout/Container";
 
 const STAT_KEYS: Record<FitProfile["id"], readonly string[]> = {
   slender: ["shoulder", "waist", "panel"],

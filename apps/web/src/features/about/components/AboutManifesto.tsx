@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import { motion, useScroll, useTransform, type MotionValue } from "motion/react";
 import { useTranslations } from "next-intl";
-import { containerClassName } from "@/components/ui/container";
+import { containerClassName } from "@/components/layout/Container";
 
 /**
  * Câu triết lý căn trái, nhãn chữ dọc bên cạnh: từng chữ sáng dần theo nhịp cuộn —

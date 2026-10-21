@@ -5,7 +5,7 @@ import { Store } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { ActionLink, AppTooltip, type ActionColors } from "@/components/shared";
-import { HeaderHeightSync } from "@/components/common/header/HeaderHeightSync";
+import { HeaderHeightSync } from "@/components/layout/header/HeaderHeightSync";
 import { AdminMobileNav } from "./AdminMobileNav";
 import { AdminSubNav } from "./AdminSubNav";
 import { AdminUserMenu } from "./AdminUserMenu";

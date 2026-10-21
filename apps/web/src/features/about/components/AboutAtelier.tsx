@@ -5,11 +5,11 @@ import Image from "next/image";
 import { animate, useInView, useReducedMotion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { Reveal } from "@/components/shared/Reveal";
-import { ClipReveal } from "@/components/shared/ClipReveal";
+import { ClipReveal } from "./ClipReveal";
 import { cn } from "@/lib/utils";
 import { AboutHeading } from "./AboutHeading";
 import { atelierStories } from "../data/aboutContent";
-import { containerClassName } from "@/components/ui/container";
+import { containerClassName } from "@/components/layout/Container";
 
 const METRIC_KEYS = ["checks", "years", "consulting"] as const;
 

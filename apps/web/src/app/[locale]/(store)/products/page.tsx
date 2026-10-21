@@ -1,4 +1,4 @@
-import { Container } from '@/components/ui/container';
+import { Container } from '@/components/layout/Container';
 import { PageIntro } from '@/components/shared/PageIntro';
 import { ProductsCollection, ProductEventBanner, type ProductFilterParams } from '@/features/products';
 import { getTranslations } from 'next-intl/server';

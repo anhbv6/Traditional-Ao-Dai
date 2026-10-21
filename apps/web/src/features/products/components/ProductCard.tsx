@@ -8,10 +8,10 @@ import { Link, useRouter } from '@/i18n/routing';
 import { parseVndString, useCartStore } from '@/features/cart';
 import { useIsWishlisted, useWishlistUndo } from '@/features/wishlist';
 import { showToast } from '@/components/ui/toast';
-import { flyToCart } from '@/components/shared/flyToCart';
+import { flyToCart } from '../utils/flyToCart';
 import { AppTooltip } from '@/components/shared/AppTooltip';
-import { HeartToggle } from '@/components/shared/HeartToggle';
-import { SaleGlow } from '@/components/shared/SaleGlow';
+import { HeartToggle } from './HeartToggle';
+import { SaleGlow } from './SaleGlow';
 import { materialKeys } from './FilterSidebar';
 
 export type ProductColorSwatch = {

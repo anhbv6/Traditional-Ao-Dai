@@ -122,7 +122,7 @@ export function QRBank({
                 title={t('copy')}
                 className="grid size-8 cursor-pointer place-items-center text-[var(--text-light)] transition-colors duration-300 hover:bg-[var(--bg-secondary)] hover:text-[var(--primary-ink)]"
               >
-                {copied ? <Check size={15} className="text-[#2F7D4F]" /> : <Copy size={15} />}
+                {copied ? <Check size={15} className="text-(--success)" /> : <Copy size={15} />}
               </button>
             </dd>
           </div>

@@ -4,11 +4,11 @@ import React, { useRef, useState } from 'react';
 import Image from 'next/image';
 import { AnimatePresence, motion, useInView, useReducedMotion } from 'motion/react';
 import { useTranslations } from 'next-intl';
-import { RatingBadge } from '@/components/shared/RatingBadge';
+import { RatingBadge } from './RatingBadge';
 import { SliderNav } from '@/components/shared/SliderNav';
 import { cn } from '@/lib/utils';
 import { SectionHeading } from './SectionHeading';
-import { containerClassName } from '@/components/ui/container';
+import { containerClassName } from '@/components/layout/Container';
 
 /** Mỗi đánh giá kèm ảnh khách diện áo — chữ ở messages HomePage.promoteFeedback.reviews.<key> */
 const REVIEWS = [

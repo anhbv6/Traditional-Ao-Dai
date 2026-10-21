@@ -209,7 +209,7 @@ export function SearchOverlay({ label, placeholder }: SearchOverlayProps) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="fixed inset-0 z-[80] bg-[#2A2525]/45 backdrop-blur-[2px]"
+              className="fixed inset-0 z-[80] bg-(--bg-inverse)/45 backdrop-blur-[2px]"
             />
             <motion.div
               key="search-panel"

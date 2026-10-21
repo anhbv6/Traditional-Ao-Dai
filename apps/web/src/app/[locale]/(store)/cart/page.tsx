@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container } from '@/components/ui/container';
+import { Container } from '@/components/layout/Container';
 import { CartExperience } from '@/features/cart';
 import { ClientMessages, CLIENT_NAMESPACES } from '@/i18n/ClientMessages';
 

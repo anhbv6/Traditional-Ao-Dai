@@ -14,7 +14,7 @@ export function AdminQuickBar() {
   }
 
   return (
-    <div className="w-full bg-[#18181B] text-white py-1.5 px-4 sm:px-8 flex items-center justify-between text-[11px] sm:text-xs z-50 border-b border-zinc-800 select-none">
+    <div className="w-full bg-(--admin-ink) text-white py-1.5 px-4 sm:px-8 flex items-center justify-between text-[11px] sm:text-xs z-50 border-b border-zinc-800 select-none">
       <div className="flex items-center gap-2">
         <span className="inline-flex items-center justify-center size-5 rounded bg-white/10 text-emerald-400">
           <Shield size={12} />

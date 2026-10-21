@@ -1,6 +1,6 @@
 import React from "react";
 import { WishlistExperience } from "@/features/wishlist";
-import { Container } from "@/components/ui/container";
+import { Container } from "@/components/layout/Container";
 import { ClientMessages, CLIENT_NAMESPACES } from "@/i18n/ClientMessages";
 
 export default function WishlistPage() {

@@ -49,7 +49,7 @@ export function SaleGlow({ className }: { className?: string }) {
   return (
     <div aria-hidden="true" className={cn("pointer-events-none absolute inset-0 z-10", className)}>
       {/* Viền vàng nhạt + quầng vàng mờ bên trong "thở" */}
-      <span className="absolute inset-0 border-[1.5px] border-[#E6C77A]/90 shadow-[inset_0_0_24px_rgba(230,199,122,0.4)] animate-[sale-breathe_3.6s_ease-in-out_infinite] motion-reduce:animate-none" />
+      <span className="absolute inset-0 border-[1.5px] border-(--sale-glow)/90 shadow-[inset_0_0_24px_rgba(230,199,122,0.4)] animate-[sale-breathe_3.6s_ease-in-out_infinite] motion-reduce:animate-none" />
 
       {/* Luồng sáng chạy vòng quanh viền */}
       <span

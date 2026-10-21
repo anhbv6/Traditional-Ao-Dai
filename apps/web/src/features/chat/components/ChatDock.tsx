@@ -8,7 +8,7 @@ import { MessageCircle, Sparkles } from "lucide-react";
 import { AppTooltip } from "@/components/shared/AppTooltip";
 import { cn } from "@/lib/utils";
 import { useHasBottomBar } from "@/hooks/useHasBottomBar";
-import { FLOATING_BUTTON_CLASS } from "@/components/common/floatingButton";
+import { FLOATING_BUTTON_CLASS } from "@/components/layout/floatingButton";
 import { useChatStore } from "../store/chatStore";
 import { type ChatChannel } from "../types/chat.types";
 

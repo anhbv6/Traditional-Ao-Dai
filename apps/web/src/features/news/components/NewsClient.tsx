@@ -162,7 +162,7 @@ export function NewsClient() {
                       sizes="(max-width: 1024px) 100vw, 640px"
                       className={IMAGE_HOVER}
                     />
-                    <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#2A0A12]/90 via-[#2A0A12]/30 to-transparent" />
+                    <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-(--bg-wine)/90 via-(--bg-wine)/30 to-transparent" />
                     <div aria-hidden="true" className={HOVER_FRAME} />
                     <div className="relative p-6 sm:p-8">
                       <MetaLine className="text-white/75" items={[leftLatestArticle.category[locale], leftLatestArticle.dateLong[locale]]} />

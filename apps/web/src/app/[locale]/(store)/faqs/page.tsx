@@ -1,6 +1,6 @@
 import React from "react";
 import { FaqsExperience } from "@/features/faqs";
-import { Container } from "@/components/ui/container";
+import { Container } from "@/components/layout/Container";
 import { ClientMessages, CLIENT_NAMESPACES } from "@/i18n/ClientMessages";
 
 /** Trang cấp 1 (từ footer / trang Liên hệ) — không cần breadcrumb. Không đặt overflow-hidden để cột trái sticky được */

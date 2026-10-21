@@ -79,7 +79,7 @@ export function ProductMobileFilterSheet({ activeFilterCount, onClearAll, result
           <button
             type="button"
             onClick={() => setIsOpen(false)}
-            className="min-h-12 cursor-pointer bg-[var(--primary-color)] px-5 text-xs font-semibold uppercase tracking-[2px] text-white transition-colors active:bg-[#2A0A12]"
+            className="min-h-12 cursor-pointer bg-[var(--primary-color)] px-5 text-xs font-semibold uppercase tracking-[2px] text-white transition-colors active:bg-(--bg-wine)"
           >
             {t('showResults', { count: resultCount })}
           </button>

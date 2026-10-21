@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { Reveal } from "@/components/shared/Reveal";
 import { AboutHeading } from "./AboutHeading";
-import { containerClassName } from "@/components/ui/container";
+import { containerClassName } from "@/components/layout/Container";
 
 const PAIN_KEYS = ["armhole", "belly", "fit"] as const;
 

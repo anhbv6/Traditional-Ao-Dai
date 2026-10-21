@@ -91,7 +91,7 @@ export function HeartToggle({ active, onToggle, labelOn, labelOff, tone = "onIma
               "transition-[color,fill] duration-500 ease-out",
               tone === "onImage" && "[filter:drop-shadow(0_1px_2px_rgba(0,0,0,0.45))]",
               !active && (tone === "onImage" ? "text-white" : "text-[var(--text-main)]"),
-              !active && "group-hover/heart:text-[#E11D48]",
+              !active && "group-hover/heart:text-(--heart)",
             )}
             style={{
               color: active ? HEART_RED : undefined,

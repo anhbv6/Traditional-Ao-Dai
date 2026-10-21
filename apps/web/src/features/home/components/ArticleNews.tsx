@@ -9,7 +9,7 @@ import { SliderNav } from '@/components/shared/SliderNav';
 import { Link } from '@/i18n/routing';
 import { SectionHeading } from './SectionHeading';
 import { mockArticles, NewsCard } from '@/features/news';
-import { containerClassName } from '@/components/ui/container';
+import { containerClassName } from '@/components/layout/Container';
 
 const VISIBLE_COUNT = 8;
 /** Thời gian dừng ở mỗi slide trước khi tự trượt */

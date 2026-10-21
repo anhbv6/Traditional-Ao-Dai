@@ -6,7 +6,7 @@ import { Link } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
 import { SectionHeading } from './SectionHeading';
 import { Reveal } from '@/components/shared/Reveal';
-import { containerClassName } from '@/components/ui/container';
+import { containerClassName } from '@/components/layout/Container';
 
 const COLLECTIONS = [
   { key: 'tet', image: '/images/login1.jpg', position: 'object-[50%_35%]', featured: true },
@@ -45,7 +45,7 @@ export function FeaturedCollections() {
                   item.position,
                 )}
               />
-              <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#2A0A12]/80 via-[#2A0A12]/10 to-transparent" />
+              <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-(--bg-wine)/80 via-(--bg-wine)/10 to-transparent" />
               {/* Khung viền mảnh hiện ra khi rê chuột — chi tiết sang trọng, không phô trương */}
               <div aria-hidden="true" className="absolute inset-4 border border-white/0 transition-colors duration-500 group-hover:border-white/50" />
 

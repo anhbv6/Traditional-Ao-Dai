@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-import { flyToCart } from '@/components/shared/flyToCart';
+import { flyToCart } from '../utils/flyToCart';
 import ProductGallery from './detail/ProductGallery';
 import ProductInfo from './detail/ProductInfo';
 import ProductSideTabs, { type ProductSideTabKey } from './detail/ProductSideTabs';

@@ -122,6 +122,15 @@
   --border: #E2D9D2;
   --ring: #E2A79E;              /* Vòng focus */
   --destructive: #B42318;       /* Lỗi, xóa */
+
+  /* Màu ngữ nghĩa phụ — giống nhau ở sáng / tối (chế độ tối kế thừa từ đây) */
+  --danger: #C81E3A;            /* Mục menu nguy hiểm (Đăng xuất, Xóa) */
+  --success: #2F7D4F;           /* Trạng thái thành công (đã sao chép, đã thanh toán) */
+  --rating: #C9A227;            /* Sao đánh giá */
+  --heart: #E11D48;             /* Trái tim yêu thích khi đã chọn */
+  --sale-glow: #E6C77A;         /* Viền ánh vàng của nhãn khuyến mãi */
+  --overlay: #1F0A10;           /* Lớp phủ nền sau dialog */
+  --admin-ink: #18181B;         /* Thanh công cụ admin hiển thị trên storefront (tông admin) */
 }
 
 

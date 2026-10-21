@@ -10,7 +10,7 @@ import '@smastrom/react-rating/style.css';
 import { formatVnd } from '@repo/shared';
 
 import { QuantitySelector } from '@/components/shared/QuantitySelector';
-import { HeartToggle } from '@/components/shared/HeartToggle';
+import { HeartToggle } from '../HeartToggle';
 import { ActionButton } from '@/components/shared/ActionButton';
 import { cn } from '@/lib/utils';
 import { MAX_LINE_QUANTITY } from '@/features/cart';

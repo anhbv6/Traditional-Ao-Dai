@@ -4,7 +4,7 @@ import { type HeroMetric } from '../types/home.types';
 import { SectionOrnament } from '@/components/shared/SectionOrnament';
 import { ActionLink } from '@/components/shared/ActionLink';
 import { FallingPetals } from '@/components/effects/FallingPetals';
-import { containerClassName } from '@/components/ui/container';
+import { containerClassName } from '@/components/layout/Container';
 
 interface HeroBannerProps {
   eyebrow: string;

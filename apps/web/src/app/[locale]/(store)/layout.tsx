@@ -1,9 +1,9 @@
 import React, { ReactNode } from 'react';
-import { Footer } from '@/components/common/footer/Footer';
-import { Header } from '@/components/common/header/Header';
-import { ScrollToTopButton } from '@/components/common/ScrollToTopButton';
+import { Footer } from '@/components/layout/footer/Footer';
+import { Header } from '@/components/layout/header/Header';
+import { ScrollToTopButton } from '@/components/layout/ScrollToTopButton';
 import { ChatDock } from '@/features/chat';
-import { ConditionalFooter } from './ConditionalFooter';
+import { ConditionalFooter } from '../../../components/layout/ConditionalFooter';
 import { ClientMessages, CLIENT_NAMESPACES } from '@/i18n/ClientMessages';
 
 interface StoreLayoutProps {

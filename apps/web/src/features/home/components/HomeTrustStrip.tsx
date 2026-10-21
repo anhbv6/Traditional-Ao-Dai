@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslations } from 'next-intl';
 import { Feather, Gift, Ruler, Scissors } from 'lucide-react';
-import { containerClassName } from '@/components/ui/container';
+import { containerClassName } from '@/components/layout/Container';
 
 const TRUST_ITEMS = [
   { key: 'silk', Icon: Feather },

@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { Palette } from "lucide-react";
-import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
+import { AnimatedThemeToggler } from "@/components/effects/AnimatedThemeToggler";
 import { ProfileSection } from "../ProfileSection";
 
 /**

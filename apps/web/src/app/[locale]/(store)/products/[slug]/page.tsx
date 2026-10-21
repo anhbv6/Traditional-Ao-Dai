@@ -1,7 +1,7 @@
 import React from 'react';
 import { ProductDetail, mockDetailProducts, productCatalog } from '@/features/products';
-import { Container } from '@/components/ui/container';
-import { Breadcrumbs } from '@/components/common/Breadcrumbs';
+import { Container } from '@/components/layout/Container';
+import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
 import { ClientMessages, CLIENT_NAMESPACES } from '@/i18n/ClientMessages';
 
 type Locale = 'vi' | 'en';
