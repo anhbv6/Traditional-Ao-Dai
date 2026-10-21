@@ -51,7 +51,7 @@ Toàn bộ hệ thống quản trị Admin sử dụng font **Inter** qua CSS va
 
 ---
 
-## 3. Thành Phần Giao Diện Dùng Chung (`features/admin/ui`)
+## 3. Thành Phần Giao Diện Dùng Chung (`features/admin/core/ui`)
 
 | Thành phần | Dùng khi |
 | :--- | :--- |

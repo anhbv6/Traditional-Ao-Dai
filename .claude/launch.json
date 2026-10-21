@@ -19,6 +19,30 @@
       "name": "web-3000-existing",
       "url": "http://localhost:3000",
       "port": 3000
+    },
+    {
+      "name": "api-3001",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "--filter",
+        "@repo/api",
+        "dev"
+      ],
+      "port": 3001
+    },
+    {
+      "name": "web-prod-3005",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "--filter",
+        "@repo/web",
+        "exec",
+        "next",
+        "start",
+        "-p",
+        "3005"
+      ],
+      "port": 3005
     }
   ]
 }

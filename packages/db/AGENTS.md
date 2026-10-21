@@ -9,6 +9,7 @@
 - Schema: `prisma/schema.prisma`.
 - Export: Prisma Client singleton từ `src/index.ts` (export thẳng file `.ts`, cần Node ≥ 22.18).
 - Các workspace khác import: `import { prisma } from "@repo/db"` (kiểu: `import { type Prisma, type Role } from "@repo/db"`).
+- ⚠ `src/index.ts` vừa `export const prisma` vừa `export * from "@prisma/client"` (CommonJS): dùng được với `tsx`/Next.js, nhưng `require()` từ bản build CommonJS của API không thấy `prisma` — xem `docs/PROJECT_RULES.md` §13.
 
 # 2. Quy trình Prisma (QUAN TRỌNG)
 - Sau khi sửa `schema.prisma`:
@@ -24,7 +25,7 @@
 - Đọc `DATABASE_URL` từ `apps/api/.env` thông qua `dotenv-cli`.
 - Khi chạy lệnh Prisma trực tiếp trong `packages/db`, các script đã tự động load đúng `.env`.
 
-# 4. Schema hiện tại (24 models)
+# 4. Schema hiện tại (23 models, 9 enums)
 - **Auth & người dùng:** `User`, `AuthToken`, `SocialAccount`, `UserSession` (refresh token dạng hash, `familyId` phát hiện dùng lại), `UserAddress`, `UserMeasurement` (số đo áo dài).
 - **Catalog:** `Category`, `Product`, `ProductVariant`.
 - **Giỏ hàng & đơn hàng:** `Cart`, `CartItem`, `Voucher`, `Order`, `OrderItem` (snapshot sản phẩm + số đo), `TailoringLog` (nhật ký may đo).
@@ -35,7 +36,7 @@
 
 # 5. Seeding
 - Seed file: `prisma/seed.ts`. Chạy: `pnpm db:seed`.
-- Tài khoản admin mặc định: `admin@gmail.com` / `admin123` (đổi qua `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`).
+- Tài khoản admin mặc định: `admin@gmail.com` / `admin123` / `0987654321` (đổi qua `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` / `SEED_ADMIN_PHONE` trong `apps/api/.env`, đã có trong `.env.example`).
 
 # 6. Quy tắc khi sửa Schema
 - `id String @id @default(uuid())`; luôn có `createdAt @default(now())` và `updatedAt @updatedAt`.

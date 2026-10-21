@@ -26,7 +26,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - **Frontend:** Next.js 16 (App Router, RSC), React 19, Tailwind CSS v4, shadcn/ui + Base UI, TanStack React Query v5, Zustand v5, React Hook Form + Zod v4, next-intl (vi + en), Motion 12.
 - **Backend:** Express.js 4, JWT RS256 (access + refresh), bcryptjs, Google OAuth, Cloudinary + Multer, Nodemailer, Swagger (`/api-docs`, chỉ ngoài production), ioredis, Zod v4, helmet.
 - **Database:** PostgreSQL qua Prisma ORM, Redis 7 (Docker) cho OTP, rate-limit, reset token.
-- **Infrastructure:** Docker Compose (chỉ Redis), pnpm workspaces, GitHub Actions CI (`typecheck` + `lint`).
+- **Infrastructure:** Docker Compose (chỉ Redis), pnpm 11 workspaces (ghim bằng `packageManager`), GitHub Actions CI (`typecheck` + `lint` cho web và api).
 
 # 4. Quy tắc sử dụng Terminal & Cài đặt Package (Crucial)
 - TUYỆT ĐỐI KHÔNG sử dụng `npm install` hoặc `yarn install`. Chỉ dùng `pnpm`.
@@ -61,4 +61,11 @@ This version has breaking changes — APIs, conventions, and file structure may 
 # 9. Phân cấp Rule (Rule Hierarchy)
 - [`docs/PROJECT_RULES.md`](docs/PROJECT_RULES.md) là nguồn quy chuẩn chi tiết của toàn bộ dự án.
 - Đây là file tóm tắt chung của Monorepo.
-- Khi làm việc trong `apps/api`, `apps/web`, `packages/db`, `packages/shared`, bắt buộc đọc thêm `AGENTS.md` nằm trong thư mục đó.
+- Khi làm việc trong `apps/api`, `apps/web`, `packages/db`, `packages/shared`, bắt buộc đọc thêm `AGENTS.md` nằm trong thư mục đó (Claude Code tự nạp qua `CLAUDE.md` của từng workspace).
+- Hướng dẫn chuyên đề: `docs/guides/` (giao diện admin, tạo khóa JWT). Quy trình tạo module/feature/mã KEY mới: skill dự án trong `.claude/skills/`.
+
+# 10. Cấu trúc thư mục (tóm tắt — chi tiết ở PROJECT_RULES §5, §7, §8)
+- **API:** `src/{app.ts, server.ts, routes.ts, config/, infra/, core/{http,middlewares,security,utils}/, modules/<module>/}`.
+- **Web:** `src/{app/, components/{ui,effects,shared,layout,feedback,providers}/, features/<feature>/, hooks/, i18n/, lib/}`; feature theo khuôn `api, components, constants, data (mock), hooks, store, types, utils, validations, index.ts`.
+- **Admin:** `features/admin/core/{auth,server,session,layout,ui}` + `features/admin/modules/<module>/{actions,queries,schemas,components,types}`.
+- **Shared:** `@repo/shared` (không zod) + `@repo/shared/validation` (validator Zod).

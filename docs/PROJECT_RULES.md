@@ -1,7 +1,20 @@
 # 📐 Quy Chuẩn Dự Án — Traditional Ao Dai
 
-> Tài liệu này là **nguồn quy chuẩn duy nhất** cho toàn bộ monorepo. Các file `AGENTS.md`, `README.md`, `.cursor/rules`, `.github/copilot-instructions.md` chỉ tóm tắt và trỏ về đây.
+> Tài liệu này là **nguồn quy chuẩn duy nhất** cho toàn bộ monorepo. Các file khác chỉ tóm tắt và trỏ về đây.
 > Khi quy chuẩn thay đổi: sửa file này trước, sau đó cập nhật các file tóm tắt.
+
+**Bản đồ tài liệu:**
+
+| File | Vai trò |
+| :--- | :--- |
+| `docs/PROJECT_RULES.md` | Quy chuẩn đầy đủ (file này) |
+| `AGENTS.md` (gốc) | Tóm tắt toàn monorepo cho người & AI agent |
+| `apps/*/AGENTS.md`, `packages/*/AGENTS.md` | Tóm tắt quy tắc riêng của từng workspace |
+| `CLAUDE.md`, `gemini.md` (gốc + mỗi workspace) | Chỉ `@AGENTS.md` — để Claude Code / Gemini tự nạp đúng `AGENTS.md` theo thư mục đang làm việc |
+| `.cursor/rules/main.mdc`, `.github/copilot-instructions.md` | Chỉ trỏ về các file trên (không chép lại nội dung) |
+| `docs/guides/` | Hướng dẫn chuyên đề: `admin-ui.md` (giao diện admin), `jwt-keys.md` (tạo cặp khóa JWT) |
+| `.claude/skills/` | Skill dự án: quy trình từng bước + mẫu file khi tạo module/feature/mã KEY mới |
+| `README.md` | Giới thiệu, cài đặt, chạy dự án |
 
 **Thứ tự ưu tiên khi có mâu thuẫn:** Bảo mật (§6) › File này › `AGENTS.md` của workspace › `AGENTS.md` ở root › thói quen cá nhân.
 
@@ -61,7 +74,7 @@ Trình duyệt ── /vi/... ─►│ proxy.ts (i18n + chặn route)  →  Ser
 ## 2. Môi trường & công cụ
 
 - **Node.js ≥ 22.18** (khuyến nghị 24). Các package workspace (`@repo/db`, `@repo/shared`) export thẳng file `.ts`; Node chạy được nhờ type-stripping mặc định.
-- **pnpm** là package manager duy nhất. **CẤM** `npm install` / `yarn`.
+- **pnpm 11** là package manager duy nhất (ghim bằng `packageManager` trong `package.json` gốc — CI đọc từ đây). **CẤM** `npm install` / `yarn`.
   - Thêm package: `pnpm --filter @repo/<workspace> add <pkg>` (`-D` cho devDependency).
 - Docker Compose hiện chỉ chạy **Redis**; PostgreSQL tự cài (local/cloud).
 
@@ -72,7 +85,7 @@ Trình duyệt ── /vi/... ─►│ proxy.ts (i18n + chặn route)  →  Ser
 | `pnpm dev` | Chạy dev tất cả workspace song song |
 | `pnpm check` | `typecheck` + `lint` toàn repo — **bắt buộc xanh trước khi commit** |
 | `pnpm typecheck` | `tsc --noEmit` cho mọi workspace |
-| `pnpm lint` | ESLint (hiện áp dụng cho `apps/web`) |
+| `pnpm lint` | ESLint cho `apps/web` và `apps/api` (cấm `any`, 0 lỗi / 0 cảnh báo) |
 | `pnpm build` | Build tất cả workspace |
 | `pnpm db:migrate` | Tạo + áp dụng migration (dev, interactive) |
 | `pnpm db:deploy` | Áp dụng migration có sẵn (production / môi trường không interactive) |
@@ -82,11 +95,11 @@ Trình duyệt ── /vi/... ─►│ proxy.ts (i18n + chặn route)  →  Ser
 ### Biến môi trường
 
 - **TUYỆT ĐỐI KHÔNG commit `.env`**. Mỗi biến mới phải được thêm vào `.env.example` tương ứng kèm comment giải thích.
-- Backend validate env bằng Zod tại `apps/api/src/shared/config/env.ts` — thêm biến mới phải khai báo ở đây.
+- Backend validate env bằng Zod tại `apps/api/src/config/env.ts` — thêm biến mới phải khai báo ở đây.
 
 | File | Biến quan trọng |
 | :--- | :--- |
-| `apps/api/.env` | `DATABASE_URL`, `JWT_PRIVATE_KEY`, `JWT_PUBLIC_KEY`, `REDIS_*`, `SMTP_*`, `CLOUDINARY_*`, `GOOGLE_CLIENT_ID`, `TRUST_PROXY` |
+| `apps/api/.env` | `DATABASE_URL`, `JWT_PRIVATE_KEY`, `JWT_PUBLIC_KEY`, `REDIS_*`, `SMTP_*`, `CLOUDINARY_*`, `GOOGLE_CLIENT_ID`, `TRUST_PROXY`, `SEED_ADMIN_*` (tài khoản do `pnpm db:seed` tạo) |
 | `apps/web/.env` | `NEXT_PUBLIC_API_URL="/api"`, `API_INTERNAL_URL`, `JWT_PUBLIC_KEY` (chỉ public key — dùng ở server để xác minh `admin_token`), `DATABASE_URL` (khu vực admin gọi Prisma trực tiếp — thiếu biến này mọi trang admin bị đẩy về đăng nhập), `NEXT_PUBLIC_GOOGLE_CLIENT_ID` |
 | `packages/db` | Không có `.env` riêng — đọc `apps/api/.env` qua `dotenv-cli` |
 
@@ -101,7 +114,8 @@ Trình duyệt ── /vi/... ─►│ proxy.ts (i18n + chặn route)  →  Ser
 - `camelCase` cho biến/hàm, `PascalCase` cho component/type/interface, `UPPER_SNAKE_CASE` cho hằng số và **mã KEY** (lỗi/phản hồi).
 - Tên file:
   - BE: `<module>.routes.ts`, `.controller.ts`, `.service.ts`, `.schema.ts`, `.types.ts`; tiện ích `camelCase.ts`.
-  - FE: component `PascalCase.tsx`; hook `useXxx.ts`; API `xxx.api.ts`; store `xxxStore.ts`; Server Action `xxx.actions.ts`; query server `xxx.queries.ts`; file chỉ chạy server `*.server.ts`.
+  - FE: component `PascalCase.tsx`; hook `useXxx.ts`; API `xxx.api.ts`; store `xxxStore.ts`; Server Action `xxx.actions.ts` (**chỉ** file có `"use server"`); query server `xxx.queries.ts` (**chỉ** hàm đọc Prisma); schema tham số action `xxx.schemas.ts`; file chỉ chạy server `*.server.ts`.
+  - Thư mục con: `kebab-case` (`manage-address/`, `order-history/`).
 
 ### TypeScript
 - `strict` ở mọi workspace. **Không dùng `any`** — dùng `unknown` + type guard, kiểu Prisma (`Prisma.XWhereInput`), generic, hoặc `Record<string, unknown>`.
@@ -121,19 +135,22 @@ Trình duyệt ── /vi/... ─►│ proxy.ts (i18n + chặn route)  →  Ser
 
 **Quy tắc của package:**
 - Chỉ code thuần — không import Express, Next.js, React, Prisma.
-- Một file entry `src/index.ts`, **không import tương đối** giữa các file (nếu cần tách, dùng `exports` map trong `package.json`).
+- Mỗi entry là **một file** và **không import tương đối** giữa các file (Node chạy thẳng `.ts` bằng type-stripping). Entry mới khai báo trong `exports` + `typesVersions` (API dùng `module: commonjs` nên TypeScript chỉ đọc `typesVersions`).
+- Entry chính `@repo/shared` **không được import zod** — trang chỉ cần hằng số (`AUTH_COOKIES`, `formatVnd`...) sẽ không phải tải zod (~98KB) xuống trình duyệt. Validator nằm ở `@repo/shared/validation`.
+- `"sideEffects": false` — không viết lệnh chạy ở cấp module.
 - Thông điệp lỗi Zod luôn là **mã KEY**.
 
 **Nội dung hiện có:**
 
-| Nhóm | Export |
-| :--- | :--- |
-| Locale | `LOCALES`, `Locale`, `DEFAULT_LOCALE`, `pickLocalized()` |
-| Vai trò | `ROLES`, `Role` |
-| Response | `ApiSuccess<T>`, `ApiError`, `ApiResponse<T>`, `ApiMeta`, `ApiFieldError` |
-| Auth | `AUTH_COOKIES`, `UserDto`, `SocialAccountDto` |
-| Validation | `VIETNAM_PHONE_REGEX`, `vietnamPhoneSchema`, `emailSchema`, `newPasswordSchema`, `loginPasswordSchema`, `verificationCodeSchema`, `normalizeVietnamPhone()` |
-| Tiền tệ | `formatVnd()`, `toVnd()` |
+| Entry | Nhóm | Export |
+| :--- | :--- | :--- |
+| `@repo/shared` | Locale | `LOCALES`, `Locale`, `DEFAULT_LOCALE`, `pickLocalized()` |
+| | Vai trò | `ROLES`, `Role` |
+| | Response | `ApiSuccess<T>`, `ApiError`, `ApiResponse<T>`, `ApiMeta`, `ApiFieldError` |
+| | Auth | `AUTH_COOKIES`, `UserDto`, `SocialAccountDto` |
+| | SĐT | `normalizeVietnamPhone()` |
+| | Tiền tệ | `formatVnd()`, `toVnd()` |
+| `@repo/shared/validation` | Validation | `VIETNAM_PHONE_REGEX`, `PASSWORD_MIN_LENGTH`, `PASSWORD_MAX_LENGTH`, `VERIFICATION_CODE_LENGTH`, `vietnamPhoneSchema`, `emailSchema`, `newPasswordSchema`, `loginPasswordSchema`, `verificationCodeSchema` |
 
 ### Định dạng response API (bắt buộc)
 
@@ -156,19 +173,33 @@ Trình duyệt ── /vi/... ─►│ proxy.ts (i18n + chặn route)  →  Ser
 
 ## 5. Backend (`apps/api`)
 
-### Cấu trúc module (Modular Monolith)
+### Cấu trúc thư mục (Modular Monolith, phân tầng)
 
 ```text
-src/modules/<module>/
-├── <module>.routes.ts      # Khai báo endpoint + Swagger JSDoc
-├── <module>.controller.ts  # Mỏng: đọc req -> gọi service -> sendSuccess / next(error)
-├── <module>.service.ts     # Logic nghiệp vụ + Prisma
-├── <module>.schema.ts      # Zod schema { body, query, params }
-├── <module>.types.ts       # (tùy chọn) kiểu nội bộ module
-└── KEYS.md                 # Danh sách mã phản hồi/lỗi của module
+src/
+├── app.ts               # createApp(): middleware, health check, router, errorHandler — KHÔNG listen (test được)
+├── server.ts            # Entry: listen + tắt êm (dev: tsx watch src/server.ts, prod: node dist/server.js)
+├── routes.ts            # Router trung tâm — đăng ký router của từng module
+├── config/              # env.ts (Zod), swagger.ts
+├── infra/               # Kết nối dịch vụ ngoài: redis, cloudinary, mailer, sms
+├── core/
+│   ├── http/            # AppError, response (sendSuccess / sendError)
+│   ├── middlewares/     # authGuard, errorHandler, requestLogger, validate, rateLimit (middleware)
+│   ├── security/        # jwt, password, session, authCookies, verificationCode, rateLimit (đếm Redis)
+│   └── utils/           # Hàm thuần: number, phone, time
+└── modules/<module>/
+    ├── <module>.routes.ts      # Khai báo endpoint + Swagger JSDoc
+    ├── <module>.controller.ts  # Mỏng: đọc req -> gọi service -> sendSuccess / next(error)
+    ├── <module>.service.ts     # Logic nghiệp vụ + Prisma
+    ├── <module>.schema.ts      # Zod schema { body, query, params }
+    ├── <module>.types.ts       # (tùy chọn) kiểu nội bộ module
+    └── KEYS.md                 # Danh sách mã phản hồi/lỗi của module
 ```
 
-Đăng ký router trong `src/routes.ts`. Import Prisma từ `@repo/db` (không import `@prisma/client`).
+- Module lớn được chia **submodule** theo đối tượng dùng, giữ chung routes/schema ở gốc module: `modules/auth/{client,admin}/` mỗi thư mục có `auth.controller.ts` + `auth.service.ts`.
+- Phụ thuộc một chiều: `modules` → `core` / `infra` / `config`; `core` → `infra` / `config`; `infra` → `config`. `core` và `infra` **không** import từ `modules`.
+- Đăng ký router trong `src/routes.ts`. Import Prisma từ `@repo/db` (không import `@prisma/client`).
+- ESLint (`apps/api/eslint.config.mjs`) cấm `any`; tham số cố ý không dùng đặt tên bắt đầu bằng `_` (vd. `_next` của error handler).
 
 ### Thứ tự middleware trên route
 
@@ -189,11 +220,12 @@ router.post('/path', validate(schema), rateLimit({...}), requireAuth, requireRol
 
 | Nhu cầu | Dùng |
 | :--- | :--- |
-| Giới hạn tần suất | `rateLimit()` / `assertRateLimit()` — `shared/utils/rateLimit.ts` (Redis) |
-| Mã xác minh OTP/email | `issueVerificationCode()` / `verifyVerificationCode()` — `shared/utils/verificationCode.ts` |
-| Cookie phiên | `setCustomerSessionCookies()` / `setAdminSessionCookies()` / `clear*()` — `shared/utils/authCookies.ts` |
-| Phiên đăng nhập | `hashToken()`, `cleanupUserSessions()`, `revokeAllUserSessions()` — `shared/utils/session.ts` |
-| Gửi email mã | `sendVerificationCodeEmail()` — `shared/utils/mail.ts` |
+| Lỗi nghiệp vụ | `AppError` — `core/http/AppError.ts` |
+| Giới hạn tần suất | Middleware `rateLimit()` — `core/middlewares/rateLimit.ts`; trong service `assertRateLimit()` — `core/security/rateLimit.ts` (Redis) |
+| Mã xác minh OTP/email | `issueVerificationCode()` / `verifyVerificationCode()` — `core/security/verificationCode.ts` |
+| Cookie phiên | `setCustomerSessionCookies()` / `setAdminSessionCookies()` / `clear*()` — `core/security/authCookies.ts` |
+| Phiên đăng nhập | `hashToken()`, `cleanupUserSessions()`, `revokeAllUserSessions()` — `core/security/session.ts` |
+| Gửi email mã | `sendVerificationCodeEmail()` — `infra/mailer.ts` |
 | Chuẩn hóa SĐT | `normalizeVietnamPhone()` (từ `@repo/shared`) |
 
 ### Tài liệu API
@@ -220,8 +252,8 @@ router.post('/path', validate(schema), rateLimit({...}), requireAuth, requireRol
 ### Quy tắc bắt buộc
 1. **Cookie auth chỉ do Backend đặt/xóa** (qua `authCookies.ts`). Client **không** ghi `document.cookie` cho mục đích xác thực, không lưu token/thông tin người dùng vào `localStorage`.
 2. Express chỉ đọc token từ header Bearer, **ngoại lệ duy nhất** là cookie `admin_token` (SameSite=Strict). Không thêm cookie auth nào khác vào `extractToken`.
-3. **Mọi Server Action admin** gọi `authorizeAdminAction({ role?, permission? })` ở dòng đầu tiên. **Mọi page admin đọc DB** gọi `requireAdminPage()`.
-4. **Không tin định danh từ client**: người thực hiện (`requestedById`, `reviewedById`, `staffId`, `createdById`...) luôn lấy từ phiên ở server.
+3. **Mọi Server Action admin** gọi `authorizeAdminAction({ role?, permission? })` ở dòng đầu tiên, rồi **kiểm tra lại tham số** bằng `parseActionInput(schema, input)` — Server Action là endpoint công khai, kiểu TypeScript không tồn tại lúc chạy. (Ngoại lệ: quyền phụ thuộc chính tham số, vd. cột Kanban → parse trước rồi mới chọn quyền.) **Mọi page admin đọc DB** gọi `requireAdminPage()`.
+4. **Không tin định danh từ client**: người thực hiện (`requestedById`, `reviewedById`, `staffId`, `createdById`...) luôn lấy từ phiên ở server — và **không có mặt** trong kiểu tham số của action (schema không khai báo thì client không gửi được).
 5. **Không trả `error.message` nội bộ** (Prisma, thư viện) về client — log ở server, trả mã KEY hoặc thông điệp cố định.
 6. Mã xác minh: tối đa 5 lần nhập sai/mã (đếm trước khi so sánh), so sánh constant-time, mã dùng một lần. Mọi endpoint gửi mã/đăng nhập/kiểm tra tài khoản phải có rate-limit.
 7. Không để lộ tài khoản có tồn tại hay không ở đăng nhập (`INVALID_CREDENTIALS`) và quên mật khẩu (luôn trả thành công).
@@ -238,34 +270,54 @@ router.post('/path', validate(schema), rateLimit({...}), requireAuth, requireRol
 
 ```text
 src/
-├── app/[locale]/(store|auth|admin)/   # Routing + layout. Page chỉ lắp ráp feature, không chứa logic lớn
+├── app/[locale]/(store|auth|admin)/   # CHỈ route, layout, loading, not-found. Page chỉ lắp ráp feature, không chứa component/logic
 ├── components/
-│   ├── ui/            # shadcn/ui, Base UI (sinh từ CLI, hạn chế sửa)
-│   ├── effects/       # Component hiệu ứng/animation lấy từ registry (react-bits, magicui): Carousel, CircularGallery...
-│   ├── shared/        # Component dùng chung KHÔNG phụ thuộc feature (ConfirmDialog, OtpInput...)
-│   ├── common/        # Khung trang storefront: header/, footer/, Breadcrumbs (được phép dùng feature qua index)
-│   └── providers/     # AppProviders (React Query, Google OAuth, khôi phục phiên, nạp giỏ hàng)
-├── features/<feature>/
-│   ├── api/           # CHỈ hàm gọi Express qua apiClient (không chứa dữ liệu mock)
-│   ├── components/
-│   ├── data/          # Dữ liệu mock tạm thời (xóa khi có API thật)
-│   ├── hooks/
-│   ├── store/         # Zustand (nếu có client state)
-│   ├── types/         # Kiểu dữ liệu — không import từ components, không re-export dữ liệu
-│   ├── utils/         # Hàm thuần (tính toán, map dữ liệu)
-│   ├── validations/   # Zod schema của form
-│   └── index.ts       # Public API của feature (bắt buộc)
-├── hooks/             # Hook dùng chung: useNotify, useLocalStorageBoolean
-├── i18n/              # next-intl routing + request config
-├── lib/               # api-client (HTTP), messages (trích xuất + dịch + toast), utils (cn, resolveClassName), jwt.server
+│   ├── ui/            # CHỈ component shadcn sinh từ CLI (button, dialog, select...) — không đặt component tự viết ở đây
+│   ├── effects/       # Hiệu ứng/animation từ registry (react-bits, magicui): ClickSpark, Counter, FallingPetals, AnimatedThemeToggler
+│   ├── shared/        # Component dùng lại ở NHIỀU feature, không phụ thuộc feature (AppDialog, ActionButton, TextField, OtpInput...)
+│   ├── layout/        # Khung trang storefront: header/, footer/, Container, Breadcrumbs, ConditionalFooter, Show (được dùng feature qua index)
+│   ├── feedback/      # Màn trạng thái toàn trang: NotFoundView, ForbiddenView
+│   └── providers/     # AppProviders (React Query, khôi phục phiên, nạp giỏ hàng), SmoothScrollProvider
+├── features/<feature>/                # Xem "Khuôn một feature" bên dưới
+├── hooks/             # Hook dùng chung: useNotify, useLocalStorageBoolean, useHasBottomBar
+├── i18n/              # next-intl routing + request config + ClientMessages (bản dịch gửi xuống client)
+├── lib/               # api-client (HTTP), messages (trích xuất + dịch + toast), utils (cn, resolveClassName), input-mask, catalog, jwt.server
 └── proxy.ts           # Middleware Next 16: i18n + chặn route
 ```
 
+### Khuôn một feature (chỉ tạo thư mục khi cần)
+
+```text
+features/<feature>/
+├── api/           # CHỈ hàm gọi Express qua apiClient (không chứa dữ liệu mock)
+├── components/    # Component của feature; được chia thư mục con kebab-case theo màn con (login/, detail/, manage-address/)
+│                  #   — KHÔNG lồng components/ bên trong, KHÔNG barrel con
+├── constants/     # Cấu hình UI cố định, sống lâu dài (bộ lọc, tùy chọn may đo, thông tin cửa hàng, nội dung trang tĩnh)
+├── data/          # CHỈ dữ liệu mock tạm thời — xóa khi có API thật
+├── hooks/
+├── store/         # Zustand (nếu có client state)
+├── types/         # Kiểu dữ liệu — không import từ components, không re-export dữ liệu
+├── utils/         # Hàm thuần (tính toán, map dữ liệu)
+├── validations/   # Zod schema của form
+└── index.ts       # Public API — barrel DUY NHẤT của feature (bắt buộc)
+```
+
+- Phụ thuộc một chiều trong feature: `components` → `hooks` / `store` / `api` → `utils` / `constants` / `data` / `types`. Tầng dưới **không** import ngược từ `components/` (kể cả để lấy hằng số hay kiểu — chuyển chúng về `constants/` / `types/`).
+- Import trong cùng feature dùng đường dẫn tương đối; giữa các feature dùng `@/features/<x>` (index).
+
+### Component chung hay riêng?
+- Chỉ đưa vào `components/shared` khi **từ 2 feature trở lên** dùng, hoặc là primitive form/UI tổng quát (TextField, SelectField, MediaUploader).
+- Phần trang trí / nghiệp vụ chỉ một màn dùng (SaleGlow, HeartToggle, RatingBadge, ClipReveal...) đặt ngay trong feature đó.
+- Trước khi tự viết nút, ô nhập, dialog, khung trang → dùng `ActionButton` / `ActionLink`, `TextField`, `AppDialog`, `Container` (xem `apps/web/AGENTS.md` §7).
+
 ### Ranh giới import
 - `lib/` **không** import từ `features/` hay `components/`. Trạng thái auth được feature đăng ký vào `apiClient` qua `configureApiClient()`.
-- `components/ui` và `components/shared` **không** import từ `features/`.
-- Import chéo giữa các feature đi qua `index` của feature (`@/features/cart`), không import sâu vào file nội bộ — ngoại trừ file `*.server.ts` / `server/` chỉ dùng ở server.
+- `components/ui`, `components/shared`, `components/effects`, `components/feedback` **không** import từ `features/`. Chỉ `components/layout` được dùng feature (qua index).
+- Import chéo giữa các feature đi qua `index` của feature (`@/features/cart`), không import sâu vào file nội bộ — ngoại trừ file `*.server.ts` / `core/server/` chỉ dùng ở server.
 - Path alias: `@/*` → `src/*`.
+- Barrel `index.ts` chỉ được tree-shake nhờ `"sideEffects"` trong `apps/web/package.json` (chỉ liệt kê `*.css` và `features/auth/store/authStore.ts`). Module mới có lệnh chạy ở cấp module (không nằm trong hàm/khai báo) **phải** được thêm vào danh sách này, nếu không bundler có thể bỏ mất lệnh đó.
+- Component/dữ liệu lớn chỉ dùng khi người dùng thao tác (khung chat, bảng tìm kiếm, danh mục mock) tải bằng `next/dynamic` hoặc `import()` — không đưa vào bundle chung của mọi trang.
+- Provider của thư viện bên thứ ba (vd. `GoogleOAuthProvider` nạp script Google) đặt tại component cần nó (`GoogleAuthButton`), không bọc toàn ứng dụng.
 
 ### Server vs Client Component
 - Mặc định là **Server Component**. Chỉ thêm `"use client"` khi cần state, effect, event handler hoặc API trình duyệt.
@@ -294,35 +346,44 @@ src/
 - **Không viết cứng text** trong `showToast`, lỗi form, thông báo state — dùng `t(...)`. Toast thành công của admin nằm ở `AdminPage.toasts`.
 
 ### Form & validation
-- React Hook Form + Zod; dùng validator từ `@repo/shared` (SĐT, mật khẩu, mã OTP) để khớp tuyệt đối với backend.
+- React Hook Form + Zod; dùng validator từ `@repo/shared/validation` (SĐT, mật khẩu, mã OTP) để khớp tuyệt đối với backend.
 
 ### Giao diện
 - Tailwind CSS v4 (không dùng cú pháp v3), `cn()` (đã tích hợp `tailwind-merge`) để ghép class; className dạng hàm của Base UI dùng `resolveClassName()`.
 - Thêm component shadcn bằng CLI theo `components.json`.
 - Ảnh: `next/image`; nguồn ảnh mới phải thêm vào `images.remotePatterns`. Ảnh từ URL tùy ý (blob xem trước, avatar người dùng) được dùng `<img>` kèm comment lý do.
-- Màu thương hiệu storefront `#800020`; admin dùng tông đơn sắc theo `app/[locale]/(admin)/admin/variables.md` — không trộn lẫn.
-- Hiển thị tiền bằng `formatVnd()`.
+- **Màu storefront chỉ dùng token** trong `src/app/globals.css` (`bg-(--bg-wine)/80`, `text-(--danger)`, `text-primary-ink`...) — không viết class hex. Cần màu mới → thêm token ở `:root` (chế độ tối kế thừa hoặc ghi đè). Admin dùng tông đơn sắc theo `docs/guides/admin-ui.md` — không trộn lẫn.
+- Hiển thị tiền bằng `formatVnd(amount, locale)` — không tự ghép `toLocaleString() + "₫"`.
 
 ---
 
 ## 8. Khu vực quản trị (Admin)
 
-### Cấu trúc một màn admin
+### Cấu trúc: `core/` (khung dùng chung) và `modules/` (nghiệp vụ)
 
 ```text
-features/admin/<module>/
-├── queries/<module>.queries.ts   # Hàm đọc Prisma — chỉ gọi từ Server Component / Server Action
-├── actions/<module>.actions.ts   # "use server" — mutation + đọc dữ liệu cho client component
-├── components/                   # UI (client component dùng React Query gọi action)
-├── types/
-└── index.ts
-features/admin/server/            # adminAuth.server.ts (checkAuthAdmin, authorizeAdminAction, requireAdminPage), db.server.ts
-features/admin/session/           # Phiên admin: useAdminSession, PermissionGate, AdminProfileDialog, action hồ sơ/mật khẩu
-features/admin/layout/            # Khung trang admin: AdminHeader, AdminSubNav, useAdminLayout, menu điều hướng
-features/admin/login/             # Màn đăng nhập admin (gọi Express /api/auth/admin/login)
+features/admin/
+├── core/
+│   ├── auth/      # Màn đăng nhập admin + adminLogin/adminLogout api (gọi Express /api/auth/admin/*)
+│   ├── server/    # adminAuth.server.ts (checkAuthAdmin, authorizeAdminAction, requireAdminPage),
+│   │              # db.server.ts, actionInput.ts (parseActionInput)
+│   ├── session/   # permissions.ts (ma trận quyền), useAdminSession, AdminProfileDialog, PermissionGate, action hồ sơ/mật khẩu
+│   ├── layout/    # AdminHeader, AdminSubNav, AdminMobileNav, AdminUserMenu, useAdminLayout, utils/navigation.ts (menu)
+│   └── ui/        # AdminPage, AdminPageHeader, AdminMetaValue, ADMIN_CARD_CLASS...
+└── modules/<module>/   # approvals, cms, customers, dashboard, inventory, orders, products, staff, tailoring, vouchers
+    ├── actions/<module>.actions.ts   # "use server" — mutation + đọc dữ liệu cho client component
+    ├── queries/<module>.queries.ts   # CHỈ hàm đọc Prisma — gọi từ Server Component / Server Action
+    ├── schemas/<module>.schemas.ts   # Zod cho tham số action — KHÔNG export qua index (có enum Prisma, không được lọt vào client)
+    ├── components/                   # UI (client component dùng React Query gọi action)
+    ├── types/  utils/  hooks/        # (khi cần)
+    └── index.ts                      # Barrel DUY NHẤT của module
 ```
 
-### Ma trận phân quyền (nguồn duy nhất: `features/admin/session/permissions.ts`)
+- Không có barrel tổng `features/admin/index.ts`: page import từ index của từng core/module (`@/features/admin/modules/orders`).
+- Trong cùng core/module dùng đường dẫn tương đối; giữa core/module dùng alias `@/features/admin/core/<x>` hoặc `@/features/admin/modules/<x>`.
+- File trong `actions/` **phải** là Server Action (`"use server"`); hàm client gọi Express đặt trong `api/`. File trong `queries/` chỉ đọc Prisma — cấu hình tĩnh (menu...) đặt trong `utils/` hoặc `constants/`.
+
+### Ma trận phân quyền (nguồn duy nhất: `features/admin/core/session/permissions.ts`)
 
 | Module | ADMIN | STAFF cần quyền | Ghi chú nghiệp vụ |
 | :--- | :---: | :--- | :--- |
@@ -340,13 +401,17 @@ features/admin/login/             # Màn đăng nhập admin (gọi Express /api
 - Nhân viên chưa có bản ghi `StaffPermission` = không có quyền chi tiết nào. Tạo nhân viên luôn tạo kèm bản ghi quyền.
 
 ### Quy tắc
-- Page (`app/[locale]/(admin)/admin/<module>/page.tsx`) là Server Component: `await requireAdminPage(ADMIN_MODULE_ACCESS.<module>)` rồi gọi query; giao diện dùng `AdminPage` + `AdminPageHeader` (`features/admin/ui`), quy chuẩn chi tiết ở `app/[locale]/(admin)/admin/variables.md`.
+- Page (`app/[locale]/(admin)/admin/<module>/page.tsx`) là Server Component: `await requireAdminPage(ADMIN_MODULE_ACCESS.<module>)`, `getTranslations("AdminPage.pages.<module>")` rồi gọi query; giao diện dùng `AdminPage` + `AdminPageHeader` (`features/admin/core/ui`), quy chuẩn chi tiết ở `docs/guides/admin-ui.md`.
 - Server Action:
   ```ts
   "use server";
+  // schemas/<module>.schemas.ts: export const updateSomethingSchema = z.object({ id: z.uuid(), value: ... });
   export async function updateSomethingAction(id: string, value: X) {
     const auth = await authorizeAdminAction({ permission: "canManageOrders" }); // hoặc { role: "ADMIN" }
     if (!auth.success) return auth;
+
+    const input = parseActionInput(updateSomethingSchema, { id, value }); // lỗi -> mã KEY của trường hoặc VALIDATION_ERROR
+    if (!input.success) return input;
     try {
       // ... Prisma, dùng auth.user.id làm người thực hiện
       revalidatePath("/admin/<module>");
@@ -361,6 +426,8 @@ features/admin/login/             # Màn đăng nhập admin (gọi Express /api
 - Phân quyền chi tiết theo `StaffPermission`: `canManageOrders`, `canUpdateTailoring`, `canManageInventory`, `canManageContent`, `canViewReports`. Trang/thao tác Super Admin (nhân sự, voucher, khóa khách hàng, duyệt yêu cầu) dùng `{ role: 'ADMIN' }`.
 - `PermissionGate` / ẩn nút chỉ là UI — server vẫn phải kiểm tra.
 - Thông tin admin hiện tại lấy qua `useAdminSession()` (đọc từ server), không dùng `authStore` (dành cho khách hàng).
+- Action nhận object thì khai báo kiểu tham số bằng `z.input<typeof schema>` để client được kiểm tra kiểu theo đúng schema.
+- **Text admin cũng phải qua i18n** (`AdminPage.<module>.*`, vi + en). Nhãn trạng thái dịch theo mã (`t(\`status.${status}\`)`), không lưu `label` cứng trong bảng cấu hình.
 
 ---
 
@@ -388,7 +455,10 @@ features/admin/login/             # Màn đăng nhập admin (gọi Express /api
 - next-intl, locale `vi` (mặc định) và `en`. Mọi route nằm dưới `/[locale]`. Dùng `Link`, `useRouter`, `redirect` từ `@/i18n/routing`.
 - File dịch: `messages/<locale>/<namespace>.json`. **Hai locale phải có cùng tập key.**
 - `errors.json` chứa **toàn bộ mã lỗi** backend/Server Action trả về và được gộp vào mọi namespace (`Auth.responses`, `ProfilePage.responses`, `AdminPage.login`, `Common.errors`, `Errors`). Namespace riêng có thể ghi đè bằng câu chữ theo ngữ cảnh.
-- Text giao diện mới phải dùng key dịch, không viết cứng (code cũ còn text cứng tiếng Việt sẽ được chuyển dần).
+- **Mã thành công** (`*_SUCCESS`, `OTP_SENT_SUCCESS`...) dịch trong `responses` của namespace màn gọi API (`auth.json` → `Auth.responses`, `profile.json` → `ProfilePage.responses`), không nằm trong `errors.json`.
+- **Bản dịch gửi xuống trình duyệt:** root layout truyền `messages={{}}` — mỗi route group / page bọc `<ClientMessages namespaces={CLIENT_NAMESPACES.<khu_vực>}>` (`src/i18n/ClientMessages.tsx`) để chỉ gửi namespace mà **Client Component** trong nhánh đó dùng. Provider lồng nhau **thay thế** (không gộp) messages của cha. Server Component dịch ở server nên không cần khai báo. Thêm client component dùng namespace mới → bổ sung vào `CLIENT_NAMESPACES` tương ứng, nếu không màn hình sẽ hiện nguyên tên key.
+- Text giao diện (kể cả placeholder, title, aria-label, nhãn trạng thái) phải dùng key dịch — không viết cứng ở cả storefront lẫn admin.
+- Số đếm dùng ICU plural ở bản tiếng Anh: `"{count, plural, one {# item} other {# items}}"`.
 - Nội dung từ DB: xem §9 (cột `En`).
 
 ---
@@ -399,31 +469,34 @@ features/admin/login/             # Màn đăng nhập admin (gọi Express /api
 - Commit message tiếng Việt, tiền tố: `feat:`, `fix:`, `refactor:`, `docs:`, `chore:`, `test:` — ví dụ `feat: thêm module sản phẩm cho storefront`.
 - **CẤM** `git add .` (add đúng file), **CẤM** tự `git push` lên `main`/`master`.
 - Trước khi commit: `pnpm check` phải xanh (0 lỗi type, 0 lỗi/cảnh báo lint).
-- CI (`.github/workflows/ci.yml`) chạy `install → db:generate → typecheck → lint` cho mọi PR và push lên `main`/`develop`.
+- CI (`.github/workflows/ci.yml`) chạy `install → db:generate → typecheck → lint (web + api)` cho mọi PR và push lên `main`/`develop`; phiên bản pnpm lấy từ `packageManager`.
 - Thay đổi schema DB, biến môi trường hoặc luồng auth phải ghi rõ trong mô tả PR (cách migrate, biến cần thêm, ai phải đăng nhập lại).
 
 ---
 
 ## 12. Checklist khi thêm tính năng
 
+> Các checklist dưới đây có bản đầy đủ kèm mẫu file trong skill dự án `.claude/skills/` (`new-api-module`, `new-admin-module`, `new-storefront-feature`, `add-message-key`).
+
 ### Endpoint / module Backend
-- [ ] Zod schema (`body/query/params`), thông điệp là mã KEY, dùng validator `@repo/shared` nếu có.
+- [ ] Zod schema (`body/query/params`), thông điệp là mã KEY, dùng validator `@repo/shared/validation` nếu có.
 - [ ] Route: `validate` → `rateLimit` (nếu công khai/nhạy cảm) → `requireAuth` / `requireRoles`.
 - [ ] Service ném `AppError` với mã KEY; transaction cho thao tác nhiều bảng.
 - [ ] Tiền trả về là số nguyên VND; không trả `password` hay trường nhạy cảm.
 - [ ] Swagger JSDoc đầy đủ mã lỗi; cập nhật `KEYS.md`; thêm bản dịch vi/en vào `errors.json`.
 
 ### Feature Storefront
-- [ ] Thư mục `features/<ten>/` đúng cấu trúc, export qua `index`.
+- [ ] Thư mục `features/<ten>/` theo khuôn §7 (`constants/` ≠ `data/`), chỉ một barrel `index.ts`.
 - [ ] Gọi API qua `apiClient`; server state bằng React Query hoặc Server Component.
-- [ ] Không fetch/setState trong `useEffect`; không ghi cookie/localStorage cho dữ liệu nghiệp vụ.
-- [ ] Text qua next-intl (đủ vi/en); tiền qua `formatVnd`.
+- [ ] Không fetch/setState trong `useEffect`; không ghi cookie/localStorage cho dữ liệu nghiệp vụ (ngoại lệ tạm thời: giỏ hàng / wishlist khách vãng lai, xem §13).
+- [ ] Text qua next-intl (đủ vi/en); namespace client mới đã thêm vào `CLIENT_NAMESPACES`; tiền qua `formatVnd`; màu qua token.
+- [ ] Phần nặng chỉ dùng khi thao tác → `next/dynamic` / `import()`.
 
 ### Màn Admin
-- [ ] `page.tsx` gọi `requireAdminPage()`; query trả object thuần.
-- [ ] Mọi Server Action gọi `authorizeAdminAction` ở dòng đầu, lấy người thực hiện từ `auth.user.id`.
+- [ ] Module nằm trong `features/admin/modules/<ten>/`; `page.tsx` gọi `requireAdminPage()` và `getTranslations`; query trả object thuần (tiền `toVnd`, không `Decimal`).
+- [ ] Mọi Server Action: `authorizeAdminAction` → `parseActionInput(schema, ...)`; người thực hiện lấy từ `auth.user.id`.
 - [ ] Không trả `error.message` nội bộ; `revalidatePath` các trang liên quan.
-- [ ] Client component dùng React Query gọi action.
+- [ ] Client component dùng React Query gọi action; text qua `AdminPage.<module>.*`.
 
 ### Thay đổi Database
 - [ ] Migration mới (không sửa migration cũ), SQL đã được xem lại.
@@ -438,7 +511,9 @@ features/admin/login/             # Màn đăng nhập admin (gọi Express /api
 | Dữ liệu storefront | Sản phẩm, tin tức, wishlist, FAQ, lịch sử đơn... vẫn là **mock** | Xây module `products`, `orders`, `cart` ở Express theo §5, chuyển trang SEO sang Server Component |
 | Giỏ hàng | Lưu localStorage (Zustand persist), mã giảm giá demo phía client | API giỏ hàng + đồng bộ model `Cart` khi đăng nhập; voucher xác thực ở server |
 | Test | Chưa có test tự động | Ưu tiên test tích hợp auth (supertest) và hàm tính tiền |
-| Lint Backend | Chỉ có `typecheck` cho `apps/api` | Thêm ESLint (typescript-eslint) cho `apps/api`, `packages/*` |
-| Text cứng | Một số component còn text tiếng Việt cứng | Chuyển dần sang next-intl khi chạm vào file |
+| Lint `packages/*` | `apps/web` và `apps/api` đã có ESLint; `packages/db`, `packages/shared` mới chỉ có `typecheck` | Thêm ESLint dùng chung cấu hình với `apps/api` |
+| **Chạy API production** (`node dist/server.js`) | `require('@repo/db')` từ bản build CommonJS **không có** `prisma` (file `.ts` của `@repo/db` vừa `export const prisma` vừa `export * from '@prisma/client'` dạng CJS) → mọi truy vấn DB lỗi. Dev (`tsx`) không bị | Build `@repo/db` ra JS (tsc) hoặc chuyển API sang ESM / bundle (tsup) trước khi triển khai |
+| Validate Server Action đọc dữ liệu | Action chỉ đọc (vd. `getApprovalRequestsAction(statusFilter)`) chưa có schema | Thêm khi chạm vào file |
+| Ngày giờ ở admin | Một số chỗ `toLocaleString("vi-VN")` cố định tiếng Việt | Đổi sang `useFormatter()` của next-intl |
 | Rate-limit theo IP khi dev | Next rewrites chuyển nguyên `X-Forwarded-For` → có thể giả mạo khi không có reverse proxy | Production bắt buộc đặt nginx/Cloudflare + `TRUST_PROXY` (§6.11). Giới hạn theo tài khoản/mã không bị ảnh hưởng |
 | Prisma generate trên Windows | Lỗi `EPERM` khi dev server đang chạy | Dừng `pnpm dev` rồi chạy `pnpm db:generate` |

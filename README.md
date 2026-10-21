@@ -34,38 +34,45 @@ learn-ecommerce-shop/
 │   │   ├── messages/{vi,en}/     # File dịch next-intl (errors.json = toàn bộ mã lỗi BE)
 │   │   └── src/
 │   │       ├── app/[locale]/     # Routing: (store), (auth), (admin)
-│   │       ├── components/       # ui (shadcn), shared, common, providers
-│   │       ├── features/         # Module nghiệp vụ: auth, cart, products, profile, admin/...
+│   │       ├── components/       # ui (shadcn), effects, shared, layout, feedback, providers
+│   │       ├── features/         # Module nghiệp vụ: auth, cart, products, profile... + admin/{core,modules}
 │   │       ├── hooks/            # Hook dùng chung
 │   │       ├── i18n/             # Cấu hình next-intl
-│   │       ├── lib/              # api-client, errorMessage, utils, jwt.server
+│   │       ├── lib/              # api-client, messages, utils, input-mask, jwt.server
 │   │       └── proxy.ts          # Middleware Next 16: i18n + chặn route
 │   └── api/                      # ⚙️ Backend API (Express) - Modular Monolith
 │       └── src/
-│           ├── index.ts          # Entrypoint: helmet, CORS, body limit, health check, graceful shutdown
+│           ├── app.ts            # createApp(): helmet, CORS, body limit, health check, router, error handler
+│           ├── server.ts         # Entry: listen + graceful shutdown
 │           ├── routes.ts         # Bộ định tuyến trung tâm
-│           ├── modules/          # auth, otp, user, upload (routes/controller/service/schema/KEYS.md)
-│           └── shared/           # config (env, swagger), middlewares, utils (rateLimit, verificationCode, authCookies...)
+│           ├── config/           # env (Zod), swagger
+│           ├── infra/            # redis, cloudinary, mailer, sms
+│           ├── core/             # http (AppError, response), middlewares, security (jwt, session, rateLimit...), utils
+│           └── modules/          # auth, otp, user, upload (routes/controller/service/schema/KEYS.md)
 ├── packages/
 │   ├── db/                       # 🗄️ Prisma schema, migrations, seed, Prisma Client (@repo/db)
-│   └── shared/                   # 🤝 Validator Zod, kiểu response, tên cookie, tiền tệ, locale (@repo/shared)
-├── docs/PROJECT_RULES.md         # 📐 Quy chuẩn dự án
-├── .github/workflows/ci.yml      # CI: typecheck + lint
+│   └── shared/                   # 🤝 @repo/shared (kiểu, cookie, tiền tệ, locale) + @repo/shared/validation (Zod)
+├── docs/
+│   ├── PROJECT_RULES.md          # 📐 Quy chuẩn dự án (nguồn duy nhất)
+│   └── guides/                   # admin-ui.md, jwt-keys.md
+├── .claude/skills/               # Skill dự án: tạo module API / màn admin / feature / mã KEY
+├── .github/workflows/ci.yml      # CI: typecheck + lint (web + api)
 ├── docker-compose.yml            # Redis
 └── pnpm-workspace.yaml
 ```
 
 ### 💻 Thiết kế Frontend (Feature-based Architecture)
 
-*   **`features/<feature>/`** tự đóng gói `api/`, `components/`, `hooks/`, `store/`, `types/`, `utils/`, `validations/` và chỉ public qua `index.ts`.
+*   **`features/<feature>/`** tự đóng gói `api/`, `components/`, `constants/`, `data/` (mock), `hooks/`, `store/`, `types/`, `utils/`, `validations/` và chỉ public qua `index.ts`.
 *   **`app/[locale]/`** là lớp routing/layout, chỉ lắp ráp feature.
 *   **State:** React Query cho dữ liệu từ server, Zustand cho client state (phiên khách hàng, giỏ hàng). Phiên admin đọc từ server qua `useAdminSession()`.
-*   **Khu vực Admin:** `features/admin/<module>/{queries,actions,components}` — Server Action luôn gọi `authorizeAdminAction()`, page luôn gọi `requireAdminPage()`.
+*   **Khu vực Admin:** `features/admin/core/*` (đăng nhập, phiên, quyền, khung trang) + `features/admin/modules/<module>/{actions,queries,schemas,components}` — Server Action luôn gọi `authorizeAdminAction()` rồi `parseActionInput()`, page luôn gọi `requireAdminPage()`.
 
 ### ⚙️ Thiết kế Backend (Modular Monolith)
 
 *   **`modules/<module>/`**: `*.routes.ts` (endpoint + Swagger), `*.controller.ts` (mỏng), `*.service.ts` (nghiệp vụ + Prisma), `*.schema.ts` (Zod), `KEYS.md` (mã phản hồi).
-*   **`shared/`**: `config/` (env Zod, Swagger), `middlewares/` (`authGuard`, `errorHandler`, `validate`, `requestLogger`), `utils/` (`rateLimit`, `verificationCode`, `authCookies`, `session`, `jwt`, `mail`...).
+*   **`app.ts` / `server.ts`**: dựng ứng dụng (test được) tách khỏi phần listen.
+*   **`config/`** (env Zod, Swagger), **`infra/`** (redis, cloudinary, mailer, sms), **`core/`**: `http/` (`AppError`, `sendSuccess`), `middlewares/` (`authGuard`, `errorHandler`, `validate`, `requestLogger`, `rateLimit`), `security/` (`jwt`, `session`, `authCookies`, `verificationCode`...), `utils/`.
 *   Response thống nhất `{ status, statusCode, message: "MA_KEY", data, meta }` — `message` luôn là mã KEY để FE dịch.
 
 ---
@@ -91,8 +98,6 @@ learn-ecommerce-shop/
 *   **Hiệu Ứng & Animation:**
     *   **Motion (Framer Motion 12):** Thư viện chuẩn để phát triển chuyển động, chuyển trang và hover mượt mà.
     *   **Lenis Smooth Scroll:** Mang lại trải nghiệm cuộn trang mượt mà (smooth scrolling).
-    *   **OGL (v1.0.11):** Thư viện WebGL siêu nhẹ để vẽ các hiệu ứng tương tác 3D/Canvas phức tạp.
-    *   **DotLottie React & React UseAnimations:** Render các animation vector Lottie chất lượng cao và các biểu tượng tương tác chuyển động nhỏ (micro-animations).
 *   **Các UI Component & Primitives:**
     *   **Base UI React (v1.6.0):** Các component thô không style (headless components) giúp tùy biến giao diện linh hoạt.
     *   **Vaul (v1.1.2):** Hỗ trợ làm Drawer kéo vuốt (Bottom Sheet) mượt mà trên mobile.
@@ -102,17 +107,16 @@ learn-ecommerce-shop/
     *   **Lucide React & React Icons:** Bộ sưu tập icon đa dạng, tối ưu SVG.
 *   **Đa Ngôn Ngữ & Tiện Ích Khác:**
     *   **Next-intl (v4.13.2):** Hỗ trợ chuyển đổi ngôn ngữ (i18n) mượt mà dựa trên routing.
-    *   **Date-fns (v4.4.0):** Xử lý định dạng ngày tháng hiển thị đơn hàng, đánh giá.
     *   **Toast (Base UI):** Hệ thống thông báo `showToast` dựng trên `@base-ui/react/toast` (`components/ui/toast.tsx`).
 *   **Bảo Mật:**
-    *   **@marsidev/react-turnstile:** Tích hợp Cloudflare Turnstile chống spam form đăng ký/đăng nhập.
     *   **@react-oauth/google:** Đăng nhập trực tiếp bằng tài khoản Google phía client.
 
 ### ⚙️ Backend API (`apps/api`)
 
 *   **Bộ Khung API Server:**
     *   **Express.js (v4.22.2):** Framework phổ biến để xây dựng RESTful API Server.
-    *   **TSX (v4.7.1) & TS-Node-Dev (v2.0.0):** Trình biên dịch chạy code TypeScript trực tiếp, hỗ trợ Hot-Reload cực nhanh khi phát triển.
+    *   **TSX (v4.7.1):** Chạy thẳng TypeScript khi phát triển (`tsx watch src/server.ts`), tự tải lại khi sửa code.
+    *   **ESLint + typescript-eslint:** Cưỡng chế quy chuẩn code (cấm `any`).
     *   **TypeScript (v5.9.3):** Đảm bảo tính nhất quán của dữ liệu từ Database lên API.
 *   **Xác Thực & Bảo Mật:**
     *   **JSONWebToken (JWT) (v9.0.3):** Xử lý mã hóa và giải mã Access Token & Refresh Token phục vụ đăng nhập bảo mật.
@@ -160,7 +164,7 @@ Vui lòng chuẩn bị sẵn các môi trường sau trước khi cài đặt:
    pnpm install
    ```
 
-3. **Tạo cặp khóa JWT RS256** theo hướng dẫn trong [`apps/api/configJWT.md`](apps/api/configJWT.md).
+3. **Tạo cặp khóa JWT RS256** theo hướng dẫn trong [`docs/guides/jwt-keys.md`](docs/guides/jwt-keys.md).
 
 4. **Cấu hình biến môi trường cho Backend** — sao chép rồi điền giá trị:
    ```bash
