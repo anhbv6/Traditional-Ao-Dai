@@ -26,8 +26,8 @@ export function RegisterForm() {
         .then(() => {
           setIsPlaying(true);
         })
-        .catch((error) => {
-          console.log('Autoplay was prevented by browser policy:', error);
+        .catch(() => {
+          // Trình duyệt chặn tự phát -> hiện nút phát cho khách bấm
           setIsPlaying(false);
         });
     }

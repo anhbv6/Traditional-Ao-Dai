@@ -1,5 +1,5 @@
 import { apiClient } from '@/lib/api-client';
-import { CheckAccountResponse, RegisterResponse} from '../types/auth.types';
+import { type CheckAccountResponse, type RegisterResponse} from '../types/auth.types';
 
 /**
  * Registers a new customer account.

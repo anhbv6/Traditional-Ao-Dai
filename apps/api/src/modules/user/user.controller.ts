@@ -1,5 +1,5 @@
-import { Response, NextFunction } from 'express'
-import { AuthenticatedRequest } from '../../core/middlewares/authGuard'
+import { type Response, type NextFunction } from 'express'
+import { type AuthenticatedRequest } from '../../core/middlewares/authGuard'
 import { sendSuccess } from '../../core/http/response'
 import * as userService from './user.service'
 

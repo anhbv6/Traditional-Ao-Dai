@@ -121,7 +121,7 @@ const options: swaggerJSDoc.Options = {
     './src/modules/**/*.routes.ts',
     './src/modules/**/*.schema.ts',
     // Dist versions (for production build compatibility)
-    './dist/index.js',
+    './dist/app.js',
     './dist/routes.js',
     './dist/modules/**/*.routes.js',
     './dist/modules/**/*.schema.js',

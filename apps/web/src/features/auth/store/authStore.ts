@@ -6,7 +6,7 @@ import { type AuthUser } from '../types/auth.types';
  * Trạng thái phiên đăng nhập của KHÁCH HÀNG (storefront).
  * - Access token chỉ giữ trong bộ nhớ (không localStorage, không cookie tự ghi)
  * - Refresh token nằm trong cookie httpOnly do Backend quản lý
- * - Phiên Admin/Staff KHÔNG nằm ở đây — xem `useAdminSession` (features/admin/session)
+ * - Phiên Admin/Staff KHÔNG nằm ở đây — xem `useAdminSession` (features/admin/core/session)
  */
 interface AuthState {
   accessToken: string | null;

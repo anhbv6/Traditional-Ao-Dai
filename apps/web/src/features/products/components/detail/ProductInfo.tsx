@@ -14,7 +14,7 @@ import { HeartToggle } from '../HeartToggle';
 import { ActionButton } from '@/components/shared/ActionButton';
 import { cn } from '@/lib/utils';
 import { MAX_LINE_QUANTITY } from '@/features/cart';
-import { DisplayProduct } from '../../types/products.types';
+import { type DisplayProduct } from '../../types/products.types';
 
 interface ProductInfoProps {
   product: DisplayProduct;

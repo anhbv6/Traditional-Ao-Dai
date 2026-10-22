@@ -5,8 +5,8 @@ import { generateToken, verifyToken } from '../../../core/security/jwt'
 import { AppError } from '../../../core/http/AppError'
 import { durationToMs } from '../../../core/utils/time'
 import { cleanupUserSessions, hashToken } from '../../../core/security/session'
-import { LoginInput } from '../auth.schema'
-import { SessionMeta } from '../auth.types'
+import { type LoginInput } from '../auth.schema'
+import { type SessionMeta } from '../auth.types'
 
 /**
  * Admin / Staff login.

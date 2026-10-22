@@ -1,7 +1,7 @@
 import { createPublicKey, verify, type KeyObject } from 'node:crypto';
 
 /**
- * Payload JWT do Backend (@repo/api) ký bằng RS256 — giữ khớp với `apps/api/src/shared/utils/jwt.ts`
+ * Payload JWT do Backend (@repo/api) ký bằng RS256 — giữ khớp với `apps/api/src/core/security/jwt.ts`
  */
 export interface AdminJwtPayload {
   userId: string;

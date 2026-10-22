@@ -162,7 +162,7 @@ const TONE_COLORS: Record<TextFieldTone, ToneColors> = {
     invalid: "var(--accent-on-primary)",
     autofillText: "#FFFFFF",
   },
-  /* Khu vực admin: đơn sắc, luôn sáng — màu theo app/[locale]/(admin)/admin/variables.md */
+  /* Khu vực admin: đơn sắc, luôn sáng — màu theo docs/guides/admin-ui.md */
   admin: {
     label: "#09090B",
     labelFocus: "#09090B",

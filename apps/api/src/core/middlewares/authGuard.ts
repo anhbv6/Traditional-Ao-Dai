@@ -1,8 +1,8 @@
-import { Request, Response, NextFunction } from 'express'
+import { type Request, type Response, type NextFunction } from 'express'
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken'
-import { prisma, Role } from '@repo/db'
+import { prisma, type Role } from '@repo/db'
 import { AUTH_COOKIES } from '@repo/shared'
-import { verifyToken, JWTPayload } from '../security/jwt'
+import { verifyToken, type JWTPayload } from '../security/jwt'
 import { AppError } from '../http/AppError'
 
 /**

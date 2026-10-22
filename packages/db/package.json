@@ -13,16 +13,19 @@
     "db:push": "dotenv -e ../../apps/api/.env -- prisma db push",
     "studio": "dotenv -e ../../apps/api/.env -- prisma studio",
     "seed": "dotenv -e ../../apps/api/.env -- prisma db seed",
-    "typecheck": "tsc --noEmit -p ."
+    "typecheck": "tsc --noEmit -p .",
+    "lint": "eslint"
   },
   "dependencies": {
     "@prisma/client": "^5.12.0"
   },
   "devDependencies": {
+    "@repo/config": "workspace:*",
     "@types/bcryptjs": "^3.0.0",
     "@types/node": "^20.19.43",
     "bcryptjs": "^3.0.3",
     "dotenv-cli": "^11.0.0",
+    "eslint": "^9.39.5",
     "prisma": "^5.12.0",
     "tsx": "^4.7.1",
     "typescript": "^5.0.0"

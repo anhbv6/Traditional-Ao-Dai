@@ -1,5 +1,5 @@
 import { apiClient } from "@/lib/api-client";
-import { ApiMessageResponse, ResetTokenResponse } from "../types/auth.types";
+import { type ApiMessageResponse, type ResetTokenResponse } from "../types/auth.types";
 
 
 export const forgotPasswordEmailApi = async (email: string): Promise<ApiMessageResponse> => {

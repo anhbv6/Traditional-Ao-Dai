@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express'
+import { type Request, type Response, type NextFunction } from 'express'
 import { Prisma } from '@repo/db'
 import { ZodError } from 'zod'
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken'

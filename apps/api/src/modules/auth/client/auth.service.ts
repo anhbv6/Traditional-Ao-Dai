@@ -2,23 +2,23 @@ import { prisma, type User } from '@repo/db'
 import { randomBytes, randomUUID } from 'crypto'
 import { OAuth2Client, type TokenPayload } from 'google-auth-library'
 import { comparePassword, hashPassword } from '../../../core/security/password'
-import { generateAccessToken, generateRefreshToken, JWTPayload, verifyToken } from '../../../core/security/jwt'
+import { generateAccessToken, generateRefreshToken, type JWTPayload, verifyToken } from '../../../core/security/jwt'
 import { AppError } from '../../../core/http/AppError'
 import { env } from '../../../config/env'
 import {
-  LoginInput,
-  RefreshTokenInput,
-  RegisterInput,
-  OtpLoginInput,
-  ForgotPasswordEmailInput,
-  ResetPasswordEmailInput,
-  ResetPasswordPhoneInput,
-  VerifyResetPasswordEmailInput,
-  VerifyResetPasswordPhoneInput,
+  type LoginInput,
+  type RefreshTokenInput,
+  type RegisterInput,
+  type OtpLoginInput,
+  type ForgotPasswordEmailInput,
+  type ResetPasswordEmailInput,
+  type ResetPasswordPhoneInput,
+  type VerifyResetPasswordEmailInput,
+  type VerifyResetPasswordPhoneInput,
 } from '../auth.schema'
 import { durationToMs } from '../../../core/utils/time'
 import { normalizeVietnamPhone } from '../../../core/utils/phone'
-import { CheckAccountResult, SessionMeta } from '../auth.types'
+import { type CheckAccountResult, type SessionMeta } from '../auth.types'
 import { verifyOtp } from '../../otp/otp.service'
 import { sendVerificationCodeEmail } from '../../../infra/mailer'
 import { redis } from '../../../infra/redis'

@@ -1,8 +1,8 @@
-import { Request, Response, NextFunction } from 'express'
+import { type Request, type Response, type NextFunction } from 'express'
 import { AUTH_COOKIES } from '@repo/shared'
 import * as authService from './auth.service'
 import * as userService from '../../user/user.service'
-import { AuthenticatedRequest } from '../../../core/middlewares/authGuard'
+import { type AuthenticatedRequest } from '../../../core/middlewares/authGuard'
 import { sendSuccess, sendError } from '../../../core/http/response'
 import { clearCustomerSessionCookies, setCustomerSessionCookies } from '../../../core/security/authCookies'
 

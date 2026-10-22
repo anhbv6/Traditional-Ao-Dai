@@ -1,6 +1,6 @@
 import jwt, { type SignOptions } from 'jsonwebtoken'
 import { env } from '../../config/env'
-import { Role } from '@repo/db'
+import { type Role } from '@repo/db'
 
 export interface JWTPayload {
   userId: string

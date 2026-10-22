@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import * as userController from './user.controller'
-import { AuthenticatedRequest, requireAuth } from '../../core/middlewares/authGuard'
+import { type AuthenticatedRequest, requireAuth } from '../../core/middlewares/authGuard'
 import { rateLimit } from '../../core/middlewares/rateLimit'
 import { validate } from '../../core/middlewares/validate'
 import {

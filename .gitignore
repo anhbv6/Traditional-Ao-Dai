@@ -46,3 +46,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Claude Code: cấu hình cá nhân và bộ nhớ đệm của hook
+.claude/settings.local.json
+.claude/.cache/

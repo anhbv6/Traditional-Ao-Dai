@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express'
+import { type Request, type Response, type NextFunction } from 'express'
 
 /**
  * Ghi log mỗi request: method, đường dẫn, status, thời gian xử lý, IP.

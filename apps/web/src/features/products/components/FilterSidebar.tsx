@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode, useState } from 'react';
+import { type ReactNode, useState } from 'react';
 import { ChevronDown, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { formatVnd } from '@repo/shared';

@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from 'express'
-import { ZodTypeAny, ZodError } from 'zod'
+import { type Request, type Response, type NextFunction } from 'express'
+import { type ZodTypeAny, ZodError } from 'zod'
 
 /**
  * Middleware kiểm tra và chuẩn hóa dữ liệu đầu vào bằng Zod Schema

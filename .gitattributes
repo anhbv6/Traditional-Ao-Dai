@@ -1,0 +1,20 @@
+# Lưu mọi file văn bản với LF trong repo (Windows checkout vẫn đúng, tránh diff do CRLF)
+* text=auto eol=lf
+
+# Script Windows giữ CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# File nhị phân
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.avif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.pdf binary

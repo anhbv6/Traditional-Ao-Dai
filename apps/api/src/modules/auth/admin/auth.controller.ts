@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express'
+import { type Request, type Response, type NextFunction } from 'express'
 import { AUTH_COOKIES } from '@repo/shared'
 import * as authService from './auth.service'
 import { sendSuccess } from '../../../core/http/response'

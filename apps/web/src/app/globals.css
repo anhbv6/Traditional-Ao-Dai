@@ -25,7 +25,7 @@
  *   - Nền trắng của card/ô nhập dùng --bg-card (không dùng bg-white, trừ chi tiết luôn trắng trên ảnh).
  *   - Khối nền tối có chữ trắng (snackbar, nút đen) dùng --bg-inverse (không dùng --text-main làm nền).
  *
- * Admin dùng tông đơn sắc riêng, luôn ở chế độ sáng — xem app/[locale]/(admin)/admin/variables.md.
+ * Admin dùng tông đơn sắc riêng, luôn ở chế độ sáng — xem docs/guides/admin-ui.md.
  * ============================================================================
  */
 
@@ -46,7 +46,7 @@
  * 1b. TOKEN BỐ CỤC — KHUNG NỘI DUNG & KHOẢNG CÁCH CHUNG (storefront)
  * ----------------------------------------------------------------------------
  * Nguồn DUY NHẤT cho lề trang. Đổi giá trị ở đây → mọi trang (trang chủ, cửa hàng, câu chuyện,
- * liên hệ, tin tức, giỏ hàng…) đổi theo. Dùng qua component `Container` (components/ui/container)
+ * liên hệ, tin tức, giỏ hàng…) đổi theo. Dùng qua component `Container` (components/layout/Container)
  * hoặc trực tiếp bằng class Tailwind: `px-(--page-gutter)`, `-mx-(--page-gutter)`, `py-(--section-y)`.
  *
  *   --page-max-width : bề rộng tối đa của khung nội dung (căn giữa).
@@ -403,7 +403,7 @@
  * ----------------------------------------------------------------------------
  * Tách hẳn khỏi kiểu chữ storefront (Lora / Playfair, h1 48px, line-height 1.75).
  * Gắn class `admin-shell` ở thẻ bọc ngoài cùng của layout admin; portal (Dialog, Dropdown) tự gắn thêm.
- * Màu admin dùng trực tiếp theo bảng trong app/[locale]/(admin)/admin/variables.md.
+ * Màu admin dùng trực tiếp theo bảng trong docs/guides/admin-ui.md.
  * ============================================================================ */
 @layer base {
   .admin-shell {

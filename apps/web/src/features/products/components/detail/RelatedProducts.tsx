@@ -2,7 +2,7 @@
 
 import { ContentCarousel } from '@/components/shared/ContentCarousel';
 import { ProductCard } from '../ProductCard';
-import { RelatedProductItem } from '../../types/products.types';
+import { type RelatedProductItem } from '../../types/products.types';
 
 interface RelatedProductsProps {
   relatedProducts: RelatedProductItem[];

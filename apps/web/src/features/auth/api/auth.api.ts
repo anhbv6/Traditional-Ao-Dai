@@ -1,8 +1,8 @@
 import { apiClient } from '@/lib/api-client';
 import {
-  LoginResponse,
-  MeResponse,
-  OtpSendResponse,
+  type LoginResponse,
+  type MeResponse,
+  type OtpSendResponse,
 } from '../types/auth.types';
 
 /**

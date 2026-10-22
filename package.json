@@ -13,9 +13,13 @@
     "db:migrate": "pnpm --filter @repo/db migrate:dev",
     "db:deploy": "pnpm --filter @repo/db migrate:deploy",
     "db:seed": "pnpm --filter @repo/db seed",
-    "db:studio": "pnpm --filter @repo/db studio"
+    "db:studio": "pnpm --filter @repo/db studio",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "devDependencies": {
+    "@repo/config": "workspace:*",
+    "prettier": "^3.9.10",
     "typescript": "^5.0.0"
   },
   "engines": {
