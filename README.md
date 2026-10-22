@@ -90,20 +90,23 @@ CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) chạy `typecheck` +
 
 ---
 
-## 7. Triển khai production
+## 7. Triển khai
 
-1. Build: `pnpm install --frozen-lockfile && pnpm db:generate && pnpm build`.
-2. Migration: `pnpm db:deploy` (**không** chạy `db:migrate` trên production).
-3. Đặt `NODE_ENV=production` cho cả hai app → cookie `Secure` (bắt buộc HTTPS), Swagger tự tắt.
-4. Chạy: `pnpm --filter @repo/api start` (cổng 3001) và `pnpm --filter @repo/web start` (cổng 3000).
-5. Web và API **cùng domain**: web chuyển tiếp `/api` sang API qua `API_INTERNAL_URL`.
-6. Đặt reverse proxy (nginx/Cloudflare) trước Next.js với `X-Forwarded-For`, rồi đặt `TRUST_PROXY` trong `apps/api/.env` bằng số proxy — rate-limit theo IP phụ thuộc vào đây.
+Đang chạy thử: **Web** https://traditional-ao-dai.vercel.app (Vercel) · **API** https://aodai.onrender.com (Render) · Neon (Postgres) · Upstash (Redis).
 
-> ℹ️ API production chạy thẳng TypeScript bằng `tsx` (`build` của API chỉ type-check). Các giới hạn còn lại (dữ liệu storefront còn mock, chưa có test) ghi ở [`PROJECT_RULES.md` §13](docs/PROJECT_RULES.md#13-giới-hạn-đã-biết--nợ-kỹ-thuật).
+👉 Cấu hình đầy đủ, env từng nền tảng, quy trình cập nhật và lỗi đã gặp: [`docs/guides/deploy.md`](docs/guides/deploy.md).
+
+Nguyên tắc chung:
+- Web và API **cùng origin**: web chuyển tiếp `/api` sang API qua `API_INTERNAL_URL`.
+- `NODE_ENV=production` → cookie `Secure` (bắt buộc HTTPS), Swagger tự tắt.
+- Migration production: `pnpm db:deploy` (không chạy `db:migrate`, không dùng `db push`).
+- API production chạy `tsx src/server.ts` (`build` của API chỉ type-check).
+- `TRUST_PROXY` = số proxy đứng trước API — rate-limit theo IP phụ thuộc vào đây.
 
 ## 8. Tài liệu khác
 
 - [`docs/PROJECT_RULES.md`](docs/PROJECT_RULES.md) — quy chuẩn đầy đủ (kiến trúc, đặt tên, i18n, git).
+- [`docs/guides/deploy.md`](docs/guides/deploy.md) — triển khai Vercel + Render + Neon + Upstash.
 - [`docs/guides/admin-ui.md`](docs/guides/admin-ui.md) — giao diện khu admin.
 - `AGENTS.md` ở gốc và từng workspace — tóm tắt quy tắc cho người và AI.
 - `.claude/skills/` — quy trình tạo module API, màn admin, feature storefront, mã KEY.

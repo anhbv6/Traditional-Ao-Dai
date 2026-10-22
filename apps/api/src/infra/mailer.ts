@@ -8,6 +8,42 @@ interface SendMailOptions {
   html?: string
 }
 
+const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email'
+
+/**
+ * Gửi email qua Brevo HTTP API (cổng 443) — dùng được cả khi hosting chặn cổng SMTP (Render free).
+ * Trả về false nếu Brevo từ chối để rơi xuống phương án dự phòng.
+ */
+async function sendViaBrevo(apiKey: string, from: string, options: SendMailOptions): Promise<boolean> {
+  try {
+    const res = await fetch(BREVO_API_URL, {
+      method: 'POST',
+      headers: { 'api-key': apiKey, 'content-type': 'application/json', accept: 'application/json' },
+      body: JSON.stringify({
+        sender: { name: env.MAIL_FROM_NAME, email: from },
+        to: [{ email: options.to }],
+        subject: options.subject,
+        htmlContent: options.html ?? `<p>${options.text}</p>`,
+        textContent: options.text,
+      }),
+    })
+
+    if (!res.ok) {
+      console.error(`[MailProvider] Brevo API error ${res.status}:`, await res.text())
+      return false
+    }
+
+    console.log(`[MailProvider] Email sent successfully via Brevo API to ${options.to}`)
+    return true
+  } catch (error) {
+    console.error('[MailProvider] Failed to send email via Brevo API:', error)
+    return false
+  }
+}
+
+/**
+ * Thứ tự ưu tiên: Brevo API (BREVO_API_KEY) → SMTP (SMTP_*) → in ra console (dev).
+ */
 class MailProvider {
   private transporter: nodemailer.Transporter | null = null
 
@@ -27,7 +63,11 @@ class MailProvider {
 
   async sendMail(options: SendMailOptions): Promise<boolean> {
     const from = env.SMTP_FROM || 'noreply@aodai.vn'
-    
+
+    if (env.BREVO_API_KEY && (await sendViaBrevo(env.BREVO_API_KEY, from, options))) {
+      return true
+    }
+
     if (this.transporter) {
       try {
         await this.transporter.sendMail({

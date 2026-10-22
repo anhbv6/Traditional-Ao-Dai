@@ -12,7 +12,7 @@
 | `apps/*/AGENTS.md`, `packages/*/AGENTS.md` | Tóm tắt quy tắc riêng của từng workspace |
 | `CLAUDE.md`, `gemini.md` (gốc + mỗi workspace) | Chỉ `@AGENTS.md` — để Claude Code / Gemini tự nạp đúng `AGENTS.md` theo thư mục đang làm việc |
 | `.cursor/rules/main.mdc`, `.github/copilot-instructions.md` | Chỉ trỏ về các file trên (không chép lại nội dung) |
-| `docs/guides/` | Hướng dẫn chuyên đề: `admin-ui.md` (giao diện admin), `jwt-keys.md` (tạo cặp khóa JWT) |
+| `docs/guides/` | Hướng dẫn chuyên đề: `admin-ui.md` (giao diện admin), `jwt-keys.md` (tạo cặp khóa JWT), `deploy.md` (triển khai Vercel/Render/Neon/Upstash) |
 | `.claude/skills/` | Skill dự án: quy trình từng bước + mẫu file khi tạo module/feature/mã KEY mới |
 | `.claude/settings.json`, `.claude/hooks/` | Quyền lệnh + hook cưỡng chế quy tắc cho Claude Code (xem §11) |
 | `packages/config/` | Cấu hình công cụ dùng chung: ESLint, tsconfig, Prettier (xem §2) |

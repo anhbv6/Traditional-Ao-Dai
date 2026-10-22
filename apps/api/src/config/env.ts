@@ -33,7 +33,11 @@ const envSchema = z.object({
   SMTP_PORT: z.coerce.number().optional(),
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),
+  // Email người gửi (dùng cho cả SMTP và Brevo API) — với Brevo phải là sender đã xác minh
   SMTP_FROM: z.string().default('noreply@aodai.vn'),
+  MAIL_FROM_NAME: z.string().default('Áo Dài Truyền Thống'),
+  // Brevo HTTP API key (dạng xkeysib-..., KHÔNG phải SMTP key xsmtpsib-...). Có key thì ưu tiên hơn SMTP.
+  BREVO_API_KEY: z.string().optional(),
   
   CLOUDINARY_CLOUD_NAME: z.string().min(1, 'CLOUDINARY_CLOUD_NAME is required'),
   CLOUDINARY_API_KEY: z.string().min(1, 'CLOUDINARY_API_KEY is required'),

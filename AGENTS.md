@@ -64,7 +64,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - [`docs/PROJECT_RULES.md`](docs/PROJECT_RULES.md) là nguồn quy chuẩn chi tiết của toàn bộ dự án.
 - Đây là file tóm tắt chung của Monorepo.
 - Khi làm việc trong `apps/api`, `apps/web`, `packages/db`, `packages/shared`, bắt buộc đọc thêm `AGENTS.md` nằm trong thư mục đó (Claude Code tự nạp qua `CLAUDE.md` của từng workspace).
-- Hướng dẫn chuyên đề: `docs/guides/` (giao diện admin, tạo khóa JWT). Quy trình tạo module/feature/mã KEY mới: skill dự án trong `.claude/skills/`.
+- Hướng dẫn chuyên đề: `docs/guides/` (giao diện admin, tạo khóa JWT, triển khai). Quy trình tạo module/feature/mã KEY mới: skill dự án trong `.claude/skills/`.
 
 # 10. Cấu trúc thư mục (tóm tắt — chi tiết ở PROJECT_RULES §5, §7, §8)
 - **API:** `src/{app.ts, server.ts, routes.ts, config/, infra/, core/{http,middlewares,security,utils}/, modules/<module>/}`.
