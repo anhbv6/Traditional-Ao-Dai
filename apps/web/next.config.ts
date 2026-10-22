@@ -12,7 +12,7 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 const API_INTERNAL_URL = (process.env.API_INTERNAL_URL || "http://127.0.0.1:3001").replace(/\/$/, "");
 
 const nextConfig: NextConfig = {
-  devIndicators: false,
+  // devIndicators: false,
   allowedDevOrigins: ["192.168.1.98"],
   // Các package workspace export thẳng mã nguồn TypeScript
   transpilePackages: ["@repo/shared", "@repo/db"],

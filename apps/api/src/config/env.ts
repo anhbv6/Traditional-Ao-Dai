@@ -19,6 +19,9 @@ const envSchema = z.object({
   // Next.js rewrites KHÔNG nối IP nên không tính. Sai số này -> rate-limit theo IP có thể bị giả mạo.
   TRUST_PROXY: z.coerce.number().int().min(0).default(1),
   
+  // Ưu tiên REDIS_URL nếu có (Upstash, Redis Cloud...). Dạng `rediss://` (2 chữ s) tự bật TLS.
+  // Bỏ trống thì dùng REDIS_HOST / REDIS_PORT / REDIS_PASSWORD (Redis Docker khi dev).
+  REDIS_URL: z.string().optional(),
   REDIS_HOST: z.string().default('localhost'),
   REDIS_PORT: z.coerce.number().default(6379),
   REDIS_PASSWORD: z.string().optional(),

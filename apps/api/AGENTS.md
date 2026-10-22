@@ -44,7 +44,7 @@
 # 5. Scripts & Lệnh
 - `pnpm --filter @repo/api dev` — Chạy dev (`tsx watch src/server.ts`).
 - `pnpm --filter @repo/api typecheck` / `lint` — Kiểm tra type / ESLint (0 lỗi).
-- `pnpm --filter @repo/api build` / `start` — Build (`dist/`) và chạy production (`node dist/server.js`). ⚠ Hiện chưa chạy được DB ở chế độ này — xem `docs/PROJECT_RULES.md` §13.
+- `pnpm --filter @repo/api build` / `start` — `build` chỉ type-check; production chạy thẳng TypeScript bằng `tsx src/server.ts` (`tsx` nằm trong `dependencies`). KHÔNG quay lại `node dist/server.js`: `require('@repo/db')` từ bản build CommonJS không thấy `prisma`.
 
 # 6. API Documentation
 - Swagger UI tại `/api-docs` (chỉ ngoài production). Mỗi endpoint phải có JSDoc `@openapi` liệt kê đủ mã lỗi theo status.

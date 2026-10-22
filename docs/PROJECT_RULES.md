@@ -198,7 +198,7 @@ Mọi workspace dùng chung một nguồn cấu hình — sửa luật ở đây
 ```text
 src/
 ├── app.ts               # createApp(): middleware, health check, router, errorHandler — KHÔNG listen (test được)
-├── server.ts            # Entry: listen + tắt êm (dev: tsx watch src/server.ts, prod: node dist/server.js)
+├── server.ts            # Entry: listen + tắt êm (dev: tsx watch src/server.ts, prod: tsx src/server.ts)
 ├── routes.ts            # Router trung tâm — đăng ký router của từng module
 ├── config/              # env.ts (Zod), swagger.ts
 ├── infra/               # Kết nối dịch vụ ngoài: redis, cloudinary, mailer, sms
@@ -551,7 +551,7 @@ Quy tắc dự án được cưỡng chế bằng công cụ, không chỉ bằn
 | Test | Chưa có test tự động | Ưu tiên test tích hợp auth (supertest) và hàm tính tiền |
 | Prettier | Đã có cấu hình chung nhưng **chưa định dạng toàn repo** (~570 file lệch, chủ yếu xuống dòng) nên chưa đưa vào CI | Một commit riêng chỉ chạy `pnpm format` (không lẫn thay đổi khác), sau đó thêm `pnpm format:check` vào CI |
 | Import tương đối chéo feature | ESLint chỉ bắt import alias `@/features/...`; `../../<feature khác>/...` chưa bị chặn | Luôn dùng alias khi import feature khác |
-| **Chạy API production** (`node dist/server.js`) | `require('@repo/db')` từ bản build CommonJS **không có** `prisma` (file `.ts` của `@repo/db` vừa `export const prisma` vừa `export * from '@prisma/client'` dạng CJS) → mọi truy vấn DB lỗi. Dev (`tsx`) không bị | Build `@repo/db` ra JS (tsc) hoặc chuyển API sang ESM / bundle (tsup) trước khi triển khai |
+| **Chạy API production** | `require('@repo/db')` từ bản build CommonJS **không có** `prisma` nên API không dùng `node dist/server.js`; production chạy `tsx src/server.ts` (`build` chỉ type-check) | Khi cần khởi động nhanh/bundle gọn: build `@repo/db` ra JS hoặc bundle API (tsup) |
 | Validate Server Action đọc dữ liệu | Action chỉ đọc (vd. `getApprovalRequestsAction(statusFilter)`) chưa có schema | Thêm khi chạm vào file |
 | Ngày giờ ở admin | Một số chỗ `toLocaleString("vi-VN")` cố định tiếng Việt | Đổi sang `useFormatter()` của next-intl |
 | Rate-limit theo IP khi dev | Next rewrites chuyển nguyên `X-Forwarded-For` → có thể giả mạo khi không có reverse proxy | Production bắt buộc đặt nginx/Cloudflare + `TRUST_PROXY` (§6.11). Giới hạn theo tài khoản/mã không bị ảnh hưởng |

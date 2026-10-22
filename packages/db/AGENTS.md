@@ -9,7 +9,7 @@
 - Schema: `prisma/schema.prisma`.
 - Export: Prisma Client singleton từ `src/index.ts` (export thẳng file `.ts`, cần Node ≥ 22.18).
 - Các workspace khác import: `import { prisma } from "@repo/db"` (kiểu: `import { type Prisma, type Role } from "@repo/db"`).
-- ⚠ `src/index.ts` vừa `export const prisma` vừa `export * from "@prisma/client"` (CommonJS): dùng được với `tsx`/Next.js, nhưng `require()` từ bản build CommonJS của API không thấy `prisma` — xem `docs/PROJECT_RULES.md` §13.
+- ⚠ `src/index.ts` vừa `export const prisma` vừa `export * from "@prisma/client"` (CommonJS): dùng được với `tsx`/Next.js, nhưng `require()` từ bản build CommonJS không thấy `prisma` — vì vậy API production chạy bằng `tsx`, không dùng `node dist/server.js`.
 
 # 2. Quy trình Prisma (QUAN TRỌNG)
 - Sau khi sửa `schema.prisma`:
