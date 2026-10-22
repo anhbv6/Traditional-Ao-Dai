@@ -19,6 +19,7 @@
 - KHÔNG dùng `prisma db push` trong development thông thường (chỉ dùng khi prototyping nhanh).
 - KHÔNG chạy `prisma format` cho cả file khi chỉ sửa vài dòng (tạo diff căn lề rất lớn).
 - Prisma Studio: `pnpm db:studio`.
+- Kiểm tra: `pnpm --filter @repo/db typecheck` / `lint` (ESLint dùng `nodeConfig()` của `@repo/config`, bỏ qua `prisma/migrations`).
 
 # 3. Environment
 - Package này KHÔNG có `.env` riêng.

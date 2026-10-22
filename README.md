@@ -51,12 +51,17 @@ learn-ecommerce-shop/
 │           └── modules/          # auth, otp, user, upload (routes/controller/service/schema/KEYS.md)
 ├── packages/
 │   ├── db/                       # 🗄️ Prisma schema, migrations, seed, Prisma Client (@repo/db)
-│   └── shared/                   # 🤝 @repo/shared (kiểu, cookie, tiền tệ, locale) + @repo/shared/validation (Zod)
+│   ├── shared/                   # 🤝 @repo/shared (kiểu, cookie, tiền tệ, locale) + @repo/shared/validation (Zod)
+│   └── config/                   # 🔧 @repo/config: ESLint, tsconfig, Prettier dùng chung
 ├── docs/
 │   ├── PROJECT_RULES.md          # 📐 Quy chuẩn dự án (nguồn duy nhất)
 │   └── guides/                   # admin-ui.md, jwt-keys.md
-├── .claude/skills/               # Skill dự án: tạo module API / màn admin / feature / mã KEY
-├── .github/workflows/ci.yml      # CI: typecheck + lint (web + api)
+├── .claude/
+│   ├── skills/                   # Skill dự án: tạo module API / màn admin / feature / mã KEY
+│   ├── settings.json             # Quyền lệnh + hook cưỡng chế quy tắc cho Claude Code
+│   └── hooks/                    # guard-bash, lint-file, check-on-stop
+├── .github/workflows/ci.yml      # CI: typecheck + lint (mọi workspace)
+├── .editorconfig, .gitattributes # UTF-8, LF, 2 dấu cách
 ├── docker-compose.yml            # Redis
 └── pnpm-workspace.yaml
 ```
@@ -116,7 +121,7 @@ learn-ecommerce-shop/
 *   **Bộ Khung API Server:**
     *   **Express.js (v4.22.2):** Framework phổ biến để xây dựng RESTful API Server.
     *   **TSX (v4.7.1):** Chạy thẳng TypeScript khi phát triển (`tsx watch src/server.ts`), tự tải lại khi sửa code.
-    *   **ESLint + typescript-eslint:** Cưỡng chế quy chuẩn code (cấm `any`).
+    *   **ESLint + typescript-eslint:** Cưỡng chế quy chuẩn code (cấm `any`) — cấu hình chung ở `packages/config`.
     *   **TypeScript (v5.9.3):** Đảm bảo tính nhất quán của dữ liệu từ Database lên API.
 *   **Xác Thực & Bảo Mật:**
     *   **JSONWebToken (JWT) (v9.0.3):** Xử lý mã hóa và giải mã Access Token & Refresh Token phục vụ đăng nhập bảo mật.
@@ -230,7 +235,8 @@ pnpm check             # Type-check + lint toàn repo (bắt buộc xanh trướ
 | Lệnh | Tác dụng |
 | :--- | :--- |
 | `pnpm typecheck` | `tsc --noEmit` cho mọi workspace |
-| `pnpm lint` | ESLint |
+| `pnpm lint` | ESLint mọi workspace (cấu hình chung `@repo/config` + luật ranh giới kiến trúc ở web) |
+| `pnpm format` / `format:check` | Prettier (chưa bắt buộc — xem PROJECT_RULES §13) |
 | `pnpm build` | Build tất cả workspace |
 | `pnpm db:studio` | Mở Prisma Studio |
 

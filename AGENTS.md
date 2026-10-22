@@ -16,6 +16,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
   - `apps/web`: Frontend Storefront + Admin (Next.js 16 App Router, React 19).
   - `packages/db`: Database layer (Prisma ORM 5, PostgreSQL).
   - `packages/shared`: Hợp đồng dữ liệu dùng chung FE/BE (validator Zod, kiểu response, tên cookie, tiền tệ, locale).
+  - `packages/config`: Cấu hình ESLint / tsconfig / Prettier dùng chung (chỉ devDependency).
 
 # 2. Kiến trúc tổng quan
 - Trình duyệt gọi `/api/*` trên domain web → Next.js rewrites chuyển tiếp sang Express (**cùng origin**, cookie httpOnly dùng chung).
@@ -26,7 +27,8 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - **Frontend:** Next.js 16 (App Router, RSC), React 19, Tailwind CSS v4, shadcn/ui + Base UI, TanStack React Query v5, Zustand v5, React Hook Form + Zod v4, next-intl (vi + en), Motion 12.
 - **Backend:** Express.js 4, JWT RS256 (access + refresh), bcryptjs, Google OAuth, Cloudinary + Multer, Nodemailer, Swagger (`/api-docs`, chỉ ngoài production), ioredis, Zod v4, helmet.
 - **Database:** PostgreSQL qua Prisma ORM, Redis 7 (Docker) cho OTP, rate-limit, reset token.
-- **Infrastructure:** Docker Compose (chỉ Redis), pnpm 11 workspaces (ghim bằng `packageManager`), GitHub Actions CI (`typecheck` + `lint` cho web và api).
+- **Infrastructure:** Docker Compose (chỉ Redis), pnpm 11 workspaces (ghim bằng `packageManager`), GitHub Actions CI (`typecheck` + `lint` cho mọi workspace).
+- **Cấu hình công cụ dùng chung:** `packages/config` (`@repo/config`) — ESLint (`nodeConfig()`, `sharedTsRules`), tsconfig (`base`/`node`/`bundler`), Prettier; `.editorconfig` + `.gitattributes` (LF). Web có thêm luật ESLint ranh giới kiến trúc (PROJECT_RULES §7).
 
 # 4. Quy tắc sử dụng Terminal & Cài đặt Package (Crucial)
 - TUYỆT ĐỐI KHÔNG sử dụng `npm install` hoặc `yarn install`. Chỉ dùng `pnpm`.
@@ -44,7 +46,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - Database (packages/db): Đọc `.env` từ `apps/api/.env` thông qua `dotenv-cli` — KHÔNG cần `.env` riêng.
 
 # 6. Quy trình làm việc tự động (Agentic Workflow Rules)
-- **Tự động kiểm tra**: Sau khi tạo mới hoặc sửa đổi code, chạy `pnpm check` (hoặc `pnpm --filter <workspace> typecheck` / `lint`).
+- **Tự động kiểm tra**: Sau khi tạo mới hoặc sửa đổi code, chạy `pnpm check` (hoặc `pnpm --filter <workspace> typecheck` / `lint`). Với Claude Code, `.claude/settings.json` đã tự làm việc này bằng hook (lint file vừa sửa, `pnpm check` khi dừng) và chặn `git add .`, push main/master, `npm`/`yarn` — xem PROJECT_RULES §11.
 - **Xử lý lỗi Terminal**: Nếu lệnh terminal trả về mã lỗi (exit code khác 0), hãy tự động đọc log lỗi, phân tích nguyên nhân, tự sửa code và chạy lại. Bạn có tối đa 2 lần thử tự sửa trước khi dừng lại hỏi người dùng.
 - **Sau khi sửa schema Prisma**: tạo migration mới (không sửa migration cũ), rồi `pnpm db:generate` (Windows: dừng dev server trước).
 

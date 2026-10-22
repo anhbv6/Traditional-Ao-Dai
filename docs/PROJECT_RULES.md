@@ -14,6 +14,8 @@
 | `.cursor/rules/main.mdc`, `.github/copilot-instructions.md` | Chỉ trỏ về các file trên (không chép lại nội dung) |
 | `docs/guides/` | Hướng dẫn chuyên đề: `admin-ui.md` (giao diện admin), `jwt-keys.md` (tạo cặp khóa JWT) |
 | `.claude/skills/` | Skill dự án: quy trình từng bước + mẫu file khi tạo module/feature/mã KEY mới |
+| `.claude/settings.json`, `.claude/hooks/` | Quyền lệnh + hook cưỡng chế quy tắc cho Claude Code (xem §11) |
+| `packages/config/` | Cấu hình công cụ dùng chung: ESLint, tsconfig, Prettier (xem §2) |
 | `README.md` | Giới thiệu, cài đặt, chạy dự án |
 
 **Thứ tự ưu tiên khi có mâu thuẫn:** Bảo mật (§6) › File này › `AGENTS.md` của workspace › `AGENTS.md` ở root › thói quen cá nhân.
@@ -66,6 +68,7 @@ Trình duyệt ── /vi/... ─►│ proxy.ts (i18n + chặn route)  →  Ser
 | `@repo/web` | Storefront + Admin (Next.js 16, React 19) |
 | `@repo/db` | Prisma schema, migration, Prisma Client singleton |
 | `@repo/shared` | Hợp đồng dữ liệu dùng chung FE/BE: validator Zod, kiểu response, mã cookie, tiền tệ, locale |
+| `@repo/config` | Cấu hình công cụ dùng chung (ESLint, tsconfig, Prettier) — chỉ là devDependency, không chạy ở runtime |
 
 **Cùng origin (bắt buộc):** trình duyệt luôn gọi `/api/*` trên domain của web; `next.config.ts` rewrites chuyển tiếp sang Express (`API_INTERNAL_URL`). Nhờ vậy cookie httpOnly do API đặt dùng được cho cả Next proxy/Server Actions và không cần CORS. **Không** cấu hình FE gọi thẳng cổng API.
 
@@ -85,12 +88,29 @@ Trình duyệt ── /vi/... ─►│ proxy.ts (i18n + chặn route)  →  Ser
 | `pnpm dev` | Chạy dev tất cả workspace song song |
 | `pnpm check` | `typecheck` + `lint` toàn repo — **bắt buộc xanh trước khi commit** |
 | `pnpm typecheck` | `tsc --noEmit` cho mọi workspace |
-| `pnpm lint` | ESLint cho `apps/web` và `apps/api` (cấm `any`, 0 lỗi / 0 cảnh báo) |
+| `pnpm lint` | ESLint cho mọi workspace (web, api, db, shared) — 0 lỗi / 0 cảnh báo |
+| `pnpm format` / `pnpm format:check` | Định dạng bằng Prettier / chỉ kiểm tra (chưa bắt buộc, xem §13) |
 | `pnpm build` | Build tất cả workspace |
 | `pnpm db:migrate` | Tạo + áp dụng migration (dev, interactive) |
 | `pnpm db:deploy` | Áp dụng migration có sẵn (production / môi trường không interactive) |
 | `pnpm db:generate` | Generate Prisma Client |
 | `pnpm db:seed` / `pnpm db:studio` | Seed dữ liệu / mở Prisma Studio |
+
+### Cấu hình công cụ dùng chung (`packages/config`)
+
+Mọi workspace dùng chung một nguồn cấu hình — sửa luật ở đây thay vì chép vào từng workspace.
+
+| File | Dùng ở | Nội dung |
+| :--- | :--- | :--- |
+| `eslint/base.mjs` | `nodeConfig()` cho api, db, shared; `sharedTsRules` ghép vào cấu hình Next của web | `js` + `typescript-eslint` recommended, cấm `any`, biến/tham số `_xxx` được bỏ qua, bắt buộc `import type` khi chỉ dùng kiểu, `eqeqeq` |
+| `tsconfig/base.json` | mọi workspace (qua `node.json` / `bundler.json`) | `strict`, `esModuleInterop`, `skipLibCheck`, `forceConsistentCasingInFileNames`, `resolveJsonModule` |
+| `tsconfig/node.json` | `apps/api`, `packages/db` | CommonJS, ES2022 |
+| `tsconfig/bundler.json` | `apps/web`, `packages/shared` | ESM, `moduleResolution: bundler`, `isolatedModules`, `noEmit` |
+| `prettier.config.mjs` | `prettier.config.mjs` ở gốc | Giữ phong cách hiện có: web nháy kép + chấm phẩy; api/db/shared nháy đơn, không chấm phẩy; `printWidth` 120 |
+
+- Riêng web có thêm luật: `no-console` (chỉ cho `warn`/`error`) và **luật ranh giới kiến trúc** (§7 "Ranh giới import").
+- `.editorconfig` (UTF-8, LF, 2 dấu cách) và `.gitattributes` (`eol=lf`) ở gốc — repo luôn lưu LF dù làm việc trên Windows.
+- Workspace mới: thêm devDependency `"@repo/config": "workspace:*"` + `eslint`, tạo `eslint.config.mjs` gọi `nodeConfig()`, `tsconfig.json` `extends` một trong các file trên, script `lint: "eslint"`.
 
 ### Biến môi trường
 
@@ -199,7 +219,7 @@ src/
 - Module lớn được chia **submodule** theo đối tượng dùng, giữ chung routes/schema ở gốc module: `modules/auth/{client,admin}/` mỗi thư mục có `auth.controller.ts` + `auth.service.ts`.
 - Phụ thuộc một chiều: `modules` → `core` / `infra` / `config`; `core` → `infra` / `config`; `infra` → `config`. `core` và `infra` **không** import từ `modules`.
 - Đăng ký router trong `src/routes.ts`. Import Prisma từ `@repo/db` (không import `@prisma/client`).
-- ESLint (`apps/api/eslint.config.mjs`) cấm `any`; tham số cố ý không dùng đặt tên bắt đầu bằng `_` (vd. `_next` của error handler).
+- ESLint (`apps/api/eslint.config.mjs` → `nodeConfig()` của `@repo/config`, §2) cấm `any`; tham số cố ý không dùng đặt tên bắt đầu bằng `_` (vd. `_next` của error handler).
 
 ### Thứ tự middleware trên route
 
@@ -311,9 +331,14 @@ features/<feature>/
 - Trước khi tự viết nút, ô nhập, dialog, khung trang → dùng `ActionButton` / `ActionLink`, `TextField`, `AppDialog`, `Container` (xem `apps/web/AGENTS.md` §7).
 
 ### Ranh giới import
-- `lib/` **không** import từ `features/` hay `components/`. Trạng thái auth được feature đăng ký vào `apiClient` qua `configureApiClient()`.
-- `components/ui`, `components/shared`, `components/effects`, `components/feedback` **không** import từ `features/`. Chỉ `components/layout` được dùng feature (qua index).
-- Import chéo giữa các feature đi qua `index` của feature (`@/features/cart`), không import sâu vào file nội bộ — ngoại trừ file `*.server.ts` / `core/server/` chỉ dùng ở server.
+> Các luật dưới đây được **ESLint cưỡng chế** (`no-restricted-imports` trong `apps/web/eslint.config.mjs`) — vi phạm làm `pnpm lint` đỏ. Đổi luật thì sửa cả file cấu hình lẫn mục này.
+
+- `lib/` **không** import từ `features/`; về component chỉ được dùng `components/ui` (vd. `showToast`). Trạng thái auth được feature đăng ký vào `apiClient` qua `configureApiClient()`.
+- `hooks/` (dùng chung), `components/ui`, `components/shared`, `components/effects`, `components/feedback` **không** import từ `features/`. Chỉ `components/layout` và `components/providers` (nối các store khi khởi động) được dùng feature (qua index).
+- Import chéo giữa các feature đi qua `index` của feature (`@/features/cart`), không import sâu vào file nội bộ — ngoại trừ file `*.server.ts`, `features/admin/core/server/*` và `features/admin/core/session/permissions` (page server cần mà không kéo component client của `session`).
+- Admin không có barrel tổng: import `@/features/admin/core/<x>` hoặc `@/features/admin/modules/<m>`.
+- Tầng dưới của feature / module admin (`api`, `constants`, `data`, `hooks`, `store`, `types`, `utils`, `validations`, `schemas`, `queries`) không import từ `components/`.
+- `index.ts` của module admin không export `schemas/`.
 - Path alias: `@/*` → `src/*`.
 - Barrel `index.ts` chỉ được tree-shake nhờ `"sideEffects"` trong `apps/web/package.json` (chỉ liệt kê `*.css` và `features/auth/store/authStore.ts`). Module mới có lệnh chạy ở cấp module (không nằm trong hàm/khai báo) **phải** được thêm vào danh sách này, nếu không bundler có thể bỏ mất lệnh đó.
 - Component/dữ liệu lớn chỉ dùng khi người dùng thao tác (khung chat, bảng tìm kiếm, danh mục mock) tải bằng `next/dynamic` hoặc `import()` — không đưa vào bundle chung của mọi trang.
@@ -469,7 +494,20 @@ features/admin/
 - Commit message tiếng Việt, tiền tố: `feat:`, `fix:`, `refactor:`, `docs:`, `chore:`, `test:` — ví dụ `feat: thêm module sản phẩm cho storefront`.
 - **CẤM** `git add .` (add đúng file), **CẤM** tự `git push` lên `main`/`master`.
 - Trước khi commit: `pnpm check` phải xanh (0 lỗi type, 0 lỗi/cảnh báo lint).
-- CI (`.github/workflows/ci.yml`) chạy `install → db:generate → typecheck → lint (web + api)` cho mọi PR và push lên `main`/`develop`; phiên bản pnpm lấy từ `packageManager`.
+- CI (`.github/workflows/ci.yml`) chạy `install → db:generate → typecheck → lint (mọi workspace)` cho mọi PR và push lên `main`/`develop`; phiên bản pnpm lấy từ `packageManager`.
+
+### Cưỡng chế cho AI agent (`.claude/settings.json`)
+
+Quy tắc dự án được cưỡng chế bằng công cụ, không chỉ bằng lời dặn — áp dụng cho Claude Code; agent khác (Cursor, Copilot, Gemini) đọc cùng nguồn quy tắc qua `AGENTS.md`.
+
+| Cơ chế | Tác dụng |
+| :--- | :--- |
+| `permissions.allow` | Cho chạy không cần hỏi: `pnpm check/typecheck/lint/build`, `git status/diff/log/show` |
+| `permissions.deny` + hook `PreToolUse` (`.claude/hooks/guard-bash.mjs`) | Chặn `git add .` / `-A` / `--all`, `git push` lên `main`/`master`, force push, `commit --no-verify`, `git add` file `.env`, `npm install` / `yarn` |
+| Hook `PostToolUse` (`.claude/hooks/lint-file.mjs`) | Sau mỗi lần sửa file TS/JS: chạy ESLint riêng file đó, lỗi được trả về để agent sửa ngay |
+| Hook `Stop` (`.claude/hooks/check-on-stop.mjs`) | Khi agent dừng mà có thay đổi code chưa kiểm tra: chạy `pnpm check`; đỏ thì agent phải sửa tiếp (nhớ kết quả xanh trong `.claude/.cache/` để không chạy lại vô ích) |
+
+- Cấu hình cá nhân đặt ở `.claude/settings.local.json` (đã gitignore), không sửa file chung để nới quy tắc.
 - Thay đổi schema DB, biến môi trường hoặc luồng auth phải ghi rõ trong mô tả PR (cách migrate, biến cần thêm, ai phải đăng nhập lại).
 
 ---
@@ -511,7 +549,8 @@ features/admin/
 | Dữ liệu storefront | Sản phẩm, tin tức, wishlist, FAQ, lịch sử đơn... vẫn là **mock** | Xây module `products`, `orders`, `cart` ở Express theo §5, chuyển trang SEO sang Server Component |
 | Giỏ hàng | Lưu localStorage (Zustand persist), mã giảm giá demo phía client | API giỏ hàng + đồng bộ model `Cart` khi đăng nhập; voucher xác thực ở server |
 | Test | Chưa có test tự động | Ưu tiên test tích hợp auth (supertest) và hàm tính tiền |
-| Lint `packages/*` | `apps/web` và `apps/api` đã có ESLint; `packages/db`, `packages/shared` mới chỉ có `typecheck` | Thêm ESLint dùng chung cấu hình với `apps/api` |
+| Prettier | Đã có cấu hình chung nhưng **chưa định dạng toàn repo** (~570 file lệch, chủ yếu xuống dòng) nên chưa đưa vào CI | Một commit riêng chỉ chạy `pnpm format` (không lẫn thay đổi khác), sau đó thêm `pnpm format:check` vào CI |
+| Import tương đối chéo feature | ESLint chỉ bắt import alias `@/features/...`; `../../<feature khác>/...` chưa bị chặn | Luôn dùng alias khi import feature khác |
 | **Chạy API production** (`node dist/server.js`) | `require('@repo/db')` từ bản build CommonJS **không có** `prisma` (file `.ts` của `@repo/db` vừa `export const prisma` vừa `export * from '@prisma/client'` dạng CJS) → mọi truy vấn DB lỗi. Dev (`tsx`) không bị | Build `@repo/db` ra JS (tsc) hoặc chuyển API sang ESM / bundle (tsup) trước khi triển khai |
 | Validate Server Action đọc dữ liệu | Action chỉ đọc (vd. `getApprovalRequestsAction(statusFilter)`) chưa có schema | Thêm khi chạm vào file |
 | Ngày giờ ở admin | Một số chỗ `toLocaleString("vi-VN")` cố định tiếng Việt | Đổi sang `useFormatter()` của next-intl |

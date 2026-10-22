@@ -19,4 +19,4 @@
 - Thay đổi ở đây ảnh hưởng cả FE và BE → chạy `pnpm check` toàn repo.
 
 # 3. Scripts
-- `pnpm --filter @repo/shared typecheck`.
+- `pnpm --filter @repo/shared typecheck` / `lint` (ESLint dùng `nodeConfig()` của `@repo/config`).

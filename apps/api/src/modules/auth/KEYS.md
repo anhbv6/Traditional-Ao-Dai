@@ -88,7 +88,7 @@ Tài liệu tổng hợp các mã phản hồi (`message` key) của Module Auth
 
 ## Mô hình cookie phiên (Session Cookies)
 
-Web và API chạy cùng origin (Next.js rewrites `/api/*`), mọi cookie dưới đây **chỉ do Backend đặt/xóa** (`shared/utils/authCookies.ts`):
+Web và API chạy cùng origin (Next.js rewrites `/api/*`), mọi cookie dưới đây **chỉ do Backend đặt/xóa** (`src/core/security/authCookies.ts`):
 
 | Cookie | httpOnly | SameSite | Đặt khi | Mục đích |
 | :--- | :---: | :---: | :--- | :--- |

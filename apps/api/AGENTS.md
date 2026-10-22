@@ -21,7 +21,7 @@
 # 2. Quy chuẩn code
 - Framework: Express.js 4 — KHÔNG dùng NestJS, Fastify hoặc framework khác.
 - Validation: Zod v4 (`schema.ts` dạng `{ body, query, params }`), thông điệp lỗi là **mã KEY**. Dùng validator chung từ `@repo/shared/validation` (SĐT, email, mật khẩu, mã OTP).
-- TypeScript strict + ESLint (`eslint.config.mjs`): CẤM `any` (controller trả `Promise<void>`, lỗi `catch` để `unknown`); tham số cố ý không dùng đặt tên `_xxx`.
+- TypeScript strict + ESLint (`eslint.config.mjs` dùng cấu hình chung `@repo/config`): CẤM `any` (controller trả `Promise<void>`, lỗi `catch` để `unknown`); tham số cố ý không dùng đặt tên `_xxx`.
 - Thứ tự middleware: `validate` → `rateLimit` → `requireAuth` → `requireRoles` → controller.
 - Controller mỏng (đọc req → service → `sendSuccess` / `next(error)`); logic nghiệp vụ ở service.
 - Lỗi nghiệp vụ: `throw new AppError(status, 'MA_KEY')`. Phản hồi: `sendSuccess(res, { data, message: 'MA_KEY' })`.

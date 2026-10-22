@@ -29,5 +29,5 @@ jobs:
       - name: Type-check toàn bộ workspace
         run: pnpm typecheck
 
-      - name: Lint (web + api)
+      - name: Lint (mọi workspace — web, api, db, shared)
         run: pnpm lint
