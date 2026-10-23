@@ -79,7 +79,7 @@ export function ProfileShell({ children }: { children: ReactNode }) {
             {/* Thẻ người dùng (desktop) */}
             <div className="mb-5 hidden items-center gap-3 border-b border-[var(--border)] pb-5 lg:flex">
               <Avatar size="lg" className="shrink-0 border border-[var(--border)]">
-                {user?.avatar ? <AvatarImage src={user.avatar} alt={displayName} className="object-cover" /> : null}
+                {user?.avatarUrl ? <AvatarImage src={user.avatarUrl} alt={displayName} className="object-cover" /> : null}
                 <AvatarFallback className="bg-[var(--bg-main)] text-xs font-bold uppercase text-[var(--primary-ink)]">
                   {getInitials(displayName) || <UserRound size={18} strokeWidth={1.6} aria-hidden="true" />}
                 </AvatarFallback>

@@ -22,33 +22,16 @@ interface PersonalInfoUIState extends PersonalInfoFormValues {
   loadUserIntoForm: (user: AuthUser | null) => void;
 }
 
-const getPersonalInfoFormValues = (user: AuthUser | null): PersonalInfoFormValues => {
-  const birthDate = user?.birth ? new Date(user.birth) : undefined;
-
-  let genderValue = "other";
-  if (user?.gender === 0 || user?.gender === "0" || user?.gender === "MALE" || user?.gender === "male") {
-    genderValue = "male";
-  } else if (user?.gender === 1 || user?.gender === "1" || user?.gender === "FEMALE" || user?.gender === "female") {
-    genderValue = "female";
-  } else {
-    genderValue = "other";
-  }
-
-  return {
-    fullName: user?.name || "",
-    email: user?.email || "",
-    phone: user?.phone || "",
-    gender: genderValue,
-    dob: birthDate
-      ? [
-          birthDate.getFullYear(),
-          String(birthDate.getMonth() + 1).padStart(2, "0"),
-          String(birthDate.getDate()).padStart(2, "0"),
-        ].join("-")
-      : "",
-    avatarUrl: user?.avatar || "",
-  };
-};
+const getPersonalInfoFormValues = (user: AuthUser | null): PersonalInfoFormValues => ({
+  fullName: user?.name || "",
+  email: user?.email || "",
+  phone: user?.phone || "",
+  // Form dùng giá trị chữ thường ("male" | "female" | "other"); API dùng enum MALE | FEMALE | OTHER
+  gender: user?.gender ? user.gender.toLowerCase() : "other",
+  // API trả sẵn dạng YYYY-MM-DD
+  dob: user?.birthDate || "",
+  avatarUrl: user?.avatarUrl || "",
+});
 
 export const usePersonalInfoStore = create<PersonalInfoUIState>((set) => ({
   isEditing: false,

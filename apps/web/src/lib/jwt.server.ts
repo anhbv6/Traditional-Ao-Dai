@@ -1,17 +1,5 @@
 import { createPublicKey, verify, type KeyObject } from 'node:crypto';
-
-/**
- * Payload JWT do Backend (@repo/api) ký bằng RS256 — giữ khớp với `apps/api/src/core/security/jwt.ts`
- */
-export interface AdminJwtPayload {
-  userId: string;
-  role: 'CUSTOMER' | 'STAFF' | 'ADMIN';
-  sessionId?: string;
-  tokenType?: 'access' | 'refresh';
-  rememberMe?: boolean;
-  exp?: number;
-  iat?: number;
-}
+import { type AuthTokenClaims, type TokenAudience } from '@repo/shared';
 
 let cachedPublicKey: KeyObject | null | undefined;
 
@@ -23,7 +11,7 @@ function getPublicKey(): KeyObject | null {
 
   const rawKey = process.env.JWT_PUBLIC_KEY?.trim();
   if (!rawKey) {
-    console.error('[jwt.server] Thiếu biến môi trường JWT_PUBLIC_KEY — mọi token quản trị sẽ bị từ chối.');
+    console.error('[jwt.server] Thiếu biến môi trường JWT_PUBLIC_KEY — mọi token sẽ bị từ chối.');
     cachedPublicKey = null;
     return null;
   }
@@ -45,10 +33,14 @@ function getPublicKey(): KeyObject | null {
 }
 
 /**
- * Xác minh chữ ký RS256 và hạn sử dụng của JWT. Trả về payload nếu hợp lệ, ngược lại trả về null.
- * Chỉ dùng phía server (Proxy, Server Components, Server Actions).
+ * Xác minh chữ ký RS256, hạn dùng, audience và loại token do Backend ký. Hợp lệ -> payload, ngược lại -> null.
+ * Chỉ xác minh, không biết phiên đã bị thu hồi hay chưa — kiểm tra phiên thật nằm ở checkAuthAdmin / Express.
  */
-export function verifyAccessToken(token: string | undefined | null): AdminJwtPayload | null {
+function verifyJwt(
+  token: string | undefined | null,
+  audience: TokenAudience,
+  tokenType: AuthTokenClaims['tokenType']
+): AuthTokenClaims | null {
   if (!token) return null;
 
   const publicKey = getPublicKey();
@@ -70,14 +62,27 @@ export function verifyAccessToken(token: string | undefined | null): AdminJwtPay
     );
     if (!isValidSignature) return null;
 
-    const payload = JSON.parse(Buffer.from(encodedPayload, 'base64url').toString('utf8')) as AdminJwtPayload;
+    const payload = JSON.parse(Buffer.from(encodedPayload, 'base64url').toString('utf8')) as AuthTokenClaims;
 
     if (typeof payload.exp !== 'number' || payload.exp * 1000 <= Date.now()) return null;
-    if (payload.tokenType && payload.tokenType !== 'access') return null;
-    if (!payload.userId || !payload.role) return null;
+    if (payload.aud !== audience || payload.tokenType !== tokenType) return null;
+    if (!payload.userId || !payload.role || !payload.sessionId) return null;
 
     return payload;
   } catch {
     return null;
   }
+}
+
+/** Token cookie `admin_token` (aud=admin) — dùng ở Proxy, Server Components, Server Actions */
+export function verifyAdminToken(token: string | undefined | null): AuthTokenClaims | null {
+  return verifyJwt(token, 'admin', 'access');
+}
+
+/**
+ * Refresh token storefront (cookie httpOnly cùng origin) — Proxy chỉ dùng để biết người đang đăng nhập
+ * storefront có vai trò gì (khách hàng vào /admin thì báo 403 thay vì trang đăng nhập)
+ */
+export function verifyStoreRefreshToken(token: string | undefined | null): AuthTokenClaims | null {
+  return verifyJwt(token, 'store', 'refresh');
 }

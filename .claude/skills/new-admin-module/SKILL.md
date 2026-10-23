@@ -5,7 +5,7 @@ description: Tạo màn quản trị mới trong apps/web (features/admin/module
 
 # Tạo màn admin mới
 
-Quy chuẩn gốc: `docs/PROJECT_RULES.md` §6 (quy tắc 3–5), §8 (Admin). Giao diện: `docs/guides/admin-ui.md`.
+Quy chuẩn gốc: `AGENTS.md` §6 (quy tắc 3–5), §8 (Admin, gồm giao diện).
 
 ## 1. Cấu trúc
 
@@ -44,7 +44,7 @@ import { parseActionInput } from "@/features/admin/core/server/actionInput";
 import { toggleThingSchema } from "../schemas/<module>.schemas";
 
 export async function toggleThingAction(thingId: string, isActive: boolean) {
-  const auth = await authorizeAdminAction({ permission: "canManageContent" }); // DÒNG ĐẦU
+  const auth = await authorizeAdminAction({ permission: "MANAGE_CONTENT" }); // DÒNG ĐẦU
   if (!auth.success) return auth;
 
   const input = parseActionInput(toggleThingSchema, { thingId, isActive }); // client gửi gì cũng phải parse lại
@@ -86,7 +86,7 @@ export default async function AdminThingsPage() {
 }
 ```
 
-Client component: `const t = useTranslations("AdminPage.<module>")`, gọi action qua React Query / `useTransition`, hiện lỗi bằng `useNotify().error(res.error, "FALLBACK_KEY")`. Tiền `formatVnd(value, locale)`. Màu theo `docs/guides/admin-ui.md` (admin được dùng hex đơn sắc theo bảng token đó).
+Client component: `const t = useTranslations("AdminPage.<module>")`, gọi action qua React Query / `useTransition`, hiện lỗi bằng `useNotify().error(res.error, "FALLBACK_KEY")`. Tiền `formatVnd(value, locale)`. Màu theo `AGENTS.md` §8 (admin được dùng hex đơn sắc theo bảng token đó).
 
 ## 4. i18n
 - `apps/web/messages/{vi,en}/admin.json`: `pages.<module>.{eyebrow,title,description,meta}`, `<module>.*`, `nav.<module>`, toast ở `toasts.*`. Hai locale cùng tập key; bản `en` dùng ICU plural cho số đếm.

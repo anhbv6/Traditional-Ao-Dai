@@ -127,5 +127,8 @@
   "PHONE_REQUIRED": "Vui lòng nhập số điện thoại",
   "MEASUREMENT_REQUIRED": "Vui lòng nhập số đo",
   "MEASUREMENT_OUT_OF_RANGE": "Số đo chưa hợp lý, vui lòng kiểm tra lại",
-  "APPOINTMENT_LIST_FAILED": "Không tải được lịch hẹn. Vui lòng thử lại."
+  "APPOINTMENT_LIST_FAILED": "Không tải được lịch hẹn. Vui lòng thử lại.",
+  "NAME_MAX_LENGTH": "Họ và tên tối đa 100 ký tự.",
+  "PROVIDER_INVALID": "Nhà cung cấp đăng nhập không hợp lệ.",
+  "STAFF_PASSWORD_RESET_FAILED": "Không thể đặt lại mật khẩu nhân viên. Vui lòng thử lại."
 }

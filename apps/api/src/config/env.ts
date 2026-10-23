@@ -1,8 +1,11 @@
+import path from 'path'
 import dotenv from 'dotenv'
 import { z } from 'zod'
 
-// Tự động nạp các biến môi trường từ .env
-dotenv.config()
+// Local: nạp apps/api/.env.local rồi .env (file trước được ưu tiên, thiếu file thì bỏ qua).
+// Production (Render) không có file — biến lấy từ môi trường của dịch vụ.
+const API_ROOT = path.resolve(__dirname, '../..')
+dotenv.config({ path: [path.join(API_ROOT, '.env.local'), path.join(API_ROOT, '.env')], quiet: true })
 
 const envSchema = z.object({
   PORT: z.coerce.number().default(3001),
@@ -10,9 +13,9 @@ const envSchema = z.object({
   DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
   JWT_PRIVATE_KEY: z.string().min(1, 'JWT_PRIVATE_KEY is required'),
   JWT_PUBLIC_KEY: z.string().min(1, 'JWT_PUBLIC_KEY is required'),
+  // Hạn access token. Hạn refresh token (24h / 7d khi "ghi nhớ") cố định trong modules/auth/client/auth.service.ts
   JWT_EXPIRES_IN: z.string().default('15m'),
-  JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
-  
+
   FRONTEND_URL: z.string().default('http://localhost:3000'),
 
   // Số proxy tin cậy đứng trước API và có NỐI IP client vào X-Forwarded-For (nginx/Cloudflare...).

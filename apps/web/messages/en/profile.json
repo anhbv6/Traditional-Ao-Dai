@@ -239,7 +239,9 @@
       "confirmPlaceholder": "Please re-enter the new password",
       "newRequired": "Please enter a new password.",
       "confirmRequired": "Please confirm your new password.",
-      "saving": "Updating..."
+      "saving": "Updating...",
+      "setTitle": "Set a password",
+      "setSubtitle": "You currently sign in with Google. Set a password to also sign in with your email or phone."
     },
     "sessions": {
       "title": "Login History",
@@ -257,7 +259,8 @@
         "title": "Sign out device",
         "message": "This device will be signed out of your account immediately.",
         "confirmBtn": "Sign out device"
-      }
+      },
+      "adminArea": "Admin area"
     },
     "toasts": {
       "passwordChangeSuccess": "Password changed! Other devices have been signed out.",

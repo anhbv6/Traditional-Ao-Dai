@@ -1,12 +1,13 @@
+import { type Gender } from "@repo/shared";
 import { type AuthUser } from "@/features/auth";
 
+/** PUT /api/user/profile — email & SĐT đổi qua luồng xác minh mã, không gửi ở đây */
 export type ProfilePayload = {
   name?: string;
-  email?: string | null;
-  phone?: string | null;
-  avatar?: string | null;
-  dob?: string | null;
-  gender?: number | string;
+  avatarUrl?: string | null;
+  /** YYYY-MM-DD */
+  birthDate?: string | null;
+  gender?: Gender | null;
 };
 
 export type UpdateProfileResponse = {

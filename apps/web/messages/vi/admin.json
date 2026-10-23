@@ -91,17 +91,18 @@
     },
     "columns": {
       "staff": "Nhân viên",
-      "status": "Trạng thái"
+      "status": "Trạng thái",
+      "actions": "Thao tác"
     },
     "unnamed": "Chưa đặt tên",
     "active": "Hoạt động",
     "locked": "Đã khóa",
     "permissions": {
-      "canManageOrders": "Đơn hàng & Khách hàng",
-      "canUpdateTailoring": "Xưởng may đo",
-      "canManageInventory": "Sản phẩm & Tồn kho",
-      "canViewReports": "Báo cáo doanh thu",
-      "canManageContent": "Nội dung & FAQ"
+      "MANAGE_ORDERS": "Đơn hàng & Khách hàng",
+      "UPDATE_TAILORING": "Xưởng may đo",
+      "MANAGE_INVENTORY": "Sản phẩm & Tồn kho",
+      "VIEW_REPORTS": "Báo cáo doanh thu",
+      "MANAGE_CONTENT": "Nội dung & FAQ"
     },
     "createTitle": "Thêm nhân viên",
     "createDescription": "Nhân viên đăng nhập tại trang quản trị bằng email và mật khẩu này.",
@@ -112,7 +113,12 @@
       "email": "Email đăng nhập",
       "password": "Mật khẩu (tối thiểu 6 ký tự)",
       "permissions": "Quyền được cấp"
-    }
+    },
+    "resetPassword": "Đặt lại mật khẩu",
+    "resettingPassword": "Đang đặt lại...",
+    "resetPasswordTitle": "Đặt lại mật khẩu nhân viên",
+    "resetPasswordDescription": "Đặt mật khẩu mới cho {name}. Mọi phiên đăng nhập của nhân viên này sẽ bị đăng xuất.",
+    "resetPasswordSuccess": "Đã đặt lại mật khẩu nhân viên!"
   },
   "dashboard": {
     "greeting": "Xin chào, {name}",

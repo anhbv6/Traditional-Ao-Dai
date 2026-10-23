@@ -5,7 +5,7 @@ description: Tạo module REST mới trong apps/api (Express) đúng quy chuẩn
 
 # Tạo module API mới (`apps/api`)
 
-Quy chuẩn gốc: `docs/PROJECT_RULES.md` §5 (Backend), §6 (Bảo mật). Đọc `apps/api/AGENTS.md` trước.
+Quy chuẩn gốc: `AGENTS.md` §5 (Backend), §6 (Bảo mật). Đọc `apps/api/AGENTS.md` trước.
 
 ## 1. Tạo file
 

@@ -5,8 +5,8 @@ import { useTranslations } from "next-intl";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { useNotify } from "@/hooks/useNotify";
 import { createStaffAction } from "../actions/staff.actions";
-import { type StaffMemberItem, type StaffPermissionInput } from "../types/staff.types";
-import { STAFF_PERMISSION_FIELDS } from "../../../core/session/permissions";
+import { type StaffMemberItem } from "../types/staff.types";
+import { STAFF_PERMISSIONS, type Permission } from "../../../core/session/permissions";
 
 interface CreateStaffDialogProps {
   open: boolean;
@@ -17,13 +17,7 @@ interface CreateStaffDialogProps {
 const EMPTY_FORM = { name: "", email: "", phone: "", password: "" };
 
 /** Mặc định nhân viên mới chỉ được xử lý đơn và cập nhật may đo (quyền tối thiểu cho vận hành) */
-const DEFAULT_PERMISSIONS: StaffPermissionInput = {
-  canManageOrders: true,
-  canUpdateTailoring: true,
-  canManageInventory: false,
-  canViewReports: false,
-  canManageContent: false,
-};
+const DEFAULT_PERMISSIONS: Permission[] = ["MANAGE_ORDERS", "UPDATE_TAILORING"];
 
 const INPUT_CLASS =
   "h-9 w-full rounded-lg border border-[#E4E4E7] bg-white px-3 text-xs text-[#09090B] placeholder:text-zinc-400 transition-all focus:border-[#09090B] focus:outline-none focus:ring-2 focus:ring-zinc-900/10";
@@ -35,7 +29,7 @@ export function CreateStaffDialog({ open, onOpenChange, onCreated }: CreateStaff
   const t = useTranslations("AdminPage.staff");
   const notify = useNotify();
   const [form, setForm] = useState(EMPTY_FORM);
-  const [permissions, setPermissions] = useState<StaffPermissionInput>(DEFAULT_PERMISSIONS);
+  const [permissions, setPermissions] = useState<Permission[]>(DEFAULT_PERMISSIONS);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const close = () => {
@@ -94,12 +88,16 @@ export function CreateStaffDialog({ open, onOpenChange, onCreated }: CreateStaff
 
           <fieldset className="space-y-2">
             <legend className="text-xs font-semibold text-zinc-700">{t("form.permissions")}</legend>
-            {STAFF_PERMISSION_FIELDS.map((permission) => (
+            {STAFF_PERMISSIONS.map((permission) => (
               <label key={permission} className="flex cursor-pointer items-center gap-2 text-xs text-[#09090B]">
                 <input
                   type="checkbox"
-                  checked={permissions[permission]}
-                  onChange={() => setPermissions((prev) => ({ ...prev, [permission]: !prev[permission] }))}
+                  checked={permissions.includes(permission)}
+                  onChange={() =>
+                    setPermissions((prev) =>
+                      prev.includes(permission) ? prev.filter((p) => p !== permission) : [...prev, permission]
+                    )
+                  }
                   className="size-4 rounded border-zinc-300 accent-zinc-900"
                 />
                 {t(`permissions.${permission}`)}

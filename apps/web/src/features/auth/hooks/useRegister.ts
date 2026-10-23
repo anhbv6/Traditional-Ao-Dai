@@ -8,11 +8,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { type RegisterFormData } from '../types/register.types';
 import { createRegisterSchema } from '../validations/register.validation';
-import { showToast } from '@/components/ui/toast';
 import { extractErrorMessage } from '@/lib/messages';
-import { notifyError, notifySuccess, resolveErrorMessage } from '@/lib/messages';
+import { notifyError, notifySuccess } from '@/lib/messages';
 import { withMinDelay } from '@/lib/utils';
-import { checkEmailApi, checkPhoneApi, registerApi } from '../api/register.api';
+import { checkEmailApi, checkPhoneApi, registerApi, sendRegisterEmailCodeApi } from '../api/register.api';
 import { loginWithGoogleApi, sendOtpApi } from '../api/auth.api';
 import { establishCustomerSession } from '../utils/session';
 import { useCountdown } from './useCountdown';
@@ -39,8 +38,8 @@ export function useRegister() {
   const [phoneApiError, setPhoneApiError] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
   const [isResendingOtp, setIsResendingOtp] = useState(false);
-  // Số điện thoại đã được gửi OTP gần nhất (để vào lại bước OTP đúng số)
-  const [otpPhone, setOtpPhone] = useState('');
+  // Nơi đã được gửi mã gần nhất, dạng "email:<giá trị>" | "phone:<giá trị>" (để vào lại bước nhập mã đúng nơi nhận)
+  const [codeTarget, setCodeTarget] = useState('');
   // Thời gian chờ gửi lại OTP — chạy tiếp khi quay lại sửa form rồi vào lại bước OTP
   const resendCountdown = useCountdown();
 
@@ -205,69 +204,53 @@ export function useRegister() {
   }, [phoneVal, registerType, setError, clearErrors, t]);
 
 
+  /** Khóa nơi nhận mã của form hiện tại — đổi email/SĐT thì phải gửi mã mới */
+  const targetKeyOf = (data: { registerType: 'email' | 'phone'; email?: string; phone?: string }) =>
+    data.registerType === 'email' ? `email:${data.email ?? ''}` : `phone:${data.phone ?? ''}`;
+
+  /** Gửi mã xác minh tới email hoặc OTP tới SĐT tùy cách đăng ký */
+  const sendCode = (data: RegisterFormData) =>
+    data.registerType === 'email' ? sendRegisterEmailCodeApi(data.email) : sendOtpApi(data.phone, 'REGISTER');
+
   const onFormSubmit = async (data: RegisterFormData) => {
-    if (data.registerType === 'email') {
-      if (emailCheckResult === 'taken') {
-        setError('email', { message: emailApiError || t('emailTaken') });
-        return;
+    if (data.registerType === 'email' && emailCheckResult === 'taken') {
+      setError('email', { message: emailApiError || t('emailTaken') });
+      return;
+    }
+    if (data.registerType === 'phone' && phoneCheckResult === 'taken') {
+      setError('phone', { message: phoneApiError || t('phoneTaken') });
+      return;
+    }
+
+    const targetKey = targetKeyOf(data);
+    // Mã cho đúng nơi nhận này vẫn còn trong thời gian chờ → vào thẳng bước nhập mã, không gửi lại
+    if (codeTarget === targetKey && resendCountdown.isRunning) {
+      setIsOtpStep(true);
+      return;
+    }
+
+    try {
+      setIsRegistering(true);
+      await withMinDelay(sendCode(data), 2000);
+      setOtpInput('');
+      setOtpError('');
+      setCodeTarget(targetKey);
+      resendCountdown.start();
+      setIsOtpStep(true);
+      notifySuccess(t(data.registerType === 'email' ? 'emailCodeSent' : 'otpSent'));
+    } catch (err: unknown) {
+      console.error('Failed to send verification code:', err);
+      const rawMsg = extractErrorMessage(err, 'OTP_SEND_FAILED');
+      const apiMsg = notifyError(err, 'OTP_SEND_FAILED', t);
+      if (rawMsg === 'EMAIL_ALREADY_EXISTS') {
+        setError('email', { message: apiMsg });
+      } else if (rawMsg === 'PHONE_ALREADY_EXISTS') {
+        setError('phone', { message: apiMsg });
+      } else if (rawMsg === 'OTP_COOLDOWN_ACTIVE' || rawMsg === 'COOLDOWN_ACTIVE') {
+        setCodeTarget(targetKey);
       }
-      try {
-        setIsRegistering(true);
-        const res = await withMinDelay(
-          registerApi({
-            registerType: 'email',
-            name: data.fullName,
-            password: data.password,
-            email: data.email,
-          }),
-          2000
-        );
-        const successMsg = resolveErrorMessage(res.message, t('registerSuccessEmail', { name: data.fullName }), t);
-        notifySuccess(successMsg);
-        // Giữ trạng thái loading tới khi rời trang để không bấm gửi lại được
-        router.push('/login');
-      } catch (err: unknown) {
-        console.error('Registration failed:', err);
-        const apiMsg = resolveErrorMessage(err, 'REGISTRATION_FAILED', t);
-        const rawMsg = extractErrorMessage(err, 'REGISTRATION_FAILED');
-        if (rawMsg === 'EMAIL_ALREADY_EXISTS' || rawMsg.toLowerCase().includes('email')) {
-          setError('email', { message: apiMsg });
-        } else if (rawMsg === 'PHONE_ALREADY_EXISTS' || rawMsg === 'INVALID_PHONE_NUMBER' || rawMsg.toLowerCase().includes('phone')) {
-          setError('phone', { message: apiMsg });
-        } else {
-          showToast.error(apiMsg);
-        }
-        setIsRegistering(false);
-      }
-    } else {
-      if (phoneCheckResult === 'taken') {
-        setError('phone', { message: phoneApiError || t('phoneTaken') });
-        return;
-      }
-      // Mã cho đúng số này vẫn còn trong thời gian chờ → vào thẳng bước OTP, không gửi lại
-      if (otpPhone === data.phone && resendCountdown.isRunning) {
-        setIsOtpStep(true);
-        return;
-      }
-      try {
-        setIsRegistering(true);
-        await withMinDelay(sendOtpApi(data.phone, 'REGISTER'), 2000);
-        setOtpInput('');
-        setOtpError('');
-        setOtpPhone(data.phone);
-        resendCountdown.start();
-        setIsOtpStep(true);
-        notifySuccess(t('otpSent'));
-      } catch (err: unknown) {
-        console.error('Failed to send OTP:', err);
-        const rawMsg = extractErrorMessage(err, 'OTP_SEND_FAILED');
-        notifyError(err, 'OTP_SEND_FAILED', t);
-        if (rawMsg === 'OTP_COOLDOWN_ACTIVE' || rawMsg === 'COOLDOWN_ACTIVE') {
-          setOtpPhone(data.phone);
-        }
-      } finally {
-        setIsRegistering(false);
-      }
+    } finally {
+      setIsRegistering(false);
     }
   };
 
@@ -275,7 +258,7 @@ export function useRegister() {
     e.preventDefault();
     // Đọc giá trị form trong event handler bằng getValues (watch() chỉ dùng khi cần re-render theo giá trị)
     const data = getValues();
-    if (data.registerType !== 'phone' || isRegistering) return;
+    if (isRegistering) return;
     if (otpInput.length < 6) {
       setOtpError(t('otpRequired'));
       return;
@@ -283,17 +266,20 @@ export function useRegister() {
 
     try {
       setIsRegistering(true);
+      const common = { name: data.fullName, password: data.password, code: otpInput };
       const res = await withMinDelay(
-        registerApi({
-          registerType: 'phone',
-          name: data.fullName,
-          password: data.password,
-          phone: data.phone,
-          code: otpInput,
-        }),
+        registerApi(
+          data.registerType === 'email'
+            ? { ...common, registerType: 'email', email: data.email }
+            : { ...common, registerType: 'phone', phone: data.phone }
+        ),
         2000
       );
-      notifySuccess(res.message, t('registerSuccessPhone'), t);
+      notifySuccess(
+        res.message,
+        data.registerType === 'email' ? t('registerSuccessEmail', { name: data.fullName }) : t('registerSuccessPhone'),
+        t
+      );
       // Giữ loading tới khi sang trang đăng nhập
       router.push('/login');
     } catch (err: unknown) {
@@ -311,16 +297,16 @@ export function useRegister() {
 
   const handleResendOtp = async () => {
     const data = getValues();
-    if (data.registerType !== 'phone' || isResendingOtp || resendCountdown.isRunning) return;
+    if (isResendingOtp || resendCountdown.isRunning) return;
 
     setIsResendingOtp(true);
     try {
-      await sendOtpApi(data.phone, 'REGISTER');
+      await sendCode(data);
       setOtpInput('');
       setOtpError('');
-      setOtpPhone(data.phone);
+      setCodeTarget(targetKeyOf(data));
       resendCountdown.start();
-      notifySuccess(t('otpSent'));
+      notifySuccess(t(data.registerType === 'email' ? 'emailCodeSent' : 'otpSent'));
     } catch (err: unknown) {
       console.error('Failed to resend OTP:', err);
       notifyError(err, 'OTP_RESEND_FAILED', t);
@@ -381,7 +367,9 @@ export function useRegister() {
     handleGoogleSignUp,
     isResendingOtp,
     resendSeconds: resendCountdown.seconds,
-    // Đã gửi OTP cho đúng số đang nhập → cho phép vào lại bước OTP
-    otpSentOnce: !!otpPhone && otpPhone === phoneVal,
+    // Đã gửi mã cho đúng email/SĐT đang nhập → cho phép vào lại bước nhập mã
+    otpSentOnce: !!codeTarget && codeTarget === targetKeyOf({ registerType, email: emailVal, phone: phoneVal }),
+    /** Nơi nhận mã hiển thị ở bước nhập mã */
+    codeDestination: (registerType === 'email' ? emailVal : phoneVal) || '',
   };
 }

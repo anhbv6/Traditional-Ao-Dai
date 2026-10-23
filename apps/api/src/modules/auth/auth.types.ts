@@ -1,5 +1,5 @@
 export interface SessionMeta {
-  deviceInfo?: string
+  userAgent?: string
   ipAddress?: string
 }
 

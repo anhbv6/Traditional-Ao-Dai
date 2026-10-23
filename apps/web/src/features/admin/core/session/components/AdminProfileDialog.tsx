@@ -68,7 +68,7 @@ export function AdminProfileDialog({
     if (open && user) {
       setName(user.name || "");
       setPhone(user.phone || "");
-      setAvatarUrl(user.avatar || "");
+      setAvatarUrl(user.avatarUrl || "");
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
@@ -112,7 +112,7 @@ export function AdminProfileDialog({
       const res = await updateAdminProfileAction({
         name: name.trim(),
         phone: phone.trim(),
-        avatar: avatarUrl,
+        avatarUrl,
       });
 
       if (!res.success) {

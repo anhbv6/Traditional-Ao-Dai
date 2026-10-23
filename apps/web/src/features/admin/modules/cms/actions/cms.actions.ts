@@ -10,7 +10,7 @@ import { toggleArticlePublishSchema, toggleFaqActiveSchema } from "../schemas/cm
  * Server Action: Bật/Tắt xuất bản bài viết
  */
 export async function toggleArticlePublishAction(articleId: string, isPublished: boolean) {
-  const auth = await authorizeAdminAction({ permission: "canManageContent" });
+  const auth = await authorizeAdminAction({ permission: "MANAGE_CONTENT" });
   if (!auth.success) return auth;
 
   const input = parseActionInput(toggleArticlePublishSchema, { articleId, isPublished });
@@ -41,7 +41,7 @@ export async function toggleArticlePublishAction(articleId: string, isPublished:
  * Server Action: Bật/Tắt kích hoạt câu hỏi FAQ
  */
 export async function toggleFaqActiveAction(faqId: string, isActive: boolean) {
-  const auth = await authorizeAdminAction({ permission: "canManageContent" });
+  const auth = await authorizeAdminAction({ permission: "MANAGE_CONTENT" });
   if (!auth.success) return auth;
 
   const input = parseActionInput(toggleFaqActiveSchema, { faqId, isActive });

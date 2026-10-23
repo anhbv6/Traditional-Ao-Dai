@@ -7,7 +7,7 @@ import {
   updateProfileSchema,
   changePasswordSchema,
   linkGoogleSchema,
-  unlinkGoogleSchema,
+  unlinkSocialSchema,
   deleteSessionSchema,
   createAddressSchema,
   updateAddressSchema,
@@ -33,7 +33,7 @@ const confirmCodeLimit = rateLimit({ name: 'contact-confirm-user', max: 20, wind
  * /api/user/profile:
  *   put:
  *     summary: Update User Profile
- *     description: Update the authenticated customer's profile details.
+ *     description: Cập nhật thông tin cá nhân của người dùng storefront (mọi vai trò). Email/SĐT đổi qua /user/email|phone/verification. Gửi null để xóa giá trị. Trả về UserDto.
  *     tags:
  *       - User
  *     security:
@@ -48,25 +48,25 @@ const confirmCodeLimit = rateLimit({ name: 'contact-confirm-user', max: 20, wind
  *               name:
  *                 type: string
  *                 example: "Bui viet"
- *               phone:
+ *               avatarUrl:
  *                 type: string
- *                 example: "0379603855"
- *               avatar:
- *                 type: string
+ *                 nullable: true
  *                 example: "https://example.com/avatar.jpg"
- *               dob:
+ *               birthDate:
  *                 type: string
  *                 format: date
+ *                 nullable: true
  *                 example: "1995-12-31"
  *               gender:
  *                 type: string
+ *                 nullable: true
  *                 enum: [MALE, FEMALE, OTHER]
- *                 example: OTHER
+ *                 example: FEMALE
  *     responses:
  *       200:
  *         description: UPDATE_PROFILE_SUCCESS
  *       400:
- *         description: VALIDATION_ERROR, GENDER_INVALID, EMAIL_CHANGE_REQUIRES_VERIFICATION, PHONE_CHANGE_REQUIRES_VERIFICATION (đổi email/SĐT phải qua /user/email|phone/verification), CANNOT_REMOVE_LAST_IDENTIFIER
+ *         description: VALIDATION_ERROR, NAME_REQUIRED, NAME_MAX_LENGTH, AVATAR_URL_INVALID, DOB_INVALID, GENDER_INVALID
  *       401:
  *         description: Unauthorized
  */
@@ -144,32 +144,32 @@ router.post('/link', validate(linkGoogleSchema), userController.linkAccount)
 
 /**
  * @openapi
- * /api/user/unlink/{providerId}:
+ * /api/user/social/{provider}:
  *   delete:
  *     summary: Unlink Google Account
- *     description: Remove a linked Google social account from the user's profile.
+ *     description: Gỡ liên kết mạng xã hội. Không cho gỡ nếu đó là cách đăng nhập duy nhất (không mật khẩu, không SĐT đã xác minh).
  *     tags:
  *       - User
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: providerId
+ *         name: provider
  *         required: true
  *         schema:
  *           type: string
- *         description: Google providerId (Google account subject sub ID)
+ *         description: Nhà cung cấp cần gỡ (GOOGLE)
  *     responses:
  *       200:
  *         description: UNLINK_ACCOUNT_SUCCESS
  *       400:
- *         description: CANNOT_UNLINK_ONLY_SIGNIN_METHOD
+ *         description: CANNOT_UNLINK_ONLY_SIGNIN_METHOD, PROVIDER_INVALID
  *       401:
  *         description: Unauthorized
  *       404:
  *         description: SOCIAL_ACCOUNT_NOT_FOUND
  */
-router.delete('/unlink/:providerId', validate(unlinkGoogleSchema), userController.unlinkAccount)
+router.delete('/social/:provider', validate(unlinkSocialSchema), userController.unlinkAccount)
 
 /**
  * @openapi

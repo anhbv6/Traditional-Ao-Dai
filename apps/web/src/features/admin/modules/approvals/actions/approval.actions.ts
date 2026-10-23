@@ -2,6 +2,7 @@
 
 import { prisma } from "../../../core/server/db.server";
 import { authorizeAdminAction } from "../../../core/server/adminAuth.server";
+import { recordAudit } from "../../../core/server/audit.server";
 import { ADMIN_ACTION_ACCESS, canAccess } from "../../../core/session/permissions";
 import { type ApprovalStatus } from "@repo/db";
 import { getApprovalRequestsQuery } from "../queries/approval.queries";
@@ -69,6 +70,7 @@ export async function reviewApprovalRequestAction(raw: z.input<typeof reviewAppr
       data: {
         status: input.status,
         reviewedById: auth.user.id,
+        reviewedAt: new Date(),
         rejectReason: input.status === "REJECTED" ? input.rejectReason : null,
       },
       include: {
@@ -82,15 +84,20 @@ export async function reviewApprovalRequestAction(raw: z.input<typeof reviewAppr
     });
 
     // Nếu phê duyệt thành công, tự động thực thi logic nghiệp vụ tương ứng
-    if (input.status === "APPROVED") {
-      const payload = existing.payload as Record<string, unknown> | null;
-      if (existing.actionType === "CANCEL_ORDER" && payload?.orderId) {
-        await prisma.order.update({
-          where: { id: String(payload.orderId) },
-          data: { orderStatus: "CANCELLED" },
-        });
-      }
+    if (input.status === "APPROVED" && existing.actionType === "CANCEL_ORDER" && existing.targetId) {
+      await prisma.order.update({
+        where: { id: existing.targetId },
+        data: { orderStatus: "CANCELLED" },
+      });
     }
+
+    await recordAudit({
+      actorId: auth.user.id,
+      action: input.status === "APPROVED" ? "APPROVAL_APPROVED" : "APPROVAL_REJECTED",
+      targetType: "APPROVAL",
+      targetId: existing.id,
+      metadata: { actionType: existing.actionType, targetId: existing.targetId },
+    });
 
     return {
       success: true,

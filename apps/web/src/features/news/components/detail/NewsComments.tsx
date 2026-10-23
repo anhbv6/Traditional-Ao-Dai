@@ -83,7 +83,7 @@ export function NewsComments({ engagement }: NewsCommentsProps) {
     addComment({
       ...createLocalStamp("comment"),
       name: accountName ?? name.trim(),
-      avatar: user?.avatar ?? null,
+      avatar: user?.avatarUrl ?? null,
       content: { vi: text, en: text },
       likes: 0,
     });

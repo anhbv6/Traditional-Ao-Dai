@@ -2,7 +2,7 @@ import createMiddleware from 'next-intl/middleware';
 import { type NextRequest, NextResponse } from 'next/server';
 import { routing } from './i18n/routing';
 import { AUTH_COOKIES } from '@repo/shared';
-import { verifyAccessToken } from './lib/jwt.server';
+import { verifyAdminToken, verifyStoreRefreshToken } from './lib/jwt.server';
 
 const intlMiddleware = createMiddleware(routing);
 
@@ -26,14 +26,15 @@ export default function proxy(request: NextRequest) {
     : pathname;
 
   // 2. Đọc cookie xác thực
-  // admin_token phải được xác minh chữ ký RS256 + hạn dùng; vai trò quản trị lấy từ payload đã ký,
-  // KHÔNG lấy từ cookie auth_role (client có thể tự sửa)
-  const adminPayload = verifyAccessToken(request.cookies.get(AUTH_COOKIES.adminToken)?.value);
+  // admin_token phải được xác minh chữ ký RS256 + hạn dùng + audience `admin`; vai trò lấy từ payload đã ký,
+  // KHÔNG lấy từ cookie admin_session (client có thể tự sửa)
+  const adminPayload = verifyAdminToken(request.cookies.get(AUTH_COOKIES.adminToken)?.value);
   const adminRole =
     adminPayload?.role === 'ADMIN' || adminPayload?.role === 'STAFF' ? adminPayload.role : null;
   const hasValidAdminToken = Boolean(adminRole);
   // Cùng origin với API nên proxy đọc được cookie httpOnly `refreshToken` do Backend đặt
-  const userLoggedIn = Boolean(request.cookies.get(AUTH_COOKIES.refreshToken)?.value);
+  const storeRefreshToken = request.cookies.get(AUTH_COOKIES.refreshToken)?.value;
+  const userLoggedIn = Boolean(storeRefreshToken);
 
   // 3. Bảo vệ khu vực Admin (/admin, /admin/dashboard, /admin/staff...)
   if (pathWithoutLocale === '/admin' || pathWithoutLocale.startsWith('/admin/')) {
@@ -55,8 +56,9 @@ export default function proxy(request: NextRequest) {
       return intlMiddleware(request);
     }
 
-    // Khách hàng đang đăng nhập (không có phiên quản trị) cố truy cập admin -> 403 Forbidden
-    if (userLoggedIn && !hasValidAdminToken) {
+    // KHÁCH HÀNG đang đăng nhập storefront cố truy cập admin -> 403 Forbidden.
+    // Nhân viên đăng nhập storefront chưa có phiên quản trị -> đi tiếp tới trang đăng nhập admin bên dưới.
+    if (!hasValidAdminToken && verifyStoreRefreshToken(storeRefreshToken)?.role === 'CUSTOMER') {
       return NextResponse.redirect(
         new URL(`/${currentLocale}/403`, request.url)
       );

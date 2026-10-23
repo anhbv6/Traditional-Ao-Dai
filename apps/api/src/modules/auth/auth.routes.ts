@@ -4,7 +4,9 @@ import * as clientAuthController from './client/auth.controller'
 import { validate } from '../../core/middlewares/validate'
 import {
   loginSchema,
+  adminLoginSchema,
   registerSchema,
+  sendRegisterEmailCodeSchema,
   checkAccountSchema,
   otpLoginSchema,
   googleLoginSchema,
@@ -36,7 +38,7 @@ const byBody = (name: string, field: string, max: number, windowSec: number, ski
   })
 
 // Đăng nhập bằng mật khẩu: chỉ đếm lần sai (đăng nhập đúng được hoàn lượt)
-const loginLimits = [byIp('login-ip', 20, 15 * MINUTE, true), byBody('login-account', 'email', 10, 15 * MINUTE, true)]
+const loginLimits = [byIp('login-ip', 20, 15 * MINUTE, true), byBody('login-account', 'identifier', 10, 15 * MINUTE, true)]
 const otpLoginLimits = [byIp('login-otp-ip', 20, 15 * MINUTE), byBody('login-otp-phone', 'phone', 10, 15 * MINUTE)]
 const adminLoginLimits = [
   byIp('admin-login-ip', 10, 15 * MINUTE, true),
@@ -46,10 +48,45 @@ const verifyCodeLimits = [byIp('verify-code-ip', 20, 15 * MINUTE)]
 
 /**
  * @openapi
+ * /api/auth/register/email/code:
+ *   post:
+ *     summary: Gửi mã xác minh email để đăng ký
+ *     description: Bước 1 của đăng ký bằng email — gửi mã 6 số tới email (hạn 10 phút, chờ 60 giây giữa 2 lần gửi, tối đa 10 email/ngày). Bước 2 gọi /api/auth/register kèm `code`.
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email]
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: newuser@aodai.vn
+ *     responses:
+ *       200:
+ *         description: VERIFICATION_CODE_SENT — data.ttl là số giây mã còn hiệu lực
+ *       400:
+ *         description: VALIDATION_ERROR, EMAIL_INVALID, EMAIL_ALREADY_EXISTS
+ *       429:
+ *         description: COOLDOWN_ACTIVE, EMAIL_DAILY_LIMIT_REACHED, TOO_MANY_REQUESTS
+ */
+router.post(
+  '/register/email/code',
+  validate(sendRegisterEmailCodeSchema),
+  byIp('register-email-code-ip', 10, 60 * MINUTE),
+  clientAuthController.sendRegisterEmailCode
+)
+
+/**
+ * @openapi
  * /api/auth/register:
  *   post:
  *     summary: Client Register
- *     description: Register a new customer account. Supports registration by email (requires registerType='email', email, password) or by phone (requires registerType='phone', phone, code, password).
+ *     description: Tạo tài khoản sau khi xác minh mã. Email (registerType='email', email, code từ /register/email/code, password) hoặc SĐT (registerType='phone', phone, code OTP từ /otp/send, password). Tài khoản tạo ra luôn có email/SĐT đã xác minh.
  *     tags:
  *       - Auth
  *     requestBody:
@@ -70,10 +107,6 @@ const verifyCodeLimits = [byIp('verify-code-ip', 20, 15 * MINUTE)]
  *                 type: string
  *                 format: password
  *                 example: "123456"
- *               rememberMe:
- *                 type: boolean
- *                 description: If true, refresh token cookie persists for 7 days and rotates on refresh. If false, cookie is session-only and JWT expires after 24 hours.
- *                 example: true
  *               name:
  *                 type: string
  *                 example: "Nguyen Van A"
@@ -86,7 +119,7 @@ const verifyCodeLimits = [byIp('verify-code-ip', 20, 15 * MINUTE)]
  *                 example: "0987654321"
  *               code:
  *                 type: string
- *                 description: Required if registerType is phone
+ *                 description: Mã 6 số gửi tới email hoặc SĐT (bắt buộc)
  *                 example: "123456"
  *     responses:
  *       201:
@@ -103,9 +136,9 @@ const verifyCodeLimits = [byIp('verify-code-ip', 20, 15 * MINUTE)]
  *                   type: string
  *                   example: REGISTER_SUCCESS
  *       400:
- *         description: VALIDATION_ERROR, EMAIL_ALREADY_EXISTS, PHONE_ALREADY_EXISTS, OTP_EXPIRED_OR_NOT_FOUND, OTP_INCORRECT
+ *         description: VALIDATION_ERROR, EMAIL_ALREADY_EXISTS, PHONE_ALREADY_EXISTS, OTP_EXPIRED_OR_NOT_FOUND, OTP_INCORRECT, VERIFICATION_CODE_EXPIRED_OR_INVALID, INCORRECT_VERIFICATION_CODE
  *       429:
- *         description: OTP_TOO_MANY_ATTEMPTS, TOO_MANY_REQUESTS
+ *         description: OTP_TOO_MANY_ATTEMPTS, VERIFICATION_TOO_MANY_ATTEMPTS, TOO_MANY_REQUESTS
  */
 router.post('/register', validate(registerSchema), byIp('register-ip', 10, 60 * MINUTE), clientAuthController.register)
 
@@ -124,20 +157,24 @@ router.post('/register', validate(registerSchema), byIp('register-ip', 10, 60 * 
  *           schema:
  *             type: object
  *             required:
- *               - email
+ *               - identifier
  *               - password
  *             properties:
- *               email:
+ *               identifier:
  *                 type: string
- *                 format: email
+ *                 description: Email hoặc SĐT
  *                 example: customer@aodai.vn
  *               password:
  *                 type: string
  *                 format: password
  *                 example: "123456"
+ *               rememberMe:
+ *                 type: boolean
+ *                 description: true = cookie refresh token giữ 7 ngày và xoay vòng khi refresh; false = cookie phiên, hết hạn sau 24 giờ
+ *                 example: true
  *     responses:
  *       200:
- *         description: Login successful. Sets an HTTP-only cookie named `refreshToken`.
+ *         description: Login successful (mọi vai trò — STAFF/ADMIN cũng mua hàng bằng phiên storefront). Sets an HTTP-only cookie named `refreshToken`.
  *         headers:
  *           Set-Cookie:
  *             schema:
@@ -740,33 +777,20 @@ router.post('/logout', clientAuthController.logout)
  *                 data:
  *                   type: object
  *                   properties:
- *                     accessToken:
+ *                     role:
  *                       type: string
- *                       example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
- *                     user:
- *                       type: object
- *                       properties:
- *                         id:
- *                           type: string
- *                         email:
- *                           type: string
- *                         name:
- *                           type: string
- *                         role:
- *                           type: string
- *                           enum: [ADMIN, STAFF]
- *                         staffPermission:
- *                           type: object
- *                           nullable: true
+ *                       enum: [ADMIN, STAFF]
  *       400:
  *         description: Validation error
  *       401:
- *         description: INVALID_CREDENTIALS
+ *         description: INVALID_CREDENTIALS (kể cả khi tài khoản là CUSTOMER — không tiết lộ ai là nhân viên)
+ *       403:
+ *         description: ACCOUNT_DEACTIVATED
  *       429:
  *         description: TOO_MANY_REQUESTS (10 lần sai/15 phút/IP, 5 lần sai/15 phút/tài khoản — đăng nhập đúng không bị tính)
- *     x-notes: Thành công thì token được đặt vào cookie httpOnly `admin_token` (SameSite=Strict) + cookie `admin_session` (vai trò, chỉ để hiển thị UI). Body chỉ có `data.user`.
+ *     x-notes: Thành công thì token (aud=admin) được đặt vào cookie httpOnly `admin_token` (SameSite=Strict) + cookie `admin_session` (vai trò, chỉ để hiển thị UI). Phiên hết hạn sau 1/7 ngày hoặc khi nhàn rỗi quá 8 giờ.
  */
-router.post('/admin/login', validate(loginSchema), ...adminLoginLimits, adminAuthController.loginAdmin)
+router.post('/admin/login', validate(adminLoginSchema), ...adminLoginLimits, adminAuthController.loginAdmin)
 
 /**
  * @openapi

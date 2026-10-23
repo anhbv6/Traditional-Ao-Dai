@@ -284,14 +284,14 @@ export function PersonalInfoTab() {
             label={t("email")}
             icon={Mail}
             value={user?.email ?? ""}
-            isVerified={Boolean(user?.isEmailVerified)}
+            isVerified={Boolean(user?.emailVerified)}
             onAction={() => contactVerification.open("email")}
           />
           <ContactRow
             label={t("phone")}
             icon={Phone}
             value={user?.phone ?? ""}
-            isVerified={Boolean(user?.isPhoneVerified)}
+            isVerified={Boolean(user?.phoneVerified)}
             onAction={() => contactVerification.open("phone")}
           />
         </ul>

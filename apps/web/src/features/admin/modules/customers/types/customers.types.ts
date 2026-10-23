@@ -20,7 +20,7 @@ export interface AdminCustomerItem {
   name?: string | null;
   email?: string | null;
   phone?: string | null;
-  avatar?: string | null;
+  avatarUrl?: string | null;
   isActive: boolean;
   ordersCount: number;
   totalSpent: number;

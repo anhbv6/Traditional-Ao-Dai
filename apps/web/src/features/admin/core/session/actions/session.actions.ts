@@ -24,7 +24,7 @@ export async function getAdminSessionAction(): Promise<AdminSessionUser | null> 
 const updateProfileSchema = z.object({
   name: z.string().trim().min(1, "NAME_REQUIRED"),
   phone: vietnamPhoneSchema.optional().or(z.literal("")),
-  avatar: z.string().url("AVATAR_URL_INVALID").optional().or(z.literal("")),
+  avatarUrl: z.string().url("AVATAR_URL_INVALID").optional().or(z.literal("")),
 });
 
 /**
@@ -53,7 +53,7 @@ export async function updateAdminProfileAction(input: z.input<typeof updateProfi
       data: {
         name: parsed.data.name,
         phone,
-        avatar: parsed.data.avatar || null,
+        avatarUrl: parsed.data.avatarUrl || null,
       },
       select: ADMIN_SESSION_USER_SELECT,
     });
@@ -71,7 +71,7 @@ const changePasswordSchema = z.object({
 });
 
 /**
- * Server Action: Admin/Staff đổi mật khẩu — thu hồi mọi phiên khác, giữ phiên hiện tại
+ * Server Action: Admin/Staff đổi mật khẩu — thu hồi mọi phiên khác (cả storefront), giữ phiên quản trị hiện tại
  */
 export async function changeAdminPasswordAction(input: z.input<typeof changePasswordSchema>) {
   const auth = await authorizeAdminAction();
@@ -85,16 +85,19 @@ export async function changeAdminPasswordAction(input: z.input<typeof changePass
   try {
     const user = await prisma.user.findUnique({
       where: { id: auth.user.id },
-      select: { password: true },
+      select: { passwordHash: true },
     });
 
-    if (!user?.password || !(await bcrypt.compare(parsed.data.currentPassword, user.password))) {
+    if (!user?.passwordHash || !(await bcrypt.compare(parsed.data.currentPassword, user.passwordHash))) {
       return { success: false as const, error: "CURRENT_PASSWORD_INCORRECT" };
     }
 
     const hashedPassword = await bcrypt.hash(parsed.data.newPassword, 10);
     await prisma.$transaction([
-      prisma.user.update({ where: { id: auth.user.id }, data: { password: hashedPassword } }),
+      prisma.user.update({
+        where: { id: auth.user.id },
+        data: { passwordHash: hashedPassword, passwordChangedAt: new Date() },
+      }),
       prisma.userSession.deleteMany({
         where: { userId: auth.user.id, id: { not: auth.sessionId } },
       }),

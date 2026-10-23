@@ -3,24 +3,16 @@
 import React, { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { Users, Shield, RefreshCw, Lock, Unlock, UserPlus } from "lucide-react";
+import { Users, Shield, RefreshCw, Lock, Unlock, UserPlus, KeyRound } from "lucide-react";
 import { useNotify } from "@/hooks/useNotify";
 import { getStaffListAction, updateStaffPermissionAction, toggleStaffActiveAction } from "../actions/staff.actions";
-import { type StaffPermissionInput, type StaffMemberItem } from "../types/staff.types";
-import { STAFF_PERMISSION_FIELDS, type StaffPermissionField } from "../../../core/session/permissions";
+import { type StaffMemberItem } from "../types/staff.types";
+import { STAFF_PERMISSIONS, type Permission } from "../../../core/session/permissions";
 import { ADMIN_CARD_CLASS, AdminPageHeader, AdminSecondaryButton } from "@/features/admin/core/ui";
 import { CreateStaffDialog } from "./CreateStaffDialog";
+import { ResetStaffPasswordDialog } from "./ResetStaffPasswordDialog";
 
 const STAFF_QUERY_KEY = ["admin", "staff"] as const;
-
-/** Nhân viên chưa có bản ghi StaffPermission = không có quyền nào (khớp với kiểm tra ở server) */
-const NO_PERMISSIONS: StaffPermissionInput = {
-  canManageOrders: false,
-  canUpdateTailoring: false,
-  canManageInventory: false,
-  canViewReports: false,
-  canManageContent: false,
-};
 
 export function AdminStaffManagement() {
   const queryClient = useQueryClient();
@@ -29,6 +21,7 @@ export function AdminStaffManagement() {
   const tToast = useTranslations("AdminPage.toasts");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [resetTarget, setResetTarget] = useState<StaffMemberItem | null>(null);
 
   // Dữ liệu server -> React Query; cập nhật lạc quan (optimistic) bằng setQueryData
   const { data: staffList = [], isFetching: isLoading, refetch } = useQuery({
@@ -46,24 +39,16 @@ export function AdminStaffManagement() {
   const setStaffList = (updater: (prev: StaffMemberItem[]) => StaffMemberItem[]) =>
     queryClient.setQueryData<StaffMemberItem[]>(STAFF_QUERY_KEY, (prev) => updater(prev ?? []));
 
-  const handleTogglePermission = async (staff: StaffMemberItem, field: StaffPermissionField) => {
+  const handleTogglePermission = async (staff: StaffMemberItem, permission: Permission) => {
     setUpdatingId(staff.id);
-    const current = staff.staffPermission ?? { ...NO_PERMISSIONS, id: "" };
-    const nextPermissions: StaffPermissionInput = {
-      canManageOrders: current.canManageOrders,
-      canUpdateTailoring: current.canUpdateTailoring,
-      canManageInventory: current.canManageInventory,
-      canViewReports: current.canViewReports,
-      canManageContent: current.canManageContent,
-      [field]: !current[field],
-    };
+    const nextPermissions = staff.permissions.includes(permission)
+      ? staff.permissions.filter((p) => p !== permission)
+      : [...staff.permissions, permission];
 
     const res = await updateStaffPermissionAction(staff.id, nextPermissions);
     if (res.success) {
       notify.success(tToast("permissionUpdateSuccess"));
-      setStaffList((prev) =>
-        prev.map((s) => (s.id === staff.id ? { ...s, staffPermission: { ...nextPermissions, id: staff.staffPermission?.id ?? "" } } : s))
-      );
+      setStaffList((prev) => prev.map((s) => (s.id === staff.id ? { ...s, permissions: res.data.permissions } : s)));
     } else {
       notify.error(res.error, "STAFF_PERMISSION_UPDATE_FAILED");
     }
@@ -75,7 +60,7 @@ export function AdminStaffManagement() {
     const res = await toggleStaffActiveAction(staffId, !currentActive);
     if (res.success) {
       notify.success(tToast(!currentActive ? "staffUnlocked" : "staffLocked"));
-      setStaffList((prev) => prev.map((s) => (s.id === staffId ? { ...s, isActive: !currentActive } : s)));
+      setStaffList((prev) => prev.map((s) => (s.id === staffId ? { ...s, status: res.data.status } : s)));
     } else {
       notify.error(res.error, "STAFF_STATUS_UPDATE_FAILED");
     }
@@ -125,18 +110,19 @@ export function AdminStaffManagement() {
               <thead className="border-b border-[#E4E4E7] bg-zinc-50/75 text-[11px] font-semibold uppercase tracking-wider text-[#71717A]">
                 <tr>
                   <th className="px-5 py-3.5">{t("columns.staff")}</th>
-                  {STAFF_PERMISSION_FIELDS.map((field) => (
-                    <th key={field} className="px-4 py-3.5 text-center">
-                      {t(`permissions.${field}`)}
+                  {STAFF_PERMISSIONS.map((permission) => (
+                    <th key={permission} className="px-4 py-3.5 text-center">
+                      {t(`permissions.${permission}`)}
                     </th>
                   ))}
                   <th className="px-4 py-3.5 text-center">{t("columns.status")}</th>
+                  <th className="px-4 py-3.5 text-center">{t("columns.actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-100">
                 {staffList.map((staff) => {
-                  const permissions = staff.staffPermission ?? NO_PERMISSIONS;
                   const isUpdating = updatingId === staff.id;
+                  const isActive = staff.status === "ACTIVE";
 
                   return (
                     <tr key={staff.id} className="transition-colors hover:bg-zinc-50/50">
@@ -145,13 +131,13 @@ export function AdminStaffManagement() {
                         <div className="text-[11px] text-[#71717A]">{staff.email || staff.phone}</div>
                       </td>
 
-                      {STAFF_PERMISSION_FIELDS.map((field) => (
-                        <td key={field} className="px-4 py-4 text-center">
+                      {STAFF_PERMISSIONS.map((permission) => (
+                        <td key={permission} className="px-4 py-4 text-center">
                           <input
                             type="checkbox"
-                            aria-label={t(`permissions.${field}`)}
-                            checked={permissions[field]}
-                            onChange={() => handleTogglePermission(staff, field)}
+                            aria-label={t(`permissions.${permission}`)}
+                            checked={staff.permissions.includes(permission)}
+                            onChange={() => handleTogglePermission(staff, permission)}
                             disabled={isUpdating}
                             className="size-4 cursor-pointer rounded border-zinc-300 accent-zinc-900"
                           />
@@ -161,16 +147,28 @@ export function AdminStaffManagement() {
                       <td className="px-4 py-4 text-center">
                         <button
                           type="button"
-                          onClick={() => handleToggleActive(staff.id, staff.isActive)}
+                          onClick={() => handleToggleActive(staff.id, isActive)}
                           disabled={isUpdating}
                           className={`inline-flex cursor-pointer items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold transition-all ${
-                            staff.isActive
+                            isActive
                               ? "border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
                               : "border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100"
                           }`}
                         >
-                          {staff.isActive ? <Unlock size={10} /> : <Lock size={10} />}
-                          <span>{staff.isActive ? t("active") : t("locked")}</span>
+                          {isActive ? <Unlock size={10} /> : <Lock size={10} />}
+                          <span>{isActive ? t("active") : t("locked")}</span>
+                        </button>
+                      </td>
+
+                      <td className="px-4 py-4 text-center">
+                        <button
+                          type="button"
+                          onClick={() => setResetTarget(staff)}
+                          disabled={isUpdating}
+                          className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-[#E4E4E7] px-2.5 py-1 text-[11px] font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
+                        >
+                          <KeyRound size={11} />
+                          <span>{t("resetPassword")}</span>
                         </button>
                       </td>
                     </tr>
@@ -187,6 +185,8 @@ export function AdminStaffManagement() {
         onOpenChange={setIsCreateOpen}
         onCreated={(member) => setStaffList((prev) => [member, ...prev])}
       />
+
+      <ResetStaffPasswordDialog staff={resetTarget} onClose={() => setResetTarget(null)} />
     </div>
   );
 }

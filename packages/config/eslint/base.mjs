@@ -1,11 +1,11 @@
-// ESLint dùng chung cho workspace Node/TypeScript thuần (api, db, shared) — xem docs/PROJECT_RULES.md §3
+// ESLint dùng chung cho workspace Node/TypeScript thuần (api, db, shared) — xem AGENTS.md §2–3
 import js from '@eslint/js'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
 /** Luật TypeScript chung cho mọi workspace (kể cả web — web ghép thêm vào cấu hình Next) */
 export const sharedTsRules = {
-  // PROJECT_RULES §3: không dùng `any`
+  // AGENTS.md §3: không dùng `any`
   '@typescript-eslint/no-explicit-any': 'error',
   // Tham số / biến bắt đầu bằng `_` là cố ý không dùng (vd. `next` của error handler Express)
   '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],

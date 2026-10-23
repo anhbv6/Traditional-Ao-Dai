@@ -41,6 +41,40 @@ export function pickLocalized<T extends Record<string, unknown>, K extends keyof
 export const ROLES = ['CUSTOMER', 'STAFF', 'ADMIN'] as const
 export type Role = (typeof ROLES)[number]
 
+/** Vai trò được vào khu quản trị. Mọi vai trò đều mua hàng được ở storefront. */
+export const ADMIN_AREA_ROLES = ['STAFF', 'ADMIN'] as const satisfies readonly Role[]
+
+export function isAdminAreaRole(role: string | null | undefined): role is 'STAFF' | 'ADMIN' {
+  return role === 'STAFF' || role === 'ADMIN'
+}
+
+/**
+ * Quyền chi tiết của STAFF — khớp enum `Permission` trong Prisma. ADMIN luôn có toàn quyền.
+ * Thứ tự mảng = thứ tự hiển thị trên bảng phân quyền.
+ */
+export const PERMISSIONS = [
+  'MANAGE_ORDERS',
+  'UPDATE_TAILORING',
+  'MANAGE_INVENTORY',
+  'VIEW_REPORTS',
+  'MANAGE_CONTENT',
+] as const
+export type Permission = (typeof PERMISSIONS)[number]
+
+export const USER_STATUSES = ['ACTIVE', 'LOCKED', 'DELETED'] as const
+export type UserStatus = (typeof USER_STATUSES)[number]
+
+export const GENDERS = ['MALE', 'FEMALE', 'OTHER'] as const
+export type Gender = (typeof GENDERS)[number]
+
+export const AUTH_PROVIDERS = ['GOOGLE'] as const
+export type AuthProvider = (typeof AUTH_PROVIDERS)[number]
+
+/** Email luôn được so khớp và lưu ở dạng chữ thường */
+export function normalizeEmail(email: string): string {
+  return email.trim().toLowerCase()
+}
+
 // ─── API Response Envelope ─────────────────────────────────────────────────────
 
 export interface ApiMeta {
@@ -89,26 +123,55 @@ export const AUTH_COOKIES = {
   adminSessionHint: 'admin_session',
 } as const
 
-export interface SocialAccountDto {
-  id: string
-  provider: string
-  providerId: string
+/**
+ * Khu vực cấp token — giá trị claim `aud` của JWT. Token storefront không vào được khu quản trị và ngược lại
+ * (một nhân viên đăng nhập cả hai nơi sẽ có hai phiên độc lập).
+ */
+export const TOKEN_AUDIENCES = { store: 'store', admin: 'admin' } as const
+export type TokenAudience = (typeof TOKEN_AUDIENCES)[keyof typeof TOKEN_AUDIENCES]
+
+/** Phiên quản trị không thao tác quá khoảng này thì hết hạn (ngoài hạn tối đa 1 hoặc 7 ngày) */
+export const ADMIN_SESSION_IDLE_TIMEOUT_MS = 8 * 60 * 60 * 1000
+/** Chỉ ghi lại `lastUsedAt` khi đã cũ hơn khoảng này — tránh mỗi request đều UPDATE DB */
+export const SESSION_TOUCH_INTERVAL_MS = 60 * 1000
+
+/** Claim JWT do Backend ký (RS256) — Web chỉ xác minh, không tự ký */
+export interface AuthTokenClaims {
+  userId: string
+  role: Role
+  sessionId: string
+  familyId?: string
+  tokenType: 'access' | 'refresh'
+  rememberMe?: boolean
+  aud: TokenAudience
+  iat?: number
+  exp?: number
 }
 
-/** Thông tin người dùng trả về cho client (không bao giờ có password) */
+export interface SocialAccountDto {
+  provider: AuthProvider
+  email: string | null
+  linkedAt: string
+}
+
+/** Thông tin người dùng trả về cho client — không bao giờ có passwordHash */
 export interface UserDto {
   id: string
   email: string | null
-  name: string | null
+  emailVerified: boolean
   phone: string | null
-  avatar: string | null
-  birth?: string | null
-  gender?: number
+  phoneVerified: boolean
+  name: string | null
+  avatarUrl: string | null
+  /** Ngày sinh dạng YYYY-MM-DD */
+  birthDate: string | null
+  gender: Gender | null
   role: Role
-  isActive: boolean
-  isEmailVerified?: boolean
-  isPhoneVerified?: boolean
-  socialAccounts?: SocialAccountDto[]
+  status: UserStatus
+  /** Có mật khẩu hay chỉ đăng nhập bằng mạng xã hội (để UI hiện "đặt mật khẩu" thay vì "đổi mật khẩu") */
+  hasPassword: boolean
+  passwordChangedAt: string | null
+  socialAccounts: SocialAccountDto[]
 }
 
 // ─── Phone ─────────────────────────────────────────────────────────────────────

@@ -1,8 +1,9 @@
 import { type Request, type Response, type NextFunction } from 'express'
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken'
 import { prisma, type Role } from '@repo/db'
-import { AUTH_COOKIES } from '@repo/shared'
+import { AUTH_COOKIES, isAdminAreaRole } from '@repo/shared'
 import { verifyToken, type JWTPayload } from '../security/jwt'
+import { isSessionUsable, touchSession } from '../security/session'
 import { AppError } from '../http/AppError'
 
 /**
@@ -12,120 +13,132 @@ export interface AuthenticatedRequest extends Request {
   user?: JWTPayload
 }
 
-/**
- * Trích xuất Access Token:
- * 1. Header `Authorization: Bearer` (khách hàng — access token giữ trong bộ nhớ FE)
- * 2. Cookie httpOnly `admin_token` (Admin/Staff) — chỉ chấp nhận vì cookie này do server đặt với SameSite=Strict,
- *    trình duyệt không gửi kèm trong request cross-site nên không bị CSRF. Không đọc bất kỳ cookie nào khác.
- */
-function extractToken(req: Request): string | undefined {
+/** Access token storefront: chỉ đọc từ header Bearer (token giữ trong bộ nhớ FE) */
+function extractBearerToken(req: Request): string | undefined {
   const authHeader = req.headers.authorization
   if (authHeader && authHeader.startsWith('Bearer ')) {
-    const token = authHeader.split(' ')[1]
-    if (token) return token
+    return authHeader.split(' ')[1] || undefined
   }
-
-  const adminToken = req.cookies?.[AUTH_COOKIES.adminToken]
-  if (typeof adminToken === 'string' && adminToken) {
-    return adminToken
-  }
-
   return undefined
 }
 
 /**
- * Xác thực token và trả về payload hợp lệ:
- * - Khách hàng (CUSTOMER): stateless, chỉ kiểm tra chữ ký + hạn dùng (access token sống 15 phút)
- * - Quản trị (ADMIN/STAFF): token sống tới 7 ngày nên bắt buộc gắn với UserSession còn hiệu lực,
- *   tài khoản còn hoạt động và vai trò khớp DB -> đăng xuất / khóa tài khoản có hiệu lực ngay lập tức
+ * Token khu quản trị: chỉ đọc cookie httpOnly `admin_token`. Cookie này do server đặt với SameSite=Strict nên
+ * trình duyệt không gửi kèm trong request cross-site (không bị CSRF). Không đọc bất kỳ cookie nào khác.
  */
-async function resolveAccessToken(token: string): Promise<JWTPayload> {
-  const decoded = verifyToken(token)
+function extractAdminCookie(req: Request): string | undefined {
+  const adminToken = req.cookies?.[AUTH_COOKIES.adminToken]
+  return typeof adminToken === 'string' && adminToken ? adminToken : undefined
+}
 
-  if (decoded.tokenType && decoded.tokenType !== 'access') {
+/**
+ * Token storefront: stateless — chỉ kiểm tra chữ ký, hạn dùng (15 phút) và audience. Khóa tài khoản có hiệu lực
+ * chậm nhất khi access token hết hạn (refresh sẽ bị từ chối).
+ */
+function resolveStoreToken(token: string): JWTPayload {
+  const decoded = verifyToken(token, 'store')
+  if (decoded.tokenType !== 'access') {
     throw new AppError(401, 'INVALID_TOKEN_TYPE')
   }
-
-  if (decoded.role !== 'CUSTOMER') {
-    if (!decoded.sessionId) {
-      throw new AppError(401, 'SESSION_EXPIRED_OR_REVOKED')
-    }
-
-    const session = await prisma.userSession.findUnique({
-      where: { id: decoded.sessionId },
-      select: {
-        userId: true,
-        isRevoked: true,
-        expiresAt: true,
-        user: { select: { isActive: true, role: true } },
-      },
-    })
-
-    if (
-      !session ||
-      session.userId !== decoded.userId ||
-      session.isRevoked ||
-      session.expiresAt <= new Date() ||
-      !session.user.isActive ||
-      session.user.role !== decoded.role
-    ) {
-      throw new AppError(401, 'SESSION_EXPIRED_OR_REVOKED')
-    }
-  }
-
   return decoded
 }
 
 /**
- * Middleware bắt buộc phải có JWT Token hợp lệ:
- * - Xác thực chữ ký và hạn sử dụng Access Token bằng RSA Public Key
- * - Phân biệt chính xác giữa lỗi hết hạn Token (401) và lỗi hệ thống (500)
+ * Token quản trị: sống tới 7 ngày nên bắt buộc gắn với UserSession ADMIN còn hiệu lực (kể cả thời gian nhàn rỗi),
+ * tài khoản còn hoạt động và vai trò khớp DB -> đăng xuất / khóa tài khoản có hiệu lực ngay lập tức.
  */
-export async function requireAuth(
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction
-): Promise<void> {
-  const token = extractToken(req)
+async function resolveAdminToken(token: string): Promise<JWTPayload> {
+  const decoded = verifyToken(token, 'admin')
+  if (decoded.tokenType !== 'access') {
+    throw new AppError(401, 'INVALID_TOKEN_TYPE')
+  }
 
+  const session = await prisma.userSession.findUnique({
+    where: { id: decoded.sessionId },
+    select: {
+      userId: true,
+      kind: true,
+      expiresAt: true,
+      revokedAt: true,
+      lastUsedAt: true,
+      user: { select: { status: true, role: true } },
+    },
+  })
+
+  if (
+    !session ||
+    session.kind !== 'ADMIN' ||
+    session.userId !== decoded.userId ||
+    !isSessionUsable(session) ||
+    session.user.status !== 'ACTIVE' ||
+    !isAdminAreaRole(session.user.role)
+  ) {
+    throw new AppError(401, 'SESSION_EXPIRED_OR_REVOKED')
+  }
+
+  await touchSession(decoded.sessionId, session.lastUsedAt)
+  // Vai trò lấy từ DB (có thể đã bị hạ quyền sau khi cấp token)
+  return { ...decoded, role: session.user.role }
+}
+
+function toAuthError(error: unknown): unknown {
+  // TokenExpiredError kế thừa JsonWebTokenError -> kiểm tra hết hạn trước
+  if (error instanceof TokenExpiredError) return new AppError(401, 'TOKEN_EXPIRED')
+  if (error instanceof JsonWebTokenError) return new AppError(401, 'INVALID_TOKEN')
+  return error
+}
+
+/**
+ * Bắt buộc access token STOREFRONT (Bearer). Dùng cho mọi endpoint của khách hàng (hồ sơ, địa chỉ, đơn của tôi...).
+ * STAFF/ADMIN mua hàng cũng đi qua đây bằng phiên storefront của họ.
+ */
+export async function requireAuth(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+  const token = extractBearerToken(req)
   if (!token) {
     return next(new AppError(401, 'AUTHENTICATION_TOKEN_REQUIRED'))
   }
 
   try {
-    req.user = await resolveAccessToken(token)
+    req.user = resolveStoreToken(token)
     return next()
   } catch (error) {
-    // TokenExpiredError kế thừa JsonWebTokenError -> kiểm tra hết hạn trước
-    if (error instanceof TokenExpiredError) {
-      return next(new AppError(401, 'TOKEN_EXPIRED'))
-    }
-    if (error instanceof JsonWebTokenError) {
-      return next(new AppError(401, 'INVALID_TOKEN'))
-    }
-    return next(error)
+    return next(toAuthError(error))
   }
 }
 
 /**
- * Middleware xác thực tùy chọn (Optional Auth):
- * - Nếu có token hợp lệ -> gán req.user (Khách đã đăng nhập)
- * - Nếu không có token hoặc token không hợp lệ -> cho qua với req.user = undefined (Khách vãng lai)
- * Dùng cho các endpoint công khai nhưng có thể cá nhân hóa: Xem sản phẩm, Giỏ hàng, Áp mã voucher, Đặt hàng...
+ * Chấp nhận phiên của bất kỳ khu nào: Bearer storefront, nếu không có thì cookie quản trị.
+ * Chỉ dùng cho endpoint phục vụ cả hai khu (vd. upload ảnh).
  */
-export async function optionalAuth(
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction
-): Promise<void> {
-  const token = extractToken(req)
+export async function requireAnyAuth(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+  const bearer = extractBearerToken(req)
+  const adminCookie = bearer ? undefined : extractAdminCookie(req)
+  if (!bearer && !adminCookie) {
+    return next(new AppError(401, 'AUTHENTICATION_TOKEN_REQUIRED'))
+  }
+
+  try {
+    req.user = bearer ? resolveStoreToken(bearer) : await resolveAdminToken(adminCookie!)
+    return next()
+  } catch (error) {
+    return next(toAuthError(error))
+  }
+}
+
+/**
+ * Xác thực tùy chọn (storefront):
+ * - Có token hợp lệ -> gán req.user (khách đã đăng nhập)
+ * - Không có / không hợp lệ -> req.user = undefined (khách vãng lai)
+ * Dùng cho endpoint công khai nhưng cá nhân hóa được: xem sản phẩm, giỏ hàng, áp voucher, đặt hàng...
+ */
+export async function optionalAuth(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+  const token = extractBearerToken(req)
   req.user = undefined
 
   if (token) {
     try {
-      req.user = await resolveAccessToken(token)
+      req.user = resolveStoreToken(token)
     } catch {
-      // Token không hợp lệ, hết hạn hoặc phiên đã bị thu hồi -> tiếp tục với vai trò khách vãng lai
       req.user = undefined
     }
   }

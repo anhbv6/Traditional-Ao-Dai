@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import multer from 'multer'
-import { requireAuth } from '../../core/middlewares/authGuard'
+import { requireAnyAuth } from '../../core/middlewares/authGuard'
 import { validate } from '../../core/middlewares/validate'
 import { uploadSingleImage } from './upload.controller'
 import { uploadQuerySchema } from './upload.schema'
@@ -96,7 +96,7 @@ const upload = multer({
  */
 router.post(
   '/',
-  requireAuth,
+  requireAnyAuth,
   validate(uploadQuerySchema),
   upload.single('image'),
   uploadSingleImage

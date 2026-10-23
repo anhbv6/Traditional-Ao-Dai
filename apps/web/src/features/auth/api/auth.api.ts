@@ -6,10 +6,11 @@ import {
 } from '../types/auth.types';
 
 /**
- * Sends a client credentials login request to the backend.
+ * Đăng nhập storefront bằng email hoặc SĐT + mật khẩu (mọi vai trò)
  */
 export const loginApi = async (data: {
-  email: string;
+  /** Email hoặc SĐT */
+  identifier: string;
   password: string;
   rememberMe: boolean;
 }): Promise<LoginResponse> => {

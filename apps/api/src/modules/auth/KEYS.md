@@ -30,7 +30,7 @@ Tài liệu tổng hợp các mã phản hồi (`message` key) của Module Auth
 | `USER_NOT_FOUND` | 401 / 404 | Tài khoản không tồn tại | User account not found | Tìm kiếm tài khoản qua Email hoặc Số điện thoại không thấy / Account not found by email or phone |
 | `ADMIN_UNAUTHORIZED` | 401 | Không có quyền truy cập trang quản trị | Unauthorized admin access | Tài khoản không có vai trò `ADMIN` hoặc `STAFF` / Account lacks ADMIN or STAFF role |
 | `INCORRECT_PASSWORD` | 401 | Mật khẩu không chính xác | Incorrect password | Người dùng nhập sai mật khẩu đăng nhập / Wrong password entered |
-| `ACCOUNT_DEACTIVATED` | 403 | Tài khoản đã bị khóa hoặc vô hiệu hóa | Account deactivated or locked | Tài khoản có trạng thái `isActive = false` / Account has `isActive = false` |
+| `ACCOUNT_DEACTIVATED` | 403 | Tài khoản đã bị khóa hoặc vô hiệu hóa | Account deactivated or locked | Tài khoản có `status = LOCKED` / Account has `status = LOCKED` |
 | `ACCOUNT_NOT_REGISTERED` | 400 | Số điện thoại chưa được đăng ký | Account not registered | Đăng nhập bằng OTP nhưng số điện thoại chưa có tài khoản / OTP login with unregistered phone |
 | `EMAIL_ALREADY_EXISTS` | 400 | Email đã được sử dụng | Email already exists | Đăng ký với Email đã tồn tại trong hệ thống / Registration with duplicate email |
 | `PHONE_ALREADY_EXISTS` | 400 | Số điện thoại đã được sử dụng | Phone number already exists | Đăng ký với Số điện thoại đã tồn tại trong hệ thống / Registration with duplicate phone |
@@ -78,7 +78,7 @@ Tài liệu tổng hợp các mã phản hồi (`message` key) của Module Auth
 ### Hành vi thay đổi
 - `POST /auth/forgot-password/email` luôn trả `VERIFICATION_CODE_SENT` dù email có tồn tại hay không.
 - Đăng nhập Google tra cứu `SocialAccount(GOOGLE, sub)` trước; chỉ tự liên kết qua email khi email tài khoản **đã xác minh**.
-- Đặt lại mật khẩu qua email thành công -> đánh dấu `isEmailVerified = true`.
+- Đặt lại mật khẩu qua email thành công -> đánh dấu `emailVerifiedAt` (nếu chưa có).
 - Token Admin/Staff mang `sessionId`; `POST /auth/admin/logout` thu hồi phiên ngay lập tức.
 - Refresh token bị xoay vòng có khoảng ân hạn 30 giây (nhiều tab refresh cùng lúc không bị đăng xuất).
 - API chỉ nhận access token qua header `Authorization: Bearer` (không đọc từ cookie — chống CSRF).

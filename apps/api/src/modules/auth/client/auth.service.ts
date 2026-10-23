@@ -1,18 +1,19 @@
 import { prisma, type User } from '@repo/db'
 import { randomBytes, randomUUID } from 'crypto'
 import { OAuth2Client, type TokenPayload } from 'google-auth-library'
+import { normalizeEmail } from '@repo/shared'
 import { comparePassword, hashPassword } from '../../../core/security/password'
 import { generateAccessToken, generateRefreshToken, type JWTPayload, verifyToken } from '../../../core/security/jwt'
 import { AppError } from '../../../core/http/AppError'
 import { env } from '../../../config/env'
 import {
   type LoginInput,
-  type RefreshTokenInput,
   type RegisterInput,
   type OtpLoginInput,
   type ForgotPasswordEmailInput,
   type ResetPasswordEmailInput,
   type ResetPasswordPhoneInput,
+  type SendRegisterEmailCodeInput,
   type VerifyResetPasswordEmailInput,
   type VerifyResetPasswordPhoneInput,
 } from '../auth.schema'
@@ -24,7 +25,7 @@ import { sendVerificationCodeEmail } from '../../../infra/mailer'
 import { redis } from '../../../infra/redis'
 import { assertRateLimit } from '../../../core/security/rateLimit'
 import { issueVerificationCode, verifyVerificationCode } from '../../../core/security/verificationCode'
-import { cleanupUserSessions, hashToken } from '../../../core/security/session'
+import { cleanupUserSessions, hashToken, revokeAllUserSessions } from '../../../core/security/session'
 
 const SESSION_REFRESH_EXPIRES_IN = '24h'
 const REMEMBER_REFRESH_EXPIRES_IN = '7d'
@@ -32,22 +33,32 @@ const REMEMBER_REFRESH_EXPIRES_IN = '7d'
 /** Khoảng ân hạn cho phép refresh token vừa bị xoay vòng được dùng lại (nhiều tab refresh cùng lúc) */
 const REFRESH_REUSE_GRACE_SECONDS = 30
 
+const EMAIL_CODE_TTL_SECONDS = 600
+const EMAIL_COOLDOWN_SECONDS = 60
+const EMAIL_DAILY_LIMIT = 10
+
+const EMAIL_CODE_ERROR_KEYS = {
+  expired: 'VERIFICATION_CODE_EXPIRED_OR_INVALID',
+  incorrect: 'INCORRECT_VERIFICATION_CODE',
+  tooManyAttempts: 'VERIFICATION_TOO_MANY_ATTEMPTS',
+}
+
+// ─── Phiên storefront ──────────────────────────────────────────────────────────
+
 function getRefreshTokenPolicy(rememberMe: boolean) {
   const expiresIn = rememberMe ? REMEMBER_REFRESH_EXPIRES_IN : SESSION_REFRESH_EXPIRES_IN
-
   return {
     expiresIn,
     expiresAt: new Date(Date.now() + durationToMs(expiresIn)),
-    rememberMe,
   }
 }
 
-function buildAuthTokens(
-  user: { id: string; role: JWTPayload['role'] },
+function buildStoreTokens(
+  user: Pick<User, 'id' | 'role'>,
   sessionId: string,
   options: { familyId: string; refreshExpiresIn: string; rememberMe: boolean }
 ) {
-  const payload = {
+  const claims = {
     userId: user.id,
     role: user.role,
     sessionId,
@@ -56,38 +67,54 @@ function buildAuthTokens(
   }
 
   return {
-    accessToken: generateAccessToken(payload),
-    refreshToken: generateRefreshToken(payload, options.refreshExpiresIn),
+    accessToken: generateAccessToken(claims, 'store'),
+    refreshToken: generateRefreshToken(claims, options.refreshExpiresIn),
   }
 }
 
-async function createClientSession(
-  user: { id: string; role: JWTPayload['role'] },
-  meta: SessionMeta,
-  rememberMe: boolean
-) {
+/**
+ * Chỉ tài khoản ACTIVE mới đăng nhập được. Tài khoản đã xóa coi như không tồn tại.
+ * Gọi SAU khi đã xác thực thông tin đăng nhập để không tiết lộ trạng thái tài khoản cho người lạ.
+ */
+function assertCanSignIn(user: Pick<User, 'status'>) {
+  if (user.status === 'DELETED') {
+    throw new AppError(401, 'INVALID_CREDENTIALS')
+  }
+  if (user.status !== 'ACTIVE') {
+    throw new AppError(403, 'ACCOUNT_DEACTIVATED')
+  }
+}
+
+/**
+ * Tạo phiên STORE mới (mọi vai trò đều mua hàng được) và cấp cặp token
+ */
+async function createStoreSession(user: Pick<User, 'id' | 'role'>, meta: SessionMeta, rememberMe: boolean) {
   const refreshPolicy = getRefreshTokenPolicy(rememberMe)
   const sessionId = randomUUID()
-  const familyId = sessionId
-  const tokens = buildAuthTokens(user, sessionId, {
-    familyId,
+  const tokens = buildStoreTokens(user, sessionId, {
+    familyId: sessionId,
     refreshExpiresIn: refreshPolicy.expiresIn,
     rememberMe,
   })
 
   await cleanupUserSessions(user.id)
 
-  await prisma.userSession.create({
-    data: {
-      id: sessionId,
-      userId: user.id,
-      refreshToken: hashToken(tokens.refreshToken),
-      familyId,
-      deviceInfo: meta.deviceInfo,
-      ipAddress: meta.ipAddress,
-      expiresAt: refreshPolicy.expiresAt,
-    },
-  })
+  await prisma.$transaction([
+    prisma.userSession.create({
+      data: {
+        id: sessionId,
+        userId: user.id,
+        kind: 'STORE',
+        refreshTokenHash: hashToken(tokens.refreshToken),
+        familyId: sessionId,
+        rememberMe,
+        userAgent: meta.userAgent,
+        ipAddress: meta.ipAddress,
+        expiresAt: refreshPolicy.expiresAt,
+      },
+    }),
+    prisma.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } }),
+  ])
 
   return {
     ...tokens,
@@ -98,75 +125,23 @@ async function createClientSession(
 
 async function revokeRefreshTokenFamily(familyId: string) {
   await prisma.userSession.updateMany({
-    where: { familyId },
-    data: { isRevoked: true },
+    where: { familyId, revokedAt: null },
+    data: { revokedAt: new Date() },
   })
-}
-
-function omitPassword<T extends { password: string | null }>(user: T): Omit<T, 'password'> {
-  const { password: _, ...safeUser } = user
-  return safeUser
-}
-
-// ─── Reset Token (sau khi xác minh mã quên mật khẩu) ────────────────────────────
-
-const RESET_TOKEN_TTL_SECONDS = 600
-const RESET_CODE_TTL_SECONDS = 600
-const RESET_EMAIL_COOLDOWN_SECONDS = 60
-const RESET_EMAIL_DAILY_LIMIT = 10
-
-const EMAIL_RESET_ERROR_KEYS = {
-  expired: 'VERIFICATION_CODE_EXPIRED_OR_INVALID',
-  incorrect: 'INCORRECT_VERIFICATION_CODE',
-  tooManyAttempts: 'VERIFICATION_TOO_MANY_ATTEMPTS',
-}
-
-function emailResetCodeKey(email: string) {
-  return `email:reset:${email}`
-}
-
-function emailResetCooldownKey(email: string) {
-  return `email:cooldown:RESET_PASSWORD:${email}`
-}
-
-function resetTokenKey(type: 'email' | 'phone', token: string) {
-  return `password-reset:${type}:${token}`
-}
-
-async function storeResetToken(type: 'email' | 'phone', target: string) {
-  const resetToken = randomBytes(32).toString('hex')
-  await redis.set(resetTokenKey(type, resetToken), target, 'EX', RESET_TOKEN_TTL_SECONDS)
-  return {
-    resetToken,
-    expiresIn: RESET_TOKEN_TTL_SECONDS,
-  }
-}
-
-async function consumeResetToken(type: 'email' | 'phone', token: string, expectedTarget: string) {
-  const key = resetTokenKey(type, token)
-  const storedTarget = await redis.get(key)
-  if (!storedTarget || storedTarget !== expectedTarget) {
-    throw new AppError(400, 'RESET_TOKEN_INVALID')
-  }
-
-  await redis.del(key)
 }
 
 /**
- * Tìm khách hàng được phép đăng nhập OTP / đặt lại mật khẩu bằng SĐT.
- * Chỉ chấp nhận SĐT ĐÃ XÁC MINH: nếu SĐT chỉ được khai báo (chưa xác minh) thì người sở hữu số đó
- * chưa chắc là chủ tài khoản (ví dụ khách gõ nhầm số của người khác khi đăng ký bằng email).
+ * Tìm tài khoản được phép đăng nhập OTP / đặt lại mật khẩu bằng SĐT.
+ * Chỉ chấp nhận SĐT ĐÃ XÁC MINH: SĐT chỉ được khai báo thì người giữ số chưa chắc là chủ tài khoản.
  */
-async function findCustomerByVerifiedPhone(normalizedPhone: string) {
-  const user = await prisma.user.findFirst({
-    where: { phone: normalizedPhone, role: 'CUSTOMER' },
-  })
+async function findUserByVerifiedPhone(normalizedPhone: string) {
+  const user = await prisma.user.findUnique({ where: { phone: normalizedPhone } })
 
-  if (!user) {
+  if (!user || user.status === 'DELETED') {
     return null
   }
 
-  if (!user.isPhoneVerified) {
+  if (!user.phoneVerifiedAt) {
     throw new AppError(400, 'PHONE_NOT_VERIFIED')
   }
 
@@ -175,62 +150,109 @@ async function findCustomerByVerifiedPhone(normalizedPhone: string) {
 
 // ─── Register ──────────────────────────────────────────────────────────────────
 
+function registerEmailCodeKey(email: string) {
+  return `email:register:${email}`
+}
+
+function registerEmailCooldownKey(email: string) {
+  return `email:cooldown:REGISTER:${email}`
+}
+
 /**
- * Registers a new client (customer).
+ * Gửi mã xác minh tới email trước khi đăng ký — tài khoản chỉ được tạo khi người dùng chứng minh sở hữu email.
+ * Email đã có tài khoản thì báo trùng (đăng ký vốn đã công khai điều này qua /check-account).
  */
-export async function clientRegister(input: RegisterInput['body']) {
-  const { registerType, password, name } = input
+export async function sendRegisterEmailCode(input: SendRegisterEmailCodeInput['body']) {
+  const email = normalizeEmail(input.email)
 
-  const finalEmail = input.email ? input.email.trim().toLowerCase() : null
-  const finalPhone = registerType === 'phone' ? normalizeVietnamPhone(input.phone) || null : null
-
-  // 1. Kiểm tra trùng lặp TRƯỚC khi tiêu thụ OTP (tránh mất mã khi thông tin bị trùng)
-  if (finalEmail) {
-    const existingEmailUser = await prisma.user.findUnique({
-      where: { email: finalEmail },
-      select: { id: true },
-    })
-    if (existingEmailUser) {
-      throw new AppError(400, 'EMAIL_ALREADY_EXISTS')
-    }
+  const existing = await prisma.user.findUnique({ where: { email }, select: { id: true } })
+  if (existing) {
+    throw new AppError(400, 'EMAIL_ALREADY_EXISTS')
   }
 
-  const phoneHolder = finalPhone
-    ? await prisma.user.findUnique({
-        where: { phone: finalPhone },
-        select: { id: true, isPhoneVerified: true },
-      })
-    : null
+  const cooldownKey = registerEmailCooldownKey(email)
+  if (await redis.get(cooldownKey)) {
+    throw new AppError(429, 'COOLDOWN_ACTIVE')
+  }
+
+  await assertRateLimit(`email-daily:${email}`, EMAIL_DAILY_LIMIT, 24 * 60 * 60, 'EMAIL_DAILY_LIMIT_REACHED')
+
+  const code = await issueVerificationCode(registerEmailCodeKey(email), EMAIL_CODE_TTL_SECONDS)
+  await redis.set(cooldownKey, '1', 'EX', EMAIL_COOLDOWN_SECONDS)
+
+  await sendVerificationCodeEmail({
+    to: email,
+    subject: 'Verify your email',
+    heading: 'Welcome to Traditional Ao Dai',
+    intro: 'Use the verification code below to finish creating your Traditional Ao Dai account:',
+    code,
+    ttlMinutes: EMAIL_CODE_TTL_SECONDS / 60,
+  })
+
+  return { ttl: EMAIL_CODE_TTL_SECONDS }
+}
+
+/**
+ * Đăng ký tài khoản khách hàng. Email hoặc SĐT đều phải xác minh bằng mã trước khi tạo tài khoản.
+ */
+export async function clientRegister(input: RegisterInput['body']) {
+  const { password, name } = input
+  const now = new Date()
+
+  if (input.registerType === 'email') {
+    const email = normalizeEmail(input.email)
+
+    // Kiểm tra trùng TRƯỚC khi tiêu thụ mã (tránh mất mã khi thông tin bị trùng)
+    const existing = await prisma.user.findUnique({ where: { email }, select: { id: true } })
+    if (existing) {
+      throw new AppError(400, 'EMAIL_ALREADY_EXISTS')
+    }
+
+    await verifyVerificationCode(registerEmailCodeKey(email), input.code, EMAIL_CODE_ERROR_KEYS)
+    await redis.del(registerEmailCooldownKey(email))
+
+    return prisma.user.create({
+      data: {
+        email,
+        emailVerifiedAt: now,
+        passwordHash: await hashPassword(password),
+        passwordChangedAt: now,
+        name: name || null,
+      },
+    })
+  }
+
+  const phone = normalizeVietnamPhone(input.phone)
+  if (!phone) {
+    throw new AppError(400, 'INVALID_PHONE_NUMBER')
+  }
+
+  const phoneHolder = await prisma.user.findUnique({
+    where: { phone },
+    select: { id: true, phoneVerifiedAt: true },
+  })
 
   // SĐT đã được xác minh bởi tài khoản khác -> không thể dùng
-  if (phoneHolder?.isPhoneVerified) {
+  if (phoneHolder?.phoneVerifiedAt) {
     throw new AppError(400, 'PHONE_ALREADY_EXISTS')
   }
 
-  // 2. Đăng ký bằng SĐT bắt buộc xác minh OTP
-  if (registerType === 'phone') {
-    await verifyOtp(input.phone, 'REGISTER', input.code)
-  }
-
-  const hashedPassword = await hashPassword(password)
+  await verifyOtp(phone, 'REGISTER', input.code)
+  const passwordHash = await hashPassword(password)
 
   return prisma.$transaction(async (tx) => {
     // Người vừa chứng minh sở hữu SĐT bằng OTP được nhận số này: gỡ SĐT chưa xác minh khỏi tài khoản cũ
-    if (registerType === 'phone' && phoneHolder) {
-      await tx.user.update({
-        where: { id: phoneHolder.id },
-        data: { phone: null, isPhoneVerified: false },
-      })
+    if (phoneHolder) {
+      await tx.user.update({ where: { id: phoneHolder.id }, data: { phone: null } })
     }
 
     return tx.user.create({
       data: {
-        email: finalEmail,
-        password: hashedPassword,
+        phone,
+        phoneVerifiedAt: now,
+        passwordHash,
+        passwordChangedAt: now,
         name: name || null,
-        phone: finalPhone,
-        role: 'CUSTOMER',
-        isPhoneVerified: registerType === 'phone',
       },
     })
   })
@@ -239,63 +261,46 @@ export async function clientRegister(input: RegisterInput['body']) {
 // ─── Login ─────────────────────────────────────────────────────────────────────
 
 /**
- * Validates client credentials and generates a JWT access token.
+ * Đăng nhập storefront bằng email/SĐT + mật khẩu. Mọi vai trò đều được (STAFF/ADMIN cũng mua hàng).
  * Không phân biệt "sai tài khoản" và "sai mật khẩu" để tránh dò tài khoản (user enumeration).
  */
 export async function clientLogin(input: LoginInput['body'], meta: SessionMeta = {}) {
-  const emailOrPhone = input.email.trim()
+  const identifier = input.identifier.trim()
   const rememberMe = input.rememberMe ?? false
 
-  const isEmail = emailOrPhone.includes('@')
-  const user = isEmail
-    ? await prisma.user.findFirst({ where: { email: { equals: emailOrPhone, mode: 'insensitive' } } })
-    : await prisma.user.findFirst({ where: { phone: normalizeVietnamPhone(emailOrPhone) } })
+  const phone = identifier.includes('@') ? null : normalizeVietnamPhone(identifier)
+  const user = identifier.includes('@')
+    ? await prisma.user.findUnique({ where: { email: normalizeEmail(identifier) } })
+    : phone
+      ? await prisma.user.findUnique({ where: { phone } })
+      : null
 
-  const isPasswordMatch =
-    !!user && user.role === 'CUSTOMER' && !!user.password && (await comparePassword(input.password, user.password))
-
+  const isPasswordMatch = !!user?.passwordHash && (await comparePassword(input.password, user.passwordHash))
   if (!user || !isPasswordMatch) {
     throw new AppError(401, 'INVALID_CREDENTIALS')
   }
 
   // Chỉ báo tài khoản bị khóa khi đã nhập đúng mật khẩu
-  if (!user.isActive) {
-    throw new AppError(403, 'ACCOUNT_DEACTIVATED')
-  }
+  assertCanSignIn(user)
 
-  const tokens = await createClientSession(user, meta, rememberMe)
-
-  return {
-    ...tokens,
-    user: omitPassword(user),
-  }
+  return createStoreSession(user, meta, rememberMe)
 }
 
 /**
  * Đăng nhập bằng OTP (chỉ dành cho tài khoản có SĐT đã xác minh)
  */
 export async function clientLoginWithOtp(input: OtpLoginInput['body'], meta: SessionMeta = {}) {
-  const { phone, code } = input
-  const normalizedPhone = normalizeVietnamPhone(phone)!
+  const phone = normalizeVietnamPhone(input.phone)!
 
-  const user = await findCustomerByVerifiedPhone(normalizedPhone)
+  const user = await findUserByVerifiedPhone(phone)
   if (!user) {
     throw new AppError(400, 'ACCOUNT_NOT_REGISTERED')
   }
 
-  await verifyOtp(normalizedPhone, 'LOGIN', code)
+  await verifyOtp(phone, 'LOGIN', input.code)
+  assertCanSignIn(user)
 
-  if (!user.isActive) {
-    throw new AppError(403, 'ACCOUNT_DEACTIVATED')
-  }
-
-  const rememberMe = input.rememberMe ?? false
-  const tokens = await createClientSession(user, meta, rememberMe)
-
-  return {
-    ...tokens,
-    user: omitPassword(user),
-  }
+  return createStoreSession(user, meta, input.rememberMe ?? false)
 }
 
 // ─── Refresh Token ─────────────────────────────────────────────────────────────
@@ -305,30 +310,32 @@ function refreshGraceKey(refreshTokenHash: string) {
 }
 
 /**
- * Refreshes a client access token.
+ * Cấp access token mới từ refresh token (cookie httpOnly).
+ * - Phiên "ghi nhớ": xoay vòng refresh token; dùng lại token cũ ngoài khoảng ân hạn -> thu hồi cả họ
+ * - Phiên thường: chỉ cấp access token mới
  */
-export async function refreshClientToken(input: RefreshTokenInput['body']) {
+export async function refreshClientToken(refreshToken: string) {
   let decoded: JWTPayload
   try {
-    decoded = verifyToken(input.refreshToken)
+    decoded = verifyToken(refreshToken, 'store')
   } catch {
     throw new AppError(401, 'INVALID_REFRESH_TOKEN')
   }
 
-  if (decoded.tokenType !== 'refresh' || !decoded.sessionId || !decoded.familyId) {
+  if (decoded.tokenType !== 'refresh' || !decoded.familyId) {
     throw new AppError(401, 'INVALID_REFRESH_TOKEN_TYPE')
   }
 
-  const currentRefreshTokenHash = hashToken(input.refreshToken)
+  const currentHash = hashToken(refreshToken)
   let session = await prisma.userSession.findUnique({
-    where: { refreshToken: currentRefreshTokenHash },
+    where: { refreshTokenHash: currentHash },
     include: { user: true },
   })
   let isGraceReuse = false
 
   if (!session) {
     // Token vừa bị xoay vòng bởi một tab khác trong vài giây trước -> không coi là đánh cắp
-    const graceSessionId = await redis.get(refreshGraceKey(currentRefreshTokenHash))
+    const graceSessionId = await redis.get(refreshGraceKey(currentHash))
     if (graceSessionId && graceSessionId === decoded.sessionId) {
       session = await prisma.userSession.findUnique({
         where: { id: graceSessionId },
@@ -343,40 +350,44 @@ export async function refreshClientToken(input: RefreshTokenInput['body']) {
     throw new AppError(401, 'REFRESH_TOKEN_REUSED')
   }
 
+  const now = new Date()
   if (
+    session.kind !== 'STORE' ||
     session.id !== decoded.sessionId ||
     session.familyId !== decoded.familyId ||
     session.userId !== decoded.userId ||
-    session.isRevoked ||
-    session.expiresAt <= new Date() ||
-    !session.user.isActive ||
-    session.user.role !== 'CUSTOMER'
+    session.revokedAt ||
+    session.expiresAt <= now ||
+    session.user.status !== 'ACTIVE'
   ) {
     throw new AppError(401, 'SESSION_EXPIRED_OR_REVOKED')
   }
 
-  const rememberMe = decoded.rememberMe === true
+  const rememberMe = session.rememberMe
 
   // Phiên không ghi nhớ hoặc dùng lại trong khoảng ân hạn: chỉ cấp access token mới, không xoay vòng refresh token.
   // (Cookie trong trình duyệt dùng chung giữa các tab nên tab đến sau đã có sẵn refresh token mới.)
   if (!rememberMe || isGraceReuse) {
+    await prisma.userSession.update({ where: { id: session.id }, data: { lastUsedAt: now } })
     return {
-      accessToken: generateAccessToken({
-        userId: session.user.id,
-        role: session.user.role,
-        sessionId: session.id,
-        familyId: session.familyId,
-        rememberMe,
-      }),
+      accessToken: generateAccessToken(
+        {
+          userId: session.user.id,
+          role: session.user.role,
+          sessionId: session.id,
+          familyId: session.familyId,
+          rememberMe,
+        },
+        'store'
+      ),
       refreshToken: undefined,
       refreshTokenExpiresAt: session.expiresAt,
       rememberMe,
-      user: omitPassword(session.user),
     }
   }
 
   const refreshPolicy = getRefreshTokenPolicy(true)
-  const tokens = buildAuthTokens(session.user, session.id, {
+  const tokens = buildStoreTokens(session.user, session.id, {
     familyId: session.familyId,
     refreshExpiresIn: refreshPolicy.expiresIn,
     rememberMe,
@@ -385,75 +396,48 @@ export async function refreshClientToken(input: RefreshTokenInput['body']) {
   await prisma.userSession.update({
     where: { id: session.id },
     data: {
-      refreshToken: hashToken(tokens.refreshToken),
+      refreshTokenHash: hashToken(tokens.refreshToken),
       expiresAt: refreshPolicy.expiresAt,
-      isRevoked: false,
+      lastUsedAt: now,
     },
   })
 
-  await redis.set(refreshGraceKey(currentRefreshTokenHash), session.id, 'EX', REFRESH_REUSE_GRACE_SECONDS)
+  await redis.set(refreshGraceKey(currentHash), session.id, 'EX', REFRESH_REUSE_GRACE_SECONDS)
 
   return {
     ...tokens,
     refreshTokenExpiresAt: refreshPolicy.expiresAt,
     rememberMe,
-    user: omitPassword(session.user),
   }
 }
 
 // ─── Logout ────────────────────────────────────────────────────────────────────
 
 /**
- * Logs out a client by deleting their session from the database.
+ * Đăng xuất storefront: xóa đúng phiên của refresh token. Token hỏng/hết hạn thì bỏ qua (cookie vẫn bị xóa).
  */
-export async function logoutClient(userId: string, sessionId?: string, refreshToken?: string) {
-  if (sessionId) {
-    await prisma.userSession.deleteMany({
-      where: {
-        id: sessionId,
-        userId,
-      },
-    })
-    return
-  }
-
-  if (!refreshToken) {
-    throw new AppError(400, 'REFRESH_TOKEN_REQUIRED')
-  }
-
-  await prisma.userSession.deleteMany({
-    where: {
-      userId,
-      refreshToken: hashToken(refreshToken),
-    },
-  })
-}
-
 export async function logoutClientByRefreshToken(refreshToken: string) {
   let decoded: JWTPayload
   try {
-    decoded = verifyToken(refreshToken)
+    decoded = verifyToken(refreshToken, 'store')
   } catch {
     return
   }
 
-  if (decoded.tokenType !== 'refresh' || !decoded.sessionId) {
+  if (decoded.tokenType !== 'refresh') {
     return
   }
 
   // Xóa theo sessionId (không đòi khớp hash) để đăng xuất được cả khi tab đang giữ refresh token cũ trong khoảng ân hạn
   await prisma.userSession.deleteMany({
-    where: {
-      id: decoded.sessionId,
-      userId: decoded.userId,
-    },
+    where: { id: decoded.sessionId, userId: decoded.userId, kind: 'STORE' },
   })
 }
 
 // ─── Check Account ─────────────────────────────────────────────────────────────
 
 /**
- * Checks if an email or phone is already registered (phục vụ form đăng ký, đã được giới hạn tần suất ở route).
+ * Kiểm tra email / SĐT đã được dùng chưa (phục vụ form đăng ký, đã được giới hạn tần suất ở route)
  */
 export async function checkAccountAvailability(email?: string, phone?: string): Promise<CheckAccountResult> {
   if (!email && !phone) {
@@ -461,10 +445,7 @@ export async function checkAccountAvailability(email?: string, phone?: string): 
   }
 
   if (email) {
-    const user = await prisma.user.findUnique({
-      where: { email: email.trim().toLowerCase() },
-      select: { id: true },
-    })
+    const user = await prisma.user.findUnique({ where: { email: normalizeEmail(email) }, select: { id: true } })
     return {
       available: !user,
       reason: user ? 'EMAIL_TAKEN' : 'AVAILABLE',
@@ -474,9 +455,9 @@ export async function checkAccountAvailability(email?: string, phone?: string): 
   // SĐT chỉ được coi là đã dùng khi đã được xác minh (SĐT khai báo chưa xác minh có thể được chủ thật nhận lại bằng OTP)
   const user = await prisma.user.findUnique({
     where: { phone: normalizeVietnamPhone(phone)! },
-    select: { id: true, isPhoneVerified: true },
+    select: { phoneVerifiedAt: true },
   })
-  const isTaken = !!user?.isPhoneVerified
+  const isTaken = !!user?.phoneVerifiedAt
   return {
     available: !isTaken,
     reason: isTaken ? 'PHONE_TAKEN' : 'AVAILABLE',
@@ -510,16 +491,7 @@ export async function verifyGoogleCredential(credential: string): Promise<TokenP
     throw new AppError(400, 'GOOGLE_EMAIL_NOT_VERIFIED')
   }
 
-  return { ...payload, sub: payload.sub, email: payload.email.trim().toLowerCase() }
-}
-
-function assertCanUseGoogleLogin(user: User) {
-  if (user.role !== 'CUSTOMER') {
-    throw new AppError(403, 'INSUFFICIENT_PERMISSIONS')
-  }
-  if (!user.isActive) {
-    throw new AppError(403, 'ACCOUNT_DEACTIVATED')
-  }
+  return { ...payload, sub: payload.sub, email: normalizeEmail(payload.email) }
 }
 
 /**
@@ -528,13 +500,13 @@ function assertCanUseGoogleLogin(user: User) {
  * 2. Chưa liên kết, email chưa có tài khoản -> tạo tài khoản mới + liên kết
  * 3. Chưa liên kết, email trùng tài khoản ĐÃ XÁC MINH email -> tự động liên kết
  * 4. Chưa liên kết, email trùng tài khoản CHƯA XÁC MINH email -> CHẶN (chống chiếm trước tài khoản).
- *    Chủ tài khoản đăng nhập bằng mật khẩu (hoặc dùng quên mật khẩu qua email) rồi liên kết Google trong hồ sơ.
+ *    Chủ tài khoản đăng nhập bằng mật khẩu (hoặc quên mật khẩu qua email) rồi liên kết Google trong hồ sơ.
  */
 export async function clientLoginWithGoogle(credential: string, meta: SessionMeta, rememberMe: boolean = true) {
   const payload = await verifyGoogleCredential(credential)
 
   const linkedAccount = await prisma.socialAccount.findUnique({
-    where: { provider_providerId: { provider: 'GOOGLE', providerId: payload.sub } },
+    where: { provider_providerUserId: { provider: 'GOOGLE', providerUserId: payload.sub } },
     include: { user: true },
   })
 
@@ -542,7 +514,7 @@ export async function clientLoginWithGoogle(credential: string, meta: SessionMet
 
   if (linkedAccount) {
     user = linkedAccount.user
-    assertCanUseGoogleLogin(user)
+    assertCanSignIn(user)
   } else {
     const existingUser = await prisma.user.findUnique({
       where: { email: payload.email },
@@ -553,20 +525,18 @@ export async function clientLoginWithGoogle(credential: string, meta: SessionMet
       user = await prisma.user.create({
         data: {
           email: payload.email,
+          emailVerifiedAt: new Date(),
           name: payload.name || null,
-          avatar: payload.picture || null,
-          role: 'CUSTOMER',
-          isActive: true,
-          isEmailVerified: true,
+          avatarUrl: payload.picture || null,
           socialAccounts: {
-            create: { provider: 'GOOGLE', providerId: payload.sub },
+            create: { provider: 'GOOGLE', providerUserId: payload.sub, email: payload.email },
           },
         },
       })
     } else {
-      assertCanUseGoogleLogin(existingUser)
+      assertCanSignIn(existingUser)
 
-      if (!existingUser.isEmailVerified) {
+      if (!existingUser.emailVerifiedAt) {
         throw new AppError(409, 'GOOGLE_EMAIL_ACCOUNT_UNVERIFIED')
       }
 
@@ -579,166 +549,175 @@ export async function clientLoginWithGoogle(credential: string, meta: SessionMet
         where: { id: existingUser.id },
         data: {
           name: existingUser.name || payload.name || null,
-          avatar: existingUser.avatar || payload.picture || null,
+          avatarUrl: existingUser.avatarUrl || payload.picture || null,
           socialAccounts: {
-            create: { provider: 'GOOGLE', providerId: payload.sub },
+            create: { provider: 'GOOGLE', providerUserId: payload.sub, email: payload.email },
           },
         },
       })
     }
   }
 
-  const tokens = await createClientSession(user, meta, rememberMe)
-
-  return {
-    user: omitPassword(user),
-    accessToken: tokens.accessToken,
-    refreshToken: tokens.refreshToken,
-    refreshTokenExpiresAt: tokens.refreshTokenExpiresAt,
-    rememberMe: tokens.rememberMe,
-  }
+  return createStoreSession(user, meta, rememberMe)
 }
 
 // ─── Forgot / Reset Password ───────────────────────────────────────────────────
+// Dùng cho MỌI vai trò: nhân viên quên mật khẩu cũng đặt lại ở storefront (cùng một tài khoản).
+
+const RESET_TOKEN_TTL_SECONDS = 600
+
+function emailResetCodeKey(email: string) {
+  return `email:reset:${email}`
+}
+
+function emailResetCooldownKey(email: string) {
+  return `email:cooldown:RESET_PASSWORD:${email}`
+}
+
+function resetTokenKey(type: 'email' | 'phone', token: string) {
+  return `password-reset:${type}:${token}`
+}
+
+async function storeResetToken(type: 'email' | 'phone', target: string) {
+  const resetToken = randomBytes(32).toString('hex')
+  await redis.set(resetTokenKey(type, resetToken), target, 'EX', RESET_TOKEN_TTL_SECONDS)
+  return {
+    resetToken,
+    expiresIn: RESET_TOKEN_TTL_SECONDS,
+  }
+}
+
+async function consumeResetToken(type: 'email' | 'phone', token: string, expectedTarget: string) {
+  const key = resetTokenKey(type, token)
+  const storedTarget = await redis.get(key)
+  if (!storedTarget || storedTarget !== expectedTarget) {
+    throw new AppError(400, 'RESET_TOKEN_INVALID')
+  }
+
+  await redis.del(key)
+}
 
 /**
  * Gửi mã đặt lại mật khẩu qua email.
  * Luôn trả về thành công dù email có tồn tại hay không để tránh dò tài khoản.
  */
-export async function sendForgotPasswordEmail(input: ForgotPasswordEmailInput['body']): Promise<{ success: boolean; message: string }> {
-  const email = input.email.trim().toLowerCase()
+export async function sendForgotPasswordEmail(input: ForgotPasswordEmailInput['body']) {
+  const email = normalizeEmail(input.email)
 
   const cooldownKey = emailResetCooldownKey(email)
   if (await redis.get(cooldownKey)) {
     throw new AppError(429, 'COOLDOWN_ACTIVE')
   }
-  await redis.set(cooldownKey, '1', 'EX', RESET_EMAIL_COOLDOWN_SECONDS)
+  await redis.set(cooldownKey, '1', 'EX', EMAIL_COOLDOWN_SECONDS)
 
-  const user = await prisma.user.findFirst({
-    where: { email, role: 'CUSTOMER' },
-    select: { id: true },
-  })
+  const user = await prisma.user.findUnique({ where: { email }, select: { status: true } })
 
-  if (user) {
-    await assertRateLimit(`email-daily:${email}`, RESET_EMAIL_DAILY_LIMIT, 24 * 60 * 60, 'EMAIL_DAILY_LIMIT_REACHED')
+  if (user && user.status !== 'DELETED') {
+    await assertRateLimit(`email-daily:${email}`, EMAIL_DAILY_LIMIT, 24 * 60 * 60, 'EMAIL_DAILY_LIMIT_REACHED')
 
-    const code = await issueVerificationCode(emailResetCodeKey(email), RESET_CODE_TTL_SECONDS)
+    const code = await issueVerificationCode(emailResetCodeKey(email), EMAIL_CODE_TTL_SECONDS)
     await sendVerificationCodeEmail({
       to: email,
       subject: 'Reset Password Verification Code',
       heading: 'Password Reset Request',
       intro: 'You requested to reset your password for your Traditional Ao Dai account. Use the verification code below:',
       code,
-      ttlMinutes: RESET_CODE_TTL_SECONDS / 60,
+      ttlMinutes: EMAIL_CODE_TTL_SECONDS / 60,
     })
   }
-
-  return { success: true, message: 'VERIFICATION_CODE_SENT' }
 }
 
 /**
- * Verifies an email reset password code and issues a short-lived reset token.
+ * Xác minh mã đặt lại mật khẩu qua email và cấp reset token ngắn hạn
  */
 export async function verifyResetPasswordEmailCode(input: VerifyResetPasswordEmailInput['body']) {
-  const email = input.email.trim().toLowerCase()
+  const email = normalizeEmail(input.email)
 
-  await verifyVerificationCode(emailResetCodeKey(email), input.code, EMAIL_RESET_ERROR_KEYS)
+  await verifyVerificationCode(emailResetCodeKey(email), input.code, EMAIL_CODE_ERROR_KEYS)
   await redis.del(emailResetCooldownKey(email))
 
   return storeResetToken('email', email)
 }
 
 /**
- * Verifies a phone reset password OTP and issues a short-lived reset token.
+ * Xác minh OTP đặt lại mật khẩu qua SĐT và cấp reset token ngắn hạn
  */
 export async function verifyResetPasswordPhoneCode(input: VerifyResetPasswordPhoneInput['body']) {
-  const normalizedPhone = normalizeVietnamPhone(input.phone)
-  if (!normalizedPhone) {
+  const phone = normalizeVietnamPhone(input.phone)
+  if (!phone) {
     throw new AppError(400, 'INVALID_PHONE_NUMBER')
   }
 
-  await verifyOtp(normalizedPhone, 'RESET_PASSWORD', input.code)
+  await verifyOtp(phone, 'RESET_PASSWORD', input.code)
 
-  const user = await findCustomerByVerifiedPhone(normalizedPhone)
+  const user = await findUserByVerifiedPhone(phone)
   if (!user) {
     throw new AppError(404, 'USER_NOT_FOUND')
   }
 
-  return storeResetToken('phone', normalizedPhone)
+  return storeResetToken('phone', phone)
 }
 
 /**
- * Cập nhật mật khẩu mới và thu hồi toàn bộ phiên đăng nhập
+ * Đặt mật khẩu mới và thu hồi toàn bộ phiên đăng nhập ở mọi khu (storefront lẫn quản trị)
  */
-async function applyNewPassword(userId: string, password: string, extraData: { isEmailVerified?: boolean } = {}) {
-  const hashedPassword = await hashPassword(password)
+async function applyNewPassword(userId: string, password: string, extraData: { emailVerifiedAt?: Date } = {}) {
+  const passwordHash = await hashPassword(password)
 
-  await prisma.$transaction([
-    prisma.user.update({
-      where: { id: userId },
-      data: { password: hashedPassword, ...extraData },
-    }),
-    prisma.userSession.deleteMany({
-      where: { userId },
-    }),
-  ])
+  await prisma.user.update({
+    where: { id: userId },
+    data: { passwordHash, passwordChangedAt: new Date(), ...extraData },
+  })
+  await revokeAllUserSessions(userId)
 }
 
 /**
- * Resets a user's password using email verification code or reset token.
+ * Đặt lại mật khẩu bằng mã email hoặc reset token
  */
-export async function resetPasswordByEmail(input: ResetPasswordEmailInput['body']): Promise<{ success: boolean }> {
-  const email = input.email.trim().toLowerCase()
+export async function resetPasswordByEmail(input: ResetPasswordEmailInput['body']) {
+  const email = normalizeEmail(input.email)
   const { code, password, resetToken } = input
 
   if (resetToken) {
     await consumeResetToken('email', resetToken, email)
   } else if (code) {
-    await verifyVerificationCode(emailResetCodeKey(email), code, EMAIL_RESET_ERROR_KEYS)
+    await verifyVerificationCode(emailResetCodeKey(email), code, EMAIL_CODE_ERROR_KEYS)
   } else {
     throw new AppError(400, 'VERIFICATION_CODE_OR_RESET_TOKEN_REQUIRED')
   }
 
-  const user = await prisma.user.findFirst({
-    where: { email, role: 'CUSTOMER' },
-    select: { id: true },
-  })
-
-  if (!user) {
+  const user = await prisma.user.findUnique({ where: { email }, select: { id: true, status: true, emailVerifiedAt: true } })
+  if (!user || user.status === 'DELETED') {
     throw new AppError(404, 'USER_NOT_FOUND')
   }
 
   // Nhận được mã qua email nghĩa là đã chứng minh sở hữu email -> đánh dấu email đã xác minh
-  await applyNewPassword(user.id, password, { isEmailVerified: true })
+  await applyNewPassword(user.id, password, user.emailVerifiedAt ? {} : { emailVerifiedAt: new Date() })
   await redis.del(emailResetCooldownKey(email))
-
-  return { success: true }
 }
 
 /**
- * Resets a user's password using phone OTP or reset token.
+ * Đặt lại mật khẩu bằng OTP SĐT hoặc reset token
  */
-export async function resetPasswordByPhone(input: ResetPasswordPhoneInput['body']): Promise<{ success: boolean }> {
+export async function resetPasswordByPhone(input: ResetPasswordPhoneInput['body']) {
   const { code, password, resetToken } = input
-  const normalizedPhone = normalizeVietnamPhone(input.phone)
-  if (!normalizedPhone) {
+  const phone = normalizeVietnamPhone(input.phone)
+  if (!phone) {
     throw new AppError(400, 'INVALID_PHONE_NUMBER')
   }
 
   if (resetToken) {
-    await consumeResetToken('phone', resetToken, normalizedPhone)
+    await consumeResetToken('phone', resetToken, phone)
   } else if (code) {
-    await verifyOtp(normalizedPhone, 'RESET_PASSWORD', code)
+    await verifyOtp(phone, 'RESET_PASSWORD', code)
   } else {
     throw new AppError(400, 'OTP_CODE_OR_RESET_TOKEN_REQUIRED')
   }
 
-  const user = await findCustomerByVerifiedPhone(normalizedPhone)
+  const user = await findUserByVerifiedPhone(phone)
   if (!user) {
     throw new AppError(404, 'USER_NOT_FOUND')
   }
 
   await applyNewPassword(user.id, password)
-
-  return { success: true }
 }

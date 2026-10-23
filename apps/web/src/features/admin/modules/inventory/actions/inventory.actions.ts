@@ -10,7 +10,7 @@ import { updateVariantStockSchema } from "../schemas/inventory.schemas";
  * Server Action: Cập nhật nhanh số lượng tồn kho biến thể SKU
  */
 export async function updateVariantStockAction(variantId: string, stock: number) {
-  const auth = await authorizeAdminAction({ permission: "canManageInventory" });
+  const auth = await authorizeAdminAction({ permission: "MANAGE_INVENTORY" });
   if (!auth.success) return auth;
 
   const input = parseActionInput(updateVariantStockSchema, { variantId, stock });

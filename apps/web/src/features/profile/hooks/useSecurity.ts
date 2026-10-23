@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
+import { type AuthProvider } from "@repo/shared";
 import { newPasswordSchema } from "@repo/shared/validation";
 import { useAuthStore, type AuthUser } from "@/features/auth";
 import { apiClient } from "@/lib/api-client";
@@ -13,9 +14,12 @@ export type DeviceKind = "desktop" | "laptop" | "phone" | "tablet";
 
 interface RawSession {
   id: string;
+  /** Khu cấp phiên: storefront hoặc khu quản trị (nhân viên) */
+  kind: "STORE" | "ADMIN";
   device: string;
   ip: string;
   createdAt: string;
+  lastUsedAt: string;
   isCurrent: boolean;
 }
 
@@ -29,6 +33,8 @@ export interface SessionView {
   ip: string;
   createdAt: string;
   isCurrent: boolean;
+  /** Phiên đăng nhập khu quản trị */
+  isAdminArea: boolean;
 }
 
 /** Nhận diện thiết bị / trình duyệt từ User-Agent lưu ở phiên đăng nhập */
@@ -97,6 +103,7 @@ export function useSecurity() {
       setNewPassword("");
       setConfirmPassword("");
       setPasswordErrors({});
+      if (user && !user.hasPassword) setUser({ ...user, hasPassword: true });
       toast.success(t("security.toasts.passwordChangeSuccess"));
     },
     onError: (error: unknown) => showApiError(error, "security.toasts.passwordChangeError"),
@@ -136,7 +143,14 @@ export function useSecurity() {
   });
 
   const sessions: SessionView[] = (sessionsQuery.data ?? [])
-    .map((session) => ({ ...parseUserAgent(session.device), id: session.id, ip: session.ip, createdAt: session.createdAt, isCurrent: session.isCurrent }))
+    .map((session) => ({
+      ...parseUserAgent(session.device),
+      id: session.id,
+      ip: session.ip,
+      createdAt: session.createdAt,
+      isCurrent: session.isCurrent,
+      isAdminArea: session.kind === "ADMIN",
+    }))
     // Thiết bị hiện tại luôn đứng đầu
     .sort((a, b) => Number(b.isCurrent) - Number(a.isCurrent));
 
@@ -167,7 +181,7 @@ export function useSecurity() {
   });
 
   const unlinkGoogleMutation = useMutation({
-    mutationFn: (providerId: string) => apiClient.delete(`/api/user/unlink/${providerId}`),
+    mutationFn: (provider: AuthProvider) => apiClient.delete(`/api/user/social/${provider}`),
     onSuccess: async () => {
       await refreshUser();
       toast.success(t("security.toasts.unlinkGoogleSuccess"));
@@ -176,7 +190,8 @@ export function useSecurity() {
   });
 
   return {
-    // Đổi mật khẩu
+    // Đổi mật khẩu (tài khoản chỉ đăng nhập Google chưa có mật khẩu -> "đặt mật khẩu", không hỏi mật khẩu hiện tại)
+    hasPassword: user?.hasPassword ?? true,
     currentPassword,
     setCurrentPassword: (value: string) => {
       setCurrentPassword(value);
@@ -206,7 +221,7 @@ export function useSecurity() {
     // Google
     isGoogleLinked: Boolean(googleAccount),
     linkGoogle: (credential: string) => linkGoogleMutation.mutate(credential),
-    unlinkGoogle: () => (googleAccount ? unlinkGoogleMutation.mutateAsync(googleAccount.providerId) : Promise.resolve()),
+    unlinkGoogle: () => (googleAccount ? unlinkGoogleMutation.mutateAsync(googleAccount.provider) : Promise.resolve()),
     isLinking: linkGoogleMutation.isPending,
     isUnlinking: unlinkGoogleMutation.isPending,
   };

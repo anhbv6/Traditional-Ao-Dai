@@ -86,7 +86,7 @@ export interface AppMenuProps {
 export type AppMenuTone = "default" | "admin";
 
 /*
- * Tông admin: đổi lại token màu ngay trên Popup (mọi class bên dưới chỉ đọc biến) → đơn sắc theo docs/guides/admin-ui.md.
+ * Tông admin: đổi lại token màu ngay trên Popup (mọi class bên dưới chỉ đọc biến) → đơn sắc theo AGENTS.md §8.
  * Popup render qua portal nên tự gắn `admin-shell` để dùng font Inter và luôn sáng.
  */
 const ADMIN_SURFACE_CLASS = cn(

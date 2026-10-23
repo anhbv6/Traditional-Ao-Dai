@@ -84,9 +84,8 @@ export function RegisterForm() {
     isResendingOtp,
     resendSeconds,
     otpSentOnce,
+    codeDestination,
   } = useRegister();
-
-  const phoneValue = watch('phone') || '';
 
   return (
     <AuthFormShell loading={isRegistering}>
@@ -116,7 +115,8 @@ export function RegisterForm() {
         />
       ) : (
         <RegisterOtpStep
-          phoneValue={phoneValue}
+          channel={registerType}
+          destination={codeDestination}
           otpValue={otpInput}
           setOtpValue={setOtpInput}
           otpError={otpError}

@@ -12,7 +12,7 @@ import { requestOrderApprovalSchema, updateOrderStatusSchema, updatePaymentStatu
  * Server Action: Cập nhật trạng thái đơn hàng (OrderStatus)
  */
 export async function updateOrderStatusAction(orderId: string, status: OrderStatus) {
-  const auth = await authorizeAdminAction({ permission: "canManageOrders" });
+  const auth = await authorizeAdminAction({ permission: "MANAGE_ORDERS" });
   if (!auth.success) return auth;
 
   const input = parseActionInput(updateOrderStatusSchema, { orderId, status });
@@ -44,7 +44,7 @@ export async function updateOrderStatusAction(orderId: string, status: OrderStat
  * Server Action: Cập nhật trạng thái thanh toán (PaymentStatus)
  */
 export async function updatePaymentStatusAction(orderId: string, paymentStatus: PaymentStatus) {
-  const auth = await authorizeAdminAction({ permission: "canManageOrders" });
+  const auth = await authorizeAdminAction({ permission: "MANAGE_ORDERS" });
   if (!auth.success) return auth;
 
   const input = parseActionInput(updatePaymentStatusSchema, { orderId, paymentStatus });
@@ -87,6 +87,7 @@ export async function requestOrderApprovalAction(raw: z.input<typeof requestOrde
     const approval = await prisma.approvalRequest.create({
       data: {
         actionType: params.actionType,
+        targetId: params.orderId,
         description: params.description,
         payload: {
           orderId: params.orderId,

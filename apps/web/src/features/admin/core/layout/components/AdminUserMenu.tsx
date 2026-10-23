@@ -35,7 +35,7 @@ export function AdminUserMenu({ user, isSuperAdmin, isLoggingOut, onOpenProfile,
       items={items}
       header={
         <div className="flex items-center gap-3">
-          <UserAvatar src={user?.avatar} alt={displayName} initial={initial} className="size-9" />
+          <UserAvatar src={user?.avatarUrl} alt={displayName} initial={initial} className="size-9" />
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold text-[#09090B]">{displayName}</p>
             <p className="truncate text-xs text-[#71717A]">{user?.email || "—"}</p>
@@ -48,7 +48,7 @@ export function AdminUserMenu({ user, isSuperAdmin, isLoggingOut, onOpenProfile,
           aria-label={t("accountMenu")}
           className="flex cursor-pointer items-center gap-2.5 rounded-xl py-1 pl-1 pr-2 outline-none transition-colors hover:bg-[#F4F4F5] focus-visible:ring-2 focus-visible:ring-[#18181B]/15 data-popup-open:bg-[#F4F4F5]"
         >
-          <UserAvatar src={user?.avatar} alt={displayName} initial={initial} className="size-8" />
+          <UserAvatar src={user?.avatarUrl} alt={displayName} initial={initial} className="size-8" />
           <span className="hidden min-w-0 flex-col text-left leading-tight md:flex">
             <span className="max-w-[140px] truncate text-[13px] font-semibold text-[#09090B]">{displayName}</span>
             <span className="text-[11px] text-[#71717A]">{displayRole}</span>

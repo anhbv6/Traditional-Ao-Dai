@@ -11,7 +11,7 @@ import { updateTailoringStatusSchema } from "../schemas/tailoring.schemas";
  * Server Action: Cập nhật công đoạn may đo và ghi nhật ký TailoringLog
  */
 export async function updateTailoringStatusAction(raw: z.input<typeof updateTailoringStatusSchema>) {
-  const auth = await authorizeAdminAction({ permission: "canUpdateTailoring" });
+  const auth = await authorizeAdminAction({ permission: "UPDATE_TAILORING" });
   if (!auth.success) return auth;
 
   const parsed = parseActionInput(updateTailoringStatusSchema, raw);

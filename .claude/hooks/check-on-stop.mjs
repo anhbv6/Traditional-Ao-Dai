@@ -1,4 +1,4 @@
-// Stop: khi agent dừng mà có thay đổi code chưa kiểm tra -> chạy `pnpm check` (AGENTS.md §6).
+// Stop: khi agent dừng mà có thay đổi code chưa kiểm tra -> chạy `pnpm check` (AGENTS.md §2, §11).
 // Lỗi -> exit 2, agent tiếp tục sửa. Ghi nhớ trạng thái đã kiểm tra xanh để không chạy lại khi không có gì đổi.
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
 import { createHash } from 'node:crypto'

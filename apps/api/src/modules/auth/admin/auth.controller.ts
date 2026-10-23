@@ -5,20 +5,20 @@ import { sendSuccess } from '../../../core/http/response'
 import { clearAdminSessionCookies, setAdminSessionCookies } from '../../../core/security/authCookies'
 
 /**
- * Controller handler for Admin and Staff Login.
- * Token được đặt vào cookie httpOnly `admin_token` (SameSite=Strict); body chỉ trả thông tin người dùng.
+ * Đăng nhập khu quản trị. Token được đặt vào cookie httpOnly `admin_token` (SameSite=Strict);
+ * thông tin người dùng do Next.js đọc lại từ DB (getAdminSessionAction), body không trả gì thêm.
  */
 export async function loginAdmin(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const result = await authService.adminLogin(req.body, {
-      deviceInfo: req.headers['user-agent'],
+      userAgent: req.headers['user-agent'],
       ipAddress: req.ip,
     })
 
-    setAdminSessionCookies(res, result.token, result.user.role, result.rememberMe, result.expiresAt)
+    setAdminSessionCookies(res, result.token, result.role, result.rememberMe, result.expiresAt)
 
     return sendSuccess(res, {
-      data: { user: result.user },
+      data: { role: result.role },
       message: 'ADMIN_LOGIN_SUCCESS',
     })
   } catch (error) {
@@ -27,7 +27,7 @@ export async function loginAdmin(req: Request, res: Response, next: NextFunction
 }
 
 /**
- * Controller handler for Admin and Staff Logout (luôn xóa cookie, kể cả khi phiên đã hết hạn / bị thu hồi)
+ * Đăng xuất khu quản trị (luôn xóa cookie, kể cả khi phiên đã hết hạn / bị thu hồi)
  */
 export async function logoutAdmin(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {

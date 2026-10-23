@@ -5,7 +5,7 @@ description: Tạo feature storefront mới trong apps/web/src/features/<feature
 
 # Tạo feature storefront mới
 
-Quy chuẩn gốc: `docs/PROJECT_RULES.md` §7 (Frontend), §10 (i18n). Đọc `apps/web/AGENTS.md` (đặc biệt §7 component dùng chung) và docs Next 16 trong `node_modules/next/dist/docs/` trước khi viết code.
+Quy chuẩn gốc: `AGENTS.md` §7 (Frontend, gồm component dùng chung), §10 (i18n). Đọc `apps/web/AGENTS.md` và docs Next 16 trong `node_modules/next/dist/docs/` trước khi viết code.
 
 ## 1. Khuôn thư mục (chỉ tạo thư mục khi cần)
 

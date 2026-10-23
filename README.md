@@ -1,8 +1,8 @@
 # 🌸 Traditional Ao Dai
 
-Webshop bán Áo Dài truyền thống Việt Nam, có dịch vụ **may đo theo số đo**. Gồm Storefront (khách hàng) và khu Admin (quản trị).
+Webshop bán Áo Dài truyền thống Việt Nam, có dịch vụ **may đo theo số đo**. Gồm Storefront (khách hàng) và khu Quản trị (nhân viên, admin).
 
-> 📐 Quy chuẩn code: [`docs/PROJECT_RULES.md`](docs/PROJECT_RULES.md) — đọc trước khi đóng góp.
+> 📐 Quy chuẩn code, kiến trúc, bảo mật: [`AGENTS.md`](AGENTS.md) — đọc trước khi viết code. File này chỉ hướng dẫn cài đặt, chạy và triển khai.
 
 ---
 
@@ -10,13 +10,11 @@ Webshop bán Áo Dài truyền thống Việt Nam, có dịch vụ **may đo the
 
 | Workspace | Vai trò | Công nghệ chính |
 | :--- | :--- | :--- |
-| [`apps/web`](apps/web/README.md) | Storefront + Admin | Next.js 16, React 19, Tailwind v4, React Query, Zustand, next-intl |
-| [`apps/api`](apps/api/README.md) | REST API | Express 4, JWT RS256, Zod, ioredis, Cloudinary, Nodemailer, Swagger |
-| [`packages/db`](packages/db/README.md) | Database | Prisma 5 + PostgreSQL |
-| [`packages/shared`](packages/shared/README.md) | Hợp đồng FE ↔ BE | Kiểu response, cookie, tiền tệ, locale, validator Zod |
-| [`packages/config`](packages/config/README.md) | Cấu hình công cụ | ESLint, tsconfig, Prettier dùng chung |
-
-## 2. Luồng hệ thống
+| `apps/web` | Storefront + Admin | Next.js 16, React 19, Tailwind v4, React Query, Zustand, next-intl (vi/en) |
+| `apps/api` | REST API | Express 4, JWT RS256, Zod v4, ioredis, Cloudinary, Nodemailer/Brevo, Swagger |
+| `packages/db` | Database | Prisma 5 + PostgreSQL (schema, migration, seed) |
+| `packages/shared` | Hợp đồng FE ↔ BE | Kiểu DTO/response, hằng số, cookie, tiền tệ, validator Zod |
+| `packages/config` | Cấu hình công cụ | ESLint, tsconfig, Prettier dùng chung |
 
 ```text
 Trình duyệt ── /vi/...  ─► apps/web (Next.js)
@@ -25,93 +23,110 @@ Trình duyệt ── /vi/...  ─► apps/web (Next.js)
 Admin (Server Actions) ─────────── Prisma trực tiếp ─► PostgreSQL
 ```
 
-- **Cùng origin:** trình duyệt chỉ gọi `/api/*` trên domain web → cookie httpOnly dùng chung, không cần CORS.
-- **Storefront** lấy dữ liệu qua Express API. **Admin** gọi Prisma trực tiếp (không có `/api/admin/*`).
-- **Auth:** khách = access token trong bộ nhớ + refresh cookie; admin = cookie `admin_token`. Phiên lưu ở bảng `UserSession`.
+## 2. Cài đặt
 
----
-
-## 3. Yêu cầu
-
-- **Node.js ≥ 22.18** (khuyến nghị 24)
-- **pnpm 11** — `npm install -g pnpm` (chỉ dùng pnpm, không dùng npm/yarn)
-- **Docker** (chạy Redis)
-- **PostgreSQL** (local hoặc cloud)
-
-## 4. Cài đặt
+**Yêu cầu:** Node.js ≥ 22.18 (khuyến nghị 24) · pnpm 11 (chỉ pnpm, không npm/yarn) · Docker (Redis) · PostgreSQL.
 
 ```bash
 git clone <url-repo> && cd learn-ecommerce-shop
 pnpm install
-cp apps/api/.env.example apps/api/.env
-cp apps/web/.env.example apps/web/.env
+cp apps/api/.env.example apps/api/.env.local
+cp apps/web/.env.example apps/web/.env.local
 ```
 
-Điền biến môi trường (ý nghĩa từng biến có comment trong `.env.example`):
-
-| File | Biến cần điền |
+| File | Biến cần điền — mỗi biến có ghi chú `[BẮT BUỘC]` / `[TÙY CHỌN]` và cách lấy trong `.env.example` |
 | :--- | :--- |
-| `apps/api/.env` | `DATABASE_URL`, `JWT_PRIVATE_KEY`, `JWT_PUBLIC_KEY`, `REDIS_*`, `GOOGLE_CLIENT_ID`, `CLOUDINARY_*` · `SMTP_*` bỏ trống khi dev (email in ra console) |
-| `apps/web/.env` | `DATABASE_URL` và `JWT_PUBLIC_KEY` **giống hệt** bên API · `NEXT_PUBLIC_GOOGLE_CLIENT_ID` · giữ nguyên `NEXT_PUBLIC_API_URL="/api"` |
+| `apps/api/.env.local` | `DATABASE_URL`, `JWT_PRIVATE_KEY`, `JWT_PUBLIC_KEY`, `GOOGLE_CLIENT_ID`, `CLOUDINARY_*` · email (`BREVO_API_KEY` / `SMTP_*`) bỏ trống khi dev → mã in ra console |
+| `apps/web/.env.local` | `DATABASE_URL` và `JWT_PUBLIC_KEY` **giống hệt** bên API · `NEXT_PUBLIC_GOOGLE_CLIENT_ID` · giữ `NEXT_PUBLIC_API_URL=/api` |
 
-🔑 Tạo khóa JWT: xem [`docs/guides/jwt-keys.md`](docs/guides/jwt-keys.md). Web **chỉ** nhận public key.
+API và lệnh `pnpm db:*` nạp `.env.local` trước rồi tới `.env` (file trước được ưu tiên); Next.js tự nạp `.env.local`. Production không dùng file — đặt biến trên Render / Vercel ([`RUNBOOK.md`](RUNBOOK.md) §3).
 
-## 5. Chạy dự án (theo thứ tự)
+**Tạo cặp khóa JWT RS256** (dán chuỗi Base64 vào `.env.local`; web **chỉ** nhận public key):
+
+```bash
+openssl genpkey -algorithm RSA -out private.pem -pkeyopt rsa_keygen_bits:2048
+openssl rsa -in private.pem -pubout -out public.pem
+base64 -w 0 private.pem   # -> JWT_PRIVATE_KEY (chỉ apps/api)
+base64 -w 0 public.pem    # -> JWT_PUBLIC_KEY (cả api và web)
+```
+
+## 3. Chạy dự án
 
 ```bash
 docker compose up -d   # 1. Redis
 pnpm db:deploy         # 2. Áp migration
-pnpm db:seed           # 3. Dữ liệu mẫu + tài khoản admin
-pnpm dev               # 4. Chạy API + Web song song
+pnpm db:seed           # 3. Tài khoản + dữ liệu demo
+pnpm dev               # 4. API + Web song song
 ```
 
 | Địa chỉ | Mô tả |
 | :--- | :--- |
-| http://localhost:3000 | Storefront (tự chuyển về `/vi` hoặc `/en`) |
-| http://localhost:3000/vi/admin/login | Admin — mặc định `admin@gmail.com` / `admin123` |
-| http://localhost:3001/api/health | Health check API (kèm DB + Redis) |
+| http://localhost:3000 | Storefront (tự chuyển `/vi` hoặc `/en`) |
+| http://localhost:3000/vi/admin/login | Khu quản trị |
+| http://localhost:3001/api/health | Health check (DB + Redis) |
 | http://localhost:3001/api-docs | Swagger (chỉ ngoài production) |
 
-## 6. Lệnh thường dùng
+**Tài khoản do seed tạo** (một tài khoản dùng được cả storefront lẫn khu quản trị nếu là STAFF/ADMIN):
+
+| Email | Vai trò | Mật khẩu mặc định |
+| :--- | :--- | :--- |
+| `admin@gmail.com` | ADMIN | `admin123` — đổi qua `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` / `SEED_ADMIN_PHONE` |
+| `staff@aodai.local` | STAFF (`MANAGE_ORDERS`, `UPDATE_TAILORING`) | `Demo@123` — đổi qua `SEED_DEMO_PASSWORD` |
+| `customer@aodai.local` | CUSTOMER (có hồ sơ số đo, đơn `AD-SEED-0001`) | `Demo@123` |
+
+## 4. Lệnh thường dùng
 
 | Lệnh | Tác dụng |
 | :--- | :--- |
 | `pnpm dev` | Chạy dev mọi workspace |
-| `pnpm check` | Typecheck + lint toàn repo — **bắt buộc xanh trước khi commit** |
+| `pnpm check` | Typecheck + lint toàn repo (gồm cả seed) — **bắt buộc xanh trước khi commit** |
 | `pnpm build` | Build mọi workspace |
-| `pnpm format` | Prettier (chưa bắt buộc) |
-| `pnpm db:generate` | Sinh Prisma Client |
-| `pnpm db:migrate --name <ten>` | Tạo migration mới (dev) |
-| `pnpm db:deploy` | Áp migration có sẵn (prod/CI) |
-| `pnpm db:seed` / `pnpm db:studio` | Seed dữ liệu / mở Prisma Studio |
-| `pnpm --filter @repo/web add <pkg>` | Cài package cho một workspace |
+| `pnpm db:migrate --name <ten>` | Tạo + áp migration (dev) |
+| `pnpm db:deploy` | Áp migration có sẵn (production / CI) |
+| `pnpm db:generate` | Sinh Prisma Client (Windows: dừng `pnpm dev` trước, nếu không lỗi `EPERM`) |
+| `pnpm db:seed` / `pnpm db:studio` | Seed dữ liệu / mở Prisma Studio (http://localhost:5555) |
+| `pnpm --filter @repo/<workspace> add <pkg>` | Cài package cho một workspace |
+| `pnpm format` | Prettier (chưa bắt buộc — xem AGENTS.md §12) |
 
-CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) chạy `typecheck` + `lint` cho mọi PR và push lên `main`/`develop`.
+CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)): `install → db:generate → typecheck → lint` cho mọi PR và push lên `main` / `develop`.
 
----
+## 5. Triển khai
 
-## 7. Triển khai
+Giai đoạn chạy thử, chi phí gần như 0đ, mọi dịch vụ đặt ở **Singapore**. Trình duyệt chỉ thấy domain Vercel → cookie dùng chung, không cần CORS.
 
-Đang chạy thử: **Web** https://traditional-ao-dai.vercel.app (Vercel) · **API** https://aodai.onrender.com (Render) · Neon (Postgres) · Upstash (Redis).
+| Dịch vụ | Vai trò | Địa chỉ / ghi chú |
+| :--- | :--- | :--- |
+| Vercel (Hobby) | Web | https://traditional-ao-dai.vercel.app — Hobby **chỉ cho phi thương mại** |
+| Render (Free) | API | https://aodai.onrender.com — ngủ sau 15 phút, request đầu ~50s |
+| Neon (Free) | PostgreSQL | Project `AoDai`, branch `production` |
+| Upstash (Free) | Redis | Database `aodai` |
+| Cloudinary · Google Cloud · Brevo | Ảnh · OAuth · Email | — |
 
-👉 Cấu hình đầy đủ, env từng nền tảng, quy trình cập nhật và lỗi đã gặp: [`docs/guides/deploy.md`](docs/guides/deploy.md).
+**Render (API)** — Branch `main`, Root Directory trống.
+- Build: `corepack pnpm install --frozen-lockfile && corepack pnpm --filter @repo/db generate`
+- Start: `corepack pnpm --filter @repo/api start` (chạy `tsx src/server.ts`; `build` của API chỉ type-check)
+- Env: `NODE_ENV=production`, `NODE_VERSION=24`, `COREPACK_ENABLE_DOWNLOAD_PROMPT=0`, `DATABASE_URL` (Neon **direct**, không `-pooler`), `REDIS_URL` (`rediss://...`), `FRONTEND_URL`, `TRUST_PROXY=2`, `JWT_PRIVATE_KEY`, `JWT_PUBLIC_KEY`, `GOOGLE_CLIENT_ID`, `CLOUDINARY_*`, `BREVO_API_KEY` (Render free chặn cổng SMTP), `SMTP_FROM`, `MAIL_FROM_NAME`. Không đặt `PORT` và `REDIS_HOST/PORT/PASSWORD`.
 
-Nguyên tắc chung:
-- Web và API **cùng origin**: web chuyển tiếp `/api` sang API qua `API_INTERNAL_URL`.
-- `NODE_ENV=production` → cookie `Secure` (bắt buộc HTTPS), Swagger tự tắt.
-- Migration production: `pnpm db:deploy` (không chạy `db:migrate`, không dùng `db push`).
-- API production chạy `tsx src/server.ts` (`build` của API chỉ type-check).
-- `TRUST_PROXY` = số proxy đứng trước API — rate-limit theo IP phụ thuộc vào đây.
+**Vercel (Web)** — Root Directory `apps/web`, bật *Include files outside root directory*, region `sin1`.
+- Env (Production + Preview): `API_INTERNAL_URL=https://aodai.onrender.com` (không `/` cuối), `NEXT_PUBLIC_API_URL=/api`, `NEXT_PUBLIC_GOOGLE_CLIENT_ID`, `JWT_PUBLIC_KEY` (**không** private key), `DATABASE_URL` (Neon **pooled** + `&pgbouncer=true&connection_limit=1`), `ENABLE_EXPERIMENTAL_COREPACK=1`.
+- Đổi env phải **Redeploy** (`API_INTERNAL_URL`, `NEXT_PUBLIC_*` đọc lúc build).
 
-## 8. Tài liệu khác
+**Google OAuth** — Authorized JavaScript origins: `http://localhost:3000` và domain Vercel (bản Preview không đăng nhập Google được).
 
-- [`docs/PROJECT_RULES.md`](docs/PROJECT_RULES.md) — quy chuẩn đầy đủ (kiến trúc, đặt tên, i18n, git).
-- [`docs/guides/deploy.md`](docs/guides/deploy.md) — triển khai Vercel + Render + Neon + Upstash.
-- [`docs/guides/admin-ui.md`](docs/guides/admin-ui.md) — giao diện khu admin.
-- `AGENTS.md` ở gốc và từng workspace — tóm tắt quy tắc cho người và AI.
-- `.claude/skills/` — quy trình tạo module API, màn admin, feature storefront, mã KEY.
+**Database production** — chạy từ máy local (PowerShell, thư mục gốc):
 
-## 9. Quy ước Git
+```powershell
+$env:DATABASE_URL="<Neon direct>"
+pnpm db:deploy
+# Seed lần đầu: tắt demo + bắt buộc mật khẩu admin riêng (thiếu thì seed dừng)
+$env:SEED_DEMO_DATA="false"; $env:SEED_ADMIN_PASSWORD="<mật khẩu mạnh>"
+pnpm db:seed
+```
 
-- Commit tiếng Việt, tiền tố `feat:` `fix:` `refactor:` `docs:` `chore:` `test:`.
-- Chỉ `git add` đúng file đã sửa; không push thẳng `main`/`master`; không commit `.env`.
+**Quy trình cập nhật:** sửa schema → `pnpm db:migrate --name <ten>` ở local → push `main` (Render + Vercel tự deploy) → có migration mới thì `pnpm db:deploy` lên Neon → kiểm tra `/api/health` trả `database: ok, redis: ok`.
+
+👉 Từng tình huống thay đổi (schema, env, package, domain, khóa bí mật, rollback...) và các bước ở Neon / Render / Vercel: [`RUNBOOK.md`](RUNBOOK.md).
+
+## 6. Quy ước Git
+
+Nhánh `main` (production), `develop` (tích hợp), `feat/…`, `fix/…`. Commit tiếng Việt có tiền tố `feat:` `fix:` `refactor:` `docs:` `chore:` `test:`. Chỉ `git add` đúng file; không push thẳng `main`; không commit `.env` / `.env.local`. Chi tiết: [`AGENTS.md`](AGENTS.md) §11.

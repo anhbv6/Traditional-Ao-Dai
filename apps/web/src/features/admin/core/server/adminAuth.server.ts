@@ -2,21 +2,27 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { getLocale } from "next-intl/server";
 import { prisma } from "./db.server";
-import { type Role } from "@repo/db";
-import { AUTH_COOKIES } from "@repo/shared";
-import { verifyAccessToken } from "@/lib/jwt.server";
-import { canAccess, type AdminAccessRule, type StaffPermissionField } from "../session/permissions";
+import { type Role, type UserStatus } from "@repo/db";
+import {
+  ADMIN_SESSION_IDLE_TIMEOUT_MS,
+  AUTH_COOKIES,
+  SESSION_TOUCH_INTERVAL_MS,
+  isAdminAreaRole,
+  type Permission,
+} from "@repo/shared";
+import { verifyAdminToken } from "@/lib/jwt.server";
+import { canAccess, type AdminAccessRule } from "../session/permissions";
 
 export interface AdminSessionUser {
   id: string;
   email: string | null;
   name: string | null;
   phone: string | null;
-  avatar: string | null;
+  avatarUrl: string | null;
   role: Role;
-  isActive: boolean;
-  /** Quyền chi tiết của STAFF (null với ADMIN — Super Admin có toàn quyền) */
-  staffPermission: Record<StaffPermissionField, boolean> | null;
+  status: UserStatus;
+  /** Quyền chi tiết của STAFF (ADMIN có toàn quyền nên mảng này không được dùng) */
+  permissions: Permission[];
 }
 
 export interface AdminAuthResult {
@@ -32,101 +38,72 @@ export const ADMIN_SESSION_USER_SELECT = {
   email: true,
   name: true,
   phone: true,
-  avatar: true,
+  avatarUrl: true,
   role: true,
-  isActive: true,
-  staffPermission: {
-    select: {
-      canManageOrders: true,
-      canUpdateTailoring: true,
-      canManageInventory: true,
-      canViewReports: true,
-      canManageContent: true,
-    },
-  },
+  status: true,
+  permissions: true,
 } as const;
 
-// Kiểu quyền dùng chung với client — định nghĩa tại session/permissions.ts
-export type { StaffPermissionField } from "../session/permissions";
+const EXPIRED: AdminAuthResult = { isAuthenticated: false, user: null, error: "ADMIN_SESSION_EXPIRED" };
 
 /**
- * Kiểm tra xác thực quyền Admin hoặc Staff trong Server Components & Server Actions.
- * - Xác minh chữ ký RS256 + hạn sử dụng của admin_token (không tin cookie auth_role từ client)
- * - Token phải gắn với UserSession còn hiệu lực (đăng xuất / khóa tài khoản có hiệu lực ngay)
- * - Vai trò và trạng thái tài khoản luôn được đọc lại từ Database
+ * Kiểm tra xác thực khu quản trị trong Server Components & Server Actions.
+ * - Xác minh chữ ký RS256 + hạn dùng + audience `admin` của cookie admin_token
+ * - Token phải gắn với UserSession ADMIN còn hiệu lực và chưa nhàn rỗi quá lâu (đăng xuất / khóa có hiệu lực ngay)
+ * - Vai trò, trạng thái và quyền luôn được đọc lại từ Database
  */
-export async function checkAuthAdmin(
-  requiredRole?: "ADMIN" | "STAFF"
-): Promise<AdminAuthResult> {
+export async function checkAuthAdmin(requiredRole?: "ADMIN" | "STAFF"): Promise<AdminAuthResult> {
   try {
     const cookieStore = await cookies();
-    const adminToken = cookieStore.get(AUTH_COOKIES.adminToken)?.value;
-    const payload = verifyAccessToken(adminToken);
+    const payload = verifyAdminToken(cookieStore.get(AUTH_COOKIES.adminToken)?.value);
+    if (!payload) return EXPIRED;
 
-    const session = payload?.sessionId
-      ? await prisma.userSession.findUnique({
-          where: { id: payload.sessionId },
-          select: { userId: true, isRevoked: true, expiresAt: true },
-        })
-      : null;
-
-    if (
-      !payload ||
-      !session ||
-      session.userId !== payload.userId ||
-      session.isRevoked ||
-      session.expiresAt <= new Date()
-    ) {
-      return {
-        isAuthenticated: false,
-        user: null,
-        error: "ADMIN_SESSION_EXPIRED",
-      };
-    }
-
-    const found = await prisma.user.findUnique({
-      where: { id: payload.userId },
+    const session = await prisma.userSession.findUnique({
+      where: { id: payload.sessionId },
       select: {
-        ...ADMIN_SESSION_USER_SELECT,
+        userId: true,
+        kind: true,
+        expiresAt: true,
+        revokedAt: true,
+        lastUsedAt: true,
+        user: { select: ADMIN_SESSION_USER_SELECT },
       },
     });
 
-    if (!found || (found.role !== "ADMIN" && found.role !== "STAFF")) {
-      return {
-        isAuthenticated: false,
-        user: null,
-        error: "ADMIN_ACCESS_DENIED",
-      };
+    const now = Date.now();
+    if (
+      !session ||
+      session.kind !== "ADMIN" ||
+      session.userId !== payload.userId ||
+      session.revokedAt ||
+      session.expiresAt.getTime() <= now ||
+      now - session.lastUsedAt.getTime() > ADMIN_SESSION_IDLE_TIMEOUT_MS
+    ) {
+      return EXPIRED;
     }
 
-    if (!found.isActive) {
-      return {
-        isAuthenticated: false,
-        user: null,
-        error: "ACCOUNT_DEACTIVATED",
-      };
+    const user = session.user;
+    if (!isAdminAreaRole(user.role)) {
+      return { isAuthenticated: false, user: null, error: "ADMIN_ACCESS_DENIED" };
     }
 
-    if (requiredRole === "ADMIN" && found.role !== "ADMIN") {
-      return {
-        isAuthenticated: false,
-        user: found,
-        error: "SUPER_ADMIN_REQUIRED",
-      };
+    if (user.status !== "ACTIVE") {
+      return { isAuthenticated: false, user: null, error: "ACCOUNT_DEACTIVATED" };
     }
 
-    return {
-      isAuthenticated: true,
-      user: found,
-      sessionId: payload.sessionId,
-    };
+    if (requiredRole === "ADMIN" && user.role !== "ADMIN") {
+      return { isAuthenticated: false, user, error: "SUPER_ADMIN_REQUIRED" };
+    }
+
+    // Gia hạn thời gian nhàn rỗi — chỉ ghi DB khi lastUsedAt đã cũ để không UPDATE ở mọi request
+    if (now - session.lastUsedAt.getTime() >= SESSION_TOUCH_INTERVAL_MS) {
+      await prisma.userSession.update({ where: { id: payload.sessionId }, data: { lastUsedAt: new Date(now) } });
+    }
+
+    return { isAuthenticated: true, user, sessionId: payload.sessionId };
   } catch (error) {
     console.error("Lỗi khi kiểm tra quyền Admin:", error);
-    return {
-      isAuthenticated: false,
-      user: null,
-      error: "ADMIN_AUTH_CHECK_FAILED",
-    };
+    return { isAuthenticated: false, user: null, error: "ADMIN_AUTH_CHECK_FAILED" };
   }
 }
 
@@ -139,7 +116,7 @@ export type AdminActionAuth =
  * Server Action là endpoint công khai — việc ẩn nút trên UI KHÔNG phải là lớp bảo mật.
  *
  * @example
- * const auth = await authorizeAdminAction({ permission: "canManageOrders" });
+ * const auth = await authorizeAdminAction({ permission: "MANAGE_ORDERS" });
  * if (!auth.success) return auth;
  */
 export async function authorizeAdminAction(options?: AdminAccessRule): Promise<AdminActionAuth> {

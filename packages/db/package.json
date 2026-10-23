@@ -8,12 +8,12 @@
     "build": "prisma generate",
     "postinstall": "prisma generate",
     "generate": "prisma generate",
-    "migrate:dev": "dotenv -e ../../apps/api/.env -- prisma migrate dev",
-    "migrate:deploy": "dotenv -e ../../apps/api/.env -- prisma migrate deploy",
-    "db:push": "dotenv -e ../../apps/api/.env -- prisma db push",
-    "studio": "dotenv -e ../../apps/api/.env -- prisma studio",
-    "seed": "dotenv -e ../../apps/api/.env -- prisma db seed",
-    "typecheck": "tsc --noEmit -p .",
+    "migrate:dev": "dotenv -e ../../apps/api/.env.local -e ../../apps/api/.env -- prisma migrate dev",
+    "migrate:deploy": "dotenv -e ../../apps/api/.env.local -e ../../apps/api/.env -- prisma migrate deploy",
+    "db:push": "dotenv -e ../../apps/api/.env.local -e ../../apps/api/.env -- prisma db push",
+    "studio": "dotenv -e ../../apps/api/.env.local -e ../../apps/api/.env -- prisma studio",
+    "seed": "dotenv -e ../../apps/api/.env.local -e ../../apps/api/.env -- prisma db seed",
+    "typecheck": "tsc --noEmit -p . && tsc --noEmit -p prisma",
     "lint": "eslint"
   },
   "dependencies": {
@@ -31,6 +31,6 @@
     "typescript": "^5.0.0"
   },
   "prisma": {
-    "seed": "tsx prisma/seed.ts"
+    "seed": "tsx prisma/seed/index.ts"
   }
 }

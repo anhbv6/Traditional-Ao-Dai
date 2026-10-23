@@ -2,10 +2,10 @@
 
 import React from 'react';
 import { useAdminSession } from '../hooks/useAdminSession';
-import { type StaffPermissionField } from '../permissions';
+import { type Permission } from '../permissions';
 
 interface PermissionGateProps {
-  permission?: StaffPermissionField;
+  permission?: Permission;
   adminOnly?: boolean;
   fallback?: React.ReactNode;
   children: React.ReactNode;
@@ -30,7 +30,7 @@ export function PermissionGate({
 
   if (adminOnly) return <>{fallback}</>;
 
-  if (isStaff && (!permission || user.staffPermission?.[permission])) {
+  if (isStaff && (!permission || user.permissions.includes(permission))) {
     return <>{children}</>;
   }
 

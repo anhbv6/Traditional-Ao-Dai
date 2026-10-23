@@ -10,7 +10,7 @@ import { toggleProductActiveSchema, toggleProductCustomFitSchema } from "../sche
  * Server Action: Bật/Tắt trạng thái hoạt động của sản phẩm
  */
 export async function toggleProductActiveAction(productId: string, isActive: boolean) {
-  const auth = await authorizeAdminAction({ permission: "canManageInventory" });
+  const auth = await authorizeAdminAction({ permission: "MANAGE_INVENTORY" });
   if (!auth.success) return auth;
 
   const input = parseActionInput(toggleProductActiveSchema, { productId, isActive });
@@ -42,7 +42,7 @@ export async function toggleProductActiveAction(productId: string, isActive: boo
  * Server Action: Bật/Tắt tính năng may đo riêng (Custom Fit)
  */
 export async function toggleProductCustomFitAction(productId: string, isCustomFit: boolean) {
-  const auth = await authorizeAdminAction({ permission: "canManageInventory" });
+  const auth = await authorizeAdminAction({ permission: "MANAGE_INVENTORY" });
   if (!auth.success) return auth;
 
   const input = parseActionInput(toggleProductCustomFitSchema, { productId, isCustomFit });

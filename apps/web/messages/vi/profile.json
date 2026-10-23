@@ -239,7 +239,9 @@
       "confirmPlaceholder": "Vui lòng nhập lại mật khẩu mới",
       "newRequired": "Vui lòng nhập mật khẩu mới.",
       "confirmRequired": "Vui lòng xác nhận mật khẩu mới.",
-      "saving": "Đang cập nhật..."
+      "saving": "Đang cập nhật...",
+      "setTitle": "Đặt mật khẩu",
+      "setSubtitle": "Tài khoản của bạn đang đăng nhập bằng Google. Đặt mật khẩu để có thể đăng nhập bằng email / SĐT."
     },
     "sessions": {
       "title": "Lịch sử đăng nhập",
@@ -257,7 +259,8 @@
         "title": "Đăng xuất thiết bị",
         "message": "Thiết bị này sẽ bị đăng xuất khỏi tài khoản của bạn ngay lập tức.",
         "confirmBtn": "Đăng xuất thiết bị"
-      }
+      },
+      "adminArea": "Khu quản trị"
     },
     "toasts": {
       "passwordChangeSuccess": "Đổi mật khẩu thành công! Các thiết bị khác đã được đăng xuất.",

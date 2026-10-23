@@ -1,21 +1,7 @@
-export interface AuthUser {
-  id: string;
-  email: string | null;
-  name: string | null;
-  phone: string | null;
-  avatar?: string | null;
-  birth?: string | null;
-  gender?: number | string;
-  role: string;
-  isActive: boolean;
-  isEmailVerified?: boolean;
-  isPhoneVerified?: boolean;
-  socialAccounts?: Array<{
-    id: string;
-    provider: string;
-    providerId: string;
-  }>;
-}
+import { type UserDto } from '@repo/shared';
+
+/** Người dùng storefront đang đăng nhập — đúng hợp đồng `UserDto` do Backend trả về */
+export type AuthUser = UserDto;
 
 export interface LoginResponse {
   status: string;

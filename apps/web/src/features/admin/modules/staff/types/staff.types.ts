@@ -1,17 +1,16 @@
-import { type StaffPermissions } from "../../../core/session/permissions";
-
-/** Bộ 5 quyền chi tiết của nhân viên (khớp model StaffPermission) */
-export type StaffPermissionInput = StaffPermissions;
+import { type UserStatus } from "@repo/db";
+import { type Permission } from "../../../core/session/permissions";
 
 export interface StaffMemberItem {
   id: string;
   name: string | null;
   email: string | null;
   phone: string | null;
-  isActive: boolean;
+  status: UserStatus;
+  /** Rỗng = chưa được cấp quyền chi tiết nào */
+  permissions: Permission[];
+  lastLoginAt: Date | null;
   createdAt: Date;
-  /** null = chưa từng được cấp quyền -> không có quyền chi tiết nào */
-  staffPermission: (StaffPermissions & { id: string }) | null;
 }
 
 export interface CreateStaffInput {
@@ -19,5 +18,5 @@ export interface CreateStaffInput {
   email: string;
   phone?: string;
   password: string;
-  permissions: StaffPermissionInput;
+  permissions: Permission[];
 }

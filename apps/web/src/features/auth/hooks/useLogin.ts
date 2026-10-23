@@ -45,7 +45,7 @@ export function useLogin() {
     if (isLoading) return;
     setIsLoading(true);
     try {
-      const res = await loginApi({ email: emailOrPhone.trim(), password, rememberMe });
+      const res = await loginApi({ identifier: emailOrPhone.trim(), password, rememberMe });
       await finishLogin(res.data.accessToken, res.message);
     } catch (err: unknown) {
       console.error('Login failed:', err);

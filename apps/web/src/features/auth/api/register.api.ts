@@ -1,17 +1,22 @@
 import { apiClient } from '@/lib/api-client';
-import { type CheckAccountResponse, type RegisterResponse} from '../types/auth.types';
+import { type CheckAccountResponse, type OtpSendResponse, type RegisterResponse } from '../types/auth.types';
 
 /**
- * Registers a new customer account.
+ * Gửi mã xác minh tới email — bước 1 của đăng ký bằng email
  */
-export const registerApi = async (data: {
-  registerType: 'email' | 'phone';
-  name?: string;
-  password?: string;
-  email?: string;
-  phone?: string;
-  code?: string;
-}): Promise<RegisterResponse> => {
+export const sendRegisterEmailCodeApi = async (email: string): Promise<OtpSendResponse> => {
+  return apiClient.post<OtpSendResponse>('/api/auth/register/email/code', { email }, { skipAuth: true, retryOnUnauthorized: false });
+};
+
+/**
+ * Tạo tài khoản sau khi đã xác minh mã (mã email hoặc OTP SĐT)
+ */
+export const registerApi = async (
+  data: { name?: string; password: string; code: string } & (
+    | { registerType: 'email'; email: string }
+    | { registerType: 'phone'; phone: string }
+  )
+): Promise<RegisterResponse> => {
   return apiClient.post<RegisterResponse>('/api/auth/register', data, { skipAuth: true, retryOnUnauthorized: false });
 };
 

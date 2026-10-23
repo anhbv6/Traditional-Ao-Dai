@@ -5,7 +5,7 @@ description: Thêm mã thông điệp (KEY UPPER_SNAKE_CASE) mới mà Backend h
 
 # Thêm mã KEY mới
 
-Quy chuẩn gốc: `docs/PROJECT_RULES.md` §4 (định dạng response), §5 (Lỗi & phản hồi), §10 (i18n).
+Quy chuẩn gốc: `AGENTS.md` §4 (định dạng response), §5 (Lỗi & phản hồi), §10 (i18n).
 
 ## 1. Đặt tên
 - `UPPER_SNAKE_CASE`, mô tả kết quả: `THING_NOT_FOUND`, `THING_CREATED`, `STAFF_PERMISSION_DENIED`.

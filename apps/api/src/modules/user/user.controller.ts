@@ -1,6 +1,7 @@
 import { type Response, type NextFunction } from 'express'
 import { type AuthenticatedRequest } from '../../core/middlewares/authGuard'
 import { sendSuccess } from '../../core/http/response'
+import { type AuthProvider } from '@repo/shared'
 import * as userService from './user.service'
 
 /**
@@ -56,13 +57,12 @@ export async function linkAccount(req: AuthenticatedRequest, res: Response, next
 }
 
 /**
- * Unlink Google account controller
+ * Gỡ liên kết mạng xã hội theo nhà cung cấp (GOOGLE...)
  */
 export async function unlinkAccount(req: AuthenticatedRequest, res: Response, next: NextFunction) {
   try {
     const userId = req.user!.userId
-    const providerId = req.params.providerId || req.params.providerID
-    await userService.unlinkGoogleAccount(userId, providerId)
+    await userService.unlinkSocialAccount(userId, req.params.provider as AuthProvider)
     return sendSuccess(res, {
       statusCode: 200,
       message: 'UNLINK_ACCOUNT_SUCCESS',

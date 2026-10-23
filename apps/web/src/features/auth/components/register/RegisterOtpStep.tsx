@@ -9,7 +9,10 @@ import { AuthResendRow } from '../AuthResendRow';
 import { AuthOtpField } from '../AuthOtpField';
 
 export interface RegisterOtpStepProps {
-  phoneValue: string;
+  /** Mã được gửi qua email hay SMS */
+  channel: 'email' | 'phone';
+  /** Email / SĐT nhận mã */
+  destination: string;
   otpValue: string;
   setOtpValue: (val: string) => void;
   otpError: string;
@@ -24,7 +27,8 @@ export interface RegisterOtpStepProps {
 }
 
 export function RegisterOtpStep({
-  phoneValue,
+  channel,
+  destination,
   otpValue,
   setOtpValue,
   otpError,
@@ -39,10 +43,11 @@ export function RegisterOtpStep({
   return (
     <>
       <AuthHeader
-        title={t('otpTitle')}
+        title={channel === 'email' ? t('emailCodeTitle') : t('otpTitle')}
         subtitle={
           <>
-            {t('smsSent')} <span className="font-semibold text-[var(--text-main)]">{phoneValue}</span>
+            {channel === 'email' ? t('emailCodeSentTo') : t('smsSent')}{' '}
+            <span className="font-semibold text-[var(--text-main)]">{destination}</span>
           </>
         }
       />

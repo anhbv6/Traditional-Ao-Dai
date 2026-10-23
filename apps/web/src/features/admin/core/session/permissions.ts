@@ -4,41 +4,29 @@
  *
  * Nguyên tắc:
  * - ADMIN (Super Admin) có toàn quyền.
- * - STAFF chỉ vào được module khi được cấp quyền tương ứng trong StaffPermission (quyền tối thiểu).
+ * - STAFF chỉ vào được module khi được cấp quyền tương ứng trong `User.permissions` (mặc định rỗng = quyền tối thiểu).
  * - Module `role: "ADMIN"` chỉ dành cho Super Admin (nhân sự, voucher).
  */
+import { PERMISSIONS, type Permission } from "@repo/shared";
 
-export type StaffPermissionField =
-  | "canManageOrders"
-  | "canUpdateTailoring"
-  | "canManageInventory"
-  | "canViewReports"
-  | "canManageContent";
-
-export type StaffPermissions = Record<StaffPermissionField, boolean>;
+export type { Permission } from "@repo/shared";
 
 /** Thứ tự hiển thị các quyền chi tiết (bảng phân quyền, form tạo nhân viên) */
-export const STAFF_PERMISSION_FIELDS: readonly StaffPermissionField[] = [
-  "canManageOrders",
-  "canUpdateTailoring",
-  "canManageInventory",
-  "canViewReports",
-  "canManageContent",
-];
+export const STAFF_PERMISSIONS: readonly Permission[] = PERMISSIONS;
 
 export interface AdminAccessRule {
   /** Chỉ Super Admin */
   role?: "ADMIN";
   /** Quyền chi tiết STAFF cần có (ADMIN luôn qua) */
-  permission?: StaffPermissionField;
+  permission?: Permission;
   /** STAFF chỉ cần có MỘT trong các quyền này */
-  anyOf?: readonly StaffPermissionField[];
+  anyOf?: readonly Permission[];
 }
 
 /** Người dùng tối thiểu cần để kiểm tra quyền */
 export interface AdminAccessSubject {
   role: string;
-  staffPermission?: StaffPermissions | null;
+  permissions: readonly Permission[];
 }
 
 export type AdminModule =
@@ -58,17 +46,17 @@ export type AdminModule =
  */
 export const ADMIN_MODULE_ACCESS: Record<AdminModule, AdminAccessRule> = {
   dashboard: {},
-  orders: { permission: "canManageOrders" },
-  tailoring: { permission: "canUpdateTailoring" },
-  products: { permission: "canManageInventory" },
-  inventory: { permission: "canManageInventory" },
+  orders: { permission: "MANAGE_ORDERS" },
+  tailoring: { permission: "UPDATE_TAILORING" },
+  products: { permission: "MANAGE_INVENTORY" },
+  inventory: { permission: "MANAGE_INVENTORY" },
   // Nhân viên xử lý đơn cần tra cứu khách hàng & số đo; khóa/mở tài khoản chỉ ADMIN (xem ADMIN_ACTION_ACCESS)
-  customers: { permission: "canManageOrders" },
+  customers: { permission: "MANAGE_ORDERS" },
   // STAFF xem được hàng đợi của chính mình; duyệt/từ chối chỉ ADMIN
   approvals: {},
   staff: { role: "ADMIN" },
   vouchers: { role: "ADMIN" },
-  cms: { permission: "canManageContent" },
+  cms: { permission: "MANAGE_CONTENT" },
 };
 
 /**
@@ -77,12 +65,12 @@ export const ADMIN_MODULE_ACCESS: Record<AdminModule, AdminAccessRule> = {
 export const ADMIN_ACTION_ACCESS = {
   reviewApproval: { role: "ADMIN" },
   toggleCustomerActive: { role: "ADMIN" },
-  viewReports: { permission: "canViewReports" },
+  viewReports: { permission: "VIEW_REPORTS" },
   /** Danh sách đơn trên dashboard: phục vụ cả xử lý đơn lẫn theo dõi may đo */
-  viewDashboardOrders: { anyOf: ["canManageOrders", "canUpdateTailoring"] },
-  manageOrders: { permission: "canManageOrders" },
-  updateTailoring: { permission: "canUpdateTailoring" },
-  manageInventory: { permission: "canManageInventory" },
+  viewDashboardOrders: { anyOf: ["MANAGE_ORDERS", "UPDATE_TAILORING"] },
+  manageOrders: { permission: "MANAGE_ORDERS" },
+  updateTailoring: { permission: "UPDATE_TAILORING" },
+  manageInventory: { permission: "MANAGE_INVENTORY" },
 } as const satisfies Record<string, AdminAccessRule>;
 
 /**
@@ -92,7 +80,7 @@ export function canAccess(user: AdminAccessSubject | null | undefined, rule: Adm
   if (!user || (user.role !== "ADMIN" && user.role !== "STAFF")) return false;
   if (user.role === "ADMIN") return true;
   if (rule.role === "ADMIN") return false;
-  if (rule.permission && !user.staffPermission?.[rule.permission]) return false;
-  if (rule.anyOf && !rule.anyOf.some((field) => user.staffPermission?.[field])) return false;
+  if (rule.permission && !user.permissions.includes(rule.permission)) return false;
+  if (rule.anyOf && !rule.anyOf.some((permission) => user.permissions.includes(permission))) return false;
   return true;
 }

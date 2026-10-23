@@ -44,23 +44,28 @@ export function SecurityTab() {
   return (
     <>
       {/* ---------- Đổi mật khẩu ---------- */}
-      <ProfileSection title={t("password.title")} description={t("password.subtitle")}>
+      <ProfileSection
+        title={security.hasPassword ? t("password.title") : t("password.setTitle")}
+        description={security.hasPassword ? t("password.subtitle") : t("password.setSubtitle")}
+      >
         <form onSubmit={security.handlePasswordSubmit} noValidate className="max-w-md space-y-5">
-          <TextField
-            appearance="outline"
-            size="md"
-            type="password"
-            passwordToggle
-            label={t("password.current")}
-            autoComplete="current-password"
-            placeholder={t("password.currentPlaceholder")}
-            helperText={t("password.currentHint")}
-            value={security.currentPassword}
-            onValueChange={security.setCurrentPassword}
-            error={errors.current}
-            shakeKey={shakeKey}
-            disabled={security.isChangingPassword}
-          />
+          {security.hasPassword ? (
+            <TextField
+              appearance="outline"
+              size="md"
+              type="password"
+              passwordToggle
+              label={t("password.current")}
+              autoComplete="current-password"
+              placeholder={t("password.currentPlaceholder")}
+              helperText={t("password.currentHint")}
+              value={security.currentPassword}
+              onValueChange={security.setCurrentPassword}
+              error={errors.current}
+              shakeKey={shakeKey}
+              disabled={security.isChangingPassword}
+            />
+          ) : null}
           <TextField
             appearance="outline"
             size="md"
@@ -151,6 +156,11 @@ export function SecurityTab() {
                       {session.isCurrent ? (
                         <span className="border border-[var(--primary-color)]/40 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[1px] text-[var(--primary-ink)]">
                           {t("sessions.current")}
+                        </span>
+                      ) : null}
+                      {session.isAdminArea ? (
+                        <span className="border border-[var(--border)] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[1px] text-[var(--text-light)]">
+                          {t("sessions.adminArea")}
                         </span>
                       ) : null}
                     </p>

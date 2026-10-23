@@ -9,6 +9,7 @@ export async function getAdminCustomersQuery(search?: string): Promise<AdminCust
   try {
     const whereCondition: Prisma.UserWhereInput = {
       role: "CUSTOMER",
+      status: { not: "DELETED" },
     };
 
     if (search) {
@@ -57,8 +58,8 @@ export async function getAdminCustomersQuery(search?: string): Promise<AdminCust
         name: c.name,
         email: c.email,
         phone: c.phone,
-        avatar: c.avatar,
-        isActive: c.isActive,
+        avatarUrl: c.avatarUrl,
+        isActive: c.status === "ACTIVE",
         ordersCount: c.orders.length,
         totalSpent,
         measurements: c.measurements,

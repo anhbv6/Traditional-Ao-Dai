@@ -28,7 +28,7 @@ Tài liệu tổng hợp các mã phản hồi (`message` key) của Module User
 | KEY | HTTP Status | Tiếng Việt (Vietnamese) | English Meaning | Ngữ cảnh sử dụng / Description |
 | :--- | :---: | :--- | :--- | :--- |
 | `USER_NOT_FOUND` | 404 | Không tìm thấy người dùng | User not found | User ID không tồn tại trong hệ thống / User ID does not exist |
-| `ACCOUNT_DEACTIVATED` | 403 | Tài khoản đã bị khóa hoặc vô hiệu hóa | Account deactivated | Tài khoản có `isActive = false` / Account has been locked or deactivated |
+| `ACCOUNT_DEACTIVATED` | 403 | Tài khoản đã bị khóa hoặc vô hiệu hóa | Account deactivated | Tài khoản có `status = LOCKED` / Account has been locked |
 | `EMAIL_ALREADY_EXISTS` | 400 | Email đã thuộc về tài khoản khác | Email already in use | Cập nhật email mới trùng với tài khoản khác / Email already registered by another user |
 | `PHONE_ALREADY_EXISTS` | 400 | Số điện thoại đã thuộc về tài khoản khác | Phone number already in use | Cập nhật SĐT mới trùng với tài khoản khác / Phone already registered by another user |
 | `GENDER_INVALID` | 400 | Giới tính không hợp lệ | Invalid gender value | Giá trị không thuộc danh mục (0: Nam, 1: Nữ, 2: Khác) / Gender value invalid |
@@ -45,7 +45,8 @@ Tài liệu tổng hợp các mã phản hồi (`message` key) của Module User
 | `NAME_REQUIRED` | 400 | Tên không được để trống. | Name is required. | Cập nhật hồ sơ với họ tên rỗng |
 | `DOB_INVALID` | 400 | Ngày sinh không đúng định dạng (YYYY-MM-DD). | Invalid date of birth format (YYYY-MM-DD). | Ngày sinh sai định dạng hoặc ở tương lai |
 | `GOOGLE_CREDENTIAL_REQUIRED` | 400 | Vui lòng cung cấp mã xác thực Google. | Google credential token is required. | Thiếu credential Google khi liên kết tài khoản |
-| `PROVIDER_ID_REQUIRED` | 400 | Thiếu mã nhà cung cấp liên kết. | Provider ID is required. | Thiếu providerId khi hủy liên kết |
+| `PROVIDER_INVALID` | 400 | Nhà cung cấp đăng nhập không hợp lệ. | Invalid sign-in provider. | `DELETE /user/social/:provider` với provider không hỗ trợ |
+| `NAME_MAX_LENGTH` | 400 | Họ và tên tối đa 100 ký tự. | Name must be at most 100 characters. | Cập nhật hồ sơ với tên quá dài |
 | `SESSION_ID_REQUIRED` | 400 | Thiếu mã phiên đăng nhập. | Session ID is required. | Thiếu sessionId khi thu hồi phiên |
 | `RECEIVER_NAME_REQUIRED` | 400 | Vui lòng nhập tên người nhận. | Please enter receiver name. | Sổ địa chỉ: thiếu tên người nhận |
 | `RECEIVER_PHONE_INVALID` | 400 | Số điện thoại người nhận không hợp lệ. | Receiver phone number is invalid. | Sổ địa chỉ: SĐT người nhận không hợp lệ |
@@ -75,4 +76,4 @@ Tài liệu tổng hợp các mã phản hồi (`message` key) của Module User
 ### Hành vi thay đổi
 - `POST /user/change-password` đăng xuất mọi phiên khác (giữ phiên hiện tại).
 - Xác minh SĐT thành công: nếu tài khoản khác đang giữ SĐT đó ở trạng thái **chưa xác minh**, SĐT được chuyển sang tài khoản vừa chứng minh sở hữu.
-- Liên kết Google có email trùng email tài khoản -> đánh dấu `isEmailVerified = true`.
+- Liên kết Google có email trùng email tài khoản -> đánh dấu `emailVerifiedAt` (nếu chưa có).

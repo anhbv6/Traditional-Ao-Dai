@@ -25,7 +25,7 @@
  *   - Nền trắng của card/ô nhập dùng --bg-card (không dùng bg-white, trừ chi tiết luôn trắng trên ảnh).
  *   - Khối nền tối có chữ trắng (snackbar, nút đen) dùng --bg-inverse (không dùng --text-main làm nền).
  *
- * Admin dùng tông đơn sắc riêng, luôn ở chế độ sáng — xem docs/guides/admin-ui.md.
+ * Admin dùng tông đơn sắc riêng, luôn ở chế độ sáng — xem AGENTS.md §8 (giao diện admin).
  * ============================================================================
  */
 
@@ -403,7 +403,7 @@
  * ----------------------------------------------------------------------------
  * Tách hẳn khỏi kiểu chữ storefront (Lora / Playfair, h1 48px, line-height 1.75).
  * Gắn class `admin-shell` ở thẻ bọc ngoài cùng của layout admin; portal (Dialog, Dropdown) tự gắn thêm.
- * Màu admin dùng trực tiếp theo bảng trong docs/guides/admin-ui.md.
+ * Màu admin dùng trực tiếp theo AGENTS.md §8 (giao diện admin).
  * ============================================================================ */
 @layer base {
   .admin-shell {

@@ -1,11 +1,10 @@
 export { type AdminLoginFormValues } from "../validations/adminLogin.validation";
 
 import { type ApiSuccess } from "@repo/shared";
-import { type AdminSessionUser } from "../../server/adminAuth.server";
 
-/** Token nằm trong cookie httpOnly, body chỉ trả thông tin người dùng */
+/** Token nằm trong cookie httpOnly; thông tin người dùng đọc lại từ server qua getAdminSessionAction */
 export interface AdminLoginResponseData {
-  user: AdminSessionUser;
+  role: "ADMIN" | "STAFF";
 }
 
 export type AdminLoginApiResponse = ApiSuccess<AdminLoginResponseData> & { data: AdminLoginResponseData };

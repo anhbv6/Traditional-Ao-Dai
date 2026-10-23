@@ -91,17 +91,18 @@
     },
     "columns": {
       "staff": "Staff",
-      "status": "Status"
+      "status": "Status",
+      "actions": "Actions"
     },
     "unnamed": "Unnamed",
     "active": "Active",
     "locked": "Locked",
     "permissions": {
-      "canManageOrders": "Orders & Customers",
-      "canUpdateTailoring": "Tailoring workshop",
-      "canManageInventory": "Products & Inventory",
-      "canViewReports": "Revenue reports",
-      "canManageContent": "Content & FAQ"
+      "MANAGE_ORDERS": "Orders & Customers",
+      "UPDATE_TAILORING": "Tailoring workshop",
+      "MANAGE_INVENTORY": "Products & Inventory",
+      "VIEW_REPORTS": "Revenue reports",
+      "MANAGE_CONTENT": "Content & FAQ"
     },
     "createTitle": "Add staff",
     "createDescription": "The staff member signs in to the admin area with this email and password.",
@@ -112,7 +113,12 @@
       "email": "Login email",
       "password": "Password (min 6 characters)",
       "permissions": "Granted permissions"
-    }
+    },
+    "resetPassword": "Reset password",
+    "resettingPassword": "Resetting...",
+    "resetPasswordTitle": "Reset staff password",
+    "resetPasswordDescription": "Set a new password for {name}. All of this staff member's sessions will be signed out.",
+    "resetPasswordSuccess": "Staff password has been reset!"
   },
   "dashboard": {
     "greeting": "Hello, {name}",

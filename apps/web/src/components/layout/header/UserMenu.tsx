@@ -56,7 +56,7 @@ export function UserMenu({
   const adminSessionCache = useAdminSessionCache();
   const user = customer ?? adminUser;
   const userName = initialUserName || user?.name || user?.email || (isAuthenticated ? 'Account' : undefined);
-  const avatarUrl = user?.avatar || undefined;
+  const avatarUrl = user?.avatarUrl || undefined;
   const avatarLabel = userName || profileLabel;
   const avatarFallback = getUserInitials(user?.name || user?.email || userName);
   const [isOpen, setIsOpen] = useState(false);

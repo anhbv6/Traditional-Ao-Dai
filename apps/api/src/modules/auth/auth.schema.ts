@@ -11,7 +11,8 @@ import {
 
 export const loginSchema = z.object({
   body: z.object({
-    email: z.string().trim().min(1, 'EMAIL_OR_PHONE_REQUIRED'),
+    /** Email hoặc SĐT */
+    identifier: z.string().trim().min(1, 'EMAIL_OR_PHONE_REQUIRED'),
     password: loginPasswordSchema,
     rememberMe: z.boolean().optional().default(false),
   }),
@@ -19,21 +20,16 @@ export const loginSchema = z.object({
 
 export type LoginInput = z.infer<typeof loginSchema>
 
-export const refreshTokenSchema = z.object({
+/** Khu quản trị chỉ đăng nhập bằng email + mật khẩu (không đăng ký, không OTP, không Google) */
+export const adminLoginSchema = z.object({
   body: z.object({
-    refreshToken: z.string().min(1, 'REFRESH_TOKEN_REQUIRED'),
+    email: emailSchema,
+    password: loginPasswordSchema,
+    rememberMe: z.boolean().optional().default(false),
   }),
 })
 
-export type RefreshTokenInput = z.infer<typeof refreshTokenSchema>
-
-export const logoutSchema = z.object({
-  body: z.object({
-    refreshToken: z.string().min(1, 'REFRESH_TOKEN_REQUIRED').optional(),
-  }).optional(),
-})
-
-export type LogoutInput = z.infer<typeof logoutSchema>
+export type AdminLoginInput = z.infer<typeof adminLoginSchema>
 
 const baseRegisterSchema = z.object({
   password: newPasswordSchema,
@@ -43,14 +39,16 @@ const baseRegisterSchema = z.object({
 const emailRegisterSchema = baseRegisterSchema.extend({
   registerType: z.literal('email'),
   email: emailSchema,
+  // Mã gửi tới email (POST /auth/register/email/code) — chứng minh sở hữu email trước khi tạo tài khoản.
   // Không nhận SĐT khi đăng ký bằng email: SĐT chỉ được gắn vào tài khoản sau khi xác minh OTP
+  code: verificationCodeSchema,
 })
 
 const phoneRegisterSchema = baseRegisterSchema.extend({
   registerType: z.literal('phone'),
   phone: vietnamPhoneSchema,
   code: verificationCodeSchema,
-  email: emailSchema.optional(),
+  // Không nhận email khi đăng ký bằng SĐT: email chưa xác minh không được gắn vào tài khoản
 })
 
 export const registerSchema = z.object({
@@ -61,6 +59,14 @@ export const registerSchema = z.object({
 })
 
 export type RegisterInput = z.infer<typeof registerSchema>
+
+export const sendRegisterEmailCodeSchema = z.object({
+  body: z.object({
+    email: emailSchema,
+  }),
+})
+
+export type SendRegisterEmailCodeInput = z.infer<typeof sendRegisterEmailCodeSchema>
 
 export const checkAccountSchema = z.object({
   query: z.object({

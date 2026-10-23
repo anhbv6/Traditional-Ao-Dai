@@ -160,6 +160,17 @@ export function RegisterFormStep({
                   <FieldIconButton icon={<Smartphone />} label={t('switchPhone')} onClick={() => switchRegisterType('phone')} />
                 </span>
               }
+              helperText={
+                otpSentOnce ? (
+                  <button
+                    type="button"
+                    onClick={() => setIsOtpStep(true)}
+                    className="cursor-pointer font-semibold text-[var(--primary-ink)] underline underline-offset-4 transition-colors hover:text-[var(--accent-color)]"
+                  >
+                    {t('goToOtpStep')}
+                  </button>
+                ) : undefined
+              }
               {...fieldErrorProps(errors.email?.message)}
               {...register('email')}
             />
@@ -281,7 +292,7 @@ export function RegisterFormStep({
         </div>
 
         <AuthSubmitButton disabled={isCheckingEmail || isCheckingPhone} loading={isRegistering} icon={<ArrowRight />}>
-          {registerType === 'phone' ? t('sendOtp') : t('signin')}
+          {registerType === 'phone' ? t('sendOtp') : t('sendEmailCode')}
         </AuthSubmitButton>
 
         {/* Divider + Google Sign-Up */}

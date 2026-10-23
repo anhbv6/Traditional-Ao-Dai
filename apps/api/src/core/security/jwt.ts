@@ -1,15 +1,11 @@
 import jwt, { type SignOptions } from 'jsonwebtoken'
+import { type AuthTokenClaims, type TokenAudience } from '@repo/shared'
 import { env } from '../../config/env'
-import { type Role } from '@repo/db'
 
-export interface JWTPayload {
-  userId: string
-  role: Role
-  sessionId?: string
-  familyId?: string
-  tokenType?: 'access' | 'refresh'
-  rememberMe?: boolean
-}
+/** Claim do server ký (iat/exp do thư viện tự thêm) */
+export type JWTPayload = AuthTokenClaims
+
+type SignableClaims = Omit<AuthTokenClaims, 'tokenType' | 'aud' | 'iat' | 'exp'>
 
 /**
  * Hàm giải mã và chuẩn hóa khóa RSA PEM từ chuỗi môi trường:
@@ -39,24 +35,34 @@ function parseJwtKey(rawKey: string): string {
 const privateKey = parseJwtKey(env.JWT_PRIVATE_KEY)
 const publicKey = parseJwtKey(env.JWT_PUBLIC_KEY)
 
-/**
- * Generates a JWT token for a given user payload.
- */
-export function generateToken(payload: JWTPayload, expiresIn: string = env.JWT_EXPIRES_IN): string {
-  return jwt.sign(payload, privateKey, { algorithm: 'RS256', expiresIn: expiresIn as SignOptions['expiresIn'] })
-}
-
-export function generateAccessToken(payload: Omit<JWTPayload, 'tokenType'>): string {
-  return generateToken({ ...payload, tokenType: 'access' }, env.JWT_EXPIRES_IN)
-}
-
-export function generateRefreshToken(payload: Omit<JWTPayload, 'tokenType'>, expiresIn: string = env.JWT_REFRESH_EXPIRES_IN): string {
-  return generateToken({ ...payload, tokenType: 'refresh' }, expiresIn)
+function signToken(claims: Omit<AuthTokenClaims, 'aud' | 'iat' | 'exp'>, audience: TokenAudience, expiresIn: string): string {
+  return jwt.sign(claims, privateKey, {
+    algorithm: 'RS256',
+    audience,
+    expiresIn: expiresIn as SignOptions['expiresIn'],
+  })
 }
 
 /**
- * Verifies a JWT token and returns the decoded payload.
+ * Access token. `audience` ghi rõ token được cấp cho khu nào: token storefront không dùng được ở khu quản trị
+ * và ngược lại, kể cả khi người dùng là STAFF/ADMIN.
  */
-export function verifyToken(token: string): JWTPayload {
-  return jwt.verify(token, publicKey, { algorithms: ['RS256'] }) as JWTPayload
+export function generateAccessToken(claims: SignableClaims, audience: TokenAudience, expiresIn: string = env.JWT_EXPIRES_IN): string {
+  return signToken({ ...claims, tokenType: 'access' }, audience, expiresIn)
+}
+
+/** Refresh token — chỉ có ở storefront (khu quản trị dùng phiên cookie, không refresh) */
+export function generateRefreshToken(claims: SignableClaims, expiresIn: string): string {
+  return signToken({ ...claims, tokenType: 'refresh' }, 'store', expiresIn)
+}
+
+/**
+ * Xác minh chữ ký, hạn dùng và audience của JWT. Ném lỗi của jsonwebtoken nếu không hợp lệ.
+ */
+export function verifyToken(token: string, audience: TokenAudience): JWTPayload {
+  const decoded: string | jwt.JwtPayload = jwt.verify(token, publicKey, { algorithms: ['RS256'], audience })
+  if (typeof decoded === 'string' || typeof decoded.userId !== 'string' || typeof decoded.sessionId !== 'string') {
+    throw new jwt.JsonWebTokenError('invalid payload')
+  }
+  return decoded as unknown as JWTPayload
 }

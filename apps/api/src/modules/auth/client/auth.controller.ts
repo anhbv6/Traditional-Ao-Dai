@@ -17,6 +17,21 @@ function getRefreshTokenCookie(req: Request): string | undefined {
 }
 
 /**
+ * Gửi mã xác minh email trước khi đăng ký bằng email
+ */
+export async function sendRegisterEmailCode(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const result = await authService.sendRegisterEmailCode(req.body)
+    return sendSuccess(res, {
+      data: result,
+      message: 'VERIFICATION_CODE_SENT',
+    })
+  } catch (error) {
+    return next(error)
+  }
+}
+
+/**
  * Controller handler for Client Registration
  */
 export async function register(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -38,7 +53,7 @@ export async function register(req: Request, res: Response, next: NextFunction):
 export async function login(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const result = await authService.clientLogin(req.body, {
-      deviceInfo: req.headers['user-agent'],
+      userAgent: req.headers['user-agent'],
       ipAddress: getClientIp(req),
     })
     setCustomerSessionCookies(res, result.refreshToken, result.rememberMe, result.refreshTokenExpiresAt)
@@ -67,7 +82,7 @@ export async function refreshToken(req: Request, res: Response, next: NextFuncti
       })
     }
 
-    const result = await authService.refreshClientToken({ refreshToken })
+    const result = await authService.refreshClientToken(refreshToken)
     if (result.refreshToken) {
       setCustomerSessionCookies(res, result.refreshToken, result.rememberMe, result.refreshTokenExpiresAt)
     }
@@ -132,7 +147,7 @@ export async function getMe(req: AuthenticatedRequest, res: Response, next: Next
       })
     }
 
-    const user = await userService.getUserById(userId)
+    const user = await userService.getProfile(userId)
     return sendSuccess(res, {
       data: user,
       message: 'GET_PROFILE_SUCCESS',
@@ -150,7 +165,7 @@ export async function getMe(req: AuthenticatedRequest, res: Response, next: Next
 export async function loginWithOtp(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const result = await authService.clientLoginWithOtp(req.body, {
-      deviceInfo: req.headers['user-agent'],
+      userAgent: req.headers['user-agent'],
       ipAddress: getClientIp(req),
     })
     setCustomerSessionCookies(res, result.refreshToken, result.rememberMe, result.refreshTokenExpiresAt)
@@ -174,7 +189,7 @@ export async function loginWithGoogle(req: Request, res: Response, next: NextFun
     const result = await authService.clientLoginWithGoogle(
       credential,
       {
-        deviceInfo: req.headers['user-agent'],
+        userAgent: req.headers['user-agent'],
         ipAddress: getClientIp(req),
       },
       rememberMe

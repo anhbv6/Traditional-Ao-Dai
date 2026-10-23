@@ -127,5 +127,8 @@
   "PHONE_REQUIRED": "Please enter your phone number",
   "MEASUREMENT_REQUIRED": "Please enter this measurement",
   "MEASUREMENT_OUT_OF_RANGE": "This measurement looks off, please check it",
-  "APPOINTMENT_LIST_FAILED": "Could not load appointments. Please try again."
+  "APPOINTMENT_LIST_FAILED": "Could not load appointments. Please try again.",
+  "NAME_MAX_LENGTH": "Name must be at most 100 characters.",
+  "PROVIDER_INVALID": "Invalid sign-in provider.",
+  "STAFF_PASSWORD_RESET_FAILED": "Could not reset the staff password. Please try again."
 }

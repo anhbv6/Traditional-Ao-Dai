@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { AUTH_PROVIDERS, GENDERS } from '@repo/shared'
 import {
   VIETNAM_PHONE_REGEX,
   emailSchema,
@@ -10,24 +11,29 @@ import {
 /** SĐT người nhận hàng: dùng mã lỗi riêng để FE hiển thị đúng ngữ cảnh form địa chỉ */
 const vietnamPhoneSchema = z.string().trim().regex(VIETNAM_PHONE_REGEX, 'RECEIVER_PHONE_INVALID')
 
+/**
+ * Cập nhật hồ sơ. Email & SĐT KHÔNG đổi ở đây — phải qua luồng xác minh mã (/user/email|phone/verification).
+ * Gửi `null` để xóa giá trị (ảnh đại diện, ngày sinh, giới tính).
+ */
 export const updateProfileSchema = z.object({
   body: z.object({
-    name: z.string().min(1, 'NAME_REQUIRED').optional(),
-    email: emailSchema.optional().nullable(),
-    phone: z.string().optional().nullable(),
-    avatar: z.string().optional().nullable(),
-    dob: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'DOB_INVALID').or(z.string().length(0)).optional().nullable(),
-    gender: z.union([
-      z.literal(0),
-      z.literal(1),
-      z.literal(2),
-      z.enum(['0', '1', '2', 'MALE', 'FEMALE', 'OTHER', 'male', 'female', 'other']),
-    ]).optional(),
+    name: z.string().trim().min(1, 'NAME_REQUIRED').max(100, 'NAME_MAX_LENGTH').optional(),
+    avatarUrl: z.url('AVATAR_URL_INVALID').nullable().optional(),
+    birthDate: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, 'DOB_INVALID')
+      .refine((value) => !Number.isNaN(Date.parse(value)) && new Date(value) < new Date(), 'DOB_INVALID')
+      .nullable()
+      .optional(),
+    gender: z.enum(GENDERS, 'GENDER_INVALID').nullable().optional(),
   }),
 })
 
+export type UpdateProfileInput = z.infer<typeof updateProfileSchema>['body']
+
 export const changePasswordSchema = z.object({
   body: z.object({
+    /** Bỏ trống khi tài khoản chưa có mật khẩu (chỉ đăng nhập Google) -> đây là "đặt mật khẩu" */
     currentPassword: z.string().optional(),
     newPassword: newPasswordSchema,
   }),
@@ -39,9 +45,9 @@ export const linkGoogleSchema = z.object({
   }),
 })
 
-export const unlinkGoogleSchema = z.object({
+export const unlinkSocialSchema = z.object({
   params: z.object({
-    providerId: z.string().min(1, 'PROVIDER_ID_REQUIRED'),
+    provider: z.enum(AUTH_PROVIDERS, 'PROVIDER_INVALID'),
   }),
 })
 

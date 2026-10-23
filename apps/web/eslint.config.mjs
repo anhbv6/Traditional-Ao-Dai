@@ -1,5 +1,5 @@
 // ESLint cho Frontend — cấu hình Next + luật TypeScript chung (@repo/config) + luật ranh giới kiến trúc
-// (docs/PROJECT_RULES.md §7 "Ranh giới import"). Sửa luật ở đây thì cập nhật cả tài liệu.
+// (AGENTS.md §7 "Ranh giới import"). Sửa luật ở đây thì cập nhật cả tài liệu.
 import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";

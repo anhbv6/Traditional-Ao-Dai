@@ -30,8 +30,8 @@ export function useAdminLogin() {
   const loginMutation = useMutation({
     mutationFn: adminLoginApi,
     onSuccess: (res) => {
-      // Backend đã đặt cookie httpOnly `admin_token` + `admin_session`; nạp sẵn phiên để layout admin không phải hỏi lại
-      sessionCache.set(res.data.user);
+      // Backend đã đặt cookie httpOnly `admin_token` + `admin_session`; layout admin đọc lại phiên từ server
+      void sessionCache.refresh();
       notifySuccess(res.message || "ADMIN_LOGIN_SUCCESS", t("loginSuccess"), t);
       // replace: bấm Back từ dashboard không quay lại màn đăng nhập
       startNavigation(() => router.replace("/admin/dashboard"));

@@ -74,89 +74,123 @@ enum DiscountType {
   FIXED_AMOUNT
 }
 
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum UserStatus {
+  ACTIVE            // Đang hoạt động
+  LOCKED            // Bị khóa bởi quản trị (đăng nhập bị từ chối, mọi phiên bị thu hồi)
+  DELETED           // Người dùng tự xóa tài khoản — dữ liệu cá nhân đã được ẩn danh
+}
+
+// Quyền chi tiết của STAFF (ADMIN luôn có toàn quyền). Mặc định rỗng = không có quyền nào.
+enum Permission {
+  MANAGE_ORDERS     // Xử lý đơn hàng, tra cứu khách hàng & số đo
+  UPDATE_TAILORING  // Cập nhật tiến độ xưởng may
+  MANAGE_INVENTORY  // Sản phẩm, biến thể, tồn kho, kho vải
+  MANAGE_CONTENT    // Bài viết, FAQ
+  VIEW_REPORTS      // Doanh thu, biểu đồ thống kê
+}
+
+// Khu vực cấp phiên — token của khu này không dùng được ở khu kia (claim `aud` của JWT)
+enum SessionKind {
+  STORE             // Storefront: access token trong bộ nhớ + refresh token cookie
+  ADMIN             // Khu quản trị: cookie admin_token, kiểm tra phiên mỗi request
+}
+
+enum AuthProvider {
+  GOOGLE
+}
+
+enum ApprovalAction {
+  CANCEL_ORDER
+  REFUND
+  MANUAL_DISCOUNT
+  PRICE_OVERRIDE
+}
+
 // ==========================================
 // USER & AUTHENTICATION
 // ==========================================
 
+// Một tài khoản dùng chung cho storefront và khu quản trị. STAFF/ADMIN cũng mua hàng như khách.
 model User {
-  id                String            @id @default(uuid())
-  email             String?           @unique
-  password          String?
-  name              String?
-  phone             String?           @unique
-  avatar            String?
-  birth             DateTime?
-  gender            Int               @default(2) // 0: MALE, 1: FEMALE, 2: OTHER
-  role              Role              @default(CUSTOMER)
-  isActive          Boolean           @default(true)
-  isEmailVerified   Boolean           @default(false)
-  isPhoneVerified   Boolean           @default(false)
+  id                 String       @id @default(uuid())
+  email              String?      @unique // Luôn lưu chữ thường (có CHECK constraint ở migration)
+  emailVerifiedAt    DateTime?
+  phone              String?      @unique // Dạng 0xxxxxxxxx
+  phoneVerifiedAt    DateTime?
+  passwordHash       String?      // null = tài khoản chỉ đăng nhập bằng mạng xã hội
+  passwordChangedAt  DateTime?
+  name               String?
+  avatarUrl          String?
+  birthDate          DateTime?    @db.Date
+  gender             Gender?
+  role               Role         @default(CUSTOMER)
+  permissions        Permission[] @default([]) // Chỉ có ý nghĩa với STAFF
+  status             UserStatus   @default(ACTIVE)
+  lockedAt           DateTime?
+  lockedReason       String?
+  lastLoginAt        DateTime?
 
-  socialAccounts    SocialAccount[]
-  sessions          UserSession[]
-  tokens            AuthToken[]
-  addresses         UserAddress[]
-  measurements      UserMeasurement[]
-  reviews           Review[]
-  orders            Order[]           @relation("CustomerOrders")
-  createdOrders     Order[]           @relation("StaffCreatedOrders")
-  appointments      Appointment[]     @relation("CustomerAppointments")
-  assignedTasks     TailoringLog[]    @relation("TailorStaff")
+  socialAccounts     SocialAccount[]
+  sessions           UserSession[]
+  addresses          UserAddress[]
+  measurements       UserMeasurement[]
+  reviews            Review[]
+  orders             Order[]           @relation("CustomerOrders")
+  createdOrders      Order[]           @relation("StaffCreatedOrders")
+  appointments       Appointment[]     @relation("CustomerAppointments")
+  assignedTasks      TailoringLog[]    @relation("TailorStaff")
 
-  cart              Cart?
-  staffPermission   StaffPermission?
+  cart               Cart?
   requestedApprovals ApprovalRequest[] @relation("RequestedBy")
   reviewedApprovals  ApprovalRequest[] @relation("ReviewedBy")
-  articles          Article[]         @relation("AuthorArticles")
+  articles           Article[]         @relation("AuthorArticles")
+  auditLogs          AuditLog[]        @relation("AuditActor")
 
-  createdAt         DateTime          @default(now())
-  updatedAt         DateTime          @updatedAt
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
 
-  @@index([role])
-  @@index([email])
-  @@index([phone])
-}
-
-model AuthToken {
-  id        String    @id @default(uuid())
-  token     String    @unique
-  type      String    // "VERIFY_EMAIL", "RESET_PASSWORD", "PHONE_OTP"
-  userId    String
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  expiresAt DateTime
-  createdAt DateTime  @default(now())
-
-  @@index([token, type])
+  @@index([role, status])
 }
 
 model SocialAccount {
-  id         String   @id @default(uuid())
-  userId     String
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  provider   String   // "GOOGLE", "FACEBOOK", "APPLE"
-  providerId String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id             String       @id @default(uuid())
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider       AuthProvider
+  providerUserId String       // `sub` do nhà cung cấp cấp
+  email          String?      // Email nhà cung cấp trả về tại thời điểm liên kết
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 
-  @@unique([provider, providerId])
-  @@index([userId])
+  @@unique([provider, providerUserId])
+  @@unique([userId, provider]) // Mỗi tài khoản chỉ liên kết một tài khoản của mỗi nhà cung cấp
 }
 
 model UserSession {
-  id           String   @id @default(uuid())
-  userId       String
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  refreshToken String   @unique @db.Text
-  familyId     String
-  isRevoked    Boolean  @default(false)
-  deviceInfo   String?
-  ipAddress    String?
-  expiresAt    DateTime
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id               String      @id @default(uuid())
+  userId           String
+  user             User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind             SessionKind
+  refreshTokenHash String?     @unique @db.VarChar(64) // SHA-256 hex; null với phiên ADMIN
+  familyId         String      // Họ refresh token — dùng lại token cũ thì thu hồi cả họ
+  rememberMe       Boolean     @default(false)
+  userAgent        String?
+  ipAddress        String?
+  lastUsedAt       DateTime    @default(now())
+  expiresAt        DateTime
+  revokedAt        DateTime?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
 
-  @@index([userId])
+  @@index([userId, kind])
   @@index([familyId])
+  @@index([expiresAt])
 }
 
 model UserAddress {
@@ -501,24 +535,11 @@ model ReviewMedia {
 // PHÂN QUYỀN & PHÊ DUYỆT (STAFF & ADMIN)
 // ==========================================
 
-model StaffPermission {
-  id                 String   @id @default(uuid())
-  userId             String   @unique
-  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  canManageOrders    Boolean  @default(true)
-  canUpdateTailoring Boolean  @default(true)
-  canManageInventory Boolean  @default(false)
-  canManageContent   Boolean  @default(false) // Quản lý bài viết tin tức, FAQ
-  canViewReports     Boolean  @default(false)
-
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-}
-
+// STAFF gửi yêu cầu cho thao tác nhạy cảm, ADMIN duyệt rồi hệ thống tự thực thi
 model ApprovalRequest {
   id            String         @id @default(uuid())
-  actionType    String         // "CANCEL_ORDER", "MANUAL_DISCOUNT", "PRICE_OVERRIDE", "REFUND"
+  actionType    ApprovalAction
+  targetId      String?        // Id đối tượng bị tác động (vd. đơn hàng)
   description   String
   payload       Json
   status        ApprovalStatus @default(PENDING)
@@ -528,13 +549,32 @@ model ApprovalRequest {
 
   reviewedById  String?
   reviewedBy    User?          @relation("ReviewedBy", fields: [reviewedById], references: [id])
+  reviewedAt    DateTime?
   rejectReason  String?
 
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
 
-  @@index([status])
+  @@index([status, createdAt])
   @@index([requestedById])
+  @@index([reviewedById])
+}
+
+// Nhật ký thao tác quản trị — chỉ ghi thêm, không sửa/xóa (nên không có updatedAt)
+model AuditLog {
+  id         String   @id @default(uuid())
+  actorId    String?
+  actor      User?    @relation("AuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+  action     String   // Mã thao tác UPPER_SNAKE_CASE, vd. STAFF_PERMISSIONS_UPDATED
+  targetType String   // USER, ORDER, APPROVAL...
+  targetId   String?
+  metadata   Json?    // Giá trị trước/sau, lý do...
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+
+  @@index([actorId])
+  @@index([targetType, targetId])
+  @@index([createdAt])
 }
 
 // ==========================================

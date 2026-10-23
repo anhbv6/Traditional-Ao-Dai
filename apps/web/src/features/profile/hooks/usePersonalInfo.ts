@@ -57,18 +57,15 @@ export function usePersonalInfo() {
 
   /** Gửi cập nhật — `overrides` dùng cho giá trị vừa tính trong handler (avatar vừa tải lên, ngày sinh vừa chuẩn hoá) */
   const handleSubmit = (overrides: { avatarUrl?: string; dob?: string } = {}) => {
-    const overrideAvatarUrl = overrides.avatarUrl;
-    let genderNumeric = 2;
-    if (form.gender === "male" || form.gender === "0") genderNumeric = 0;
-    else if (form.gender === "female" || form.gender === "1") genderNumeric = 1;
-    else genderNumeric = 2;
+    const avatarUrl = overrides.avatarUrl !== undefined ? overrides.avatarUrl : form.avatarUrl;
+    const gender = form.gender.toUpperCase();
 
     updateProfileMutation.mutate({
       name: form.fullName,
       // Email & SĐT không gửi ở đây: đổi qua luồng xác minh mã (useContactVerification)
-      avatar: overrideAvatarUrl !== undefined ? overrideAvatarUrl : (form.avatarUrl || undefined),
-      dob: (overrides.dob ?? form.dob) || undefined,
-      gender: genderNumeric,
+      avatarUrl: avatarUrl || null,
+      birthDate: (overrides.dob ?? form.dob) || null,
+      gender: gender === "MALE" || gender === "FEMALE" ? gender : "OTHER",
     });
   };
 

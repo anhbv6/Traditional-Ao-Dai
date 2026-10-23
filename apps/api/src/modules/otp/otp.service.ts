@@ -63,22 +63,23 @@ export async function sendOtp(phone: string, purpose: Exclude<OtpPurpose, 'VERIF
     throw new AppError(400, 'INVALID_PHONE_NUMBER')
   }
 
-  const existingUser = await prisma.user.findFirst({
+  const existingUser = await prisma.user.findUnique({
     where: { phone: normalizedPhone },
-    select: { id: true, role: true, isPhoneVerified: true },
+    select: { status: true, phoneVerifiedAt: true },
   })
-  const isRegisteredCustomer = existingUser?.role === 'CUSTOMER'
+  // Mọi vai trò đều đăng nhập storefront được; tài khoản đã xóa coi như không tồn tại
+  const isRegistered = !!existingUser && existingUser.status !== 'DELETED'
   // Chỉ SĐT đã xác minh mới được dùng để đăng nhập OTP / đặt lại mật khẩu
-  const canUsePhoneAuth = isRegisteredCustomer && existingUser?.isPhoneVerified === true
+  const canUsePhoneAuth = isRegistered && existingUser.phoneVerifiedAt !== null
 
-  if (purpose === 'REGISTER' && existingUser?.isPhoneVerified) {
+  if (purpose === 'REGISTER' && existingUser?.phoneVerifiedAt) {
     // Không gửi SMS vô ích cho số đã được đăng ký & xác minh.
     // SĐT chỉ khai báo (chưa xác minh) ở tài khoản khác vẫn được gửi OTP để chủ thật nhận lại số.
     throw new AppError(400, 'PHONE_ALREADY_EXISTS')
   }
 
   if (purpose === 'LOGIN') {
-    if (!isRegisteredCustomer) {
+    if (!isRegistered) {
       throw new AppError(404, 'USER_NOT_FOUND')
     }
     if (!canUsePhoneAuth) {
