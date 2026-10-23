@@ -82,7 +82,8 @@ pnpm dev               # 4. API + Web song song
 | `pnpm check` | Typecheck + lint toàn repo (gồm cả seed) — **bắt buộc xanh trước khi commit** |
 | `pnpm build` | Build mọi workspace |
 | `pnpm db:migrate --name <ten>` | Tạo + áp migration (dev) |
-| `pnpm db:deploy` | Áp migration có sẵn (production / CI) |
+| `pnpm db:deploy` | Áp migration có sẵn vào DB local / CI |
+| `pnpm db:status:prod` / `db:deploy:prod` / `db:seed:prod` | Xem / áp migration / seed lên **Neon production** (đọc `apps/api/.env.production`) |
 | `pnpm db:generate` | Sinh Prisma Client (Windows: dừng `pnpm dev` trước, nếu không lỗi `EPERM`) |
 | `pnpm db:seed` / `pnpm db:studio` | Seed dữ liệu / mở Prisma Studio (http://localhost:5555) |
 | `pnpm --filter @repo/<workspace> add <pkg>` | Cài package cho một workspace |
@@ -113,17 +114,15 @@ Giai đoạn chạy thử, chi phí gần như 0đ, mọi dịch vụ đặt ở
 
 **Google OAuth** — Authorized JavaScript origins: `http://localhost:3000` và domain Vercel (bản Preview không đăng nhập Google được).
 
-**Database production** — chạy từ máy local (PowerShell, thư mục gốc):
+**Database production** — chạy từ máy local bằng lệnh `:prod`, đọc **duy nhất** `apps/api/.env.production` (gitignored; điền `DATABASE_URL` = Neon **direct**, `SEED_ADMIN_PASSWORD`). Thiếu file thì lệnh dừng, không bao giờ rơi về DB local:
 
-```powershell
-$env:DATABASE_URL="<Neon direct>"
-pnpm db:deploy
-# Seed lần đầu: tắt demo + bắt buộc mật khẩu admin riêng (thiếu thì seed dừng)
-$env:SEED_DEMO_DATA="false"; $env:SEED_ADMIN_PASSWORD="<mật khẩu mạnh>"
-pnpm db:seed
+```bash
+pnpm db:status:prod    # migration nào chưa áp lên Neon
+pnpm db:deploy:prod    # áp migration lên Neon
+pnpm db:seed:prod      # seed lần đầu — tự tắt dữ liệu demo, bắt buộc SEED_ADMIN_PASSWORD
 ```
 
-**Quy trình cập nhật:** sửa schema → `pnpm db:migrate --name <ten>` ở local → push `main` (Render + Vercel tự deploy) → có migration mới thì `pnpm db:deploy` lên Neon → kiểm tra `/api/health` trả `database: ok, redis: ok`.
+**Quy trình cập nhật:** sửa schema → `pnpm db:migrate --name <ten>` ở local → push `main` (Render + Vercel tự deploy) → có migration mới thì `pnpm db:deploy:prod` → kiểm tra `/api/health` trả `database: ok, redis: ok`.
 
 👉 Từng tình huống thay đổi (schema, env, package, domain, khóa bí mật, rollback...) và các bước ở Neon / Render / Vercel: [`RUNBOOK.md`](RUNBOOK.md).
 

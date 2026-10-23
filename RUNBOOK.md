@@ -5,7 +5,7 @@ Tra theo tình huống. Mỗi mục: **làm ở code** → **làm ở dịch v�
 **Nguyên tắc chung**
 - Mọi thay đổi đi qua `develop` → `main`. Push `main` = **Render và Vercel tự deploy**; Neon **không** tự chạy migration.
 - Trước khi commit luôn: `pnpm check` (xanh).
-- Lệnh tới production chạy **từ máy local** (PowerShell, thư mục gốc). Biến `$env:` chỉ sống trong cửa sổ đó.
+- Lệnh tới DB production chạy **từ máy local** bằng các lệnh `pnpm db:*:prod` — chỉ đọc `apps/api/.env.production` (gitignored, điền `DATABASE_URL` Neon **direct**). Thiếu file thì lệnh dừng ngay.
 - Kiểm tra sau mỗi lần deploy: `https://traditional-ao-dai.vercel.app/api/health` → `database: ok, redis: ok`.
 
 ---
@@ -41,11 +41,12 @@ git add packages/db/prisma/schema.prisma packages/db/prisma/migrations/<thư m�
 | Chỉ **thêm** (bảng, cột nullable, index) | Áp migration lên Neon **trước** → rồi merge `main` |
 | **Phá vỡ** (xóa/đổi tên cột, đổi kiểu) | Tách 2 bước: (1) deploy code chịu được cả schema cũ lẫn mới, (2) áp migration. Hoặc chấp nhận vài phút lỗi khi dự án chưa có khách thật |
 
-```powershell
-$env:DATABASE_URL="<Neon DIRECT, không -pooler>"
-pnpm db:deploy
+```bash
+pnpm db:status:prod     # xem migration nào chưa áp
+pnpm db:deploy:prod     # áp lên Neon
 ```
-- Muốn thử migration an toàn: Neon → **Branches** → tạo branch từ `production` → chạy `pnpm db:deploy` với connection string của branch đó → kiểm tra xong thì xóa branch.
+- Migration đổi email/khóa unique: kiểm tra dữ liệu trùng trên Neon SQL Editor trước khi áp.
+- Muốn thử migration an toàn: Neon → **Branches** → tạo branch từ `production` → tạm đổi `DATABASE_URL` trong `.env.production` sang chuỗi của branch đó → `pnpm db:deploy:prod` → kiểm tra xong đổi lại và xóa branch.
 - Render tự `prisma generate` lúc build; Vercel generate qua `postinstall` — không cần thao tác thêm.
 
 ## 3. Thêm / đổi biến môi trường
@@ -107,12 +108,12 @@ Bí mật lộ ra ngoài → đổi ngay, sau đó kiểm tra `AuditLog` và b�
 
 Chỉ chạy **lần đầu** (hoặc khi cần tạo lại tài khoản admin):
 
-```powershell
-$env:DATABASE_URL="<Neon DIRECT>"
-$env:SEED_DEMO_DATA="false"; $env:SEED_ADMIN_PASSWORD="<mật khẩu mạnh>"
-pnpm db:seed
+Điền `SEED_ADMIN_PASSWORD` (mật khẩu mạnh) trong `apps/api/.env.production`, rồi:
+
+```bash
+pnpm db:seed:prod       # tự đặt SEED_DEMO_DATA=false — chỉ tạo admin + danh mục
 ```
-Seed không ghi đè mật khẩu tài khoản đã có. Không bao giờ chạy seed demo lên production.
+Seed không ghi đè mật khẩu tài khoản đã có. Không bao giờ chạy `pnpm db:seed` (bản local, có demo) với chuỗi Neon.
 
 ## 10. Sự cố & khôi phục
 
@@ -129,7 +130,7 @@ Seed không ghi đè mật khẩu tài khoản đã có. Không bao giờ chạy
 ## 11. Checklist trước khi merge vào `main`
 
 - [ ] `pnpm check` xanh, CI xanh trên PR.
-- [ ] Có migration mới → đã quyết định thứ tự (§2) và đã/ sẽ chạy `pnpm db:deploy` lên Neon.
+- [ ] Có migration mới → đã quyết định thứ tự (§2) và đã/ sẽ chạy `pnpm db:deploy:prod` lên Neon.
 - [ ] Có biến môi trường mới → đã thêm ở Render / Vercel (§3).
 - [ ] Đổi luồng auth / JWT → ghi trong PR ai phải đăng nhập lại.
 - [ ] Sau deploy: `/api/health` ok, thử đăng nhập storefront + admin.

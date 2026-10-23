@@ -12,7 +12,10 @@
     "db:generate": "pnpm --filter @repo/db generate",
     "db:migrate": "pnpm --filter @repo/db migrate:dev",
     "db:deploy": "pnpm --filter @repo/db migrate:deploy",
+    "db:deploy:prod": "pnpm --filter @repo/db migrate:deploy:prod",
+    "db:status:prod": "pnpm --filter @repo/db migrate:status:prod",
     "db:seed": "pnpm --filter @repo/db seed",
+    "db:seed:prod": "pnpm --filter @repo/db seed:prod",
     "db:studio": "pnpm --filter @repo/db studio",
     "format": "prettier --write .",
     "format:check": "prettier --check ."

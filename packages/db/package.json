@@ -10,9 +10,12 @@
     "generate": "prisma generate",
     "migrate:dev": "dotenv -e ../../apps/api/.env.local -e ../../apps/api/.env -- prisma migrate dev",
     "migrate:deploy": "dotenv -e ../../apps/api/.env.local -e ../../apps/api/.env -- prisma migrate deploy",
+    "migrate:deploy:prod": "node -e \"require('fs').accessSync('../../apps/api/.env.production')\" && dotenv -o -e ../../apps/api/.env.production -- prisma migrate deploy",
+    "migrate:status:prod": "node -e \"require('fs').accessSync('../../apps/api/.env.production')\" && dotenv -o -e ../../apps/api/.env.production -- prisma migrate status",
     "db:push": "dotenv -e ../../apps/api/.env.local -e ../../apps/api/.env -- prisma db push",
     "studio": "dotenv -e ../../apps/api/.env.local -e ../../apps/api/.env -- prisma studio",
     "seed": "dotenv -e ../../apps/api/.env.local -e ../../apps/api/.env -- prisma db seed",
+    "seed:prod": "node -e \"require('fs').accessSync('../../apps/api/.env.production')\" && dotenv -o -e ../../apps/api/.env.production -v SEED_DEMO_DATA=false -- prisma db seed",
     "typecheck": "tsc --noEmit -p . && tsc --noEmit -p prisma",
     "lint": "eslint"
   },
