@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { ActionLink } from "@/components/shared/ActionLink";
 import { PageIntro } from "@/components/shared/PageIntro";
 import type { TermsSection } from "../types/terms.types";
+import { TermsToc } from "./TermsToc";
 
 /**
  * Nội dung trang Điều khoản & Chính sách dịch vụ:
@@ -19,23 +20,7 @@ export function TermsContent() {
 
       <div className="mt-12 grid gap-10 border-t border-[var(--border)] pt-10 sm:mt-16 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-16">
         {/* Mục lục */}
-        <nav aria-label={t("tocLabel")} className="hidden lg:block">
-          <div className="sticky top-28">
-            <p className="text-[11px] font-semibold uppercase tracking-[2.5px] text-[var(--primary-ink)]">{t("tocLabel")}</p>
-            <ol className="mt-5 space-y-1 border-l border-[var(--border)]">
-              {sections.map((section) => (
-                <li key={section.id}>
-                  <a
-                    href={`#${section.id}`}
-                    className="-ml-px block border-l border-transparent py-1.5 pl-4 text-[13px] leading-5 text-[var(--text-light)] transition-colors hover:border-[var(--primary-color)] hover:text-[var(--primary-ink)]"
-                  >
-                    {section.title}
-                  </a>
-                </li>
-              ))}
-            </ol>
-          </div>
-        </nav>
+        <TermsToc label={t("tocLabel")} sections={sections.map(({ id, title }) => ({ id, title }))} />
 
         {/* Nội dung điều khoản */}
         <article className="max-w-3xl">

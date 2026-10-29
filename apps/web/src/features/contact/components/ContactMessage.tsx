@@ -16,7 +16,7 @@ export function ContactMessage() {
     <section className="bg-[var(--bg-secondary)]">
       <Container spacing="section" className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-12 xl:gap-20">
         <Reveal>
-          <SectionIntro eyebrow={t('eyebrow')} title={t('title')} description={t('description')} />
+          <SectionIntro eyebrow={t('eyebrow')} title={t('title')} />
 
           <ol className="mt-8 border-t border-[var(--text-main)]/80 sm:mt-10">
             {stepKeys.map((key, index) => (
@@ -32,7 +32,8 @@ export function ContactMessage() {
         </Reveal>
 
         <Reveal delay={0.12}>
-          <ContactForm />
+          {/* Lời dặn đặt ngay đầu form để người sắp điền đọc được trước khi nhập */}
+          <ContactForm intro={t('description')} />
         </Reveal>
       </Container>
     </section>

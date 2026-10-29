@@ -9,6 +9,9 @@ import { issueVerificationCode, verifyVerificationCode } from '../../core/securi
 
 export type OtpPurpose = 'REGISTER' | 'LOGIN' | 'RESET_PASSWORD' | 'VERIFY_PHONE'
 
+/** Kết quả gửi OTP. `devCode` chỉ có ngoài production (SMS đang là mock) để web hiện mã lên màn khi test. */
+export type SendOtpResult = { success: boolean; ttl: number; devCode?: string }
+
 /** Thời gian chờ giữa 2 lần gửi OTP cho cùng một SĐT + mục đích */
 const OTP_COOLDOWN_SECONDS = 60
 /** Hạn mức SMS tối đa gửi tới một SĐT mỗi ngày (chống SMS pumping / spam) */
@@ -36,7 +39,7 @@ export async function deliverOtp(
   normalizedPhone: string,
   purpose: OtpPurpose,
   scope: string = normalizedPhone
-): Promise<{ success: boolean; ttl: number }> {
+): Promise<SendOtpResult> {
   const ttl = env.OTP_TTL_SECONDS
 
   if (await redis.get(cooldownKey(purpose, scope))) {
@@ -51,13 +54,14 @@ export async function deliverOtp(
   const message = `Your AODAI OTP code is: ${code}. Valid for ${Math.floor(ttl / 60)} minutes.`
   await smsProvider.sendSms(normalizedPhone, message)
 
-  return { success: true, ttl }
+  // Không bao giờ trả mã ở production — mã chỉ được đi qua SMS
+  return env.NODE_ENV === 'production' ? { success: true, ttl } : { success: true, ttl, devCode: code }
 }
 
 /**
  * Gửi OTP cho các luồng công khai (đăng ký, đăng nhập, quên mật khẩu)
  */
-export async function sendOtp(phone: string, purpose: Exclude<OtpPurpose, 'VERIFY_PHONE'>): Promise<{ success: boolean; ttl: number }> {
+export async function sendOtp(phone: string, purpose: Exclude<OtpPurpose, 'VERIFY_PHONE'>): Promise<SendOtpResult> {
   const normalizedPhone = normalizeVietnamPhone(phone)
   if (!normalizedPhone) {
     throw new AppError(400, 'INVALID_PHONE_NUMBER')

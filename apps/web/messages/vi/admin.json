@@ -1,7 +1,7 @@
 {
   "login": {
-    "title": "Đăng Nhập Quản Trị",
-    "subtitle": "Hệ thống quản lý bán hàng & xưởng may đo",
+    "title": "Đăng nhập quản trị",
+    "subtitle": "Dùng email nhân viên do quản trị viên cấp để tiếp tục.",
     "emailLabel": "Email quản trị viên",
     "emailPlaceholder": "Vui lòng nhập địa chỉ email",
     "passwordLabel": "Mật khẩu",
@@ -9,9 +9,9 @@
     "forgotPassword": "Quên mật khẩu?",
     "forgotPasswordNotice": "Vui lòng liên hệ Quản trị viên cấp cao để cấp lại mật khẩu.",
     "rememberMe": "Ghi nhớ đăng nhập",
-    "submit": "Đăng nhập hệ thống",
+    "submit": "Đăng nhập",
     "submitting": "Đang xác thực...",
-    "backToStore": "Quay trở lại cửa hàng",
+    "backToStore": "Về cửa hàng",
     "emailRequired": "Email không được để trống",
     "invalidEmail": "Vui lòng nhập địa chỉ email hợp lệ!",
     "passwordRequired": "Mật khẩu không được để trống",
@@ -24,7 +24,10 @@
     "USER_NOT_FOUND": "Tài khoản quản trị không tồn tại trong hệ thống.",
     "ADMIN_LOGIN_SUCCESS": "Đăng nhập quản trị viên thành công!",
     "ADMIN_LOGOUT_SUCCESS": "Đăng xuất quản trị viên thành công!",
-    "brand": "AODAI Admin"
+    "brand": "AODAI Admin",
+    "eyebrow": "Khu quản trị",
+    "secureNote": "Phiên quản trị tách riêng với tài khoản mua hàng và tự hết hạn sau 8 giờ không hoạt động.",
+    "staffOnly": "Chỉ dành cho nhân viên và quản trị viên. Chưa có tài khoản hoặc quên mật khẩu? Liên hệ quản trị viên cấp cao."
   },
   "header": {
     "systemTitle": "AODAI Admin",

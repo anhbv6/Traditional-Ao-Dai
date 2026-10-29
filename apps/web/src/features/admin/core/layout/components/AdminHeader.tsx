@@ -27,7 +27,7 @@ export function AdminHeader({ user, isSuperAdmin, navLinks, isLoggingOut, onOpen
 
           <Link href="/admin/dashboard" className="flex min-w-0 items-center gap-2.5">
             <span className="size-8 shrink-0 overflow-hidden rounded-lg border border-[#E4E4E7] bg-white">
-              <Image src="/logoPage.png" alt="" width={64} height={64} priority className="size-full scale-125 object-cover" />
+              <Image src="/logo.png" alt="" width={64} height={64} priority className="size-full object-contain p-0.5" />
             </span>
             <span className="truncate text-sm font-semibold text-[#09090B]">{t("systemTitle")}</span>
           </Link>

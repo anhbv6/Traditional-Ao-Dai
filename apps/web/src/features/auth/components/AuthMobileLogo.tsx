@@ -8,11 +8,11 @@ export function AuthMobileLogo() {
       <Link href="/" className="flex flex-col items-center gap-1.5">
         <div className="relative h-9 w-9 overflow-hidden rounded-md flex items-center justify-center">
           <Image
-            src="/logoPage.png"
+            src="/logo.png"
             alt="AODAI logo"
             width={70}
             height={70}
-            className="h-full w-full object-cover scale-125"
+            className="h-full w-full object-contain"
             unoptimized
           />
         </div>

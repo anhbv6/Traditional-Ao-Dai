@@ -16,6 +16,8 @@ export interface TextAreaFieldProps extends Omit<ComponentProps<"textarea">, "va
   error?: ReactNode | boolean;
   /** Hiện bộ đếm ký tự (kết hợp `maxLength` sẽ hiện dạng 12/500) */
   showCount?: boolean;
+  /** Cao theo nội dung (bắt đầu từ `rows`, tối đa ~10 dòng rồi cuộn) — gạch chân luôn sát chữ */
+  autoResize?: boolean;
   /** Controlled: giá trị hiện tại */
   value?: string;
   /** Uncontrolled: giá trị ban đầu */
@@ -49,6 +51,7 @@ export function TextAreaField({
   helperText,
   error,
   showCount = false,
+  autoResize = false,
   value,
   defaultValue,
   onValueChange,
@@ -101,8 +104,11 @@ export function TextAreaField({
         disabled={disabled}
         aria-invalid={hasError || undefined}
         aria-describedby={describedBy}
+        /* Lăn chuột cuộn nội dung ô (Lenis mặc định chiếm wheel để cuộn trang) */
+        data-lenis-prevent
         className={cn(
-          "block w-full resize-y py-2.5 text-[15px] leading-7 text-[var(--text-main)] outline-none transition-[border-color,box-shadow] duration-300",
+          "scrollbar-brand block w-full overscroll-contain py-2.5 text-[15px] leading-7 text-[var(--text-main)] outline-none transition-[border-color,box-shadow] duration-300",
+          autoResize ? "field-sizing-content max-h-[19rem] resize-none" : "resize-y",
           "border-[var(--border)] placeholder:text-[color-mix(in_oklab,var(--text-light)_55%,transparent)]",
           "hover:not-focus:border-[color-mix(in_oklab,var(--text-light)_60%,transparent)] focus:border-[var(--primary-color)] disabled:cursor-not-allowed",
           APPEARANCE_CLASS[appearance],

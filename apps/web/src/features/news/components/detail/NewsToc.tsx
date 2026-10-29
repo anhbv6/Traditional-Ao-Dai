@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { useLenis } from "lenis/react";
 import { ChevronDown } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useActiveSection } from "@/hooks/useActiveSection";
 import { type ArticleSection } from "../../data/articleContent";
 
 /** Khoảng chừa cho header dính khi cuộn tới mục */
@@ -14,31 +15,6 @@ interface NewsTocProps {
   sections: ArticleSection[];
   /** `sidebar`: cột dính bên trái (desktop) · `inline`: hộp thu gọn đầu bài (mobile) */
   variant: "sidebar" | "inline";
-}
-
-/** Theo dõi mục đang đọc bằng IntersectionObserver (mục gần mép trên màn hình nhất) */
-function useActiveSection(ids: string[]) {
-  const [activeId, setActiveId] = useState<string | null>(null);
-
-  useEffect(() => {
-    const elements = ids.map((id) => document.getElementById(id)).filter((el): el is HTMLElement => Boolean(el));
-    if (elements.length === 0) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries.filter((entry) => entry.isIntersecting);
-        if (visible.length > 0) {
-          visible.sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-          setActiveId(visible[0].target.id);
-        }
-      },
-      // Vùng "đang đọc": dải từ 20% đến 45% chiều cao màn hình
-      { rootMargin: "-20% 0px -55% 0px" }
-    );
-    elements.forEach((element) => observer.observe(element));
-    return () => observer.disconnect();
-  }, [ids]);
-
-  return activeId;
 }
 
 /**

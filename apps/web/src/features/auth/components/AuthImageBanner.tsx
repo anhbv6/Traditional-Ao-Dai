@@ -81,7 +81,7 @@ export function AuthImageBanner({
         >
           <div className="relative h-10 w-10 overflow-hidden rounded-md bg-white/10 backdrop-blur-sm p-1 border border-white/20">
             <Image
-              src="/logoPage.png"
+              src="/logo.png"
               alt="AODAI Logo"
               width={40}
               height={40}

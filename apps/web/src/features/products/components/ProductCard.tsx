@@ -53,10 +53,11 @@ const MAX_SWATCHES = 4;
  * - Nút yêu thích: HeartToggle (chỉ icon, tim nảy + toả hạt khi thích).
  * - Rê chuột (desktop): ảnh phụ mờ dần vào + phóng rất chậm, nút yêu thích trượt vào, dải "Thêm vào giỏ" trượt lên.
  *   Mọi chuyển động vào / ra dùng chung một đường cong êm và thời lượng dài để mượt, không giật khi rê ra nhanh.
- * - Mobile: nút yêu thích / giỏ hàng luôn hiện ở góc ảnh.
+ * - Mobile / tablet (< lg): kiểu thẻ trắng gọn — tên 2 dòng, giá (giá gốc + % giảm bên dưới) + nút giỏ tròn đỏ đô ở đáy thẻ
+ *   (không có rê chuột nên nút phải luôn thấy và đủ lớn để chạm), tim luôn hiện ở góc ảnh.
  */
 export function ProductCard({
-  imageSrc = '/logoPage.png',
+  imageSrc = '/logo.png',
   hoverImageSrc,
   imageAlt = 'Product image',
   name = '',
@@ -76,7 +77,7 @@ export function ProductCard({
 }: ProductCardProps) {
   const t = useTranslations('Product');
   const { toggleWithUndo } = useWishlistUndo();
-  const fallbackImageSrc = '/logoPage.png';
+  const fallbackImageSrc = '/logo.png';
   const [failedImageSrc, setFailedImageSrc] = useState<string | null>(null);
   const [hoverImageFailed, setHoverImageFailed] = useState(false);
   const currentImageSrc = failedImageSrc === imageSrc ? fallbackImageSrc : imageSrc;
@@ -162,7 +163,7 @@ export function ProductCard({
 
   return (
     <article
-      className="group w-full cursor-pointer font-[family-name:var(--font-lora)] text-[var(--text-main)]"
+      className="group w-full cursor-pointer font-[family-name:var(--font-lora)] text-[var(--text-main)] max-lg:flex max-lg:h-full max-lg:flex-col max-lg:bg-[var(--bg-card)] max-lg:shadow-[0_10px_28px_-18px_rgba(42,37,37,0.35)]"
       onMouseEnter={() => router.prefetch(targetHref)}
       onClick={handleCardClick}
     >
@@ -189,29 +190,21 @@ export function ProductCard({
 
         {originalPrice ? <SaleGlow /> : null}
 
-        {/* Nút yêu thích + giỏ (mobile). Desktop: trượt nhẹ từ phải vào khi rê chuột (đang thích thì luôn hiện) */}
-        <div
-          className={`absolute right-2.5 top-2.5 z-10 flex flex-col gap-2 transition-[opacity,translate] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] lg:group-hover:translate-x-0 lg:group-hover:opacity-100 ${
-            isWishlisted && showWishlist ? '' : 'lg:translate-x-2 lg:opacity-0'
-          }`}
-        >
-          {showWishlist ? (
+        {/* Nút yêu thích. Desktop: trượt nhẹ từ phải vào khi rê chuột (đang thích thì luôn hiện); mobile luôn hiện */}
+        {showWishlist ? (
+          <div
+            className={`absolute right-2 top-2 z-10 transition-[opacity,translate] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] lg:right-2.5 lg:top-2.5 lg:group-hover:translate-x-0 lg:group-hover:opacity-100 ${
+              isWishlisted ? '' : 'lg:translate-x-2 lg:opacity-0'
+            }`}
+          >
             <HeartToggle
               active={isWishlisted}
               onToggle={handleToggleWishlist}
               labelOn={t('removeFromWishlist')}
               labelOff={t('addToWishlist')}
             />
-          ) : null}
-          <button
-            type="button"
-            onClick={handleAddToCart}
-            aria-label={isCustom ? t('customTailor') : t('addToCart')}
-            className="grid size-9 cursor-pointer place-items-center bg-[var(--bg-card)]/70 text-[var(--text-main)] shadow-[0_6px_16px_-8px_rgba(128,0,32,0.35)] backdrop-blur-md transition-colors duration-500 hover:bg-[var(--primary-color)] hover:text-white active:scale-90 lg:hidden"
-          >
-            <ShoppingBag size={15} strokeWidth={1.6} />
-          </button>
-        </div>
+          </div>
+        ) : null}
 
         {/* Desktop: dải thêm vào giỏ trượt lên khi rê chuột */}
         <button
@@ -224,22 +217,57 @@ export function ProductCard({
         </button>
       </div>
 
-      <div className="pt-4">
-        {/* Tên dài bị cắt 1 dòng → rê chuột / focus hiện tên đầy đủ (tên ngắn hiển thị đủ thì không hiện tooltip) */}
+      <div className="pt-4 max-lg:flex max-lg:flex-1 max-lg:flex-col max-lg:px-2.5 max-lg:pb-3 max-lg:pt-3 sm:max-lg:px-3.5 sm:max-lg:pb-4">
+        {/* Desktop: tên cắt 1 dòng → rê chuột / focus hiện tên đầy đủ. Mobile: tên 2 dòng (không có rê chuột để xem tooltip) */}
         <h3 className="min-w-0">
           <AppTooltip content={name} onlyWhenTruncated align="start">
             <Link
               href={targetHref}
-              className="block truncate font-[family-name:var(--font-playfair)] text-[15px] font-semibold leading-snug text-[var(--text-main)] transition-colors duration-500 group-hover:text-[var(--primary-ink)] sm:text-[17px]"
+              className="block truncate font-[family-name:var(--font-playfair)] text-[15px] font-semibold leading-snug text-[var(--text-main)] transition-colors duration-500 group-hover:text-[var(--primary-ink)] max-lg:line-clamp-2 max-lg:min-h-[2lh] max-lg:whitespace-normal max-lg:text-[14px] sm:text-[17px] sm:max-lg:text-[15px]"
             >
               {name}
             </Link>
           </AppTooltip>
         </h3>
-        {subline ? <p className="mt-1 truncate text-xs text-[var(--text-light)] sm:text-[13px]">{subline}</p> : null}
 
-        {/* Giá + màu: trên thẻ hẹp (mobile 2 cột) dải màu tự xuống dòng thay vì ép giá gốc xuống dưới */}
-        <div className="mt-2 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 sm:mt-2.5">
+        {/* Mobile: chất liệu + chấm màu chung một hàng, giá + nút giỏ dồn xuống đáy thẻ cho các thẻ cùng hàng thẳng nhau */}
+        <div className="mt-1 flex items-center justify-between gap-2 lg:hidden">
+          {subline ? <p className="min-w-0 truncate text-xs text-[var(--text-light)]">{subline}</p> : <span />}
+          {colorSwatches.length > 0 ? (
+            <ul className="flex shrink-0 items-center gap-1" aria-label={t('colorsLabel')}>
+              {colorSwatches.slice(0, 3).map((swatch) => (
+                <li key={swatch.name} title={swatch.name} className="size-2 rounded-full ring-1 ring-black/10" style={{ backgroundColor: swatch.hex }} />
+              ))}
+              {colorSwatches.length > 3 ? <li className="text-[10px] text-[var(--text-light)]">+{colorSwatches.length - 3}</li> : null}
+            </ul>
+          ) : null}
+        </div>
+        <div className="mt-auto flex items-end justify-between gap-2 pt-2.5 lg:hidden">
+          <p className="min-w-0 leading-tight">
+            <span className="block whitespace-nowrap text-[14px] font-semibold text-[var(--primary-ink)] sm:text-[15px]">{price}</span>
+            {originalPrice ? (
+              <span className="mt-0.5 flex items-baseline gap-1.5 whitespace-nowrap text-[11px]">
+                <span className="text-[var(--text-light)]/70 line-through">{originalPrice}</span>
+                {discountPercent > 0 ? (
+                  <span className="font-semibold text-[var(--sale-gold)] [font-variant-numeric:lining-nums]">−{discountPercent}%</span>
+                ) : null}
+              </span>
+            ) : null}
+          </p>
+          <button
+            type="button"
+            onClick={handleAddToCart}
+            aria-label={isCustom ? t('customTailor') : t('addToCart')}
+            className="grid size-9 shrink-0 cursor-pointer place-items-center rounded-full bg-[var(--primary-color)] text-white shadow-[0_8px_18px_-8px_rgba(128,0,32,0.6)] transition-[scale,background-color] duration-300 hover:bg-[var(--bg-inverse)] active:scale-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]"
+          >
+            {isCustom ? <Scissors size={15} strokeWidth={1.7} /> : <ShoppingBag size={15} strokeWidth={1.7} />}
+          </button>
+        </div>
+
+        {subline ? <p className="mt-1 hidden truncate text-[13px] text-[var(--text-light)] lg:block">{subline}</p> : null}
+
+        {/* Desktop: giá + màu một hàng */}
+        <div className="mt-2.5 hidden flex-wrap items-center justify-between gap-x-3 gap-y-2 lg:flex">
           <p className="flex items-baseline gap-x-1.5 whitespace-nowrap text-[13px] sm:gap-x-2 sm:text-[15px]">
             <span className="font-semibold text-[var(--primary-ink)]">{price}</span>
             {originalPrice ? <span className="text-[11px] text-[var(--text-light)]/70 line-through sm:text-xs">{originalPrice}</span> : null}

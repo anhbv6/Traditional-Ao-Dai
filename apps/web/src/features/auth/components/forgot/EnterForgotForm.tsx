@@ -8,7 +8,7 @@ import { KeyRound, Send } from 'lucide-react';
 import { ActionButton } from '@/components/shared/ActionButton';
 import { TextField } from '@/components/shared/TextField';
 import { showToast } from '@/components/ui/toast';
-import { notifyError } from '@/lib/messages';
+import { notifyDevCode, notifyError } from '@/lib/messages';
 import { forgotPasswordEmailApi } from '../../api/forgot.api';
 import { sendOtpApi } from '../../api/auth.api';
 
@@ -63,8 +63,9 @@ export function EnterForgotForm({
         await forgotPasswordEmailApi(cleanVal);
         showToast.success(t('forgotEmailCodeSent'));
       } else {
-        await sendOtpApi(cleanVal, 'RESET_PASSWORD');
+        const res = await sendOtpApi(cleanVal, 'RESET_PASSWORD');
         showToast.success(t('forgotPhoneOtpSent'));
+        notifyDevCode(res.data, t);
       }
 
       onSubmitSuccess?.(cleanVal, isEmail ? 'email' : 'phone');

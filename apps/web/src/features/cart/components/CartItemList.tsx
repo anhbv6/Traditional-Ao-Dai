@@ -12,7 +12,7 @@ import { type CartItem } from "../types/cart.types";
 import { QuantityStepper } from "./QuantityStepper";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
-const FALLBACK_IMAGE = "/logoPage.png";
+const FALLBACK_IMAGE = "/logo.png";
 
 interface CartItemListProps {
   cartItems: CartItem[];

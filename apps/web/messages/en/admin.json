@@ -1,7 +1,7 @@
 {
   "login": {
-    "title": "Admin Portal Login",
-    "subtitle": "Management portal for orders & tailoring atelier",
+    "title": "Admin sign in",
+    "subtitle": "Use the staff email issued by your administrator to continue.",
     "emailLabel": "Admin Email",
     "emailPlaceholder": "Please enter your email address",
     "passwordLabel": "Password",
@@ -9,9 +9,9 @@
     "forgotPassword": "Forgot password?",
     "forgotPasswordNotice": "Please contact Super Admin to reset password.",
     "rememberMe": "Remember me",
-    "submit": "Log in to portal",
+    "submit": "Sign in",
     "submitting": "Authenticating...",
-    "backToStore": "Storefront",
+    "backToStore": "Back to store",
     "emailRequired": "Email is required",
     "invalidEmail": "Please enter a valid email address!",
     "passwordRequired": "Password is required",
@@ -24,7 +24,10 @@
     "USER_NOT_FOUND": "Admin account not found in system.",
     "ADMIN_LOGIN_SUCCESS": "Admin login successful!",
     "ADMIN_LOGOUT_SUCCESS": "Admin logout successful!",
-    "brand": "AODAI Admin"
+    "brand": "AODAI Admin",
+    "eyebrow": "Admin area",
+    "secureNote": "The admin session is separate from your shopping account and expires after 8 hours of inactivity.",
+    "staffOnly": "For staff and administrators only. No account or forgot your password? Contact a super admin."
   },
   "header": {
     "systemTitle": "AODAI Admin",

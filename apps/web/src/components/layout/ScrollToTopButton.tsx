@@ -66,8 +66,9 @@ export function ScrollToTopButton() {
         FLOATING_BUTTON_CLASS,
         // Ghi đè transition chung: thêm mờ + trượt khi hiện / ẩn
         'fixed z-40 transition-[opacity,translate,background-color] duration-300',
-        // Nằm ngay trên cụm nút chat (ChatDock: 2 nút cùng cỡ + khoảng cách 0.75rem), cùng lề phải
-        hasBottomBar ? 'bottom-[12.25rem] right-5 sm:right-7 lg:bottom-[8rem]' : 'bottom-[8rem] right-5 sm:right-7',
+        // Trên cụm nút chat (ChatDock: đáy + 2 nút size-11 + gap-3), cách nút chat trên cùng đúng gap-3 (0.75rem)
+        // để cả cột 3 nút cách đều: 1.75 + 2×2.75 + 0.75 + 0.75 = 8.75rem (thanh đáy: 6 + … = 13rem), cùng lề phải
+        hasBottomBar ? 'bottom-[13rem] right-5 sm:right-7 lg:bottom-[8.75rem]' : 'bottom-[8.75rem] right-5 sm:right-7',
         isVisible
           ? 'translate-y-0 opacity-100'
           : 'pointer-events-none translate-y-4 opacity-0'

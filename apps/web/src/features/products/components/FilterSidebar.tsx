@@ -61,7 +61,7 @@ export function FilterSidebar({ searchQuery, onSearchChange, activeFilterCount, 
   const canClear = activeFilterCount > 0 || searchQuery.trim().length > 0;
 
   return (
-    <aside className="hidden lg:sticky lg:top-24 lg:flex lg:max-h-[calc(100vh-7rem)] lg:flex-col lg:self-start">
+    <aside className="hidden lg:sticky lg:top-[calc(var(--site-header-h)+1rem)] lg:flex lg:max-h-[calc(100vh-var(--site-header-h)-2rem)] lg:flex-col lg:self-start">
       <div className="shrink-0 space-y-4 border-b border-[var(--text-main)]/80 pb-4">
         <ProductSearchInput value={searchQuery} onChange={onSearchChange} />
         <div className="flex items-baseline justify-between">

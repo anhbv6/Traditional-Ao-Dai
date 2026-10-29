@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useAuthStore } from "@/features/auth";
-import { getErrorMessage, translateMessage } from "@/lib/messages";
+import { getErrorMessage, notifyDevCode, translateMessage } from "@/lib/messages";
 import { showToast as toast } from "@/components/ui/toast";
 import { usePersonalInfoStore } from "../store/personalInfoStore";
 import {
@@ -58,6 +58,7 @@ export function useContactVerification() {
       setCode("");
       setCooldown(RESEND_COOLDOWN_SECONDS);
       toast.success(translateMessage(response.message, t("codeSent"), tProfile));
+      notifyDevCode(response.data, tProfile);
     },
     onError: showError,
   });

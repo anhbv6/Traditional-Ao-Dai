@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, Check, LogOut, Menu, Minus, Plus, UserRound } from 'lucide-react';
+import { Check, LogOut, Menu, Minus, Plus, UserRound } from 'lucide-react';
 import { Link, usePathname, useRouter, routing } from '@/i18n/routing';
 import { useLocale } from 'next-intl';
 import { useState, useTransition } from 'react';
@@ -14,21 +14,16 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from '@/components/ui/drawer';
-import { SearchBar } from './SearchBar';
 import { Logo } from './Logo';
 import type { NavItem } from './types';
 import { LogoutDialog, useAuthStore } from '@/features/auth';
 import { ActionButton } from '@/components/shared/ActionButton';
 import { ActionLink } from '@/components/shared/ActionLink';
-import { useWishlistStore } from '@/features/wishlist';
-import { useSearchHistoryStore } from '@/features/products';
 import { executeAdminLogout } from '@/features/admin/core/auth';
 import { useAdminSession, useAdminSessionCache } from '@/features/admin/core/session';
 
 type MobileMenuProps = {
   items: NavItem[];
-  searchPlaceholder?: string;
-  searchLabel?: string;
   loginLabel?: string;
   profileLabel?: string;
   logoutLabel?: string;
@@ -38,8 +33,6 @@ type MobileMenuProps = {
 
 export function MobileMenu({
   items,
-  searchPlaceholder = 'Search...',
-  searchLabel = 'Search',
   loginLabel = 'Login',
   profileLabel = 'Profile',
   logoutLabel = 'Logout',
@@ -53,7 +46,6 @@ export function MobileMenu({
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { isAuthenticated, user: customer } = useAuthStore();
-  const wishlistCount = useWishlistStore((state) => state.items.length);
   const { user: adminUser, isAdminOrStaff: isAdmin } = useAdminSession();
   const adminSessionCache = useAdminSessionCache();
   const user = customer ?? adminUser;
@@ -75,13 +67,6 @@ export function MobileMenu({
   };
 
   const locales = routing.locales;
-
-  /** Tìm từ menu mobile: lưu lịch sử, đóng menu rồi sang trang kết quả (cùng luồng với bảng tìm kiếm trên header) */
-  const handleSearch = (keyword: string) => {
-    useSearchHistoryStore.getState().add(keyword);
-    setIsDrawerOpen(false);
-    router.push(`/products?q=${encodeURIComponent(keyword)}#product-list`);
-  };
 
   /** Đóng menu rồi mở hộp thoại xác nhận đăng xuất chung (đặt ngoài Drawer nên không bị đóng theo) */
   const handleLogout = () => {
@@ -116,25 +101,14 @@ export function MobileMenu({
 
           <div className="flex-1 flex flex-col justify-between overflow-y-auto px-5 pb-5">
             <div>
-              <div className="py-5">
-                <SearchBar placeholder={searchPlaceholder} submitLabel={searchLabel} onSearch={handleSearch} />
-              </div>
-
-              <nav className="grid gap-1" aria-label="Mobile navigation">
+              <nav className="grid gap-1 pt-3" aria-label="Mobile navigation">
                 {items.map((item) => (
                   <DrawerClose key={item.href} asChild>
                     <Link
                       href={item.href}
                       className="group flex min-h-12 items-center justify-between border-b border-secondary py-3 text-sm font-normal uppercase tracking-[1px] text-foreground transition-colors hover:text-primary-ink"
                     >
-                      <span className="font-[family-name:var(--font-lora)]">
-                        {item.label}
-                        {item.href === '/wishlist' && wishlistCount > 0 ? (
-                          <span className="ml-2 inline-flex h-5 min-w-5 items-center justify-center bg-primary px-1 text-[10px] font-bold text-white">
-                            {wishlistCount}
-                          </span>
-                        ) : null}
-                      </span>
+                      <span className="font-[family-name:var(--font-lora)]">{item.label}</span>
                     </Link>
                   </DrawerClose>
                 ))}
@@ -186,7 +160,7 @@ export function MobileMenu({
               </nav>
             </div>
 
-            {/* Tài khoản / Đăng nhập & Mua sắm — nút chung ActionLink / ActionButton */}
+            {/* Tài khoản / Đăng nhập — nút chung ActionLink / ActionButton ("Cửa hàng" đã có trong menu nên không lặp nút mua sắm) */}
             <div className="mt-6 grid gap-3">
               {userName ? (
                 <>
@@ -208,12 +182,6 @@ export function MobileMenu({
                   </ActionLink>
                 </DrawerClose>
               )}
-
-              <DrawerClose asChild>
-                <ActionLink href="/products" variant="dialog" size="lg" fullWidth icon={<ArrowRight />} iconPosition="end">
-                  Shop now
-                </ActionLink>
-              </DrawerClose>
             </div>
           </div>
         </DrawerContent>

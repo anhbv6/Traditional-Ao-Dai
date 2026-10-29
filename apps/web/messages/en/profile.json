@@ -2,6 +2,7 @@
   "title": "Account Settings",
   "subtitle": "Manage your profile details, orders, addresses, and payment methods.",
   "responses": {
+    "DEV_VERIFICATION_CODE": "OTP code (dev only)",
     "VALIDATION_ERROR": "The submitted information is invalid.",
     "UPDATE_PROFILE_SUCCESS": "Personal information updated successfully!",
     "CHANGE_PASSWORD_SUCCESS": "Password changed successfully!",

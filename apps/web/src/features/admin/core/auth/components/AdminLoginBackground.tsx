@@ -1,9 +1,9 @@
-/** Nền màn đăng nhập admin: lưới mảnh đơn sắc, mờ dần ra mép — tách biệt hẳn phong cách ảnh của storefront */
+/** Nền màn đăng nhập admin: lưới chấm đơn sắc, mờ dần ra mép — khác hẳn bố cục ảnh 2 cột của đăng nhập storefront */
 export function AdminLoginBackground() {
   return (
     <div
       aria-hidden
-      className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#E4E4E7_1px,transparent_1px),linear-gradient(to_bottom,#E4E4E7_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_70%)]"
+      className="pointer-events-none absolute inset-0 bg-[radial-gradient(#D4D4D8_1px,transparent_1px)] bg-[size:20px_20px] [mask-image:radial-gradient(ellipse_at_center,black_25%,transparent_75%)]"
     />
   );
 }

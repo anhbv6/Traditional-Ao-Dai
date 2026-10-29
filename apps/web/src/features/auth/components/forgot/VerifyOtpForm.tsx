@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { motion } from 'motion/react';
 import { ShieldCheck } from 'lucide-react';
-import { notifyError, notifySuccess } from '@/lib/messages';
+import { notifyDevCode, notifyError, notifySuccess } from '@/lib/messages';
 import { forgotPasswordEmailApi, verifyResetPasswordEmailApi, verifyResetPasswordPhoneApi } from '../../api/forgot.api';
 import { sendOtpApi } from '../../api/auth.api';
 
@@ -55,7 +55,8 @@ export function VerifyOtpForm({
       if (forgotType === 'email') {
         await forgotPasswordEmailApi(target);
       } else {
-        await sendOtpApi(target, 'RESET_PASSWORD');
+        const res = await sendOtpApi(target, 'RESET_PASSWORD');
+        notifyDevCode(res.data, t);
       }
 
       onResent();

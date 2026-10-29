@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion, type Variants } from 'motion/react';
 import { AppLoading } from '@/components/shared/AppLoading';
+import { Logo } from '@/components/layout/header/Logo';
 import { cn } from '@/lib/utils';
 
 /** Hiệu ứng xuất hiện lần lượt cho từng khối trong form auth */
@@ -30,13 +31,18 @@ interface AuthFormShellProps {
 export function AuthFormShell({ children, loading = false, className }: AuthFormShellProps) {
   return (
     /* Khoảng cách dọc được giữ gọn để cả form (kể cả khi hiện lỗi) vừa một màn hình laptop, không phải cuộn */
-    <div className="relative flex min-h-dvh w-full items-center justify-center bg-[var(--bg-main)] px-4 py-6 sm:px-8 lg:px-16">
+    <div className="relative flex min-h-dvh w-full flex-col items-center bg-[var(--bg-main)] px-4 py-6 sm:px-8 lg:px-16">
       <AppLoading visible={loading} />
+      {/* Logo + tên trang ở góc trên cột form (desktop); mobile đã có AuthMobileLogo trong AuthHeader.
+          Nằm trong luồng (không absolute) để form dài / màn thấp không bị logo đè lên tiêu đề */}
+      <div className="hidden self-stretch pb-6 lg:block">
+        <Logo textLogo />
+      </div>
       <motion.div
         variants={authContainerVariants}
         initial="hidden"
         animate="visible"
-        className={cn('w-full max-w-[520px] space-y-5 sm:space-y-6', className)}
+        className={cn('my-auto w-full max-w-[520px] space-y-5 sm:space-y-6', className)}
       >
         {children}
       </motion.div>

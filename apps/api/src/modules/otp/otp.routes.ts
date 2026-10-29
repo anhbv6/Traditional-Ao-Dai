@@ -54,6 +54,10 @@ const router = Router()
  *                     ttl:
  *                       type: integer
  *                       example: 300
+ *                     devCode:
+ *                       type: string
+ *                       description: Mã OTP — CHỈ trả ngoài production (SMS mock) để test
+ *                       example: "123456"
  *       400:
  *         description: VALIDATION_ERROR, INVALID_PHONE_NUMBER, PHONE_ALREADY_EXISTS (purpose REGISTER)
  *       404:

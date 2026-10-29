@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { Link } from '@/i18n/routing';
 import { ArrowRight } from 'lucide-react';
 
-const FALLBACK_IMAGE = '/logoPage.png';
+const FALLBACK_IMAGE = '/logo.png';
 
 export interface NewsCardProps {
   slug: string;

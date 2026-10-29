@@ -9,7 +9,7 @@ import * as z from 'zod';
 import { type RegisterFormData } from '../types/register.types';
 import { createRegisterSchema } from '../validations/register.validation';
 import { extractErrorMessage } from '@/lib/messages';
-import { notifyError, notifySuccess } from '@/lib/messages';
+import { notifyDevCode, notifyError, notifySuccess } from '@/lib/messages';
 import { withMinDelay } from '@/lib/utils';
 import { checkEmailApi, checkPhoneApi, registerApi, sendRegisterEmailCodeApi } from '../api/register.api';
 import { loginWithGoogleApi, sendOtpApi } from '../api/auth.api';
@@ -231,7 +231,8 @@ export function useRegister() {
 
     try {
       setIsRegistering(true);
-      await withMinDelay(sendCode(data), 2000);
+      const res = await withMinDelay(sendCode(data), 2000);
+      notifyDevCode(res.data, t);
       setOtpInput('');
       setOtpError('');
       setCodeTarget(targetKey);

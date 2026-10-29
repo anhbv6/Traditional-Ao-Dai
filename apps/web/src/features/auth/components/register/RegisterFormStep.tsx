@@ -283,7 +283,7 @@ export function RegisterFormStep({
             <p
               key={`terms:${submitCount}`}
               role="alert"
-              className="flex items-start gap-1.5 text-xs leading-5 text-rose-500 motion-safe:animate-shake"
+              className="flex items-start gap-1.5 text-xs leading-5 text-(--destructive) motion-safe:animate-shake"
             >
               <AlertCircle aria-hidden="true" className="mt-0.5 size-3.5 shrink-0" />
               <span>{errors.agreeTerms.message}</span>

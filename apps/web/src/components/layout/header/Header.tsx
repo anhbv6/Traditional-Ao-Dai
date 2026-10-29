@@ -18,8 +18,8 @@ type HeaderProps = {
 export async function Header({ sticky = true }: HeaderProps) {
   const t = await getTranslations('Common');
 
-  // Danh sách NavItems dành cho PC Desktop (Không có Wishlist)
-  const desktopNavItems: NavItem[] = [
+  // Điều hướng chính — dùng chung cho thanh menu desktop và drawer mobile (Yêu thích là icon tim trên header ở cả hai)
+  const navItems: NavItem[] = [
     { label: t('home'), href: '/' },
     { label: t('shop'), href: '/products' },
     { label: t('ourStory'), href: '/about' },
@@ -27,17 +27,12 @@ export async function Header({ sticky = true }: HeaderProps) {
     { label: t('contact'), href: '/contact' },
   ];
 
-  // Danh sách NavItems riêng cho Mobile Drawer (Bao gồm thêm Wishlist)
-  const mobileNavItems: NavItem[] = [
-    ...desktopNavItems,
-    { label: t('wishlist'), href: '/wishlist' },
-  ];
-
   return (
     <HeaderWrapper sticky={sticky}>
       <header className="relative mx-auto flex h-16 w-full items-center justify-between gap-4 px-5 sm:px-8 lg:h-[4.5rem] lg:px-6 xl:px-8 2xl:h-20 2xl:px-12">
-        <Logo textLogo/>
-        <DesktopNav items={desktopNavItems} />
+        {/* Điện thoại rất hẹp (< 390px): chỉ giữ hình logo để đủ chỗ cho hàng icon (tìm kiếm, thông báo, tim, giỏ, menu) */}
+        <Logo textLogo textClassName="max-[389px]:sr-only" />
+        <DesktopNav items={navItems} />
         <div className="flex items-center gap-1 sm:gap-2">
           <SearchOverlay label={t('search')} placeholder={t('searchPlaceholder')} />
 
@@ -50,14 +45,13 @@ export async function Header({ sticky = true }: HeaderProps) {
             <UserMenu loginLabel={t('login')} profileLabel={t('profile')} ordersLabel={t('orders')} logoutLabel={t('logout')} />
           </div>
 
-          {/* Mobile Header Items: Cart icon + Mobile Menu Drawer */}
-          <div className="flex items-center gap-1 lg:hidden">
+          {/* Mobile: thao tác nhanh nằm ngoài header (thông báo, yêu thích, giỏ); drawer chỉ còn điều hướng + ngôn ngữ + tài khoản */}
+          <div className="flex items-center lg:hidden">
             <NotificationButton label={t('notifications')} />
+            <WishlistButton label={t('wishlist')} />
             <CartButton label={t('cart')} />
             <MobileMenu
-              items={mobileNavItems}
-              searchPlaceholder={t('searchPlaceholder')}
-              searchLabel={t('search')}
+              items={navItems}
               loginLabel={t('login')}
               profileLabel={t('profile')}
               logoutLabel={t('logout')}

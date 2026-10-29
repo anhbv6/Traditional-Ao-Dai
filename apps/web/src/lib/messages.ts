@@ -270,6 +270,15 @@ export function notifyError(err: unknown, fallback?: string, t?: Translator): st
 }
 
 /**
+ * Ngoài production API trả kèm `devCode` (SMS đang là mock) -> hiện mã ngay trên màn để test, khỏi mở log API.
+ * API production không trả trường này nên hàm không làm gì.
+ */
+export function notifyDevCode(data: unknown, t?: Translator): void {
+  if (typeof data !== 'object' || data === null || !('devCode' in data) || typeof data.devCode !== 'string') return;
+  showToast.info(translateMessage('DEV_VERIFICATION_CODE', 'DEV_VERIFICATION_CODE', t), data.devCode);
+}
+
+/**
  * Dịch và hiển thị toast thành công
  */
 export function notifySuccess(keyOrMessage: string, fallback?: string, t?: Translator): string {

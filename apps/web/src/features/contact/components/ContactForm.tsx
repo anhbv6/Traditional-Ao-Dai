@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
-import { ArrowRight } from "lucide-react";
+import React, { type ReactNode } from "react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { ActionButton } from "@/components/shared/ActionButton";
@@ -14,7 +14,12 @@ import { optionKeys } from "../types/contact.types";
 const LEGEND_CLASS = "text-[11px] font-semibold uppercase tracking-[2.5px] text-[var(--text-light)]";
 const MESSAGE_MAX_LENGTH = 1000;
 
-export function ContactForm() {
+interface ContactFormProps {
+  /** Lời dặn hiện nổi bật ở đầu form (vd. "Không cần biết trước số đo…") */
+  intro?: ReactNode;
+}
+
+export function ContactForm({ intro }: ContactFormProps) {
   const t = useTranslations("ContactPage.form");
   const tCommon = useTranslations("Common");
   const { formData, isSubmitting, isSuccess, error, handleChange, handleSubmit } = useContact();
@@ -29,6 +34,13 @@ export function ContactForm() {
 
   return (
     <form onSubmit={handleSubmit} className="bg-[var(--bg-main)] p-6 sm:p-10 xl:p-12">
+      {intro ? (
+        <p className="mb-8 flex gap-3 border-l-2 border-[var(--primary-color)] bg-[var(--bg-secondary)] px-4 py-3.5 text-sm leading-6 text-[var(--text-main)] sm:mb-10 sm:px-5 sm:py-4 sm:text-[15px] sm:leading-7">
+          <Sparkles aria-hidden="true" className="mt-1 size-4 shrink-0 text-[var(--primary-ink)]" />
+          <span>{intro}</span>
+        </p>
+      ) : null}
+
       {/* 2 cột khi đủ rộng; laptop nhỏ (cột form hẹp) xếp 1 cột cho khỏi chật */}
       <div className="grid gap-7 sm:grid-cols-2 sm:gap-8 lg:grid-cols-1 xl:grid-cols-2 xl:gap-10">
         <TextField
@@ -75,7 +87,8 @@ export function ContactForm() {
         required
         className="mt-8 sm:mt-10"
         label={t("message")}
-        rows={4}
+        rows={2}
+        autoResize
         maxLength={MESSAGE_MAX_LENGTH}
         showCount
         placeholder={t("messagePlaceholder")}

@@ -212,7 +212,8 @@ export function ProductsCollection({ filterParams, initialQuery }: ProductsColle
         {visibleProducts.length > 0 ? (
           // Đổi bộ lọc / sắp xếp / số cột: thẻ cũ mờ đi, thẻ còn lại trượt mượt về vị trí mới (layout), thẻ mới hiện lần lượt
           <MotionConfig reducedMotion="user">
-          <motion.div layout className={cn('grid grid-cols-2 gap-x-3 gap-y-9 sm:gap-x-6 sm:gap-y-12', gridClassName[gridSize])}>
+          {/* Mobile: thẻ trắng có nền nên khoảng cách dọc ngắn hơn; tablet 3 cột cho thẻ khỏi to quá khổ */}
+          <motion.div layout className={cn('grid grid-cols-2 gap-x-3 gap-y-4 sm:gap-x-5 sm:gap-y-6 md:grid-cols-3 lg:gap-x-6 lg:gap-y-12', gridClassName[gridSize])}>
             <AnimatePresence mode="popLayout" initial={false}>
             {visibleProducts.map((product, index) => (
               <motion.div

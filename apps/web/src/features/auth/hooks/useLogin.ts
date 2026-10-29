@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/routing';
 import { loginApi, sendOtpApi, loginWithOtpApi, loginWithGoogleApi } from '../api/auth.api';
 import { establishCustomerSession } from '../utils/session';
-import { notifyError, notifySuccess } from '@/lib/messages';
+import { notifyDevCode, notifyError, notifySuccess } from '@/lib/messages';
 import { useCountdown } from './useCountdown';
 
 export function useLogin() {
@@ -61,12 +61,13 @@ export function useLogin() {
 
     setIsSendingOtp(true);
     try {
-      await sendOtpApi(phone.trim(), 'LOGIN');
+      const res = await sendOtpApi(phone.trim(), 'LOGIN');
       setOtpSent(true);
       setOtpInputState('');
       setOtpError('');
       resendCountdown.start();
       notifySuccess(t('otpSent'));
+      notifyDevCode(res.data, t);
     } catch (err: unknown) {
       console.error(err);
       notifyError(err, 'OTP_SEND_FAILED', t);

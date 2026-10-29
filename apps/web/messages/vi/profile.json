@@ -2,6 +2,7 @@
   "title": "Quản lý tài khoản",
   "subtitle": "Quản lý thông tin cá nhân, đơn hàng, sổ địa chỉ và phương thức thanh toán.",
   "responses": {
+    "DEV_VERIFICATION_CODE": "Mã OTP (chỉ hiện khi dev)",
     "VALIDATION_ERROR": "Thông tin gửi lên chưa hợp lệ.",
     "UPDATE_PROFILE_SUCCESS": "Cập nhật thông tin cá nhân thành công!",
     "CHANGE_PASSWORD_SUCCESS": "Đổi mật khẩu thành công!",
