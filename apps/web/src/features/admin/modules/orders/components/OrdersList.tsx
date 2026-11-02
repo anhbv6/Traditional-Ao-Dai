@@ -87,7 +87,7 @@ export function OrdersList({ initialOrders }: OrdersListProps) {
           />
         </div>
 
-        <div className="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
+        <div className="flex items-center gap-2 w-full md:w-auto overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <Filter size={15} className="text-[#71717A] shrink-0" />
           {["ALL", "PENDING", "CONFIRMED", "IN_PRODUCTION", "SHIPPING", "DELIVERED"].map((st) => (
             <button
@@ -105,8 +105,70 @@ export function OrdersList({ initialOrders }: OrdersListProps) {
         </div>
       </div>
 
+      {/* Màn nhỏ: danh sách thẻ thay cho bảng 7 cột */}
+      <ul className="space-y-3 md:hidden">
+        {filteredOrders.length === 0 ? (
+          <li className="bg-white rounded-xl border border-[#E4E4E7] shadow-2xs py-12 text-center text-sm text-[#71717A]">
+            <Package className="mx-auto size-8 text-zinc-300 mb-2" />
+            {t("empty")}
+          </li>
+        ) : (
+          filteredOrders.map((order) => {
+            const badge = statusBadges[order.orderStatus];
+            const BadgeIcon = badge?.icon || Package;
+            const hasCustomFit = order.items.some((i) => i.isCustomFit);
+
+            return (
+              <li key={order.id}>
+                <button
+                  type="button"
+                  onClick={() => setSelectedOrder(order)}
+                  className="block w-full cursor-pointer rounded-xl border border-[#E4E4E7] bg-white p-4 text-left shadow-2xs transition-colors active:bg-zinc-50"
+                >
+                  <span className="flex items-center justify-between gap-2">
+                    <span className="min-w-0 truncate font-mono text-xs font-semibold text-[#09090B]">{order.orderNumber}</span>
+                    <span className={`inline-flex shrink-0 items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${badge?.bg} ${badge?.text}`}>
+                      <BadgeIcon size={12} />
+                      {t(`status.${order.orderStatus}`)}
+                    </span>
+                  </span>
+
+                  <span className="mt-3 block truncate text-sm font-semibold text-[#09090B]">{order.customerName}</span>
+                  <span className="block font-mono text-xs text-[#71717A]">{order.customerPhone}</span>
+
+                  <span className="mt-3 flex flex-wrap items-center gap-1.5 text-xs text-zinc-700">
+                    {t("itemsCount", { count: order.items.length })}
+                    {hasCustomFit && (
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-purple-50 text-purple-700 text-[10px] font-semibold border border-purple-200">
+                        <Sparkles size={10} /> {t("customFit")}
+                      </span>
+                    )}
+                  </span>
+
+                  <span className="mt-3 flex items-center justify-between gap-2 border-t border-dashed border-[#E4E4E7] pt-3">
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium ${
+                      order.paymentStatus === "PAID"
+                        ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                        : order.paymentStatus === "PARTIALLY_PAID"
+                        ? "bg-amber-50 text-amber-700 border border-amber-200"
+                        : "bg-zinc-100 text-zinc-600 border border-[#E4E4E7]"
+                    }`}>
+                      {order.paymentStatus === "PAID" ? t("payment.PAID") : order.paymentStatus === "PARTIALLY_PAID" ? t("payment.PARTIALLY_PAID") : t("payment.UNPAID")}
+                    </span>
+                    <span className="flex items-center gap-1 font-mono text-sm font-semibold text-[#09090B]">
+                      {formatVnd(Number(order.totalAmount), locale)}
+                      <ChevronRight size={16} className="text-zinc-400" />
+                    </span>
+                  </span>
+                </button>
+              </li>
+            );
+          })
+        )}
+      </ul>
+
       {/* Orders Table */}
-      <div className="bg-white rounded-xl border border-[#E4E4E7] shadow-2xs overflow-hidden">
+      <div className="hidden md:block bg-white rounded-xl border border-[#E4E4E7] shadow-2xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>

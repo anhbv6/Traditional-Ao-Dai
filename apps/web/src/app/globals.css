@@ -430,6 +430,13 @@
     color: #09090B;
   }
 
+  /* Màn nhỏ: bảng giữ nguyên dòng và vuốt ngang, không bóp cột làm chữ xuống từng từ */
+  @media (max-width: 47.99rem) {
+    .admin-shell :where(th, td) {
+      white-space: nowrap;
+    }
+  }
+
   .admin-shell :where(h1, h2, h3, h4, h5, h6, .product-title) {
     font-family: inherit;
     font-size: inherit;

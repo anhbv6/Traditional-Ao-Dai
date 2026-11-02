@@ -55,7 +55,7 @@ export function TailoringBoard({ initialItems }: TailoringBoardProps) {
       const res = await updateTailoringStatusAction({
         orderItemId: item.id,
         orderId: item.orderId,
-        status: newStatus,
+        status: newStatus,
         note: noteText || undefined,
       });
 
@@ -74,7 +74,7 @@ export function TailoringBoard({ initialItems }: TailoringBoardProps) {
   return (
     <div className="space-y-6">
       {/* Header filter tags */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-2">
+      <div className="flex items-center gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <button
           onClick={() => setFilterStep("ALL")}
           className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${

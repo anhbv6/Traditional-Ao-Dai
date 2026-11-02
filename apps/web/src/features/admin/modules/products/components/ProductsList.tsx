@@ -1,188 +1,260 @@
 "use client";
 
 import React, { useState, useTransition } from "react";
-import { useLocale, useTranslations } from "next-intl";
-import { formatVnd, type Locale } from "@repo/shared";
-import { type AdminProductItem } from "../types/products.types";
-import { toggleProductActiveAction, toggleProductCustomFitAction } from "../actions/products.actions";
+import dynamic from "next/dynamic";
+import { useTranslations } from "next-intl";
+import { Plus, Search } from "lucide-react";
+import { useNotify } from "@/hooks/useNotify";
+import { cn } from "@/lib/utils";
+import { ADMIN_CARD_CLASS, AdminFilterSelect, AdminPageHeader, AdminSecondaryButton } from "@/features/admin/core/ui";
+import { type AdminProductCategory, type AdminProductItem } from "../types/products.types";
 import {
-  Shirt,
-  Search,
-  Plus,
-  Scissors,
-  CheckCircle,
-  XCircle,
-} from "lucide-react";
+  bulkSetProductsActiveAction,
+  toggleProductActiveAction,
+  toggleProductCustomFitAction,
+} from "../actions/products.actions";
+import { matchesStatusTab, PRODUCT_STATUS_TABS, uniqueOptions, type ProductStatusTab } from "../utils/products.utils";
+import { ProductsTable } from "./ProductsTable";
+
+// Dialog chỉ cần khi thao tác nên tách khỏi bundle đầu trang
+const ProductFormDialog = dynamic(() => import("./ProductFormDialog").then((m) => m.ProductFormDialog));
+const ProductDetailDialog = dynamic(() => import("./ProductDetailDialog").then((m) => m.ProductDetailDialog));
 
 interface ProductsListProps {
   initialProducts: AdminProductItem[];
+  categories: AdminProductCategory[];
 }
 
-export function ProductsList({ initialProducts }: ProductsListProps) {
+type ProductDialog = { type: "create" } | { type: "edit"; productId: string } | { type: "detail"; productId: string };
+
+/** Dựng danh sách lựa chọn cho bộ lọc: mục "tất cả" (giá trị rỗng) đứng đầu */
+const toFilterOptions = (allLabel: string, values: (string | null | undefined)[]) => [
+  { value: "", label: allLabel },
+  ...uniqueOptions(values).map((value) => ({ value, label: value })),
+];
+
+export function ProductsList({ initialProducts, categories }: ProductsListProps) {
   const t = useTranslations("AdminPage.products");
-  const locale = useLocale() as Locale;
+  const tPage = useTranslations("AdminPage.pages.products");
+  const notify = useNotify();
+  const [dialog, setDialog] = useState<ProductDialog | null>(null);
   const [products, setProducts] = useState<AdminProductItem[]>(initialProducts);
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusTab, setStatusTab] = useState<ProductStatusTab>("ALL");
+  const [category, setCategory] = useState("");
+  const [material, setMaterial] = useState("");
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isPending, startTransition] = useTransition();
 
+  const keyword = searchTerm.trim().toLowerCase();
   const filtered = products.filter((p) => {
+    const matchesSearch =
+      p.name.toLowerCase().includes(keyword) ||
+      p.material?.toLowerCase().includes(keyword) ||
+      p.categoryName?.toLowerCase().includes(keyword);
+
     return (
-      p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.material?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.categoryName?.toLowerCase().includes(searchTerm.toLowerCase())
+      matchesSearch &&
+      matchesStatusTab(p, statusTab) &&
+      (!category || p.categoryName === category) &&
+      (!material || p.material === material)
     );
   });
 
-  const handleToggleActive = (productId: string, current: boolean) => {
+  // Chỉ tính dòng đang hiển thị: sản phẩm đã bị lọc mất không được đổi ngầm khi bấm thao tác hàng loạt
+  const selectedProducts = filtered.filter((p) => selectedIds.has(p.id));
+
+  const patchProducts = (ids: string[], patch: Partial<AdminProductItem>) => {
+    setProducts((prev) => prev.map((p) => (ids.includes(p.id) ? { ...p, ...patch } : p)));
+  };
+
+  const handleToggleActive = ({ id, isActive }: AdminProductItem) => {
     startTransition(async () => {
-      const res = await toggleProductActiveAction(productId, !current);
-      if (res.success) {
-        setProducts((prev) =>
-          prev.map((p) => (p.id === productId ? { ...p, isActive: !current } : p))
-        );
+      const res = await toggleProductActiveAction(id, !isActive);
+      if (!res.success) {
+        notify.error(res.error, "PRODUCT_UPDATE_FAILED");
+        return;
       }
+      patchProducts([id], { isActive: !isActive });
     });
   };
 
-  const handleToggleCustomFit = (productId: string, current: boolean) => {
+  const handleToggleCustomFit = ({ id, isCustomFit }: AdminProductItem) => {
     startTransition(async () => {
-      const res = await toggleProductCustomFitAction(productId, !current);
-      if (res.success) {
-        setProducts((prev) =>
-          prev.map((p) => (p.id === productId ? { ...p, isCustomFit: !current } : p))
-        );
+      const res = await toggleProductCustomFitAction(id, !isCustomFit);
+      if (!res.success) {
+        notify.error(res.error, "PRODUCT_UPDATE_FAILED");
+        return;
       }
+      patchProducts([id], { isCustomFit: !isCustomFit });
+    });
+  };
+
+  const handleBulkActive = (isActive: boolean) => {
+    const productIds = selectedProducts.map((p) => p.id);
+
+    startTransition(async () => {
+      const res = await bulkSetProductsActiveAction({ productIds, isActive });
+      if (!res.success) {
+        notify.error(res.error, "PRODUCT_UPDATE_FAILED");
+        return;
+      }
+      patchProducts(productIds, { isActive });
+      setSelectedIds(new Set());
+    });
+  };
+
+  const handleSaved = (saved: AdminProductItem) => {
+    setProducts((prev) =>
+      prev.some((p) => p.id === saved.id) ? prev.map((p) => (p.id === saved.id ? saved : p)) : [saved, ...prev]
+    );
+    setDialog(null);
+  };
+
+  const handleSelect = (id: string, checked: boolean) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (checked) next.add(id);
+      else next.delete(id);
+      return next;
     });
   };
 
   return (
-    <div className="space-y-6">
-      {/* Top Bar */}
-      <div className="bg-white p-4 rounded-xl border border-[#E4E4E7] shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="relative w-full sm:w-80">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
-          <input
-            type="text"
-            placeholder={t("searchPlaceholder")}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-zinc-50 border border-[#E4E4E7] rounded-lg text-sm focus:outline-none focus:border-zinc-900 transition-colors"
-          />
-        </div>
+    <>
+      <AdminPageHeader
+        title={tPage("title")}
+        description={tPage("description")}
+        actions={
+          <button
+            type="button"
+            onClick={() => setDialog({ type: "create" })}
+            className="inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-lg bg-[#18181B] px-3.5 text-sm font-medium text-white shadow-2xs transition-colors hover:bg-[#09090B]"
+          >
+            <Plus size={16} aria-hidden /> {t("add")}
+          </button>
+        }
+      />
 
-        <button
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-[#18181B] hover:bg-[#09090B] text-white rounded-lg text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
+      <div className={cn(ADMIN_CARD_CLASS, "overflow-hidden")}>
+        <div
+          role="tablist"
+          aria-label={t("colStatus")}
+          className="flex gap-5 overflow-x-auto border-b border-[#E4E4E7] px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
-          <Plus size={14} /> {t("add")}
-        </button>
+          {PRODUCT_STATUS_TABS.map((tab) => {
+            const count = products.filter((p) => matchesStatusTab(p, tab)).length;
+
+            return (
+              <button
+                key={tab}
+                type="button"
+                role="tab"
+                aria-selected={statusTab === tab}
+                onClick={() => setStatusTab(tab)}
+                className={cn(
+                  "-mb-px flex shrink-0 cursor-pointer items-center gap-1.5 border-b-2 py-3 text-sm font-medium outline-none transition-colors",
+                  statusTab === tab
+                    ? "border-[#18181B] text-[#09090B]"
+                    : "border-transparent text-[#71717A] hover:text-[#09090B]"
+                )}
+              >
+                {t(`tabs.${tab}`)}
+                <span className="text-xs font-normal tabular-nums text-[#A1A1AA]">{count}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {selectedProducts.length > 0 ? (
+          <div className="flex min-h-[57px] flex-wrap items-center gap-2 border-b border-[#E4E4E7] bg-[#FAFAFA] px-4 py-2.5">
+            <span className="mr-auto text-sm font-medium text-[#09090B]">
+              {t("selectedCount", { count: selectedProducts.length })}
+            </span>
+            <AdminSecondaryButton disabled={isPending} onClick={() => handleBulkActive(true)}>
+              {t("showProduct")}
+            </AdminSecondaryButton>
+            <AdminSecondaryButton disabled={isPending} onClick={() => handleBulkActive(false)}>
+              {t("hideProduct")}
+            </AdminSecondaryButton>
+            <AdminSecondaryButton disabled={isPending} onClick={() => setSelectedIds(new Set())}>
+              {t("clearSelection")}
+            </AdminSecondaryButton>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2 border-b border-[#E4E4E7] p-3 sm:flex-row sm:items-center">
+            <div className="relative min-w-0 flex-1">
+              <Search size={15} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#A1A1AA]" aria-hidden />
+              <input
+                type="search"
+                aria-label={t("searchPlaceholder")}
+                placeholder={t("searchPlaceholder")}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="h-9 w-full rounded-lg border border-[#E4E4E7] bg-white pl-8 pr-3 text-sm text-[#09090B] shadow-2xs outline-none placeholder:text-[#A1A1AA] focus:border-[#18181B]"
+              />
+            </div>
+            <div className="grid gap-2 sm:flex">
+              <AdminFilterSelect
+                label={t("colCategory")}
+                value={category}
+                onChange={setCategory}
+                options={toFilterOptions(
+                  t("allCategories"),
+                  products.map((p) => p.categoryName)
+                )}
+                className="w-full sm:w-64"
+              />
+              <AdminFilterSelect
+                label={t("colMaterial")}
+                value={material}
+                onChange={setMaterial}
+                options={toFilterOptions(
+                  t("allMaterials"),
+                  products.map((p) => p.material)
+                )}
+                className="w-full sm:w-64"
+              />
+            </div>
+          </div>
+        )}
+
+        {filtered.length === 0 ? (
+          <p className="py-16 text-center text-sm text-[#71717A]">
+            {products.length === 0 ? t("empty") : t("noResults")}
+          </p>
+        ) : (
+          <ProductsTable
+            products={filtered}
+            selectedIds={selectedIds}
+            disabled={isPending}
+            onSelectAll={(checked) => setSelectedIds(checked ? new Set(filtered.map((p) => p.id)) : new Set())}
+            onSelect={handleSelect}
+            onView={({ id }) => setDialog({ type: "detail", productId: id })}
+            onEdit={({ id }) => setDialog({ type: "edit", productId: id })}
+            onToggleActive={handleToggleActive}
+            onToggleCustomFit={handleToggleCustomFit}
+          />
+        )}
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-xl border border-[#E4E4E7] shadow-2xs overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b border-[#E4E4E7] bg-zinc-50/50 text-[11px] font-semibold text-[#71717A] uppercase tracking-wider">
-                <th className="py-3 px-4">{t("colProduct")}</th>
-                <th className="py-3 px-4">{t("colCategory")}</th>
-                <th className="py-3 px-4">{t("colPrice")}</th>
-                <th className="py-3 px-4">{t("colStock")}</th>
-                <th className="py-3 px-4">{t("colCustomFit")}</th>
-                <th className="py-3 px-4">{t("colStatus")}</th>
-                <th className="py-3 px-4 text-right">{t("colSold")}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#E4E4E7] text-sm">
-              {filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="py-12 text-center text-[#71717A]">
-                    <Shirt className="mx-auto size-8 text-zinc-300 mb-2" />
-                    {t("empty")}
-                  </td>
-                </tr>
-              ) : (
-                filtered.map((product) => (
-                  <tr key={product.id} className="hover:bg-zinc-50/80 transition-colors">
-                    <td className="py-3.5 px-4">
-                      <div className="flex items-center gap-3">
-                        <div className="size-10 rounded-lg bg-zinc-100 border border-[#E4E4E7] overflow-hidden shrink-0 flex items-center justify-center">
-                          {product.images?.[0] ? (
-                            // eslint-disable-next-line @next/next/no-img-element -- ảnh từ URL tùy ý (blob xem trước / avatar / ảnh do admin nhập), không tối ưu được bằng next/image
-                            <img
-                              src={product.images[0]}
-                              alt={product.name}
-                              className="size-full object-cover"
-                            />
-                          ) : (
-                            <Shirt size={18} className="text-zinc-400" />
-                          )}
-                        </div>
-                        <div>
-                          <div className="font-semibold text-[#09090B] line-clamp-1">{product.name}</div>
-                          <div className="text-xs text-zinc-400 font-mono">/{product.slug}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <div className="font-medium text-zinc-800">{product.categoryName ?? t("uncategorized")}</div>
-                      <div className="text-xs text-[#71717A]">{product.material || t("defaultMaterial")}</div>
-                    </td>
-                    <td className="py-3.5 px-4 font-mono font-semibold text-[#09090B]">
-                      {formatVnd(Number(product.basePrice), locale)}
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <div className="font-mono font-medium text-[#09090B]">
-                        {t("units", { count: product.totalStock })}
-                      </div>
-                      <div className="text-xs text-[#71717A]">
-                        {t("variantsCount", { count: product.variantsCount })}
-                      </div>
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <button
-                        disabled={isPending}
-                        onClick={() => handleToggleCustomFit(product.id, product.isCustomFit)}
-                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border transition-colors cursor-pointer ${
-                          product.isCustomFit
-                            ? "bg-purple-50 text-purple-700 border-purple-200"
-                            : "bg-zinc-100 text-[#71717A] border-[#E4E4E7]"
-                        }`}
-                      >
-                        <Scissors size={12} />
-                        {product.isCustomFit ? t("customFitOn") : t("customFitOff")}
-                      </button>
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <button
-                        disabled={isPending}
-                        onClick={() => handleToggleActive(product.id, product.isActive)}
-                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border transition-colors cursor-pointer ${
-                          product.isActive
-                            ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                            : "bg-rose-50 text-rose-700 border-rose-200"
-                        }`}
-                      >
-                        {product.isActive ? (
-                          <>
-                            <CheckCircle size={12} /> {t("active")}
-                          </>
-                        ) : (
-                          <>
-                            <XCircle size={12} /> {t("hidden")}
-                          </>
-                        )}
-                      </button>
-                    </td>
-                    <td className="py-3.5 px-4 text-right font-mono font-medium text-zinc-600">
-                      {product.soldCount}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+      {dialog?.type === "detail" && (
+        <ProductDetailDialog
+          productId={dialog.productId}
+          onOpenChange={(open) => !open && setDialog(null)}
+          onEdit={(productId) => setDialog({ type: "edit", productId })}
+        />
+      )}
+
+      {(dialog?.type === "create" || dialog?.type === "edit") && (
+        <ProductFormDialog
+          open
+          productId={dialog.type === "edit" ? dialog.productId : null}
+          categories={categories}
+          onOpenChange={(open) => !open && setDialog(null)}
+          onSaved={handleSaved}
+        />
+      )}
+    </>
   );
 }

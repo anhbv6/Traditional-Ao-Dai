@@ -13,6 +13,8 @@ interface DashboardKpiCardsProps {
   isLoading?: boolean;
 }
 
+const KPI_GRID_CLASS = "grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4";
+
 function KpiCard({
   icon: Icon,
   label,
@@ -20,6 +22,7 @@ function KpiCard({
   action,
   children,
   tone = "default",
+  className,
 }: {
   icon: LucideIcon;
   label: string;
@@ -27,12 +30,13 @@ function KpiCard({
   action?: ReactNode;
   children: ReactNode;
   tone?: "default" | "warning";
+  className?: string;
 }) {
   return (
-    <section className={cn(ADMIN_CARD_CLASS, "flex min-w-0 flex-col gap-4 p-5")}>
+    <section className={cn(ADMIN_CARD_CLASS, "flex min-w-0 flex-col gap-3 p-4 sm:gap-4 sm:p-5", className)}>
       <div className="flex min-h-7 flex-wrap items-center justify-between gap-2">
-        <span className="flex min-w-0 items-center gap-2 truncate text-xs font-semibold uppercase tracking-[0.5px] text-[#71717A]">
-          <Icon size={14} />
+        <span className="flex min-w-0 items-center gap-1.5 text-[11px] font-semibold uppercase leading-tight tracking-[0.5px] text-[#71717A] sm:gap-2 sm:text-xs">
+          <Icon size={14} className="shrink-0" />
           {label}
         </span>
         {action}
@@ -45,12 +49,12 @@ function KpiCard({
   );
 }
 
-/** Ô số nhỏ trong phần tách chi tiết của thẻ */
-function Breakdown({ items }: { items: { label: string; value: number }[] }) {
+/** Ô số nhỏ trong phần tách chi tiết của thẻ — màn nhỏ thẻ hẹp nên xếp thành từng dòng để nhãn không bị cắt */
+function Breakdown({ items, wide }: { items: { label: string; value: number }[]; wide?: boolean }) {
   return (
-    <dl className="grid grid-cols-3 gap-2">
+    <dl className={cn("grid gap-1 sm:grid-cols-3 sm:gap-2", wide && "grid-cols-3 gap-2")}>
       {items.map((item) => (
-        <div key={item.label}>
+        <div key={item.label} className={cn("gap-2 sm:block", wide ? "block" : "flex items-center justify-between")}>
           <dt className="truncate text-[11px]">{item.label}</dt>
           <dd className="font-mono text-sm font-semibold text-[#09090B]">{item.value}</dd>
         </div>
@@ -68,7 +72,7 @@ export function DashboardKpiCards({ kpis, isLoading }: DashboardKpiCardsProps) {
 
   if (isLoading || !kpis) {
     return (
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className={KPI_GRID_CLASS}>
         {Array.from({ length: 4 }).map((_, i) => (
           <div key={i} className={cn(ADMIN_CARD_CLASS, "h-[178px] animate-pulse bg-[#FAFAFA]")} />
         ))}
@@ -79,10 +83,11 @@ export function DashboardKpiCards({ kpis, isLoading }: DashboardKpiCardsProps) {
   const { finance, tailoring, urgent, appointments } = kpis;
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div className={KPI_GRID_CLASS}>
       {finance && (
         <KpiCard
           icon={Wallet}
+          className="col-span-2 sm:col-span-1"
           label={t("finance")}
           value={formatVnd(range === "today" ? finance.receivedToday : finance.receivedMonth)}
           action={
@@ -131,8 +136,14 @@ export function DashboardKpiCards({ kpis, isLoading }: DashboardKpiCardsProps) {
       )}
 
       {appointments && (
-        <KpiCard icon={CalendarClock} label={t("appointments")} value={appointments.total}>
+        <KpiCard
+          icon={CalendarClock}
+          label={t("appointments")}
+          value={appointments.total}
+          className="col-span-2 sm:col-span-1"
+        >
           <Breakdown
+            wide
             items={[
               { label: t("measurement"), value: appointments.measurement },
               { label: t("fitting"), value: appointments.fitting },

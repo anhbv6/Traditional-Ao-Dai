@@ -2,7 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import { ArrowLeft, ArrowRight, Loader2, LockKeyhole, ShieldCheck } from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2, ShieldCheck } from "lucide-react";
 import { Link } from "@/i18n/routing";
 import { AppLoading } from "@/components/shared";
 import { cn } from "@/lib/utils";
@@ -26,7 +26,7 @@ export function AdminLoginForm() {
 
       {/* ---------- Thanh trên ---------- */}
       <header className="relative z-10 border-b border-[#E4E4E7] bg-white/80 backdrop-blur-md">
-        <div className="mx-auto flex h-14 w-full max-w-[1440px] items-center justify-between gap-4 px-5 sm:px-8 lg:px-12">
+        <div className="flex h-14 w-full items-center justify-between gap-4 px-5 sm:px-8 lg:px-12">
           <div className="flex min-w-0 items-center gap-2.5">
             <span className="size-8 shrink-0 overflow-hidden rounded-lg border border-[#E4E4E7] bg-white">
               <Image src="/logo.png" alt="" width={64} height={64} priority className="size-full object-contain p-0.5" />
@@ -50,12 +50,14 @@ export function AdminLoginForm() {
       <main className="relative z-10 flex flex-1 items-center justify-center px-4 py-12">
         <div className="w-full max-w-[420px]">
           <div className={cn(ADMIN_CARD_CLASS, "overflow-hidden shadow-[0_24px_48px_-24px_rgba(9,9,11,0.18)]")}>
-            <div className="border-b border-[#E4E4E7] bg-[#FAFAFA] px-6 py-5 sm:px-8">
-              <span className="grid size-10 place-items-center rounded-xl bg-[#18181B] text-white">
-                <LockKeyhole aria-hidden className="size-[18px]" strokeWidth={1.8} />
+            <div className="flex flex-row border-b items-center gap-5 border-[#E4E4E7] bg-[#FFFFFF] px-6 py-3 sm:px-8">
+              <span className="size-20 shrink-0 overflow-hidden rounded-lg bg-white">
+                <Image src="/logo.png" alt="" width={64} height={64} priority className="size-full object-contain p-0.5" />
               </span>
-              <h1 className="mt-4 text-xl font-semibold tracking-tight text-[#09090B]">{t("title")}</h1>
-              <p className="mt-1 text-sm text-[#71717A]">{t("subtitle")}</p>
+              <div>
+                <h1 className="text-xl font-semibold tracking-tight text-[#09090B]">{t("title")}</h1>
+                <p className="mt-1 text-sm text-[#71717A]">{t("subtitle")}</p>
+              </div>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6 px-6 py-6 sm:px-8 sm:py-7" noValidate>
@@ -81,7 +83,7 @@ export function AdminLoginForm() {
 
       {/* ---------- Chân trang: thông tin phiên ---------- */}
       <footer className="relative z-10 border-t border-[#E4E4E7] bg-white/80 backdrop-blur-md">
-        <p className="mx-auto flex w-full max-w-[1440px] items-start gap-2 px-5 py-3.5 text-xs leading-5 text-[#71717A] sm:items-center sm:px-8 lg:px-12">
+        <p className="flex w-full justify-center items-center gap-2 px-5 py-3.5 text-xs leading-5 text-[#71717A] sm:items-center sm:px-8 lg:px-12">
           <ShieldCheck aria-hidden className="mt-0.5 size-4 shrink-0 text-emerald-600 sm:mt-0" strokeWidth={1.8} />
           {t("secureNote")}
         </p>

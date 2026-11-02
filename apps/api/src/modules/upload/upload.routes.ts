@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import multer from 'multer'
+import { MAX_IMAGE_BYTES } from '@repo/shared'
 import { requireAnyAuth } from '../../core/middlewares/authGuard'
 import { validate } from '../../core/middlewares/validate'
 import { uploadSingleImage } from './upload.controller'
@@ -28,7 +29,7 @@ const upload = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit
+    fileSize: MAX_IMAGE_BYTES,
   },
 })
 
@@ -37,7 +38,7 @@ const upload = multer({
  * /api/upload:
  *   post:
  *     summary: Upload Single Image
- *     description: Uploads an image to Cloudinary (Max 5MB). Requires customer or admin authentication.
+ *     description: Uploads an image to Cloudinary (Max 5MB). Requires customer or admin authentication. Folder `products` stores WebP and rejects non-portrait images with IMAGE_RATIO_INVALID (400).
  *     tags:
  *       - Upload
  *     security:

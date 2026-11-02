@@ -48,7 +48,7 @@ E-commerce Áo Dài truyền thống (có may đo theo số đo). Monorepo **pnp
 ## 4. Hợp đồng dùng chung (`@repo/shared`) & định dạng API
 
 - Chỉ đặt thứ **cả FE và BE** cùng dùng; chỉ code thuần (không Express/Next/React/Prisma). Không `enum`/`namespace` — dùng `as const` + union. Mỗi entry **một file**, không import tương đối; entry mới khai báo cả `exports` lẫn `typesVersions`. `"sideEffects": false`.
-- `@repo/shared` (**không import zod**): `LOCALES`, `pickLocalized`, `ROLES`, `PERMISSIONS`, `USER_STATUSES`, `GENDERS`, `AUTH_PROVIDERS`, `isAdminAreaRole`, `normalizeEmail`, `AUTH_COOKIES`, `TOKEN_AUDIENCES`, `AuthTokenClaims`, `UserDto`, `ApiResponse<T>`, hằng số phiên admin, `normalizeVietnamPhone`, `formatVnd`, `toVnd`.
+- `@repo/shared` (**không import zod**): `LOCALES`, `pickLocalized`, `ROLES`, `PERMISSIONS`, `USER_STATUSES`, `GENDERS`, `AUTH_PROVIDERS`, `isAdminAreaRole`, `normalizeEmail`, `AUTH_COOKIES`, `TOKEN_AUDIENCES`, `AuthTokenClaims`, `UserDto`, `ApiResponse<T>`, hằng số phiên admin, `normalizeVietnamPhone`, `formatVnd`, `toVnd`, `MAX_IMAGE_BYTES`, `isProductImageRatio`.
 - `@repo/shared/validation` (Zod): `vietnamPhoneSchema`, `emailSchema`, `newPasswordSchema`, `loginPasswordSchema`, `verificationCodeSchema`, regex & độ dài. Thông điệp lỗi luôn là mã KEY.
 - **Response API:**
   ```jsonc
@@ -184,8 +184,9 @@ features/admin/
 
 **Giao diện admin** — tông đơn sắc, luôn sáng, **không** dùng màu thương hiệu Burgundy của storefront, không breadcrumb / `Container` storefront.
 - Font Inter (`--font-admin`); layout và mọi portal (Dialog, Dropdown) gắn class `admin-shell` (reset kiểu chữ storefront).
+- Điều hướng: từ `lg` là menu trái `AdminSidebar` (thẻ nổi `rounded-2xl`, phân nhóm bằng đường nét đứt, mục đang chọn `bg-[#F4F4F5]`); màn nhỏ dùng `AdminHeader` (chỉ menu, logo, avatar) + ngăn kéo `AdminMobileNav`. Cả hai dùng chung `AdminNavPanel`.
 - Màu: nền trang `#FAFAFA`, card `bg-white`, chữ chính `#09090B`, chữ phụ `#71717A`, viền `#E4E4E7`, nút chính `bg-[#18181B] hover:bg-[#09090B]`. Màu ngữ nghĩa chỉ cho trạng thái: `emerald` = thành công/hoạt động, `amber` = chờ/cảnh báo, `rose` = lỗi/khóa/hết hàng.
-- Thành phần (`core/ui`): `AdminPage` (khung trang), `AdminPageHeader` (icon + eyebrow, tiêu đề `text-2xl font-semibold`, `meta` hoặc `actions`), `AdminMetaValue` (số liệu font mono), `AdminSegmentedControl`, `AdminSecondaryButton`, `ADMIN_CARD_CLASS` (`rounded-xl border border-[#E4E4E7] bg-white shadow-2xs` — không `rounded-2xl`).
+- Thành phần (`core/ui`): `AdminPage` (khung trang), `AdminPageHeader` (icon + eyebrow, tiêu đề `text-2xl font-semibold`, `meta` hoặc `actions`), `AdminMetaValue` (số liệu font mono), `AdminSegmentedControl`, `AdminSecondaryButton`, `AdminFilterSelect` (bộ lọc chọn một "Nhãn | Giá trị" — dùng thay `<select>`), `ADMIN_CARD_CLASS` (`rounded-xl border border-[#E4E4E7] bg-white shadow-2xs` — không `rounded-2xl`). Màn danh sách theo mẫu màn Sản phẩm: một khối bảng duy nhất (tab trạng thái có số đếm → tìm kiếm & lọc → bảng), thao tác dòng nằm trong menu `⋯`, thao tác hàng loạt thay vào hàng bộ lọc; không thẻ KPI trang trí, không bóng mềm, không nét đứt; số dùng `tabular-nums`.
 - Chữ: tiêu đề bảng/card `text-sm font-semibold uppercase tracking-[0.5px]`; nội dung bảng `text-sm`; nhãn phụ `text-xs text-[#71717A]`; KPI `text-3xl font-bold font-mono`.
 
 ## 9. Database (`packages/db`)

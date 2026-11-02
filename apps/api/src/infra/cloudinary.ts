@@ -12,16 +12,19 @@ cloudinary.config({
  * Uploads a file from memory buffer directly to Cloudinary
  * @param fileBuffer The file buffer from multer memory storage
  * @param folder The folder path in Cloudinary
+ * @param format Convert to this format when storing (e.g. 'webp')
  */
 export const uploadToCloudinary = (
   fileBuffer: Buffer,
-  folder: string = 'products'
-): Promise<{ secure_url: string; public_id: string }> => {
+  folder: string = 'products',
+  format?: string
+): Promise<{ secure_url: string; public_id: string; width: number; height: number }> => {
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
       {
         folder: `aodai-shop/${folder}`,
         resource_type: 'auto',
+        ...(format ? { format } : {}),
       },
       (error, result) => {
         if (error || !result) {
@@ -30,6 +33,8 @@ export const uploadToCloudinary = (
         resolve({
           secure_url: result.secure_url,
           public_id: result.public_id,
+          width: result.width,
+          height: result.height,
         });
       }
     );

@@ -199,6 +199,18 @@ export function formatVnd(amount: number, locale: Locale = DEFAULT_LOCALE): stri
   }).format(amount)
 }
 
+/** Dung lượng tối đa của một ảnh tải lên */
+export const MAX_IMAGE_BYTES = 5 * 1024 * 1024
+
+const PRODUCT_IMAGE_RATIOS = [3 / 4, 9 / 16]
+const PRODUCT_IMAGE_RATIO_TOLERANCE = 0.02
+
+/** Ảnh sản phẩm phải dọc 3:4 hoặc 9:16 để hiển thị trọn dáng áo, không bị cắt mất tà */
+export function isProductImageRatio(width: number, height: number): boolean {
+  if (width <= 0 || height <= 0) return false
+  return PRODUCT_IMAGE_RATIOS.some((ratio) => Math.abs(width / height - ratio) <= PRODUCT_IMAGE_RATIO_TOLERANCE)
+}
+
 /** Chuyển Prisma Decimal / string số về số nguyên VND */
 export function toVnd(value: { toString(): string } | number | string | null | undefined): number {
   if (value === null || value === undefined) return 0

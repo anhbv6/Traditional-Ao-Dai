@@ -12,17 +12,19 @@ import { cn } from "@/lib/utils";
 export const ADMIN_CARD_CLASS = "rounded-xl border border-[#E4E4E7] bg-white shadow-2xs";
 
 /**
- * Khung nội dung một trang admin: cùng chiều rộng tối đa, lề và khoảng cách giữa các khối
+ * Khung nội dung một trang admin: full chiều rộng màn hình, cùng lề và khoảng cách giữa các khối
  */
 export function AdminPage({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cn("mx-auto w-full max-w-[1440px] space-y-6 px-5 py-8 sm:px-8 lg:px-12", className)}>{children}</div>;
+  return (
+    <div className={cn("w-full space-y-5 px-4 py-5 sm:space-y-6 sm:px-8 sm:py-8 lg:px-12", className)}>{children}</div>
+  );
 }
 
 interface AdminPageHeaderProps {
   /** Icon nhóm chức năng hiển thị cạnh eyebrow */
-  icon: LucideIcon;
-  /** Nhãn nhóm nhỏ phía trên tiêu đề */
-  eyebrow: string;
+  icon?: LucideIcon;
+  /** Nhãn nhóm nhỏ phía trên tiêu đề — bỏ trống thì header chỉ còn tiêu đề và mô tả */
+  eyebrow?: string;
   title: string;
   description?: string;
   /** Thông tin tóm tắt (ví dụ "12 đơn hàng") hiển thị bên phải khi không có actions */
@@ -36,13 +38,15 @@ interface AdminPageHeaderProps {
  */
 export function AdminPageHeader({ icon: Icon, eyebrow, title, description, meta, actions }: AdminPageHeaderProps) {
   return (
-    <div className="flex flex-col gap-4 border-b border-[#E4E4E7] pb-5 sm:flex-row sm:items-end sm:justify-between">
+    <div className="flex flex-col gap-3 border-b border-[#E4E4E7] pb-4 sm:flex-row sm:items-end sm:justify-between sm:gap-4 sm:pb-5">
       <div className="min-w-0">
-        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.5px] text-[#71717A]">
-          <Icon size={14} aria-hidden="true" />
-          <span>{eyebrow}</span>
-        </div>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#09090B]">{title}</h1>
+        {eyebrow && (
+          <div className="mb-1 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.5px] text-[#71717A]">
+            {Icon && <Icon size={14} aria-hidden="true" />}
+            <span>{eyebrow}</span>
+          </div>
+        )}
+        <h1 className="text-xl font-semibold tracking-tight text-[#09090B] sm:text-2xl">{title}</h1>
         {description && <p className="mt-1 text-xs text-[#71717A]">{description}</p>}
       </div>
       {(actions || meta) && (

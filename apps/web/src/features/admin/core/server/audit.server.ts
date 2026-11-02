@@ -2,7 +2,7 @@ import { headers } from "next/headers";
 import { type Prisma } from "@repo/db";
 import { prisma } from "./db.server";
 
-export type AuditTargetType = "USER" | "ORDER" | "APPROVAL";
+export type AuditTargetType = "USER" | "ORDER" | "APPROVAL" | "PRODUCT";
 
 export interface AuditEntry {
   /** Người thực hiện — luôn lấy từ `auth.user.id` của phiên, không nhận từ client */
