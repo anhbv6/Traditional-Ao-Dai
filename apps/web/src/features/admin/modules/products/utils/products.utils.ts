@@ -71,6 +71,20 @@ export function hasDuplicateVariant(variants: { color?: string | null; size: str
   return new Set(variants.map(toVariantKey)).size !== variants.length;
 }
 
+/** Điều kiện mở bán: ảnh đại diện + ít nhất 1 ảnh mô tả, giá > 0, có SKU và không trùng size (tên, danh mục đã bắt buộc ở schema) */
+export function isProductReadyToActivate(product: {
+  images: string[];
+  basePrice: number;
+  variants: { size: string; color?: string | null }[];
+}): boolean {
+  return (
+    product.images.length >= MIN_IMAGES_TO_ACTIVATE &&
+    product.basePrice > 0 &&
+    product.variants.length > 0 &&
+    !hasDuplicateVariant(product.variants)
+  );
+}
+
 /** Danh sách giá trị không trùng, bỏ giá trị rỗng, sắp xếp để dùng cho bộ lọc */
 export function uniqueOptions(values: (string | null | undefined)[]): string[] {
   return [...new Set(values.filter((value): value is string => Boolean(value)))].sort((a, b) => a.localeCompare(b));

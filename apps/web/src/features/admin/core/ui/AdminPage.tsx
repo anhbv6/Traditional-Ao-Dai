@@ -12,11 +12,12 @@ import { cn } from "@/lib/utils";
 export const ADMIN_CARD_CLASS = "rounded-xl border border-[#E4E4E7] bg-white shadow-2xs";
 
 /**
- * Khung nội dung một trang admin: full chiều rộng màn hình, cùng lề và khoảng cách giữa các khối
+ * Khung nội dung một trang admin: full chiều rộng màn hình, cùng lề và khoảng cách giữa các khối.
+ * Từ `lg` lề trên/dưới 12px để đỉnh khối đầu tiên thẳng hàng với thẻ menu và thẻ ghi chú.
  */
 export function AdminPage({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <div className={cn("w-full space-y-5 px-4 py-5 sm:space-y-6 sm:px-8 sm:py-8 lg:px-12", className)}>{children}</div>
+    <div className={cn("w-full space-y-5 px-4 py-5 sm:space-y-6 sm:px-8 sm:py-8 lg:px-6 lg:py-3", className)}>{children}</div>
   );
 }
 

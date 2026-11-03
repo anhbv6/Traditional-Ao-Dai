@@ -19,21 +19,7 @@ import {
   updateProductSchema,
   type ProductFormValues,
 } from "../schemas/products.schemas";
-import { buildSku, hasDuplicateVariant, MIN_IMAGES_TO_ACTIVATE, toSlug } from "../utils/products.utils";
-
-/** Điều kiện mở bán; tên và danh mục đã bắt buộc ở schema */
-function isReadyToActivate(product: {
-  images: string[];
-  basePrice: number;
-  variants: { size: string; color?: string | null }[];
-}) {
-  return (
-    product.images.length >= MIN_IMAGES_TO_ACTIVATE &&
-    product.basePrice > 0 &&
-    product.variants.length > 0 &&
-    !hasDuplicateVariant(product.variants)
-  );
-}
+import { buildSku, isProductReadyToActivate as isReadyToActivate, toSlug } from "../utils/products.utils";
 
 async function hasUnreadyProduct(productIds: string[]) {
   const products = await prisma.product.findMany({
@@ -84,6 +70,18 @@ async function resolveVariantSkus({ name, collectionCode, variants }: ProductFor
   });
 }
 
+/** Bảng size gắn riêng phải cùng nhóm hàng với loại sản phẩm (không gắn bảng áo dài cho guốc) */
+async function checkSizeChartGroup(values: ProductFormValues): Promise<string | null> {
+  if (!values.sizeChartId) return null;
+  const [chart, category] = await Promise.all([
+    prisma.sizeChart.findUnique({ where: { id: values.sizeChartId }, select: { group: true } }),
+    prisma.category.findUnique({ where: { id: values.categoryId }, select: { group: true } }),
+  ]);
+  if (!chart) return "SIZE_CHART_NOT_FOUND";
+  if (!category) return "PRODUCT_CATEGORY_REQUIRED";
+  return chart.group === category.group ? null : "PRODUCT_SIZE_CHART_GROUP_MISMATCH";
+}
+
 /** Cột của ProductVariant lấy từ dòng form */
 function toVariantData({ sku, size, color, price, useBasePrice, stock }: ProductFormValues["variants"][number]) {
   return { sku, size, color: color || null, price: useBasePrice ? null : price, stock };
@@ -95,6 +93,7 @@ function toProductData(input: ProductFormValues) {
     name: input.name,
     nameEn: input.nameEn || null,
     categoryId: input.categoryId,
+    sizeChartId: input.sizeChartId || null,
     material: input.material || null,
     materialEn: input.materialEn || null,
     description: input.description || null,
@@ -145,6 +144,8 @@ export async function createProductAction(raw: z.input<typeof productFormSchema>
 
   try {
     const slug = await resolveUniqueSlug(values.name);
+    const sizeChartError = await checkSizeChartGroup(values);
+    if (sizeChartError) return { success: false, error: sizeChartError };
     const variants = await resolveVariantSkus(values);
 
     const created = await prisma.product.create({
@@ -206,6 +207,8 @@ export async function updateProductAction(raw: z.input<typeof updateProductSchem
       return { success: false, error: "PRODUCT_VARIANT_IN_USE" };
     }
 
+    const sizeChartError = await checkSizeChartGroup(values);
+    if (sizeChartError) return { success: false, error: sizeChartError };
     const variants = await resolveVariantSkus(values);
 
     await prisma.$transaction(async (tx) => {

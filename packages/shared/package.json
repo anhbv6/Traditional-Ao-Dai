@@ -7,12 +7,16 @@
   "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./validation": "./src/validation.ts"
+    "./validation": "./src/validation.ts",
+    "./sizing": "./src/sizing.ts"
   },
   "typesVersions": {
     "*": {
       "validation": [
         "./src/validation.ts"
+      ],
+      "sizing": [
+        "./src/sizing.ts"
       ]
     }
   },

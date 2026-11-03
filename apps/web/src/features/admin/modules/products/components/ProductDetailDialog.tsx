@@ -7,6 +7,7 @@ import { formatVnd, type Locale } from "@repo/shared";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { useProductDetail } from "../hooks/useProductDetail";
+import { Link } from "@/i18n/routing";
 import { type AdminProductDetail } from "../types/products.types";
 import { ProductStatusBadge, ProductStockHint } from "./ProductRowParts";
 
@@ -81,6 +82,18 @@ function ProductDetailBody({ product }: { product: AdminProductDetail }) {
           <dl className="mt-3 divide-y divide-[#F4F4F5] border-t border-[#F4F4F5]">
             <InfoRow label={t("colCategory")}>{product.categoryName ?? t("uncategorized")}</InfoRow>
             <InfoRow label={t("colMaterial")}>{product.material || "—"}</InfoRow>
+            <InfoRow label={t("field.sizeChart")}>
+              {product.effectiveSizeChart ? (
+                <Link href={`/admin/catalog/size-charts/${product.effectiveSizeChart.id}`} className="hover:underline">
+                  {product.effectiveSizeChart.name}
+                  {product.effectiveSizeChart.inherited && (
+                    <span className="ml-1 text-xs text-[#71717A]">({t("detail.sizeChartInherited")})</span>
+                  )}
+                </Link>
+              ) : (
+                "—"
+              )}
+            </InfoRow>
             <InfoRow label={t("colStock")}>
               <span className="tabular-nums">{product.totalStock}</span>
               <span className="block">

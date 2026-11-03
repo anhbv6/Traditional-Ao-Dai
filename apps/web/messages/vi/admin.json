@@ -43,6 +43,14 @@
     "openMenu": "Mở menu quản trị",
     "navigation": "Điều hướng quản trị"
   },
+  "todayNotes": {
+    "title": "Việc hôm nay",
+    "placeholder": "Thêm việc cần làm...",
+    "add": "Thêm",
+    "empty": "Chưa có việc nào. Ghi lại việc cần làm hôm nay.",
+    "remove": "Xóa việc này",
+    "clearDone": "Xóa {count} việc đã xong"
+  },
   "nav": {
     "dashboard": "Tổng quan",
     "collections": "Bộ sưu tập",
@@ -294,23 +302,11 @@
     },
     "collections": {
       "title": "Bộ sưu tập",
-      "description": "Gom sản phẩm theo mùa và dịp: Tết, Thu Đông, Cưới...",
-      "planned": [
-        "Tạo, sửa, ẩn bộ sưu tập theo mùa",
-        "Gán sản phẩm vào bộ sưu tập",
-        "Mã bộ sưu tập dùng để sinh SKU (VD TET26)",
-        "Ẩn/hiện cả bộ sưu tập khi hết mùa"
-      ]
+      "description": "Gom sản phẩm theo mùa, theo dịp — từ lúc ra mắt, mở bán tới khi vào thư viện lookbook."
     },
     "categories": {
       "title": "Loại sản phẩm",
-      "description": "Phân loại áo dài, quần và phụ kiện để lọc trên cửa hàng.",
-      "planned": [
-        "Loại: áo dài, quần lụa, phụ kiện (mấn, kiềng, guốc)",
-        "Kiểu dáng: truyền thống, cách tân, cưới, bà sui, trẻ em, cổ phục",
-        "Danh mục cha - con",
-        "Ảnh và mô tả song ngữ"
-      ]
+      "description": "Cây phân loại hai cấp — nhóm hàng quyết định may đo, đơn vị bán và bảng size."
     },
     "materials": {
       "title": "Chất liệu vải",
@@ -333,12 +329,7 @@
     },
     "sizeCharts": {
       "title": "Bảng size mẫu",
-      "description": "Bảng quy đổi số đo cho từng form áo.",
-      "planned": [
-        "Bảng size riêng cho form ôm truyền thống và form suông cách tân",
-        "Gắn bảng size vào sản phẩm",
-        "Ngưỡng bigsize để tính phụ phí may đo"
-      ]
+      "description": "Số đo dạng số cho từng size: hiển thị rõ trên điện thoại, gợi ý size tự động và nhận diện bigsize khi may đo."
     },
     "fabrics": {
       "title": "Số lượng vải",
@@ -650,7 +641,13 @@
       "isFeatured": "Sản phẩm nổi bật",
       "nameEn": "Tên tiếng Anh",
       "materialEn": "Chất liệu tiếng Anh",
-      "descriptionEn": "Mô tả tiếng Anh"
+      "descriptionEn": "Mô tả tiếng Anh",
+      "sizeChart": "Bảng size",
+      "sizeChartInherit": "Theo loại sản phẩm ({name})",
+      "sizeChartNone": "Chưa có bảng size",
+      "sizeChartInactive": "chưa áp dụng",
+      "sizeChartHint": "Ký hiệu size trong bảng: {sizes}. SKU nên dùng đúng các ký hiệu này để khách được gợi ý size.",
+      "sizeChartMissing": "Loại sản phẩm này chưa gắn bảng size — khách sẽ không có gợi ý size."
     },
     "image": {
       "add": "Thêm ảnh",
@@ -676,13 +673,15 @@
       "collectionCodePlaceholder": "VD: TET26, trống thì lấy theo tên",
       "add": "Thêm biến thể",
       "remove": "Xóa biến thể",
-      "hint": "Mã tự sinh theo quy tắc AD-TET26-DO-S (Áo dài - BST - Màu - Size). Tắt \"Tự sinh\" hoặc \"Giá chung\" thì bắt buộc nhập tay. SKU đã có đơn hàng hoặc đang trong giỏ của khách thì không xóa được."
+      "hint": "Mã tự sinh theo quy tắc AD-TET26-DO-S (Áo dài - BST - Màu - Size). Tắt \"Tự sinh\" hoặc \"Giá chung\" thì bắt buộc nhập tay. SKU đã có đơn hàng hoặc đang trong giỏ của khách thì không xóa được.",
+      "sizeNotInChart": "Size “{size}” không có trong bảng size"
     },
     "detail": {
       "title": "Chi tiết sản phẩm",
       "slug": "Đường dẫn",
       "noDescription": "Chưa có mô tả.",
-      "noVariants": "Sản phẩm chưa có SKU nào."
+      "noVariants": "Sản phẩm chưa có SKU nào.",
+      "sizeChartInherited": "theo loại"
     }
   },
   "tailoring": {
@@ -724,5 +723,542 @@
     "title": "Màn này đang được xây dựng",
     "description": "Đã có chỗ trong menu và phân quyền; chức năng sẽ được làm theo phạm vi dưới đây.",
     "planned": "Phạm vi dự kiến"
+  },
+  "collections": {
+    "status": {
+      "DRAFT": "Nháp",
+      "COMING_SOON": "Sắp ra mắt",
+      "ACTIVE": "Đang mở bán",
+      "ARCHIVED": "Lưu trữ"
+    },
+    "statusHint": {
+      "DRAFT": "Đang soạn, khách chưa thấy",
+      "COMING_SOON": "Công bố trước để chạy quảng cáo",
+      "ACTIVE": "Hiện trên web, khách mua được",
+      "ARCHIVED": "Hết mùa, vào thư viện lookbook"
+    },
+    "statusLabel": "Trạng thái",
+    "filterAll": "Tất cả",
+    "searchPlaceholder": "Tìm theo tên, mã, mùa",
+    "homepageUsage": "Trang chủ {used}/{limit} vị trí",
+    "homepageFilter": {
+      "label": "Trang chủ",
+      "ALL": "Tất cả",
+      "SHOWN": "Đang hiển thị",
+      "HIDDEN": "Không hiển thị"
+    },
+    "noResults": "Không có bộ sưu tập phù hợp.",
+    "empty": {
+      "title": "Chưa có bộ sưu tập nào",
+      "description": "Tạo bộ sưu tập đầu tiên cho mùa Tết, Thu Đông hay mùa cưới — gom mẫu, chạy quảng cáo rồi mở bán."
+    },
+    "create": {
+      "open": "Tạo bộ sưu tập",
+      "title": "Tạo bộ sưu tập",
+      "description": "Bắt đầu ở trạng thái nháp. Các thông tin khác điền ở bước tiếp theo.",
+      "namePlaceholder": "VD: Tết Bính Ngọ 2026",
+      "codeHint": "2–12 chữ in hoa hoặc số, dùng trong mã SKU. Khóa lại sau khi công bố.",
+      "submit": "Tạo và soạn tiếp",
+      "success": "Đã tạo bộ sưu tập nháp."
+    },
+    "homepageBadge": "Trang chủ",
+    "homepageAdded": "Đã đưa lên trang chủ.",
+    "homepageRemoved": "Đã bỏ khỏi trang chủ.",
+    "productSummary": "{count} sản phẩm · {selling} đang bán",
+    "productCount": "{count} sản phẩm",
+    "menu": {
+      "label": "Thao tác cho {name}",
+      "edit": "Mở trình soạn",
+      "moveTo": {
+        "DRAFT": "Rút về nháp",
+        "COMING_SOON": "Công bố sắp ra mắt",
+        "ACTIVE": "Mở bán",
+        "ARCHIVED": "Lưu trữ (hết mùa)"
+      },
+      "addHomepage": "Đưa lên trang chủ",
+      "removeHomepage": "Bỏ khỏi trang chủ",
+      "delete": "Xóa bản nháp"
+    },
+    "cancel": "Hủy",
+    "processing": "Đang xử lý...",
+    "statusDialog": {
+      "title": {
+        "DRAFT": "Rút bộ sưu tập về nháp?",
+        "COMING_SOON": "Công bố \"sắp ra mắt\"?",
+        "ACTIVE": "Mở bán bộ sưu tập?",
+        "ARCHIVED": "Lưu trữ bộ sưu tập?"
+      },
+      "explain": {
+        "DRAFT": "Bộ sưu tập sẽ gỡ khỏi website. Link đã chia sẻ hoặc quảng cáo đang chạy sẽ không còn mở được.",
+        "COMING_SOON": "Trang bộ sưu tập hiện trên web với ngày mở bán để chạy quảng cáo trước. Khách xem được nhưng chưa thể mua qua bộ sưu tập này.",
+        "ACTIVE": "Bộ sưu tập hiện trên web, khách mua được các sản phẩm đang mở bán.",
+        "ARCHIVED": "Bộ sưu tập rời trang danh sách và trang chủ. Mã và đường dẫn được giữ nguyên để không mất thứ hạng tìm kiếm."
+      },
+      "confirm": {
+        "DRAFT": "Rút về nháp",
+        "COMING_SOON": "Công bố",
+        "ACTIVE": "Mở bán",
+        "ARCHIVED": "Lưu trữ"
+      },
+      "blocked": "Cần bổ sung trước khi chuyển:",
+      "loadingImpact": "Đang tính ảnh hưởng tới sản phẩm...",
+      "activateReady": "Mở bán luôn {count} sản phẩm đang ẩn đã đủ điều kiện",
+      "notReadyNote": "{count} sản phẩm đang ẩn chưa đủ điều kiện (ảnh, giá, SKU) sẽ vẫn ẩn.",
+      "hideExclusive": "Ẩn {count} sản phẩm chỉ còn bán qua bộ sưu tập này",
+      "sharedNote": "{count} sản phẩm đang bán ở bộ sưu tập khác sẽ giữ nguyên.",
+      "lookbookOn": "Bộ sưu tập vẫn hiện trong thư viện lookbook mùa cũ để giữ nội dung cho SEO.",
+      "lookbookOff": "Bộ sưu tập sẽ ẩn hoàn toàn (đang tắt hiển thị ở lookbook).",
+      "success": "Đã chuyển sang \"{status}\".",
+      "activatedCount": "Mở bán {count} sản phẩm.",
+      "hiddenCount": "Ẩn {count} sản phẩm.",
+      "skippedCount": "{count} sản phẩm chưa đủ điều kiện nên giữ ẩn."
+    },
+    "deleteDialog": {
+      "title": "Xóa bộ sưu tập nháp?",
+      "description": "\"{name}\" sẽ được chuyển vào thùng rác. Sản phẩm bên trong không bị ảnh hưởng.",
+      "confirm": "Xóa",
+      "success": "Đã xóa bộ sưu tập."
+    },
+    "timeline": {
+      "draft": "Chưa công bố",
+      "launchIn": "Mở bán sau {count} ngày · {date}",
+      "launchReached": "Đã tới ngày mở bán",
+      "endIn": "Hết mùa sau {count} ngày · {date}",
+      "endPassed": "Đã qua ngày hết mùa",
+      "selling": "Đang mở bán",
+      "inLookbook": "Trong thư viện lookbook",
+      "hidden": "Đã ẩn hoàn toàn"
+    },
+    "field": {
+      "name": "Tên bộ sưu tập",
+      "code": "Mã bộ sưu tập",
+      "codeHint": "Dùng sinh SKU, VD AD-TET26-DO-S.",
+      "codeLocked": "Đã công bố nên không đổi được — mã đã nằm trong SKU.",
+      "season": "Nhãn mùa",
+      "seasonHint": "Hiện phía trên tên ở banner.",
+      "seasonPlaceholder": "VD: Xuân 2026",
+      "tagline": "Câu giới thiệu ngắn",
+      "taglinePlaceholder": "Một câu cho banner và quảng cáo",
+      "description": "Mô tả",
+      "accent": "Màu nhấn của mùa",
+      "accentCustom": "Chọn màu khác",
+      "accentNone": "Chưa chọn",
+      "accentClear": "Bỏ màu",
+      "autoPushOos": "Tự đẩy hàng hết xuống cuối",
+      "storyPlaceholder": "Câu chuyện của mùa: cảm hứng, chất liệu, người thợ...",
+      "launchAt": "Ngày mở bán",
+      "endAt": "Ngày hết mùa",
+      "scheduleHint": "Ngày mở bán bắt buộc khi công bố \"sắp ra mắt\". Hệ thống nhắc khi tới mốc, không tự đổi trạng thái.",
+      "showOnHomepage": "Hiện ở trang chủ",
+      "homepageArchived": "Bộ sưu tập lưu trữ không hiện ở trang chủ.",
+      "homepageOrder": "Thứ tự trên trang chủ",
+      "homepageOrderHint": "Số nhỏ hiện trước.",
+      "showInLookbook": "Đưa vào lookbook khi lưu trữ",
+      "lookbookHint": "Giữ trang mùa cũ làm nội dung quảng bá và SEO."
+    },
+    "editor": {
+      "back": "Về danh sách bộ sưu tập",
+      "untitled": "Bộ sưu tập chưa đặt tên",
+      "unsaved": "Chưa lưu",
+      "preview": "Xem trước",
+      "save": "Lưu thay đổi",
+      "saved": "Đã lưu bộ sưu tập.",
+      "sections": {
+        "info": "Thông tin chung",
+        "infoHint": "Tên, mã và lời giới thiệu hiển thị trên banner.",
+        "media": "Hình ảnh",
+        "mediaHint": "Mỗi ảnh có bản riêng cho điện thoại; để trống thì dùng bản máy tính.",
+        "products": "Sản phẩm",
+        "productsHint": "Thứ tự trong danh sách là thứ tự hiển thị. Tối đa 3 sản phẩm nổi bật.",
+        "story": "Câu chuyện lookbook",
+        "storyHint": "Hiện ở trang bộ sưu tập và thư viện lookbook mùa cũ.",
+        "english": "Bản tiếng Anh",
+        "englishHint": "Để trống thì dùng nội dung tiếng Việt.",
+        "seo": "SEO",
+        "seoHint": "Tiêu đề và mô tả hiện trên kết quả tìm kiếm.",
+        "lifecycle": "Vòng đời",
+        "schedule": "Lịch",
+        "visibility": "Hiển thị",
+        "warnings": "Cần chú ý"
+      }
+    },
+    "warnings": {
+      "hiddenInActive": "{count} sản phẩm đang ẩn nên khách không thấy trong bộ sưu tập.",
+      "notReady": "{count} sản phẩm chưa đủ điều kiện mở bán (ảnh, giá, SKU) — khi mở bán sẽ vẫn ẩn.",
+      "sellingBeforeLaunch": "{count} sản phẩm đang bán trước ngày ra mắt (không thuộc bộ sưu tập đang mở bán nào khác).",
+      "oosPushed": "{count} sản phẩm hết hàng sẽ tự xuống cuối danh sách.",
+      "oosKept": "{count} sản phẩm hết hàng vẫn giữ vị trí hiện tại.",
+      "shared": "{count} sản phẩm cũng thuộc bộ sưu tập khác.",
+      "launchReached": "Đã tới ngày mở bán — cân nhắc chuyển sang \"Đang mở bán\".",
+      "endPassed": "Đã qua ngày hết mùa — cân nhắc lưu trữ.",
+      "homepageDraft": "Bộ sưu tập chưa công bố nên chưa hiện ở trang chủ."
+    },
+    "lifecycle": {
+      "launchOn": "Mở bán {date}",
+      "publishedOn": "Công bố {date}",
+      "archivedOn": "Lưu trữ {date}",
+      "saveFirst": "Lưu thay đổi trước khi chuyển trạng thái."
+    },
+    "media": {
+      "cover": "Ảnh bìa",
+      "coverMobile": "Ảnh bìa mobile",
+      "banner": "Banner",
+      "bannerMobile": "Banner mobile",
+      "lookbook": "Ảnh lookbook",
+      "upload": "Tải ảnh",
+      "uploading": "Đang tải...",
+      "replace": "Thay ảnh",
+      "useOwn": "Dùng ảnh riêng",
+      "usingDesktop": "Đang dùng bản máy tính",
+      "remove": "Gỡ ảnh",
+      "moveLeft": "Chuyển sang trái",
+      "moveRight": "Chuyển sang phải",
+      "addLookbook": "Thêm ảnh"
+    },
+    "products": {
+      "summary": "{count} sản phẩm · {selling} đang bán · {highlighted} nổi bật",
+      "add": "Thêm sản phẩm",
+      "empty": "Chưa có sản phẩm — bấm để chọn",
+      "highlighted": "Nổi bật",
+      "selling": "Đang bán",
+      "hidden": "Đang ẩn",
+      "notReady": "Chưa đủ điều kiện",
+      "outOfStock": "Hết hàng",
+      "outOfStockPushed": "Hết hàng · tự xuống cuối",
+      "alsoIn": "Cũng ở: {names}",
+      "toggleHighlight": "Đánh dấu nổi bật",
+      "highlightHint": "Tối đa {max} sản phẩm nổi bật",
+      "moveUp": "Lên trên",
+      "moveDown": "Xuống dưới",
+      "remove": "Gỡ khỏi bộ sưu tập",
+      "pickerTitle": "Chọn sản phẩm",
+      "pickerDescription": "Một sản phẩm có thể thuộc nhiều bộ sưu tập.",
+      "pickerSearch": "Tìm theo tên, danh mục",
+      "pickerOnlyFree": "Chỉ sản phẩm chưa thuộc bộ sưu tập nào",
+      "pickerEmpty": "Không có sản phẩm phù hợp.",
+      "alreadyAdded": "Đã có",
+      "pickedCount": "Đã chọn {count}",
+      "cancel": "Hủy",
+      "addPicked": "Thêm vào bộ sưu tập"
+    },
+    "seo": {
+      "slug": "Đường dẫn",
+      "locked": "Đã khóa",
+      "lockedHint": "Đã công bố nên giữ nguyên để không mất thứ hạng và link quảng cáo.",
+      "title": "Tiêu đề SEO",
+      "titlePlaceholder": "Để trống thì dùng tên bộ sưu tập",
+      "description": "Mô tả SEO",
+      "descriptionPlaceholder": "Để trống thì dùng câu giới thiệu",
+      "googlePreview": "Xem trước trên Google",
+      "untitled": "Bộ sưu tập",
+      "noDescription": "Thêm mô tả để khách hiểu bộ sưu tập ngay từ trang tìm kiếm."
+    },
+    "preview": {
+      "title": "Xem trước trang bộ sưu tập",
+      "statusNote": {
+        "DRAFT": "Bản nháp — khách chưa thấy trang này",
+        "COMING_SOON": "Đang công bố \"sắp ra mắt\"",
+        "ACTIVE": "Đang mở bán — đây là trang khách thấy",
+        "ARCHIVED": "Đã lưu trữ — hiển thị như trang lookbook mùa cũ"
+      },
+      "device": {
+        "desktop": "Máy tính",
+        "mobile": "Điện thoại"
+      },
+      "ribbon": {
+        "comingSoon": "Sắp ra mắt",
+        "comingSoonDays": "Sắp ra mắt · còn {count} ngày",
+        "DRAFT": "Bản nháp",
+        "ARCHIVED": "Lookbook mùa cũ"
+      },
+      "untitled": "Tên bộ sưu tập",
+      "noProducts": "Chưa có sản phẩm hiển thị.",
+      "hiddenNote": "{count} sản phẩm đang ẩn không hiện với khách.",
+      "lookbook": "Lookbook",
+      "highlight": "Nổi bật",
+      "outOfStock": "Hết hàng",
+      "comingSoonPrice": "{price} · Sắp mở bán",
+      "stillSelling": "Vẫn còn bán",
+      "pastSeason": "Mùa trước"
+    }
+  },
+  "sizing": {
+    "group": {
+      "AO_DAI": "Áo dài",
+      "PANTS": "Quần",
+      "ACCESSORY": "Phụ kiện",
+      "FOOTWEAR": "Giày, guốc",
+      "MATERIAL": "Nguyên liệu"
+    },
+    "groupHint": {
+      "AO_DAI": "Áo dài nhận may đo theo số đo đầy đủ, khách cũng có thể ghép bộ nhanh bằng 3 vòng ngực – eo – mông.",
+      "PANTS": "Quần lẻ chỉ lấy số đo phần quần: eo, mông, đùi, dài quần, ống.",
+      "ACCESSORY": "Phụ kiện (mấn, kiềng, túi, quạt) bán theo cái, không nhập số đo và không cần bảng size.",
+      "FOOTWEAR": "Giày, guốc bán theo cỡ chân — bảng size quy đổi chiều dài bàn chân sang số size.",
+      "MATERIAL": "Vải bán theo mét, không có size."
+    },
+    "trait": {
+      "FULL": "May đo đầy đủ",
+      "PANTS": "May đo quần",
+      "THREE_POINT": "Ghép bộ 3 vòng",
+      "METER": "Bán theo mét",
+      "FOOT": "Size theo chân",
+      "NO_SIZE": "Không size"
+    },
+    "sellUnit": {
+      "PIECE": "Bán theo cái",
+      "METER": "Bán theo mét vải"
+    },
+    "measurement": {
+      "height": "Chiều cao",
+      "weight": "Cân nặng",
+      "age": "Tuổi",
+      "bust": "Vòng ngực",
+      "waist": "Vòng eo",
+      "hips": "Vòng mông",
+      "shoulder": "Rộng vai",
+      "armpit": "Vòng nách",
+      "upperArm": "Bắp tay",
+      "armLength": "Dài tay",
+      "shirtLength": "Dài áo",
+      "neck": "Vòng cổ",
+      "thigh": "Vòng đùi",
+      "pantsLength": "Dài quần",
+      "legOpening": "Rộng ống",
+      "footLength": "Dài bàn chân"
+    },
+    "unit": {
+      "cm": "cm",
+      "kg": "kg",
+      "year": "tuổi"
+    }
+  },
+  "categories": {
+    "groupLabel": "Nhóm hàng",
+    "filterAll": "Tất cả",
+    "createRoot": "Thêm nhóm gốc",
+    "searchPlaceholder": "Tìm loại sản phẩm...",
+    "expandAll": "Mở tất cả",
+    "collapseAll": "Thu gọn",
+    "summary": "{roots} nhóm gốc · {children} loại con",
+    "dragHint": "Kéo tay nắm ⠿ để đổi thứ tự hiển thị trong cùng cấp",
+    "dragDisabled": "Bỏ tìm kiếm và bộ lọc để kéo thả đổi thứ tự",
+    "noResults": "Không có loại sản phẩm nào khớp.",
+    "empty": "Chưa có loại sản phẩm nào.",
+    "expand": "Mở {name}",
+    "collapse": "Thu gọn {name}",
+    "hidden": "Đang ẩn",
+    "noChart": "Chưa gắn bảng size",
+    "inheritChart": "Theo nhóm gốc",
+    "products": "SP",
+    "addChildTo": "Thêm loại con vào {name}",
+    "reordered": "Đã lưu thứ tự hiển thị",
+    "hiddenSuccess": "Đã ẩn loại sản phẩm khỏi cửa hàng",
+    "shownSuccess": "Đã hiện loại sản phẩm trên cửa hàng",
+    "cancel": "Hủy",
+    "processing": "Đang xử lý...",
+    "menu": {
+      "label": "Thao tác với {name}",
+      "edit": "Sửa",
+      "addChild": "Thêm loại con",
+      "hide": "Ẩn khỏi cửa hàng",
+      "show": "Hiện trên cửa hàng",
+      "moveUp": "Lên trên",
+      "moveDown": "Xuống dưới",
+      "delete": "Xóa"
+    },
+    "deleteBlocked": {
+      "children": "Còn loại con — xóa hoặc chuyển chúng trước",
+      "products": "Còn sản phẩm — chuyển sản phẩm hoặc ẩn loại này"
+    },
+    "editor": {
+      "createRootTitle": "Thêm nhóm gốc",
+      "createChildTitle": "Thêm loại con vào {name}",
+      "editTitle": "Sửa {name}",
+      "description": "Nhóm hàng quyết định cách may đo, đơn vị bán và bảng size áp dụng cho sản phẩm thuộc loại này.",
+      "rootOption": "— Là nhóm gốc —",
+      "parentLocked": "Đang có loại con nên luôn là nhóm gốc",
+      "chartNone": "Chưa gắn bảng size",
+      "chartInherit": "Theo bảng size của nhóm gốc",
+      "chartInactive": "chưa áp dụng",
+      "chartHint": "Sản phẩm thuộc loại này dùng bảng size này để gợi ý size; từng sản phẩm vẫn chọn được bảng riêng.",
+      "create": "Thêm loại",
+      "save": "Lưu thay đổi",
+      "created": "Đã thêm loại sản phẩm",
+      "updated": "Đã lưu loại sản phẩm"
+    },
+    "field": {
+      "group": "Nhóm hàng",
+      "name": "Tên loại",
+      "namePlaceholder": "VD: Áo dài cách tân",
+      "nameEn": "Tên tiếng Anh",
+      "slug": "Đường dẫn (slug)",
+      "parent": "Thuộc nhóm",
+      "parentShort": "Nhóm",
+      "sizeChart": "Bảng size mặc định",
+      "sizeChartShort": "Bảng size",
+      "description": "Mô tả",
+      "descriptionEn": "Mô tả tiếng Anh",
+      "isActive": "Hiển thị trên cửa hàng",
+      "isActiveHint": "Tắt để ẩn loại này khỏi menu và bộ lọc mà không xóa dữ liệu."
+    },
+    "deleteDialog": {
+      "title": "Xóa loại sản phẩm?",
+      "description": "“{name}” sẽ bị xóa vĩnh viễn. Loại này không còn sản phẩm hay loại con nào.",
+      "confirm": "Xóa",
+      "success": "Đã xóa loại sản phẩm"
+    }
+  },
+  "sizeCharts": {
+    "create": {
+      "open": "Tạo bảng size",
+      "title": "Tạo bảng size mẫu",
+      "description": "Đặt tên và chọn nhóm hàng — hệ thống gợi ý sẵn các thông số đo phù hợp.",
+      "namePlaceholder": "VD: Áo dài truyền thống form ôm",
+      "groupHint": "Phụ kiện và vải bán theo mét không cần bảng size.",
+      "submit": "Tạo và nhập số liệu",
+      "success": "Đã tạo bảng size"
+    },
+    "groupLabel": "Nhóm hàng",
+    "filterAll": "Tất cả",
+    "searchPlaceholder": "Tìm theo tên hoặc ký hiệu size...",
+    "empty": "Chưa có bảng size nào.",
+    "noResults": "Không có bảng size nào khớp.",
+    "column": {
+      "name": "Tên bảng",
+      "group": "Nhóm hàng",
+      "sizes": "Các size",
+      "products": "Sản phẩm dùng",
+      "status": "Trạng thái",
+      "actions": "Thao tác"
+    },
+    "columnsCount": "{count} thông số",
+    "bigsizeConfigured": "có ngưỡng bigsize",
+    "noRows": "Chưa nhập size",
+    "categoriesCount": "{count} loại sản phẩm",
+    "status": {
+      "active": "Đang áp dụng",
+      "inactive": "Chưa áp dụng"
+    },
+    "activated": "Đã áp dụng bảng size",
+    "deactivated": "Đã ngừng áp dụng bảng size",
+    "duplicated": "Đã nhân bản bảng size",
+    "deleted": "Đã xóa bảng size",
+    "deleteBlocked": "Đang được sản phẩm hoặc loại sản phẩm sử dụng",
+    "cancel": "Hủy",
+    "processing": "Đang xử lý...",
+    "menu": {
+      "label": "Thao tác với {name}",
+      "edit": "Sửa số liệu",
+      "preview": "Xem trước popup tư vấn",
+      "duplicate": "Nhân bản",
+      "activate": "Áp dụng",
+      "deactivate": "Ngừng áp dụng",
+      "delete": "Xóa"
+    },
+    "surcharge": {
+      "NONE": "Không",
+      "FIXED_AMOUNT": "Số tiền",
+      "PERCENTAGE": "Phần trăm"
+    },
+    "field": {
+      "name": "Tên bảng",
+      "nameEn": "Tên tiếng Anh",
+      "group": "Nhóm hàng",
+      "description": "Ghi chú nội bộ",
+      "isActive": "Áp dụng cho cửa hàng",
+      "isActiveHint": "Khách thấy bảng size và dùng được “Tìm size vừa với tôi” trên trang sản phẩm.",
+      "isActiveEmpty": "Cần nhập ít nhất một hàng size trước khi áp dụng.",
+      "surchargeType": "Kiểu phụ phí",
+      "surchargeValue": "Mức phụ phí",
+      "extraFabric": "Vải cộng thêm",
+      "measurementGuide": "Hướng dẫn tự đo",
+      "measurementGuideEn": "Hướng dẫn tự đo (tiếng Anh)",
+      "guideImage": "Hình minh họa vị trí đo"
+    },
+    "editor": {
+      "back": "Bảng size mẫu",
+      "untitled": "Bảng size chưa đặt tên",
+      "usage": "{products} sản phẩm · {categories} loại sản phẩm đang dùng",
+      "unsaved": "Chưa lưu",
+      "preview": "Xem trước",
+      "save": "Lưu bảng size",
+      "saved": "Đã lưu bảng size",
+      "gridTitle": "Bảng thông số",
+      "gridDescription": "Mỗi hàng là một size, mỗi ô là khoảng số đo nhỏ nhất – lớn nhất. Ô đỏ là số nằm ngoài ngưỡng hợp lệ của cột.",
+      "issues": "{count} ô cần sửa",
+      "infoTitle": "Thông tin",
+      "groupLocked": "Bảng đang gắn cho loại sản phẩm nên không đổi được nhóm hàng.",
+      "bigsizeTitle": "Bigsize & phụ phí may đo",
+      "bigsizeDescription": "Đơn may đo có số đo vượt ngưỡng “Bigsize từ” ở bất kỳ cột nào sẽ cộng phụ phí và báo xưởng chuẩn bị thêm vải.",
+      "surchargeInvalid": "Nhập mức phụ phí lớn hơn 0 (phần trăm tối đa 100).",
+      "bigsizeColumnsHint": "{count, plural, =0 {Chưa cột nào có ngưỡng bigsize — nhập ở hàng “Bigsize từ” cuối bảng thông số.} other {# cột đã có ngưỡng bigsize (hàng “Bigsize từ” cuối bảng thông số).}}",
+      "guideTitle": "Hướng dẫn đo",
+      "guideDescription": "Hiển thị trong tab “Cách đo” của popup tư vấn size.",
+      "guidePlaceholder": "VD: Vòng eo — đo quanh chỗ nhỏ nhất của bụng, cao hơn rốn khoảng 2–3 cm, thước vừa sát không siết.",
+      "uploadImage": "Tải ảnh lên",
+      "removeImage": "Xóa ảnh"
+    },
+    "grid": {
+      "pickColumns": "Thông số đo (bấm để thêm / bỏ cột)",
+      "suggested": "Gợi ý cho nhóm hàng này",
+      "suggestedHint": "Thông số gợi ý cho nhóm hàng này",
+      "noColumns": "Chọn ít nhất một thông số đo để bắt đầu nhập bảng.",
+      "sizeColumn": "Size",
+      "rangeHeader": "từ – đến ({unit})",
+      "rowActions": "Thao tác hàng",
+      "sizeLabelAria": "Ký hiệu size hàng {index}",
+      "min": "từ",
+      "max": "đến",
+      "moveUp": "Lên trên",
+      "moveDown": "Xuống dưới",
+      "deleteRow": "Xóa hàng {size}",
+      "validRange": "Ngưỡng hợp lệ",
+      "validMin": "tối thiểu",
+      "validMax": "tối đa",
+      "bigsizeFrom": "Bigsize từ",
+      "bigsizeNone": "—",
+      "addRow": "Thêm hàng size",
+      "pasteHint": "Dán được vùng ô từ Excel / Google Sheets (VD 82-86)",
+      "issue": {
+        "OUT_OF_RANGE": "Ngoài ngưỡng hợp lệ {min} – {max}",
+        "MIN_GT_MAX": "Số “từ” lớn hơn số “đến”"
+      }
+    },
+    "preview": {
+      "title": "Xem trước popup tư vấn size",
+      "description": "Khách thấy như thế này trên điện thoại. Dữ liệu đang soạn, chưa cần lưu."
+    },
+    "advisor": {
+      "eyebrow": "Tư vấn chọn size",
+      "tab": {
+        "finder": "Tìm size",
+        "table": "Bảng size",
+        "guide": "Cách đo"
+      },
+      "emptyChart": "Bảng size chưa có số liệu.",
+      "finderIntro": "Nhập số đo bạn nhớ — không cần đủ hết, càng nhiều số càng chính xác.",
+      "issue": {
+        "BELOW_MIN": "Số này có vẻ quá nhỏ (tối thiểu {limit} {unit}) — bạn kiểm tra lại nhé.",
+        "ABOVE_MAX": "Số này có vẻ quá lớn (tối đa {limit} {unit}) — có thể gõ nhầm đơn vị?"
+      },
+      "result": {
+        "size": "Size {size}",
+        "fit": "Bạn mặc vừa Size {size}.",
+        "tight": "Bạn mặc vừa Size {size}, nhưng {keys} hơi sát — nên chọn lụa có co giãn hoặc đặt may riêng.",
+        "tightWithNext": "Bạn mặc vừa Size {size}, nhưng {keys} hơi sát — nên chọn lụa có co giãn, lên Size {next} hoặc đặt may riêng.",
+        "noFit": "Số đo của bạn chưa khớp size may sẵn nào (gần nhất là {size}).",
+        "noFitCustom": "Số đo của bạn chưa khớp size may sẵn nào — Thiên Canh khuyên bạn đặt may theo số đo để áo vừa vặn nhất.",
+        "insufficient": "Nhập thêm vòng ngực, eo hoặc mông để gợi ý chính xác hơn.",
+        "loose": "Ở size này {keys} sẽ hơi rộng.",
+        "bigsize": "Số đo {keys} thuộc nhóm bigsize khi may đo.",
+        "surcharge": "Phụ phí {amount}.",
+        "extraFabric": "Cần thêm khoảng {meters} m vải."
+      },
+      "fullTable": "Xem cả bảng size",
+      "sizeColumn": "Size",
+      "guideImageAlt": "Hình minh họa vị trí đo",
+      "emptyGuide": "Chưa có hướng dẫn đo."
+    }
   }
 }

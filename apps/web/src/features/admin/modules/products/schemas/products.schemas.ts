@@ -27,6 +27,8 @@ const productFields = z.object({
   name: z.string().trim().min(1, "PRODUCT_NAME_REQUIRED").max(200),
   nameEn: z.string().trim().max(200),
   categoryId: z.uuid("PRODUCT_CATEGORY_REQUIRED"),
+  /** Chuỗi rỗng = dùng bảng size mặc định của loại sản phẩm */
+  sizeChartId: z.uuid().or(z.literal("")),
   material: z.string().trim().max(200),
   materialEn: z.string().trim().max(200),
   description: z.string().trim().max(5000),

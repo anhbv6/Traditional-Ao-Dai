@@ -3,6 +3,7 @@ export * from "./utils/navigation";
 export * from "./hooks/useAdminLayout";
 export * from "./components/AdminHeader";
 export * from "./components/AdminSidebar";
+export * from "./components/AdminTodayNotes";
 export * from "./components/AdminNavPanel";
 export * from "./components/AdminNavList";
 export * from "./components/AdminMobileNav";

@@ -112,6 +112,28 @@ enum ApprovalAction {
   PRICE_OVERRIDE
 }
 
+// Nhóm hàng — quyết định cách bán: có nhập số đo không, đo những gì, bán theo cái hay theo mét
+enum ProductGroup {
+  AO_DAI    // May đo theo số đo đầy đủ, ghép bộ đo nhanh 3 vòng (ngực - eo - mông)
+  PANTS     // May đo riêng phần quần (eo, mông, dài quần, rộng ống)
+  ACCESSORY // Không nhập số đo (mấn, kiềng, túi, quạt...)
+  FOOTWEAR  // Bán theo size chân (guốc mộc)
+  MATERIAL  // Bán theo mét (vải)
+}
+
+enum SurchargeType {
+  PERCENTAGE
+  FIXED_AMOUNT
+}
+
+// Vòng đời bộ sưu tập: nháp → sắp ra mắt (chạy quảng cáo) → mở bán → lưu trữ (chuyển vào lookbook mùa cũ)
+enum CollectionStatus {
+  DRAFT
+  COMING_SOON
+  ACTIVE
+  ARCHIVED
+}
+
 // ==========================================
 // USER & AUTHENTICATION
 // ==========================================
@@ -253,6 +275,8 @@ model UserMeasurement {
 // Quy ước nội dung đa ngôn ngữ: cột gốc = tiếng Việt (bắt buộc), cột hậu tố `En` = tiếng Anh (tùy chọn).
 // Chọn bản dịch bằng `pickLocalized(entity, 'name', locale)` trong @repo/shared (thiếu bản EN thì rơi về VI).
 
+// Cây loại sản phẩm (nhóm gốc → loại con). Nút con mặc định cùng nhóm hàng với cha nhưng được đổi
+// (VD guốc mộc nằm trong "Phụ kiện" nhưng bán theo size chân → FOOTWEAR)
 model Category {
   id          String    @id @default(uuid())
   name        String
@@ -261,14 +285,24 @@ model Category {
   description String?
   descriptionEn String?
   image       String?
+  group       ProductGroup @default(AO_DAI)
+  position    Int       @default(0) // Thứ tự hiển thị giữa các nút cùng cha
+  isActive    Boolean   @default(true)
   parentId    String?
   parent      Category? @relation("CategoryHierarchy", fields: [parentId], references: [id])
   children    Category[]@relation("CategoryHierarchy")
+
+  // Bảng size dùng cho mọi sản phẩm thuộc loại này (sản phẩm có thể chọn bảng riêng)
+  defaultSizeChartId String?
+  defaultSizeChart   SizeChart? @relation(fields: [defaultSizeChartId], references: [id], onDelete: SetNull)
 
   products    Product[]
 
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+
+  @@index([parentId, position])
+  @@index([defaultSizeChartId])
 }
 
 model Product {
@@ -290,7 +324,12 @@ model Product {
   categoryId  String
   category    Category         @relation(fields: [categoryId], references: [id])
 
+  // Bảng size riêng; null thì dùng bảng mặc định của loại sản phẩm
+  sizeChartId String?
+  sizeChart   SizeChart?       @relation(fields: [sizeChartId], references: [id], onDelete: SetNull)
+
   variants    ProductVariant[]
+  collections CollectionProduct[]
   fabrics     Fabric[]
   reviews     Review[]
   orderItems  OrderItem[]
@@ -300,6 +339,7 @@ model Product {
   updatedAt   DateTime         @updatedAt
 
   @@index([categoryId])
+  @@index([sizeChartId])
   @@index([slug])
   @@index([isActive, isFeatured])
 }
@@ -323,6 +363,135 @@ model ProductVariant {
 
   @@index([productId])
   @@index([sku])
+}
+
+// Bảng size mẫu: ma trận số đo (cm/kg) cho từng size theo một form áo — dữ liệu số chứ không phải ảnh,
+// để hiển thị gọn trên điện thoại, gợi ý size tự động và nhận diện đơn may đo bigsize.
+// Khác "ký hiệu size" (S, M, L, 35...) — ký hiệu chỉ là nhãn của SKU, khớp với SizeChartRow.sizeLabel.
+model SizeChart {
+  id                    String            @id @default(uuid())
+  name                  String
+  nameEn                String?
+  group                 ProductGroup      // Nhóm hàng áp dụng
+  description           String?
+  descriptionEn         String?
+  measurementGuide      String?           @db.Text // Hướng dẫn tự đo: đo ngực ở đâu, eo cao hơn rốn mấy phân...
+  measurementGuideEn    String?           @db.Text
+  guideImage            String?           // Hình minh họa vị trí đo
+  isActive              Boolean           @default(true)
+
+  // Phụ phí khi số đo may đo vượt ngưỡng bigsize (SizeChartColumn.bigsizeFrom) ở BẤT KỲ cột nào
+  bigsizeSurchargeType  SurchargeType?
+  bigsizeSurchargeValue Decimal?          @db.Decimal(12, 2)
+  bigsizeExtraFabric    Decimal?          @db.Decimal(6, 2) // Số mét vải tốn thêm, để xưởng chuẩn bị
+
+  columns               SizeChartColumn[]
+  rows                  SizeChartRow[]
+  categories            Category[]
+  products              Product[]
+
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+
+  @@index([group, isActive])
+}
+
+// Một thông số đo của bảng size (cột) kèm ngưỡng kiểm tra số đo khách tự nhập
+model SizeChartColumn {
+  id          String    @id @default(uuid())
+  sizeChartId String
+  sizeChart   SizeChart @relation(fields: [sizeChartId], references: [id], onDelete: Cascade)
+  key         String    // Mã thông số dùng chung (MEASUREMENT_KEYS ở @repo/shared/sizing): bust, waist, hips...
+  position    Int       @default(0)
+  validMin    Float?    // Nhỏ hơn → báo nhập sai (VD eo < 50cm)
+  validMax    Float?    // Lớn hơn → báo nhập sai (VD gõ 650 thay vì 65)
+  bigsizeFrom Float?    // Vượt mức này khi may đo → đơn bigsize, cộng phụ phí
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([sizeChartId, key])
+}
+
+// Một size (hàng) với khoảng số đo cho từng cột: { [key]: { min, max } }
+model SizeChartRow {
+  id          String    @id @default(uuid())
+  sizeChartId String
+  sizeChart   SizeChart @relation(fields: [sizeChartId], references: [id], onDelete: Cascade)
+  sizeLabel   String    // Trùng ký hiệu size của SKU: S, M, L, 35, "3-4 tuổi"...
+  position    Int       @default(0)
+  values      Json      // Record<key, { min: number | null, max: number | null }>
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([sizeChartId, sizeLabel])
+}
+
+// Bộ sưu tập theo mùa/dịp (Tết, Thu Đông, Cưới...). Khác Category (phân loại cố định, mỗi sản phẩm một danh mục):
+// một sản phẩm thuộc được nhiều bộ sưu tập. Có thể bán sản phẩm hay không vẫn do Product.isActive quyết định.
+model Collection {
+  id               String              @id @default(uuid())
+  code             String              @unique // VD "TET26" — dùng sinh SKU, khóa lại sau khi công bố
+  slug             String              @unique
+  name             String
+  nameEn           String?
+  tagline          String?             // Một câu ngắn cho banner, quảng cáo
+  taglineEn        String?
+  description      String?             @db.Text
+  descriptionEn    String?             @db.Text
+  story            String?             @db.Text // Câu chuyện mùa — hiển thị ở lookbook
+  storyEn          String?             @db.Text
+  season           String?             // Nhãn mùa hiển thị, VD "Xuân 2026"
+  seasonEn         String?
+  coverImage       String?             // Ảnh dọc cho thẻ, lookbook
+  coverImageMobile String?             // Bản cho màn nhỏ (cắt gọn hơn); trống thì dùng coverImage
+  bannerImage      String?             // Ảnh ngang cho banner trang chủ / đầu trang
+  bannerImageMobile String?            // Banner dọc cho mobile — ảnh ngang thu nhỏ trên điện thoại sẽ mất chủ thể
+  gallery          String[]            // Ảnh lookbook
+  accentColor      String?             // Màu nhấn của mùa (#RRGGBB)
+  autoPushOosToBottom Boolean          @default(true) // Sản phẩm hết hàng tự xuống cuối danh sách, không chiếm vị trí đầu
+
+  status           CollectionStatus    @default(DRAFT)
+  launchAt         DateTime?           // Ngày mở bán dự kiến — bắt buộc khi "sắp ra mắt"
+  endAt            DateTime?           // Ngày hết mùa dự kiến
+  publishedAt      DateTime?           // Lần đầu công bố (khác null thì không xóa được, chỉ lưu trữ)
+  archivedAt       DateTime?
+  deletedAt        DateTime?           // Xóa mềm — mọi truy vấn lọc deletedAt = null, dữ liệu và liên kết sản phẩm vẫn giữ
+
+  showOnHomepage   Boolean             @default(false)
+  homepageOrder    Int                 @default(0)
+  showInLookbook   Boolean             @default(true) // Khi lưu trữ: còn hiện ở thư viện lookbook mùa cũ
+
+  seoTitle         String?
+  seoTitleEn       String?
+  seoDescription   String?
+  seoDescriptionEn String?
+
+  products         CollectionProduct[]
+
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+
+  @@index([status, deletedAt])
+  @@index([showOnHomepage, homepageOrder])
+}
+
+// Sản phẩm trong bộ sưu tập (nhiều - nhiều), kèm thứ tự hiển thị và sản phẩm nổi bật của mùa
+model CollectionProduct {
+  id            String     @id @default(uuid())
+  collectionId  String
+  collection    Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  productId     String
+  product       Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  position      Int        @default(0)
+  isHighlighted Boolean    @default(false)
+
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@unique([collectionId, productId])
+  @@index([productId])
 }
 
 // ==========================================

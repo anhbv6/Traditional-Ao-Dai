@@ -5,7 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
+import { PRODUCT_GROUP_TRAITS } from "@repo/shared/sizing";
 import { TextField, type TextFieldProps } from "@/components/shared/TextField";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { useNotify } from "@/hooks/useNotify";
@@ -17,6 +18,7 @@ import {
   type AdminProductCategory,
   type AdminProductDetail,
   type AdminProductItem,
+  type AdminProductSizeChart,
 } from "../types/products.types";
 import { ProductImagesField } from "./ProductImagesField";
 import { ProductCheckbox } from "./ProductRowParts";
@@ -27,6 +29,7 @@ interface ProductFormDialogProps {
   /** null = thêm mới */
   productId: string | null;
   categories: AdminProductCategory[];
+  sizeCharts: AdminProductSizeChart[];
   onOpenChange: (open: boolean) => void;
   onSaved: (product: AdminProductItem) => void;
 }
@@ -47,6 +50,7 @@ function toFormValues(product: AdminProductDetail | null): ProductFormValues {
     name: product?.name ?? "",
     nameEn: product?.nameEn ?? "",
     categoryId: product?.categoryId ?? "",
+    sizeChartId: product?.sizeChartId ?? "",
     material: product?.material ?? "",
     materialEn: product?.materialEn ?? "",
     description: product?.description ?? "",
@@ -93,7 +97,14 @@ function FlagField({ label, checked, onChange }: { label: string; checked: boole
 }
 
 /** Dialog thêm mới / sửa sản phẩm: chờ tải xong chi tiết rồi mới dựng form để giá trị ban đầu luôn đúng */
-export function ProductFormDialog({ open, productId, categories, onOpenChange, onSaved }: ProductFormDialogProps) {
+export function ProductFormDialog({
+  open,
+  productId,
+  categories,
+  sizeCharts,
+  onOpenChange,
+  onSaved,
+}: ProductFormDialogProps) {
   const t = useTranslations("AdminPage.products");
   const detail = useProductDetail(open ? productId : null);
   const isReady = !productId || Boolean(detail.data);
@@ -115,6 +126,7 @@ export function ProductFormDialog({ open, productId, categories, onOpenChange, o
             key={productId ?? "new"}
             product={detail.data ?? null}
             categories={categories}
+            sizeCharts={sizeCharts}
             onCancel={() => onOpenChange(false)}
             onSaved={onSaved}
           />
@@ -133,11 +145,13 @@ export function ProductFormDialog({ open, productId, categories, onOpenChange, o
 function ProductForm({
   product,
   categories,
+  sizeCharts,
   onCancel,
   onSaved,
 }: {
   product: AdminProductDetail | null;
   categories: AdminProductCategory[];
+  sizeCharts: AdminProductSizeChart[];
   onCancel: () => void;
   onSaved: (product: AdminProductItem) => void;
 }) {
@@ -153,6 +167,17 @@ function ProductForm({
   const { errors, submitCount } = form.formState;
 
   const fieldError = (key?: string) => (key ? notify.translateError(key) : undefined);
+
+  // Bảng size hiệu lực: gắn riêng, nếu không thì theo loại sản phẩm — dùng gợi ý ký hiệu size khi nhập SKU
+  const categoryId = useWatch({ control: form.control, name: "categoryId" });
+  const sizeChartId = useWatch({ control: form.control, name: "sizeChartId" });
+  const category = categories.find((c) => c.id === categoryId);
+  const usesSizeChart = category ? PRODUCT_GROUP_TRAITS[category.group].sizing !== "NONE" : false;
+  const groupCharts = category ? sizeCharts.filter((chart) => chart.group === category.group) : [];
+  const inheritedChart = sizeCharts.find((chart) => chart.id === category?.defaultSizeChartId);
+  const effectiveChart = usesSizeChart
+    ? (sizeChartId ? sizeCharts.find((chart) => chart.id === sizeChartId) : inheritedChart)
+    : undefined;
 
   const onSubmit = async (values: ProductFormValues) => {
     setIsSaving(true);
@@ -196,10 +221,16 @@ function ProductForm({
                   <AdminFilterSelect
                     label={t("colCategory")}
                     value={field.value}
-                    onChange={field.onChange}
+                    onChange={(value) => {
+                      field.onChange(value);
+                      // Bảng size riêng thuộc nhóm hàng khác thì bỏ, quay về bảng của loại mới
+                      const nextGroup = categories.find((c) => c.id === value)?.group;
+                      const chart = sizeCharts.find((c) => c.id === form.getValues("sizeChartId"));
+                      if (chart && chart.group !== nextGroup) form.setValue("sizeChartId", "");
+                    }}
                     options={[
                       { value: "", label: t("field.chooseCategory") },
-                      ...categories.map((c) => ({ value: c.id, label: c.name })),
+                      ...categories.map((c) => ({ value: c.id, label: c.label })),
                     ]}
                     className="w-full"
                   />
@@ -216,6 +247,39 @@ function ProductForm({
               placeholder={t("field.materialPlaceholder")}
             />
           </div>
+          {usesSizeChart && (
+            <div className="space-y-1">
+              <Controller
+                control={form.control}
+                name="sizeChartId"
+                render={({ field }) => (
+                  <AdminFilterSelect
+                    label={t("field.sizeChart")}
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={[
+                      {
+                        value: "",
+                        label: inheritedChart
+                          ? t("field.sizeChartInherit", { name: inheritedChart.name })
+                          : t("field.sizeChartNone"),
+                      },
+                      ...groupCharts.map((chart) => ({
+                        value: chart.id,
+                        label: chart.isActive ? chart.name : `${chart.name} (${t("field.sizeChartInactive")})`,
+                      })),
+                    ]}
+                    className="w-full"
+                  />
+                )}
+              />
+              <p className="text-xs text-[#71717A]">
+                {effectiveChart
+                  ? t("field.sizeChartHint", { sizes: effectiveChart.sizeLabels.join(", ") || "—" })
+                  : t("field.sizeChartMissing")}
+              </p>
+            </div>
+          )}
           <label className="block space-y-1">
             <span className="text-xs font-medium text-[#3F3F46]">{t("field.description")}</span>
             <textarea {...form.register("description")} rows={3} className={TEXTAREA_CLASS} />
@@ -259,7 +323,7 @@ function ProductForm({
         </FormSection>
 
         <FormSection title={t("sectionVariants")}>
-          <ProductVariantsField form={form} />
+          <ProductVariantsField form={form} sizeOptions={effectiveChart?.sizeLabels ?? []} />
         </FormSection>
 
         <FormSection title={t("sectionEnglish")}>

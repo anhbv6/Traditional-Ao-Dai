@@ -1,38 +1,8 @@
 import { prisma } from '../../src'
+import { seedTaxonomy } from './taxonomy'
 import { type SeededCatalog } from './types'
 
 // Quy ước đa ngôn ngữ: cột gốc = tiếng Việt, cột `<field>En` = tiếng Anh
-
-const CATEGORIES = [
-  {
-    slug: 'ao-dai-truyen-thong',
-    name: 'Áo Dài Truyền Thống',
-    nameEn: 'Traditional Ao Dai',
-    description: 'Các mẫu áo dài mang nét đẹp cổ điển, kín đáo và sang trọng phong cách truyền thống.',
-    descriptionEn: 'Classic, graceful ao dai in the timeless traditional style.',
-  },
-  {
-    slug: 'ao-dai-cach-tan',
-    name: 'Áo Dài Cách Tân',
-    nameEn: 'Modern Ao Dai',
-    description: 'Sự kết hợp giữa nét truyền thống và hơi thở hiện đại, trẻ trung, năng động.',
-    descriptionEn: 'Tradition meets modern design — youthful and easy to wear.',
-  },
-  {
-    slug: 'ao-dai-cuoi-hoi',
-    name: 'Áo Dài Cưới & Hỏi',
-    nameEn: 'Wedding Ao Dai',
-    description: 'Các thiết kế lộng lẫy, thêu đính tinh xảo dành riêng cho ngày lễ trọng đại.',
-    descriptionEn: 'Lavish, hand-embroidered designs for your engagement and wedding day.',
-  },
-  {
-    slug: 'phu-kien-ao-dai',
-    name: 'Phụ Kiện Áo Dài',
-    nameEn: 'Ao Dai Accessories',
-    description: 'Mấn, quần áo dài rời, trâm cài tóc, và các phụ kiện đi kèm khác.',
-    descriptionEn: 'Headpieces, pants, hairpins and other accessories.',
-  },
-]
 
 /**
  * `price` của biến thể chỉ khai báo khi KHÁC giá gốc (null = dùng basePrice của sản phẩm)
@@ -115,12 +85,7 @@ export const DEMO_PRODUCT_SLUGS = {
  * Danh mục (luôn tạo) + sản phẩm & biến thể demo (chỉ khi bật demo)
  */
 export async function seedCatalog({ demo }: { demo: boolean }): Promise<SeededCatalog> {
-  const categoryIds: Record<string, string> = {}
-  for (const { slug, ...data } of CATEGORIES) {
-    const category = await prisma.category.upsert({ where: { slug }, update: data, create: { slug, ...data } })
-    categoryIds[slug] = category.id
-  }
-  console.log(`   🗂️  ${CATEGORIES.length} danh mục`)
+  const categoryIds = await seedTaxonomy()
 
   const products: SeededCatalog = {}
   if (!demo) return products
@@ -128,7 +93,11 @@ export async function seedCatalog({ demo }: { demo: boolean }): Promise<SeededCa
   let variantCount = 0
   for (const { slug, categorySlug, color, skuPrefix, variants, ...data } of DEMO_PRODUCTS) {
     const productData = { ...data, categoryId: categoryIds[categorySlug] }
-    const product = await prisma.product.upsert({ where: { slug }, update: productData, create: { slug, ...productData } })
+    const product = await prisma.product.upsert({
+      where: { slug },
+      update: productData,
+      create: { slug, ...productData },
+    })
     products[slug] = product
 
     for (const { size, stock, price } of variants) {

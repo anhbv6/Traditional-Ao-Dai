@@ -4,6 +4,7 @@ import React, { type ReactNode } from "react";
 import {
   AdminHeader,
   AdminSidebar,
+  AdminTodayNotes,
   AdminAccessDenied,
   useAdminLayout,
 } from "@/features/admin/core/layout";
@@ -81,6 +82,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         {/* Vùng nội dung chính */}
         <main className="flex-1 flex flex-col">{children}</main>
       </div>
+
+      {/* Cột phải: ghi chú việc hôm nay (chỉ từ xl) */}
+      <AdminTodayNotes />
 
       {/* Modal sửa hồ sơ tài khoản quản trị viên */}
       <AdminProfileDialog

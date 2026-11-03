@@ -5,6 +5,7 @@ import {
   type AdminProductCategory,
   type AdminProductDetail,
   type AdminProductItem,
+  type AdminProductSizeChart,
 } from "../types/products.types";
 import { LOW_STOCK_THRESHOLD } from "../utils/products.utils";
 
@@ -70,12 +71,38 @@ export async function getAdminProductItemQuery(productId: string): Promise<Admin
   return product ? toAdminProductItem(product) : null;
 }
 
+interface ChartRef {
+  id: string;
+  name: string;
+}
+
+/** Bảng size hiệu lực: riêng của sản phẩm → của loại → của nhóm gốc (khi loại con cùng nhóm hàng với gốc) */
+function resolveEffectiveSizeChart(product: {
+  sizeChart: ChartRef | null;
+  category: { group: string; defaultSizeChart: ChartRef | null; parent: { group: string; defaultSizeChart: ChartRef | null } | null };
+}) {
+  if (product.sizeChart) return { ...product.sizeChart, inherited: false };
+  const { category } = product;
+  const inherited =
+    category.defaultSizeChart ?? (category.parent?.group === category.group ? category.parent.defaultSizeChart : null);
+  return inherited ? { ...inherited, inherited: true } : null;
+}
+
 /** Query: Chi tiết sản phẩm kèm toàn bộ SKU cho dialog xem/sửa */
 export async function getAdminProductDetailQuery(productId: string): Promise<AdminProductDetail | null> {
   const product = await prisma.product.findUnique({
     where: { id: productId },
     include: {
-      category: { select: { id: true, name: true } },
+      category: {
+        select: {
+          id: true,
+          name: true,
+          group: true,
+          defaultSizeChart: { select: { id: true, name: true } },
+          parent: { select: { group: true, defaultSizeChart: { select: { id: true, name: true } } } },
+        },
+      },
+      sizeChart: { select: { id: true, name: true } },
       variants: { orderBy: { createdAt: "asc" } },
     },
   });
@@ -87,6 +114,8 @@ export async function getAdminProductDetailQuery(productId: string): Promise<Adm
     materialEn: product.materialEn,
     description: product.description,
     descriptionEn: product.descriptionEn,
+    sizeChartId: product.sizeChartId,
+    effectiveSizeChart: resolveEffectiveSizeChart(product),
     variants: product.variants.map((v) => ({
       id: v.id,
       sku: v.sku,
@@ -98,12 +127,48 @@ export async function getAdminProductDetailQuery(productId: string): Promise<Adm
   };
 }
 
-/** Query: Danh mục cho ô chọn trong form sản phẩm */
+/** Query: Loại sản phẩm cho ô chọn trong form sản phẩm — theo thứ tự cây, kèm nhóm hàng và bảng size thừa hưởng */
 export async function getAdminProductCategoriesQuery(): Promise<AdminProductCategory[]> {
   try {
-    return await prisma.category.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } });
+    const categories = await prisma.category.findMany({
+      select: { id: true, name: true, group: true, parentId: true, position: true, defaultSizeChartId: true },
+      orderBy: [{ position: "asc" }, { name: "asc" }],
+    });
+    const roots = categories.filter((c) => c.parentId === null);
+    return roots.flatMap((root) => [
+      { id: root.id, name: root.name, label: root.name, group: root.group, defaultSizeChartId: root.defaultSizeChartId },
+      ...categories
+        .filter((c) => c.parentId === root.id)
+        .map((child) => ({
+          id: child.id,
+          name: child.name,
+          label: `${root.name} › ${child.name}`,
+          group: child.group,
+          defaultSizeChartId: child.defaultSizeChartId ?? (child.group === root.group ? root.defaultSizeChartId : null),
+        })),
+    ]);
   } catch (error) {
     console.error("Lỗi khi query danh mục sản phẩm Admin:", error);
+    return [];
+  }
+}
+
+/** Query: Bảng size để gắn riêng cho sản phẩm và gợi ý ký hiệu size khi nhập SKU */
+export async function getAdminProductSizeChartsQuery(): Promise<AdminProductSizeChart[]> {
+  try {
+    const charts = await prisma.sizeChart.findMany({
+      select: {
+        id: true,
+        name: true,
+        group: true,
+        isActive: true,
+        rows: { select: { sizeLabel: true }, orderBy: { position: "asc" } },
+      },
+      orderBy: { name: "asc" },
+    });
+    return charts.map(({ rows, ...chart }) => ({ ...chart, sizeLabels: rows.map((row) => row.sizeLabel) }));
+  } catch (error) {
+    console.error("Lỗi khi query bảng size cho sản phẩm:", error);
     return [];
   }
 }

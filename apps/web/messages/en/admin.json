@@ -43,6 +43,14 @@
     "openMenu": "Open admin menu",
     "navigation": "Admin navigation"
   },
+  "todayNotes": {
+    "title": "Today's tasks",
+    "placeholder": "Add a task...",
+    "add": "Add",
+    "empty": "No tasks yet. Note what to do today.",
+    "remove": "Remove this task",
+    "clearDone": "{count, plural, one {Clear # done task} other {Clear # done tasks}}"
+  },
   "nav": {
     "dashboard": "Overview",
     "collections": "Collections",
@@ -294,23 +302,11 @@
     },
     "collections": {
       "title": "Collections",
-      "description": "Group products by season and occasion: Tết, autumn-winter, weddings...",
-      "planned": [
-        "Create, edit and hide seasonal collections",
-        "Assign products to a collection",
-        "Collection code used to generate SKUs (e.g. TET26)",
-        "Hide or show a whole collection when the season ends"
-      ]
+      "description": "Group products by season and occasion — from launch and sale to the lookbook archive."
     },
     "categories": {
       "title": "Product types",
-      "description": "Classify ao dai, pants and accessories for storefront filters.",
-      "planned": [
-        "Types: ao dai, silk pants, accessories (headpieces, necklaces, clogs)",
-        "Styles: traditional, modern, wedding, mother of the bride, kids, heritage",
-        "Parent and child categories",
-        "Bilingual images and descriptions"
-      ]
+      "description": "A two-level taxonomy — the product group decides tailoring, sell unit and size chart."
     },
     "materials": {
       "title": "Fabrics & materials",
@@ -333,12 +329,7 @@
     },
     "sizeCharts": {
       "title": "Size charts",
-      "description": "Measurement charts for each silhouette.",
-      "planned": [
-        "Separate charts for fitted traditional and loose modern cuts",
-        "Attach a size chart to a product",
-        "Plus-size threshold for tailoring surcharges"
-      ]
+      "description": "Numeric measurements per size: readable on phones, automatic size suggestions and bigsize detection for tailoring."
     },
     "fabrics": {
       "title": "Fabric stock",
@@ -650,7 +641,13 @@
       "isFeatured": "Featured product",
       "nameEn": "English name",
       "materialEn": "English material",
-      "descriptionEn": "English description"
+      "descriptionEn": "English description",
+      "sizeChart": "Size chart",
+      "sizeChartInherit": "From product type ({name})",
+      "sizeChartNone": "No size chart",
+      "sizeChartInactive": "inactive",
+      "sizeChartHint": "Sizes in this chart: {sizes}. SKUs should use these labels so customers get size suggestions.",
+      "sizeChartMissing": "This product type has no size chart — customers won't get size suggestions."
     },
     "image": {
       "add": "Add image",
@@ -676,13 +673,15 @@
       "collectionCodePlaceholder": "e.g. TET26, name-based if empty",
       "add": "Add variant",
       "remove": "Remove variant",
-      "hint": "Generated codes follow AD-TET26-DO-S (Ao dai - collection - color - size). Turn off \"Auto\" or \"Base\" to enter values by hand. SKUs with orders or in a customer's cart cannot be removed."
+      "hint": "Generated codes follow AD-TET26-DO-S (Ao dai - collection - color - size). Turn off \"Auto\" or \"Base\" to enter values by hand. SKUs with orders or in a customer's cart cannot be removed.",
+      "sizeNotInChart": "Size “{size}” is not in the size chart"
     },
     "detail": {
       "title": "Product details",
       "slug": "URL slug",
       "noDescription": "No description yet.",
-      "noVariants": "This product has no SKUs yet."
+      "noVariants": "This product has no SKUs yet.",
+      "sizeChartInherited": "from type"
     }
   },
   "tailoring": {
@@ -724,5 +723,542 @@
     "title": "This screen is under construction",
     "description": "It already has its place in the menu and permissions; features will follow the scope below.",
     "planned": "Planned scope"
+  },
+  "collections": {
+    "status": {
+      "DRAFT": "Draft",
+      "COMING_SOON": "Coming soon",
+      "ACTIVE": "On sale",
+      "ARCHIVED": "Archived"
+    },
+    "statusHint": {
+      "DRAFT": "In progress, hidden from customers",
+      "COMING_SOON": "Announced early for ad campaigns",
+      "ACTIVE": "Live on the site, customers can buy",
+      "ARCHIVED": "Season over, moved to the lookbook"
+    },
+    "statusLabel": "Status",
+    "filterAll": "All",
+    "searchPlaceholder": "Search by name, code, season",
+    "homepageUsage": "Homepage {used}/{limit} slots",
+    "homepageFilter": {
+      "label": "Homepage",
+      "ALL": "All",
+      "SHOWN": "Shown",
+      "HIDDEN": "Hidden"
+    },
+    "noResults": "No collections match.",
+    "empty": {
+      "title": "No collections yet",
+      "description": "Create your first collection for Tết, autumn-winter or the wedding season — gather designs, run ads, then go on sale."
+    },
+    "create": {
+      "open": "New collection",
+      "title": "New collection",
+      "description": "It starts as a draft. Fill in the rest in the next step.",
+      "namePlaceholder": "e.g. Tết 2026",
+      "codeHint": "2–12 uppercase letters or digits, used in SKUs. Locked once published.",
+      "submit": "Create and continue",
+      "success": "Draft collection created."
+    },
+    "homepageBadge": "Homepage",
+    "homepageAdded": "Added to the homepage.",
+    "homepageRemoved": "Removed from the homepage.",
+    "productSummary": "{count, plural, one {# product} other {# products}} · {selling} on sale",
+    "productCount": "{count, plural, one {# product} other {# products}}",
+    "menu": {
+      "label": "Actions for {name}",
+      "edit": "Open editor",
+      "moveTo": {
+        "DRAFT": "Back to draft",
+        "COMING_SOON": "Announce as coming soon",
+        "ACTIVE": "Put on sale",
+        "ARCHIVED": "Archive (season over)"
+      },
+      "addHomepage": "Show on homepage",
+      "removeHomepage": "Remove from homepage",
+      "delete": "Delete draft"
+    },
+    "cancel": "Cancel",
+    "processing": "Processing...",
+    "statusDialog": {
+      "title": {
+        "DRAFT": "Move back to draft?",
+        "COMING_SOON": "Announce as \"coming soon\"?",
+        "ACTIVE": "Put the collection on sale?",
+        "ARCHIVED": "Archive the collection?"
+      },
+      "explain": {
+        "DRAFT": "The collection is removed from the site. Shared links and running ads will stop working.",
+        "COMING_SOON": "The collection page goes live with its launch date so ads can run early. Customers can browse but cannot buy through this collection yet.",
+        "ACTIVE": "The collection is live and customers can buy its products that are on sale.",
+        "ARCHIVED": "The collection leaves listings and the homepage. Its code and URL are kept so search rankings are not lost."
+      },
+      "confirm": {
+        "DRAFT": "Move to draft",
+        "COMING_SOON": "Announce",
+        "ACTIVE": "Put on sale",
+        "ARCHIVED": "Archive"
+      },
+      "blocked": "Complete these first:",
+      "loadingImpact": "Calculating the effect on products...",
+      "activateReady": "{count, plural, one {Also put # hidden ready product on sale} other {Also put # hidden ready products on sale}}",
+      "notReadyNote": "{count, plural, one {# hidden product is} other {# hidden products are}} not ready (images, price, SKU) and will stay hidden.",
+      "hideExclusive": "{count, plural, one {Hide # product sold only through this collection} other {Hide # products sold only through this collection}}",
+      "sharedNote": "{count, plural, one {# product on sale in another collection stays} other {# products on sale in other collections stay}} as is.",
+      "lookbookOn": "The collection stays in the past-season lookbook to keep its content for SEO.",
+      "lookbookOff": "The collection will be fully hidden (lookbook display is off).",
+      "success": "Moved to \"{status}\".",
+      "activatedCount": "{count, plural, one {# product put on sale.} other {# products put on sale.}}",
+      "hiddenCount": "{count, plural, one {# product hidden.} other {# products hidden.}}",
+      "skippedCount": "{count, plural, one {# product is} other {# products are}} not ready and stay hidden."
+    },
+    "deleteDialog": {
+      "title": "Delete this draft collection?",
+      "description": "\"{name}\" will be moved to the trash. Its products are not affected.",
+      "confirm": "Delete",
+      "success": "Collection deleted."
+    },
+    "timeline": {
+      "draft": "Not published",
+      "launchIn": "{count, plural, one {Launches in # day} other {Launches in # days}} · {date}",
+      "launchReached": "Launch date reached",
+      "endIn": "{count, plural, one {Season ends in # day} other {Season ends in # days}} · {date}",
+      "endPassed": "Season end date passed",
+      "selling": "On sale",
+      "inLookbook": "In the lookbook",
+      "hidden": "Fully hidden"
+    },
+    "field": {
+      "name": "Collection name",
+      "code": "Collection code",
+      "codeHint": "Used in SKUs, e.g. AD-TET26-DO-S.",
+      "codeLocked": "Published, so it cannot change — the code is already in SKUs.",
+      "season": "Season label",
+      "seasonHint": "Shown above the name on the banner.",
+      "seasonPlaceholder": "e.g. Spring 2026",
+      "tagline": "Short tagline",
+      "taglinePlaceholder": "One line for the banner and ads",
+      "description": "Description",
+      "accent": "Season accent color",
+      "accentCustom": "Pick another color",
+      "accentNone": "None",
+      "accentClear": "Clear color",
+      "autoPushOos": "Push out-of-stock items to the end",
+      "storyPlaceholder": "The story of the season: inspiration, fabrics, artisans...",
+      "launchAt": "Launch date",
+      "endAt": "Season end date",
+      "scheduleHint": "A launch date is required to announce \"coming soon\". You get reminders at each date; status never changes automatically.",
+      "showOnHomepage": "Show on homepage",
+      "homepageArchived": "Archived collections are not shown on the homepage.",
+      "homepageOrder": "Homepage order",
+      "homepageOrderHint": "Lower numbers show first.",
+      "showInLookbook": "Add to the lookbook when archived",
+      "lookbookHint": "Keeps past-season pages as marketing and SEO content."
+    },
+    "editor": {
+      "back": "Back to collections",
+      "untitled": "Untitled collection",
+      "unsaved": "Unsaved",
+      "preview": "Preview",
+      "save": "Save changes",
+      "saved": "Collection saved.",
+      "sections": {
+        "info": "General information",
+        "infoHint": "Name, code and intro shown on the banner.",
+        "media": "Images",
+        "mediaHint": "Each image has its own phone version; leave empty to reuse the desktop one.",
+        "products": "Products",
+        "productsHint": "List order is display order. Up to 3 highlighted products.",
+        "story": "Lookbook story",
+        "storyHint": "Shown on the collection page and the past-season lookbook.",
+        "english": "English version",
+        "englishHint": "Leave empty to fall back to Vietnamese.",
+        "seo": "SEO",
+        "seoHint": "Title and description shown in search results.",
+        "lifecycle": "Lifecycle",
+        "schedule": "Schedule",
+        "visibility": "Visibility",
+        "warnings": "Needs attention"
+      }
+    },
+    "warnings": {
+      "hiddenInActive": "{count, plural, one {# product is hidden, so customers do not see it} other {# products are hidden, so customers do not see them}} in this collection.",
+      "notReady": "{count, plural, one {# product is} other {# products are}} not ready to sell (images, price, SKU) and will stay hidden at launch.",
+      "sellingBeforeLaunch": "{count, plural, one {# product is} other {# products are}} on sale before launch (not in any other collection on sale).",
+      "oosPushed": "{count, plural, one {# out-of-stock product moves} other {# out-of-stock products move}} to the end automatically.",
+      "oosKept": "{count, plural, one {# out-of-stock product keeps its} other {# out-of-stock products keep their}} current position.",
+      "shared": "{count, plural, one {# product also belongs} other {# products also belong}} to other collections.",
+      "launchReached": "Launch date reached — consider putting it on sale.",
+      "endPassed": "Season end date passed — consider archiving.",
+      "homepageDraft": "Not published yet, so it is not on the homepage."
+    },
+    "lifecycle": {
+      "launchOn": "Launches {date}",
+      "publishedOn": "Published {date}",
+      "archivedOn": "Archived {date}",
+      "saveFirst": "Save your changes before changing status."
+    },
+    "media": {
+      "cover": "Cover",
+      "coverMobile": "Mobile cover",
+      "banner": "Banner",
+      "bannerMobile": "Mobile banner",
+      "lookbook": "Lookbook images",
+      "upload": "Upload",
+      "uploading": "Uploading...",
+      "replace": "Replace",
+      "useOwn": "Use its own image",
+      "usingDesktop": "Using the desktop version",
+      "remove": "Remove image",
+      "moveLeft": "Move left",
+      "moveRight": "Move right",
+      "addLookbook": "Add images"
+    },
+    "products": {
+      "summary": "{count, plural, one {# product} other {# products}} · {selling} on sale · {highlighted} highlighted",
+      "add": "Add products",
+      "empty": "No products yet — click to choose",
+      "highlighted": "Highlighted",
+      "selling": "On sale",
+      "hidden": "Hidden",
+      "notReady": "Not ready",
+      "outOfStock": "Out of stock",
+      "outOfStockPushed": "Out of stock · moved to end",
+      "alsoIn": "Also in: {names}",
+      "toggleHighlight": "Highlight",
+      "highlightHint": "Up to {max} highlighted products",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "remove": "Remove from collection",
+      "pickerTitle": "Choose products",
+      "pickerDescription": "A product can belong to several collections.",
+      "pickerSearch": "Search by name or category",
+      "pickerOnlyFree": "Only products not in any collection",
+      "pickerEmpty": "No matching products.",
+      "alreadyAdded": "Added",
+      "pickedCount": "{count} selected",
+      "cancel": "Cancel",
+      "addPicked": "Add to collection"
+    },
+    "seo": {
+      "slug": "URL",
+      "locked": "Locked",
+      "lockedHint": "Published, so it stays the same to keep rankings and ad links.",
+      "title": "SEO title",
+      "titlePlaceholder": "Leave empty to use the collection name",
+      "description": "SEO description",
+      "descriptionPlaceholder": "Leave empty to use the tagline",
+      "googlePreview": "Google preview",
+      "untitled": "Collection",
+      "noDescription": "Add a description so shoppers understand the collection right from search."
+    },
+    "preview": {
+      "title": "Collection page preview",
+      "statusNote": {
+        "DRAFT": "Draft — customers cannot see this page",
+        "COMING_SOON": "Announced as \"coming soon\"",
+        "ACTIVE": "On sale — this is what customers see",
+        "ARCHIVED": "Archived — shown as a past-season lookbook page"
+      },
+      "device": {
+        "desktop": "Desktop",
+        "mobile": "Phone"
+      },
+      "ribbon": {
+        "comingSoon": "Coming soon",
+        "comingSoonDays": "{count, plural, one {Coming soon · # day left} other {Coming soon · # days left}}",
+        "DRAFT": "Draft",
+        "ARCHIVED": "Past-season lookbook"
+      },
+      "untitled": "Collection name",
+      "noProducts": "No products to show yet.",
+      "hiddenNote": "{count, plural, one {# hidden product is} other {# hidden products are}} not shown to customers.",
+      "lookbook": "Lookbook",
+      "highlight": "Highlight",
+      "outOfStock": "Out of stock",
+      "comingSoonPrice": "{price} · Coming soon",
+      "stillSelling": "Still available",
+      "pastSeason": "Past season"
+    }
+  },
+  "sizing": {
+    "group": {
+      "AO_DAI": "Áo dài",
+      "PANTS": "Pants",
+      "ACCESSORY": "Accessories",
+      "FOOTWEAR": "Footwear",
+      "MATERIAL": "Materials"
+    },
+    "groupHint": {
+      "AO_DAI": "Áo dài can be tailored from full measurements, or quickly matched by bust – waist – hips.",
+      "PANTS": "Pants only take lower-body measurements: waist, hips, thigh, length, leg opening.",
+      "ACCESSORY": "Accessories are sold per piece, with no measurements and no size chart.",
+      "FOOTWEAR": "Footwear is sized by foot — the size chart converts foot length into a shoe size.",
+      "MATERIAL": "Fabric is sold by the meter and has no sizes."
+    },
+    "trait": {
+      "FULL": "Full tailoring",
+      "PANTS": "Pants tailoring",
+      "THREE_POINT": "3-point set",
+      "METER": "Sold by meter",
+      "FOOT": "Foot sizing",
+      "NO_SIZE": "No size"
+    },
+    "sellUnit": {
+      "PIECE": "Sold per piece",
+      "METER": "Sold per meter"
+    },
+    "measurement": {
+      "height": "Height",
+      "weight": "Weight",
+      "age": "Age",
+      "bust": "Bust",
+      "waist": "Waist",
+      "hips": "Hips",
+      "shoulder": "Shoulder",
+      "armpit": "Armpit",
+      "upperArm": "Upper arm",
+      "armLength": "Sleeve length",
+      "shirtLength": "Dress length",
+      "neck": "Neck",
+      "thigh": "Thigh",
+      "pantsLength": "Pants length",
+      "legOpening": "Leg opening",
+      "footLength": "Foot length"
+    },
+    "unit": {
+      "cm": "cm",
+      "kg": "kg",
+      "year": "yrs"
+    }
+  },
+  "categories": {
+    "groupLabel": "Product group",
+    "filterAll": "All",
+    "createRoot": "Add root group",
+    "searchPlaceholder": "Search product types...",
+    "expandAll": "Expand all",
+    "collapseAll": "Collapse",
+    "summary": "{roots, plural, one {# root group} other {# root groups}} · {children, plural, one {# subtype} other {# subtypes}}",
+    "dragHint": "Drag the ⠿ handle to reorder within the same level",
+    "dragDisabled": "Clear the search and filters to reorder by drag and drop",
+    "noResults": "No product types match.",
+    "empty": "No product types yet.",
+    "expand": "Expand {name}",
+    "collapse": "Collapse {name}",
+    "hidden": "Hidden",
+    "noChart": "No size chart",
+    "inheritChart": "From root group",
+    "products": "items",
+    "addChildTo": "Add a subtype to {name}",
+    "reordered": "Display order saved",
+    "hiddenSuccess": "Product type hidden from the store",
+    "shownSuccess": "Product type shown in the store",
+    "cancel": "Cancel",
+    "processing": "Processing...",
+    "menu": {
+      "label": "Actions for {name}",
+      "edit": "Edit",
+      "addChild": "Add subtype",
+      "hide": "Hide from store",
+      "show": "Show in store",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "delete": "Delete"
+    },
+    "deleteBlocked": {
+      "children": "Has subtypes — delete or move them first",
+      "products": "Has products — move them or hide this type"
+    },
+    "editor": {
+      "createRootTitle": "Add root group",
+      "createChildTitle": "Add a subtype to {name}",
+      "editTitle": "Edit {name}",
+      "description": "The product group decides tailoring, sell unit and which size chart applies to its products.",
+      "rootOption": "— Root group —",
+      "parentLocked": "Has subtypes, so it stays a root group",
+      "chartNone": "No size chart",
+      "chartInherit": "Use the root group's size chart",
+      "chartInactive": "inactive",
+      "chartHint": "Products of this type use this chart for size suggestions; each product can still pick its own.",
+      "create": "Add type",
+      "save": "Save changes",
+      "created": "Product type added",
+      "updated": "Product type saved"
+    },
+    "field": {
+      "group": "Product group",
+      "name": "Type name",
+      "namePlaceholder": "e.g. Modern áo dài",
+      "nameEn": "English name",
+      "slug": "Slug",
+      "parent": "Parent group",
+      "parentShort": "Group",
+      "sizeChart": "Default size chart",
+      "sizeChartShort": "Size chart",
+      "description": "Description",
+      "descriptionEn": "English description",
+      "isActive": "Show in store",
+      "isActiveHint": "Turn off to hide this type from menus and filters without deleting data."
+    },
+    "deleteDialog": {
+      "title": "Delete product type?",
+      "description": "“{name}” will be permanently deleted. It has no products or subtypes.",
+      "confirm": "Delete",
+      "success": "Product type deleted"
+    }
+  },
+  "sizeCharts": {
+    "create": {
+      "open": "New size chart",
+      "title": "New size chart",
+      "description": "Name it and pick a product group — suitable measurements are suggested for you.",
+      "namePlaceholder": "e.g. Traditional áo dài, fitted",
+      "groupHint": "Accessories and fabric sold by the meter don't need a size chart.",
+      "submit": "Create and enter data",
+      "success": "Size chart created"
+    },
+    "groupLabel": "Product group",
+    "filterAll": "All",
+    "searchPlaceholder": "Search by name or size label...",
+    "empty": "No size charts yet.",
+    "noResults": "No size charts match.",
+    "column": {
+      "name": "Chart",
+      "group": "Product group",
+      "sizes": "Sizes",
+      "products": "Products using",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "columnsCount": "{count, plural, one {# measurement} other {# measurements}}",
+    "bigsizeConfigured": "bigsize thresholds set",
+    "noRows": "No sizes yet",
+    "categoriesCount": "{count, plural, one {# product type} other {# product types}}",
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "activated": "Size chart activated",
+    "deactivated": "Size chart deactivated",
+    "duplicated": "Size chart duplicated",
+    "deleted": "Size chart deleted",
+    "deleteBlocked": "Used by products or product types",
+    "cancel": "Cancel",
+    "processing": "Processing...",
+    "menu": {
+      "label": "Actions for {name}",
+      "edit": "Edit data",
+      "preview": "Preview size advisor",
+      "duplicate": "Duplicate",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "delete": "Delete"
+    },
+    "surcharge": {
+      "NONE": "None",
+      "FIXED_AMOUNT": "Amount",
+      "PERCENTAGE": "Percent"
+    },
+    "field": {
+      "name": "Chart name",
+      "nameEn": "English name",
+      "group": "Product group",
+      "description": "Internal note",
+      "isActive": "Active in store",
+      "isActiveHint": "Customers see the size chart and can use “Find my size” on product pages.",
+      "isActiveEmpty": "Add at least one size row before activating.",
+      "surchargeType": "Surcharge type",
+      "surchargeValue": "Surcharge",
+      "extraFabric": "Extra fabric",
+      "measurementGuide": "How to measure",
+      "measurementGuideEn": "How to measure (English)",
+      "guideImage": "Measurement guide image"
+    },
+    "editor": {
+      "back": "Size charts",
+      "untitled": "Untitled size chart",
+      "usage": "Used by {products, plural, one {# product} other {# products}} · {categories, plural, one {# product type} other {# product types}}",
+      "unsaved": "Unsaved",
+      "preview": "Preview",
+      "save": "Save chart",
+      "saved": "Size chart saved",
+      "gridTitle": "Measurements",
+      "gridDescription": "Each row is a size, each cell a min – max range. Red cells fall outside the column's valid range.",
+      "issues": "{count, plural, one {# cell to fix} other {# cells to fix}}",
+      "infoTitle": "Details",
+      "groupLocked": "This chart is assigned to product types, so its group can't change.",
+      "bigsizeTitle": "Bigsize & tailoring surcharge",
+      "bigsizeDescription": "Tailored orders exceeding “Bigsize from” in any column get a surcharge and the workshop is told to prepare extra fabric.",
+      "surchargeInvalid": "Enter a surcharge above 0 (percent at most 100).",
+      "bigsizeColumnsHint": "{count, plural, =0 {No column has a bigsize threshold yet — fill the “Bigsize from” row at the bottom of the grid.} one {# column has a bigsize threshold (“Bigsize from” row of the grid).} other {# columns have a bigsize threshold (“Bigsize from” row of the grid).}}",
+      "guideTitle": "Measuring guide",
+      "guideDescription": "Shown in the “How to measure” tab of the size advisor.",
+      "guidePlaceholder": "e.g. Waist — measure around the narrowest part, about 2–3 cm above the navel, snug but not tight.",
+      "uploadImage": "Upload image",
+      "removeImage": "Remove image"
+    },
+    "grid": {
+      "pickColumns": "Measurements (click to add / remove a column)",
+      "suggested": "Suggested for this group",
+      "suggestedHint": "Suggested for this product group",
+      "noColumns": "Pick at least one measurement to start the grid.",
+      "sizeColumn": "Size",
+      "rangeHeader": "from – to ({unit})",
+      "rowActions": "Row actions",
+      "sizeLabelAria": "Size label of row {index}",
+      "min": "from",
+      "max": "to",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "deleteRow": "Delete row {size}",
+      "validRange": "Valid range",
+      "validMin": "minimum",
+      "validMax": "maximum",
+      "bigsizeFrom": "Bigsize from",
+      "bigsizeNone": "—",
+      "addRow": "Add size row",
+      "pasteHint": "Paste a block of cells from Excel / Google Sheets (e.g. 82-86)",
+      "issue": {
+        "OUT_OF_RANGE": "Outside the valid range {min} – {max}",
+        "MIN_GT_MAX": "“From” is larger than “to”"
+      }
+    },
+    "preview": {
+      "title": "Size advisor preview",
+      "description": "What customers see on a phone. Uses the data being edited, no need to save."
+    },
+    "advisor": {
+      "eyebrow": "Size advisor",
+      "tab": {
+        "finder": "Find size",
+        "table": "Size chart",
+        "guide": "How to measure"
+      },
+      "emptyChart": "This size chart has no data yet.",
+      "finderIntro": "Enter the measurements you know — not all are needed; more numbers mean a better match.",
+      "issue": {
+        "BELOW_MIN": "This looks too small (minimum {limit} {unit}) — please double-check.",
+        "ABOVE_MAX": "This looks too large (maximum {limit} {unit}) — wrong unit perhaps?"
+      },
+      "result": {
+        "size": "Size {size}",
+        "fit": "Size {size} fits you.",
+        "tight": "Size {size} fits, but the {keys} is a bit snug — choose a stretch silk or order a tailored fit.",
+        "tightWithNext": "Size {size} fits, but the {keys} is a bit snug — choose a stretch silk, go up to {next} or order a tailored fit.",
+        "noFit": "Your measurements don't match any ready-made size (closest is {size}).",
+        "noFitCustom": "Your measurements don't match any ready-made size — Thiên Canh recommends a tailored fit for the best result.",
+        "insufficient": "Add your bust, waist or hips for a more accurate suggestion.",
+        "loose": "The {keys} will be a little loose in this size.",
+        "bigsize": "Your {keys} falls in the bigsize range for tailoring.",
+        "surcharge": "Surcharge {amount}.",
+        "extraFabric": "About {meters} m of extra fabric is needed."
+      },
+      "fullTable": "See the full size chart",
+      "sizeColumn": "Size",
+      "guideImageAlt": "Measurement guide",
+      "emptyGuide": "No measuring guide yet."
+    }
   }
 }

@@ -51,6 +51,7 @@ E-commerce Áo Dài truyền thống (có may đo theo số đo) của tiệm **
 
 - Chỉ đặt thứ **cả FE và BE** cùng dùng; chỉ code thuần (không Express/Next/React/Prisma). Không `enum`/`namespace` — dùng `as const` + union. Mỗi entry **một file**, không import tương đối; entry mới khai báo cả `exports` lẫn `typesVersions`. `"sideEffects": false`.
 - `@repo/shared` (**không import zod**): `LOCALES`, `pickLocalized`, `ROLES`, `PERMISSIONS`, `USER_STATUSES`, `GENDERS`, `AUTH_PROVIDERS`, `isAdminAreaRole`, `normalizeEmail`, `AUTH_COOKIES`, `TOKEN_AUDIENCES`, `AuthTokenClaims`, `UserDto`, `ApiResponse<T>`, hằng số phiên admin, `normalizeVietnamPhone`, `formatVnd`, `toVnd`, `MAX_IMAGE_BYTES`, `isProductImageRatio`.
+- `@repo/shared/sizing`: `PRODUCT_GROUPS`, `PRODUCT_GROUP_TRAITS` (nguồn duy nhất cho bản chất nhóm hàng), `MEASUREMENT_KEYS`, `validateMeasurements`, `detectBigsize`, `suggestSize` — server luôn tính lại phụ phí bigsize.
 - `@repo/shared/validation` (Zod): `vietnamPhoneSchema`, `emailSchema`, `newPasswordSchema`, `loginPasswordSchema`, `verificationCodeSchema`, regex & độ dài. Thông điệp lỗi luôn là mã KEY.
 - **Response API:**
   ```jsonc
@@ -139,7 +140,7 @@ src/
 ```text
 features/admin/
 ├── core/{auth,server,session,layout,ui}/   # đăng nhập · adminAuth.server, audit.server, actionInput · permissions, useAdminSession · khung · AdminPage...
-└── modules/<module>/                       # approvals, cms, customers, dashboard, inventory, orders, products, staff, tailoring, vouchers
+└── modules/<module>/                       # approvals, cms, collections, customers, dashboard, inventory, orders, products, staff, tailoring, vouchers
     ├── actions/<m>.actions.ts   # "use server" — mutation + đọc cho client component
     ├── queries/<m>.queries.ts   # CHỈ đọc Prisma
     ├── schemas/<m>.schemas.ts   # Zod tham số action — KHÔNG export qua index
@@ -154,7 +155,10 @@ Menu chia nhóm (cấu hình ở `core/layout/utils/navigation.ts`; URL → modu
 | Nhóm menu → màn (`AdminModule`) | STAFF cần quyền | Ghi chú |
 | :--- | :--- | :--- |
 | Tổng quan (`dashboard`) | — | Mỗi khối theo quyền: doanh thu = `VIEW_REPORTS`, tồn kho = `MANAGE_INVENTORY`, may đo = `UPDATE_TAILORING`, đơn mới = `MANAGE_ORDERS` |
-| Danh mục: bộ sưu tập, loại sản phẩm, chất liệu vải, thuộc tính, bảng size mẫu (`collections` `categories` `materials` `attributes` `sizeCharts`) | `MANAGE_INVENTORY` | Chưa làm (khung tạm) |
+| Danh mục: bộ sưu tập (`collections`) | `MANAGE_INVENTORY` | Vòng đời, sản phẩm nhiều bộ sưu tập, trang chủ (tối đa 4), lookbook, xem trước — luật ở `modules/collections/utils/collectionLifecycle.ts` |
+| Danh mục: loại sản phẩm (`categories`) | `MANAGE_INVENTORY` | Cây 2 cấp (nhóm gốc → loại con), kéo thả đổi thứ tự cùng cấp, nhóm hàng `ProductGroup` + bảng size mặc định (loại con chưa gắn thì thừa hưởng nhóm gốc); chỉ xóa được khi trống |
+| Danh mục: bảng size mẫu (`sizeCharts`) | `MANAGE_INVENTORY` | Lưới số đo (hàng = size, cột = thông số, ô = min–max, dán từ Excel), ngưỡng hợp lệ + bigsize theo cột, phụ phí, nhân bản, xem trước popup tư vấn size; bảng đang dùng không xóa được |
+| Danh mục: chất liệu vải, thuộc tính (`materials` `attributes`) | `MANAGE_INVENTORY` | Chưa làm (khung tạm) — ký hiệu size gợi ý tạm ở `modules/size-charts/utils/sizeChartPresets.ts` |
 | Sản phẩm (`products`) | `MANAGE_INVENTORY` | |
 | Kho: số lượng vải, SKU, lịch sử biến động (`fabrics` `inventory` `inventoryHistory`) | `MANAGE_INVENTORY` | SKU ở `/admin/inventory/skus`; vải & lịch sử chưa làm |
 | Đơn hàng: xưởng đang may (`tailoring`) | `UPDATE_TAILORING` | Người thực hiện ghi vào `TailoringLog` |
@@ -200,9 +204,9 @@ Menu chia nhóm (cấu hình ở `core/layout/utils/navigation.ts`; URL → modu
 
 ## 9. Database (`packages/db`)
 
-**Schema** (22 model, 15 enum):
+**Schema** (27 model, 18 enum):
 - **Người dùng & phiên:** `User` (email chữ thường — CHECK constraint; `emailVerifiedAt` / `phoneVerifiedAt`, `passwordHash`, `status` ACTIVE/LOCKED/DELETED, `permissions` của STAFF), `SocialAccount` (`provider` enum, unique `userId + provider`), `UserSession` (`kind` STORE/ADMIN, `refreshTokenHash` chỉ ở STORE, `familyId`, `lastUsedAt`), `UserAddress`, `UserMeasurement`.
-- **Catalog & bán hàng:** `Category`, `Product`, `ProductVariant`, `Cart`, `CartItem`, `Voucher`, `Order` (`paidAmount`, `dueDate`), `OrderItem` (snapshot sản phẩm + số đo), `TailoringLog`, `Review`, `ReviewMedia`.
+- **Catalog & bán hàng:** `Category` (cây 2 cấp, `group` ProductGroup quyết định may đo / đơn vị bán / có size hay không, `position`, `isActive`, `defaultSizeChartId`), `SizeChart` + `SizeChartColumn` (thông số `key` theo `MEASUREMENT_KEYS`, `validMin`/`validMax`, `bigsizeFrom`) + `SizeChartRow` (`sizeLabel` khớp `ProductVariant.size`, `values` JSON `{ key: { min, max } }`), `Collection` (bộ sưu tập theo mùa: `status` DRAFT → COMING_SOON → ACTIVE → ARCHIVED, ảnh desktop + mobile, trang chủ, lookbook, SEO, xóa mềm `deletedAt`), `CollectionProduct` (nhiều - nhiều, `position`, `isHighlighted`), `Product` (`sizeChartId` riêng, null = theo loại sản phẩm), `ProductVariant`, `Cart`, `CartItem`, `Voucher`, `Order` (`paidAmount`, `dueDate`), `OrderItem` (snapshot sản phẩm + số đo), `TailoringLog`, `Review`, `ReviewMedia`.
 - **Vận hành:** `ApprovalRequest` (`actionType` enum, `targetId`), `AuditLog` (chỉ ghi thêm), `Article`, `Faq`, `Appointment`, `Fabric`.
 
 **Quy ước schema**

@@ -1,6 +1,7 @@
 import React from "react";
 import {
   getAdminProductCategoriesQuery,
+  getAdminProductSizeChartsQuery,
   getAdminProductsListQuery,
   ProductsList,
 } from "@/features/admin/modules/products";
@@ -13,11 +14,15 @@ export const dynamic = "force-dynamic";
 export default async function AdminProductsPage() {
   await requireAdminPage(ADMIN_MODULE_ACCESS.products);
 
-  const [products, categories] = await Promise.all([getAdminProductsListQuery(), getAdminProductCategoriesQuery()]);
+  const [products, categories, sizeCharts] = await Promise.all([
+    getAdminProductsListQuery(),
+    getAdminProductCategoriesQuery(),
+    getAdminProductSizeChartsQuery(),
+  ]);
 
   return (
     <AdminPage>
-      <ProductsList initialProducts={products} categories={categories} />
+      <ProductsList initialProducts={products} categories={categories} sizeCharts={sizeCharts} />
     </AdminPage>
   );
 }

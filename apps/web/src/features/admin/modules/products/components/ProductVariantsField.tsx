@@ -47,13 +47,17 @@ function FieldToggle({ label, pressed, onToggle, children }: { label: string; pr
   );
 }
 
+const SIZE_LIST_ID = "product-variant-sizes";
+
 function VariantRow({
   form,
   index,
+  sizeOptions,
   onRemove,
 }: {
   form: UseFormReturn<ProductFormValues>;
   index: number;
+  sizeOptions: string[];
   onRemove: () => void;
 }) {
   const t = useTranslations("AdminPage.products.variant");
@@ -69,6 +73,9 @@ function VariantRow({
   const collectionCode = useWatch({ control, name: "collectionCode" });
   const basePrice = useWatch({ control, name: "basePrice" });
 
+  // Size không có trong bảng size thì khách không được gợi ý size đó — chỉ cảnh báo, vẫn cho lưu (VD size đặc biệt)
+  const sizeOutsideChart =
+    sizeOptions.length > 0 && size.trim() !== "" && !sizeOptions.some((label) => label.toUpperCase() === size.trim().toUpperCase());
   const skuPreview = buildSku({ collectionCode: collectionCode.trim().toUpperCase(), productName, color, size });
   const rowErrors = form.formState.errors.variants?.[index];
   const message =
@@ -92,6 +99,7 @@ function VariantRow({
         <VariantCell label={`${t("size")} *`}>
           <input
             {...register(`variants.${index}.size`)}
+            list={sizeOptions.length > 0 ? SIZE_LIST_ID : undefined}
             aria-label={t("size")}
             aria-invalid={Boolean(rowErrors?.size)}
             placeholder={t("sizePlaceholder")}
@@ -168,12 +176,20 @@ function VariantRow({
         </button>
       </div>
       {message && <p className="mt-1 text-xs text-rose-700">{notify.translateError(message)}</p>}
+      {!message && sizeOutsideChart && <p className="mt-1 text-xs text-amber-700">{t("sizeNotInChart", { size })}</p>}
     </div>
   );
 }
 
 /** Bảng nhập SKU: size, màu, mã, giá riêng, tồn kho */
-export function ProductVariantsField({ form }: { form: UseFormReturn<ProductFormValues> }) {
+export function ProductVariantsField({
+  form,
+  sizeOptions,
+}: {
+  form: UseFormReturn<ProductFormValues>;
+  /** Ký hiệu size trong bảng size đang áp dụng — gợi ý khi nhập và cảnh báo khi lệch */
+  sizeOptions: string[];
+}) {
   const t = useTranslations("AdminPage.products.variant");
   const notify = useNotify();
   const { fields, append, remove } = useFieldArray({ control: form.control, name: "variants", keyName: "fieldKey" });
@@ -192,6 +208,14 @@ export function ProductVariantsField({ form }: { form: UseFormReturn<ProductForm
         {collectionError && <span className="mt-1 block text-xs text-rose-700">{notify.translateError(collectionError)}</span>}
       </label>
 
+      {sizeOptions.length > 0 && (
+        <datalist id={SIZE_LIST_ID}>
+          {sizeOptions.map((label) => (
+            <option key={label} value={label} />
+          ))}
+        </datalist>
+      )}
+
       {fields.length > 0 && (
         <div className={cn(ROW_GRID_CLASS, "hidden pt-2 text-xs font-medium text-[#71717A] sm:grid")}>
           <span>{t("size")} *</span>
@@ -204,7 +228,13 @@ export function ProductVariantsField({ form }: { form: UseFormReturn<ProductForm
       )}
 
       {fields.map((field, index) => (
-        <VariantRow key={field.fieldKey} form={form} index={index} onRemove={() => remove(index)} />
+        <VariantRow
+          key={field.fieldKey}
+          form={form}
+          index={index}
+          sizeOptions={sizeOptions}
+          onRemove={() => remove(index)}
+        />
       ))}
 
       <button

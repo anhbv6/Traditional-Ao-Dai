@@ -3,11 +3,11 @@
 import React, { useState, useTransition } from "react";
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
-import { Plus, Search } from "lucide-react";
+import { Shirt } from "lucide-react";
 import { useNotify } from "@/hooks/useNotify";
 import { cn } from "@/lib/utils";
-import { ADMIN_CARD_CLASS, AdminFilterSelect, AdminPageHeader, AdminSecondaryButton } from "@/features/admin/core/ui";
-import { type AdminProductCategory, type AdminProductItem } from "../types/products.types";
+import { ADMIN_CARD_CLASS, AdminFilterSelect, AdminListPanel, AdminSecondaryButton } from "@/features/admin/core/ui";
+import { type AdminProductCategory, type AdminProductSizeChart, type AdminProductItem } from "../types/products.types";
 import {
   bulkSetProductsActiveAction,
   toggleProductActiveAction,
@@ -23,6 +23,7 @@ const ProductDetailDialog = dynamic(() => import("./ProductDetailDialog").then((
 interface ProductsListProps {
   initialProducts: AdminProductItem[];
   categories: AdminProductCategory[];
+  sizeCharts: AdminProductSizeChart[];
 }
 
 type ProductDialog = { type: "create" } | { type: "edit"; productId: string } | { type: "detail"; productId: string };
@@ -33,7 +34,7 @@ const toFilterOptions = (allLabel: string, values: (string | null | undefined)[]
   ...uniqueOptions(values).map((value) => ({ value, label: value })),
 ];
 
-export function ProductsList({ initialProducts, categories }: ProductsListProps) {
+export function ProductsList({ initialProducts, categories, sizeCharts }: ProductsListProps) {
   const t = useTranslations("AdminPage.products");
   const tPage = useTranslations("AdminPage.pages.products");
   const notify = useNotify();
@@ -122,51 +123,50 @@ export function ProductsList({ initialProducts, categories }: ProductsListProps)
 
   return (
     <>
-      <AdminPageHeader
+      <AdminListPanel
+        icon={Shirt}
         title={tPage("title")}
         description={tPage("description")}
-        actions={
-          <button
-            type="button"
-            onClick={() => setDialog({ type: "create" })}
-            className="inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-lg bg-[#18181B] px-3.5 text-sm font-medium text-white shadow-2xs transition-colors hover:bg-[#09090B]"
-          >
-            <Plus size={16} aria-hidden /> {t("add")}
-          </button>
+        search={{ value: searchTerm, onChange: setSearchTerm, placeholder: t("searchPlaceholder") }}
+        action={{ label: t("add"), onClick: () => setDialog({ type: "create" }) }}
+        filters={
+          <>
+            <AdminFilterSelect
+              label={t("colStatus")}
+              value={statusTab}
+              onChange={setStatusTab}
+              options={PRODUCT_STATUS_TABS.map((tab) => ({
+                value: tab,
+                label: `${t(`tabs.${tab}`)} (${products.filter((p) => matchesStatusTab(p, tab)).length})`,
+              }))}
+              className="w-full sm:w-52"
+            />
+            <AdminFilterSelect
+              label={t("colCategory")}
+              value={category}
+              onChange={setCategory}
+              options={toFilterOptions(
+                t("allCategories"),
+                products.map((p) => p.categoryName)
+              )}
+              className="w-full sm:w-64"
+            />
+            <AdminFilterSelect
+              label={t("colMaterial")}
+              value={material}
+              onChange={setMaterial}
+              options={toFilterOptions(
+                t("allMaterials"),
+                products.map((p) => p.material)
+              )}
+              className="w-full sm:w-60"
+            />
+          </>
         }
       />
 
       <div className={cn(ADMIN_CARD_CLASS, "overflow-hidden")}>
-        <div
-          role="tablist"
-          aria-label={t("colStatus")}
-          className="flex gap-5 overflow-x-auto border-b border-[#E4E4E7] px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        >
-          {PRODUCT_STATUS_TABS.map((tab) => {
-            const count = products.filter((p) => matchesStatusTab(p, tab)).length;
-
-            return (
-              <button
-                key={tab}
-                type="button"
-                role="tab"
-                aria-selected={statusTab === tab}
-                onClick={() => setStatusTab(tab)}
-                className={cn(
-                  "-mb-px flex shrink-0 cursor-pointer items-center gap-1.5 border-b-2 py-3 text-sm font-medium outline-none transition-colors",
-                  statusTab === tab
-                    ? "border-[#18181B] text-[#09090B]"
-                    : "border-transparent text-[#71717A] hover:text-[#09090B]"
-                )}
-              >
-                {t(`tabs.${tab}`)}
-                <span className="text-xs font-normal tabular-nums text-[#A1A1AA]">{count}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {selectedProducts.length > 0 ? (
+        {selectedProducts.length > 0 && (
           <div className="flex min-h-[57px] flex-wrap items-center gap-2 border-b border-[#E4E4E7] bg-[#FAFAFA] px-4 py-2.5">
             <span className="mr-auto text-sm font-medium text-[#09090B]">
               {t("selectedCount", { count: selectedProducts.length })}
@@ -180,42 +180,6 @@ export function ProductsList({ initialProducts, categories }: ProductsListProps)
             <AdminSecondaryButton disabled={isPending} onClick={() => setSelectedIds(new Set())}>
               {t("clearSelection")}
             </AdminSecondaryButton>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-2 border-b border-[#E4E4E7] p-3 sm:flex-row sm:items-center">
-            <div className="relative min-w-0 flex-1">
-              <Search size={15} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#A1A1AA]" aria-hidden />
-              <input
-                type="search"
-                aria-label={t("searchPlaceholder")}
-                placeholder={t("searchPlaceholder")}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="h-9 w-full rounded-lg border border-[#E4E4E7] bg-white pl-8 pr-3 text-sm text-[#09090B] shadow-2xs outline-none placeholder:text-[#A1A1AA] focus:border-[#18181B]"
-              />
-            </div>
-            <div className="grid gap-2 sm:flex">
-              <AdminFilterSelect
-                label={t("colCategory")}
-                value={category}
-                onChange={setCategory}
-                options={toFilterOptions(
-                  t("allCategories"),
-                  products.map((p) => p.categoryName)
-                )}
-                className="w-full sm:w-64"
-              />
-              <AdminFilterSelect
-                label={t("colMaterial")}
-                value={material}
-                onChange={setMaterial}
-                options={toFilterOptions(
-                  t("allMaterials"),
-                  products.map((p) => p.material)
-                )}
-                className="w-full sm:w-64"
-              />
-            </div>
           </div>
         )}
 
@@ -251,6 +215,7 @@ export function ProductsList({ initialProducts, categories }: ProductsListProps)
           open
           productId={dialog.type === "edit" ? dialog.productId : null}
           categories={categories}
+          sizeCharts={sizeCharts}
           onOpenChange={(open) => !open && setDialog(null)}
           onSaved={handleSaved}
         />
