@@ -10,10 +10,10 @@
     "placeholder": "Write a message to the shop..."
   },
   "ai": {
-    "open": "Ask the AI assistant",
-    "title": "AI assistant",
-    "status": "Virtual assistant · Instant replies",
-    "placeholder": "Ask about designs, sizing, fabrics...",
+    "open": "Ask Thợ phụ Thiên Canh",
+    "title": "Thợ phụ Thiên Canh",
+    "status": "AI assistant · Instant replies",
+    "placeholder": "Ask about silk, measurements, designs...",
     "disclaimer": "Answers are AI-generated and for reference only. For precise advice, switch to the shop chat."
   }
 }

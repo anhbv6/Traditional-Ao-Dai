@@ -2,18 +2,32 @@ import { type LucideIcon } from "lucide-react";
 import { type AdminSessionUser } from "../../server/adminAuth.server";
 import { type AdminModule } from "../../session/permissions";
 
-export interface AdminNavItem {
+/** Một trang trong menu; mục con của nhóm không có icon */
+export interface AdminNavLink {
+  type: "link";
   key: AdminModule;
   label: string;
   href: string;
-  icon: LucideIcon;
-  active?: boolean;
+  icon?: LucideIcon;
+  active: boolean;
 }
+
+/** Nhóm menu thu gọn được; `active` khi một mục con đang mở */
+export interface AdminNavGroup {
+  type: "group";
+  key: string;
+  label: string;
+  icon: LucideIcon;
+  active: boolean;
+  children: AdminNavLink[];
+}
+
+export type AdminNavEntry = AdminNavLink | AdminNavGroup;
 
 export interface AdminHeaderProps {
   user: AdminSessionUser | null;
   isSuperAdmin: boolean;
-  navLinks: AdminNavItem[];
+  navLinks: AdminNavEntry[];
   isLoggingOut?: boolean;
   onOpenProfile: () => void;
   onLogout: () => void;
@@ -37,7 +51,7 @@ export interface AdminUserMenuProps {
 }
 
 export interface AdminNavListProps {
-  items: AdminNavItem[];
+  items: AdminNavEntry[];
   /** Gọi khi chọn một mục (ngăn kéo mobile dùng để tự đóng) */
   onNavigate?: () => void;
   className?: string;
@@ -51,7 +65,7 @@ export interface AdminLayoutState {
   isAccessDenied: boolean;
   isHydrated: boolean;
   isLoggingOut: boolean;
-  navLinks: AdminNavItem[];
+  navLinks: AdminNavEntry[];
   isProfileOpen: boolean;
   setIsProfileOpen: (open: boolean) => void;
   handleLogout: () => Promise<void>;

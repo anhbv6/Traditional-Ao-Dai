@@ -82,14 +82,14 @@ export function AuthImageBanner({
           <div className="relative h-10 w-10 overflow-hidden rounded-md bg-white/10 backdrop-blur-sm p-1 border border-white/20">
             <Image
               src="/logo.png"
-              alt="AODAI Logo"
+              alt="Thiên Canh Logo"
               width={40}
               height={40}
               className="h-full w-full object-contain scale-110"
             />
           </div>
           <span className="font-[family-name:var(--font-playfair)] text-xl font-medium tracking-widest text-white uppercase">
-            AODAI
+            Thiên Canh
           </span>
         </motion.div>
       </div> */}

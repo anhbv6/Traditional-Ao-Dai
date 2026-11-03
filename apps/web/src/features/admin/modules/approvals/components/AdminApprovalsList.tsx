@@ -10,15 +10,23 @@ import {
   getApprovalRequestsAction,
   reviewApprovalRequestAction,
 } from "../actions/approval.actions";
+import { type ApprovalView } from "../schemas/approval.schemas";
 import { type ApprovalRequestItem } from "../types/approval.types";
 import { type ApprovalStatus } from "@repo/db";
 import { useTranslations } from "next-intl";
 import { useNotify } from "@/hooks/useNotify";
 
-export function AdminApprovalsList() {
+/** Bộ lọc trạng thái của từng màn; hàng đợi chỉ có yêu cầu chờ duyệt nên không cần lọc */
+const VIEW_FILTERS: Record<ApprovalView, string[]> = {
+  queue: [],
+  history: ["ALL", "APPROVED", "REJECTED"],
+  mine: ["ALL", "PENDING", "APPROVED", "REJECTED"],
+};
+
+export function AdminApprovalsList({ view }: { view: ApprovalView }) {
   const { user } = useAdminSession({ force: true });
-  // Chỉ Super Admin được duyệt/từ chối; STAFF chỉ xem yêu cầu của chính mình (server cũng lọc theo người gửi)
-  const canReview = canAccess(user, ADMIN_ACTION_ACCESS.reviewApproval);
+  // Chỉ Super Admin được duyệt/từ chối và chỉ ở màn hàng đợi; server cũng chặn theo quyền + lọc theo người gửi
+  const canReview = view === "queue" && canAccess(user, ADMIN_ACTION_ACCESS.reviewApproval);
   const notify = useNotify();
   const tToast = useTranslations("AdminPage.toasts");
   const t = useTranslations("AdminPage.approvals");
@@ -29,10 +37,10 @@ export function AdminApprovalsList() {
 
   // Dữ liệu server -> React Query (không tự fetch trong useEffect)
   const { data: requests = [], isFetching: isLoading, refetch } = useQuery({
-    queryKey: ["admin", "approvals", statusFilter],
+    queryKey: ["admin", "approvals", view, statusFilter],
     queryFn: async () => {
-      const filter = statusFilter === "ALL" ? undefined : (statusFilter as ApprovalStatus);
-      const res = await getApprovalRequestsAction(filter);
+      const status = statusFilter === "ALL" ? undefined : (statusFilter as ApprovalStatus);
+      const res = await getApprovalRequestsAction({ view, status });
       if (!res.success) {
         notify.error(res.error, "APPROVAL_LIST_FAILED");
         return [];
@@ -47,7 +55,7 @@ export function AdminApprovalsList() {
     setIsProcessing(true);
     const res = await reviewApprovalRequestAction({
       requestId: id,
-      status: "APPROVED",
+      status: "APPROVED",
     });
 
     if (res.success) {
@@ -67,7 +75,7 @@ export function AdminApprovalsList() {
     setIsProcessing(true);
     const res = await reviewApprovalRequestAction({
       requestId: id,
-      status: "REJECTED",
+      status: "REJECTED",
       rejectReason: rejectReason.trim(),
     });
 
@@ -130,24 +138,17 @@ export function AdminApprovalsList() {
       <AdminPageHeader
         icon={UserCheck}
         eyebrow={t("eyebrow")}
-        title={canReview ? t("titleReviewer") : t("titleRequester")}
-        description={
-          canReview
-            ? t("descriptionReviewer")
-            : t("descriptionRequester")
-        }
+        title={t(`views.${view}.title`)}
+        description={t(`views.${view}.description`)}
         actions={
           <>
-            <AdminSegmentedControl
-              value={statusFilter}
-              onChange={setStatusFilter}
-              options={[
-                { value: "ALL", label: t("filter.ALL") },
-                { value: "PENDING", label: t("filter.PENDING") },
-                { value: "APPROVED", label: t("filter.APPROVED") },
-                { value: "REJECTED", label: t("filter.REJECTED") },
-              ]}
-            />
+            {VIEW_FILTERS[view].length > 0 && (
+              <AdminSegmentedControl
+                value={statusFilter}
+                onChange={setStatusFilter}
+                options={VIEW_FILTERS[view].map((value) => ({ value, label: t(`filter.${value}`) }))}
+              />
+            )}
             <AdminSecondaryButton onClick={fetchRequests} disabled={isLoading} title={t("refresh")}>
               <RefreshCw size={14} className={isLoading ? "animate-spin" : ""} />
               <span>{t("refresh")}</span>

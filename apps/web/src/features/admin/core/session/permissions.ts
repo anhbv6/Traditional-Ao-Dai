@@ -21,6 +21,8 @@ export interface AdminAccessRule {
   permission?: Permission;
   /** STAFF chỉ cần có MỘT trong các quyền này */
   anyOf?: readonly Permission[];
+  /** Chỉ dành cho STAFF — ADMIN đã có màn tổng nên không cần (VD "Yêu cầu của tôi") */
+  staffOnly?: boolean;
 }
 
 /** Người dùng tối thiểu cần để kiểm tra quyền */
@@ -31,14 +33,34 @@ export interface AdminAccessSubject {
 
 export type AdminModule =
   | "dashboard"
-  | "orders"
-  | "tailoring"
+  // Danh mục
+  | "collections"
+  | "categories"
+  | "materials"
+  | "attributes"
+  | "sizeCharts"
   | "products"
+  // Kho
+  | "fabrics"
   | "inventory"
+  | "inventoryHistory"
+  // Đơn hàng
+  | "tailoring"
+  | "orders"
+  | "returns"
+  // Người dùng
   | "customers"
-  | "approvals"
   | "staff"
+  // Khuyến mãi
   | "vouchers"
+  | "saleEvents"
+  // Phê duyệt
+  | "approvals"
+  | "approvalHistory"
+  | "approvalMine"
+  // Cấu hình
+  | "shippingPayment"
+  | "rolePermissions"
   | "cms";
 
 /**
@@ -46,16 +68,29 @@ export type AdminModule =
  */
 export const ADMIN_MODULE_ACCESS: Record<AdminModule, AdminAccessRule> = {
   dashboard: {},
-  orders: { permission: "MANAGE_ORDERS" },
-  tailoring: { permission: "UPDATE_TAILORING" },
+  collections: { permission: "MANAGE_INVENTORY" },
+  categories: { permission: "MANAGE_INVENTORY" },
+  materials: { permission: "MANAGE_INVENTORY" },
+  attributes: { permission: "MANAGE_INVENTORY" },
+  sizeCharts: { permission: "MANAGE_INVENTORY" },
   products: { permission: "MANAGE_INVENTORY" },
+  fabrics: { permission: "MANAGE_INVENTORY" },
   inventory: { permission: "MANAGE_INVENTORY" },
+  inventoryHistory: { permission: "MANAGE_INVENTORY" },
+  tailoring: { permission: "UPDATE_TAILORING" },
+  orders: { permission: "MANAGE_ORDERS" },
+  returns: { permission: "MANAGE_ORDERS" },
   // Nhân viên xử lý đơn cần tra cứu khách hàng & số đo; khóa/mở tài khoản chỉ ADMIN (xem ADMIN_ACTION_ACCESS)
   customers: { permission: "MANAGE_ORDERS" },
-  // STAFF xem được hàng đợi của chính mình; duyệt/từ chối chỉ ADMIN
-  approvals: {},
   staff: { role: "ADMIN" },
   vouchers: { role: "ADMIN" },
+  saleEvents: { role: "ADMIN" },
+  // Hàng đợi và lịch sử duyệt chỉ ADMIN; nhân viên theo dõi yêu cầu của mình ở approvalMine
+  approvals: { role: "ADMIN" },
+  approvalHistory: { role: "ADMIN" },
+  approvalMine: { staffOnly: true },
+  shippingPayment: { role: "ADMIN" },
+  rolePermissions: { role: "ADMIN" },
   cms: { permission: "MANAGE_CONTENT" },
 };
 
@@ -78,7 +113,7 @@ export const ADMIN_ACTION_ACCESS = {
  */
 export function canAccess(user: AdminAccessSubject | null | undefined, rule: AdminAccessRule = {}): boolean {
   if (!user || (user.role !== "ADMIN" && user.role !== "STAFF")) return false;
-  if (user.role === "ADMIN") return true;
+  if (user.role === "ADMIN") return !rule.staffOnly;
   if (rule.role === "ADMIN") return false;
   if (rule.permission && !user.permissions.includes(rule.permission)) return false;
   if (rule.anyOf && !rule.anyOf.some((permission) => user.permissions.includes(permission))) return false;

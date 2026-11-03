@@ -4,7 +4,7 @@
   "products": "Products",
   "shop": "Shop",
   "ourStory": "Our Story",
-  "blog": "Blog",
+  "blog": "Stories of Silk & Clouds",
   "contact": "Contact Us",
   "cart": "Cart",
   "wishlist": "Wishlist",
@@ -39,7 +39,7 @@
       "Tet"
     ]
   },
-  "tagline": "Embrace the Grace of Áo Việt, Embrace Youth for Life.",
+  "tagline": "Silk cut true beneath the clouds, hand-sewn inch by inch.",
   "login": "Login",
   "logout": "Logout",
   "profile": "Profile",
@@ -102,20 +102,20 @@
     "links": {
       "products": "Shop",
       "custom": "Design your Ao Dai",
-      "about": "The AODAI story",
+      "about": "The Thiên Canh story",
       "faqs": "FAQs",
       "contact": "Talk to a tailor"
     },
-    "metaTitle": "Page not found — AODAI"
+    "metaTitle": "Page not found — Thiên Canh"
   },
   "forbidden": {
     "eyebrow": "Error 403",
     "title": "This area is for staff only",
-    "description": "Your customer account doesn't have access to the admin dashboard. Head back to shopping, or sign in with an admin account if you're on the AODAI team.",
+    "description": "Your customer account doesn't have access to the admin dashboard. Head back to shopping, or sign in with an admin account if you're on the Thiên Canh team.",
     "home": "Back to shopping",
     "adminLogin": "Admin sign-in",
     "suggestions": "You might like",
-    "metaTitle": "Access denied — AODAI"
+    "metaTitle": "Access denied — Thiên Canh"
   },
   "notifications": "Notifications"
 }

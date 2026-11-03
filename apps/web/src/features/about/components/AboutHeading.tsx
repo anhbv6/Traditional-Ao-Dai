@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 interface AboutHeadingProps {
-  /** Số La Mã của chương (I, II, III) — khác cách đánh số 01/02 ở trang chủ */
+  /** Số La Mã của chương (I, II, III, IV) — khác cách đánh số 01/02 ở trang chủ */
   numeral: string;
   eyebrow: string;
   title: string;

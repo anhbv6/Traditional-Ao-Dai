@@ -7,15 +7,15 @@ import { type ChatChannel, type ChatReplyRule, type LocalizedText } from "../typ
 /** Người đại diện mỗi kênh (hiện ở đầu khung chat) */
 export const CHAT_AGENTS: Record<ChatChannel, { name: string; avatar: string | null }> = {
   shop: { name: "Thu Hà", avatar: "/images/ex5.jpg" },
-  ai: { name: "AODAI AI", avatar: null },
+  ai: { name: "Thợ phụ Thiên Canh", avatar: null },
 };
 
 /** Tin chào sẵn khi mở khung chat lần đầu */
 export const CHAT_GREETINGS: Record<ChatChannel, LocalizedText[]> = {
   shop: [
     {
-      vi: "Xin chào! Mình là Thu Hà, tư vấn viên của AODAI 🌸",
-      en: "Hello! I'm Thu Ha, a stylist at AODAI 🌸",
+      vi: "Xin chào! Mình là Thu Hà, tư vấn viên của Thiên Canh 🌸",
+      en: "Hello! I'm Thu Ha, a stylist at Thiên Canh 🌸",
     },
     {
       vi: "Bạn cần tư vấn chọn size, may đo hay kiểm tra đơn hàng? Cứ nhắn cho mình nhé.",
@@ -24,8 +24,8 @@ export const CHAT_GREETINGS: Record<ChatChannel, LocalizedText[]> = {
   ],
   ai: [
     {
-      vi: "Chào bạn, mình là trợ lý AI của AODAI. Mình có thể gợi ý mẫu áo dài, cách chọn size và chất liệu.",
-      en: "Hi, I'm the AODAI AI assistant. I can suggest designs and help with sizing and fabrics.",
+      vi: "Chào bạn, Thiên Canh đang nghe đây. Bạn cần mình tư vấn chất lụa hay hỗ trợ đo kích thước cơ thể nhé?",
+      en: "Hi, Thiên Canh is listening. Would you like advice on silk, or help taking your body measurements?",
     },
   ],
 };
@@ -38,9 +38,9 @@ export const CHAT_SUGGESTIONS: Record<ChatChannel, LocalizedText[]> = {
     { vi: "Kiểm tra đơn hàng", en: "Check my order" },
   ],
   ai: [
+    { vi: "Tư vấn chất lụa", en: "Help me choose a silk" },
+    { vi: "Hướng dẫn đo kích thước cơ thể", en: "How to take my measurements" },
     { vi: "Gợi ý áo dài đi cưới", en: "Suggest a wedding ao dai" },
-    { vi: "Chất liệu nào mát cho mùa hè?", en: "Which fabric is cool for summer?" },
-    { vi: "Cách bảo quản áo lụa", en: "How to care for silk" },
   ],
 };
 
@@ -76,6 +76,21 @@ const SHOP_RULES: ChatReplyRule[] = [
 ];
 
 const AI_RULES: ChatReplyRule[] = [
+  // Hai luật đầu khớp đúng hai lời mời trong câu chào; đặt trước luật "lụa" / "số đo" chung bên dưới
+  {
+    keywords: ["chất lụa", "chọn lụa", "choose a silk"],
+    reply: {
+      vi: "Lụa tơ tằm mềm, mát và rũ tự nhiên, hợp để mặc cả ngày. Muốn tà áo đứng dáng, trang trọng hơn thì chọn gấm; muốn nhẹ và bay thì chọn voan. Bạn định mặc vào dịp nào để mình gợi ý kỹ hơn?",
+      en: "Mulberry silk is soft, cool and drapes naturally, so it's comfortable all day. For a more structured, formal look choose brocade; for something light and airy, chiffon. What occasion is it for?",
+    },
+  },
+  {
+    keywords: ["đo kích thước", "cách đo", "take my measurements"],
+    reply: {
+      vi: "Bạn chuẩn bị thước dây mềm, mặc đồ ôm nhẹ và đứng thẳng tự nhiên. Đo trước vòng ngực – eo – mông, rồi ngang vai và dài tay. Nếu đặt may đo, thợ sẽ cùng bạn hoàn thiện đủ 12 số đo.",
+      en: "Grab a soft tape measure, wear something close-fitting and stand naturally. Start with bust, waist and hips, then shoulder width and sleeve length. For made-to-measure orders, our tailor will complete all 12 measurements with you.",
+    },
+  },
   {
     keywords: ["cưới", "cô dâu", "wedding", "bride"],
     reply: {

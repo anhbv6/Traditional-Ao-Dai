@@ -10,7 +10,7 @@ const PAIN_KEYS = ["armhole", "belly", "fit"] as const;
 const EASE_CLASS = "ease-[cubic-bezier(0.65,0,0.35,1)]";
 
 /**
- * 3 cột ngắn: mỗi cột một nỗi lo và cách AODAI xử lý.
+ * 3 cột ngắn: mỗi cột một nỗi lo và cách Thiên Canh xử lý.
  * - Mặc định chỉ hiện vấn đề (chữ rõ); phần "Cách xử lý" ẩn nhưng vẫn giữ chỗ → rê vào không làm xô lệch bố cục.
  * - Rê chuột / focus bàn phím vào cột: nét gạch ngang kẻ qua tên vấn đề, chữ nhạt đi, vạch đỏ đô chạy dài,
  *   rồi cách xử lý hiện lên.
@@ -22,7 +22,7 @@ export function AboutPainSolution() {
 
   return (
     <section className={containerClassName({ className: 'pb-(--section-y)' })}>
-      <AboutHeading numeral="I" eyebrow={t("eyebrow")} title={t("title")} description={t("description")} />
+      <AboutHeading numeral="II" eyebrow={t("eyebrow")} title={t("title")} description={t("description")} />
 
       <div className="grid gap-10 md:grid-cols-3 md:gap-8 lg:gap-12">
         {PAIN_KEYS.map((key, i) => (

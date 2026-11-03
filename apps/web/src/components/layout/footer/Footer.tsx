@@ -24,7 +24,7 @@ type FooterColumn = {
   links: FooterLink[];
 };
 
-const showroomMapUrl = 'https://www.google.com/maps/search/?api=1&query=AODAI+showroom+Vietnam';
+const showroomMapUrl = 'https://www.google.com/maps/search/?api=1&query=Thien+Canh+showroom+Vietnam';
 
 function FooterLinkList({ links }: { links: FooterLink[] }) {
   return (

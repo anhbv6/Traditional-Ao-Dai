@@ -1,10 +1,10 @@
 {
-  "title": "Welcome to Webshop",
+  "title": "Welcome to Thiên Canh",
   "subtitle": "Discover elegant Ao Dai designs",
   "hero": {
     "eyebrow": "The Lotus Collection · Fall Winter 2026",
-    "title": "Heritage in every panel",
-    "subtitle": "Mulberry silk, hand-embroidered brocade and a silhouette tailored just for you — so your Ao Dai tells your own story on the moments that matter.",
+    "title": "Silk cut true beneath the clouds, hand-sewn inch by inch",
+    "subtitle": "Every Thiên Canh áo dài begins in the stillness of the northwest highlands — each length of silk is cut to your measurements, the set of your shoulders and the way you move.",
     "primaryAction": "Explore the collection",
     "secondaryAction": "Book a fitting",
     "metrics": {
@@ -93,7 +93,7 @@
     "ratingCount": "From 1,200+ reviews"
   },
   "articleNews": {
-    "eyebrow": "Ao Dai journal",
+    "eyebrow": "Stories of Silk & Clouds",
     "title": "Stories & insights",
     "description": "Ao Dai culture, styling tips and garment care guides from our experts.",
     "readMore": "Read more",
@@ -158,7 +158,7 @@
       "3": {
         "label": "Tailoring",
         "title": "A silhouette of your own",
-        "content": "Each gown is cut to 12 body measurements, then fitted and adjusted so it hugs the body yet flows gracefully as you walk."
+        "content": "The grain is aligned with care, the cloth cut to your 12 body measurements, then fitted and adjusted so the panels fall naturally and move lightly as you walk."
       }
     }
   },
@@ -197,6 +197,10 @@
     "craft": "Craft",
     "bespoke": "Bespoke",
     "reviews": "Reviews",
-    "news": "Journal"
+    "news": "Silk & Clouds"
+  },
+  "meta": {
+    "title": "Thiên Canh — Silk cut true beneath the clouds, hand-sewn inch by inch",
+    "description": "Thiên Canh is a made-to-measure áo dài atelier: every piece begins in the stillness of the northwest highlands, cut to your measurements and sewn by hand."
   }
 }

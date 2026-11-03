@@ -60,7 +60,7 @@ const CONTENT: Record<ArticleCategoryKey, Localized<ArticleContent>> = {
       ],
       quote: {
         text: "Áo dài giữ được bao lâu là do người mặc thương nó đến đâu.",
-        author: "Nghệ nhân may đo AODAI",
+        author: "Nghệ nhân may đo Thiên Canh",
       },
     },
     en: {
@@ -99,7 +99,7 @@ const CONTENT: Record<ArticleCategoryKey, Localized<ArticleContent>> = {
       ],
       quote: {
         text: "How long an Ao Dai lasts depends on how lovingly it is kept.",
-        author: "AODAI master tailor",
+        author: "Thiên Canh master tailor",
       },
     },
   },
@@ -134,7 +134,7 @@ const CONTENT: Record<ArticleCategoryKey, Localized<ArticleContent>> = {
           ],
         },
       ],
-      quote: { text: "Áo đẹp nhất là chiếc áo khiến bạn quên mình đang mặc nó.", author: "Stylist AODAI" },
+      quote: { text: "Áo đẹp nhất là chiếc áo khiến bạn quên mình đang mặc nó.", author: "Stylist Thiên Canh" },
     },
     en: {
       intro: "Choosing the right Ao Dai means matching fabric, silhouette and colour to you and to the occasion. {description}",
@@ -166,7 +166,7 @@ const CONTENT: Record<ArticleCategoryKey, Localized<ArticleContent>> = {
           ],
         },
       ],
-      quote: { text: "The best Ao Dai is the one you forget you are wearing.", author: "AODAI stylist" },
+      quote: { text: "The best Ao Dai is the one you forget you are wearing.", author: "Thiên Canh stylist" },
     },
   },
   culture: {
@@ -199,7 +199,7 @@ const CONTENT: Record<ArticleCategoryKey, Localized<ArticleContent>> = {
           ],
         },
       ],
-      quote: { text: "Áo dài là tà áo mà mỗi đường kim đều kể chuyện quê hương.", author: "Nghệ nhân thêu tay AODAI" },
+      quote: { text: "Áo dài là tà áo mà mỗi đường kim đều kể chuyện quê hương.", author: "Nghệ nhân thêu tay Thiên Canh" },
     },
     en: {
       intro: "For more than three centuries the Ao Dai has accompanied the Vietnamese through history and become a symbol of national grace. {description}",
@@ -230,7 +230,7 @@ const CONTENT: Record<ArticleCategoryKey, Localized<ArticleContent>> = {
           ],
         },
       ],
-      quote: { text: "In an Ao Dai, every stitch tells a story of home.", author: "AODAI embroidery artisan" },
+      quote: { text: "In an Ao Dai, every stitch tells a story of home.", author: "Thiên Canh embroidery artisan" },
     },
   },
   trends: {
@@ -263,7 +263,7 @@ const CONTENT: Record<ArticleCategoryKey, Localized<ArticleContent>> = {
           ],
         },
       ],
-      quote: { text: "Cách tân là để áo dài sống cùng thời đại, không phải để quên đi gốc rễ.", author: "Nhà thiết kế AODAI" },
+      quote: { text: "Cách tân là để áo dài sống cùng thời đại, không phải để quên đi gốc rễ.", author: "Nhà thiết kế Thiên Canh" },
     },
     en: {
       intro: "Each season, Ao Dai trends are a conversation between tradition and modern life. {description}",
@@ -294,7 +294,7 @@ const CONTENT: Record<ArticleCategoryKey, Localized<ArticleContent>> = {
           ],
         },
       ],
-      quote: { text: "Modernising the Ao Dai lets it live with our times without forgetting its roots.", author: "AODAI designer" },
+      quote: { text: "Modernising the Ao Dai lets it live with our times without forgetting its roots.", author: "Thiên Canh designer" },
     },
   },
   tailoring: {
@@ -314,7 +314,7 @@ const CONTENT: Record<ArticleCategoryKey, Localized<ArticleContent>> = {
         },
         {
           id: "process",
-          heading: "Quy trình may đo tại AODAI",
+          heading: "Quy trình may đo tại Thiên Canh",
           paragraphs: [
             "Sau khi nhận số đo, nghệ nhân cắt rập riêng và may thô để thử lần đầu. Áo được chỉnh sửa theo dáng thực tế rồi mới hoàn thiện đường viền, khuy bấm và thêu (nếu có). Toàn bộ quy trình mất khoảng 7–10 ngày.",
           ],
@@ -327,7 +327,7 @@ const CONTENT: Record<ArticleCategoryKey, Localized<ArticleContent>> = {
           ],
         },
       ],
-      quote: { text: "Một tấc vải vừa người hơn mười thước vải đẹp.", author: "Thợ cả AODAI" },
+      quote: { text: "Một tấc vải vừa người hơn mười thước vải đẹp.", author: "Thợ cả Thiên Canh" },
     },
     en: {
       intro: "A perfectly fitted bespoke Ao Dai is the result of accurate measurements and careful fittings. {description}",
@@ -358,7 +358,7 @@ const CONTENT: Record<ArticleCategoryKey, Localized<ArticleContent>> = {
           ],
         },
       ],
-      quote: { text: "An inch of cloth that fits beats ten metres of beautiful fabric.", author: "AODAI head tailor" },
+      quote: { text: "An inch of cloth that fits beats ten metres of beautiful fabric.", author: "Thiên Canh head tailor" },
     },
   },
 };

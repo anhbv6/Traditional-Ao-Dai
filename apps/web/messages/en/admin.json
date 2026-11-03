@@ -24,13 +24,13 @@
     "USER_NOT_FOUND": "Admin account not found in system.",
     "ADMIN_LOGIN_SUCCESS": "Admin login successful!",
     "ADMIN_LOGOUT_SUCCESS": "Admin logout successful!",
-    "brand": "AODAI Admin",
+    "brand": "Thiên Canh Admin",
     "eyebrow": "Admin area",
     "secureNote": "The admin session is separate from your shopping account and expires after 8 hours of inactivity.",
     "staffOnly": "For staff and administrators only. No account or forgot your password? Contact a super admin."
   },
   "header": {
-    "systemTitle": "AODAI Admin",
+    "systemTitle": "Thiên Canh Admin",
     "viewStore": "View Storefront",
     "defaultAdminName": "Administrator",
     "superAdminRole": "Super Admin",
@@ -44,16 +44,38 @@
     "navigation": "Admin navigation"
   },
   "nav": {
-    "dashboard": "Dashboard",
-    "orders": "Orders",
-    "tailoring": "Tailoring Atelier",
+    "dashboard": "Overview",
+    "collections": "Collections",
+    "categories": "Product types",
+    "materials": "Fabrics & materials",
+    "attributes": "Attributes",
+    "sizeCharts": "Size charts",
     "products": "Products",
-    "inventory": "Inventory",
+    "fabrics": "Fabric stock",
+    "inventory": "SKUs",
+    "inventoryHistory": "Stock history",
+    "tailoring": "In the workshop",
+    "orders": "Orders",
+    "returns": "Warranty & returns",
     "customers": "Customers",
-    "approvals": "Approvals",
     "staff": "Staff",
-    "vouchers": "Vouchers",
-    "cms": "CMS & FAQs"
+    "vouchers": "Coupons",
+    "saleEvents": "Sale events",
+    "approvals": "Pending approvals",
+    "approvalHistory": "Approval history",
+    "approvalMine": "My requests",
+    "shippingPayment": "Shipping & payment",
+    "rolePermissions": "Permissions",
+    "cms": "Content & FAQs",
+    "groups": {
+      "catalog": "Catalog",
+      "warehouse": "Warehouse",
+      "sales": "Orders",
+      "people": "People",
+      "promotions": "Promotions",
+      "approval": "Approvals",
+      "settings": "Settings"
+    }
   },
   "accessDenied": {
     "title": "Access Restricted",
@@ -269,6 +291,109 @@
       "title": "News & FAQ Management",
       "description": "Publish or unpublish articles and FAQs shown on the storefront.",
       "meta": "<value>{articles}</value> {articles, plural, one {article} other {articles}} • <value>{faqs}</value> {faqs, plural, one {question} other {questions}}"
+    },
+    "collections": {
+      "title": "Collections",
+      "description": "Group products by season and occasion: Tết, autumn-winter, weddings...",
+      "planned": [
+        "Create, edit and hide seasonal collections",
+        "Assign products to a collection",
+        "Collection code used to generate SKUs (e.g. TET26)",
+        "Hide or show a whole collection when the season ends"
+      ]
+    },
+    "categories": {
+      "title": "Product types",
+      "description": "Classify ao dai, pants and accessories for storefront filters.",
+      "planned": [
+        "Types: ao dai, silk pants, accessories (headpieces, necklaces, clogs)",
+        "Styles: traditional, modern, wedding, mother of the bride, kids, heritage",
+        "Parent and child categories",
+        "Bilingual images and descriptions"
+      ]
+    },
+    "materials": {
+      "title": "Fabrics & materials",
+      "description": "Materials used for products, with care instructions.",
+      "planned": [
+        "Mulberry silk, brocade, raw silk, velvet, chiffon, linen, organza...",
+        "Care instruction templates per material",
+        "Stretch and tailoring notes"
+      ]
+    },
+    "attributes": {
+      "title": "Attributes",
+      "description": "Shared values for building variants and filtering products.",
+      "planned": [
+        "Tunic and pants colors",
+        "Sizes S - XXL and made to measure",
+        "Techniques and patterns: hand embroidery, hand painting, beading, 3D print, plain",
+        "Collar and sleeve styles"
+      ]
+    },
+    "sizeCharts": {
+      "title": "Size charts",
+      "description": "Measurement charts for each silhouette.",
+      "planned": [
+        "Separate charts for fitted traditional and loose modern cuts",
+        "Attach a size chart to a product",
+        "Plus-size threshold for tailoring surcharges"
+      ]
+    },
+    "fabrics": {
+      "title": "Fabric stock",
+      "description": "Track remaining meters of fabric for made-to-order items.",
+      "planned": [
+        "Remaining meters per fabric roll",
+        "Alerts below the threshold",
+        "Link fabrics to designs to hide them quickly when fabric runs out",
+        "Restock and adjust meters"
+      ]
+    },
+    "inventoryHistory": {
+      "title": "Stock history",
+      "description": "Log of stock receipts, issues and adjustments.",
+      "planned": [
+        "Changes per SKU and per fabric roll",
+        "Who changed what, when, old value → new value",
+        "Filter by time, product and staff member"
+      ]
+    },
+    "returns": {
+      "title": "Warranty & returns",
+      "description": "Receive and handle alteration, exchange and refund requests.",
+      "planned": [
+        "Log warranty, alteration and exchange requests",
+        "Track processing status",
+        "Refunds go through an approval request"
+      ]
+    },
+    "saleEvents": {
+      "title": "Sale events",
+      "description": "Time-limited discounts for collections, categories or products.",
+      "planned": [
+        "Set start and end times",
+        "Apply to a collection, a category or individual products",
+        "Discount by percentage or fixed amount"
+      ]
+    },
+    "shippingPayment": {
+      "title": "Shipping & payment",
+      "description": "Configure delivery fees and payment methods.",
+      "planned": [
+        "Shipping fees by region",
+        "Payment methods: COD, bank transfer, payment gateway",
+        "Deposit rate for made-to-measure orders"
+      ]
+    },
+    "rolePermissions": {
+      "title": "Permissions",
+      "description": "Manage detailed staff permissions in the admin area.",
+      "planned": [
+        "Permission table per staff member",
+        "Permission presets for quick setup",
+        "Permission change history"
+      ]
     }
   },
   "measurements": {
@@ -323,10 +448,6 @@
     "eyebrow": "Internal control",
     "refresh": "Refresh",
     "rejectReasonPlaceholder": "Enter the rejection reason...",
-    "titleReviewer": "Approval Queue",
-    "titleRequester": "My Approval Requests",
-    "descriptionReviewer": "Review sensitive operations submitted by staff (cancellations, special discounts, refunds).",
-    "descriptionRequester": "Track the cancellation / refund / discount requests you sent to the Super Admin.",
     "filter": {
       "ALL": "All",
       "PENDING": "Pending",
@@ -345,7 +466,21 @@
     "approve": "Approve request",
     "confirm": "Confirm",
     "reject": "Reject",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "views": {
+      "queue": {
+        "title": "Pending approvals",
+        "description": "Review sensitive actions submitted by staff (cancellations, special discounts, refunds)."
+      },
+      "history": {
+        "title": "Approval history",
+        "description": "Approved and rejected requests, with the reviewer and reason."
+      },
+      "mine": {
+        "title": "My requests",
+        "description": "Track the cancellation, refund and discount requests you have submitted."
+      }
+    }
   },
   "cms": {
     "tabArticles": "Articles & Guides ({count})",
@@ -584,5 +719,10 @@
     "colValidity": "Validity",
     "inactive": "Inactive",
     "active": "Active"
+  },
+  "placeholder": {
+    "title": "This screen is under construction",
+    "description": "It already has its place in the menu and permissions; features will follow the scope below.",
+    "planned": "Planned scope"
   }
 }

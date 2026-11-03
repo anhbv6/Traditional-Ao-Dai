@@ -188,7 +188,7 @@ export async function requestEmailVerification(userId: string, rawEmail: string)
     to: email,
     subject: 'Email Verification Code',
     heading: 'Verify your email',
-    intro: 'Use the verification code below to confirm this email address for your Traditional Ao Dai account:',
+    intro: 'Use the verification code below to confirm this email address for your Thiên Canh account:',
     code,
     ttlMinutes: CONTACT_CODE_TTL_SECONDS / 60,
   })

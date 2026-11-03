@@ -31,7 +31,7 @@ export function DashboardFabricAlerts({ fabrics, isLoading, hidingProductId, onH
           <p className="mt-0.5 text-xs text-[#71717A]">{t("subtitle")}</p>
         </div>
         <Link
-          href="/admin/inventory"
+          href="/admin/inventory/fabrics"
           className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg border border-[#E4E4E7] bg-white px-2.5 text-xs font-medium text-[#3F3F46] transition-colors hover:bg-[#FAFAFA] hover:text-[#09090B]"
         >
           <PackagePlus size={13} />

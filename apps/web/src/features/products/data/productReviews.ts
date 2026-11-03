@@ -48,12 +48,12 @@ export const productReviews: ProductReview[] = [
     replies: [
       {
         id: 'r1-1',
-        name: 'AODAI',
+        name: 'Thiên Canh',
         isShop: true,
         date: '2026-06-06',
         content: {
-          vi: 'Cảm ơn anh Mark đã tin chọn AODAI! Chúc anh và gia đình có những dịp thật đẹp cùng chiếc áo.',
-          en: 'Thank you for choosing AODAI, Mark! We wish you and your family many beautiful occasions in it.',
+          vi: 'Cảm ơn anh Mark đã tin chọn Thiên Canh! Chúc anh và gia đình có những dịp thật đẹp cùng chiếc áo.',
+          en: 'Thank you for choosing Thiên Canh, Mark! We wish you and your family many beautiful occasions in it.',
         },
       },
     ],
@@ -89,7 +89,7 @@ export const productReviews: ProductReview[] = [
     replies: [
       {
         id: 'r3-1',
-        name: 'AODAI',
+        name: 'Thiên Canh',
         isShop: true,
         date: '2026-05-29',
         content: {

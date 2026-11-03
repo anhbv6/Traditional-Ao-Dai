@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: DetailProductsProps) {
   const product = productCatalog.find((item) => item.id === decodeURIComponent(slug));
   if (product) {
     return {
-      title: `${product.name[locale]} - Traditional Ao Dai`,
+      title: `${product.name[locale]} - Thiên Canh`,
       description: product.description[locale],
       openGraph: {
         images: [product.imageSrc],
@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: DetailProductsProps) {
   }
 
   return {
-    title: 'Chi tiết sản phẩm - Traditional Ao Dai',
+    title: 'Chi tiết sản phẩm - Thiên Canh',
   };
 }
 

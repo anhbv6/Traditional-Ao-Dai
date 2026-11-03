@@ -45,7 +45,7 @@ const COMMENT_POOL: Omit<NewsComment, "id" | "date">[] = [
     replies: [
       {
         id: "author",
-        name: "Traditional Ao Dai",
+        name: "Thiên Canh",
         isAuthor: true,
         date: "",
         content: {

@@ -5,12 +5,12 @@ const options: swaggerJSDoc.Options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'AODAI Ecommerce API Documentation',
+      title: 'Thiên Canh Ecommerce API Documentation',
       version: '1.0.0',
-      description: 'API specifications for AODAI ecommerce monolith backend application.',
+      description: 'API specifications for Thiên Canh ecommerce monolith backend application.',
       contact: {
-        name: 'AODAI Tech Team',
-        email: 'tech@aodai.vn',
+        name: 'Thiên Canh Tech Team',
+        email: 'tech@tiemthiencanh.vn',
       },
     },
     servers: [

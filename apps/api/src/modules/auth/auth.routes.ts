@@ -65,7 +65,7 @@ const verifyCodeLimits = [byIp('verify-code-ip', 20, 15 * MINUTE)]
  *               email:
  *                 type: string
  *                 format: email
- *                 example: newuser@aodai.vn
+ *                 example: newuser@tiemthiencanh.vn
  *     responses:
  *       200:
  *         description: VERIFICATION_CODE_SENT — data.ttl là số giây mã còn hiệu lực
@@ -113,7 +113,7 @@ router.post(
  *               email:
  *                 type: string
  *                 format: email
- *                 example: newuser@aodai.vn
+ *                 example: newuser@tiemthiencanh.vn
  *               phone:
  *                 type: string
  *                 example: "0987654321"
@@ -163,7 +163,7 @@ router.post('/register', validate(registerSchema), byIp('register-ip', 10, 60 * 
  *               identifier:
  *                 type: string
  *                 description: Email hoặc SĐT
- *                 example: customer@aodai.vn
+ *                 example: customer@tiemthiencanh.vn
  *               password:
  *                 type: string
  *                 format: password
@@ -330,7 +330,7 @@ router.post('/google', validate(googleLoginSchema), byIp('google-ip', 30, 15 * M
  *               email:
  *                 type: string
  *                 format: email
- *                 example: customer@aodai.vn
+ *                 example: customer@tiemthiencanh.vn
  *     responses:
  *       200:
  *         description: Verification code sent successfully
@@ -371,7 +371,7 @@ router.post('/forgot-password/email', validate(forgotPasswordEmailSchema), byIp(
  *               email:
  *                 type: string
  *                 format: email
- *                 example: customer@aodai.vn
+ *                 example: customer@tiemthiencanh.vn
  *               code:
  *                 type: string
  *                 example: "123456"
@@ -481,7 +481,7 @@ router.post('/forgot-password/phone/verify', validate(verifyResetPasswordPhoneSc
  *               email:
  *                 type: string
  *                 format: email
- *                 example: customer@aodai.vn
+ *                 example: customer@tiemthiencanh.vn
  *               code:
  *                 type: string
  *                 example: "123456"
@@ -683,7 +683,7 @@ router.get('/check-account', validate(checkAccountSchema), byIp('check-account-i
  *                       example: clm1234567890
  *                     email:
  *                       type: string
- *                       example: user@aodai.vn
+ *                       example: user@tiemthiencanh.vn
  *                     role:
  *                       type: string
  *                       example: CUSTOMER
@@ -755,7 +755,7 @@ router.post('/logout', clientAuthController.logout)
  *               email:
  *                 type: string
  *                 format: email
- *                 example: admin@aodai.vn
+ *                 example: admin@tiemthiencanh.vn
  *               password:
  *                 type: string
  *                 format: password

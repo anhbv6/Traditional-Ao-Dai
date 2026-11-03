@@ -4,8 +4,8 @@
 export const BANK_ACCOUNT = {
   bankName: "Techcombank",
   accountNumber: "19034567891011",
-  accountHolder: "CONG TY AO DAI SAC VIET",
+  accountHolder: "TIEM AO DAI THIEN CANH",
 } as const;
 
 /** Nội dung chuyển khoản: mã đơn — đối soát tự động theo mã */
-export const buildTransferContent = (orderId: string) => `AODAI ${orderId}`;
+export const buildTransferContent = (orderId: string) => `THIENCANH ${orderId}`;

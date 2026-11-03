@@ -50,7 +50,7 @@
         "description": "Visa, Mastercard, JCB và thẻ nội địa."
       }
     },
-    "cardNote": "Sau khi đặt hàng, bạn sẽ được chuyển tới cổng thanh toán bảo mật để nhập thông tin thẻ. AODAI không lưu số thẻ của bạn."
+    "cardNote": "Sau khi đặt hàng, bạn sẽ được chuyển tới cổng thanh toán bảo mật để nhập thông tin thẻ. Thiên Canh không lưu số thẻ của bạn."
   },
   "review": {
     "title": "Xác nhận đơn hàng",
@@ -68,7 +68,7 @@
       "contentHint": "Ghi đúng nội dung để đơn được xác nhận nhanh"
     },
     "customNote": "Đơn có sản phẩm may đo: thợ sẽ gọi xác nhận số đo trước khi cắt vải (7–10 ngày hoàn thiện).",
-    "agreement": "Bằng việc bấm “Đặt hàng”, bạn đồng ý với chính sách mua hàng và đổi trả của AODAI."
+    "agreement": "Bằng việc bấm “Đặt hàng”, bạn đồng ý với chính sách mua hàng và đổi trả của Thiên Canh."
   },
   "actions": {
     "back": "Quay lại",
@@ -101,7 +101,7 @@
     "amountColumn": "Thành tiền",
     "lineQuantity": "{count} × {price}",
     "grandTotal": "Tổng cộng",
-    "thanks": "Cảm ơn quý khách đã chọn AODAI"
+    "thanks": "Cảm ơn quý khách đã chọn Thiên Canh"
   },
   "empty": {
     "title": "Chưa có sản phẩm để thanh toán",
@@ -110,7 +110,7 @@
   },
   "success": {
     "eyebrow": "Đặt hàng thành công",
-    "title": "Cảm ơn bạn đã chọn AODAI",
+    "title": "Cảm ơn bạn đã chọn Thiên Canh",
     "description": "Đơn hàng đã được ghi nhận và đang được chuẩn bị.",
     "orderId": "Mã đơn hàng",
     "total": "Tổng thanh toán",

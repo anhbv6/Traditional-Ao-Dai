@@ -1,16 +1,16 @@
 {
   "meta": {
-    "title": "Câu chuyện AODAI — May áo dài vừa vặn từng đường cong",
-    "description": "Hành trình của AODAI: lắng nghe nỗi lo khi mặc áo dài may sẵn, may đo theo từng vóc dáng và đội ngũ nghệ nhân tỉ mỉ trong từng đường kim."
+    "title": "Về Thiên Canh — Canh vải dưới trời mây, khâu tay từng tấc lụa",
+    "description": "Câu chuyện của tiệm áo dài Thiên Canh: bắt đầu từ vùng cao Tây Bắc, canh sợi vải chuẩn xác và khâu tay theo số đo, dáng vai, thói quen cử động của riêng bạn."
   },
   "hero": {
-    "eyebrow": "Câu chuyện AODAI",
-    "title": "Kiến tạo phom dáng Áo dài chuẩn xác từng milimet",
-    "subtitle": "Chúng tôi không chỉ may đo áo dài. Chúng tôi nghiên cứu chuyển động cơ thể để tạo nên những tà áo thoải mái, vừa vặn tôn dáng nhất cho người phụ nữ Việt.",
+    "eyebrow": "Câu chuyện thương hiệu",
+    "title": "Thiên Canh",
+    "subtitle": "Canh vải dưới trời mây, khâu tay từng tấc lụa.",
     "badges": {
-      "armhole": "Không căng nách",
-      "belly": "Che khuyết điểm bụng",
-      "realFit": "Tư vấn phom dáng 3D"
+      "grain": "Canh sợi vải chuẩn từng milimet",
+      "measure": "Hạ kéo theo số đo của riêng bạn",
+      "handStitch": "Khâu tay từng mũi"
     },
     "imageAlt": "Nghệ nhân đo may áo dài truyền thống",
     "measureTitle": "Tỉ mỉ từng số đo",
@@ -18,12 +18,12 @@
     "primaryAction": "Đặt lịch may đo",
     "secondaryAction": "Xem bộ sưu tập",
     "secondaryImageAlt": "Chi tiết áo dài gấm thêu hoa sen",
-    "since": "Từ 2012 · Hà Nội"
+    "since": "Từ vùng cao Tây Bắc"
   },
   "pain": {
     "eyebrow": "Vấn đề của tà áo dài truyền thống",
     "title": "Tại sao áo dài mua sẵn thường gây khó chịu?",
-    "description": "Nhiều phụ nữ ngần ngại mặc áo dài vì cảm giác bó khít, khó thở khi ngồi hoặc căng nách khi vận động. AODAI giải quyết những nỗi lo đó bằng kỹ thuật cắt đo cải tiến.",
+    "description": "Nhiều phụ nữ ngần ngại mặc áo dài vì cảm giác bó khít, khó thở khi ngồi hoặc căng nách khi vận động. Thiên Canh giải quyết những nỗi lo đó bằng kỹ thuật cắt đo cải tiến.",
     "cards": {
       "armhole": {
         "title": "Căng nách khó chịu",
@@ -41,17 +41,17 @@
         "fix": "Cắt rập riêng theo 12 số đo của chính bạn, thử áo và chỉnh lại trước khi hoàn thiện."
       }
     },
-    "solutionEyebrow": "Giải pháp từ AODAI",
+    "solutionEyebrow": "Giải pháp từ Thiên Canh",
     "solutionText": "Chúng tôi nghiên cứu và tinh chỉnh các chi tiết nách, eo, và tà xẻ để tà áo dài vừa giữ nét tôn dáng, vừa thoải mái tối đa khi mặc cả ngày.",
     "problemLabel": "Vấn đề thường gặp",
-    "fixLabel": "Cách AODAI xử lý"
+    "fixLabel": "Cách Thiên Canh xử lý"
   },
   "fit": {
     "eyebrow": "Thử nghiệm phom dáng",
     "title": "Phù hợp với từng vóc dáng thực tế",
     "description": "Chúng tôi phân tích và thiết kế dựa trên các dáng người khác nhau để đảm bảo sự vừa vặn tối ưu.",
     "beforeLabel": "Trước cải tiến",
-    "afterLabel": "Sau cải tiến từ AODAI",
+    "afterLabel": "Sau cải tiến từ Thiên Canh",
     "profiles": {
       "slender": {
         "label": "Dáng người thanh mảnh",
@@ -101,13 +101,13 @@
   "atelier": {
     "eyebrow": "Nghệ nhân & Xưởng may",
     "title": "Sự tỉ mỉ đứng sau từng tà áo",
-    "description": "Mỗi chiếc áo dài của AODAI đều đi qua đôi tay điêu luyện của những người thợ lành nghề nhất.",
+    "description": "Mỗi chiếc áo dài của Thiên Canh đều đi qua đôi tay điêu luyện của những người thợ lành nghề nhất.",
     "stories": {
       "founder": {
-        "imageAlt": "Người sáng lập AODAI",
+        "imageAlt": "Người sáng lập Thiên Canh",
         "role": "Người sáng lập & Thiết kế",
         "title": "Chị Linh An",
-        "story": "Ý tưởng của tôi là kết hợp nghệ thuật thêu tay thủ công truyền thống với kỹ thuật cắt rập 3D hiện đại để chiếc áo dài dễ tiếp cận hơn."
+        "story": "Ý tưởng của tôi là giữ lại nhịp chậm của nghề: canh đúng sợi vải, hạ kéo theo đúng người mặc và khâu tay đến mũi cuối cùng."
       },
       "tailor": {
         "imageAlt": "Thợ may ráp áo dài",
@@ -119,7 +119,7 @@
         "imageAlt": "Nghệ nhân cắt rập",
         "role": "Nghệ nhân cắt rập & Tạo phom",
         "title": "Chú Hoàng Nam",
-        "story": "Cắt rập là bước định hình linh hồn chiếc áo. Một nhát kéo lệch vài milimet cũng có thể làm mất đi độ bay bổng tự nhiên của tà áo."
+        "story": "Canh vải là bước định hình linh hồn chiếc áo. Một nhát kéo lệch vài milimet cũng có thể làm mất đi độ rũ tự nhiên của tà áo."
       }
     },
     "metrics": {
@@ -140,13 +140,39 @@
   "manifesto": {
     "eyebrow": "Triết lý của chúng tôi",
     "text": "Một tà áo dài đẹp là khi người mặc quên rằng mình đang mặc nó — chỉ còn lại sự tự tin, thoải mái và nét duyên rất riêng.",
-    "author": "Linh An — Người sáng lập AODAI"
+    "author": "Linh An — Người sáng lập Thiên Canh"
   },
   "cta": {
-    "eyebrow": "Bắt đầu cùng AODAI",
+    "eyebrow": "Bắt đầu cùng Thiên Canh",
     "title": "Tà áo của riêng bạn, bắt đầu từ một buổi trò chuyện",
     "description": "Hẹn lịch tư vấn miễn phí tại xưởng hoặc trực tuyến — chúng tôi lắng nghe, đo đạc và phác thảo cùng bạn.",
     "primaryAction": "Đặt lịch tư vấn",
     "secondaryAction": "Câu hỏi thường gặp"
+  },
+  "story": {
+    "eyebrow": "Về Thiên Canh",
+    "title": "Vì sao tiệm tên là Thiên Canh",
+    "paragraphs": {
+      "origin": "Khác với những xưởng may công nghiệp hối hả nơi phố thị, mỗi tà áo dài của Thiên Canh được bắt đầu từ sự tĩnh lặng của vùng cao Tây Bắc.",
+      "name": "Chúng tôi đặt tên tiệm là Thiên Canh — vừa là bầu trời mây trắng nơi rẻo cao, vừa là kỹ thuật \"canh sợi vải\" chuẩn xác đến từng milimet, và cũng là những \"canh giờ\" miệt mài của người thợ thủ công bên bàn cắt.",
+      "craft": "Tại Thiên Canh, không có những chiếc áo rập khuôn hàng loạt. Mỗi tấm lụa được hạ kéo đều dựa trên chính số đo, dáng vai và thói quen cử động của riêng bạn. Chậm rãi, cần mẫn và trọn vẹn tâm huyết trong từng mũi khâu tay."
+    },
+    "meanings": {
+      "sky": {
+        "word": "Thiên",
+        "title": "Trời mây Tây Bắc",
+        "text": "Nơi khởi nguồn của tiệm – giữa vùng cao quanh năm mây phủ, không khí tĩnh lặng và trong trẻo."
+      },
+      "grain": {
+        "word": "Canh",
+        "title": "Canh vải thiên",
+        "text": "Kỹ thuật cắt vải xéo 45 độ tinh tế nhất trong nghề may áo dài, giúp tà áo có độ rũ tự nhiên và ôm trọn đường cong cơ thể mà không gây gò bó."
+      },
+      "watch": {
+        "word": "Canh",
+        "title": "Canh khuya / Canh cửi",
+        "text": "Hình ảnh người thợ vùng cao cần mẫn, thức khuya dậy sớm bên ánh đèn và bàn may, chăm chút từng đường kim mũi đột cho kịp ngày vui của khách."
+      }
+    }
   }
 }

@@ -1,6 +1,8 @@
-# 🌸 Traditional Ao Dai
+# 🌸 Thiên Canh
 
-Webshop bán Áo Dài truyền thống Việt Nam, có dịch vụ **may đo theo số đo**. Gồm Storefront (khách hàng) và khu Quản trị (nhân viên, admin).
+> Canh vải dưới trời mây, khâu tay từng tấc lụa.
+
+Website của tiệm áo dài **Thiên Canh** — khởi nguồn từ vùng cao Tây Bắc, bán Áo Dài truyền thống Việt Nam và nhận **may đo theo số đo**. Gồm Storefront (khách hàng) và khu Quản trị (nhân viên, admin). Tên miền hướng đến: `tiemthiencanh`.
 
 > 📐 Quy chuẩn code, kiến trúc, bảo mật: [`AGENTS.md`](AGENTS.md) — đọc trước khi viết code. File này chỉ hướng dẫn cài đặt, chạy và triển khai.
 

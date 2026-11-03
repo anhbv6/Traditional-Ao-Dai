@@ -8,15 +8,15 @@
     "emailHint": "Example: yourname@gmail.com",
     "submit": "Subscribe",
     "success": "Subscribed! New collections and offers will be sent to your email.",
-    "legal": "By subscribing, you agree to receive emails about new collections and offers from AODAI under our <link>Privacy Policy</link>. You can unsubscribe at any time via the link at the bottom of every email."
+    "legal": "By subscribing, you agree to receive emails about new collections and offers from Thiên Canh under our <link>Privacy Policy</link>. You can unsubscribe at any time via the link at the bottom of every email."
   },
   "brand": {
-    "tagline": "Preserving the beauty of Vietnamese Ao Dai",
-    "address": "AODAI Showroom, District 1, Ho Chi Minh City",
+    "tagline": "Silk cut true beneath the clouds, hand-sewn inch by inch.",
+    "address": "Thiên Canh Showroom, District 1, Ho Chi Minh City",
     "hotline": "Hotline: 0909 000 000",
     "hotlineValue": "0909000000",
-    "email": "Email: hello@aodai.vn",
-    "emailValue": "hello@aodai.vn",
+    "email": "Email: hello@tiemthiencanh.vn",
+    "emailValue": "hello@tiemthiencanh.vn",
     "hours": "Hours: 09:00 - 21:00, Monday - Sunday",
     "socialLabel": "Social channels"
   },
@@ -49,7 +49,7 @@
     "ministryBadge": "Notified to Ministry of Industry and Trade"
   },
   "legal": {
-    "copyright": "© 2026 AODAI. All rights reserved.",
+    "copyright": "© 2026 Thiên Canh. All rights reserved.",
     "privacy": "Privacy Policy",
     "terms": "Terms of Use"
   },

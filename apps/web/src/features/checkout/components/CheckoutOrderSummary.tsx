@@ -39,7 +39,7 @@ function MetaRow({ label, value }: { label: string; value: string }) {
 
 /**
  * Tóm tắt đơn ở cột phải, trình bày như HOÁ ĐƠN khách nhận kèm hàng (không ảnh — chỉ thông tin):
- * - Đầu: AODAI · "Hoá đơn bán hàng" · số đơn / ngày / khách / thanh toán (điền dần theo các bước).
+ * - Đầu: Thiên Canh · "Hoá đơn bán hàng" · số đơn / ngày / khách / thanh toán (điền dần theo các bước).
  * - Giữa (tự cuộn khi dài): cột Sản phẩm | Thành tiền; mỗi dòng: tên, phân loại, "SL × đơn giá".
  * - Đáy (luôn thấy): tạm tính → giảm giá → vận chuyển → TỔNG CỘNG (vạch đôi) → lời cảm ơn; mép giấy răng cưa.
  * Ghim cao vừa màn hình trên desktop (cha đặt chiều cao), mobile cao theo nội dung.
@@ -65,7 +65,7 @@ export function CheckoutOrderSummary({
       <div className="flex min-h-0 flex-1 flex-col bg-[var(--bg-card)] text-[13px] [font-variant-numeric:lining-nums_tabular-nums]">
         {/* Đầu hoá đơn */}
         <header className="shrink-0 px-5 pt-6 text-center sm:px-6">
-          <p className="font-[family-name:var(--font-playfair)] text-xl font-semibold tracking-[0.3em] text-[var(--primary-ink)]">AODAI</p>
+          <p className="font-[family-name:var(--font-playfair)] text-xl font-semibold tracking-[0.3em] text-[var(--primary-ink)]">Thiên Canh</p>
           <p className="mt-1 text-[11px] text-[var(--text-light)]">{t("summary.brandLine")}</p>
           <p className="mt-4 text-[11px] font-semibold uppercase tracking-[3px] text-[var(--text-main)]">{t("summary.receipt")}</p>
 

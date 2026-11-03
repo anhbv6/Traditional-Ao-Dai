@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Dancing_Script, Inter, Lora, Playfair_Display } from "next/font/google";
 import "../globals.css";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { AppProviders } from "@/components/providers/AppProviders";
@@ -44,10 +44,13 @@ const adminSans = Inter({
   fallback: ["system-ui", "-apple-system", "sans-serif"],
 });
 
-export const metadata: Metadata = {
-  title: "Traditional Ao Dai",
-  description: "Ao Dai Viet Nam Shop",
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) return {};
+
+  const t = await getTranslations({ locale, namespace: "HomePage.meta" });
+  return { title: t("title"), description: t("description") };
+}
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));

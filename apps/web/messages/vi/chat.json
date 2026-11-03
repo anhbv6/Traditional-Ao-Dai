@@ -10,10 +10,10 @@
     "placeholder": "Nhập tin nhắn cho cửa hàng..."
   },
   "ai": {
-    "open": "Hỏi trợ lý AI",
-    "title": "Trợ lý AI",
-    "status": "Trợ lý ảo · Trả lời tức thì",
-    "placeholder": "Hỏi về mẫu áo, size, chất liệu...",
+    "open": "Hỏi Thợ phụ Thiên Canh",
+    "title": "Thợ phụ Thiên Canh",
+    "status": "Trợ lý AI · Trả lời tức thì",
+    "placeholder": "Hỏi về chất lụa, số đo, mẫu áo...",
     "disclaimer": "Câu trả lời do AI tạo, chỉ mang tính tham khảo. Cần tư vấn chính xác, hãy chuyển sang chat với cửa hàng."
   }
 }

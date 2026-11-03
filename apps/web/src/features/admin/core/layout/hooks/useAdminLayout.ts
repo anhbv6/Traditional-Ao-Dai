@@ -5,8 +5,8 @@ import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/routing";
 import { useAdminSession, useAdminSessionCache } from "@/features/admin/core/session";
-import { ADMIN_MODULE_ACCESS, canAccess, type AdminModule } from "../../session/permissions";
-import { getAdminNavLinks } from "../utils/navigation";
+import { ADMIN_MODULE_ACCESS, canAccess } from "../../session/permissions";
+import { findAdminModuleByPath, getAdminNavEntries } from "../utils/navigation";
 import { executeAdminLogout } from "@/features/admin/core/auth";
 import { type AdminLayoutState } from "../types/header.types";
 
@@ -26,13 +26,11 @@ export function useAdminLayout(): AdminLayoutState {
   const currentRole = user?.role;
 
   // 3. Module hiện tại theo URL -> kiểm tra quyền (page ở server cũng chặn & chuyển về dashboard)
-  const currentModule = (Object.keys(ADMIN_MODULE_ACCESS) as AdminModule[]).find((key) =>
-    pathname?.includes(`/admin/${key}`)
-  );
+  const currentModule = findAdminModuleByPath(pathname);
   const isAccessDenied = Boolean(user && currentModule && !canAccess(user, ADMIN_MODULE_ACCESS[currentModule]));
 
   // 4. Danh sách menu đã được lọc theo ma trận quyền, gán active và dịch i18n
-  const navLinks = getAdminNavLinks(pathname, user, (key) => tNav(key));
+  const navLinks = getAdminNavEntries(pathname, user, (key) => tNav(key));
 
   // 5. Đăng xuất
   const handleLogout = async () => {

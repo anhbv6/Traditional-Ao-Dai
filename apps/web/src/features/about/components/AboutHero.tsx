@@ -8,7 +8,7 @@ import { ArrowRight } from "lucide-react";
 import { ActionLink } from "@/components/shared/ActionLink";
 import { ON_PRIMARY_COLORS } from "@/components/shared/ActionButton";
 
-const HERO_BADGES = ["armhole", "belly", "realFit"] as const;
+const HERO_BADGES = ["grain", "measure", "handStitch"] as const;
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 /** Chữ hiện lần lượt khi vào trang — mỗi dòng trễ hơn dòng trước một nhịp */

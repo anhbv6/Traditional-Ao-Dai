@@ -30,7 +30,7 @@ export function FitModel() {
 
   return (
     <section className={containerClassName({ className: 'pb-(--section-y)' })}>
-      <AboutHeading numeral="II" eyebrow={t("eyebrow")} title={t("title")} description={t("description")} />
+      <AboutHeading numeral="III" eyebrow={t("eyebrow")} title={t("title")} description={t("description")} />
       {/* Ảnh bên trái, điều khiển bên phải — ngược với bố cục chữ trái / ảnh phải của trang chủ */}
       <div className="grid gap-12 lg:grid-cols-[0.85fr_1fr] lg:items-center lg:gap-20">
         <div className="lg:order-2">

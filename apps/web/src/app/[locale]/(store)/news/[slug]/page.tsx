@@ -20,11 +20,11 @@ const findArticle = (slug: string) => mockArticles.find((item) => item.slug === 
 export async function generateMetadata({ params }: NewsDetailPageProps) {
   const { slug, locale } = await params;
   const article = findArticle(slug);
-  if (!article) return { title: 'Tin tức - Traditional Ao Dai' };
+  if (!article) return { title: 'Chuyện Của Lụa & Mây - Thiên Canh' };
 
   const loc = locale === 'en' ? 'en' : 'vi';
   return {
-    title: `${article.title[loc]} - Traditional Ao Dai`,
+    title: `${article.title[loc]} - Thiên Canh`,
     description: article.description[loc],
     openGraph: {
       type: 'article',

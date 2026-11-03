@@ -23,7 +23,7 @@ export function AboutAtelier() {
   return (
     <section>
       <div className={containerClassName({ className: 'pb-(--section-y)' })}>
-        <AboutHeading numeral="III" eyebrow={t("eyebrow")} title={t("title")} description={t("description")} />
+        <AboutHeading numeral="IV" eyebrow={t("eyebrow")} title={t("title")} description={t("description")} />
 
         <div className="grid gap-10 md:grid-cols-3 md:gap-6 lg:gap-8">
           {atelierStories.map((story, i) => (

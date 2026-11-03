@@ -202,7 +202,7 @@
     "default": "Default",
     "setAsDefault": "Set as default",
     "secureTitle": "Secure payments",
-    "secureNote": "For your security, AODAI never collects full card numbers or CVV codes on the account page. New cards are saved through the payment gateway when you check out.",
+    "secureNote": "For your security, Thiên Canh never collects full card numbers or CVV codes on the account page. New cards are saved through the payment gateway when you check out.",
     "cardholder": "Cardholder",
     "expires": "Expires",
     "remove": "Remove card",
@@ -291,5 +291,5 @@
   },
   "eyebrow": "Account",
   "navLabel": "Account sections",
-  "memberSince": "AODAI member"
+  "memberSince": "Thiên Canh member"
 }

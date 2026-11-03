@@ -4,7 +4,7 @@
   "products": "Sản phẩm",
   "shop": "Cửa hàng",
   "ourStory": "Câu chuyện",
-  "blog": "Tin tức",
+  "blog": "Chuyện Của Lụa & Mây",
   "contact": "Liên hệ",
   "cart": "Giỏ hàng",
   "wishlist": "Yêu thích",
@@ -39,7 +39,7 @@
       "Lễ Tết"
     ]
   },
-  "tagline": "Tôn nét dịu dàng Áo Việt, Lưu nét thanh xuân Đời người",
+  "tagline": "Canh vải dưới trời mây, khâu tay từng tấc lụa.",
   "login": "Đăng nhập",
   "logout": "Đăng xuất",
   "profile": "Tài khoản",
@@ -102,20 +102,20 @@
     "links": {
       "products": "Cửa hàng",
       "custom": "Tự thiết kế áo dài",
-      "about": "Câu chuyện AODAI",
+      "about": "Câu chuyện Thiên Canh",
       "faqs": "Câu hỏi thường gặp",
       "contact": "Liên hệ thợ may"
     },
-    "metaTitle": "Không tìm thấy trang — AODAI"
+    "metaTitle": "Không tìm thấy trang — Thiên Canh"
   },
   "forbidden": {
     "eyebrow": "Lỗi 403",
     "title": "Khu vực này dành cho nhân viên",
-    "description": "Tài khoản khách hàng của bạn chưa có quyền vào trang quản trị. Mời bạn quay lại mua sắm, hoặc đăng nhập bằng tài khoản quản trị nếu bạn là nhân viên AODAI.",
+    "description": "Tài khoản khách hàng của bạn chưa có quyền vào trang quản trị. Mời bạn quay lại mua sắm, hoặc đăng nhập bằng tài khoản quản trị nếu bạn là nhân viên Thiên Canh.",
     "home": "Quay lại mua sắm",
     "adminLogin": "Đăng nhập quản trị",
     "suggestions": "Bạn có thể ghé",
-    "metaTitle": "Không có quyền truy cập — AODAI"
+    "metaTitle": "Không có quyền truy cập — Thiên Canh"
   },
   "notifications": "Thông báo"
 }

@@ -3,7 +3,7 @@ import Link from 'next/link';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: '404 — AODAI',
+  title: '404 — Thiên Canh',
 };
 
 /**

@@ -62,7 +62,7 @@ class MailProvider {
   }
 
   async sendMail(options: SendMailOptions): Promise<boolean> {
-    const from = env.SMTP_FROM || 'noreply@aodai.vn'
+    const from = env.SMTP_FROM || 'noreply@tiemthiencanh.vn'
 
     if (env.BREVO_API_KEY && (await sendViaBrevo(env.BREVO_API_KEY, from, options))) {
       return true

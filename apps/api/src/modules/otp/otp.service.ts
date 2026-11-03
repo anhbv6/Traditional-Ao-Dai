@@ -51,7 +51,7 @@ export async function deliverOtp(
   const code = await issueVerificationCode(otpKey(purpose, scope), ttl)
   await redis.set(cooldownKey(purpose, scope), '1', 'EX', OTP_COOLDOWN_SECONDS)
 
-  const message = `Your AODAI OTP code is: ${code}. Valid for ${Math.floor(ttl / 60)} minutes.`
+  const message = `Your Thien Canh OTP code is: ${code}. Valid for ${Math.floor(ttl / 60)} minutes.`
   await smsProvider.sendSms(normalizedPhone, message)
 
   // Không bao giờ trả mã ở production — mã chỉ được đi qua SMS

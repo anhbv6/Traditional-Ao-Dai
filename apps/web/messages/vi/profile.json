@@ -202,7 +202,7 @@
     "default": "Mặc định",
     "setAsDefault": "Đặt làm mặc định",
     "secureTitle": "Thanh toán an toàn",
-    "secureNote": "Vì lý do bảo mật, AODAI không nhận số thẻ đầy đủ hay mã CVV trên trang tài khoản. Thẻ mới được lưu qua cổng thanh toán khi bạn thanh toán đơn hàng.",
+    "secureNote": "Vì lý do bảo mật, Thiên Canh không nhận số thẻ đầy đủ hay mã CVV trên trang tài khoản. Thẻ mới được lưu qua cổng thanh toán khi bạn thanh toán đơn hàng.",
     "cardholder": "Chủ thẻ",
     "expires": "Hết hạn",
     "remove": "Gỡ thẻ",
@@ -291,5 +291,5 @@
   },
   "eyebrow": "Tài khoản",
   "navLabel": "Mục tài khoản",
-  "memberSince": "Thành viên AODAI"
+  "memberSince": "Thành viên Thiên Canh"
 }

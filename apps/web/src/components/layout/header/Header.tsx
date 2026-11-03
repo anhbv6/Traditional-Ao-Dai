@@ -30,8 +30,9 @@ export async function Header({ sticky = true }: HeaderProps) {
   return (
     <HeaderWrapper sticky={sticky}>
       <header className="relative mx-auto flex h-16 w-full items-center justify-between gap-4 px-5 sm:px-8 lg:h-[4.5rem] lg:px-6 xl:px-8 2xl:h-20 2xl:px-12">
-        {/* Điện thoại rất hẹp (< 390px): chỉ giữ hình logo để đủ chỗ cho hàng icon (tìm kiếm, thông báo, tim, giỏ, menu) */}
-        <Logo textLogo textClassName="max-[389px]:sr-only" />
+        {/* Chỉ giữ hình logo khi chật: điện thoại rất hẹp (< 390px) nhường chỗ hàng icon;
+            lg → xl nhường chỗ menu desktop (tên "Thiên Canh" + mục "Chuyện Của Lụa & Mây" không đủ chỗ ở 1024px) */}
+        <Logo textLogo textClassName="max-[389px]:sr-only lg:max-xl:sr-only" />
         <DesktopNav items={navItems} />
         <div className="flex items-center gap-1 sm:gap-2">
           <SearchOverlay label={t('search')} placeholder={t('searchPlaceholder')} />

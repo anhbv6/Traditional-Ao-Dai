@@ -1,10 +1,10 @@
 {
-  "title": "Chào mừng đến với Webshop",
+  "title": "Chào mừng đến với Thiên Canh",
   "subtitle": "Khám phá các mẫu áo dài thanh lịch",
   "hero": {
     "eyebrow": "Bộ sưu tập Hoa Sen · Thu Đông 2026",
-    "title": "Nét xưa trong từng tà áo",
-    "subtitle": "Lụa tơ tằm, gấm thêu tay và phom dáng may đo riêng — để tà áo dài kể câu chuyện của chính bạn trong những khoảnh khắc trang trọng nhất.",
+    "title": "Canh vải dưới trời mây, khâu tay từng tấc lụa",
+    "subtitle": "Mỗi tà áo dài của Thiên Canh bắt đầu từ sự tĩnh lặng của vùng cao Tây Bắc — tấm lụa được hạ kéo theo chính số đo, dáng vai và thói quen cử động của riêng bạn.",
     "primaryAction": "Khám phá bộ sưu tập",
     "secondaryAction": "Đặt may đo",
     "metrics": {
@@ -93,7 +93,7 @@
     "ratingCount": "Từ hơn 1.200 đánh giá"
   },
   "articleNews": {
-    "eyebrow": "Bản tin áo dài",
+    "eyebrow": "Chuyện Của Lụa & Mây",
     "title": "Câu chuyện & cẩm nang",
     "description": "Văn hoá áo dài, bí quyết chọn lựa và cách bảo quản trang phục từ chuyên gia.",
     "readMore": "Xem chi tiết",
@@ -158,7 +158,7 @@
       "3": {
         "label": "May đo",
         "title": "Phom dáng của riêng bạn",
-        "content": "Áo được cắt theo 12 số đo cơ thể, thử và chỉnh lại để tà áo ôm vừa vặn mà vẫn thanh thoát khi bước đi."
+        "content": "Sợi vải được canh chuẩn xác, hạ kéo theo 12 số đo cơ thể, rồi thử và chỉnh lại để tà áo rũ tự nhiên, thanh thoát khi bước đi."
       }
     }
   },
@@ -197,6 +197,10 @@
     "craft": "Thủ công",
     "bespoke": "May đo",
     "reviews": "Đánh giá",
-    "news": "Bản tin"
+    "news": "Lụa & Mây"
+  },
+  "meta": {
+    "title": "Thiên Canh — Canh vải dưới trời mây, khâu tay từng tấc lụa",
+    "description": "Tiệm áo dài may đo Thiên Canh: mỗi tà áo bắt đầu từ sự tĩnh lặng của vùng cao Tây Bắc, hạ kéo theo số đo của riêng bạn và khâu tay từng mũi."
   }
 }

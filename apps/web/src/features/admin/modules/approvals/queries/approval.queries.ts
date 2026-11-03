@@ -6,13 +6,13 @@ import { type ApprovalRequestItem } from "../types/approval.types";
  * Đọc danh sách các yêu cầu phê duyệt từ cơ sở dữ liệu (Chỉ dùng cho Server Components hoặc Server Actions)
  */
 export async function getApprovalRequestsQuery(
-  statusFilter?: ApprovalStatus,
+  statuses?: ApprovalStatus[],
   requestedById?: string
 ): Promise<ApprovalRequestItem[]> {
   try {
     const requests = await prisma.approvalRequest.findMany({
       where: {
-        ...(statusFilter ? { status: statusFilter } : {}),
+        ...(statuses ? { status: { in: statuses } } : {}),
         // Giới hạn theo người gửi (STAFF chỉ xem yêu cầu của chính mình)
         ...(requestedById ? { requestedById } : {}),
       },

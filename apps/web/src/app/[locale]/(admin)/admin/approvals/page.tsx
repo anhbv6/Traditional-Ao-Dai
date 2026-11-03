@@ -10,7 +10,7 @@ export default async function AdminApprovalsPage() {
 
   return (
     <AdminPage>
-      <AdminApprovalsList />
+      <AdminApprovalsList view="queue" />
     </AdminPage>
   );
 }

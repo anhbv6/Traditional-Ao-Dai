@@ -5,7 +5,7 @@
 export const CONTACT_CHANNELS = {
   phoneHref: "tel:0909000000",
   zaloHref: "https://zalo.me/0909000000",
-  emailHref: "mailto:hello@aodai.vn",
+  emailHref: "mailto:hello@tiemthiencanh.vn",
 } as const;
 
 /** Truy vấn bản đồ — phải khớp với địa chỉ hiển thị (`visit.address`) */

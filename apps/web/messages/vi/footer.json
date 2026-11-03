@@ -8,15 +8,15 @@
     "emailHint": "Ví dụ: tenban@gmail.com",
     "submit": "Đăng ký",
     "success": "Đăng ký thành công! Ưu đãi và thông tin BST mới sẽ được gửi tới email của bạn.",
-    "legal": "Bằng việc đăng ký, bạn đồng ý nhận email về bộ sưu tập mới và ưu đãi từ AODAI theo <link>Chính sách bảo mật</link>. Bạn có thể huỷ đăng ký bất cứ lúc nào qua liên kết ở cuối mỗi email."
+    "legal": "Bằng việc đăng ký, bạn đồng ý nhận email về bộ sưu tập mới và ưu đãi từ Thiên Canh theo <link>Chính sách bảo mật</link>. Bạn có thể huỷ đăng ký bất cứ lúc nào qua liên kết ở cuối mỗi email."
   },
   "brand": {
-    "tagline": "Gìn giữ nét đẹp Áo dài Việt",
-    "address": "Showroom AODAI, Quận 1, TP. Hồ Chí Minh",
+    "tagline": "Canh vải dưới trời mây, khâu tay từng tấc lụa.",
+    "address": "Showroom Thiên Canh, Quận 1, TP. Hồ Chí Minh",
     "hotline": "Hotline: 0909 000 000",
     "hotlineValue": "0909000000",
-    "email": "Email: hello@aodai.vn",
-    "emailValue": "hello@aodai.vn",
+    "email": "Email: hello@tiemthiencanh.vn",
+    "emailValue": "hello@tiemthiencanh.vn",
     "hours": "Giờ làm việc: 09:00 - 21:00, Thứ 2 - Chủ nhật",
     "socialLabel": "Kênh mạng xã hội"
   },
@@ -49,7 +49,7 @@
     "ministryBadge": "Đã thông báo Bộ Công Thương"
   },
   "legal": {
-    "copyright": "© 2026 AODAI. All rights reserved.",
+    "copyright": "© 2026 Thiên Canh. All rights reserved.",
     "privacy": "Chính sách bảo mật",
     "terms": "Điều khoản sử dụng"
   },

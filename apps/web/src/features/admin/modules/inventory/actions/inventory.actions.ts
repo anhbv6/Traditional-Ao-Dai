@@ -22,7 +22,7 @@ export async function updateVariantStockAction(variantId: string, stock: number)
       data: { stock: Math.max(0, stock) },
     });
 
-    revalidatePath("/admin/inventory");
+    revalidatePath("/admin/inventory/skus");
     revalidatePath("/admin/products");
     revalidatePath("/admin/dashboard");
 

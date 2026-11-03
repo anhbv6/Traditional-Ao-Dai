@@ -9,7 +9,7 @@ export function AuthMobileLogo() {
         <div className="relative h-9 w-9 overflow-hidden rounded-md flex items-center justify-center">
           <Image
             src="/logo.png"
-            alt="AODAI logo"
+            alt="Thiên Canh logo"
             width={70}
             height={70}
             className="h-full w-full object-contain"
@@ -17,7 +17,7 @@ export function AuthMobileLogo() {
           />
         </div>
         <span className="font-[family-name:var(--font-playfair)] text-base font-normal tracking-widest text-[var(--primary-ink)] uppercase">
-          AODAI
+          Thiên Canh
         </span>
       </Link>
     </div>

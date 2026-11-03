@@ -1,16 +1,16 @@
 {
   "meta": {
-    "title": "The AODAI Story — Ao Dai Tailored to Every Curve",
-    "description": "Discover AODAI's journey: solving the discomforts of ready-made Ao Dai, tailoring for every body shape, and the artisans behind every stitch."
+    "title": "About Thiên Canh — Silk cut true beneath the clouds, hand-sewn inch by inch",
+    "description": "The story of Thiên Canh: an áo dài atelier born in the highlands of northwest Vietnam, cutting true to the grain and hand-sewing to your measurements, shoulders and the way you move."
   },
   "hero": {
-    "eyebrow": "AODAI Story",
-    "title": "Crafting Gowns to Fit Every Curve Perfectly",
-    "subtitle": "We don't just tailor Ao Dai. We study body movements to create the most comfortable, flattering silhouette for every woman.",
+    "eyebrow": "Our story",
+    "title": "Thiên Canh",
+    "subtitle": "Silk cut true beneath the clouds, hand-sewn inch by inch.",
     "badges": {
-      "armhole": "Easy Armhole Ease",
-      "belly": "Flattering Waistlines",
-      "realFit": "3D Fitting Advice"
+      "grain": "Cut true to the grain, to the millimetre",
+      "measure": "Every cut made to your measurements",
+      "handStitch": "Sewn stitch by stitch, by hand"
     },
     "imageAlt": "Artisans tailoring traditional Vietnamese gown",
     "measureTitle": "Precise Measurements",
@@ -18,12 +18,12 @@
     "primaryAction": "Book a fitting",
     "secondaryAction": "View collections",
     "secondaryImageAlt": "Detail of a lotus-embroidered brocade Ao Dai",
-    "since": "Since 2012 · Hanoi"
+    "since": "From the northwest highlands"
   },
   "pain": {
-    "eyebrow": "Traditional Ao Dai Issues",
+    "eyebrow": "Thiên Canh Issues",
     "title": "Why Off-the-Shelf Ao Dai Can Be Uncomfortable",
-    "description": "Many women hesitate to wear Ao Dai due to tight armholes, restricted breathing while sitting, or awkward fit. AODAI resolves these pain points with advanced tailoring techniques.",
+    "description": "Many women hesitate to wear Ao Dai due to tight armholes, restricted breathing while sitting, or awkward fit. Thiên Canh resolves these pain points with advanced tailoring techniques.",
     "cards": {
       "armhole": {
         "title": "Tight Armholes",
@@ -41,17 +41,17 @@
         "fix": "Every pattern is cut to your own 12 measurements, then fitted and adjusted before finishing."
       }
     },
-    "solutionEyebrow": "The AODAI Solution",
+    "solutionEyebrow": "The Thiên Canh Solution",
     "solutionText": "We re-engineered the armholes, waist ease, and slit points to ensure your Ao Dai is both stunning and comfortably wearable all day.",
     "problemLabel": "Common problem",
-    "fixLabel": "How AODAI solves it"
+    "fixLabel": "How Thiên Canh solves it"
   },
   "fit": {
     "eyebrow": "Fit Profiling",
     "title": "Designed for Diverse Silhouette Profiles",
     "description": "We analyze and design patterns around distinct body profiles to ensure personalized, optimal fit.",
     "beforeLabel": "Standard Fit",
-    "afterLabel": "AODAI Enhanced Fit",
+    "afterLabel": "Thiên Canh Enhanced Fit",
     "profiles": {
       "slender": {
         "label": "Slender Profile",
@@ -101,13 +101,13 @@
   "atelier": {
     "eyebrow": "Our Artisans & Atelier",
     "title": "The Care and Craft in Every Single Seam",
-    "description": "Every single AODAI gown passes through the skilled hands of our most experienced artisans.",
+    "description": "Every single Thiên Canh gown passes through the skilled hands of our most experienced artisans.",
     "stories": {
       "founder": {
-        "imageAlt": "Founder of AODAI",
+        "imageAlt": "Founder of Thiên Canh",
         "role": "Founder & Lead Designer",
         "title": "Linh An",
-        "story": "My goal is to merge traditional hand-embroidery with modern 3D pattern drafting, making custom Ao Dai accessible to modern women."
+        "story": "My aim is to keep the slow rhythm of the craft: true to the grain, cut for the person who will wear it, and hand-sewn to the very last stitch."
       },
       "tailor": {
         "imageAlt": "Artisan tailoring gown",
@@ -119,7 +119,7 @@
         "imageAlt": "Artisan cutting fabric patterns",
         "role": "Master Pattern Maker",
         "title": "Mr. Hoàng Nam",
-        "story": "Pattern cutting dictates the flow of the dress. Even a variance of a few millimeters can alter the natural movement of the panels."
+        "story": "Aligning the grain is what gives the dress its soul. A cut a few millimetres off can cost the panels their natural fall."
       }
     },
     "metrics": {
@@ -140,13 +140,39 @@
   "manifesto": {
     "eyebrow": "Our philosophy",
     "text": "A beautiful Ao Dai is one the wearer forgets she is wearing — leaving only confidence, comfort and a grace that is entirely her own.",
-    "author": "Linh An — Founder of AODAI"
+    "author": "Linh An — Founder of Thiên Canh"
   },
   "cta": {
-    "eyebrow": "Begin with AODAI",
+    "eyebrow": "Begin with Thiên Canh",
     "title": "Your own Ao Dai starts with a conversation",
     "description": "Book a free consultation in our atelier or online — we listen, measure and sketch together with you.",
     "primaryAction": "Book a consultation",
     "secondaryAction": "FAQs"
+  },
+  "story": {
+    "eyebrow": "About Thiên Canh",
+    "title": "Why we are called Thiên Canh",
+    "paragraphs": {
+      "origin": "Unlike the busy garment factories of the city, every Thiên Canh áo dài begins in the stillness of the northwest Vietnamese highlands.",
+      "name": "We named our atelier Thiên Canh for three things at once: the white clouds over the high country, the craft of aligning the fabric grain to the millimetre, and the long watches of the night an artisan keeps at the cutting table.",
+      "craft": "At Thiên Canh, nothing is stamped out by the hundred. Each length of silk is cut to your own measurements, the set of your shoulders and the way you move. Slowly, patiently, with care in every hand stitch."
+    },
+    "meanings": {
+      "sky": {
+        "word": "Thiên",
+        "title": "The northwest sky",
+        "text": "Where the atelier began: high country wrapped in cloud all year, the air still and clear."
+      },
+      "grain": {
+        "word": "Canh",
+        "title": "Canh vải thiên — the bias cut",
+        "text": "The finest technique in áo dài making: cutting the cloth at 45 degrees, so the panels fall naturally and follow the body's curves without constraint."
+      },
+      "watch": {
+        "word": "Canh",
+        "title": "Canh khuya, canh cửi — the night watch",
+        "text": "The highland artisan at work late and early by lamp and sewing table, tending every stitch so the dress is ready for your happy day."
+      }
+    }
   }
 }

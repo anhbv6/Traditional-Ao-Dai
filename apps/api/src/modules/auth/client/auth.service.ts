@@ -183,8 +183,8 @@ export async function sendRegisterEmailCode(input: SendRegisterEmailCodeInput['b
   await sendVerificationCodeEmail({
     to: email,
     subject: 'Verify your email',
-    heading: 'Welcome to Traditional Ao Dai',
-    intro: 'Use the verification code below to finish creating your Traditional Ao Dai account:',
+    heading: 'Welcome to Thiên Canh',
+    intro: 'Use the verification code below to finish creating your Thiên Canh account:',
     code,
     ttlMinutes: EMAIL_CODE_TTL_SECONDS / 60,
   })
@@ -620,7 +620,7 @@ export async function sendForgotPasswordEmail(input: ForgotPasswordEmailInput['b
       to: email,
       subject: 'Reset Password Verification Code',
       heading: 'Password Reset Request',
-      intro: 'You requested to reset your password for your Traditional Ao Dai account. Use the verification code below:',
+      intro: 'You requested to reset your password for your Thiên Canh account. Use the verification code below:',
       code,
       ttlMinutes: EMAIL_CODE_TTL_SECONDS / 60,
     })

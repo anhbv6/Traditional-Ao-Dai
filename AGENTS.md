@@ -1,4 +1,4 @@
-# 📐 Quy chuẩn dự án — Traditional Ao Dai
+# 📐 Quy chuẩn dự án — Thiên Canh
 
 > **Nguồn quy chuẩn DUY NHẤT** cho người và AI agent (Claude Code, Cursor, Copilot, Gemini đều trỏ về đây). Cài đặt / chạy / triển khai: [`README.md`](README.md).
 > `AGENTS.md` trong từng workspace chỉ là bản rút gọn cho agent, trỏ về các mục của file này — không chép lại nội dung.
@@ -10,7 +10,9 @@
 
 ## 1. Dự án & kiến trúc
 
-E-commerce Áo Dài truyền thống (có may đo theo số đo). Monorepo **pnpm**, TypeScript strict toàn bộ.
+E-commerce Áo Dài truyền thống (có may đo theo số đo) của tiệm **Thiên Canh**. Monorepo **pnpm**, TypeScript strict toàn bộ.
+
+**Thương hiệu:** tên "Thiên Canh" (giữ dấu ở cả bản `en`; chỗ không dấu được như nội dung chuyển khoản, SMS thì viết `THIENCANH` / `Thien Canh`), slogan "Canh vải dưới trời mây, khâu tay từng tấc lụa.", bot AI "Thợ phụ Thiên Canh", mục blog "Chuyện Của Lụa & Mây", tên miền hướng đến `tiemthiencanh`. Giọng văn chậm rãi, thủ công, gắn với vùng cao Tây Bắc; câu chuyện gốc nằm ở `apps/web/messages/*/about.json`. Định danh kỹ thuật cũ (`aodai-*` ở khóa localStorage, Cloudinary, DB local, tài khoản seed) giữ nguyên.
 
 | Workspace | Vai trò |
 | :--- | :--- |
@@ -147,15 +149,22 @@ features/admin/
 
 **Phân quyền** — nguồn duy nhất `core/session/permissions.ts` (`ADMIN_MODULE_ACCESS`, `ADMIN_ACTION_ACCESS`, `canAccess`), dùng chung cho menu, page, action và nút UI. ADMIN có toàn quyền; STAFF chỉ có quyền trong `User.permissions` (mặc định rỗng).
 
-| Module | STAFF cần quyền | Ghi chú |
+Menu chia nhóm (cấu hình ở `core/layout/utils/navigation.ts`; URL → module theo `href` dài nhất khớp). Màn chưa làm chức năng dùng `AdminPlaceholderPage` (`core/server`) — vẫn kiểm tra quyền, liệt kê phạm vi ở `AdminPage.pages.<module>.planned`.
+
+| Nhóm menu → màn (`AdminModule`) | STAFF cần quyền | Ghi chú |
 | :--- | :--- | :--- |
-| Dashboard | — | Mỗi khối theo quyền: doanh thu = `VIEW_REPORTS`, tồn kho = `MANAGE_INVENTORY`, may đo = `UPDATE_TAILORING`, đơn mới = `MANAGE_ORDERS` |
-| Đơn hàng · Khách hàng | `MANAGE_ORDERS` | Hủy đơn / hoàn tiền / giảm giá tay phải gửi **yêu cầu phê duyệt**. Khóa/mở khách hàng chỉ ADMIN |
-| Xưởng may đo | `UPDATE_TAILORING` | Người thực hiện ghi vào `TailoringLog` |
-| Sản phẩm · Tồn kho | `MANAGE_INVENTORY` | |
-| Nội dung & FAQ | `MANAGE_CONTENT` | |
-| Phê duyệt | — | STAFF chỉ thấy yêu cầu của mình; duyệt/từ chối chỉ ADMIN (duyệt xong hệ thống tự thực thi) |
-| Nhân sự · Voucher | ✗ (chỉ ADMIN) | Tạo nhân viên, cấp quyền, khóa/mở, đặt lại mật khẩu |
+| Tổng quan (`dashboard`) | — | Mỗi khối theo quyền: doanh thu = `VIEW_REPORTS`, tồn kho = `MANAGE_INVENTORY`, may đo = `UPDATE_TAILORING`, đơn mới = `MANAGE_ORDERS` |
+| Danh mục: bộ sưu tập, loại sản phẩm, chất liệu vải, thuộc tính, bảng size mẫu (`collections` `categories` `materials` `attributes` `sizeCharts`) | `MANAGE_INVENTORY` | Chưa làm (khung tạm) |
+| Sản phẩm (`products`) | `MANAGE_INVENTORY` | |
+| Kho: số lượng vải, SKU, lịch sử biến động (`fabrics` `inventory` `inventoryHistory`) | `MANAGE_INVENTORY` | SKU ở `/admin/inventory/skus`; vải & lịch sử chưa làm |
+| Đơn hàng: xưởng đang may (`tailoring`) | `UPDATE_TAILORING` | Người thực hiện ghi vào `TailoringLog` |
+| Đơn hàng: danh sách đơn, bảo hành & hoàn trả (`orders` `returns`) | `MANAGE_ORDERS` | Hủy đơn / hoàn tiền / giảm giá tay phải gửi **yêu cầu phê duyệt**. Bảo hành chưa làm |
+| Người dùng: khách hàng (`customers`) | `MANAGE_ORDERS` | Khóa/mở khách hàng chỉ ADMIN |
+| Người dùng: nhân sự (`staff`) · Khuyến mãi: coupon, chương trình sale (`vouchers` `saleEvents`) | ✗ (chỉ ADMIN) | Tạo nhân viên, cấp quyền, khóa/mở, đặt lại mật khẩu. Chương trình sale chưa làm |
+| Phê duyệt: danh sách chờ duyệt, lịch sử (`approvals` `approvalHistory`) | ✗ (chỉ ADMIN) | Duyệt xong hệ thống tự thực thi |
+| Phê duyệt: yêu cầu của tôi (`approvalMine`) | — (`staffOnly`, ADMIN không thấy) | STAFF chỉ thấy yêu cầu do mình gửi |
+| Cấu hình: vận chuyển & thanh toán, phân quyền (`shippingPayment` `rolePermissions`) | ✗ (chỉ ADMIN) | Chưa làm |
+| Cấu hình: nội dung & FAQs (`cms`) | `MANAGE_CONTENT` | |
 
 **Quy tắc**
 - Page: `await requireAdminPage(ADMIN_MODULE_ACCESS.<module>)` → `getTranslations("AdminPage.pages.<module>")` → query. Giao diện luôn `AdminPage` + `AdminPageHeader`.

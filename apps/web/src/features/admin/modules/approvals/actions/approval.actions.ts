@@ -8,19 +8,38 @@ import { type ApprovalStatus } from "@repo/db";
 import { getApprovalRequestsQuery } from "../queries/approval.queries";
 import { type z } from "zod";
 import { parseActionInput } from "@/features/admin/core/server/actionInput";
-import { reviewApprovalSchema } from "../schemas/approval.schemas";
+import { listApprovalsSchema, reviewApprovalSchema } from "../schemas/approval.schemas";
 
 /**
  * Server Action: Lấy danh sách yêu cầu phê duyệt
  */
-export async function getApprovalRequestsAction(statusFilter?: ApprovalStatus) {
+export async function getApprovalRequestsAction(raw: z.input<typeof listApprovalsSchema>) {
   const auth = await authorizeAdminAction();
   if (!auth.success) return auth;
 
+  const input = parseActionInput(listApprovalsSchema, raw);
+  if (!input.success) return input;
+  const { view, status } = input.data;
+
+  // Hàng đợi và lịch sử là dữ liệu của mọi nhân viên → chỉ người duyệt; "mine" luôn khóa theo người gửi từ phiên
+  if (view !== "mine" && !canAccess(auth.user, ADMIN_ACTION_ACCESS.reviewApproval)) {
+    return { success: false, error: "STAFF_PERMISSION_DENIED" };
+  }
+
+  const RESOLVED: ApprovalStatus[] = ["APPROVED", "REJECTED"];
+  const statuses: ApprovalStatus[] | undefined =
+    view === "queue"
+      ? ["PENDING"]
+      : view === "history"
+        ? status && status !== "PENDING"
+          ? [status]
+          : RESOLVED
+        : status
+          ? [status]
+          : undefined;
+
   try {
-    // ADMIN xem toàn bộ hàng đợi; STAFF chỉ xem yêu cầu do mình gửi
-    const ownerFilter = canAccess(auth.user, ADMIN_ACTION_ACCESS.reviewApproval) ? undefined : auth.user.id;
-    const data = await getApprovalRequestsQuery(statusFilter, ownerFilter);
+    const data = await getApprovalRequestsQuery(statuses, view === "mine" ? auth.user.id : undefined);
     return {
       success: true,
       data,

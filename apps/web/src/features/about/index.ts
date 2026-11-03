@@ -1,6 +1,7 @@
 export * from "./components/AboutExperience";
 export * from "./components/AboutHeading";
 export * from "./components/AboutHero";
+export * from "./components/AboutStory";
 export * from "./components/AboutManifesto";
 export * from "./components/AboutPainSolution";
 export * from "./components/FitModel";

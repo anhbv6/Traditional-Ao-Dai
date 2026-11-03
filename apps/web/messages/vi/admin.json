@@ -24,13 +24,13 @@
     "USER_NOT_FOUND": "Tài khoản quản trị không tồn tại trong hệ thống.",
     "ADMIN_LOGIN_SUCCESS": "Đăng nhập quản trị viên thành công!",
     "ADMIN_LOGOUT_SUCCESS": "Đăng xuất quản trị viên thành công!",
-    "brand": "AODAI Admin",
+    "brand": "Thiên Canh Admin",
     "eyebrow": "Khu quản trị",
     "secureNote": "Phiên quản trị tách riêng với tài khoản mua hàng và tự hết hạn sau 8 giờ không hoạt động.",
     "staffOnly": "Chỉ dành cho nhân viên và quản trị viên. Chưa có tài khoản hoặc quên mật khẩu? Liên hệ quản trị viên cấp cao."
   },
   "header": {
-    "systemTitle": "AODAI Admin",
+    "systemTitle": "Thiên Canh Admin",
     "viewStore": "Xem cửa hàng",
     "defaultAdminName": "Quản trị viên",
     "superAdminRole": "Super Admin",
@@ -45,15 +45,37 @@
   },
   "nav": {
     "dashboard": "Tổng quan",
-    "orders": "Đơn hàng",
-    "tailoring": "Xưởng may đo",
+    "collections": "Bộ sưu tập",
+    "categories": "Loại sản phẩm",
+    "materials": "Chất liệu vải",
+    "attributes": "Thuộc tính",
+    "sizeCharts": "Bảng size mẫu",
     "products": "Sản phẩm",
-    "inventory": "Tồn kho",
+    "fabrics": "Số lượng vải",
+    "inventory": "SKU",
+    "inventoryHistory": "Lịch sử biến động kho",
+    "tailoring": "Xưởng đang may",
+    "orders": "Danh sách đơn hàng",
+    "returns": "Bảo hành & hoàn trả",
     "customers": "Khách hàng",
-    "approvals": "Phê duyệt",
     "staff": "Nhân sự",
-    "vouchers": "Voucher",
-    "cms": "Nội dung & FAQ"
+    "vouchers": "Coupon",
+    "saleEvents": "Chương trình sale",
+    "approvals": "Danh sách chờ duyệt",
+    "approvalHistory": "Lịch sử phê duyệt",
+    "approvalMine": "Yêu cầu của tôi",
+    "shippingPayment": "Vận chuyển & thanh toán",
+    "rolePermissions": "Phân quyền",
+    "cms": "Nội dung & FAQs",
+    "groups": {
+      "catalog": "Danh mục",
+      "warehouse": "Kho",
+      "sales": "Đơn hàng",
+      "people": "Người dùng",
+      "promotions": "Khuyến mãi",
+      "approval": "Phê duyệt",
+      "settings": "Cấu hình"
+    }
   },
   "accessDenied": {
     "title": "Truy Cập Bị Giới Hạn",
@@ -269,6 +291,109 @@
       "title": "Quản Trị Tin Tức & FAQs",
       "description": "Bật/tắt xuất bản bài viết và câu hỏi thường gặp hiển thị trên cửa hàng.",
       "meta": "<value>{articles}</value> bài viết • <value>{faqs}</value> câu hỏi"
+    },
+    "collections": {
+      "title": "Bộ sưu tập",
+      "description": "Gom sản phẩm theo mùa và dịp: Tết, Thu Đông, Cưới...",
+      "planned": [
+        "Tạo, sửa, ẩn bộ sưu tập theo mùa",
+        "Gán sản phẩm vào bộ sưu tập",
+        "Mã bộ sưu tập dùng để sinh SKU (VD TET26)",
+        "Ẩn/hiện cả bộ sưu tập khi hết mùa"
+      ]
+    },
+    "categories": {
+      "title": "Loại sản phẩm",
+      "description": "Phân loại áo dài, quần và phụ kiện để lọc trên cửa hàng.",
+      "planned": [
+        "Loại: áo dài, quần lụa, phụ kiện (mấn, kiềng, guốc)",
+        "Kiểu dáng: truyền thống, cách tân, cưới, bà sui, trẻ em, cổ phục",
+        "Danh mục cha - con",
+        "Ảnh và mô tả song ngữ"
+      ]
+    },
+    "materials": {
+      "title": "Chất liệu vải",
+      "description": "Danh sách chất liệu dùng cho sản phẩm và hướng dẫn bảo quản.",
+      "planned": [
+        "Lụa tơ tằm, gấm, tơ sống, nhung, voan, đũi, organza...",
+        "Mẫu hướng dẫn giặt ủi theo chất liệu",
+        "Độ co giãn và lưu ý khi may đo"
+      ]
+    },
+    "attributes": {
+      "title": "Thuộc tính",
+      "description": "Các giá trị dùng chung để tạo biến thể và lọc sản phẩm.",
+      "planned": [
+        "Màu áo và màu quần",
+        "Size S - XXL và may đo",
+        "Kỹ thuật, họa tiết: thêu tay, vẽ tay, đính kết, in 3D, trơn",
+        "Kiểu cổ, kiểu tay"
+      ]
+    },
+    "sizeCharts": {
+      "title": "Bảng size mẫu",
+      "description": "Bảng quy đổi số đo cho từng form áo.",
+      "planned": [
+        "Bảng size riêng cho form ôm truyền thống và form suông cách tân",
+        "Gắn bảng size vào sản phẩm",
+        "Ngưỡng bigsize để tính phụ phí may đo"
+      ]
+    },
+    "fabrics": {
+      "title": "Số lượng vải",
+      "description": "Theo dõi số mét vải còn lại cho hàng đặt may.",
+      "planned": [
+        "Số mét còn lại theo từng cây vải",
+        "Cảnh báo khi dưới ngưỡng",
+        "Liên kết vải với mẫu áo để ẩn nhanh khi hết vải",
+        "Nhập thêm và điều chỉnh số mét"
+      ]
+    },
+    "inventoryHistory": {
+      "title": "Lịch sử biến động kho",
+      "description": "Nhật ký nhập, xuất và điều chỉnh tồn kho.",
+      "planned": [
+        "Biến động theo SKU và theo cây vải",
+        "Ai thay đổi, lúc nào, giá trị cũ → mới",
+        "Lọc theo thời gian, sản phẩm, người thực hiện"
+      ]
+    },
+    "returns": {
+      "title": "Bảo hành & hoàn trả",
+      "description": "Tiếp nhận và xử lý yêu cầu sửa đồ, đổi trả, hoàn tiền.",
+      "planned": [
+        "Tiếp nhận yêu cầu bảo hành, sửa đồ, đổi trả",
+        "Theo dõi trạng thái xử lý",
+        "Hoàn tiền gửi qua yêu cầu phê duyệt"
+      ]
+    },
+    "saleEvents": {
+      "title": "Chương trình sale",
+      "description": "Giảm giá theo thời gian cho bộ sưu tập, danh mục hoặc sản phẩm.",
+      "planned": [
+        "Đặt thời gian bắt đầu - kết thúc",
+        "Áp dụng theo bộ sưu tập, danh mục hoặc từng sản phẩm",
+        "Giảm theo % hoặc số tiền cố định"
+      ]
+    },
+    "shippingPayment": {
+      "title": "Vận chuyển & thanh toán",
+      "description": "Cấu hình phí giao hàng và phương thức thanh toán.",
+      "planned": [
+        "Phí vận chuyển theo khu vực",
+        "Phương thức thanh toán: COD, chuyển khoản, cổng thanh toán",
+        "Tỉ lệ đặt cọc cho đơn may đo"
+      ]
+    },
+    "rolePermissions": {
+      "title": "Phân quyền",
+      "description": "Quản lý quyền chi tiết của nhân viên ở khu quản trị.",
+      "planned": [
+        "Bảng quyền theo từng nhân viên",
+        "Nhóm quyền mẫu để cấp nhanh",
+        "Lịch sử thay đổi quyền"
+      ]
     }
   },
   "measurements": {
@@ -323,10 +448,6 @@
     "eyebrow": "Kiểm soát nội bộ",
     "refresh": "Làm mới",
     "rejectReasonPlaceholder": "Nhập lý do từ chối...",
-    "titleReviewer": "Hàng Đợi Phê Duyệt",
-    "titleRequester": "Yêu Cầu Phê Duyệt Của Tôi",
-    "descriptionReviewer": "Duyệt các thao tác nhạy cảm do nhân viên gửi lên (hủy đơn, giảm giá đặc biệt, hoàn tiền).",
-    "descriptionRequester": "Theo dõi trạng thái các yêu cầu hủy đơn / hoàn tiền / giảm giá bạn đã gửi lên Super Admin.",
     "filter": {
       "ALL": "Tất cả",
       "PENDING": "Chờ duyệt",
@@ -345,7 +466,21 @@
     "approve": "Phê duyệt yêu cầu",
     "confirm": "Xác nhận",
     "reject": "Từ chối",
-    "cancel": "Hủy"
+    "cancel": "Hủy",
+    "views": {
+      "queue": {
+        "title": "Danh sách chờ duyệt",
+        "description": "Duyệt các thao tác nhạy cảm do nhân viên gửi lên (hủy đơn, giảm giá đặc biệt, hoàn tiền)."
+      },
+      "history": {
+        "title": "Lịch sử phê duyệt",
+        "description": "Các yêu cầu đã duyệt hoặc từ chối, kèm người duyệt và lý do."
+      },
+      "mine": {
+        "title": "Yêu cầu của tôi",
+        "description": "Theo dõi trạng thái các yêu cầu hủy đơn, hoàn tiền, giảm giá bạn đã gửi."
+      }
+    }
   },
   "cms": {
     "tabArticles": "Bài viết & Cẩm nang ({count})",
@@ -584,5 +719,10 @@
     "colValidity": "Hiệu lực",
     "inactive": "Đang tắt",
     "active": "Đang mở"
+  },
+  "placeholder": {
+    "title": "Màn này đang được xây dựng",
+    "description": "Đã có chỗ trong menu và phân quyền; chức năng sẽ được làm theo phạm vi dưới đây.",
+    "planned": "Phạm vi dự kiến"
   }
 }

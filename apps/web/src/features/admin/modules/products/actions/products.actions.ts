@@ -161,7 +161,7 @@ export async function createProductAction(raw: z.input<typeof productFormSchema>
     });
 
     revalidatePath("/admin/products");
-    revalidatePath("/admin/inventory");
+    revalidatePath("/admin/inventory/skus");
 
     return { success: true, data: await getAdminProductItemQuery(created.id) };
   } catch (error) {
@@ -249,7 +249,7 @@ export async function updateProductAction(raw: z.input<typeof updateProductSchem
     });
 
     revalidatePath("/admin/products");
-    revalidatePath("/admin/inventory");
+    revalidatePath("/admin/inventory/skus");
 
     return { success: true, data: await getAdminProductItemQuery(productId) };
   } catch (error) {
@@ -284,7 +284,7 @@ export async function toggleProductActiveAction(productId: string, isActive: boo
     });
 
     revalidatePath("/admin/products");
-    revalidatePath("/admin/inventory");
+    revalidatePath("/admin/inventory/skus");
 
     return { success: true, data: { id: productId, isActive } };
   } catch (error) {
@@ -322,7 +322,7 @@ export async function bulkSetProductsActiveAction(raw: z.input<typeof bulkSetPro
     });
 
     revalidatePath("/admin/products");
-    revalidatePath("/admin/inventory");
+    revalidatePath("/admin/inventory/skus");
 
     return { success: true, data: { count } };
   } catch (error) {

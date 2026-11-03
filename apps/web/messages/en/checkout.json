@@ -50,7 +50,7 @@
         "description": "Visa, Mastercard, JCB and domestic cards."
       }
     },
-    "cardNote": "After placing your order you will be redirected to a secure payment gateway to enter your card. AODAI never stores your card number."
+    "cardNote": "After placing your order you will be redirected to a secure payment gateway to enter your card. Thiên Canh never stores your card number."
   },
   "review": {
     "title": "Review your order",
@@ -68,7 +68,7 @@
       "contentHint": "Use this exact reference so we can confirm your order quickly"
     },
     "customNote": "Your order includes made-to-measure items: our tailor will call to confirm measurements before cutting (7–10 days to complete).",
-    "agreement": "By clicking “Place order”, you agree to AODAI's purchase and return policies."
+    "agreement": "By clicking “Place order”, you agree to Thiên Canh's purchase and return policies."
   },
   "actions": {
     "back": "Back",
@@ -101,7 +101,7 @@
     "amountColumn": "Amount",
     "lineQuantity": "{count} × {price}",
     "grandTotal": "Grand total",
-    "thanks": "Thank you for choosing AODAI"
+    "thanks": "Thank you for choosing Thiên Canh"
   },
   "empty": {
     "title": "Nothing to check out yet",
@@ -110,7 +110,7 @@
   },
   "success": {
     "eyebrow": "Order placed",
-    "title": "Thank you for choosing AODAI",
+    "title": "Thank you for choosing Thiên Canh",
     "description": "Your order has been received and is being prepared.",
     "orderId": "Order number",
     "total": "Total",
