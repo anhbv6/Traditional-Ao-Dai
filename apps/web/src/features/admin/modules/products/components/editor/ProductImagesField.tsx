@@ -5,7 +5,7 @@ import { ImagePlus, Loader2, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useNotify } from "@/hooks/useNotify";
 import { uploadImageApi } from "@/features/upload";
-import { prepareProductImage } from "../utils/productImage";
+import { prepareProductImage } from "../../utils/productImage";
 
 const MAX_IMAGES = 8;
 
@@ -67,14 +67,14 @@ export function ProductImagesField({ value, onChange }: ProductImagesFieldProps)
               <X size={13} />
             </button>
             {index === 0 ? (
-              <span className="absolute inset-x-1 bottom-1 rounded-md bg-[#18181B] py-0.5 text-center text-[11px] font-medium text-white">
+              <span className="absolute inset-x-1 bottom-1 rounded-md bg-[#18181B] py-0.5 text-center text-2xs font-medium text-white">
                 {t("cover")}
               </span>
             ) : (
               <button
                 type="button"
                 onClick={() => makeCover(index)}
-                className="absolute inset-x-1 bottom-1 cursor-pointer rounded-md bg-white/90 py-0.5 text-center text-[11px] font-medium text-[#3F3F46] transition-colors hover:bg-white hover:text-[#09090B]"
+                className="absolute inset-x-1 bottom-1 cursor-pointer rounded-md bg-white/90 py-0.5 text-center text-2xs font-medium text-[#3F3F46] transition-colors hover:bg-white hover:text-[#09090B]"
               >
                 {t("makeCover")}
               </button>
@@ -94,8 +94,6 @@ export function ProductImagesField({ value, onChange }: ProductImagesFieldProps)
           </button>
         )}
       </div>
-
-      <p className="mt-2 text-xs text-[#71717A]">{t("hint", { max: MAX_IMAGES })}</p>
 
       <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp" multiple hidden onChange={handleFiles} />
     </div>

@@ -78,7 +78,7 @@ export function CustomersList({ initialCustomers }: CustomersListProps) {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-[#E4E4E7] bg-zinc-50/50 text-[11px] font-semibold text-[#71717A] uppercase tracking-wider">
+              <tr className="border-b border-[#E4E4E7] bg-zinc-50/50 text-body font-semibold text-[#3F3F46]">
                 <th className="py-3 px-4">{t("colCustomer")}</th>
                 <th className="py-3 px-4">{t("colPhone")}</th>
                 <th className="py-3 px-4">{t("colOrders")}</th>
@@ -88,7 +88,7 @@ export function CustomersList({ initialCustomers }: CustomersListProps) {
                 <th className="py-3 px-4 text-right">{t("colDetail")}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#E4E4E7] text-sm">
+            <tbody className="divide-y divide-[#E4E4E7] text-body">
               {filtered.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="py-12 text-center text-[#71717A]">
@@ -169,10 +169,10 @@ export function CustomersList({ initialCustomers }: CustomersListProps) {
             <div className="space-y-6">
               <div className="flex items-center justify-between border-b border-[#E4E4E7] pb-4">
                 <div>
-                  <div className="text-xs font-semibold uppercase tracking-wider text-[#71717A]">
+                  <div className="text-sm font-medium text-[#71717A]">
                     {t("profileTitle")}
                   </div>
-                  <h3 className="text-lg font-bold text-[#09090B]">
+                  <h3 className="text-lg font-semibold text-[#09090B]">
                     {selectedCustomer.name || t("customerFallback")}
                   </h3>
                 </div>
@@ -198,7 +198,7 @@ export function CustomersList({ initialCustomers }: CustomersListProps) {
 
               {/* Danh sách các hồ sơ số đo áo dài đã lưu */}
               <div className="space-y-3">
-                <div className="text-xs font-semibold uppercase tracking-wider text-[#71717A] flex items-center gap-1.5">
+                <div className="text-body font-semibold text-[#3F3F46] flex items-center gap-1.5">
                   <Ruler size={14} /> {t("measurementsTitle")}
                 </div>
                 {selectedCustomer.measurements.length === 0 ? (
@@ -209,29 +209,29 @@ export function CustomersList({ initialCustomers }: CustomersListProps) {
                   selectedCustomer.measurements.map((profile) => (
                     <div key={profile.id} className="p-4 bg-white rounded-xl border border-[#E4E4E7] shadow-2xs space-y-3">
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-sm text-[#09090B]">{profile.profileName}</span>
+                        <span className="font-semibold text-sm text-[#09090B]">{profile.profileName}</span>
                         {profile.isDefault && (
-                          <span className="px-2 py-0.5 rounded bg-[#18181B] text-white text-[10px] font-semibold">
+                          <span className="px-2 py-0.5 rounded bg-[#18181B] text-white text-2xs font-semibold">
                             {t("default")}
                           </span>
                         )}
                       </div>
-                      <div className="grid grid-cols-4 gap-2 text-[11px] bg-zinc-50 p-2.5 rounded-lg border border-[#E4E4E7]">
+                      <div className="grid grid-cols-4 gap-2 text-2xs bg-zinc-50 p-2.5 rounded-lg border border-[#E4E4E7]">
                         <div>
-                          <span className="text-zinc-400 block text-[9px]">{tm("bustShort")}</span>
-                          <span className="font-mono font-bold text-zinc-800">{profile.bust || "--"} cm</span>
+                          <span className="text-zinc-400 block text-2xs">{tm("bustShort")}</span>
+                          <span className="font-mono font-semibold text-zinc-800">{profile.bust || "--"} cm</span>
                         </div>
                         <div>
-                          <span className="text-zinc-400 block text-[9px]">Eo</span>
-                          <span className="font-mono font-bold text-zinc-800">{profile.waist || "--"} cm</span>
+                          <span className="text-zinc-400 block text-2xs">Eo</span>
+                          <span className="font-mono font-semibold text-zinc-800">{profile.waist || "--"} cm</span>
                         </div>
                         <div>
-                          <span className="text-zinc-400 block text-[9px]">{tm("hipsShort")}</span>
-                          <span className="font-mono font-bold text-zinc-800">{profile.hips || "--"} cm</span>
+                          <span className="text-zinc-400 block text-2xs">{tm("hipsShort")}</span>
+                          <span className="font-mono font-semibold text-zinc-800">{profile.hips || "--"} cm</span>
                         </div>
                         <div>
-                          <span className="text-zinc-400 block text-[9px]">{tm("shirtLength")}</span>
-                          <span className="font-mono font-bold text-zinc-800">{profile.shirtLength || "--"} cm</span>
+                          <span className="text-zinc-400 block text-2xs">{tm("shirtLength")}</span>
+                          <span className="font-mono font-semibold text-zinc-800">{profile.shirtLength || "--"} cm</span>
                         </div>
                       </div>
                       {profile.note && (
@@ -247,7 +247,7 @@ export function CustomersList({ initialCustomers }: CustomersListProps) {
 
             <div className="border-t border-[#E4E4E7] pt-4 mt-6 flex justify-between items-center text-xs">
               <span className="text-[#71717A]">{t("totalRevenue")}</span>
-              <span className="font-mono font-bold text-base text-[#09090B]">
+              <span className="font-mono font-semibold text-base text-[#09090B]">
                 {formatVnd(selectedCustomer.totalSpent, locale)}
               </span>
             </div>

@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import { useWatch, type UseFormReturn } from "react-hook-form";
 import { Lock } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
+import { AdminInfoTip, type AdminContentLang } from "@/features/admin/core/ui";
 import { type SaveCollectionValues } from "../../schemas/collections.schemas";
 
 const INPUT_CLASS =
@@ -22,16 +22,20 @@ function Counter({ length, limit }: { length: number; limit: number }) {
   );
 }
 
-/** SEO hai ngôn ngữ kèm xem trước kết quả Google; slug khóa lại sau khi công bố */
+/**
+ * SEO hai ngôn ngữ kèm xem trước kết quả Google; slug khóa lại sau khi công bố.
+ * Ngôn ngữ do nơi chứa quyết định (AdminLangSwitch cạnh tiêu đề dialog SEO).
+ */
 export function CollectionSeoField({
   form,
   slugLocked,
+  lang,
 }: {
   form: UseFormReturn<SaveCollectionValues>;
   slugLocked: boolean;
+  lang: AdminContentLang;
 }) {
   const t = useTranslations("AdminPage.collections.seo");
-  const [lang, setLang] = useState<"vi" | "en">("vi");
   const titleKey = lang === "vi" ? "seoTitle" : "seoTitleEn";
   const descriptionKey = lang === "vi" ? "seoDescription" : "seoDescriptionEn";
 
@@ -45,8 +49,9 @@ export function CollectionSeoField({
   return (
     <div className="space-y-4">
       <label className="block space-y-1.5">
-        <span className="flex items-center gap-1.5 text-xs font-medium text-[#3F3F46]">
+        <span className="flex items-center gap-1.5 text-sm font-medium text-[#3F3F46]">
           {t("slug")} {slugLocked && <Lock size={12} className="text-[#A1A1AA]" aria-label={t("locked")} />}
+          {slugLocked && <AdminInfoTip content={t("lockedHint")} />}
         </span>
         <div className="flex items-center rounded-lg border border-[#E4E4E7] bg-[#FAFAFA] focus-within:border-[#18181B]">
           <span className="shrink-0 pl-3 text-sm text-[#A1A1AA]">/{lang}/bo-suu-tap/</span>
@@ -56,28 +61,10 @@ export function CollectionSeoField({
             className="h-9 min-w-0 flex-1 rounded-r-lg bg-transparent pr-3 text-sm text-[#09090B] outline-none disabled:text-[#71717A]"
           />
         </div>
-        {slugLocked && <span className="block text-xs text-[#71717A]">{t("lockedHint")}</span>}
       </label>
 
-      <div className="flex w-fit rounded-lg border border-[#E4E4E7] p-0.5">
-        {(["vi", "en"] as const).map((code) => (
-          <button
-            key={code}
-            type="button"
-            aria-pressed={lang === code}
-            onClick={() => setLang(code)}
-            className={cn(
-              "cursor-pointer rounded-md px-2.5 py-1 text-xs font-medium uppercase",
-              lang === code ? "bg-[#18181B] text-white" : "text-[#71717A] hover:text-[#09090B]"
-            )}
-          >
-            {code}
-          </button>
-        ))}
-      </div>
-
       <label className="block space-y-1.5">
-        <span className="flex justify-between text-xs font-medium text-[#3F3F46]">
+        <span className="flex justify-between text-sm font-medium text-[#3F3F46]">
           {t("title")} <Counter length={values[titleKey]?.length ?? 0} limit={TITLE_SOFT_LIMIT} />
         </span>
         <input
@@ -88,7 +75,7 @@ export function CollectionSeoField({
         />
       </label>
       <label className="block space-y-1.5">
-        <span className="flex justify-between text-xs font-medium text-[#3F3F46]">
+        <span className="flex justify-between text-sm font-medium text-[#3F3F46]">
           {t("description")} <Counter length={values[descriptionKey]?.length ?? 0} limit={DESCRIPTION_SOFT_LIMIT} />
         </span>
         <textarea
@@ -101,7 +88,7 @@ export function CollectionSeoField({
       </label>
 
       <div className="rounded-lg border border-[#E4E4E7] bg-white p-4">
-        <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.5px] text-[#A1A1AA]">{t("googlePreview")}</p>
+        <p className="mb-2 text-xs font-medium text-[#71717A]">{t("googlePreview")}</p>
         <p className="truncate text-xs text-[#3F3F46]">
           tiemthiencanh.vn › {lang} › bo-suu-tap › {values.slug}
         </p>

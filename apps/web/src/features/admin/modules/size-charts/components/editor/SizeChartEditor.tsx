@@ -2,13 +2,19 @@
 
 import { useState } from "react";
 import dynamic from "next/dynamic";
-import { AlertTriangle, ArrowLeft, Eye, ImagePlus, Loader2, Save, X } from "lucide-react";
+import { AlertTriangle, Eye, ImagePlus, Loader2, Save, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { type ProductGroup } from "@repo/shared/sizing";
 import { useNotify } from "@/hooks/useNotify";
-import { Link, useRouter } from "@/i18n/routing";
+import { useRouter } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
-import { ADMIN_CARD_CLASS, AdminSecondaryButton, AdminSegmentedControl } from "@/features/admin/core/ui";
+import {
+  ADMIN_CARD_CLASS,
+  ADMIN_PRIMARY_BUTTON_CLASS,
+  ADMIN_SECONDARY_BUTTON_CLASS,
+  AdminDetailHeader,
+  AdminSegmentedControl,
+} from "@/features/admin/core/ui";
 import { PRODUCT_GROUP_ICONS, groupUsesSizeChart } from "@/features/admin/modules/categories";
 import { compressCollectionImage } from "@/features/admin/modules/collections";
 import { uploadImageApi } from "@/features/upload";
@@ -31,14 +37,25 @@ const INPUT_CLASS =
   "h-10 w-full rounded-lg border border-[#E4E4E7] bg-white px-3 text-sm text-[#09090B] outline-none placeholder:text-[#A1A1AA] focus:border-[#18181B]";
 const TEXTAREA_CLASS =
   "w-full resize-y rounded-lg border border-[#E4E4E7] bg-white px-3 py-2 text-sm leading-relaxed text-[#09090B] outline-none placeholder:text-[#A1A1AA] focus:border-[#18181B]";
-const SECTION_TITLE = "text-sm font-semibold uppercase tracking-[0.5px] text-[#09090B]";
+const SECTION_TITLE = "text-lg font-semibold text-[#09090B]";
 const SIZED_GROUPS: ProductGroup[] = ["AO_DAI", "PANTS", "FOOTWEAR"];
 
-type InfoValues = Omit<AdminSizeChartDetail, "columns" | "rows" | "id" | "productCount" | "categoryNames" | "updatedAt">;
+type InfoValues = Omit<
+  AdminSizeChartDetail,
+  "columns" | "rows" | "id" | "productCount" | "categoryNames" | "updatedAt"
+>;
 type SurchargeOption = "NONE" | SurchargeType;
 
 function pickInfo(chart: AdminSizeChartDetail): InfoValues {
-  const { columns: _columns, rows: _rows, id: _id, productCount: _p, categoryNames: _c, updatedAt: _u, ...info } = chart;
+  const {
+    columns: _columns,
+    rows: _rows,
+    id: _id,
+    productCount: _p,
+    categoryNames: _c,
+    updatedAt: _u,
+    ...info
+  } = chart;
   return info;
 }
 
@@ -64,9 +81,12 @@ export function SizeChartEditor({ initialChart }: { initialChart: AdminSizeChart
   const GroupIcon = PRODUCT_GROUP_ICONS[info.group];
   const surchargeInvalid =
     info.surchargeType !== null &&
-    (!info.surchargeValue || info.surchargeValue <= 0 || (info.surchargeType === "PERCENTAGE" && info.surchargeValue > 100));
+    (!info.surchargeValue ||
+      info.surchargeValue <= 0 ||
+      (info.surchargeType === "PERCENTAGE" && info.surchargeValue > 100));
 
-  const set = <K extends keyof InfoValues>(key: K, value: InfoValues[K]) => setInfo((prev) => ({ ...prev, [key]: value }));
+  const set = <K extends keyof InfoValues>(key: K, value: InfoValues[K]) =>
+    setInfo((prev) => ({ ...prev, [key]: value }));
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -111,39 +131,35 @@ export function SizeChartEditor({ initialChart }: { initialChart: AdminSizeChart
 
   return (
     <>
-      <div className="flex flex-col gap-3 border-b border-[#E4E4E7] pb-4 sm:flex-row sm:items-end sm:justify-between">
-        <div className="min-w-0">
-          <Link
-            href="/admin/catalog/size-charts"
-            className="mb-2 inline-flex items-center gap-1 text-xs font-medium text-[#71717A] hover:text-[#09090B]"
-          >
-            <ArrowLeft size={14} aria-hidden /> {t("editor.back")}
-          </Link>
-          <h1 className="flex min-w-0 items-center gap-2 text-xl font-semibold tracking-tight text-[#09090B] sm:text-2xl">
-            <GroupIcon size={20} aria-hidden className="shrink-0 text-[#52525B]" />
-            <span className="truncate">{info.name || t("editor.untitled")}</span>
-          </h1>
-          <p className="mt-1 text-xs text-[#71717A]">
+      <AdminDetailHeader
+        backHref="/admin/catalog/size-charts"
+        backLabel={t("editor.back")}
+        title={info.name || t("editor.untitled")}
+        badge={<GroupIcon size={18} aria-hidden className="shrink-0 text-[#52525B]" />}
+        subtitle={
+          <>
             {t("editor.usage", { products: initialChart.productCount, categories: initialChart.categoryNames.length })}
             {initialChart.categoryNames.length > 0 && ` — ${initialChart.categoryNames.join(", ")}`}
-          </p>
-        </div>
-        <div className="flex shrink-0 flex-wrap items-center gap-2">
-          {isDirty && <span className="text-xs font-medium text-amber-700">{t("editor.unsaved")}</span>}
-          <AdminSecondaryButton onClick={() => setPreviewOpen(true)} className="h-9">
-            <Eye size={14} aria-hidden /> {t("editor.preview")}
-          </AdminSecondaryButton>
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={isSaving || !isDirty || issues.total > 0 || surchargeInvalid || !info.name.trim()}
-            className="inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-lg bg-[#18181B] px-3.5 text-sm font-medium text-white shadow-2xs transition-colors hover:bg-[#09090B] disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {isSaving ? <Loader2 size={15} className="animate-spin" aria-hidden /> : <Save size={15} aria-hidden />}
-            {t("editor.save")}
-          </button>
-        </div>
-      </div>
+            {isDirty && <span className="ml-2 text-amber-700">● {t("editor.unsaved")}</span>}
+          </>
+        }
+        actions={
+          <>
+            <button type="button" onClick={() => setPreviewOpen(true)} className={ADMIN_SECONDARY_BUTTON_CLASS}>
+              <Eye size={15} aria-hidden /> {t("editor.preview")}
+            </button>
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={isSaving || !isDirty || issues.total > 0 || surchargeInvalid || !info.name.trim()}
+              className={ADMIN_PRIMARY_BUTTON_CLASS}
+            >
+              {isSaving ? <Loader2 size={15} className="animate-spin" aria-hidden /> : <Save size={15} aria-hidden />}
+              {t("editor.save")}
+            </button>
+          </>
+        }
+      />
 
       <section className={cn(ADMIN_CARD_CLASS, "p-4 sm:p-5")}>
         <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
@@ -337,7 +353,11 @@ export function SizeChartEditor({ initialChart }: { initialChart: AdminSizeChart
               </div>
             ) : (
               <label className="flex aspect-[3/4] cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-[#D4D4D8] text-xs text-[#71717A] transition-colors hover:border-[#18181B] hover:text-[#09090B]">
-                {isUploading ? <Loader2 size={18} className="animate-spin" aria-hidden /> : <ImagePlus size={18} aria-hidden />}
+                {isUploading ? (
+                  <Loader2 size={18} className="animate-spin" aria-hidden />
+                ) : (
+                  <ImagePlus size={18} aria-hidden />
+                )}
                 {t("editor.uploadImage")}
                 <input
                   type="file"

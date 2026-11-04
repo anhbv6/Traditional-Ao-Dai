@@ -66,16 +66,25 @@ const APPOINTMENTS: DemoAppointment[] = [
 
 /** Cây vải dưới ngưỡng 3 m sẽ hiện cảnh báo sắp hết trên dashboard */
 const FABRICS = [
-  { code: 'LUA-HONG-01', name: 'Lụa tơ tằm hồng phấn', color: 'Hồng phấn', remainingMeters: 2.4, productSlug: DEMO_PRODUCT_SLUGS.lotus },
-  { code: 'GAM-DO-01', name: 'Gấm ruby đỏ nhung', color: 'Đỏ nhung', remainingMeters: 1.6, productSlug: DEMO_PRODUCT_SLUGS.wedding },
-  { code: 'LINEN-VANG-01', name: 'Linen vàng cúc', color: 'Vàng cúc', remainingMeters: 14, productSlug: DEMO_PRODUCT_SLUGS.linen },
-  { code: 'VOAN-TRANG-01', name: 'Voan lụa trắng', color: 'Trắng', remainingMeters: 2.9, productSlug: null },
+  { code: 'LUA-HONG-01', name: 'Lụa tơ tằm hồng phấn', color: 'Hồng phấn', remainingMeters: 2.4, productSlug: DEMO_PRODUCT_SLUGS.lotus, materialCode: 'LUA-TO-TAM' },
+  { code: 'GAM-DO-01', name: 'Gấm ruby đỏ nhung', color: 'Đỏ nhung', remainingMeters: 1.6, productSlug: DEMO_PRODUCT_SLUGS.wedding, materialCode: 'GAM-RUBY' },
+  { code: 'LINEN-VANG-01', name: 'Linen vàng cúc', color: 'Vàng cúc', remainingMeters: 14, productSlug: DEMO_PRODUCT_SLUGS.linen, materialCode: 'LINEN-THO' },
+  { code: 'VOAN-TRANG-01', name: 'Voan lụa trắng', color: 'Trắng', remainingMeters: 2.9, productSlug: null, materialCode: 'VOAN-LUA' },
 ]
 
 /**
  * Dữ liệu vận hành demo cho dashboard admin: đơn may đo (có cọc + ngày hẹn trả), lịch hẹn hôm nay, kho vải
  */
-export async function seedOperations({ catalog, accounts }: { catalog: SeededCatalog; accounts: SeededAccounts }) {
+export async function seedOperations({
+  catalog,
+  accounts,
+  materials,
+}: {
+  catalog: SeededCatalog
+  accounts: SeededAccounts
+  /** Mã chất liệu → id (từ seedMaterials) */
+  materials: Record<string, string>
+}) {
   const { inDays, todayAt } = clock()
 
   const orders: Record<string, { id: string; customerName: string; customerPhone: string; userId: string | null }> = {}
@@ -135,8 +144,12 @@ export async function seedOperations({ catalog, accounts }: { catalog: SeededCat
   }
   console.log(`   📅 ${APPOINTMENTS.length} lịch hẹn hôm nay`)
 
-  for (const { productSlug, ...fabric } of FABRICS) {
-    const data = { ...fabric, productId: productSlug ? catalog[productSlug].id : null }
+  for (const { productSlug, materialCode, ...fabric } of FABRICS) {
+    const data = {
+      ...fabric,
+      productId: productSlug ? catalog[productSlug].id : null,
+      materialId: materials[materialCode] ?? null,
+    }
     await prisma.fabric.upsert({ where: { code: fabric.code }, update: data, create: data })
   }
   console.log(`   🧶 ${FABRICS.length} cây vải`)

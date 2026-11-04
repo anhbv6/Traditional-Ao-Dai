@@ -86,14 +86,14 @@ export function CmsManager({ initialArticles, initialFaqs }: CmsManagerProps) {
         <div className="bg-white rounded-xl border border-[#E4E4E7] shadow-2xs overflow-hidden">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-[#E4E4E7] bg-zinc-50/50 text-[11px] font-semibold text-[#71717A] uppercase tracking-wider">
+              <tr className="border-b border-[#E4E4E7] bg-zinc-50/50 text-body font-semibold text-[#3F3F46]">
                 <th className="py-3 px-4">{t("colTitle")}</th>
                 <th className="py-3 px-4">{t("colAuthor")}</th>
                 <th className="py-3 px-4">{t("colDate")}</th>
                 <th className="py-3 px-4 text-right">{t("colStatus")}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#E4E4E7] text-sm">
+            <tbody className="divide-y divide-[#E4E4E7] text-body">
               {articles.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="py-12 text-center text-[#71717A]">
@@ -159,7 +159,7 @@ export function CmsManager({ initialArticles, initialFaqs }: CmsManagerProps) {
               <div key={faq.id} className="bg-white p-4 rounded-xl border border-[#E4E4E7] shadow-2xs flex items-start justify-between gap-4">
                 <div>
                   {faq.category && (
-                    <span className="inline-block px-2 py-0.5 rounded bg-zinc-100 text-[10px] font-bold text-zinc-600 mb-1.5 uppercase">
+                    <span className="inline-block px-2 py-0.5 rounded bg-zinc-100 text-2xs font-semibold text-zinc-600 mb-1.5">
                       {faq.category}
                     </span>
                   )}

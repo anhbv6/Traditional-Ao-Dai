@@ -3,13 +3,21 @@
 import { useMemo, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm, useWatch } from "react-hook-form";
-import { ChevronLeft, Eye, Info, Lock, Star, TriangleAlert } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { Controller, useForm, useWatch, type FieldErrors } from "react-hook-form";
+import { Eye, Lock, Search, Star } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { useNotify } from "@/hooks/useNotify";
-import { Link } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
-import { ADMIN_CARD_CLASS } from "@/features/admin/core/ui";
+import {
+  ADMIN_CARD_CLASS,
+  ADMIN_PRIMARY_BUTTON_CLASS,
+  ADMIN_SECONDARY_BUTTON_CLASS,
+  AdminDatePicker,
+  AdminDetailHeader,
+  AdminInfoTip,
+  AdminLangSwitch,
+  type AdminContentLang,
+} from "@/features/admin/core/ui";
 import { saveCollectionAction } from "../../actions/collections.actions";
 import { saveCollectionSchema, type SaveCollectionValues } from "../../schemas/collections.schemas";
 import {
@@ -28,12 +36,14 @@ import { ACCENT_PRESETS, DEFAULT_ACCENT } from "../../utils/collectionStatusMeta
 import { CollectionStatusBadge } from "../shared/CollectionStatusBadge";
 import { GalleryField, ImageSlot } from "./CollectionImageFields";
 import { CollectionLifecyclePanel } from "./CollectionLifecyclePanel";
+import { CollectionAdvancedAction, CollectionAdvancedOptions } from "./CollectionAdvancedOptions";
+import { CollectionNoticeHint, type CollectionNotice } from "./CollectionNoticeHint";
 import { CollectionProductsField } from "./CollectionProductsField";
-import { CollectionSeoField } from "./CollectionSeoField";
 
 const CollectionPreviewDialog = dynamic(() =>
   import("./CollectionPreviewDialog").then((m) => m.CollectionPreviewDialog)
 );
+const CollectionSeoDialog = dynamic(() => import("./CollectionSeoDialog").then((m) => m.CollectionSeoDialog));
 const ChangeCollectionStatusDialog = dynamic(() =>
   import("../shared/ChangeCollectionStatusDialog").then((m) => m.ChangeCollectionStatusDialog)
 );
@@ -83,6 +93,15 @@ function toFormValues(c: AdminCollectionDetail): SaveCollectionValues {
   };
 }
 
+/** Ngôn ngữ nội dung soạn trong thẻ "Thông tin chung" */
+type ContentLang = AdminContentLang;
+
+/** Tên trường form theo ngôn ngữ — cột gốc tiếng Việt, cột `En` cho tiếng Anh (AGENTS.md §9) */
+const LANG_FIELDS = {
+  vi: { name: "name", season: "season", tagline: "tagline", description: "description", story: "story" },
+  en: { name: "nameEn", season: "seasonEn", tagline: "taglineEn", description: "descriptionEn", story: "storyEn" },
+} as const satisfies Record<ContentLang, Record<string, keyof SaveCollectionValues>>;
+
 function Section({
   title,
   description,
@@ -96,9 +115,9 @@ function Section({
 }) {
   return (
     <section className={cn(ADMIN_CARD_CLASS, "p-4 sm:p-5")}>
-      <header className="mb-4 flex items-start justify-between gap-3">
-        <div>
-          <h2 className="text-sm font-semibold text-[#09090B]">{title}</h2>
+      <header className="mb-4 flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-[12rem] flex-1">
+          <h2 className="text-lg font-semibold text-[#09090B]">{title}</h2>
           {description && <p className="mt-0.5 text-xs text-[#71717A]">{description}</p>}
         </div>
         {aside}
@@ -123,13 +142,13 @@ function Field({
 }) {
   return (
     <label className={cn("block min-w-0 space-y-1.5", className)}>
-      <span className="flex items-center gap-1.5 text-xs font-medium text-[#3F3F46]">{label}</span>
+      {/* Hướng dẫn không chiếm dòng dưới ô nữa: gom vào icon ⓘ cạnh nhãn */}
+      <span className="flex items-center gap-1.5 text-sm font-medium text-[#3F3F46]">
+        {label}
+        {hint && <AdminInfoTip content={hint} />}
+      </span>
       {children}
-      {error ? (
-        <span className="block text-xs text-rose-700">{error}</span>
-      ) : hint ? (
-        <span className="block text-xs text-[#71717A]">{hint}</span>
-      ) : null}
+      {error && <span className="block text-xs text-rose-700">{error}</span>}
     </label>
   );
 }
@@ -150,8 +169,8 @@ function ToggleRow({
   return (
     <label className={cn("flex items-start justify-between gap-3", disabled ? "opacity-60" : "cursor-pointer")}>
       <span className="min-w-0">
-        <span className="block text-sm font-medium text-[#09090B]">{label}</span>
-        {hint && <span className="mt-0.5 block text-xs text-[#71717A]">{hint}</span>}
+        <span className="block text-sm font-semibold text-[#09090B]">{label}</span>
+        {hint && <span className="mt-0.5 block text-2xs leading-4 text-[#A1A1AA]">{hint}</span>}
       </span>
       <input
         type="checkbox"
@@ -194,6 +213,11 @@ export function CollectionEditor({ collection: initial, products, homepageUsedBy
   });
   const { errors, isDirty } = form.formState;
   const values = useWatch({ control: form.control }) as SaveCollectionValues;
+  const locale = useLocale();
+  const [contentLang, setContentLang] = useState<ContentLang>(locale === "en" ? "en" : "vi");
+  const [isSeoOpen, setIsSeoOpen] = useState(false);
+  const isEnglish = contentLang === "en";
+  const langFields = LANG_FIELDS[contentLang];
   const productsById = useMemo(() => new Map(products.map((p) => [p.id, p])), [products]);
   const locked = isIdentityLocked(saved);
   const err = (key?: string) => (key ? notify.translateError(key) : undefined);
@@ -207,7 +231,13 @@ export function CollectionEditor({ collection: initial, products, homepageUsedBy
   const sellingBeforeLaunch = selected.filter(
     (p) => p.isActive && !p.collections.some((c) => c.id !== saved.id && c.status === "ACTIVE")
   );
-  const warnings: { tone: "warn" | "info"; text: string }[] = [];
+  const warnings: CollectionNotice[] = [];
+  // Còn thiếu dữ liệu trước khi công bố / mở bán
+  if (values.products.length === 0) warnings.push({ tone: "info", text: t("warnings.noProducts") });
+  if (!values.coverImage) warnings.push({ tone: "info", text: t("warnings.noCover") });
+  if (!values.coverImageMobile) warnings.push({ tone: "info", text: t("warnings.noCoverMobile") });
+  if ((saved.status === "DRAFT" || saved.status === "COMING_SOON") && !values.launchAt)
+    warnings.push({ tone: "info", text: t("warnings.noLaunchAt") });
   if (saved.status === "ACTIVE" && hidden.length > 0)
     warnings.push({ tone: "warn", text: t("warnings.hiddenInActive", { count: hidden.length }) });
   if (saved.status !== "ACTIVE" && notReady.length > 0)
@@ -230,6 +260,16 @@ export function CollectionEditor({ collection: initial, products, homepageUsedBy
     warnings.push({ tone: "info", text: t("warnings.homepageDraft") });
 
   const homepageFull = !saved.showOnHomepage && homepageUsedByOthers >= HOMEPAGE_COLLECTION_LIMIT;
+
+  // SEO nằm trong dialog nên lỗi ở đó không nhìn thấy trên form — bấm lưu mà lỗi ở SEO thì mở dialog ra
+  const seoError = Boolean(
+    errors.slug || errors.seoTitle || errors.seoTitleEn || errors.seoDescription || errors.seoDescriptionEn
+  );
+  const onInvalid = (invalid: FieldErrors<SaveCollectionValues>) => {
+    if (invalid.slug || invalid.seoTitle || invalid.seoTitleEn || invalid.seoDescription || invalid.seoDescriptionEn) {
+      setIsSeoOpen(true);
+    }
+  };
 
   const onSubmit = async (data: SaveCollectionValues) => {
     setIsSaving(true);
@@ -269,61 +309,132 @@ export function CollectionEditor({ collection: initial, products, homepageUsedBy
   };
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} noValidate className="space-y-5">
-      <div className="sticky top-(--site-header-h) z-30 -mx-4 border-b border-[#E4E4E7] bg-[#FAFAFA]/90 px-4 py-3 backdrop-blur sm:-mx-8 sm:px-8 lg:-mx-6 lg:px-6">
-        <div className="flex flex-wrap items-center gap-3">
-          <Link
-            href="/admin/catalog/collections"
-            aria-label={t("editor.back")}
-            className="grid size-8 shrink-0 place-items-center rounded-lg border border-[#E4E4E7] bg-white text-[#52525B] hover:text-[#09090B]"
-          >
-            <ChevronLeft size={16} />
-          </Link>
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
-              <h1 className="truncate text-lg font-semibold text-[#09090B] sm:text-xl">
-                {values.name || t("editor.untitled")}
-              </h1>
-              <CollectionStatusBadge status={saved.status} />
-            </div>
-            <p className="text-xs text-[#71717A]">
-              <span className="font-mono">{values.code}</span>
-              {isDirty && <span className="ml-2 text-amber-700">● {t("editor.unsaved")}</span>}
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => setIsPreviewing(true)}
-            className="inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-[#E4E4E7] bg-white px-3 text-sm font-medium text-[#3F3F46] shadow-2xs hover:bg-[#FAFAFA] hover:text-[#09090B]"
-          >
-            <Eye size={15} aria-hidden /> {t("editor.preview")}
-          </button>
-          <button
-            type="submit"
-            disabled={!isDirty || isSaving}
-            className="h-9 cursor-pointer rounded-lg bg-[#18181B] px-4 text-sm font-medium text-white shadow-2xs transition-colors hover:bg-[#09090B] disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {isSaving ? t("processing") : t("editor.save")}
-          </button>
-        </div>
-      </div>
+    <form onSubmit={form.handleSubmit(onSubmit, onInvalid)} noValidate className="space-y-5">
+      <AdminDetailHeader
+        backHref="/admin/catalog/collections"
+        backLabel={t("editor.back")}
+        title={values.name || t("editor.untitled")}
+        badge={<CollectionStatusBadge status={saved.status} />}
+        subtitle={
+          <>
+            <span className="font-mono">{values.code}</span>
+            {isDirty && <span className="ml-2 text-amber-700">● {t("editor.unsaved")}</span>}
+          </>
+        }
+        actions={
+          <>
+            <button type="button" onClick={() => setIsPreviewing(true)} className={ADMIN_SECONDARY_BUTTON_CLASS}>
+              <Eye size={15} aria-hidden /> {t("editor.preview")}
+            </button>
+            <button type="submit" disabled={!isDirty || isSaving} className={ADMIN_PRIMARY_BUTTON_CLASS}>
+              {isSaving ? t("processing") : t("editor.save")}
+            </button>
+          </>
+        }
+      />
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="min-w-0 space-y-5">
-          <Section title={t("editor.sections.info")} description={t("editor.sections.infoHint")}>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field label={`${t("field.name")} *`} error={err(errors.name?.message)} className="sm:col-span-2">
+          <Section
+            title={t("editor.sections.info")}
+            description={t("editor.sections.infoHint")}
+            aside={
+              <div className="flex flex-wrap items-center gap-2">
+                {/* Ngôn ngữ chỉ áp dụng cho thẻ này: hai ngôn ngữ dùng CHUNG một bộ trường (LANG_FIELDS) nên form luôn giống
+                    hệt nhau; đổi ngôn ngữ thì gắn lại form theo tên trường của ngôn ngữ đó */}
+                <AdminLangSwitch
+                  value={contentLang}
+                  onChange={setContentLang}
+                  label={t("editor.langTabs.label")}
+                  hint={t("editor.sections.englishHint")}
+                  missingLabel={t("editor.langTabs.untranslated")}
+                  status={{
+                    vi: errors.name || errors.code ? "error" : undefined,
+                    en: values.nameEn ? undefined : "missing",
+                  }}
+                />
+                <CollectionAdvancedOptions
+                  label={t("editor.advanced")}
+                  activeCount={Number(values.showOnHomepage) + Number(values.showInLookbook)}
+                >
+                  <Controller
+                    control={form.control}
+                    name="showOnHomepage"
+                    render={({ field }) => (
+                      <ToggleRow
+                        label={t("field.showOnHomepage")}
+                        hint={
+                          saved.status === "ARCHIVED"
+                            ? t("field.homepageArchived")
+                            : t("homepageUsage", {
+                                used: homepageUsedByOthers + (field.value ? 1 : 0),
+                                limit: HOMEPAGE_COLLECTION_LIMIT,
+                              })
+                        }
+                        checked={field.value}
+                        disabled={saved.status === "ARCHIVED" || (homepageFull && !field.value)}
+                        onChange={field.onChange}
+                      />
+                    )}
+                  />
+                  {values.showOnHomepage && (
+                    <Field label={t("field.homepageOrder")} hint={t("field.homepageOrderHint")}>
+                      <input
+                        type="number"
+                        min={0}
+                        max={99}
+                        {...form.register("homepageOrder", { valueAsNumber: true })}
+                        className={cn(INPUT_CLASS, "h-9 w-24")}
+                      />
+                    </Field>
+                  )}
+                  <Controller
+                    control={form.control}
+                    name="showInLookbook"
+                    render={({ field }) => (
+                      <ToggleRow
+                        label={t("field.showInLookbook")}
+                        hint={t("field.lookbookHint")}
+                        checked={field.value}
+                        onChange={field.onChange}
+                      />
+                    )}
+                  />
+                  <CollectionAdvancedAction
+                    icon={Search}
+                    label={t("seoDialog.open")}
+                    description={
+                      seoError
+                        ? t("seoDialog.hasError")
+                        : values.seoTitle || values.seoDescription || values.seoTitleEn || values.seoDescriptionEn
+                          ? t("seoDialog.customized")
+                          : t("seoDialog.auto")
+                    }
+                    tone={seoError ? "error" : "default"}
+                    onClick={() => setIsSeoOpen(true)}
+                  />
+                </CollectionAdvancedOptions>
+              </div>
+            }
+          >
+            <div key={contentLang} role="tabpanel" className="grid gap-4 sm:grid-cols-2">
+              <Field
+                label={`${t("field.name")}${isEnglish ? "" : " *"}`}
+                error={isEnglish ? undefined : err(errors.name?.message)}
+                className="sm:col-span-2"
+              >
                 <input
-                  {...form.register("name")}
-                  aria-invalid={Boolean(errors.name)}
+                  {...form.register(langFields.name)}
+                  aria-invalid={!isEnglish && Boolean(errors.name)}
+                  placeholder={t(`field.placeholders.${contentLang}.name`)}
                   className={cn(INPUT_CLASS, "h-10")}
                 />
               </Field>
               <Field label={t("field.season")} hint={t("field.seasonHint")}>
                 <input
-                  {...form.register("season")}
-                  placeholder={t("field.seasonPlaceholder")}
-                  className={cn(INPUT_CLASS, "h-9")}
+                  {...form.register(langFields.season)}
+                  placeholder={t(`field.placeholders.${contentLang}.season`)}
+                  className={cn(INPUT_CLASS, "h-10")}
                 />
               </Field>
               <Field
@@ -335,8 +446,9 @@ export function CollectionEditor({ collection: initial, products, homepageUsedBy
                   <input
                     {...form.register("code")}
                     disabled={locked}
+                    placeholder={t("field.codePlaceholder")}
                     aria-invalid={Boolean(errors.code)}
-                    className={cn(INPUT_CLASS, "h-9 pr-8 font-mono uppercase tracking-wider")}
+                    className={cn(INPUT_CLASS, "h-10 pr-8 font-mono uppercase tracking-wider")}
                   />
                   {locked && (
                     <Lock size={13} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#A1A1AA]" aria-hidden />
@@ -345,16 +457,29 @@ export function CollectionEditor({ collection: initial, products, homepageUsedBy
               </Field>
               <Field label={t("field.tagline")} className="sm:col-span-2">
                 <input
-                  {...form.register("tagline")}
-                  placeholder={t("field.taglinePlaceholder")}
-                  className={cn(INPUT_CLASS, "h-9")}
+                  {...form.register(langFields.tagline)}
+                  placeholder={t(`field.placeholders.${contentLang}.tagline`)}
+                  className={cn(INPUT_CLASS, "h-10")}
                 />
               </Field>
               <Field label={t("field.description")} className="sm:col-span-2">
-                <textarea {...form.register("description")} rows={3} className={cn(INPUT_CLASS, "py-2")} />
+                <textarea
+                  {...form.register(langFields.description)}
+                  rows={3}
+                  placeholder={t(`field.placeholders.${contentLang}.description`)}
+                  className={cn(INPUT_CLASS, "py-2")}
+                />
+              </Field>
+              <Field label={t("editor.sections.story")} hint={t("editor.sections.storyHint")} className="sm:col-span-2">
+                <textarea
+                  {...form.register(langFields.story)}
+                  rows={5}
+                  placeholder={t(`field.placeholders.${contentLang}.story`)}
+                  className={cn(INPUT_CLASS, "py-2 leading-relaxed")}
+                />
               </Field>
               <div className="sm:col-span-2">
-                <span className="mb-1.5 block text-xs font-medium text-[#3F3F46]">{t("field.accent")}</span>
+                <span className="mb-1.5 block text-sm font-medium text-[#3F3F46]">{t("field.accent")}</span>
                 <Controller
                   control={form.control}
                   name="accentColor"
@@ -442,7 +567,7 @@ export function CollectionEditor({ collection: initial, products, homepageUsedBy
               ))}
             </div>
             <div className="mt-5">
-              <span className="mb-1.5 block text-xs font-medium text-[#3F3F46]">{t("media.lookbook")}</span>
+              <span className="mb-1.5 block text-sm font-medium text-[#3F3F46]">{t("media.lookbook")}</span>
               <Controller
                 control={form.control}
                 name="gallery"
@@ -488,128 +613,43 @@ export function CollectionEditor({ collection: initial, products, homepageUsedBy
             />
             {errors.products?.message && <p className="mt-2 text-xs text-rose-700">{err(errors.products.message)}</p>}
           </Section>
-
-          <Section title={t("editor.sections.story")} description={t("editor.sections.storyHint")}>
-            <textarea
-              {...form.register("story")}
-              rows={6}
-              placeholder={t("field.storyPlaceholder")}
-              className={cn(INPUT_CLASS, "py-2 leading-relaxed")}
-            />
-          </Section>
-
-          <Section title={t("editor.sections.english")} description={t("editor.sections.englishHint")}>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field label={t("field.name")}>
-                <input {...form.register("nameEn")} placeholder={values.name} className={cn(INPUT_CLASS, "h-9")} />
-              </Field>
-              <Field label={t("field.season")}>
-                <input {...form.register("seasonEn")} placeholder={values.season} className={cn(INPUT_CLASS, "h-9")} />
-              </Field>
-              <Field label={t("field.tagline")} className="sm:col-span-2">
-                <input {...form.register("taglineEn")} className={cn(INPUT_CLASS, "h-9")} />
-              </Field>
-              <Field label={t("field.description")} className="sm:col-span-2">
-                <textarea {...form.register("descriptionEn")} rows={3} className={cn(INPUT_CLASS, "py-2")} />
-              </Field>
-              <Field label={t("editor.sections.story")} className="sm:col-span-2">
-                <textarea {...form.register("storyEn")} rows={4} className={cn(INPUT_CLASS, "py-2")} />
-              </Field>
-            </div>
-          </Section>
-
-          <Section title={t("editor.sections.seo")} description={t("editor.sections.seoHint")}>
-            <CollectionSeoField form={form} slugLocked={locked} />
-            {errors.slug?.message && <p className="mt-2 text-xs text-rose-700">{err(errors.slug.message)}</p>}
-          </Section>
         </div>
 
-        <aside className="space-y-5 lg:sticky lg:top-[calc(var(--site-header-h)+5rem)] lg:self-start">
-          <Section title={t("editor.sections.lifecycle")}>
+        <aside className="space-y-5 lg:sticky lg:top-[8rem] lg:self-start">
+          <Section title={t("editor.sections.lifecycle")} aside={<CollectionNoticeHint notices={warnings} />}>
             <CollectionLifecyclePanel collection={saved} isDirty={isDirty} onChangeStatus={setStatusTarget} />
           </Section>
 
           <Section title={t("editor.sections.schedule")}>
-            <div className="grid grid-cols-2 gap-3">
-              <Field label={t("field.launchAt")}>
-                <input type="date" {...form.register("launchAt")} className={cn(INPUT_CLASS, "h-9 px-2")} />
+            {/* Một cột: cột phải hẹp, hai ô cạnh nhau sẽ cắt chữ ngày */}
+            <div className="grid gap-3">
+              <Field label={t("field.launchAt")} hint={t("field.scheduleHint")}>
+                <Controller
+                  control={form.control}
+                  name="launchAt"
+                  render={({ field }) => (
+                    <AdminDatePicker value={field.value ?? ""} onChange={field.onChange} onBlur={field.onBlur} />
+                  )}
+                />
               </Field>
               <Field label={t("field.endAt")} error={err(errors.endAt?.message)}>
-                <input
-                  type="date"
-                  {...form.register("endAt")}
-                  aria-invalid={Boolean(errors.endAt)}
-                  className={cn(INPUT_CLASS, "h-9 px-2")}
+                <Controller
+                  control={form.control}
+                  name="endAt"
+                  render={({ field }) => (
+                    <AdminDatePicker
+                      value={field.value ?? ""}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      // Hết mùa không thể trước ngày mở bán
+                      min={values.launchAt || undefined}
+                      invalid={Boolean(errors.endAt)}
+                    />
+                  )}
                 />
               </Field>
             </div>
-            <p className="mt-2 text-xs text-[#71717A]">{t("field.scheduleHint")}</p>
           </Section>
-
-          <Section title={t("editor.sections.visibility")}>
-            <div className="space-y-4">
-              <Controller
-                control={form.control}
-                name="showOnHomepage"
-                render={({ field }) => (
-                  <ToggleRow
-                    label={t("field.showOnHomepage")}
-                    hint={
-                      saved.status === "ARCHIVED"
-                        ? t("field.homepageArchived")
-                        : t("homepageUsage", {
-                            used: homepageUsedByOthers + (field.value ? 1 : 0),
-                            limit: HOMEPAGE_COLLECTION_LIMIT,
-                          })
-                    }
-                    checked={field.value}
-                    disabled={saved.status === "ARCHIVED" || (homepageFull && !field.value)}
-                    onChange={field.onChange}
-                  />
-                )}
-              />
-              {values.showOnHomepage && (
-                <Field label={t("field.homepageOrder")} hint={t("field.homepageOrderHint")}>
-                  <input
-                    type="number"
-                    min={0}
-                    max={99}
-                    {...form.register("homepageOrder", { valueAsNumber: true })}
-                    className={cn(INPUT_CLASS, "h-9 w-24")}
-                  />
-                </Field>
-              )}
-              <Controller
-                control={form.control}
-                name="showInLookbook"
-                render={({ field }) => (
-                  <ToggleRow
-                    label={t("field.showInLookbook")}
-                    hint={t("field.lookbookHint")}
-                    checked={field.value}
-                    onChange={field.onChange}
-                  />
-                )}
-              />
-            </div>
-          </Section>
-
-          {warnings.length > 0 && (
-            <Section title={t("editor.sections.warnings")}>
-              <ul className="space-y-2">
-                {warnings.map((warning) => (
-                  <li key={warning.text} className="flex items-start gap-2 text-xs leading-relaxed text-[#3F3F46]">
-                    {warning.tone === "warn" ? (
-                      <TriangleAlert size={14} className="mt-px shrink-0 text-amber-600" aria-hidden />
-                    ) : (
-                      <Info size={14} className="mt-px shrink-0 text-[#A1A1AA]" aria-hidden />
-                    )}
-                    {warning.text}
-                  </li>
-                ))}
-              </ul>
-            </Section>
-          )}
 
           {saved.showOnHomepage && saved.status !== "ARCHIVED" && (
             <p className="flex items-center gap-1.5 px-1 text-xs text-[#71717A]">
@@ -628,6 +668,7 @@ export function CollectionEditor({ collection: initial, products, homepageUsedBy
           productsById={productsById}
         />
       )}
+      {isSeoOpen && <CollectionSeoDialog open onOpenChange={setIsSeoOpen} form={form} slugLocked={locked} />}
       {statusTarget && (
         <ChangeCollectionStatusDialog
           collection={saved}

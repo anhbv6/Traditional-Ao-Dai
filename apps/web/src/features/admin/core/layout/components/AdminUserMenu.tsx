@@ -38,6 +38,8 @@ export function AdminUserMenu({
   ];
 
   const isSidebar = variant === "sidebar";
+  // Nút rộng (avatar + tên + email) dùng ở cả đáy menu trái lẫn góc trên phải
+  const isWide = isSidebar || variant === "corner";
 
   // Ngăn kéo vaul khóa pointer-events của phần còn lại, menu portal ra body không bấm được → hiện thao tác trực tiếp
   if (variant === "drawer") {
@@ -51,7 +53,7 @@ export function AdminUserMenu({
         >
           <UserAvatar src={user?.avatarUrl} alt={displayName} initial={initial} className="size-9" />
           <span className="min-w-0 flex-1 leading-tight">
-            <span className="block truncate text-[13px] font-semibold text-[#09090B]">{displayName}</span>
+            <span className="block truncate text-body font-semibold text-[#09090B]">{displayName}</span>
             <span className="block truncate text-xs text-[#71717A]">{user?.email || displayRole}</span>
           </span>
         </button>
@@ -71,7 +73,7 @@ export function AdminUserMenu({
   return (
     <AppMenu
       tone="admin"
-      width={isSidebar ? "trigger" : 240}
+      width={isWide ? "trigger" : 240}
       // Nút tài khoản nằm đáy sidebar → menu mở lên trên
       side={isSidebar ? "top" : undefined}
       sideOffset={8}
@@ -86,18 +88,27 @@ export function AdminUserMenu({
         </div>
       }
       trigger={
-        isSidebar ? (
+        isWide ? (
           <button
             type="button"
             aria-label={t("accountMenu")}
-            className={`${TRIGGER_FOCUS_CLASS} flex w-full items-center gap-3 rounded-xl p-2 text-left`}
+            className={
+              isSidebar
+                ? `${TRIGGER_FOCUS_CLASS} flex w-full items-center gap-3 rounded-xl p-2 text-left`
+                : // Góc trên phải: chính nút là thẻ nổi → menu (width="trigger") rộng đúng bằng thẻ, thẳng hai mép
+                  "flex w-full cursor-pointer items-center gap-3 rounded-2xl border border-[#E4E4E7] bg-white p-3 text-left shadow-[0_12px_32px_-20px_rgba(9,9,11,0.18)] outline-none transition-colors hover:bg-[#FAFAFA] focus-visible:ring-2 focus-visible:ring-[#18181B]/15 data-popup-open:border-[#D4D4D8]"
+            }
           >
             <UserAvatar src={user?.avatarUrl} alt={displayName} initial={initial} className="size-9" />
             <span className="min-w-0 flex-1 leading-tight">
-              <span className="block truncate text-[13px] font-semibold text-[#09090B]">{displayName}</span>
+              <span className="block truncate text-body font-semibold text-[#09090B]">{displayName}</span>
               <span className="block truncate text-xs text-[#71717A]">{user?.email || displayRole}</span>
             </span>
-            <ChevronsUpDown size={14} className="shrink-0 text-[#A1A1AA]" />
+            {isSidebar ? (
+              <ChevronsUpDown size={14} className="shrink-0 text-[#A1A1AA]" />
+            ) : (
+              <ChevronDown size={14} className="shrink-0 text-[#A1A1AA]" />
+            )}
           </button>
         ) : (
           <button
@@ -107,8 +118,8 @@ export function AdminUserMenu({
           >
             <UserAvatar src={user?.avatarUrl} alt={displayName} initial={initial} className="size-8" />
             <span className="hidden min-w-0 flex-col text-left leading-tight md:flex">
-              <span className="max-w-[140px] truncate text-[13px] font-semibold text-[#09090B]">{displayName}</span>
-              <span className="text-[11px] text-[#71717A]">{displayRole}</span>
+              <span className="max-w-[140px] truncate text-body font-semibold text-[#09090B]">{displayName}</span>
+              <span className="text-2xs text-[#71717A]">{displayRole}</span>
             </span>
             <ChevronDown size={14} className="hidden text-[#A1A1AA] md:block" />
           </button>
@@ -118,7 +129,17 @@ export function AdminUserMenu({
   );
 }
 
-function UserAvatar({ src, alt, initial, className }: { src?: string | null; alt: string; initial: string; className?: string }) {
+function UserAvatar({
+  src,
+  alt,
+  initial,
+  className,
+}: {
+  src?: string | null;
+  alt: string;
+  initial: string;
+  className?: string;
+}) {
   return (
     <Avatar className={className}>
       <AvatarImage src={src ?? undefined} alt={alt} />

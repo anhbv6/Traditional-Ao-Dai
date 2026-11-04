@@ -88,6 +88,8 @@ export default async function AdminThingsPage() {
 
 Client component: `const t = useTranslations("AdminPage.<module>")`, gọi action qua React Query / `useTransition`, hiện lỗi bằng `useNotify().error(res.error, "FALLBACK_KEY")`. Tiền `formatVnd(value, locale)`. Màu theo `AGENTS.md` §8 (admin được dùng hex đơn sắc theo bảng token đó).
 
+Giao diện dùng thành phần `core/ui` theo `AGENTS.md` §8: màn danh sách mở đầu bằng `AdminListPanel`; mọi hộp thoại dùng `AdminDialog` (ESLint chặn import `@/components/ui/dialog` trong `features/admin`); chọn ngày `AdminDatePicker`; hướng dẫn ô nhập là `AdminInfoTip` cạnh nhãn.
+
 ## 4. i18n
 - `apps/web/messages/{vi,en}/admin.json`: `pages.<module>.{eyebrow,title,description,meta}`, `<module>.*`, `nav.<module>`, toast ở `toasts.*`. Hai locale cùng tập key; bản `en` dùng ICU plural cho số đếm.
 - `AdminPage` đã nằm trong `CLIENT_NAMESPACES.admin` — không cần khai báo thêm.

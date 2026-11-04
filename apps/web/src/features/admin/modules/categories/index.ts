@@ -3,3 +3,5 @@ export * from "./queries/categories.queries";
 export * from "./actions/categories.actions";
 export * from "./utils/productGroupMeta";
 export * from "./components/tree/CategoryTreeBoard";
+export { findCategory } from "./utils/categoryTree";
+export * from "./components/detail/CategoryDetail";

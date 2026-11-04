@@ -419,7 +419,20 @@
  * Tách hẳn khỏi kiểu chữ storefront (Lora / Playfair, h1 48px, line-height 1.75).
  * Gắn class `admin-shell` ở thẻ bọc ngoài cùng của layout admin; portal (Dialog, Dropdown) tự gắn thêm.
  * Màu admin dùng trực tiếp theo AGENTS.md §8 (giao diện admin).
+ *
+ * THANG CHỮ ADMIN (AGENTS.md §8 — "Kiểu chữ"): mỗi cấp chỉ một cỡ, tiêu đề luôn to hơn nội dung nó dẫn.
+ *   text-3xl 30px  số KPI            text-body 15px  nội dung bảng · tiêu đề cột/nhóm (đậm)
+ *   text-2xl 24px  tiêu đề trang      text-sm   14px  nhãn form · nút · ô nhập · bộ lọc
+ *   text-xl  20px  tiêu đề màn chi tiết text-xs 13px  chú thích · mô tả · thông tin phụ (admin nâng từ 12px)
+ *   text-lg  18px  tiêu đề thẻ/dialog  text-2xs 12px  nhỏ nhất: badge, mã, lịch — không dùng cỡ dưới 12px
  * ============================================================================ */
+@theme {
+  --text-2xs: 0.75rem;
+  --text-2xs--line-height: 1rem;
+  --text-body: 0.9375rem;
+  --text-body--line-height: 1.5rem;
+}
+
 @layer base {
   .admin-shell {
     color-scheme: light;
@@ -428,6 +441,9 @@
     font-size: 14px;
     line-height: 1.5;
     color: #09090B;
+    /* Chú thích 12px khó đọc với Inter trên màn admin dày chữ — nâng text-xs lên 13px; 12px dành cho text-2xs */
+    --text-xs: 0.8125rem;
+    --text-xs--line-height: 1.125rem;
   }
 
   /* Màn nhỏ: bảng giữ nguyên dòng và vuốt ngang, không bóp cột làm chữ xuống từng từ */

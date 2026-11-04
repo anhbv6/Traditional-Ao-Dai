@@ -3,6 +3,7 @@
 import { type CSSProperties, type ReactElement, type ReactNode } from "react";
 import { Popover } from "@base-ui/react/popover";
 import { cn } from "@/lib/utils";
+import { useAnchorPositionMethod } from "@/hooks/useAnchorPositionMethod";
 import {
   FLOATING_ARROW_CLASS,
   FLOATING_COLLISION_PADDING,
@@ -74,12 +75,20 @@ export function AppPopover({
   showArrow = true,
   className,
 }: AppPopoverProps) {
+  const { positionMethod, captureAnchor } = useAnchorPositionMethod();
+
   if (disabled) return trigger;
 
   const widthStyle: CSSProperties | undefined = typeof width === "number" ? { width } : undefined;
 
   return (
-    <Popover.Root open={open} onOpenChange={onOpenChange}>
+    <Popover.Root
+      open={open}
+      onOpenChange={(next, details) => {
+        if (next) captureAnchor(details.event);
+        onOpenChange?.(next);
+      }}
+    >
       <Popover.Trigger
         render={keepLinkSemantics(trigger)}
         nativeButton={nativeButton ?? isNativeButton(trigger)}
@@ -93,6 +102,7 @@ export function AppPopover({
           align={align}
           sideOffset={sideOffset}
           collisionPadding={FLOATING_COLLISION_PADDING}
+          positionMethod={positionMethod}
           className="z-50 outline-none"
         >
           <Popover.Popup

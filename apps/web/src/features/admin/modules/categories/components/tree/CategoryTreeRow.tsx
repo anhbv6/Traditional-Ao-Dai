@@ -1,13 +1,28 @@
 "use client";
 
-import { type DragEvent } from "react";
-import { ArrowDown, ArrowUp, ChevronRight, EyeOff, GripVertical, MoreHorizontal, Pencil, Plus, Table2, Trash2, Eye } from "lucide-react";
+import { useState, type DragEvent } from "react";
+import {
+  ArrowDown,
+  ArrowUp,
+  ChevronRight,
+  Eye,
+  EyeOff,
+  GripVertical,
+  MoreHorizontal,
+  Pencil,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 import { AppMenu, type AppMenuEntry } from "@/components/shared/AppMenu";
 import { Link } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
+import { ADMIN_ROW_ICON_BUTTON_CLASS, AdminSwitch } from "@/features/admin/core/ui";
 import { type AdminCategoryNode, type SizeChartOption } from "../../types/categories.types";
-import { PRODUCT_GROUP_ICONS, getGroupTraitKeys, groupUsesSizeChart } from "../../utils/productGroupMeta";
+import { PRODUCT_GROUP_COLORS, PRODUCT_GROUP_ICONS, groupUsesSizeChart } from "../../utils/productGroupMeta";
+
+/** Lưới cột dùng chung cho hàng tiêu đề và từng dòng: tay kéo · tên · công tắc hiển thị · menu */
+export const CATEGORY_LIST_GRID = "grid grid-cols-[20px_minmax(0,1fr)_auto_36px] items-center gap-3";
 
 export interface CategoryRowHandlers {
   onEdit: (node: AdminCategoryNode) => void;
@@ -15,9 +30,17 @@ export interface CategoryRowHandlers {
   onToggleActive: (node: AdminCategoryNode) => void;
   onDelete: (node: AdminCategoryNode) => void;
   onMove: (node: AdminCategoryNode, direction: -1 | 1) => void;
-  onDragStart: (node: AdminCategoryNode) => void;
-  onDragOverRow: (event: DragEvent<HTMLElement>, node: AdminCategoryNode) => void;
-  onDropRow: (event: DragEvent<HTMLElement>) => void;
+}
+
+/** Kéo thả đổi thứ tự trong cùng cấp — trạng thái giữ ở CategoryTreeBoard */
+export interface CategoryRowDrag {
+  /** Đang kéo dòng này */
+  isDragging: boolean;
+  /** Vạch báo chỗ thả phía trên / dưới dòng này */
+  dropPlacement: "before" | "after" | null;
+  onDragStart: (event: DragEvent<HTMLDivElement>) => void;
+  onDragOver: (event: DragEvent<HTMLDivElement>) => void;
+  onDrop: (event: DragEvent<HTMLDivElement>) => void;
   onDragEnd: () => void;
 }
 
@@ -31,13 +54,20 @@ interface CategoryTreeRowProps extends CategoryRowHandlers {
   /** Có loại con và đang mở (chỉ nhóm gốc) */
   expanded?: boolean;
   onToggleExpand?: () => void;
-  isDragging: boolean;
-  dropPlacement: "before" | "after" | null;
-  /** Tắt kéo thả khi đang lọc — thứ tự đang thấy không phải thứ tự đầy đủ */
+  /** Tắt đổi thứ tự khi đang lọc — thứ tự đang thấy không phải thứ tự đầy đủ */
   reorderDisabled: boolean;
+  /** Đang lưu bật / tắt hiển thị */
+  togglePending: boolean;
+  /** Dòng đang được trỏ (ở danh sách hoặc ở sơ đồ cây) — tô nền để hai bên khớp nhau */
+  isActive: boolean;
+  onActivate: (id: string | null) => void;
+  drag: CategoryRowDrag;
 }
 
-/** Một dòng trong cây: tay nắm kéo, nhóm hàng, đặc tính, bảng size, số sản phẩm/SKU, thao tác */
+/**
+ * Một dòng danh sách loại sản phẩm: tay kéo, ô icon nhóm hàng, tên (mở màn chi tiết) + dòng mô tả,
+ * công tắc hiển thị trên cửa hàng, menu ⋯. Thêm / sửa mở dialog; thông tin đầy đủ ở màn chi tiết.
+ */
 export function CategoryTreeRow({
   node,
   parent,
@@ -46,26 +76,39 @@ export function CategoryTreeRow({
   isLast,
   expanded,
   onToggleExpand,
-  isDragging,
-  dropPlacement,
   reorderDisabled,
+  togglePending,
+  isActive,
+  onActivate,
+  drag,
   ...handlers
 }: CategoryTreeRowProps) {
   const t = useTranslations("AdminPage.categories");
   const tSizing = useTranslations("AdminPage.sizing");
+  // Chỉ cho kéo khi đang nhấn tay kéo — tránh kéo nhầm khi bôi chọn chữ hay bấm công tắc
+  const [armed, setArmed] = useState(false);
   const isRoot = node.parentId === null;
   const GroupIcon = PRODUCT_GROUP_ICONS[node.group];
+  const color = PRODUCT_GROUP_COLORS[node.group];
   const chart = node.defaultSizeChartId ? sizeCharts.get(node.defaultSizeChartId) : undefined;
   // Cùng quy tắc với form sản phẩm: loại con chưa gắn bảng chỉ thừa hưởng khi cùng nhóm hàng với gốc
-  const inheritedChart =
-    !chart && parent?.defaultSizeChartId && parent.group === node.group ? sizeCharts.get(parent.defaultSizeChartId) : undefined;
-  // Nhóm gốc không cần bảng riêng khi mọi loại con đã tự gắn bảng
-  const chartCovered = isRoot && node.children.length > 0 && node.children.every((child) => child.defaultSizeChartId);
-  const childProductCount = node.children.reduce((sum, child) => sum + child.productCount, 0);
-  const childSkuCount = node.children.reduce((sum, child) => sum + child.skuCount, 0);
-  const productCount = node.productCount + childProductCount;
-  const skuCount = node.skuCount + childSkuCount;
+  const inherited =
+    !chart && parent?.defaultSizeChartId && parent.group === node.group
+      ? sizeCharts.get(parent.defaultSizeChartId)
+      : undefined;
+  const productCount = node.productCount + node.children.reduce((sum, child) => sum + child.productCount, 0);
   const canDelete = node.children.length === 0 && node.productCount === 0;
+
+  // Dòng mô tả: nhóm gốc = nhóm hàng · số loại con · số sản phẩm; loại con = bảng size · số sản phẩm
+  const chartText = !groupUsesSizeChart(node.group)
+    ? null
+    : chart
+      ? { text: chart.name, warn: false }
+      : inherited
+        ? { text: t("inheritChart"), warn: false }
+        : isRoot && node.children.length > 0 && node.children.every((child) => child.defaultSizeChartId)
+          ? null
+          : { text: t("noChart"), warn: true };
 
   const menuItems: AppMenuEntry[] = [
     { key: "edit", label: t("menu.edit"), icon: Pencil, onSelect: () => handlers.onEdit(node) },
@@ -97,7 +140,9 @@ export function CategoryTreeRow({
     {
       key: "delete",
       label: t("menu.delete"),
-      description: canDelete ? undefined : t(node.children.length > 0 ? "deleteBlocked.children" : "deleteBlocked.products"),
+      description: canDelete
+        ? undefined
+        : t(node.children.length > 0 ? "deleteBlocked.children" : "deleteBlocked.products"),
       icon: Trash2,
       tone: "danger",
       disabled: !canDelete,
@@ -107,165 +152,115 @@ export function CategoryTreeRow({
 
   return (
     <div
-      onDragOver={(event) => handlers.onDragOverRow(event, node)}
-      onDrop={handlers.onDropRow}
+      draggable={armed && !reorderDisabled}
+      onDragStart={drag.onDragStart}
+      onDragOver={drag.onDragOver}
+      onDrop={drag.onDrop}
+      onDragEnd={() => {
+        setArmed(false);
+        drag.onDragEnd();
+      }}
+      onMouseEnter={() => onActivate(node.id)}
+      onMouseLeave={() => onActivate(null)}
       className={cn(
-        "group/row relative flex items-center gap-2 bg-white px-2 py-2.5 transition-colors sm:gap-3 sm:px-3",
-        isRoot ? "min-h-16" : "min-h-13 hover:bg-[#FAFAFA]",
-        isDragging && "opacity-40",
-        !node.isActive && "bg-[#FAFAFA]"
+        CATEGORY_LIST_GRID,
+        "relative rounded-xl px-2 py-3 transition-colors",
+        isActive ? "bg-[#F4F4F5]" : "hover:bg-[#FAFAFA]",
+        drag.isDragging && "opacity-40"
       )}
     >
-      {dropPlacement && (
+      {drag.dropPlacement && (
         <span
           aria-hidden
           className={cn(
-            "pointer-events-none absolute inset-x-2 z-10 h-0.5 rounded-full bg-[#18181B]",
-            dropPlacement === "before" ? "-top-px" : "-bottom-px"
+            "pointer-events-none absolute inset-x-2 h-0.5 rounded-full bg-[#18181B]",
+            drag.dropPlacement === "before" ? "-top-px" : "-bottom-px"
           )}
         />
       )}
 
       <span
-        draggable={!reorderDisabled}
-        onDragStart={(event) => {
-          event.dataTransfer.effectAllowed = "move";
-          // Firefox cần dữ liệu để kích hoạt kéo
-          event.dataTransfer.setData("text/plain", node.id);
-          const row = event.currentTarget.parentElement;
-          if (row) event.dataTransfer.setDragImage(row, 24, 24);
-          handlers.onDragStart(node);
-        }}
-        onDragEnd={handlers.onDragEnd}
-        title={reorderDisabled ? t("dragDisabled") : t("dragHint")}
+        role="button"
+        tabIndex={-1}
+        aria-label={t("list.dragHandle", { name: node.name })}
+        title={reorderDisabled ? t("reorderDisabled") : undefined}
+        onPointerDown={() => setArmed(true)}
+        onPointerUp={() => setArmed(false)}
         className={cn(
-          "hidden size-7 shrink-0 place-items-center rounded-md text-[#A1A1AA] sm:grid",
-          reorderDisabled ? "cursor-not-allowed opacity-40" : "cursor-grab hover:bg-[#F4F4F5] hover:text-[#09090B] active:cursor-grabbing"
+          "grid h-8 place-items-center rounded-md text-[#A1A1AA] transition-colors",
+          reorderDisabled ? "cursor-not-allowed opacity-40" : "cursor-grab hover:text-[#09090B] active:cursor-grabbing"
         )}
       >
-        <GripVertical size={15} aria-hidden />
+        <GripVertical size={16} aria-hidden />
       </span>
 
-      {isRoot ? (
-        <button
-          type="button"
-          onClick={onToggleExpand}
-          disabled={node.children.length === 0}
-          aria-expanded={expanded}
-          aria-label={expanded ? t("collapse", { name: node.name }) : t("expand", { name: node.name })}
-          className="grid size-7 shrink-0 cursor-pointer place-items-center rounded-md text-[#52525B] transition-colors hover:bg-[#F4F4F5] disabled:cursor-default disabled:opacity-30 disabled:hover:bg-transparent"
+      <div className={cn("flex min-w-0 items-center gap-3", !isRoot && "pl-9")}>
+        {isRoot &&
+          (node.children.length > 0 ? (
+            <button
+              type="button"
+              onClick={onToggleExpand}
+              aria-expanded={expanded}
+              aria-label={expanded ? t("collapse", { name: node.name }) : t("expand", { name: node.name })}
+              className="-mr-1 grid size-6 shrink-0 cursor-pointer place-items-center rounded-md text-[#71717A] hover:bg-[#E4E4E7]/70 hover:text-[#09090B]"
+            >
+              <ChevronRight size={15} className={cn("transition-transform", expanded && "rotate-90")} aria-hidden />
+            </button>
+          ) : (
+            <span className="-mr-1 size-6 shrink-0" aria-hidden />
+          ))}
+        <span
+          aria-hidden
+          className={cn(
+            "grid shrink-0 place-items-center rounded-xl",
+            isRoot ? cn("size-10", color.tile) : "size-9 border border-[#E4E4E7] bg-white text-[#52525B]"
+          )}
         >
-          <ChevronRight size={16} aria-hidden className={cn("transition-transform duration-200", expanded && "rotate-90")} />
-        </button>
-      ) : null}
-
-      <span
-        className={cn(
-          "grid shrink-0 place-items-center rounded-lg border border-[#E4E4E7]",
-          isRoot ? "size-10 bg-[#F4F4F5] text-[#09090B]" : "size-8 bg-white text-[#52525B]"
-        )}
-      >
-        <GroupIcon size={isRoot ? 18 : 15} aria-hidden />
-      </span>
-
-      <button type="button" onClick={() => handlers.onEdit(node)} className="min-w-0 flex-1 cursor-pointer text-left">
-        <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
-          <span
+          <GroupIcon size={isRoot ? 18 : 16} />
+        </span>
+        <div className="min-w-0">
+          <Link
+            href={`/admin/catalog/categories/${node.id}`}
             className={cn(
-              "truncate text-[#09090B]",
-              isRoot ? "text-[15px] font-semibold" : "text-sm font-medium",
-              !node.isActive && "text-[#71717A]"
+              "block truncate text-body hover:underline",
+              isRoot ? "font-semibold" : "font-medium",
+              node.isActive ? "text-[#09090B]" : "text-[#71717A]"
             )}
           >
             {node.name}
-          </span>
-          {!node.isActive && (
-            <span className="inline-flex items-center gap-1 rounded-md bg-[#F4F4F5] px-1.5 py-0.5 text-[11px] font-medium text-[#71717A]">
-              <EyeOff size={11} aria-hidden /> {t("hidden")}
-            </span>
-          )}
-        </span>
-        <span className="mt-1 flex min-w-0 flex-wrap items-center gap-1.5">
-          <span className="text-xs font-medium text-[#52525B]">{tSizing(`group.${node.group}`)}</span>
-          {getGroupTraitKeys(node.group).map((trait) => (
-            <span
-              key={trait}
-              className="rounded border border-[#E4E4E7] bg-white px-1.5 py-px text-[11px] leading-4 text-[#52525B]"
-            >
-              {tSizing(`trait.${trait}`)}
-            </span>
-          ))}
-          <span className="text-[11px] tabular-nums text-[#71717A] md:hidden">
-            · {productCount} {t("products")} · {skuCount} SKU
-          </span>
-        </span>
-      </button>
-
-      <div className="hidden shrink-0 items-center gap-4 md:flex">
-        {groupUsesSizeChart(node.group) &&
-          !(chartCovered && !chart) &&
-          (chart ? (
-            <Link
-              href={`/admin/catalog/size-charts/${chart.id}`}
-              className="inline-flex max-w-52 items-center gap-1.5 rounded-md border border-[#E4E4E7] px-2 py-1 text-xs text-[#3F3F46] transition-colors hover:border-[#18181B] hover:text-[#09090B]"
-            >
-              <Table2 size={13} aria-hidden className="shrink-0" />
-              <span className="truncate">{chart.name}</span>
-            </Link>
-          ) : inheritedChart ? (
-            <span
-              title={inheritedChart.name}
-              className="inline-flex max-w-52 items-center gap-1.5 rounded-md border border-dashed border-[#D4D4D8] px-2 py-1 text-xs text-[#71717A]"
-            >
-              <Table2 size={13} aria-hidden className="shrink-0" />
-              <span className="truncate">
-                {t("inheritChart")} · {inheritedChart.name}
-              </span>
-            </span>
-          ) : (
-            <span className="inline-flex items-center gap-1.5 rounded-md border border-dashed border-amber-300 bg-amber-50 px-2 py-1 text-xs text-amber-700">
-              <Table2 size={13} aria-hidden /> {t("noChart")}
-            </span>
-          ))}
-        <div className="w-24 text-right text-xs leading-tight text-[#71717A]">
-          <div>
-            <span className="font-mono font-semibold tabular-nums text-[#09090B]">{productCount}</span> {t("products")}
-          </div>
-          <div className="mt-0.5">
-            <span className="font-mono tabular-nums text-[#3F3F46]">{skuCount}</span> SKU
-          </div>
+          </Link>
+          <p className="truncate text-xs text-[#71717A]">
+            {isRoot && <>{tSizing(`group.${node.group}`)} · </>}
+            {isRoot && node.children.length > 0 && <>{t("row.children", { count: node.children.length })} · </>}
+            {chartText && <span className={cn(chartText.warn && "text-amber-700")}>{chartText.text} · </span>}
+            {t("row.products", { count: productCount })}
+          </p>
         </div>
       </div>
 
-      <div className="flex shrink-0 items-center">
-        {isRoot && (
+      <AdminSwitch
+        checked={node.isActive}
+        disabled={togglePending}
+        onChange={() => handlers.onToggleActive(node)}
+        label={t("list.toggleLabel", { name: node.name })}
+      />
+
+      <AppMenu
+        tone="admin"
+        width={232}
+        align="end"
+        sideOffset={4}
+        items={menuItems}
+        trigger={
           <button
             type="button"
-            onClick={() => handlers.onAddChild(node)}
-            aria-label={t("addChildTo", { name: node.name })}
-            title={t("addChildTo", { name: node.name })}
-            className="grid size-8 cursor-pointer place-items-center rounded-md text-[#71717A] transition-colors hover:bg-[#F4F4F5] hover:text-[#09090B]"
+            aria-label={t("menu.label", { name: node.name })}
+            className={ADMIN_ROW_ICON_BUTTON_CLASS}
           >
-            <Plus size={16} aria-hidden />
+            <MoreHorizontal size={18} />
           </button>
-        )}
-        <AppMenu
-          tone="admin"
-          width={232}
-          align="end"
-          sideOffset={4}
-          items={menuItems}
-          trigger={
-            <button
-              type="button"
-              aria-label={t("menu.label", { name: node.name })}
-              className="grid size-8 cursor-pointer place-items-center rounded-md text-[#71717A] outline-none transition-colors hover:bg-[#F4F4F5] hover:text-[#09090B] focus-visible:ring-2 focus-visible:ring-[#18181B]/15 data-popup-open:bg-[#F4F4F5]"
-            >
-              <MoreHorizontal size={16} />
-            </button>
-          }
-        />
-      </div>
+        }
+      />
     </div>
   );
 }

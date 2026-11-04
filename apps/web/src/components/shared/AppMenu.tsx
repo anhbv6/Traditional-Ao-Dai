@@ -5,6 +5,7 @@ import { Menu } from "@base-ui/react/menu";
 import { Check, type LucideIcon } from "lucide-react";
 import { Link } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
+import { useAnchorPositionMethod } from "@/hooks/useAnchorPositionMethod";
 import {
   FLOATING_ARROW_CLASS,
   FLOATING_COLLISION_PADDING,
@@ -158,6 +159,7 @@ export function AppMenu({
   className,
 }: AppMenuProps) {
   const isAdmin = tone === "admin";
+  const { positionMethod, captureAnchor } = useAnchorPositionMethod();
   const widthStyle: CSSProperties | undefined = typeof width === "number" ? { width } : undefined;
 
   const renderItemContent = (item: AppMenuItem, selectable: boolean) => {
@@ -255,7 +257,14 @@ export function AppMenu({
   const list = items.map(renderEntry);
 
   return (
-    <Menu.Root open={open} onOpenChange={onOpenChange} modal={modal}>
+    <Menu.Root
+      open={open}
+      onOpenChange={(next, details) => {
+        if (next) captureAnchor(details.event);
+        onOpenChange?.(next);
+      }}
+      modal={modal}
+    >
       <Menu.Trigger
         render={keepLinkSemantics(trigger)}
         nativeButton={nativeButton ?? isNativeButton(trigger)}
@@ -264,7 +273,7 @@ export function AppMenu({
         closeDelay={160}
       />
       <Menu.Portal>
-        <Menu.Positioner side={side} align={align} sideOffset={sideOffset} collisionPadding={FLOATING_COLLISION_PADDING} className="z-50 outline-none">
+        <Menu.Positioner side={side} align={align} sideOffset={sideOffset} collisionPadding={FLOATING_COLLISION_PADDING} positionMethod={positionMethod} className="z-50 outline-none">
           <Menu.Popup
             style={widthStyle}
             className={cn(

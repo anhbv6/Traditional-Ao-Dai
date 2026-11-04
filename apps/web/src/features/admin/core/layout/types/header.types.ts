@@ -46,8 +46,11 @@ export interface AdminUserMenuProps {
   isLoggingOut?: boolean;
   onOpenProfile: () => void;
   onLogout: () => void;
-  /** `header`: nút gọn trên thanh mobile · `sidebar`: nút rộng ở đáy menu trái, menu mở lên trên · `drawer`: thao tác trực tiếp trong ngăn kéo */
-  variant?: "header" | "sidebar" | "drawer";
+  /**
+   * `header`: nút gọn trên thanh mobile · `sidebar`: nút rộng ở đáy menu trái, menu mở lên trên ·
+   * `corner`: nút rộng ở góc trên phải (cột phải), menu mở xuống · `drawer`: thao tác trực tiếp trong ngăn kéo
+   */
+  variant?: "header" | "sidebar" | "corner" | "drawer";
 }
 
 export interface AdminNavListProps {

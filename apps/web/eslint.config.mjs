@@ -31,6 +31,11 @@ const NO_COMPONENTS_FROM_LOWER_LAYER = {
   message: "Tầng dưới (api, constants, data, hooks, store, types, utils, validations, schemas, queries) không import ngược từ components/. Chuyển hằng số / kiểu xuống tầng dưới.",
 };
 
+const ADMIN_DIALOG_ONLY = {
+  regex: String.raw`^@/components/ui/dialog$`,
+  message: "Dialog khu quản trị luôn dùng AdminDialog (@/features/admin/core/ui) — không dựng từ components/ui/dialog (AGENTS.md §8).",
+};
+
 const NO_SCHEMA_EXPORT = {
   regex: String.raw`^\./schemas(/.*)?$`,
   message: "Zod schema của Server Action là nội bộ module — không export qua index.ts.",
@@ -57,6 +62,9 @@ const eslintConfig = defineConfig([
   restrictImports(["src/**/*.{ts,tsx}"]),
   restrictImports(["src/hooks/**", "src/components/{ui,shared,effects,feedback}/**"], [NO_FEATURES]),
   restrictImports(["src/lib/**"], [NO_FEATURES, LIB_ONLY_UI_COMPONENTS]),
+  // Đặt trước nhóm tầng dưới / index (nhóm sau ghi đè nhóm trước); riêng AdminDialog được dựng từ dialog gốc
+  restrictImports(["src/features/admin/**/*.tsx"], [ADMIN_DIALOG_ONLY]),
+  restrictImports(["src/features/admin/core/ui/AdminDialog.tsx"]),
   restrictImports(
     [
       `src/features/*/${LOWER_LAYERS}/**`,

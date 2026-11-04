@@ -1,9 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
+import { KeyRound } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { useNotify } from "@/hooks/useNotify";
+import {
+  ADMIN_DIALOG_PRIMARY_BUTTON_CLASS,
+  ADMIN_DIALOG_SECONDARY_BUTTON_CLASS,
+  AdminDialog,
+} from "@/features/admin/core/ui";
 import { resetStaffPasswordAction } from "../actions/staff.actions";
 import { type StaffMemberItem } from "../types/staff.types";
 
@@ -48,48 +53,38 @@ export function ResetStaffPasswordDialog({ staff, onClose }: ResetStaffPasswordD
   };
 
   return (
-    <Dialog open={staff !== null} onOpenChange={(next) => !next && close()}>
-      <DialogContent className="admin-shell max-w-[calc(100%-2rem)] rounded-xl border border-[#E4E4E7] bg-white p-6 sm:max-w-[420px]">
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <DialogTitle className="text-base font-semibold text-[#09090B]">{t("resetPasswordTitle")}</DialogTitle>
-            <DialogDescription className="mt-0.5 text-xs text-[#71717A]">
-              {t("resetPasswordDescription", { name: staff?.name || staff?.email || "" })}
-            </DialogDescription>
-          </div>
-
-          <label className="block space-y-1">
-            <span className="text-xs font-semibold text-zinc-700">
-              {t("form.password")} <span className="text-rose-500">*</span>
-            </span>
-            <input
-              type="password"
-              value={newPassword}
-              required
-              autoComplete="new-password"
-              onChange={(e) => setNewPassword(e.target.value)}
-              className={INPUT_CLASS}
-            />
-          </label>
-
-          <div className="flex justify-end gap-2 border-t border-[#E4E4E7] pt-4">
-            <button
-              type="button"
-              onClick={close}
-              className="cursor-pointer rounded-lg px-3.5 py-2 text-xs font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-[#09090B]"
-            >
-              {t("cancel")}
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="cursor-pointer rounded-lg bg-[#18181B] px-4 py-2 text-xs font-semibold text-white shadow-2xs transition-colors hover:bg-[#09090B] disabled:opacity-60"
-            >
-              {isSubmitting ? t("resettingPassword") : t("resetPassword")}
-            </button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+    <AdminDialog
+      open={staff !== null}
+      onOpenChange={(next) => !next && close()}
+      icon={KeyRound}
+      title={t("resetPasswordTitle")}
+      description={t("resetPasswordDescription", { name: staff?.name || staff?.email || "" })}
+      size="sm"
+      onSubmit={handleSubmit}
+      footer={
+        <>
+          <button type="button" onClick={close} className={ADMIN_DIALOG_SECONDARY_BUTTON_CLASS}>
+            {t("cancel")}
+          </button>
+          <button type="submit" disabled={isSubmitting} className={ADMIN_DIALOG_PRIMARY_BUTTON_CLASS}>
+            {isSubmitting ? t("resettingPassword") : t("resetPassword")}
+          </button>
+        </>
+      }
+    >
+      <label className="block space-y-1">
+        <span className="text-sm font-medium text-[#3F3F46]">
+          {t("form.password")} <span className="text-rose-500">*</span>
+        </span>
+        <input
+          type="password"
+          value={newPassword}
+          required
+          autoComplete="new-password"
+          onChange={(e) => setNewPassword(e.target.value)}
+          className={INPUT_CLASS}
+        />
+      </label>
+    </AdminDialog>
   );
 }

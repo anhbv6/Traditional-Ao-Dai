@@ -14,7 +14,7 @@ export function AdminAccessDenied() {
         <div className="size-12 mx-auto rounded-full bg-rose-50 text-rose-600 flex items-center justify-center">
           <Shield size={24} />
         </div>
-        <h2 className="text-lg font-bold text-[#09090B]">{t("title")}</h2>
+        <h2 className="text-lg font-semibold text-[#09090B]">{t("title")}</h2>
         <p className="text-xs text-[#71717A]">
           {t("description")}
         </p>

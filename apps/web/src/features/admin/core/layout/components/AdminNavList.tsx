@@ -24,7 +24,7 @@ function NavLink({ item, onNavigate, nested }: { item: AdminNavLink; onNavigate?
       aria-current={item.active ? "page" : undefined}
       className={cn(
         nested
-          ? "flex h-9 items-center rounded-lg px-3 text-[13px] font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[#18181B]/15"
+          ? "flex h-9 items-center rounded-lg px-3 text-sm font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[#18181B]/15"
           : ADMIN_NAV_ITEM_CLASS,
         item.active ? ITEM_ACTIVE_CLASS : ITEM_IDLE_CLASS
       )}

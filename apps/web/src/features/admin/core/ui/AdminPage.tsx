@@ -42,13 +42,13 @@ export function AdminPageHeader({ icon: Icon, eyebrow, title, description, meta,
     <div className="flex flex-col gap-3 border-b border-[#E4E4E7] pb-4 sm:flex-row sm:items-end sm:justify-between sm:gap-4 sm:pb-5">
       <div className="min-w-0">
         {eyebrow && (
-          <div className="mb-1 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.5px] text-[#71717A]">
+          <div className="mb-1 flex items-center gap-2 text-sm font-medium text-[#71717A]">
             {Icon && <Icon size={14} aria-hidden="true" />}
             <span>{eyebrow}</span>
           </div>
         )}
-        <h1 className="text-xl font-semibold tracking-tight text-[#09090B] sm:text-2xl">{title}</h1>
-        {description && <p className="mt-1 text-xs text-[#71717A]">{description}</p>}
+        <h1 className="text-2xl font-semibold tracking-tight text-[#09090B]">{title}</h1>
+        {description && <p className="mt-1 text-sm text-[#71717A]">{description}</p>}
       </div>
       {(actions || meta) && (
         <div className="flex shrink-0 flex-wrap items-center gap-2 text-xs text-[#71717A]">{actions ?? meta}</div>
@@ -61,7 +61,7 @@ export function AdminPageHeader({ icon: Icon, eyebrow, title, description, meta,
  * Số liệu nổi bật trong meta của header (font mono theo quy chuẩn KPI)
  */
 export function AdminMetaValue({ children }: { children: ReactNode }) {
-  return <span className="font-mono font-bold text-[#09090B]">{children}</span>;
+  return <span className="font-mono font-semibold text-[#09090B]">{children}</span>;
 }
 
 /**
@@ -87,7 +87,7 @@ export function AdminSegmentedControl<T extends string>({
           onClick={() => onChange(option.value)}
           disabled={disabled}
           className={cn(
-            "cursor-pointer whitespace-nowrap rounded-md px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.5px] transition-all duration-200 disabled:cursor-default",
+            "cursor-pointer whitespace-nowrap rounded-md px-3 py-1.5 text-xs font-medium transition-all duration-200 disabled:cursor-default",
             value === option.value ? "bg-[#18181B] text-white shadow-2xs" : "text-[#71717A] hover:text-[#09090B]"
           )}
         >

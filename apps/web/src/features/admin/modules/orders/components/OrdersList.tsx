@@ -139,14 +139,14 @@ export function OrdersList({ initialOrders }: OrdersListProps) {
                   <span className="mt-3 flex flex-wrap items-center gap-1.5 text-xs text-zinc-700">
                     {t("itemsCount", { count: order.items.length })}
                     {hasCustomFit && (
-                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-purple-50 text-purple-700 text-[10px] font-semibold border border-purple-200">
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-purple-50 text-purple-700 text-2xs font-semibold border border-purple-200">
                         <Sparkles size={10} /> {t("customFit")}
                       </span>
                     )}
                   </span>
 
                   <span className="mt-3 flex items-center justify-between gap-2 border-t border-dashed border-[#E4E4E7] pt-3">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium ${
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-2xs font-medium ${
                       order.paymentStatus === "PAID"
                         ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                         : order.paymentStatus === "PARTIALLY_PAID"
@@ -172,7 +172,7 @@ export function OrdersList({ initialOrders }: OrdersListProps) {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-[#E4E4E7] bg-zinc-50/50 text-[11px] font-semibold text-[#71717A] uppercase tracking-wider">
+              <tr className="border-b border-[#E4E4E7] bg-zinc-50/50 text-body font-semibold text-[#3F3F46]">
                 <th className="py-3 px-4">{t("colNumber")}</th>
                 <th className="py-3 px-4">{t("colCustomer")}</th>
                 <th className="py-3 px-4">{t("colItems")}</th>
@@ -182,7 +182,7 @@ export function OrdersList({ initialOrders }: OrdersListProps) {
                 <th className="py-3 px-4 text-right">{t("colDetail")}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#E4E4E7] text-sm">
+            <tbody className="divide-y divide-[#E4E4E7] text-body">
               {filteredOrders.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="py-12 text-center text-[#71717A]">
@@ -215,7 +215,7 @@ export function OrdersList({ initialOrders }: OrdersListProps) {
                             {t("itemsCount", { count: order.items.length })}
                           </span>
                           {hasCustomFit && (
-                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-purple-50 text-purple-700 text-[10px] font-semibold border border-purple-200">
+                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-purple-50 text-purple-700 text-2xs font-semibold border border-purple-200">
                               <Sparkles size={10} /> {t("customFit")}
                             </span>
                           )}
@@ -225,7 +225,7 @@ export function OrdersList({ initialOrders }: OrdersListProps) {
                         {formatVnd(Number(order.totalAmount), locale)}
                       </td>
                       <td className="py-3.5 px-4">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium ${
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-2xs font-medium ${
                           order.paymentStatus === "PAID"
                             ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                             : order.paymentStatus === "PARTIALLY_PAID"
@@ -262,8 +262,8 @@ export function OrdersList({ initialOrders }: OrdersListProps) {
             <div className="space-y-6">
               <div className="flex items-center justify-between border-b border-[#E4E4E7] pb-4">
                 <div>
-                  <div className="text-xs font-semibold uppercase tracking-wider text-[#71717A]">{t("detailTitle")}</div>
-                  <h3 className="text-lg font-bold font-mono text-[#09090B]">{selectedOrder.orderNumber}</h3>
+                  <div className="text-sm font-medium text-[#71717A]">{t("detailTitle")}</div>
+                  <h3 className="text-lg font-semibold font-mono text-[#09090B]">{selectedOrder.orderNumber}</h3>
                 </div>
                 <button
                   onClick={() => setSelectedOrder(null)}
@@ -275,7 +275,7 @@ export function OrdersList({ initialOrders }: OrdersListProps) {
 
               {/* Thông tin người nhận */}
               <div className="bg-zinc-50 rounded-xl p-4 border border-[#E4E4E7] space-y-2">
-                <div className="text-xs font-semibold text-[#71717A] uppercase tracking-wider">{t("detailCustomer")}</div>
+                <div className="text-body font-semibold text-[#3F3F46]">{t("detailCustomer")}</div>
                 <div className="flex items-center gap-2 text-sm font-medium text-[#09090B]">
                   <User size={14} className="text-[#71717A]" />
                   {selectedOrder.customerName} ({selectedOrder.customerPhone})
@@ -288,7 +288,7 @@ export function OrdersList({ initialOrders }: OrdersListProps) {
 
               {/* Danh sách áo dài trong đơn */}
               <div className="space-y-3">
-                <div className="text-xs font-semibold text-[#71717A] uppercase tracking-wider">{t("detailItems")}</div>
+                <div className="text-body font-semibold text-[#3F3F46]">{t("detailItems")}</div>
                 <div className="space-y-2">
                   {selectedOrder.items.map((item) => (
                     <div key={item.id} className="p-3 bg-white rounded-lg border border-[#E4E4E7] flex justify-between items-center">
@@ -298,7 +298,7 @@ export function OrdersList({ initialOrders }: OrdersListProps) {
                           {item.variantName ? t("itemSize", { size: item.variantName }) : t("customFit")} | {t("itemQuantity", { count: item.quantity })}
                         </div>
                         {item.isCustomFit && (
-                          <div className="mt-1 inline-flex items-center gap-1 text-[11px] font-semibold text-purple-700">
+                          <div className="mt-1 inline-flex items-center gap-1 text-2xs font-semibold text-purple-700">
                             <Scissors size={11} /> {t("measurementsReceived")}
                           </div>
                         )}
@@ -313,7 +313,7 @@ export function OrdersList({ initialOrders }: OrdersListProps) {
 
               {/* Thao tác chuyển trạng thái */}
               <div className="space-y-3">
-                <div className="text-xs font-semibold text-[#71717A] uppercase tracking-wider">{t("updateProgress")}</div>
+                <div className="text-body font-semibold text-[#3F3F46]">{t("updateProgress")}</div>
                 <div className="grid grid-cols-2 gap-2">
                   {(["CONFIRMED", "IN_PRODUCTION", "READY_TO_SHIP", "SHIPPING", "DELIVERED"] as OrderStatus[]).map((st) => (
                     <button
@@ -335,7 +335,7 @@ export function OrdersList({ initialOrders }: OrdersListProps) {
 
             <div className="border-t border-[#E4E4E7] pt-4 mt-6 flex justify-between items-center">
               <span className="text-xs text-[#71717A]">{t("grandTotal")}</span>
-              <span className="font-mono font-bold text-lg text-[#09090B]">
+              <span className="font-mono font-semibold text-lg text-[#09090B]">
                 {formatVnd(Number(selectedOrder.totalAmount), locale)}
               </span>
             </div>

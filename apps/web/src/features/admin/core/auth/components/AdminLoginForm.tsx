@@ -27,15 +27,6 @@ export function AdminLoginForm() {
       {/* ---------- Thanh trên ---------- */}
       <header className="relative z-10 border-b border-[#E4E4E7] bg-white/80 backdrop-blur-md">
         <div className="flex h-14 w-full items-center justify-between gap-4 px-5 sm:px-8 lg:px-12">
-          <div className="flex min-w-0 items-center gap-2.5">
-            <span className="size-8 shrink-0 overflow-hidden rounded-lg border border-[#E4E4E7] bg-white">
-              <Image src="/logo.png" alt="" width={64} height={64} priority className="size-full object-contain p-0.5" />
-            </span>
-            <span className="truncate text-sm font-semibold text-[#09090B]">{t("brand")}</span>
-            <span className="hidden rounded-md border border-[#E4E4E7] bg-[#FAFAFA] px-1.5 py-0.5 text-[11px] font-medium text-[#71717A] sm:inline">
-              {t("eyebrow")}
-            </span>
-          </div>
           <Link
             href="/"
             className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg px-2.5 text-sm font-medium text-[#71717A] transition-colors hover:bg-[#F4F4F5] hover:text-[#09090B]"
@@ -43,6 +34,15 @@ export function AdminLoginForm() {
             <ArrowLeft aria-hidden className="size-4" />
             {t("backToStore")}
           </Link>
+          <div className="flex min-w-0 items-center gap-2.5">
+            <span className="size-8 shrink-0 overflow-hidden rounded-lg bg-white">
+              <Image src="/logo.png" alt="" width={64} height={64} priority className="size-full object-contain p-0.5" />
+            </span>
+            <span className="truncate text-sm font-semibold text-[#09090B]">{t("brand")}</span>
+            <span className="hidden rounded-md border border-[#E4E4E7] bg-[#FAFAFA] px-1.5 py-0.5 text-2xs font-medium text-[#71717A] sm:inline">
+              {t("eyebrow")}
+            </span>
+          </div>
         </div>
       </header>
 
@@ -50,15 +50,6 @@ export function AdminLoginForm() {
       <main className="relative z-10 flex flex-1 items-center justify-center px-4 py-12">
         <div className="w-full max-w-[420px]">
           <div className={cn(ADMIN_CARD_CLASS, "overflow-hidden shadow-[0_24px_48px_-24px_rgba(9,9,11,0.18)]")}>
-            <div className="flex flex-row border-b items-center gap-5 border-[#E4E4E7] bg-[#FFFFFF] px-6 py-3 sm:px-8">
-              <span className="size-20 shrink-0 overflow-hidden rounded-lg bg-white">
-                <Image src="/logo.png" alt="" width={64} height={64} priority className="size-full object-contain p-0.5" />
-              </span>
-              <div>
-                <h1 className="text-xl font-semibold tracking-tight text-[#09090B]">{t("title")}</h1>
-                <p className="mt-1 text-sm text-[#71717A]">{t("subtitle")}</p>
-              </div>
-            </div>
 
             <form onSubmit={handleSubmit} className="space-y-6 px-6 py-6 sm:px-8 sm:py-7" noValidate>
               <AdminLoginFormFields form={form} errors={errors} disabled={isLoading} t={t} />

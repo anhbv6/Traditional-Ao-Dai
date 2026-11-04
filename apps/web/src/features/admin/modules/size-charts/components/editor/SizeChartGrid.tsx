@@ -124,16 +124,16 @@ export function SizeChartGrid({ group, columns, rows, issues, onColumnsChange, o
               <option key={label} value={label} />
             ))}
           </datalist>
-          <table className="w-full border-collapse text-sm" style={{ minWidth: 140 + columns.length * 132 + 96 }}>
+          <table className="w-full border-collapse text-body" style={{ minWidth: 140 + columns.length * 132 + 96 }}>
             <thead>
               <tr className="bg-[#FAFAFA] text-left text-xs text-[#71717A]">
-                <th className="sticky left-0 z-10 w-28 border-b border-r border-[#E4E4E7] bg-[#FAFAFA] px-3 py-2 font-semibold uppercase tracking-[0.5px]">
+                <th className="sticky left-0 z-10 w-28 border-b border-r border-[#E4E4E7] bg-[#FAFAFA] px-3 py-2 font-semibold text-body">
                   {t("sizeColumn")}
                 </th>
                 {columns.map((column) => (
                   <th key={column.key} className="border-b border-r border-[#E4E4E7] px-2 py-2 font-medium">
-                    <span className="block text-[13px] font-semibold text-[#09090B]">{tSizing(`measurement.${column.key}`)}</span>
-                    <span className="text-[11px]">
+                    <span className="block text-body font-semibold text-[#09090B]">{tSizing(`measurement.${column.key}`)}</span>
+                    <span className="text-2xs">
                       {t("rangeHeader", { unit: tSizing(`unit.${MEASUREMENT_UNITS[column.key]}`) })}
                     </span>
                   </th>

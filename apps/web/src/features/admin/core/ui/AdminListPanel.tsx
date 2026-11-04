@@ -22,12 +22,12 @@ export function AdminListPanel({ icon: Icon, title, description, filters, search
   return (
     <section className={cn(ADMIN_CARD_CLASS, "p-4 sm:p-5")}>
       <div className="flex min-w-0 items-center gap-3">
-        <span className="grid size-10 shrink-0 place-items-center rounded-full border border-[#E4E4E7] text-[#52525B]">
-          <Icon size={18} aria-hidden />
+        <span className="grid size-12 shrink-0 place-items-center rounded-full border border-[#E4E4E7] text-[#52525B]">
+          <Icon size={20} aria-hidden />
         </span>
         <div className="min-w-0">
-          <h1 className="text-lg font-semibold tracking-tight text-[#09090B]">{title}</h1>
-          {description && <p className="mt-0.5 text-xs text-[#71717A]">{description}</p>}
+          <h1 className="text-2xl font-semibold tracking-tight text-[#09090B]">{title}</h1>
+          {description && <p className="mt-1 text-sm text-[#71717A]">{description}</p>}
         </div>
       </div>
 

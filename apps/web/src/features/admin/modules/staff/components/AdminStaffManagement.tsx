@@ -107,7 +107,7 @@ export function AdminStaffManagement() {
         <div className={`${ADMIN_CARD_CLASS} overflow-hidden`}>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs text-zinc-700">
-              <thead className="border-b border-[#E4E4E7] bg-zinc-50/75 text-[11px] font-semibold uppercase tracking-wider text-[#71717A]">
+              <thead className="border-b border-[#E4E4E7] bg-zinc-50/75 text-body font-semibold text-[#3F3F46]">
                 <tr>
                   <th className="px-5 py-3.5">{t("columns.staff")}</th>
                   {STAFF_PERMISSIONS.map((permission) => (
@@ -128,7 +128,7 @@ export function AdminStaffManagement() {
                     <tr key={staff.id} className="transition-colors hover:bg-zinc-50/50">
                       <td className="px-5 py-4">
                         <div className="text-sm font-semibold text-[#09090B]">{staff.name || t("unnamed")}</div>
-                        <div className="text-[11px] text-[#71717A]">{staff.email || staff.phone}</div>
+                        <div className="text-2xs text-[#71717A]">{staff.email || staff.phone}</div>
                       </td>
 
                       {STAFF_PERMISSIONS.map((permission) => (
@@ -149,7 +149,7 @@ export function AdminStaffManagement() {
                           type="button"
                           onClick={() => handleToggleActive(staff.id, isActive)}
                           disabled={isUpdating}
-                          className={`inline-flex cursor-pointer items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold transition-all ${
+                          className={`inline-flex cursor-pointer items-center gap-1 rounded-full px-2.5 py-1 text-2xs font-semibold transition-all ${
                             isActive
                               ? "border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
                               : "border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100"
@@ -165,7 +165,7 @@ export function AdminStaffManagement() {
                           type="button"
                           onClick={() => setResetTarget(staff)}
                           disabled={isUpdating}
-                          className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-[#E4E4E7] px-2.5 py-1 text-[11px] font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
+                          className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-[#E4E4E7] px-2.5 py-1 text-2xs font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
                         >
                           <KeyRound size={11} />
                           <span>{t("resetPassword")}</span>

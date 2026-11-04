@@ -147,9 +147,9 @@ export function SizeChartsBoard({ initialCharts }: { initialCharts: AdminSizeCha
           </p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[860px] text-sm">
+            <table className="w-full min-w-[860px] text-body">
               <thead>
-                <tr className="whitespace-nowrap border-b border-[#E4E4E7] text-left text-xs font-semibold uppercase tracking-[0.5px] text-[#71717A]">
+                <tr className="whitespace-nowrap border-b border-[#E4E4E7] text-left text-body font-semibold text-[#3F3F46]">
                   <th className="px-4 py-2.5">{t("column.name")}</th>
                   <th className="px-4 py-2.5">{t("column.group")}</th>
                   <th className="px-4 py-2.5">{t("column.sizes")}</th>

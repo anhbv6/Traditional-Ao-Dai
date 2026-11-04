@@ -1,9 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
+import { UserPlus } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { useNotify } from "@/hooks/useNotify";
+import {
+  ADMIN_DIALOG_PRIMARY_BUTTON_CLASS,
+  ADMIN_DIALOG_SECONDARY_BUTTON_CLASS,
+  AdminDialog,
+} from "@/features/admin/core/ui";
 import { createStaffAction } from "../actions/staff.actions";
 import { type StaffMemberItem } from "../types/staff.types";
 import { STAFF_PERMISSIONS, type Permission } from "../../../core/session/permissions";
@@ -57,7 +62,7 @@ export function CreateStaffDialog({ open, onOpenChange, onCreated }: CreateStaff
 
   const field = (key: keyof typeof EMPTY_FORM, type: string, required = true) => (
     <label className="block space-y-1">
-      <span className="text-xs font-semibold text-zinc-700">
+      <span className="text-sm font-medium text-[#3F3F46]">
         {t(`form.${key}`)} {required && <span className="text-rose-500">*</span>}
       </span>
       <input
@@ -71,58 +76,51 @@ export function CreateStaffDialog({ open, onOpenChange, onCreated }: CreateStaff
   );
 
   return (
-    <Dialog open={open} onOpenChange={(next) => (next ? onOpenChange(true) : close())}>
-      <DialogContent className="admin-shell max-w-[calc(100%-2rem)] rounded-xl border border-[#E4E4E7] bg-white p-6 sm:max-w-[480px]">
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <DialogTitle className="text-base font-semibold text-[#09090B]">{t("createTitle")}</DialogTitle>
-            <DialogDescription className="mt-0.5 text-xs text-[#71717A]">{t("createDescription")}</DialogDescription>
-          </div>
+    <AdminDialog
+      open={open}
+      onOpenChange={(next) => (next ? onOpenChange(true) : close())}
+      icon={UserPlus}
+      title={t("createTitle")}
+      description={t("createDescription")}
+      onSubmit={handleSubmit}
+      footer={
+        <>
+          <button type="button" onClick={close} className={ADMIN_DIALOG_SECONDARY_BUTTON_CLASS}>
+            {t("cancel")}
+          </button>
+          <button type="submit" disabled={isSubmitting} className={ADMIN_DIALOG_PRIMARY_BUTTON_CLASS}>
+            {isSubmitting ? t("creating") : t("create")}
+          </button>
+        </>
+      }
+    >
+      <div className="space-y-5">
+        <div className="grid gap-3 sm:grid-cols-2">
+          {field("name", "text")}
+          {field("phone", "tel", false)}
+          <div className="sm:col-span-2">{field("email", "email")}</div>
+          <div className="sm:col-span-2">{field("password", "password")}</div>
+        </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
-            {field("name", "text")}
-            {field("phone", "tel", false)}
-            <div className="sm:col-span-2">{field("email", "email")}</div>
-            <div className="sm:col-span-2">{field("password", "password")}</div>
-          </div>
-
-          <fieldset className="space-y-2">
-            <legend className="text-xs font-semibold text-zinc-700">{t("form.permissions")}</legend>
-            {STAFF_PERMISSIONS.map((permission) => (
-              <label key={permission} className="flex cursor-pointer items-center gap-2 text-xs text-[#09090B]">
-                <input
-                  type="checkbox"
-                  checked={permissions.includes(permission)}
-                  onChange={() =>
-                    setPermissions((prev) =>
-                      prev.includes(permission) ? prev.filter((p) => p !== permission) : [...prev, permission]
-                    )
-                  }
-                  className="size-4 rounded border-zinc-300 accent-zinc-900"
-                />
-                {t(`permissions.${permission}`)}
-              </label>
-            ))}
-          </fieldset>
-
-          <div className="flex justify-end gap-2 border-t border-[#E4E4E7] pt-4">
-            <button
-              type="button"
-              onClick={close}
-              className="cursor-pointer rounded-lg px-3.5 py-2 text-xs font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-[#09090B]"
-            >
-              {t("cancel")}
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="cursor-pointer rounded-lg bg-[#18181B] px-4 py-2 text-xs font-semibold text-white shadow-2xs transition-colors hover:bg-[#09090B] disabled:opacity-60"
-            >
-              {isSubmitting ? t("creating") : t("create")}
-            </button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+        <fieldset className="space-y-2">
+          <legend className="text-sm font-medium text-[#3F3F46]">{t("form.permissions")}</legend>
+          {STAFF_PERMISSIONS.map((permission) => (
+            <label key={permission} className="flex cursor-pointer items-center gap-2 text-xs text-[#09090B]">
+              <input
+                type="checkbox"
+                checked={permissions.includes(permission)}
+                onChange={() =>
+                  setPermissions((prev) =>
+                    prev.includes(permission) ? prev.filter((p) => p !== permission) : [...prev, permission]
+                  )
+                }
+                className="size-4 rounded border-zinc-300 accent-zinc-900"
+              />
+              {t(`permissions.${permission}`)}
+            </label>
+          ))}
+        </fieldset>
+      </div>
+    </AdminDialog>
   );
 }

@@ -1,29 +1,20 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
 import { useTranslations } from "next-intl";
 import { uploadImageApi } from "@/features/upload";
 import { showToast } from "@/components/ui/toast";
+import { cn } from "@/lib/utils";
+import {
+  ADMIN_DIALOG_BODY_CLASS,
+  ADMIN_DIALOG_PRIMARY_BUTTON_CLASS,
+  ADMIN_DIALOG_SECONDARY_BUTTON_CLASS,
+  AdminDialog,
+  AdminDialogFooter,
+} from "../../ui";
 import { changeAdminPasswordAction, updateAdminProfileAction } from "../actions/session.actions";
 import { useAdminSession, useAdminSessionCache } from "../hooks/useAdminSession";
-import {
-  User,
-  Mail,
-  Phone,
-  Lock,
-  Camera,
-  Loader2,
-  Eye,
-  EyeOff,
-  ShieldCheck,
-} from "lucide-react";
+import { User, Mail, Phone, Lock, Camera, Loader2, Eye, EyeOff, ShieldCheck } from "lucide-react";
 import { useNotify } from "@/hooks/useNotify";
 
 interface AdminProfileDialogProps {
@@ -31,10 +22,7 @@ interface AdminProfileDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export function AdminProfileDialog({
-  open,
-  onOpenChange,
-}: AdminProfileDialogProps) {
+export function AdminProfileDialog({ open, onOpenChange }: AdminProfileDialogProps) {
   const { user, isAdmin } = useAdminSession({ force: true });
   const sessionCache = useAdminSessionCache();
   const notify = useNotify();
@@ -163,63 +151,48 @@ export function AdminProfileDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="admin-shell sm:max-w-[480px] p-0 overflow-hidden bg-white border border-[#E4E4E7] rounded-xl shadow-xl">
-        <DialogHeader className="p-6 pb-4 border-b border-zinc-100 bg-zinc-50/50">
-          <div className="flex items-center gap-3">
-            <div className="size-10 rounded-xl bg-[#18181B] text-white flex items-center justify-center shadow-2xs">
-              <User size={18} />
-            </div>
-            <div>
-              <DialogTitle className="text-base font-bold text-[#09090B]">
-                {t("title")}
-              </DialogTitle>
-              <DialogDescription className="text-xs text-[#71717A] mt-0.5">
-                {t("subtitle")}
-              </DialogDescription>
-            </div>
-          </div>
-
-          {/* Tab buttons */}
-          <div className="flex border border-[#E4E4E7] p-0.5 rounded-lg bg-zinc-100/80 mt-4 text-xs font-medium">
+    <AdminDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      icon={User}
+      title={t("title")}
+      description={t("subtitle")}
+      bare
+      toolbar={
+        <div
+          role="tablist"
+          className="grid grid-cols-2 divide-x divide-[#E4E4E7] overflow-hidden rounded-lg border border-[#E4E4E7] bg-white shadow-2xs"
+        >
+          {(["info", "security"] as const).map((tab) => (
             <button
+              key={tab}
               type="button"
-              onClick={() => setActiveTab("info")}
-              className={`flex-1 py-1.5 rounded-md transition-all ${
-                activeTab === "info"
-                  ? "bg-white text-[#09090B] font-semibold shadow-2xs"
-                  : "text-zinc-600 hover:text-[#09090B]"
-              }`}
+              role="tab"
+              aria-selected={activeTab === tab}
+              onClick={() => setActiveTab(tab)}
+              className={cn(
+                "h-9 cursor-pointer text-sm font-medium outline-none transition-colors focus-visible:bg-[#F4F4F5]",
+                activeTab === tab
+                  ? "bg-[#F4F4F5] text-[#09090B]"
+                  : "text-[#52525B] hover:bg-[#FAFAFA] hover:text-[#09090B]"
+              )}
             >
-              {t("tabProfile")}
+              {tab === "info" ? t("tabProfile") : t("tabPassword")}
             </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("security")}
-              className={`flex-1 py-1.5 rounded-md transition-all ${
-                activeTab === "security"
-                  ? "bg-white text-[#09090B] font-semibold shadow-2xs"
-                  : "text-zinc-600 hover:text-[#09090B]"
-              }`}
-            >
-              {t("tabPassword")}
-            </button>
-          </div>
-        </DialogHeader>
-
-        {activeTab === "info" ? (
-          <form onSubmit={handleSaveInfo} className="p-6 space-y-4">
+          ))}
+        </div>
+      }
+    >
+      {activeTab === "info" ? (
+        <form onSubmit={handleSaveInfo} className="flex min-h-0 flex-1 flex-col">
+          <div className={cn(ADMIN_DIALOG_BODY_CLASS, "space-y-4")}>
             {/* Avatar upload section */}
             <div className="flex items-center gap-4 pb-2 border-b border-zinc-100">
               <div className="relative group">
-                <div className="size-16 rounded-full overflow-hidden border-2 border-[#E4E4E7] bg-zinc-100 flex items-center justify-center font-bold text-lg text-zinc-600">
+                <div className="size-16 rounded-full overflow-hidden border-2 border-[#E4E4E7] bg-zinc-100 flex items-center justify-center font-semibold text-lg text-zinc-600">
                   {avatarUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element -- ảnh từ URL tùy ý (blob xem trước / avatar / ảnh do admin nhập), không tối ưu được bằng next/image
-                    <img
-                      src={avatarUrl}
-                      alt={name || "Avatar"}
-                      className="size-full object-cover"
-                    />
+                    <img src={avatarUrl} alt={name || "Avatar"} className="size-full object-cover" />
                   ) : (
                     <span>{(name || user?.email || "A")[0]?.toUpperCase()}</span>
                   )}
@@ -232,11 +205,7 @@ export function AdminProfileDialog({
                   className="absolute bottom-0 right-0 p-1.5 rounded-full bg-[#18181B] text-white hover:bg-[#09090B] shadow-md cursor-pointer transition-transform hover:scale-105"
                   title={t("changeAvatar")}
                 >
-                  {isUploadingAvatar ? (
-                    <Loader2 size={12} className="animate-spin" />
-                  ) : (
-                    <Camera size={12} />
-                  )}
+                  {isUploadingAvatar ? <Loader2 size={12} className="animate-spin" /> : <Camera size={12} />}
                 </button>
                 <input
                   ref={fileInputRef}
@@ -248,12 +217,8 @@ export function AdminProfileDialog({
               </div>
 
               <div>
-                <p className="text-xs font-semibold text-[#09090B]">
-                  {t("avatar")}
-                </p>
-                <p className="text-[11px] text-[#71717A] mt-0.5">
-                  {t("avatarHint")}
-                </p>
+                <p className="text-xs font-semibold text-[#09090B]">{t("avatar")}</p>
+                <p className="text-2xs text-[#71717A] mt-0.5">{t("avatarHint")}</p>
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
@@ -271,10 +236,7 @@ export function AdminProfileDialog({
                   {t("fullName")} <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
-                  <User
-                    size={14}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
-                  />
+                  <User size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
                   <input
                     type="text"
                     value={name}
@@ -287,14 +249,9 @@ export function AdminProfileDialog({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-zinc-700 mb-1">
-                  {t("loginEmail")}
-                </label>
+                <label className="block text-xs font-semibold text-zinc-700 mb-1">{t("loginEmail")}</label>
                 <div className="relative">
-                  <Mail
-                    size={14}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
-                  />
+                  <Mail size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
                   <input
                     type="email"
                     value={user?.email || ""}
@@ -302,20 +259,13 @@ export function AdminProfileDialog({
                     className="w-full h-9 pl-9 pr-3 text-xs rounded-lg border border-[#E4E4E7] bg-zinc-50 text-[#71717A] cursor-not-allowed"
                   />
                 </div>
-                <p className="text-[10px] text-zinc-400 mt-1">
-                  {t("emailReadonly")}
-                </p>
+                <p className="text-2xs text-zinc-400 mt-1">{t("emailReadonly")}</p>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-zinc-700 mb-1">
-                  {t("phone")}
-                </label>
+                <label className="block text-xs font-semibold text-zinc-700 mb-1">{t("phone")}</label>
                 <div className="relative">
-                  <Phone
-                    size={14}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
-                  />
+                  <Phone size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
                   <input
                     type="tel"
                     value={phone}
@@ -327,53 +277,41 @@ export function AdminProfileDialog({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-zinc-700 mb-1">
-                  {t("role")}
-                </label>
+                <label className="block text-xs font-semibold text-zinc-700 mb-1">{t("role")}</label>
                 <div className="flex items-center gap-2 p-2 rounded-lg bg-zinc-50 border border-[#E4E4E7] text-xs">
                   <ShieldCheck size={16} className="text-zinc-700" />
-                  <span className="font-semibold text-[#09090B]">
-                    {isAdmin ? t("roleAdmin") : t("roleStaff")}
-                  </span>
+                  <span className="font-semibold text-[#09090B]">{isAdmin ? t("roleAdmin") : t("roleStaff")}</span>
                 </div>
               </div>
             </div>
-
-            <div className="flex items-center justify-end gap-2 pt-3 border-t border-zinc-100">
-              <button
-                type="button"
-                onClick={() => onOpenChange(false)}
-                className="px-3.5 py-2 text-xs font-medium text-zinc-600 hover:text-[#09090B] hover:bg-zinc-100 rounded-lg transition-colors cursor-pointer"
-              >
-                {t("cancel")}
-              </button>
-              <button
-                type="submit"
-                disabled={isSavingInfo || isUploadingAvatar}
-                className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-[#18181B] hover:bg-[#09090B] rounded-lg shadow-2xs transition-all cursor-pointer disabled:opacity-60"
-              >
-                {isSavingInfo ? (
-                  <>
-                    <Loader2 size={13} className="animate-spin" />
-                    <span>{t("saving")}</span>
-                  </>
-                ) : (
-                  <span>{t("save")}</span>
-                )}
-              </button>
-            </div>
-          </form>
-        ) : (
-          <form onSubmit={handleSaveSecurity} className="p-6 space-y-3.5">
+          </div>
+          <AdminDialogFooter>
+            <button type="button" onClick={() => onOpenChange(false)} className={ADMIN_DIALOG_SECONDARY_BUTTON_CLASS}>
+              {t("cancel")}
+            </button>
+            <button
+              type="submit"
+              disabled={isSavingInfo || isUploadingAvatar}
+              className={ADMIN_DIALOG_PRIMARY_BUTTON_CLASS}
+            >
+              {isSavingInfo ? (
+                <>
+                  <Loader2 size={13} className="animate-spin" />
+                  <span>{t("saving")}</span>
+                </>
+              ) : (
+                <span>{t("save")}</span>
+              )}
+            </button>
+          </AdminDialogFooter>
+        </form>
+      ) : (
+        <form onSubmit={handleSaveSecurity} className="flex min-h-0 flex-1 flex-col">
+          <div className={cn(ADMIN_DIALOG_BODY_CLASS, "space-y-3.5")}>
             <div>
-              <label className="block text-xs font-semibold text-zinc-700 mb-1">
-                {t("currentPassword")}
-              </label>
+              <label className="block text-xs font-semibold text-zinc-700 mb-1">{t("currentPassword")}</label>
               <div className="relative">
-                <Lock
-                  size={14}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
-                />
+                <Lock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
                 <input
                   type={showCurrentPass ? "text" : "password"}
                   value={currentPassword}
@@ -396,10 +334,7 @@ export function AdminProfileDialog({
                 {t("newPassword")} <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
-                <Lock
-                  size={14}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
-                />
+                <Lock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
                 <input
                   type={showNewPass ? "text" : "password"}
                   value={newPassword}
@@ -423,10 +358,7 @@ export function AdminProfileDialog({
                 {t("confirmPassword")} <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
-                <Lock
-                  size={14}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
-                />
+                <Lock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
                 <input
                   type={showConfirmPass ? "text" : "password"}
                   value={confirmPassword}
@@ -444,33 +376,24 @@ export function AdminProfileDialog({
                 </button>
               </div>
             </div>
-
-            <div className="flex items-center justify-end gap-2 pt-3 border-t border-zinc-100">
-              <button
-                type="button"
-                onClick={() => onOpenChange(false)}
-                className="px-3.5 py-2 text-xs font-medium text-zinc-600 hover:text-[#09090B] hover:bg-zinc-100 rounded-lg transition-colors cursor-pointer"
-              >
-                {t("cancel")}
-              </button>
-              <button
-                type="submit"
-                disabled={isSavingSecurity}
-                className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-[#18181B] hover:bg-[#09090B] rounded-lg shadow-2xs transition-all cursor-pointer disabled:opacity-60"
-              >
-                {isSavingSecurity ? (
-                  <>
-                    <Loader2 size={13} className="animate-spin" />
-                    <span>{t("updating")}</span>
-                  </>
-                ) : (
-                  <span>{t("updatePassword")}</span>
-                )}
-              </button>
-            </div>
-          </form>
-        )}
-      </DialogContent>
-    </Dialog>
+          </div>
+          <AdminDialogFooter>
+            <button type="button" onClick={() => onOpenChange(false)} className={ADMIN_DIALOG_SECONDARY_BUTTON_CLASS}>
+              {t("cancel")}
+            </button>
+            <button type="submit" disabled={isSavingSecurity} className={ADMIN_DIALOG_PRIMARY_BUTTON_CLASS}>
+              {isSavingSecurity ? (
+                <>
+                  <Loader2 size={13} className="animate-spin" />
+                  <span>{t("updating")}</span>
+                </>
+              ) : (
+                <span>{t("updatePassword")}</span>
+              )}
+            </button>
+          </AdminDialogFooter>
+        </form>
+      )}
+    </AdminDialog>
   );
 }

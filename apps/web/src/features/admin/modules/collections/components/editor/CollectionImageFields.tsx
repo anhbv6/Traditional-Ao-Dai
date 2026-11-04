@@ -71,7 +71,7 @@ export function ImageSlot({
 
   return (
     <div className="min-w-0">
-      <div className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-[#3F3F46]">
+      <div className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-[#3F3F46]">
         <DeviceIcon size={13} className="text-[#71717A]" aria-hidden />
         {label}
       </div>
@@ -97,7 +97,7 @@ export function ImageSlot({
         </button>
 
         {!value && fallback && (
-          <span className="pointer-events-none absolute inset-x-1.5 bottom-1.5 rounded bg-white/90 px-1.5 py-0.5 text-center text-[10px] font-medium text-[#52525B]">
+          <span className="pointer-events-none absolute inset-x-1.5 bottom-1.5 rounded bg-white/90 px-1.5 py-0.5 text-center text-2xs font-medium text-[#52525B]">
             {t("usingDesktop")}
           </span>
         )}

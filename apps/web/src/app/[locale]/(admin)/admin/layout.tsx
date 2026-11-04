@@ -4,10 +4,11 @@ import React, { type ReactNode } from "react";
 import {
   AdminHeader,
   AdminSidebar,
-  AdminTodayNotes,
+  AdminRightRail,
   AdminAccessDenied,
   useAdminLayout,
 } from "@/features/admin/core/layout";
+import { AdminAssistantDock } from "@/features/admin/core/assistant";
 import { AdminProfileDialog } from "@/features/admin/core/session";
 import { AppLoading } from "@/components/shared/AppLoading";
 
@@ -83,8 +84,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         <main className="flex-1 flex flex-col">{children}</main>
       </div>
 
-      {/* Cột phải: ghi chú việc hôm nay (chỉ từ xl) */}
-      <AdminTodayNotes />
+      {/* Cột phải (chỉ từ xl): tài khoản ở góc trên + ghi chú việc hôm nay */}
+      <AdminRightRail {...navProps} />
+
+      {/* Trợ lý AI nổi góc dưới phải */}
+      <AdminAssistantDock />
 
       {/* Modal sửa hồ sơ tài khoản quản trị viên */}
       <AdminProfileDialog

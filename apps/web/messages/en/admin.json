@@ -1,7 +1,6 @@
 {
   "login": {
     "title": "Admin sign in",
-    "subtitle": "Use the staff email issued by your administrator to continue.",
     "emailLabel": "Admin Email",
     "emailPlaceholder": "Please enter your email address",
     "passwordLabel": "Password",
@@ -49,7 +48,41 @@
     "add": "Add",
     "empty": "No tasks yet. Note what to do today.",
     "remove": "Remove this task",
-    "clearDone": "{count, plural, one {Clear # done task} other {Clear # done tasks}}"
+    "clearDone": "{count, plural, one {Clear # done task} other {Clear # done tasks}}",
+    "calendar": {
+      "previous": "Previous month",
+      "next": "Next month",
+      "backToToday": "Back to this month"
+    }
+  },
+  "assistant": {
+    "open": "Open AI assistant",
+    "title": "Thiên Canh assistant",
+    "subtitle": "Admin AI helper · sample data",
+    "greeting": "Hi, I'm Thiên Canh's AI assistant. I can summarise revenue, check stock, track the workshop or write product descriptions. What do you need?",
+    "placeholder": "Ask the assistant...",
+    "send": "Send",
+    "close": "Close",
+    "reset": "New conversation",
+    "typing": "Assistant is typing",
+    "disclaimer": "Using sample data — answers don't reflect real figures yet."
+  },
+  "datePicker": {
+    "open": "Open calendar",
+    "previous": "Previous",
+    "next": "Next",
+    "monthTitle": "{month, select, 1 {January} 2 {February} 3 {March} 4 {April} 5 {May} 6 {June} 7 {July} 8 {August} 9 {September} 10 {October} 11 {November} other {December}} {year}",
+    "yearTitle": "{year}",
+    "monthShort": "{month, select, 1 {Jan} 2 {Feb} 3 {Mar} 4 {Apr} 5 {May} 6 {Jun} 7 {Jul} 8 {Aug} 9 {Sep} 10 {Oct} 11 {Nov} other {Dec}}",
+    "weekdays": "Mo,Tu,We,Th,Fr,Sa,Su",
+    "today": "Today",
+    "clear": "Clear"
+  },
+  "infoTip": {
+    "label": "Show help"
+  },
+  "dialog": {
+    "close": "Close"
   },
   "nav": {
     "dashboard": "Overview",
@@ -274,7 +307,7 @@
     },
     "products": {
       "title": "Products",
-      "description": "Track stock, sale status and made-to-measure options for each design."
+      "description": "Designs on sale by category and sale mode (single, set, made to measure) with generated SKUs."
     },
     "inventory": {
       "eyebrow": "Warehouse & Variants",
@@ -309,23 +342,12 @@
       "description": "A two-level taxonomy — the product group decides tailoring, sell unit and size chart."
     },
     "materials": {
-      "title": "Fabrics & materials",
-      "description": "Materials used for products, with care instructions.",
-      "planned": [
-        "Mulberry silk, brocade, raw silk, velvet, chiffon, linen, organza...",
-        "Care instruction templates per material",
-        "Stretch and tailoring notes"
-      ]
+      "title": "Fabric materials",
+      "description": "A profile for each fabric: origin, composition, physical scales, care and yield."
     },
     "attributes": {
       "title": "Attributes",
-      "description": "Shared values for building variants and filtering products.",
-      "planned": [
-        "Tunic and pants colors",
-        "Sizes S - XXL and made to measure",
-        "Techniques and patterns: hand embroidery, hand painting, beading, 3D print, plain",
-        "Collar and sleeve styles"
-      ]
+      "description": "Colors and sizes for SKU variants plus design traits for product filters."
     },
     "sizeCharts": {
       "title": "Size charts",
@@ -572,15 +594,14 @@
     "colDetail": "Details"
   },
   "products": {
-    "searchPlaceholder": "Search by name, category or material",
+    "searchPlaceholder": "Search by name, code, category, material",
     "empty": "No products yet.",
-    "noResults": "No products match these filters.",
+    "noResults": "No products match the filters.",
     "active": "On sale",
     "hidden": "Hidden",
     "outOfStock": "Out of stock",
-    "uncategorized": "Uncategorized",
-    "yes": "Yes",
-    "no": "No",
+    "noSku": "No SKU yet",
+    "madeToOrder": "Made to order",
     "tabs": {
       "ALL": "All",
       "ACTIVE": "On sale",
@@ -589,18 +610,14 @@
       "HIDDEN": "Hidden"
     },
     "allCategories": "All categories",
-    "allMaterials": "All materials",
+    "allModes": "All",
     "colProduct": "Product",
     "colCategory": "Category",
-    "colMaterial": "Material",
     "colPrice": "Price",
     "colStock": "Stock",
-    "colSold": "Sold",
-    "colCustomFit": "Made to measure",
     "colStatus": "Status",
     "colActions": "Actions",
     "skuCount": "{count, plural, one {# SKU} other {# SKUs}}",
-    "stockCount": "{count} in stock",
     "lowStockSku": "{count, plural, one {# SKU} other {# SKUs}} running low",
     "selectAll": "Select all visible products",
     "selectProduct": "Select {name}",
@@ -609,46 +626,167 @@
     "rowActions": "Actions for {name}",
     "showProduct": "Put on sale",
     "hideProduct": "Hide from store",
-    "enableCustomFit": "Enable made to measure",
-    "disableCustomFit": "Disable made to measure",
+    "enableCustomFit": "Accept made-to-measure",
+    "disableCustomFit": "Stop made-to-measure",
     "add": "Add product",
-    "viewDetail": "View details",
-    "edit": "Edit product",
+    "edit": "Open details",
     "cancel": "Cancel",
-    "close": "Close",
-    "save": "Save",
     "saving": "Saving...",
-    "loading": "Loading...",
-    "loadFailed": "Could not load this product.",
-    "createTitle": "Add product",
-    "createDescription": "New products stay hidden until you put them on sale.",
-    "editTitle": "Edit product",
-    "editDescription": "Changes apply as soon as you save and are recorded in the audit log.",
-    "createSuccess": "Product added.",
-    "updateSuccess": "Changes saved.",
-    "sectionInfo": "General information",
-    "sectionSales": "Price & sales",
-    "sectionImages": "Images",
-    "sectionVariants": "Variants (SKUs)",
-    "sectionEnglish": "English version",
+    "updateSuccess": "Product saved.",
+    "create": {
+      "title": "Add product",
+      "description": "Pick a category and sale mode — the product code is generated; price, images and SKUs go on the detail screen.",
+      "submit": "Create and add details",
+      "success": "Product added.",
+      "inheritHint": "Sale modes, sizes and tailoring follow this product group."
+    },
+    "mode": {
+      "SINGLE": {
+        "label": "Single item",
+        "short": "Ready-made, bought in stock sizes."
+      },
+      "SET": {
+        "label": "Set",
+        "short": "Several pieces, one price, one set size."
+      },
+      "CUSTOM": {
+        "label": "Made to measure",
+        "short": "Tailored to the customer, no stock."
+      },
+      "notAllowed": "This category's product group cannot be sold this way",
+      "notAllowedFor": "{group} cannot be sold this way",
+      "acceptsCustom": "Also made to measure"
+    },
+    "editor": {
+      "back": "Products",
+      "save": "Save changes",
+      "unsaved": "Unsaved",
+      "langLabel": "Content language",
+      "langHint": "Applies to name, description and set item names."
+    },
+    "sections": {
+      "general": "General information",
+      "saleMode": "Sale mode",
+      "design": "Material & design",
+      "pricing": "Price & SKUs"
+    },
     "field": {
       "name": "Product name",
-      "chooseCategory": "Choose a category",
-      "materialPlaceholder": "Material, e.g. Mulberry silk",
+      "category": "Category",
+      "categoryShort": "Category",
       "description": "Description",
-      "isActive": "On sale",
-      "isCustomFit": "Made to measure",
-      "isFeatured": "Featured product",
-      "nameEn": "English name",
-      "materialEn": "English material",
-      "descriptionEn": "English description",
+      "images": "Images",
+      "saleMode": "Sale mode",
+      "isCustomFit": "Also accept made-to-measure orders",
+      "leadTimeDays": "Tailoring time",
+      "basePrice": "Price",
       "sizeChart": "Size chart",
-      "sizeChartInherit": "From product type ({name})",
-      "sizeChartNone": "No size chart",
-      "sizeChartInactive": "inactive",
-      "sizeChartHint": "Sizes in this chart: {sizes}. SKUs should use these labels so customers get size suggestions.",
-      "sizeChartMissing": "This product type has no size chart — customers won't get size suggestions."
+      "sizeChartShort": "Size chart",
+      "isActive": "On sale",
+      "isFeatured": "Featured product"
     },
+    "hints": {
+      "category": "The category's product group decides the allowed sale modes, whether there are sizes, tailoring and whether it sells per piece or per meter.",
+      "saleMode": "Single item: ready-made in sizes. Set: several pieces sold together (top + pants...). Made to measure: tailored from the customer's measurements, no finished stock.",
+      "isCustomFit": "Customers pick a stock size or send measurements for a tailored piece.",
+      "design": "Fabric specs are inherited from the material profile; design traits power storefront filters.",
+      "pricing": "Leave a SKU price empty to use the base price.",
+      "sizeChart": "Defaults to the category chart; choose another if this design has its own fit (e.g. slim fit).",
+      "notReady": "Complete the items below to put it on sale."
+    },
+    "placeholders": {
+      "basePrice": "Please enter a price",
+      "leadTimeDays": "Please enter",
+      "vi": {
+        "name": "Please enter the product name",
+        "description": "Please enter a description"
+      },
+      "en": {
+        "name": "Please enter the product name (English)",
+        "description": "Please enter a description (English)"
+      }
+    },
+    "set": {
+      "title": "Pieces in the set",
+      "min": "A set needs at least 2 pieces.",
+      "quantity": "Quantity",
+      "material": "Material",
+      "materialInherit": "Main material",
+      "remove": "Remove piece",
+      "add": "Add piece",
+      "placeholder": {
+        "vi": "Please enter the piece name, e.g. Áo dài",
+        "en": "Please enter the piece name (English)"
+      }
+    },
+    "custom": {
+      "measurements": "Measurements the customer sends",
+      "inherited": "per product group",
+      "days": "days"
+    },
+    "design": {
+      "manage": "Missing an option?",
+      "manageLink": "Add it under Attributes"
+    },
+    "material": {
+      "label": "Main material",
+      "none": "— Not set —",
+      "open": "Profile",
+      "care": "Care",
+      "yield": "Yield: {top} m/top · {pants} m/pants"
+    },
+    "sku": {
+      "colors": "Colors",
+      "colorsHint": "Pick colors from the color attributes; with no color, each size gets one SKU.",
+      "noColors": "No color attributes yet.",
+      "sizes": "Sizes",
+      "sizesFromChart": "from the size chart",
+      "sizesFromAttributes": "from size attributes (no size chart linked)",
+      "rule": "Generated code: {example}",
+      "generate": "Generate {count, plural, one {# SKU} other {# SKUs}}",
+      "allGenerated": "All combinations exist",
+      "empty": "No SKUs yet — pick colors and sizes, then generate.",
+      "color": "Color",
+      "size": "Size",
+      "code": "SKU code",
+      "price": "Own price",
+      "stock": "Stock",
+      "stockMeters": "Stock (m)",
+      "noColor": "No color",
+      "sizeInvalid": "Size doesn't fit the current sale mode / size chart",
+      "codePlaceholder": "Please enter a code",
+      "manual": "Enter code manually",
+      "auto": "Use generated code",
+      "basePrice": "Base price",
+      "remove": "Delete SKU",
+      "inUse": "This SKU has orders or is in a cart — cannot delete",
+      "customSize": "Made to measure",
+      "freeSize": "One size"
+    },
+    "ready": {
+      "IMAGES": "Cover + at least 1 description image",
+      "PRICE": "Price above 0",
+      "SKUS": "At least 1 SKU",
+      "DUPLICATE_SKU": "No duplicate color + size",
+      "SET_ITEMS": "Set has at least 2 pieces"
+    },
+    "inherit": {
+      "title": "Inherited from catalog",
+      "hint": "Change it under Categories / Size charts — the product follows automatically.",
+      "group": "Product group",
+      "sellUnit": "Sold by",
+      "custom": "Tailoring",
+      "noCustom": "Not offered",
+      "measure": {
+        "FULL": "Full measurements",
+        "PANTS": "Pants measurements"
+      },
+      "sizes": "Sizes",
+      "sizesFromAttributes": "Size attributes",
+      "modes": "Allowed sale modes"
+    },
+    "sizeChartInherit": "Category default ({name})",
+    "sizeChartNone": "Category has no size chart",
     "image": {
       "add": "Add image",
       "uploading": "Uploading...",
@@ -656,32 +794,6 @@
       "cover": "Cover image",
       "makeCover": "Set as cover",
       "hint": "Up to {max} images, under 5MB each, portrait 3:4 or 9:16 only. Images are compressed to WebP. The first image is the cover, the rest are description images."
-    },
-    "variant": {
-      "size": "Size",
-      "color": "Color",
-      "sku": "SKU",
-      "price": "Custom price",
-      "stock": "Stock",
-      "sizePlaceholder": "M",
-      "colorPlaceholder": "Red",
-      "skuPlaceholder": "Enter SKU",
-      "pricePlaceholder": "Enter price",
-      "autoSku": "Auto",
-      "useBasePrice": "Base",
-      "collectionCode": "Collection code",
-      "collectionCodePlaceholder": "e.g. TET26, name-based if empty",
-      "add": "Add variant",
-      "remove": "Remove variant",
-      "hint": "Generated codes follow AD-TET26-DO-S (Ao dai - collection - color - size). Turn off \"Auto\" or \"Base\" to enter values by hand. SKUs with orders or in a customer's cart cannot be removed.",
-      "sizeNotInChart": "Size “{size}” is not in the size chart"
-    },
-    "detail": {
-      "title": "Product details",
-      "slug": "URL slug",
-      "noDescription": "No description yet.",
-      "noVariants": "This product has no SKUs yet.",
-      "sizeChartInherited": "from type"
     }
   },
   "tailoring": {
@@ -756,7 +868,6 @@
       "open": "New collection",
       "title": "New collection",
       "description": "It starts as a draft. Fill in the rest in the next step.",
-      "namePlaceholder": "e.g. Tết 2026",
       "codeHint": "2–12 uppercase letters or digits, used in SKUs. Locked once published.",
       "submit": "Create and continue",
       "success": "Draft collection created."
@@ -830,22 +941,36 @@
       "hidden": "Fully hidden"
     },
     "field": {
+      "codePlaceholder": "Enter the collection code",
+      "placeholders": {
+        "vi": {
+          "name": "Enter the collection name (Vietnamese)",
+          "season": "Enter the season label (Vietnamese)",
+          "tagline": "Enter a short tagline (Vietnamese)",
+          "description": "Enter the collection description (Vietnamese)",
+          "story": "Enter the lookbook story (Vietnamese)"
+        },
+        "en": {
+          "name": "Enter the collection name",
+          "season": "Enter the season label",
+          "tagline": "Enter a short tagline",
+          "description": "Enter the collection description",
+          "story": "Enter the lookbook story"
+        }
+      },
       "name": "Collection name",
       "code": "Collection code",
       "codeHint": "Used in SKUs, e.g. AD-TET26-DO-S.",
       "codeLocked": "Published, so it cannot change — the code is already in SKUs.",
       "season": "Season label",
       "seasonHint": "Shown above the name on the banner.",
-      "seasonPlaceholder": "e.g. Spring 2026",
       "tagline": "Short tagline",
-      "taglinePlaceholder": "One line for the banner and ads",
       "description": "Description",
       "accent": "Season accent color",
       "accentCustom": "Pick another color",
       "accentNone": "None",
       "accentClear": "Clear color",
       "autoPushOos": "Push out-of-stock items to the end",
-      "storyPlaceholder": "The story of the season: inspiration, fabrics, artisans...",
       "launchAt": "Launch date",
       "endAt": "Season end date",
       "scheduleHint": "A launch date is required to announce \"coming soon\". You get reminders at each date; status never changes automatically.",
@@ -853,11 +978,16 @@
       "homepageArchived": "Archived collections are not shown on the homepage.",
       "homepageOrder": "Homepage order",
       "homepageOrderHint": "Lower numbers show first.",
-      "showInLookbook": "Add to the lookbook when archived",
+      "showInLookbook": "Archive to lookbook",
       "lookbookHint": "Keeps past-season pages as marketing and SEO content."
     },
     "editor": {
-      "back": "Back to collections",
+      "langTabs": {
+        "label": "Content language",
+        "untranslated": "No English version yet"
+      },
+      "advanced": "Advanced options",
+      "back": "Collections",
       "untitled": "Untitled collection",
       "unsaved": "Unsaved",
       "preview": "Preview",
@@ -872,17 +1002,20 @@
         "productsHint": "List order is display order. Up to 3 highlighted products.",
         "story": "Lookbook story",
         "storyHint": "Shown on the collection page and the past-season lookbook.",
-        "english": "English version",
         "englishHint": "Leave empty to fall back to Vietnamese.",
         "seo": "SEO",
         "seoHint": "Title and description shown in search results.",
         "lifecycle": "Lifecycle",
         "schedule": "Schedule",
-        "visibility": "Visibility",
         "warnings": "Needs attention"
       }
     },
     "warnings": {
+      "noProducts": "The collection has no products yet.",
+      "noCover": "No desktop cover image yet.",
+      "noCoverMobile": "No mobile cover image yet.",
+      "noLaunchAt": "No launch date set.",
+      "none": "Everything is in place — nothing needs attention.",
       "hiddenInActive": "{count, plural, one {# product is hidden, so customers do not see it} other {# products are hidden, so customers do not see them}} in this collection.",
       "notReady": "{count, plural, one {# product is} other {# products are}} not ready to sell (images, price, SKU) and will stay hidden at launch.",
       "sellingBeforeLaunch": "{count, plural, one {# product is} other {# products are}} on sale before launch (not in any other collection on sale).",
@@ -940,6 +1073,14 @@
       "pickedCount": "{count} selected",
       "cancel": "Cancel",
       "addPicked": "Add to collection"
+    },
+    "seoDialog": {
+      "open": "SEO & URL",
+      "auto": "Uses the name and tagline",
+      "customized": "Custom title / description",
+      "hasError": "Has errors to fix",
+      "done": "Done",
+      "saveNote": "Click “Save changes” to apply."
     },
     "seo": {
       "slug": "URL",
@@ -1041,8 +1182,6 @@
     "expandAll": "Expand all",
     "collapseAll": "Collapse",
     "summary": "{roots, plural, one {# root group} other {# root groups}} · {children, plural, one {# subtype} other {# subtypes}}",
-    "dragHint": "Drag the ⠿ handle to reorder within the same level",
-    "dragDisabled": "Clear the search and filters to reorder by drag and drop",
     "noResults": "No product types match.",
     "empty": "No product types yet.",
     "expand": "Expand {name}",
@@ -1050,8 +1189,6 @@
     "hidden": "Hidden",
     "noChart": "No size chart",
     "inheritChart": "From root group",
-    "products": "items",
-    "addChildTo": "Add a subtype to {name}",
     "reordered": "Display order saved",
     "hiddenSuccess": "Product type hidden from the store",
     "shownSuccess": "Product type shown in the store",
@@ -1074,7 +1211,6 @@
     "editor": {
       "createRootTitle": "Add root group",
       "createChildTitle": "Add a subtype to {name}",
-      "editTitle": "Edit {name}",
       "description": "The product group decides tailoring, sell unit and which size chart applies to its products.",
       "rootOption": "— Root group —",
       "parentLocked": "Has subtypes, so it stays a root group",
@@ -1085,20 +1221,34 @@
       "create": "Add type",
       "save": "Save changes",
       "created": "Product type added",
-      "updated": "Product type saved"
+      "updated": "Product type saved",
+      "langLabel": "Content language",
+      "slugHint": "The last part of the category URL on the store. Leave empty to build it from the name.",
+      "placeholders": {
+        "slug": "Enter the URL slug",
+        "vi": {
+          "name": "Enter the category name (Vietnamese)",
+          "description": "Enter a description (Vietnamese)"
+        },
+        "en": {
+          "name": "Enter the category name",
+          "description": "Enter a description"
+        }
+      },
+      "editTitle": "Edit category: {name}",
+      "dialogDescription": "Name, parent, product group and size chart of the category.",
+      "cancel": "Cancel",
+      "nameRequired": "Please enter the category name",
+      "groupLabel": "Product group & size chart"
     },
     "field": {
-      "group": "Product group",
       "name": "Type name",
-      "namePlaceholder": "e.g. Modern áo dài",
-      "nameEn": "English name",
       "slug": "Slug",
       "parent": "Parent group",
       "parentShort": "Group",
       "sizeChart": "Default size chart",
       "sizeChartShort": "Size chart",
       "description": "Description",
-      "descriptionEn": "English description",
       "isActive": "Show in store",
       "isActiveHint": "Turn off to hide this type from menus and filters without deleting data."
     },
@@ -1107,6 +1257,60 @@
       "description": "“{name}” will be permanently deleted. It has no products or subtypes.",
       "confirm": "Delete",
       "success": "Product type deleted"
+    },
+    "reorderDisabled": "Clear the search and filters to reorder",
+    "status": {
+      "active": "Visible",
+      "hidden": "Hidden"
+    },
+    "column": {
+      "name": "Category"
+    },
+    "detail": {
+      "back": "Categories",
+      "childOf": "In",
+      "childCount": "{count, plural, one {# subcategory} other {# subcategories}}",
+      "noChildren": "No subcategories yet.",
+      "sections": {
+        "general": "General information",
+        "group": "Product group & size chart",
+        "overview": "Overview",
+        "children": "Subcategories"
+      },
+      "stats": {
+        "products": "Products",
+        "skus": "SKUs",
+        "children": "Subcategories"
+      },
+      "info": {
+        "nameVi": "Name (Vietnamese)",
+        "nameEn": "Name (English)",
+        "descriptionVi": "Description (Vietnamese)",
+        "descriptionEn": "Description (English)",
+        "noEnglish": "No English version yet",
+        "none": "None",
+        "isRoot": "Top-level group"
+      }
+    },
+    "list": {
+      "title": "Display order",
+      "columnStatus": "Visible",
+      "dragHint": "Drag the ⋮⋮ handle to reorder within the same level — shoppers see categories in this order.",
+      "dragHandle": "Drag to reorder {name}",
+      "toggleLabel": "Show {name} on the store"
+    },
+    "row": {
+      "children": "{count, plural, one {# subcategory} other {# subcategories}}",
+      "products": "{count, plural, one {# product} other {# products}}"
+    },
+    "diagram": {
+      "title": "Category map",
+      "description": "How shoppers browse categories on the store. Point at a row in the list to see where it sits.",
+      "legendHidden": "Hidden",
+      "legendProducts": "Bar length = product count",
+      "hidden": "Hidden",
+      "storeMeta": "{count, plural, one {# category} other {# categories}}",
+      "collapsed": "{count, plural, one {# subcategory collapsed} other {# subcategories collapsed}}"
     }
   },
   "sizeCharts": {
@@ -1259,6 +1463,335 @@
       "sizeColumn": "Size",
       "guideImageAlt": "Measurement guide",
       "emptyGuide": "No measuring guide yet."
+    }
+  },
+  "materials": {
+    "searchPlaceholder": "Search by name, code, origin...",
+    "filterAll": "All",
+    "filterSeason": "Season",
+    "filterStatus": "Status",
+    "summary": "{count, plural, one {# material} other {# materials}}",
+    "empty": "No materials yet.",
+    "noResults": "No materials match.",
+    "cancel": "Cancel",
+    "processing": "Processing...",
+    "view": {
+      "label": "View",
+      "cards": "Swatches",
+      "matrix": "Matrix"
+    },
+    "status": {
+      "active": "In use",
+      "inactive": "Discontinued"
+    },
+    "card": {
+      "noOrigin": "Origin not set",
+      "perTop": "Yield / top",
+      "stock": "Stock · {rolls, plural, one {# roll} other {# rolls}}",
+      "tops": "{count, plural, one {# top} other {# tops}}"
+    },
+    "matrix": {
+      "material": "Material",
+      "stock": "Stock",
+      "seasons": "Seasons",
+      "perTop": "m / top"
+    },
+    "create": {
+      "open": "Add material",
+      "title": "Add fabric material",
+      "description": "Enter a name and code; fill in the details on the next screen.",
+      "submit": "Create and add details",
+      "success": "Material added"
+    },
+    "editor": {
+      "back": "Fabric materials",
+      "save": "Save changes",
+      "saved": "Material saved",
+      "unsaved": "Unsaved",
+      "langLabel": "Content language",
+      "langHint": "Applies to name, origin, description, process and care note."
+    },
+    "delete": {
+      "open": "Delete",
+      "title": "Delete material?",
+      "description": "\"{name}\" will be permanently deleted.",
+      "body": "Only possible while no fabric roll in stock belongs to this material.",
+      "confirm": "Delete material",
+      "success": "Material deleted"
+    },
+    "sections": {
+      "identity": "Identity",
+      "metrics": "Physical scales",
+      "media": "Close-ups & video",
+      "process": "Making process",
+      "care": "Care",
+      "yield": "Fabric yield"
+    },
+    "field": {
+      "name": "Material name",
+      "code": "Code",
+      "origin": "Origin",
+      "description": "Description",
+      "composition": "Fiber composition",
+      "seasons": "Seasons",
+      "videoUrl": "Fabric-in-motion video",
+      "careNote": "Extra note",
+      "widthCm": "Fabric width",
+      "metersPerTop": "Meters per top",
+      "metersPerPants": "Meters per pants",
+      "isActive": "In use"
+    },
+    "hints": {
+      "code": "Short code printed on stock slips and roll tags: unaccented letters, digits and hyphens.",
+      "composition": "Components must add up to 100%.",
+      "metrics": "A shared 1–5 scale for every material, used to compare and advise customers. Click the selected step again to clear it.",
+      "media": "The first image is the swatch shown in the list. Film the fabric moving or draped over a hand to show drape and sheen.",
+      "process": "Steps that make the fabric, told to customers on the product page.",
+      "care": "Pick the symbols printed on the sewn-in label and product page.",
+      "yield": "The workshop uses this to prepare fabric; stock uses it to estimate how many tops can still be made. Big sizes add fabric per the size chart.",
+      "isActive": "Turn off when this fabric is no longer sourced — existing products keep their data."
+    },
+    "placeholders": {
+      "code": "Please enter a code, e.g. LUA-TO-TAM",
+      "videoUrl": "Please enter a video link (https://...)",
+      "widthCm": "Please enter width",
+      "meters": "Please enter meters",
+      "vi": {
+        "name": "Please enter the material name",
+        "origin": "Please enter where it is made",
+        "description": "Please enter a description",
+        "stepTitle": "Please enter the step name",
+        "stepDetail": "Please enter the step description",
+        "careNote": "Please enter a care note"
+      },
+      "en": {
+        "name": "Please enter the material name (English)",
+        "origin": "Please enter where it is made (English)",
+        "description": "Please enter a description (English)",
+        "stepTitle": "Please enter the step name (English)",
+        "stepDetail": "Please enter the step description (English)",
+        "careNote": "Please enter a care note (English)"
+      }
+    },
+    "composition": {
+      "empty": "No fiber composition yet",
+      "fiber": "Fiber",
+      "percent": "Share",
+      "add": "Add fiber",
+      "remove": "Remove fiber",
+      "total": "Total {total}%",
+      "notFull": "Composition does not add up to 100%."
+    },
+    "fiber": {
+      "SILK": "Silk",
+      "COTTON": "Cotton",
+      "LINEN": "Linen",
+      "HEMP": "Hemp",
+      "BAMBOO": "Bamboo",
+      "VISCOSE": "Viscose",
+      "POLYESTER": "Polyester",
+      "SPANDEX": "Spandex",
+      "NYLON": "Nylon",
+      "WOOL": "Wool",
+      "OTHER": "Other"
+    },
+    "metrics": {
+      "stretch": {
+        "label": "Stretch",
+        "short": "Stretch",
+        "low": "No stretch",
+        "high": "Very stretchy"
+      },
+      "thickness": {
+        "label": "Thickness",
+        "short": "Weight",
+        "low": "Light",
+        "high": "Heavy, structured"
+      },
+      "drape": {
+        "label": "Drape",
+        "short": "Drape",
+        "low": "Stiff, holds shape",
+        "high": "Soft, fluid"
+      },
+      "sheerness": {
+        "label": "Sheerness",
+        "short": "Sheer",
+        "low": "Opaque",
+        "high": "See-through"
+      },
+      "sheen": {
+        "label": "Sheen",
+        "short": "Sheen",
+        "low": "Matte",
+        "high": "Glossy"
+      }
+    },
+    "season": {
+      "SPRING": "Spring",
+      "SUMMER": "Summer",
+      "AUTUMN": "Autumn",
+      "WINTER": "Winter"
+    },
+    "media": {
+      "cover": "Swatch",
+      "add": "Add images ({count})",
+      "uploading": "Uploading...",
+      "remove": "Remove image",
+      "moveLeft": "Move earlier",
+      "moveRight": "Move later",
+      "openVideo": "Open video"
+    },
+    "process": {
+      "empty": "No steps yet. E.g. grow mulberry → reel silk → hand-loom → leaf dye.",
+      "add": "Add step",
+      "remove": "Remove step",
+      "moveUp": "Move up",
+      "moveDown": "Move down"
+    },
+    "care": {
+      "labelPreview": "Sewn-in label preview",
+      "labelEmpty": "No symbols selected"
+    },
+    "careCode": {
+      "HAND_WASH": "Gentle hand wash",
+      "MACHINE_GENTLE": "Machine wash, gentle",
+      "COLD_WATER": "Cold water below 30°C",
+      "NO_BLEACH": "Do not bleach",
+      "NO_WRING": "Do not wring",
+      "DRY_SHADE": "Dry in the shade",
+      "IRON_LOW": "Iron low, inside out",
+      "STEAM": "Steam only",
+      "DRY_CLEAN": "Dry clean",
+      "STORE_HANGING": "Store hanging, avoid folds"
+    },
+    "yield": {
+      "perSet": "A top + pants set needs about {meters} m of fabric."
+    },
+    "stock": {
+      "title": "Fabric stock",
+      "meters": "meters · {rolls, plural, one {# roll} other {# rolls}}",
+      "tops": "tops still possible",
+      "needYield": "Enter meters per top to estimate tops.",
+      "empty": "No fabric rolls belong to this material yet."
+    }
+  },
+  "attributes": {
+    "searchPlaceholder": "Search in this group...",
+    "groupsLabel": "Attribute groups",
+    "addValue": "Add {group}",
+    "empty": "This group has no values yet.",
+    "noResults": "No values match.",
+    "cancel": "Cancel",
+    "processing": "Processing...",
+    "hiddenSuccess": "Value hidden",
+    "shownSuccess": "Value shown",
+    "skuCount": "{count, plural, one {# SKU} other {# SKUs}}",
+    "section": {
+      "variant": "SKU variants",
+      "design": "Design traits"
+    },
+    "status": {
+      "hidden": "Hidden"
+    },
+    "size": {
+      "tapeHint": "Order on the tape is the order shown on product pages. Click a size to edit."
+    },
+    "menu": {
+      "label": "Actions for {name}",
+      "edit": "Edit",
+      "hide": "Hide",
+      "show": "Show",
+      "moveUp": "Move earlier",
+      "moveDown": "Move later",
+      "delete": "Delete",
+      "deleteBlocked": "Used by {count, plural, one {# SKU} other {# SKUs}} — hide it instead"
+    },
+    "field": {
+      "name": "Name",
+      "code": "Code",
+      "description": "Short description",
+      "hex": "Color code",
+      "family": "Color family",
+      "isActive": "In use"
+    },
+    "hints": {
+      "code": "Stable code within the group; sizes use the exact SKU label (S, XL, 35...).",
+      "family": "Groups colors in storefront filters.",
+      "isActive": "Turn off to hide from filters and product forms without deleting."
+    },
+    "placeholders": {
+      "code": "Please enter a code",
+      "vi": {
+        "name": "Please enter the {group} name",
+        "description": "Please enter a description"
+      },
+      "en": {
+        "name": "Please enter the {group} name (English)",
+        "description": "Please enter a description (English)"
+      }
+    },
+    "dialog": {
+      "createTitle": "Add {group}",
+      "editTitle": "Edit: {name}",
+      "langLabel": "Content language",
+      "create": "Add",
+      "save": "Save changes",
+      "created": "Value added",
+      "updated": "Value saved",
+      "familySuggested": "Suggested from color code: {family}"
+    },
+    "deleteDialog": {
+      "title": "Delete value?",
+      "description": "\"{name}\" will be permanently deleted.",
+      "body": "Products tagged with this trait will no longer show it in filters.",
+      "confirm": "Delete",
+      "success": "Value deleted"
+    },
+    "group": {
+      "COLOR": {
+        "label": "Colors",
+        "hint": "SKU variant colors, grouped into families for storefront filters."
+      },
+      "SIZE": {
+        "label": "Sizes",
+        "hint": "SKU size labels from small to large — matching size chart rows."
+      },
+      "NECKLINE": {
+        "label": "Necklines",
+        "hint": "Mandarin, boat, V-neck... for filtering and describing products."
+      },
+      "SLEEVE": {
+        "label": "Sleeves",
+        "hint": "Long, three-quarter, raglan..."
+      },
+      "PATTERN_TECHNIQUE": {
+        "label": "Pattern techniques",
+        "hint": "Hand embroidery, hand painting, beading, print, woven motif..."
+      },
+      "FLAP_LENGTH": {
+        "label": "Flap length",
+        "hint": "Knee-length, ankle-length, high slit..."
+      },
+      "OCCASION": {
+        "label": "Occasions",
+        "hint": "Wedding, Tết, office, photoshoot..."
+      }
+    },
+    "family": {
+      "RED": "Red",
+      "PINK": "Pink",
+      "ORANGE": "Orange",
+      "YELLOW": "Yellow",
+      "GREEN": "Green",
+      "BLUE": "Blue",
+      "PURPLE": "Purple",
+      "BROWN": "Brown",
+      "WHITE": "White, cream",
+      "GRAY": "Gray",
+      "BLACK": "Black",
+      "MULTI": "Multicolor",
+      "none": "No family"
     }
   }
 }

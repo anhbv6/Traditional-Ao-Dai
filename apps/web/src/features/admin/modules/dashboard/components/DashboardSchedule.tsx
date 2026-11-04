@@ -30,7 +30,7 @@ export function DashboardSchedule({ appointments, isLoading, onOpenMeasurement }
   return (
     <section className={cn(ADMIN_CARD_CLASS, "flex flex-col")}>
       <header className="flex items-center justify-between gap-3 border-b border-[#E4E4E7] px-5 py-4">
-        <h2 className="flex items-center gap-2 text-sm font-semibold text-[#09090B]">
+        <h2 className="flex items-center gap-2 text-lg font-semibold text-[#09090B]">
           <CalendarCheck size={15} />
           {t("title")}
         </h2>
@@ -56,13 +56,13 @@ export function DashboardSchedule({ appointments, isLoading, onOpenMeasurement }
 
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="truncate text-[13px] font-medium text-[#09090B]">{appointment.customerName}</span>
-                    <span className={cn("rounded-md px-1.5 py-0.5 text-[10px] font-semibold", TYPE_CLASS[appointment.type])}>
+                    <span className="truncate text-sm font-medium text-[#09090B]">{appointment.customerName}</span>
+                    <span className={cn("rounded-md px-1.5 py-0.5 text-2xs font-semibold", TYPE_CLASS[appointment.type])}>
                       {t(`types.${appointment.type}`)}
                     </span>
                   </div>
                   {appointment.note ? <p className="mt-0.5 text-xs text-[#3F3F46]">{appointment.note}</p> : null}
-                  <p className="mt-1 flex flex-wrap items-center gap-x-3 text-[11px] text-[#71717A]">
+                  <p className="mt-1 flex flex-wrap items-center gap-x-3 text-2xs text-[#71717A]">
                     {appointment.customerPhone ? (
                       <a href={`tel:${appointment.customerPhone}`} className="inline-flex items-center gap-1 hover:text-[#09090B]">
                         <Phone size={11} />

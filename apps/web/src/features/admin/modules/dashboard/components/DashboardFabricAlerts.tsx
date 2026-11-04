@@ -27,7 +27,7 @@ export function DashboardFabricAlerts({ fabrics, isLoading, hidingProductId, onH
     <section className={cn(ADMIN_CARD_CLASS, "flex flex-col")}>
       <header className="flex items-center justify-between gap-3 border-b border-[#E4E4E7] px-5 py-4">
         <div>
-          <h2 className="text-sm font-semibold text-[#09090B]">{t("title")}</h2>
+          <h2 className="text-lg font-semibold text-[#09090B]">{t("title")}</h2>
           <p className="mt-0.5 text-xs text-[#71717A]">{t("subtitle")}</p>
         </div>
         <Link
@@ -59,7 +59,7 @@ export function DashboardFabricAlerts({ fabrics, isLoading, hidingProductId, onH
               <li key={fabric.id} className="flex items-center gap-4 px-5 py-3.5">
                 <div className="min-w-0 flex-1">
                   <div className="flex items-baseline justify-between gap-2">
-                    <p className="truncate text-[13px] font-medium text-[#09090B]">{fabric.name}</p>
+                    <p className="truncate text-sm font-medium text-[#09090B]">{fabric.name}</p>
                     <span className={cn("shrink-0 font-mono text-sm font-semibold", critical ? "text-rose-700" : "text-amber-700")}>
                       {t("remaining", { meters: formatMeters(fabric.remainingMeters) })}
                     </span>
@@ -67,7 +67,7 @@ export function DashboardFabricAlerts({ fabrics, isLoading, hidingProductId, onH
                   <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-[#F4F4F5]">
                     <div className={cn("h-full", critical ? "bg-rose-500" : "bg-amber-500")} style={{ width: `${ratio}%` }} />
                   </div>
-                  <p className="mt-1 truncate text-[11px] text-[#71717A]">
+                  <p className="mt-1 truncate text-2xs text-[#71717A]">
                     <span className="font-mono">{fabric.code}</span>
                     {fabric.product ? ` · ${fabric.product.name}` : ` · ${t("noProduct")}`}
                   </p>
@@ -85,7 +85,7 @@ export function DashboardFabricAlerts({ fabrics, isLoading, hidingProductId, onH
                       <span className="hidden sm:inline">{t("hideOnWeb")}</span>
                     </button>
                   ) : (
-                    <span className="shrink-0 rounded-md bg-[#F4F4F5] px-2 py-1 text-[11px] font-medium text-[#71717A]">{t("hidden")}</span>
+                    <span className="shrink-0 rounded-md bg-[#F4F4F5] px-2 py-1 text-2xs font-medium text-[#71717A]">{t("hidden")}</span>
                   )
                 ) : null}
               </li>

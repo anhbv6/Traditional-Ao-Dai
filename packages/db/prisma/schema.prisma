@@ -134,6 +134,32 @@ enum CollectionStatus {
   ARCHIVED
 }
 
+// Hình thức bán: một món (may sẵn theo size), theo bộ (nhiều món bán chung một giá), may đo theo số đo
+enum SaleMode {
+  SINGLE
+  SET
+  CUSTOM
+}
+
+// Mùa mặc phù hợp của chất liệu vải
+enum Season {
+  SPRING
+  SUMMER
+  AUTUMN
+  WINTER
+}
+
+// Nhóm thuộc tính dùng chung: biến thể SKU (màu, size) và đặc tính thiết kế để lọc / mô tả sản phẩm
+enum AttributeGroup {
+  COLOR
+  SIZE
+  NECKLINE          // Kiểu cổ áo
+  SLEEVE            // Kiểu tay áo
+  PATTERN_TECHNIQUE // Kỹ thuật họa tiết: thêu tay, vẽ tay, đính kết, in...
+  FLAP_LENGTH       // Chiều dài tà
+  OCCASION          // Dịp sử dụng
+}
+
 // ==========================================
 // USER & AUTHENTICATION
 // ==========================================
@@ -307,13 +333,16 @@ model Category {
 
 model Product {
   id          String           @id @default(uuid())
+  code        String           @unique // Mã sản phẩm tự sinh theo nhóm hàng, VD "AD0007" — gốc của mọi SKU
   name        String
   nameEn      String?
   slug        String           @unique
   description String?          @db.Text
   descriptionEn String?        @db.Text
-  material    String?          // Lụa tơ tằm, Voan, Gấm, Nhung...
-  materialEn  String?
+  saleMode    SaleMode         @default(SINGLE)
+  // Theo bộ: các món trong bộ [{ label, labelEn, quantity, materialId }]
+  setItems    Json             @default("[]")
+  leadTimeDays Int?            // May đo: số ngày may dự kiến
   basePrice   Decimal          @db.Decimal(12, 2)
   images      String[]
   soldCount   Int              @default(0)
@@ -328,6 +357,11 @@ model Product {
   sizeChartId String?
   sizeChart   SizeChart?       @relation(fields: [sizeChartId], references: [id], onDelete: SetNull)
 
+  // Chất liệu chính — thanh đo, bảo quản, định mức vải kế thừa từ hồ sơ chất liệu
+  materialId  String?
+  material    Material?        @relation(fields: [materialId], references: [id], onDelete: SetNull)
+
+  attributes  ProductAttribute[]
   variants    ProductVariant[]
   collections CollectionProduct[]
   fabrics     Fabric[]
@@ -340,6 +374,7 @@ model Product {
 
   @@index([categoryId])
   @@index([sizeChartId])
+  @@index([materialId])
   @@index([slug])
   @@index([isActive, isFeatured])
 }
@@ -347,8 +382,10 @@ model Product {
 model ProductVariant {
   id        String      @id @default(uuid())
   sku       String      @unique
-  size      String      // S, M, L, XL, XXL, FREE_SIZE
-  color     String?
+  size      String      // S, M, L, XL, XXL; FREE_SIZE (không có size); CUSTOM (may đo)
+  color     String?     // Tên màu lúc lưu (giữ được khi thuộc tính màu bị xóa)
+  colorId   String?
+  colorValue AttributeValue? @relation(fields: [colorId], references: [id], onDelete: SetNull)
   price     Decimal?    @db.Decimal(12, 2) // Null nếu dùng basePrice của Product
   stock     Int         @default(0)
 
@@ -362,6 +399,7 @@ model ProductVariant {
   updatedAt DateTime    @updatedAt
 
   @@index([productId])
+  @@index([colorId])
   @@index([sku])
 }
 
@@ -828,9 +866,94 @@ model Fabric {
   productId         String?
   product           Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
 
+  // Cây vải thuộc chất liệu nào — để tính tồn kho theo chất liệu và số áo còn may được
+  materialId        String?
+  material          Material? @relation(fields: [materialId], references: [id], onDelete: SetNull)
+
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
   @@index([productId])
+  @@index([materialId])
   @@index([isActive, remainingMeters])
+}
+
+// Chất liệu vải (định nghĩa loại vải: lụa tơ tằm, đũi, gấm...) — khác Fabric là từng cây vải cụ thể trong kho.
+// Thanh đo vật lý 1–5 chuẩn hóa để so sánh các chất liệu với nhau và tư vấn cho khách.
+model Material {
+  id             String   @id @default(uuid())
+  code           String   @unique // VD: "LUA-TO-TAM"
+  name           String
+  nameEn         String?
+  origin         String?  // Xuất xứ, VD: "Bảo Lộc, Lâm Đồng"
+  originEn       String?
+  description    String?
+  descriptionEn  String?
+  composition    Json     @default("[]") // Thành phần sợi: [{ fiber: "SILK", percent: 100 }]
+  processSteps   Json     @default("[]") // Quy trình: [{ title, titleEn, detail, detailEn }]
+  closeupImages  String[] // Ảnh chụp cận mặt vải
+  videoUrl       String?  // Video chuyển động / độ rủ của vải
+
+  // Thanh đo 1–5 (null = chưa đánh giá)
+  stretch        Int?     // Độ co giãn
+  thickness      Int?     // Độ dày
+  drape          Int?     // Độ mềm rủ
+  sheerness      Int?     // Độ xuyên thấu
+  sheen          Int?     // Độ bóng bề mặt
+  seasons        Season[]
+
+  careCodes      String[] // Mã ký hiệu bảo quản (danh sách cố định ở web)
+  careNote       String?
+  careNoteEn     String?
+
+  // Định mức vải
+  widthCm        Int?                  // Khổ vải
+  metersPerTop   Decimal? @db.Decimal(5, 2) // Mét vải cho một thân áo dài
+  metersPerPants Decimal? @db.Decimal(5, 2) // Mét vải cho một quần
+
+  isActive       Boolean  @default(true)
+  position       Int      @default(0)
+
+  fabrics        Fabric[]
+  products       Product[]
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([isActive, position])
+}
+
+// Giá trị thuộc tính theo nhóm (màu, size, kiểu cổ...). Màu có mã hex + họ màu để lọc trên cửa hàng.
+model AttributeValue {
+  id            String         @id @default(uuid())
+  group         AttributeGroup
+  code          String         // Mã ổn định trong nhóm, VD: "DO-DO", "S", "CO-TRU"
+  name          String
+  nameEn        String?
+  description   String?
+  descriptionEn String?
+  hex           String?        // Chỉ COLOR, VD: "#8B1E3F"
+  family        String?        // Chỉ COLOR: họ màu (RED, PINK...) để gom bộ lọc
+  isActive      Boolean        @default(true)
+  position      Int            @default(0)
+
+  products      ProductAttribute[] // Đặc tính thiết kế gắn cho sản phẩm
+  variants      ProductVariant[]   // Màu của SKU
+
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@unique([group, code])
+  @@index([group, position])
+}
+
+// Đặc tính thiết kế của sản phẩm (kiểu cổ, tay, họa tiết, tà, dịp) — nhiều - nhiều với AttributeValue
+model ProductAttribute {
+  productId        String
+  product          Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  attributeValueId String
+  attributeValue   AttributeValue @relation(fields: [attributeValueId], references: [id], onDelete: Cascade)
+
+  @@id([productId, attributeValueId])
+  @@index([attributeValueId])
 }

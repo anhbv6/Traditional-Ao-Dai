@@ -27,7 +27,7 @@ export async function AdminPlaceholderPage({ module }: { module: AdminModule }) 
             <Hammer size={17} aria-hidden />
           </span>
           <div>
-            <h2 className="text-sm font-semibold text-[#09090B]">{tPlaceholder("title")}</h2>
+            <h2 className="text-lg font-semibold text-[#09090B]">{tPlaceholder("title")}</h2>
             <p className="mt-0.5 text-sm text-[#71717A]">{tPlaceholder("description")}</p>
           </div>
         </div>

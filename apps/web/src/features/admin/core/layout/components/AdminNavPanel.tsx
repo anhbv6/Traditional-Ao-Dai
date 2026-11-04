@@ -67,17 +67,19 @@ export function AdminNavPanel({
         </Link>
       </div>
 
-      <PanelDivider />
-
-      <div className="p-2">
-        <AdminUserMenu
-          variant={accountVariant}
-          user={user}
-          isSuperAdmin={isSuperAdmin}
-          isLoggingOut={isLoggingOut}
-          onOpenProfile={onOpenProfile}
-          onLogout={onLogout}
-        />
+      {/* Từ xl khối tài khoản lên góc trên phải (AdminRightRail); ngăn kéo mobile luôn giữ */}
+      <div className={cn(accountVariant === "sidebar" && "xl:hidden")}>
+        <PanelDivider />
+        <div className="p-2">
+          <AdminUserMenu
+            variant={accountVariant}
+            user={user}
+            isSuperAdmin={isSuperAdmin}
+            isLoggingOut={isLoggingOut}
+            onOpenProfile={onOpenProfile}
+            onLogout={onLogout}
+          />
+        </div>
       </div>
     </div>
   );

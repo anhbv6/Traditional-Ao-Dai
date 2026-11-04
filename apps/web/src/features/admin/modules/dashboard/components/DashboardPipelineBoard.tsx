@@ -21,13 +21,13 @@ const DRAG_TYPE = "application/x-order-id";
 /** Hạn trả: đỏ khi còn ≤ 1 ngày / đã trễ, vàng khi còn ≤ 3 ngày */
 function DueChip({ days }: { days: number | null }) {
   const t = useTranslations("AdminPage.dashboard.pipeline");
-  if (days === null) return <span className="text-[11px] text-[#A1A1AA]">{t("noDue")}</span>;
+  if (days === null) return <span className="text-2xs text-[#A1A1AA]">{t("noDue")}</span>;
 
   const label = days < 0 ? t("overdue", { days: -days }) : days === 0 ? t("dueToday") : t("dueInDays", { days });
   return (
     <span
       className={cn(
-        "rounded-md px-1.5 py-0.5 text-[11px] font-semibold",
+        "rounded-md px-1.5 py-0.5 text-2xs font-semibold",
         days <= 1 ? "bg-rose-50 text-rose-700" : days <= 3 ? "bg-amber-50 text-amber-700" : "bg-[#F4F4F5] text-[#71717A]"
       )}
     >
@@ -67,8 +67,8 @@ function OrderCard({
     >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <p className="truncate text-[13px] font-semibold text-[#09090B]">{card.customerName}</p>
-          <p className="font-mono text-[11px] text-[#71717A]">{card.orderNumber}</p>
+          <p className="truncate text-body font-semibold text-[#09090B]">{card.customerName}</p>
+          <p className="font-mono text-2xs text-[#71717A]">{card.orderNumber}</p>
         </div>
         {draggable ? <GripVertical size={14} className="mt-0.5 shrink-0 text-[#D4D4D8] group-hover:text-[#A1A1AA]" /> : null}
       </div>
@@ -78,7 +78,7 @@ function OrderCard({
       <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
         <DueChip days={card.daysLeft} />
         {card.stage === "sewing" && ["FABRIC_CUTTING", "SEWING", "EMBROIDERY_BEADING"].includes(card.tailoringStatus) ? (
-          <span className="rounded-md border border-[#E4E4E7] px-1.5 py-0.5 text-[11px] text-[#3F3F46]">
+          <span className="rounded-md border border-[#E4E4E7] px-1.5 py-0.5 text-2xs text-[#3F3F46]">
             {t(`tailoringStatus.${card.tailoringStatus}`)}
           </span>
         ) : null}
@@ -89,7 +89,7 @@ function OrderCard({
         <div className="h-1 overflow-hidden rounded-full bg-[#F4F4F5]">
           <div className={cn("h-full", debt > 0 ? "bg-amber-500" : "bg-emerald-500")} style={{ width: `${paidRatio}%` }} />
         </div>
-        <p className="mt-1 text-[11px] text-[#71717A]">
+        <p className="mt-1 text-2xs text-[#71717A]">
           {debt > 0 ? t("debt", { amount: formatVnd(debt) }) : t("paidInFull")}
         </p>
       </div>
@@ -112,7 +112,7 @@ function OrderCard({
           <button
             type="button"
             onClick={() => onMove(card.orderId, next)}
-            className="inline-flex h-7 cursor-pointer items-center gap-1 rounded-md bg-[#18181B] px-2 text-[11px] font-medium text-white transition-colors hover:bg-[#09090B]"
+            className="inline-flex h-7 cursor-pointer items-center gap-1 rounded-md bg-[#18181B] px-2 text-2xs font-medium text-white transition-colors hover:bg-[#09090B]"
           >
             {t(`stages.${next}.short`)}
             <ChevronRight size={13} />
@@ -141,7 +141,7 @@ export function DashboardPipelineBoard({ cards, isLoading, canMoveTo, onMove }: 
   return (
     <section className={cn(ADMIN_CARD_CLASS, "overflow-hidden")}>
       <header className="border-b border-[#E4E4E7] px-5 py-4">
-        <h2 className="text-sm font-semibold text-[#09090B]">{t("title")}</h2>
+        <h2 className="text-lg font-semibold text-[#09090B]">{t("title")}</h2>
         <p className="mt-0.5 text-xs text-[#71717A]">{t("subtitle")}</p>
       </header>
 
@@ -166,22 +166,22 @@ export function DashboardPipelineBoard({ cards, isLoading, canMoveTo, onMove }: 
             >
               <div className="px-1.5 pb-2.5 pt-1">
                 <div className="flex items-center justify-between gap-2">
-                  <h3 className="truncate text-xs font-semibold text-[#09090B]">
+                  <h3 className="truncate text-sm font-semibold text-[#09090B]">
                     <span className="mr-1.5 font-mono text-[#A1A1AA]">{index + 1}</span>
                     {t(`stages.${stage}.title`)}
                   </h3>
-                  <span className="rounded-md bg-white px-1.5 py-0.5 font-mono text-[11px] font-semibold text-[#3F3F46] shadow-2xs">
+                  <span className="rounded-md bg-white px-1.5 py-0.5 font-mono text-2xs font-semibold text-[#3F3F46] shadow-2xs">
                     {isLoading ? "–" : columnCards.length}
                   </span>
                 </div>
-                <p className="mt-0.5 line-clamp-1 text-[11px] text-[#71717A]">{t(`stages.${stage}.hint`)}</p>
+                <p className="mt-0.5 line-clamp-1 text-2xs text-[#71717A]">{t(`stages.${stage}.hint`)}</p>
               </div>
 
               <div className="flex max-h-[520px] flex-1 flex-col gap-2 overflow-y-auto px-0.5 pb-1">
                 {isLoading ? (
                   Array.from({ length: 2 }).map((_, i) => <div key={i} className="h-32 animate-pulse rounded-lg bg-[#F4F4F5]" />)
                 ) : columnCards.length === 0 ? (
-                  <p className="rounded-lg border border-dashed border-[#E4E4E7] py-6 text-center text-[11px] text-[#A1A1AA]">
+                  <p className="rounded-lg border border-dashed border-[#E4E4E7] py-6 text-center text-2xs text-[#A1A1AA]">
                     {t("empty")}
                   </p>
                 ) : (

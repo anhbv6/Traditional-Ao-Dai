@@ -72,7 +72,7 @@ export function VouchersList({ initialVouchers }: VouchersListProps) {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-[#E4E4E7] bg-zinc-50/50 text-[11px] font-semibold text-[#71717A] uppercase tracking-wider">
+              <tr className="border-b border-[#E4E4E7] bg-zinc-50/50 text-body font-semibold text-[#3F3F46]">
                 <th className="py-3 px-4">{t("colCode")}</th>
                 <th className="py-3 px-4">{t("colDiscount")}</th>
                 <th className="py-3 px-4">{t("colMinOrder")}</th>
@@ -81,7 +81,7 @@ export function VouchersList({ initialVouchers }: VouchersListProps) {
                 <th className="py-3 px-4">{t("colStatus")}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#E4E4E7] text-sm">
+            <tbody className="divide-y divide-[#E4E4E7] text-body">
               {filtered.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="py-12 text-center text-[#71717A]">
@@ -96,7 +96,7 @@ export function VouchersList({ initialVouchers }: VouchersListProps) {
                   return (
                     <tr key={voucher.id} className="hover:bg-zinc-50/80 transition-colors">
                       <td className="py-3.5 px-4">
-                        <div className="font-mono font-bold text-xs text-[#09090B] bg-zinc-100 px-2.5 py-1 rounded inline-block border border-[#E4E4E7]">
+                        <div className="font-mono font-semibold text-xs text-[#09090B] bg-zinc-100 px-2.5 py-1 rounded inline-block border border-[#E4E4E7]">
                           {voucher.code}
                         </div>
                         {voucher.description && (
@@ -122,7 +122,7 @@ export function VouchersList({ initialVouchers }: VouchersListProps) {
                           : t("noMinimum")}
                       </td>
                       <td className="py-3.5 px-4 font-mono text-xs text-zinc-800">
-                        <span className="font-bold">{voucher.usedCount}</span>
+                        <span className="font-semibold">{voucher.usedCount}</span>
                         {voucher.usageLimit ? ` / ${voucher.usageLimit}` : " / ∞"}
                       </td>
                       <td className="py-3.5 px-4 text-xs text-zinc-600">
@@ -132,7 +132,7 @@ export function VouchersList({ initialVouchers }: VouchersListProps) {
                           {new Date(voucher.endDate).toLocaleDateString("vi-VN")}
                         </div>
                         {isExpired && (
-                          <span className="text-[10px] text-rose-600 font-semibold block mt-0.5">
+                          <span className="text-2xs text-rose-600 font-semibold block mt-0.5">
                             {t("expired")}
                           </span>
                         )}

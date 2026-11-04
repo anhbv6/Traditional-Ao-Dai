@@ -93,15 +93,15 @@ export function AdminApprovalsList({ view }: { view: ApprovalView }) {
   const getActionBadge = (action: string) => {
     switch (action) {
       case "CANCEL_ORDER":
-        return <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">{t("action.CANCEL_ORDER")}</span>;
+        return <span className="px-2.5 py-0.5 rounded-full text-2xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">{t("action.CANCEL_ORDER")}</span>;
       case "SPECIAL_DISCOUNT":
-        return <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">{t("action.SPECIAL_DISCOUNT")}</span>;
+        return <span className="px-2.5 py-0.5 rounded-full text-2xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">{t("action.SPECIAL_DISCOUNT")}</span>;
       case "PRICE_OVERRIDE":
-        return <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">{t("action.PRICE_OVERRIDE")}</span>;
+        return <span className="px-2.5 py-0.5 rounded-full text-2xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">{t("action.PRICE_OVERRIDE")}</span>;
       case "REFUND":
-        return <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-purple-50 text-purple-700 border border-purple-200">{t("action.REFUND")}</span>;
+        return <span className="px-2.5 py-0.5 rounded-full text-2xs font-semibold bg-purple-50 text-purple-700 border border-purple-200">{t("action.REFUND")}</span>;
       default:
-        return <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-zinc-100 text-zinc-700">{action}</span>;
+        return <span className="px-2.5 py-0.5 rounded-full text-2xs font-semibold bg-zinc-100 text-zinc-700">{action}</span>;
     }
   };
 
@@ -109,21 +109,21 @@ export function AdminApprovalsList({ view }: { view: ApprovalView }) {
     switch (status) {
       case "PENDING":
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-2xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
             <Clock size={12} />
             <span>{t("filter.PENDING")}</span>
           </span>
         );
       case "APPROVED":
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-2xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
             <CheckCircle2 size={12} />
             <span>{t("filter.APPROVED")}</span>
           </span>
         );
       case "REJECTED":
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-2xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
             <XCircle size={12} />
             <span>{t("filter.REJECTED")}</span>
           </span>

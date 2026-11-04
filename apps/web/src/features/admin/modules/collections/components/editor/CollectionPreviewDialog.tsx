@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Monitor, Shirt, Smartphone, Star } from "lucide-react";
+import { Eye, Monitor, Shirt, Smartphone, Star } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { formatVnd, type Locale } from "@repo/shared";
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { AdminDialog } from "@/features/admin/core/ui";
 import { type SaveCollectionValues } from "../../schemas/collections.schemas";
 import { type CollectionPickerProduct, type CollectionStatus } from "../../types/collections.types";
 import { daysUntil, fromDateInputValue, orderCollectionProducts } from "../../utils/collectionLifecycle";
@@ -67,15 +67,16 @@ export function CollectionPreviewDialog({
   const price = (amount: number) => formatVnd(amount, locale);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="admin-shell flex h-[92dvh] max-w-[calc(100%-1.5rem)] flex-col gap-0 overflow-hidden rounded-xl border border-[#E4E4E7] bg-[#E4E4E7] p-0 sm:max-w-[min(1280px,calc(100%-3rem))]">
-        <div className="flex flex-wrap items-center gap-2 border-b border-[#D4D4D8] bg-white px-4 py-2.5 pr-12">
-          <div className="min-w-0 flex-1">
-            <DialogTitle className="truncate text-sm font-semibold text-[#09090B]">{t("title")}</DialogTitle>
-            <DialogDescription className="truncate text-xs text-[#71717A]">
-              {t(`statusNote.${status}`)}
-            </DialogDescription>
-          </div>
+    <AdminDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      icon={Eye}
+      title={t("title")}
+      description={t(`statusNote.${status}`)}
+      size="full"
+      bodyClassName="bg-[#E4E4E7] p-3 sm:p-6"
+      headerAside={
+        <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
           <div className="flex rounded-lg border border-[#E4E4E7] p-0.5">
             {(
               [
@@ -115,126 +116,121 @@ export function CollectionPreviewDialog({
             ))}
           </div>
         </div>
+      }
+    >
+      <div
+        className={cn(
+          "mx-auto overflow-hidden bg-(--bg-main) text-(--text-main) shadow-xl transition-[max-width] duration-300",
+          isMobile ? "max-w-[390px] rounded-[28px] border-8 border-[#18181B]" : "max-w-full rounded-lg"
+        )}
+      >
+        {status !== "ACTIVE" && (
+          <div className="px-4 py-2 text-center text-xs font-medium text-white" style={{ backgroundColor: accent }}>
+            {status === "COMING_SOON"
+              ? launchDays !== null && launchDays > 0
+                ? t("ribbon.comingSoonDays", { count: launchDays })
+                : t("ribbon.comingSoon")
+              : t(`ribbon.${status}`)}
+          </div>
+        )}
 
-        <div className="min-h-0 flex-1 overflow-y-auto p-3 sm:p-6">
-          <div
-            className={cn(
-              "mx-auto overflow-hidden bg-(--bg-main) text-(--text-main) shadow-xl transition-[max-width] duration-300",
-              isMobile ? "max-w-[390px] rounded-[28px] border-8 border-[#18181B]" : "max-w-full rounded-lg"
-            )}
-          >
-            {status !== "ACTIVE" && (
-              <div className="px-4 py-2 text-center text-xs font-medium text-white" style={{ backgroundColor: accent }}>
-                {status === "COMING_SOON"
-                  ? launchDays !== null && launchDays > 0
-                    ? t("ribbon.comingSoonDays", { count: launchDays })
-                    : t("ribbon.comingSoon")
-                  : t(`ribbon.${status}`)}
-              </div>
-            )}
-
-            <section className={cn("relative bg-(--bg-secondary)", isMobile ? "aspect-[4/5]" : "aspect-[16/7]")}>
-              {hero && (
-                // eslint-disable-next-line @next/next/no-img-element -- ảnh từ URL tùy ý (blob xem trước / avatar / ảnh do admin nhập), không tối ưu được bằng next/image
-                <img src={hero} alt="" className="absolute inset-0 size-full object-cover" />
+        <section className={cn("relative bg-(--bg-secondary)", isMobile ? "aspect-[4/5]" : "aspect-[16/7]")}>
+          {hero && (
+            // eslint-disable-next-line @next/next/no-img-element -- ảnh từ URL tùy ý (blob xem trước / avatar / ảnh do admin nhập), không tối ưu được bằng next/image
+            <img src={hero} alt="" className="absolute inset-0 size-full object-cover" />
+          )}
+          <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent" />
+          <div className={cn("absolute inset-x-0 bottom-0 text-white", isMobile ? "p-5" : "p-10")}>
+            {season && <p className="text-xs font-medium uppercase tracking-[0.3em] text-white/85">{season}</p>}
+            <h1
+              className={cn(
+                "mt-2 font-(family-name:--font-playfair) font-semibold leading-tight",
+                isMobile ? "text-3xl" : "text-5xl"
               )}
-              <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent" />
-              <div className={cn("absolute inset-x-0 bottom-0 text-white", isMobile ? "p-5" : "p-10")}>
-                {season && <p className="text-xs font-medium uppercase tracking-[0.3em] text-white/85">{season}</p>}
-                <h1
-                  className={cn(
-                    "mt-2 font-(family-name:--font-playfair) font-semibold leading-tight",
-                    isMobile ? "text-3xl" : "text-5xl"
-                  )}
-                >
-                  {name || t("untitled")}
-                </h1>
-                {tagline && <p className={cn("mt-2 text-white/90", isMobile ? "text-sm" : "text-lg")}>{tagline}</p>}
-                <span aria-hidden className="mt-4 block h-0.5 w-16" style={{ backgroundColor: accent }} />
-              </div>
-            </section>
+            >
+              {name || t("untitled")}
+            </h1>
+            {tagline && <p className={cn("mt-2 text-white/90", isMobile ? "text-sm" : "text-lg")}>{tagline}</p>}
+            <span aria-hidden className="mt-4 block h-0.5 w-16" style={{ backgroundColor: accent }} />
+          </div>
+        </section>
 
-            <div className={cn("space-y-10", isMobile ? "px-4 py-8" : "px-10 py-12")}>
-              {description && (
-                <p
-                  className={cn(
-                    "mx-auto max-w-2xl text-center leading-relaxed text-(--text-light)",
-                    isMobile ? "text-sm" : "text-base"
-                  )}
-                >
-                  {description}
+        <div className={cn("space-y-10", isMobile ? "px-4 py-8" : "px-10 py-12")}>
+          {description && (
+            <p
+              className={cn(
+                "mx-auto max-w-2xl text-center leading-relaxed text-(--text-light)",
+                isMobile ? "text-sm" : "text-base"
+              )}
+            >
+              {description}
+            </p>
+          )}
+
+          {highlighted.length > 0 && (
+            <div className={cn("grid gap-4", isMobile ? "grid-cols-1" : "grid-cols-3")}>
+              {highlighted.map((product) => (
+                <PreviewProduct
+                  key={product.id}
+                  product={product}
+                  price={price}
+                  large
+                  status={status}
+                  locale={locale}
+                />
+              ))}
+            </div>
+          )}
+
+          {rest.length > 0 ? (
+            <div className={cn("grid gap-x-4 gap-y-6", isMobile ? "grid-cols-2" : "grid-cols-4")}>
+              {rest.map((product) => (
+                <PreviewProduct key={product.id} product={product} price={price} status={status} locale={locale} />
+              ))}
+            </div>
+          ) : highlighted.length === 0 ? (
+            <p className="py-10 text-center text-sm text-(--text-light)">{t("noProducts")}</p>
+          ) : null}
+
+          {hiddenCount > 0 && (
+            <p className="rounded-md border border-dashed border-(--border) px-3 py-2 text-center text-xs text-(--text-light)">
+              {t("hiddenNote", { count: hiddenCount })}
+            </p>
+          )}
+
+          {(story || values.gallery.length > 0) && (
+            <section className="space-y-5">
+              <h2
+                className={cn(
+                  "text-center font-(family-name:--font-playfair) font-semibold text-(--primary-ink)",
+                  isMobile ? "text-2xl" : "text-3xl"
+                )}
+              >
+                {t("lookbook")}
+              </h2>
+              {story && (
+                <p className="mx-auto max-w-2xl whitespace-pre-line text-center text-sm leading-relaxed text-(--text-light)">
+                  {story}
                 </p>
               )}
-
-              {highlighted.length > 0 && (
-                <div className={cn("grid gap-4", isMobile ? "grid-cols-1" : "grid-cols-3")}>
-                  {highlighted.map((product) => (
-                    <PreviewProduct
-                      key={product.id}
-                      product={product}
-                      price={price}
-                      large
-                      status={status}
-                      locale={locale}
+              {values.gallery.length > 0 && (
+                <div className={cn("grid gap-2", isMobile ? "grid-cols-2" : "grid-cols-4")}>
+                  {values.gallery.map((url, index) => (
+                    // eslint-disable-next-line @next/next/no-img-element -- ảnh từ URL tùy ý (blob xem trước / avatar / ảnh do admin nhập), không tối ưu được bằng next/image
+                    <img
+                      key={url}
+                      src={url}
+                      alt=""
+                      className={cn("w-full rounded object-cover", index % 3 === 0 ? "aspect-[3/4]" : "aspect-square")}
                     />
                   ))}
                 </div>
               )}
-
-              {rest.length > 0 ? (
-                <div className={cn("grid gap-x-4 gap-y-6", isMobile ? "grid-cols-2" : "grid-cols-4")}>
-                  {rest.map((product) => (
-                    <PreviewProduct key={product.id} product={product} price={price} status={status} locale={locale} />
-                  ))}
-                </div>
-              ) : highlighted.length === 0 ? (
-                <p className="py-10 text-center text-sm text-(--text-light)">{t("noProducts")}</p>
-              ) : null}
-
-              {hiddenCount > 0 && (
-                <p className="rounded-md border border-dashed border-(--border) px-3 py-2 text-center text-xs text-(--text-light)">
-                  {t("hiddenNote", { count: hiddenCount })}
-                </p>
-              )}
-
-              {(story || values.gallery.length > 0) && (
-                <section className="space-y-5">
-                  <h2
-                    className={cn(
-                      "text-center font-(family-name:--font-playfair) font-semibold text-(--primary-ink)",
-                      isMobile ? "text-2xl" : "text-3xl"
-                    )}
-                  >
-                    {t("lookbook")}
-                  </h2>
-                  {story && (
-                    <p className="mx-auto max-w-2xl whitespace-pre-line text-center text-sm leading-relaxed text-(--text-light)">
-                      {story}
-                    </p>
-                  )}
-                  {values.gallery.length > 0 && (
-                    <div className={cn("grid gap-2", isMobile ? "grid-cols-2" : "grid-cols-4")}>
-                      {values.gallery.map((url, index) => (
-                        // eslint-disable-next-line @next/next/no-img-element -- ảnh từ URL tùy ý (blob xem trước / avatar / ảnh do admin nhập), không tối ưu được bằng next/image
-                        <img
-                          key={url}
-                          src={url}
-                          alt=""
-                          className={cn(
-                            "w-full rounded object-cover",
-                            index % 3 === 0 ? "aspect-[3/4]" : "aspect-square"
-                          )}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </section>
-              )}
-            </div>
-          </div>
+            </section>
+          )}
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </AdminDialog>
   );
 }
 

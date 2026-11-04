@@ -2,35 +2,38 @@
 
 import { useMemo, useState, type DragEvent } from "react";
 import dynamic from "next/dynamic";
-import { ChevronsDownUp, ChevronsUpDown, FolderTree } from "lucide-react";
+import { ChevronsDownUp, ChevronsUpDown, FolderTree, Info } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { PRODUCT_GROUPS, type ProductGroup } from "@repo/shared/sizing";
 import { useNotify } from "@/hooks/useNotify";
 import { cn } from "@/lib/utils";
-import { AdminFilterSelect, AdminListPanel } from "@/features/admin/core/ui";
+import {
+  ADMIN_CARD_CLASS,
+  ADMIN_SECONDARY_BUTTON_CLASS,
+  AdminFilterSelect,
+  AdminListPanel,
+} from "@/features/admin/core/ui";
 import { reorderCategoriesAction, updateCategoryAction } from "../../actions/categories.actions";
 import { type AdminCategoryNode, type SizeChartOption } from "../../types/categories.types";
 import { filterTree, filterTreeByGroup, getSiblings, moveSibling, replaceSiblings } from "../../utils/categoryTree";
-import { type CategoryEditorTarget } from "./CategoryEditorDialog";
-import { CategoryTreeRow, type CategoryRowHandlers } from "./CategoryTreeRow";
+import { CATEGORY_LIST_GRID, CategoryTreeRow, type CategoryRowDrag, type CategoryRowHandlers } from "./CategoryTreeRow";
 
 // Hộp thoại chỉ cần khi thao tác nên tách khỏi bundle đầu trang
-const CategoryEditorDialog = dynamic(() => import("./CategoryEditorDialog").then((m) => m.CategoryEditorDialog));
 const ConfirmDeleteCategoryDialog = dynamic(() =>
   import("./ConfirmDeleteCategoryDialog").then((m) => m.ConfirmDeleteCategoryDialog)
 );
+const CategoryEditorDialog = dynamic(() => import("./CategoryEditorDialog").then((m) => m.CategoryEditorDialog));
+// Sơ đồ dùng motion — tách chunk để danh sách hiện trước
+const CategoryTreeDiagram = dynamic(() => import("./CategoryTreeDiagram").then((m) => m.CategoryTreeDiagram));
 
-interface DragState {
-  id: string;
-  parentId: string | null;
-}
+/** Đang mở dialog: sửa `node`, hoặc thêm mới (`node` null, `parent` = nhóm gốc khi thêm loại con) */
+type EditorState = { node: AdminCategoryNode | null; parent: AdminCategoryNode | null };
 
-interface DropHint {
-  id: string;
-  placement: "before" | "after";
-}
-
-/** Màn loại sản phẩm: cây 2 cấp (nhóm gốc → loại con), kéo thả đổi thứ tự trong cùng cấp */
+/**
+ * Màn loại sản phẩm: trái là danh sách theo cây 2 cấp (kéo thả đổi thứ tự cùng cấp, công tắc hiển thị, menu ⋯),
+ * phải là sơ đồ cây động minh họa cách khách duyệt danh mục — trỏ một bên thì bên kia sáng theo.
+ * Xem ở màn chi tiết `/admin/catalog/categories/[id]`, thêm / sửa mở CategoryEditorDialog.
+ */
 export function CategoryTreeBoard({
   initialTree,
   sizeCharts,
@@ -46,13 +49,15 @@ export function CategoryTreeBoard({
   const [collapsed, setCollapsed] = useState<Set<string>>(() => new Set());
   const [search, setSearch] = useState("");
   const [groupFilter, setGroupFilter] = useState<"ALL" | ProductGroup>("ALL");
-  const [editor, setEditor] = useState<CategoryEditorTarget | null>(null);
   const [deleting, setDeleting] = useState<AdminCategoryNode | null>(null);
-  const [drag, setDrag] = useState<DragState | null>(null);
-  const [dropHint, setDropHint] = useState<DropHint | null>(null);
+  const [editor, setEditor] = useState<EditorState | null>(null);
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [pendingIds, setPendingIds] = useState<Set<string>>(() => new Set());
+  const [dragging, setDragging] = useState<AdminCategoryNode | null>(null);
+  const [dropTarget, setDropTarget] = useState<{ id: string; placement: "before" | "after" } | null>(null);
 
   const chartMap = useMemo(() => new Map(sizeCharts.map((chart) => [chart.id, chart])), [sizeCharts]);
-  // Đang lọc thì chỉ thấy một phần anh em cùng cấp — tắt kéo thả để không đổi thứ tự sai
+  // Đang lọc thì chỉ thấy một phần anh em cùng cấp — tắt đổi thứ tự để không xếp sai
   const isFiltering = search.trim().length > 0 || groupFilter !== "ALL";
   const visibleTree = filterTreeByGroup(filterTree(tree, search), groupFilter);
   const totalChildren = tree.reduce((sum, root) => sum + root.children.length, 0);
@@ -75,10 +80,12 @@ export function CategoryTreeBoard({
   };
 
   const handlers: CategoryRowHandlers = {
-    onEdit: (node) => setEditor({ mode: "edit", node }),
-    onAddChild: (parent) => setEditor({ mode: "create", parent }),
     onDelete: setDeleting,
+    onEdit: (node) => setEditor({ node, parent: null }),
+    onAddChild: (parent) => setEditor({ node: null, parent }),
     onToggleActive: async (node) => {
+      if (pendingIds.has(node.id)) return;
+      setPendingIds((prev) => new Set(prev).add(node.id));
       const res = await updateCategoryAction({
         categoryId: node.id,
         name: node.name,
@@ -90,6 +97,11 @@ export function CategoryTreeBoard({
         isActive: !node.isActive,
         defaultSizeChartId: node.defaultSizeChartId ?? "",
         parentId: node.parentId,
+      });
+      setPendingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(node.id);
+        return next;
       });
       if (!res.success) {
         notify.error(res.error, "CATEGORY_UPDATE_FAILED");
@@ -105,30 +117,6 @@ export function CategoryTreeBoard({
       if (!target) return;
       void persistOrder(node.parentId, moveSibling(siblings, node.id, target.id, direction < 0 ? "before" : "after"));
     },
-    onDragStart: (node) => setDrag({ id: node.id, parentId: node.parentId }),
-    onDragOverRow: (event: DragEvent<HTMLElement>, node) => {
-      // Chỉ cho thả giữa các nút cùng cha — đổi cha dùng ô "Thuộc nhóm" trong hộp thoại sửa
-      if (!drag || drag.parentId !== node.parentId || drag.id === node.id) return;
-      event.preventDefault();
-      event.dataTransfer.dropEffect = "move";
-      const rect = event.currentTarget.getBoundingClientRect();
-      const placement = event.clientY < rect.top + rect.height / 2 ? "before" : "after";
-      if (dropHint?.id !== node.id || dropHint.placement !== placement) setDropHint({ id: node.id, placement });
-    },
-    onDropRow: (event) => {
-      event.preventDefault();
-      if (drag && dropHint) {
-        const siblings = getSiblings(tree, drag.parentId);
-        const ordered = moveSibling(siblings, drag.id, dropHint.id, dropHint.placement);
-        if (ordered.some((node, index) => node.id !== siblings[index]?.id)) void persistOrder(drag.parentId, ordered);
-      }
-      setDrag(null);
-      setDropHint(null);
-    },
-    onDragEnd: () => {
-      setDrag(null);
-      setDropHint(null);
-    },
   };
 
   const toggleExpand = (id: string) =>
@@ -139,6 +127,39 @@ export function CategoryTreeBoard({
       return next;
     });
   const allCollapsed = tree.every((root) => root.children.length === 0 || collapsed.has(root.id));
+  const isExpanded = (rootId: string) => isFiltering || !collapsed.has(rootId);
+
+  /** Kéo thả HTML5: chỉ thả được vào anh em cùng cấp; nửa trên dòng = chèn trước, nửa dưới = chèn sau */
+  const dragFor = (node: AdminCategoryNode): CategoryRowDrag => ({
+    isDragging: dragging?.id === node.id,
+    dropPlacement: dropTarget?.id === node.id ? dropTarget.placement : null,
+    onDragStart: (event: DragEvent<HTMLDivElement>) => {
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.setData("text/plain", node.id);
+      setDragging(node);
+    },
+    onDragOver: (event: DragEvent<HTMLDivElement>) => {
+      if (!dragging || dragging.id === node.id || dragging.parentId !== node.parentId) return;
+      event.preventDefault();
+      const rect = event.currentTarget.getBoundingClientRect();
+      const placement = event.clientY < rect.top + rect.height / 2 ? "before" : "after";
+      if (dropTarget?.id !== node.id || dropTarget.placement !== placement) setDropTarget({ id: node.id, placement });
+    },
+    onDrop: (event: DragEvent<HTMLDivElement>) => {
+      event.preventDefault();
+      if (dragging && dropTarget && dragging.parentId === node.parentId) {
+        const siblings = getSiblings(tree, node.parentId);
+        const ordered = moveSibling(siblings, dragging.id, dropTarget.id, dropTarget.placement);
+        if (ordered.some((item, index) => item.id !== siblings[index]?.id)) void persistOrder(node.parentId, ordered);
+      }
+      setDragging(null);
+      setDropTarget(null);
+    },
+    onDragEnd: () => {
+      setDragging(null);
+      setDropTarget(null);
+    },
+  });
 
   return (
     <>
@@ -147,7 +168,7 @@ export function CategoryTreeBoard({
         title={tPage("title")}
         description={tPage("description")}
         search={{ value: search, onChange: setSearch, placeholder: t("searchPlaceholder") }}
-        action={{ label: t("createRoot"), onClick: () => setEditor({ mode: "create", parent: null }) }}
+        action={{ label: t("createRoot"), onClick: () => setEditor({ node: null, parent: null }) }}
         filters={
           <AdminFilterSelect
             label={t("groupLabel")}
@@ -165,87 +186,115 @@ export function CategoryTreeBoard({
         }
       />
 
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-xs text-[#71717A]">
-          {t("summary", { roots: tree.length, children: totalChildren })} ·{" "}
-          {isFiltering ? t("dragDisabled") : t("dragHint")}
-        </p>
-        <button
-          type="button"
-          onClick={() => setCollapsed(allCollapsed ? new Set() : new Set(tree.map((root) => root.id)))}
-          className="inline-flex h-8 shrink-0 cursor-pointer items-center gap-1.5 rounded-lg px-2.5 text-xs font-medium text-[#52525B] transition-colors hover:bg-[#F4F4F5] hover:text-[#09090B]"
-        >
-          {allCollapsed ? <ChevronsUpDown size={14} aria-hidden /> : <ChevronsDownUp size={14} aria-hidden />}
-          {allCollapsed ? t("expandAll") : t("collapseAll")}
-        </button>
-      </div>
+      <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(320px,0.8fr)]">
+        <section className={cn(ADMIN_CARD_CLASS, "p-4 sm:p-5")}>
+          <header className="flex flex-wrap items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h2 className="text-lg font-semibold text-[#09090B]">{t("list.title")}</h2>
+              <p className="mt-0.5 text-xs text-[#71717A]">
+                {t("summary", { roots: tree.length, children: totalChildren })}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setCollapsed(allCollapsed ? new Set() : new Set(tree.map((root) => root.id)))}
+              className={ADMIN_SECONDARY_BUTTON_CLASS}
+            >
+              {allCollapsed ? <ChevronsUpDown size={15} aria-hidden /> : <ChevronsDownUp size={15} aria-hidden />}
+              {allCollapsed ? t("expandAll") : t("collapseAll")}
+            </button>
+          </header>
 
-      {visibleTree.length === 0 ? (
-        <p className="rounded-xl border border-[#E4E4E7] bg-white py-16 text-center text-sm text-[#71717A]">
-          {isFiltering ? t("noResults") : t("empty")}
-        </p>
-      ) : (
-        <ol className="space-y-3">
-          {visibleTree.map((root, rootIndex) => {
-            const expanded = isFiltering || !collapsed.has(root.id);
-            return (
-              <li
-                key={root.id}
+          <div className="mt-4 border-t border-dashed border-[#E4E4E7]" aria-hidden />
+
+          {visibleTree.length === 0 ? (
+            <p className="py-16 text-center text-sm text-[#71717A]">{isFiltering ? t("noResults") : t("empty")}</p>
+          ) : (
+            <>
+              <div
                 className={cn(
-                  "overflow-hidden rounded-xl border border-[#E4E4E7] bg-white shadow-2xs",
-                  drag?.id === root.id && "border-dashed"
+                  CATEGORY_LIST_GRID,
+                  "border-b border-dashed border-[#E4E4E7] px-2 py-3 text-body font-semibold text-[#3F3F46]"
                 )}
               >
-                <CategoryTreeRow
-                  node={root}
-                  sizeCharts={chartMap}
-                  isFirst={rootIndex === 0}
-                  isLast={rootIndex === visibleTree.length - 1}
-                  expanded={expanded}
-                  onToggleExpand={() => toggleExpand(root.id)}
-                  isDragging={drag?.id === root.id}
-                  dropPlacement={dropHint?.id === root.id ? dropHint.placement : null}
-                  reorderDisabled={isFiltering}
-                  {...handlers}
-                />
-                {expanded && root.children.length > 0 && (
-                  <ol className="relative border-t border-[#F4F4F5] py-1 pl-6 sm:pl-14">
-                    {/* Đường dẫn phân cấp nối các loại con với nhóm gốc */}
-                    <span aria-hidden className="absolute bottom-6 left-4 top-0 w-px bg-[#E4E4E7] sm:left-[46px]" />
-                    {root.children.map((child, childIndex) => (
-                      <li key={child.id} className="relative">
-                        <span aria-hidden className="absolute -left-2 top-1/2 h-px w-2 bg-[#E4E4E7] sm:-left-2" />
-                        <CategoryTreeRow
-                          node={child}
-                          parent={root}
-                          sizeCharts={chartMap}
-                          isFirst={childIndex === 0}
-                          isLast={childIndex === root.children.length - 1}
-                          isDragging={drag?.id === child.id}
-                          dropPlacement={dropHint?.id === child.id ? dropHint.placement : null}
-                          reorderDisabled={isFiltering}
-                          {...handlers}
-                        />
-                      </li>
-                    ))}
-                  </ol>
-                )}
-              </li>
-            );
-          })}
-        </ol>
-      )}
+                <span aria-hidden />
+                <span>{t("column.name")}</span>
+                <span>{t("list.columnStatus")}</span>
+                <span aria-hidden />
+              </div>
+              <ol className="divide-y divide-dashed divide-[#E4E4E7]">
+                {visibleTree.map((root, rootIndex) => {
+                  const expanded = isExpanded(root.id);
+                  const rowProps = (node: AdminCategoryNode) => ({
+                    sizeCharts: chartMap,
+                    reorderDisabled: isFiltering,
+                    togglePending: pendingIds.has(node.id),
+                    isActive: activeId === node.id,
+                    onActivate: setActiveId,
+                    drag: dragFor(node),
+                    ...handlers,
+                  });
+                  return (
+                    <li key={root.id} className="py-1">
+                      <CategoryTreeRow
+                        node={root}
+                        isFirst={rootIndex === 0}
+                        isLast={rootIndex === visibleTree.length - 1}
+                        expanded={expanded}
+                        onToggleExpand={() => toggleExpand(root.id)}
+                        {...rowProps(root)}
+                      />
+                      {expanded && root.children.length > 0 && (
+                        <ol>
+                          {root.children.map((child, childIndex) => (
+                            <li key={child.id}>
+                              <CategoryTreeRow
+                                node={child}
+                                parent={root}
+                                isFirst={childIndex === 0}
+                                isLast={childIndex === root.children.length - 1}
+                                {...rowProps(child)}
+                              />
+                            </li>
+                          ))}
+                        </ol>
+                      )}
+                    </li>
+                  );
+                })}
+              </ol>
+            </>
+          )}
+
+          <p className="mt-2 flex items-center gap-2 border-t border-dashed border-[#E4E4E7] pt-4 text-xs text-[#71717A]">
+            <Info size={14} className="shrink-0" aria-hidden />
+            {isFiltering ? t("reorderDisabled") : t("list.dragHint")}
+          </p>
+        </section>
+
+        <div className="xl:sticky xl:top-3">
+          <CategoryTreeDiagram
+            tree={visibleTree}
+            isExpanded={isExpanded}
+            activeId={activeId}
+            onActivate={setActiveId}
+          />
+        </div>
+      </div>
 
       {editor && (
         <CategoryEditorDialog
-          key={editor.mode === "edit" ? editor.node.id : `new-${editor.parent?.id ?? "root"}`}
-          target={editor}
+          // Mỗi lần mở là một form mới
+          key={editor.node?.id ?? `new-${editor.parent?.id ?? "root"}`}
+          node={editor.node}
+          parent={editor.parent}
           roots={tree}
           sizeCharts={sizeCharts}
           onOpenChange={(open) => !open && setEditor(null)}
           onSaved={setTree}
         />
       )}
+
       {deleting && (
         <ConfirmDeleteCategoryDialog
           category={deleting}

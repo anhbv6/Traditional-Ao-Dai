@@ -156,7 +156,7 @@ function EmptyState({ onCreate }: { onCreate: () => void }) {
           />
         ))}
       </div>
-      <h2 className="mt-5 text-base font-semibold text-[#09090B]">{t("empty.title")}</h2>
+      <h2 className="mt-5 text-lg font-semibold text-[#09090B]">{t("empty.title")}</h2>
       <p className="mt-1 max-w-sm text-sm text-[#71717A]">{t("empty.description")}</p>
       <button
         type="button"

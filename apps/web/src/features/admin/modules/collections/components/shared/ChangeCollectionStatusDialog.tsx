@@ -4,11 +4,16 @@ import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowRight, CircleAlert, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { useNotify } from "@/hooks/useNotify";
+import {
+  ADMIN_DIALOG_PRIMARY_BUTTON_CLASS,
+  ADMIN_DIALOG_SECONDARY_BUTTON_CLASS,
+  AdminDialog,
+} from "@/features/admin/core/ui";
 import { changeCollectionStatusAction, getCollectionStatusImpactAction } from "../../actions/collections.actions";
 import { type AdminCollectionItem, type CollectionStatus } from "../../types/collections.types";
 import { getTransitionBlockers, getTransitionOptions } from "../../utils/collectionLifecycle";
+import { COLLECTION_STATUS_META } from "../../utils/collectionStatusMeta";
 import { CollectionStatusBadge } from "./CollectionStatusBadge";
 
 interface ChangeCollectionStatusDialogProps {
@@ -116,101 +121,95 @@ export function ChangeCollectionStatusDialog({
   };
 
   return (
-    <Dialog open onOpenChange={onOpenChange}>
-      <DialogContent className="admin-shell gap-0 rounded-xl border border-[#E4E4E7] bg-white p-0 sm:max-w-lg">
-        <div className="border-b border-[#E4E4E7] px-5 py-4 pr-12">
-          <DialogTitle className="text-base font-semibold text-[#09090B]">
-            {t(`statusDialog.title.${target}`)}
-          </DialogTitle>
-          <DialogDescription className="mt-0.5 truncate text-xs text-[#71717A]">{collection.name}</DialogDescription>
-        </div>
-
-        <div className="space-y-4 px-5 py-4">
-          <div className="flex items-center gap-2">
-            <CollectionStatusBadge status={collection.status} />
-            <ArrowRight size={14} className="text-[#A1A1AA]" aria-hidden />
-            <CollectionStatusBadge status={target} />
-          </div>
-
-          <p className="text-sm leading-relaxed text-[#3F3F46]">{t(`statusDialog.explain.${target}`)}</p>
-
-          {blockers.length > 0 ? (
-            <div className="rounded-lg border border-rose-200 bg-rose-50 p-3">
-              <p className="text-sm font-medium text-rose-800">{t("statusDialog.blocked")}</p>
-              <ul className="mt-1.5 space-y-1">
-                {blockers.map((key) => (
-                  <li key={key} className="flex items-start gap-1.5 text-xs text-rose-700">
-                    <CircleAlert size={13} className="mt-px shrink-0" aria-hidden />
-                    {notify.translateError(key)}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : impact.isPending ? (
-            <div className="flex items-center gap-2 text-xs text-[#71717A]">
-              <Loader2 size={14} className="animate-spin" aria-hidden /> {t("statusDialog.loadingImpact")}
-            </div>
-          ) : data ? (
-            <div className="space-y-2">
-              {target === "ACTIVE" && data.readyHiddenProducts > 0 && (
-                <OptionRow
-                  checked={activateReady}
-                  onChange={setActivateReady}
-                  label={t("statusDialog.activateReady", { count: data.readyHiddenProducts })}
-                  note={notReady > 0 ? t("statusDialog.notReadyNote", { count: notReady }) : undefined}
-                />
-              )}
-              {/* Không có sản phẩm nào bật được thì chỉ báo, không đưa lựa chọn "mở bán 0 sản phẩm" */}
-              {target === "ACTIVE" && data.readyHiddenProducts === 0 && notReady > 0 && (
-                <p className="text-xs text-[#71717A]">{t("statusDialog.notReadyNote", { count: notReady })}</p>
-              )}
-              {(target === "COMING_SOON" || target === "ARCHIVED") &&
-                data.exclusiveActiveProducts > 0 && (
-                  <OptionRow
-                    checked={hideExclusive}
-                    onChange={setHideExclusive}
-                    label={t("statusDialog.hideExclusive", { count: data.exclusiveActiveProducts })}
-                    note={
-                      data.sharedActiveProducts > 0
-                        ? t("statusDialog.sharedNote", { count: data.sharedActiveProducts })
-                        : undefined
-                    }
-                  />
-                )}
-              {(target === "COMING_SOON" || target === "ARCHIVED") &&
-                data.exclusiveActiveProducts === 0 &&
-                data.sharedActiveProducts > 0 && (
-                  <p className="text-xs text-[#71717A]">
-                    {t("statusDialog.sharedNote", { count: data.sharedActiveProducts })}
-                  </p>
-                )}
-              {target === "ARCHIVED" && (
-                <p className="text-xs text-[#71717A]">
-                  {collection.showInLookbook ? t("statusDialog.lookbookOn") : t("statusDialog.lookbookOff")}
-                </p>
-              )}
-            </div>
-          ) : null}
-        </div>
-
-        <div className="flex justify-end gap-2 border-t border-[#E4E4E7] px-5 py-3">
-          <button
-            type="button"
-            onClick={() => onOpenChange(false)}
-            className="h-9 cursor-pointer rounded-lg px-3.5 text-sm font-medium text-[#52525B] transition-colors hover:bg-[#F4F4F5] hover:text-[#09090B]"
-          >
+    <AdminDialog
+      open
+      onOpenChange={onOpenChange}
+      icon={COLLECTION_STATUS_META[target].icon}
+      title={t(`statusDialog.title.${target}`)}
+      description={collection.name}
+      size="lg"
+      footer={
+        <>
+          <button type="button" onClick={() => onOpenChange(false)} className={ADMIN_DIALOG_SECONDARY_BUTTON_CLASS}>
             {t("cancel")}
           </button>
           <button
             type="button"
             disabled={isSubmitting || blockers.length > 0 || impact.isPending}
             onClick={handleConfirm}
-            className="h-9 cursor-pointer rounded-lg bg-[#18181B] px-4 text-sm font-medium text-white shadow-2xs transition-colors hover:bg-[#09090B] disabled:cursor-not-allowed disabled:opacity-50"
+            className={ADMIN_DIALOG_PRIMARY_BUTTON_CLASS}
           >
             {isSubmitting ? t("processing") : t(`statusDialog.confirm.${target}`)}
           </button>
+        </>
+      }
+    >
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <CollectionStatusBadge status={collection.status} />
+          <ArrowRight size={14} className="text-[#A1A1AA]" aria-hidden />
+          <CollectionStatusBadge status={target} />
         </div>
-      </DialogContent>
-    </Dialog>
+
+        <p className="text-sm leading-relaxed text-[#3F3F46]">{t(`statusDialog.explain.${target}`)}</p>
+
+        {blockers.length > 0 ? (
+          <div className="rounded-lg border border-rose-200 bg-rose-50 p-3">
+            <p className="text-sm font-medium text-rose-800">{t("statusDialog.blocked")}</p>
+            <ul className="mt-1.5 space-y-1">
+              {blockers.map((key) => (
+                <li key={key} className="flex items-start gap-1.5 text-xs text-rose-700">
+                  <CircleAlert size={13} className="mt-px shrink-0" aria-hidden />
+                  {notify.translateError(key)}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : impact.isPending ? (
+          <div className="flex items-center gap-2 text-xs text-[#71717A]">
+            <Loader2 size={14} className="animate-spin" aria-hidden /> {t("statusDialog.loadingImpact")}
+          </div>
+        ) : data ? (
+          <div className="space-y-2">
+            {target === "ACTIVE" && data.readyHiddenProducts > 0 && (
+              <OptionRow
+                checked={activateReady}
+                onChange={setActivateReady}
+                label={t("statusDialog.activateReady", { count: data.readyHiddenProducts })}
+                note={notReady > 0 ? t("statusDialog.notReadyNote", { count: notReady }) : undefined}
+              />
+            )}
+            {/* Không có sản phẩm nào bật được thì chỉ báo, không đưa lựa chọn "mở bán 0 sản phẩm" */}
+            {target === "ACTIVE" && data.readyHiddenProducts === 0 && notReady > 0 && (
+              <p className="text-xs text-[#71717A]">{t("statusDialog.notReadyNote", { count: notReady })}</p>
+            )}
+            {(target === "COMING_SOON" || target === "ARCHIVED") && data.exclusiveActiveProducts > 0 && (
+              <OptionRow
+                checked={hideExclusive}
+                onChange={setHideExclusive}
+                label={t("statusDialog.hideExclusive", { count: data.exclusiveActiveProducts })}
+                note={
+                  data.sharedActiveProducts > 0
+                    ? t("statusDialog.sharedNote", { count: data.sharedActiveProducts })
+                    : undefined
+                }
+              />
+            )}
+            {(target === "COMING_SOON" || target === "ARCHIVED") &&
+              data.exclusiveActiveProducts === 0 &&
+              data.sharedActiveProducts > 0 && (
+                <p className="text-xs text-[#71717A]">
+                  {t("statusDialog.sharedNote", { count: data.sharedActiveProducts })}
+                </p>
+              )}
+            {target === "ARCHIVED" && (
+              <p className="text-xs text-[#71717A]">
+                {collection.showInLookbook ? t("statusDialog.lookbookOn") : t("statusDialog.lookbookOff")}
+              </p>
+            )}
+          </div>
+        ) : null}
+      </div>
+    </AdminDialog>
   );
 }

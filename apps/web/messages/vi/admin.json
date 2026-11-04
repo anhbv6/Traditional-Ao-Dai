@@ -1,7 +1,6 @@
 {
   "login": {
     "title": "Đăng nhập quản trị",
-    "subtitle": "Dùng email nhân viên do quản trị viên cấp để tiếp tục.",
     "emailLabel": "Email quản trị viên",
     "emailPlaceholder": "Vui lòng nhập địa chỉ email",
     "passwordLabel": "Mật khẩu",
@@ -49,7 +48,41 @@
     "add": "Thêm",
     "empty": "Chưa có việc nào. Ghi lại việc cần làm hôm nay.",
     "remove": "Xóa việc này",
-    "clearDone": "Xóa {count} việc đã xong"
+    "clearDone": "Xóa {count} việc đã xong",
+    "calendar": {
+      "previous": "Tháng trước",
+      "next": "Tháng sau",
+      "backToToday": "Về tháng này"
+    }
+  },
+  "assistant": {
+    "open": "Mở trợ lý AI",
+    "title": "Trợ lý Thiên Canh",
+    "subtitle": "AI hỗ trợ quản trị · dữ liệu mẫu",
+    "greeting": "Chào bạn, mình là trợ lý AI của Thiên Canh. Mình có thể tóm tắt doanh thu, kiểm tra tồn kho, theo dõi xưởng may hoặc viết mô tả sản phẩm. Bạn cần gì nào?",
+    "placeholder": "Hỏi trợ lý...",
+    "send": "Gửi",
+    "close": "Đóng",
+    "reset": "Cuộc trò chuyện mới",
+    "typing": "Trợ lý đang trả lời",
+    "disclaimer": "Đang dùng dữ liệu mẫu — câu trả lời chưa phản ánh số liệu thật."
+  },
+  "datePicker": {
+    "open": "Mở lịch",
+    "previous": "Trước",
+    "next": "Sau",
+    "monthTitle": "Tháng {month} Năm {year}",
+    "yearTitle": "Năm {year}",
+    "monthShort": "Tháng {month}",
+    "weekdays": "T2,T3,T4,T5,T6,T7,CN",
+    "today": "Hôm nay",
+    "clear": "Xóa ngày"
+  },
+  "infoTip": {
+    "label": "Xem hướng dẫn"
+  },
+  "dialog": {
+    "close": "Đóng"
   },
   "nav": {
     "dashboard": "Tổng quan",
@@ -274,7 +307,7 @@
     },
     "products": {
       "title": "Sản phẩm",
-      "description": "Theo dõi tồn kho, trạng thái bán và tùy chọn may đo của từng mẫu."
+      "description": "Mẫu bán ra theo loại, hình thức bán (một món, theo bộ, may đo) và SKU tự sinh."
     },
     "inventory": {
       "eyebrow": "Kho vận & Biến thể",
@@ -310,22 +343,11 @@
     },
     "materials": {
       "title": "Chất liệu vải",
-      "description": "Danh sách chất liệu dùng cho sản phẩm và hướng dẫn bảo quản.",
-      "planned": [
-        "Lụa tơ tằm, gấm, tơ sống, nhung, voan, đũi, organza...",
-        "Mẫu hướng dẫn giặt ủi theo chất liệu",
-        "Độ co giãn và lưu ý khi may đo"
-      ]
+      "description": "Hồ sơ từng loại vải: xuất xứ, thành phần, thanh đo vật lý, bảo quản và định mức."
     },
     "attributes": {
       "title": "Thuộc tính",
-      "description": "Các giá trị dùng chung để tạo biến thể và lọc sản phẩm.",
-      "planned": [
-        "Màu áo và màu quần",
-        "Size S - XXL và may đo",
-        "Kỹ thuật, họa tiết: thêu tay, vẽ tay, đính kết, in 3D, trơn",
-        "Kiểu cổ, kiểu tay"
-      ]
+      "description": "Màu, size cho biến thể SKU và các đặc tính thiết kế dùng để lọc sản phẩm."
     },
     "sizeCharts": {
       "title": "Bảng size mẫu",
@@ -572,15 +594,14 @@
     "colDetail": "Chi tiết"
   },
   "products": {
-    "searchPlaceholder": "Tìm theo tên, danh mục, chất liệu",
+    "searchPlaceholder": "Tìm theo tên, mã, loại, chất liệu",
     "empty": "Chưa có sản phẩm nào.",
     "noResults": "Không có sản phẩm phù hợp với bộ lọc.",
     "active": "Đang bán",
     "hidden": "Đang ẩn",
     "outOfStock": "Hết hàng",
-    "uncategorized": "Chưa phân loại",
-    "yes": "Có",
-    "no": "Không",
+    "noSku": "Chưa có SKU",
+    "madeToOrder": "Đặt may",
     "tabs": {
       "ALL": "Tất cả",
       "ACTIVE": "Đang bán",
@@ -588,19 +609,15 @@
       "OUT_OF_STOCK": "Hết hàng",
       "HIDDEN": "Đang ẩn"
     },
-    "allCategories": "Tất cả danh mục",
-    "allMaterials": "Tất cả chất liệu",
+    "allCategories": "Tất cả loại",
+    "allModes": "Tất cả",
     "colProduct": "Sản phẩm",
-    "colCategory": "Danh mục",
-    "colMaterial": "Chất liệu",
+    "colCategory": "Loại",
     "colPrice": "Giá bán",
     "colStock": "Tồn kho",
-    "colSold": "Đã bán",
-    "colCustomFit": "May đo",
     "colStatus": "Trạng thái",
     "colActions": "Thao tác",
     "skuCount": "{count} SKU",
-    "stockCount": "Tồn {count}",
     "lowStockSku": "{count} SKU sắp hết",
     "selectAll": "Chọn tất cả sản phẩm đang hiển thị",
     "selectProduct": "Chọn {name}",
@@ -612,43 +629,164 @@
     "enableCustomFit": "Bật nhận may đo",
     "disableCustomFit": "Tắt nhận may đo",
     "add": "Thêm sản phẩm",
-    "viewDetail": "Xem chi tiết",
-    "edit": "Sửa sản phẩm",
+    "edit": "Mở chi tiết",
     "cancel": "Hủy",
-    "close": "Đóng",
-    "save": "Lưu",
     "saving": "Đang lưu...",
-    "loading": "Đang tải...",
-    "loadFailed": "Không tải được thông tin sản phẩm.",
-    "createTitle": "Thêm sản phẩm",
-    "createDescription": "Sản phẩm mới mặc định ở trạng thái ẩn cho đến khi bạn mở bán.",
-    "editTitle": "Sửa sản phẩm",
-    "editDescription": "Thay đổi có hiệu lực ngay sau khi lưu và được ghi vào nhật ký.",
-    "createSuccess": "Đã thêm sản phẩm.",
-    "updateSuccess": "Đã lưu thay đổi.",
-    "sectionInfo": "Thông tin chung",
-    "sectionSales": "Giá & bán hàng",
-    "sectionImages": "Hình ảnh",
-    "sectionVariants": "Biến thể (SKU)",
-    "sectionEnglish": "Bản tiếng Anh",
+    "updateSuccess": "Đã lưu sản phẩm.",
+    "create": {
+      "title": "Thêm sản phẩm",
+      "description": "Chọn loại và hình thức bán — mã sản phẩm tự sinh, giá, ảnh, SKU nhập ở màn chi tiết.",
+      "submit": "Tạo và nhập chi tiết",
+      "success": "Đã thêm sản phẩm.",
+      "inheritHint": "Hình thức bán, size và may đo theo nhóm hàng này."
+    },
+    "mode": {
+      "SINGLE": {
+        "label": "Một món",
+        "short": "May sẵn, mua theo size có sẵn."
+      },
+      "SET": {
+        "label": "Theo bộ",
+        "short": "Nhiều món chung một giá, một size bộ."
+      },
+      "CUSTOM": {
+        "label": "May đo",
+        "short": "May theo số đo khách, không giữ tồn."
+      },
+      "notAllowed": "Nhóm hàng của loại này không bán theo hình thức này",
+      "notAllowedFor": "Nhóm {group} không bán theo hình thức này",
+      "acceptsCustom": "Nhận thêm may đo"
+    },
+    "editor": {
+      "back": "Sản phẩm",
+      "save": "Lưu thay đổi",
+      "unsaved": "Chưa lưu",
+      "langLabel": "Ngôn ngữ nội dung",
+      "langHint": "Áp dụng cho tên, mô tả và tên món trong bộ."
+    },
+    "sections": {
+      "general": "Thông tin chung",
+      "saleMode": "Hình thức bán",
+      "design": "Chất liệu & thiết kế",
+      "pricing": "Giá & SKU"
+    },
     "field": {
       "name": "Tên sản phẩm",
-      "chooseCategory": "Chọn danh mục",
-      "materialPlaceholder": "Chất liệu, VD: Lụa tơ tằm",
+      "category": "Loại sản phẩm",
+      "categoryShort": "Loại",
       "description": "Mô tả",
-      "isActive": "Mở bán",
-      "isCustomFit": "Nhận may đo",
-      "isFeatured": "Sản phẩm nổi bật",
-      "nameEn": "Tên tiếng Anh",
-      "materialEn": "Chất liệu tiếng Anh",
-      "descriptionEn": "Mô tả tiếng Anh",
+      "images": "Hình ảnh",
+      "saleMode": "Hình thức bán",
+      "isCustomFit": "Nhận thêm may đo theo số đo",
+      "leadTimeDays": "Thời gian may",
+      "basePrice": "Giá bán",
       "sizeChart": "Bảng size",
-      "sizeChartInherit": "Theo loại sản phẩm ({name})",
-      "sizeChartNone": "Chưa có bảng size",
-      "sizeChartInactive": "chưa áp dụng",
-      "sizeChartHint": "Ký hiệu size trong bảng: {sizes}. SKU nên dùng đúng các ký hiệu này để khách được gợi ý size.",
-      "sizeChartMissing": "Loại sản phẩm này chưa gắn bảng size — khách sẽ không có gợi ý size."
+      "sizeChartShort": "Bảng size",
+      "isActive": "Mở bán",
+      "isFeatured": "Sản phẩm nổi bật"
     },
+    "hints": {
+      "category": "Nhóm hàng của loại quyết định hình thức bán được phép, có size hay không, có nhận may đo không và bán theo cái hay theo mét.",
+      "saleMode": "Một món: may sẵn theo size. Theo bộ: nhiều món bán chung (áo + quần...). May đo: may theo số đo khách, không giữ tồn kho thành phẩm.",
+      "isCustomFit": "Khách chọn size có sẵn hoặc gửi số đo để may riêng.",
+      "design": "Thông số vải kế thừa từ hồ sơ chất liệu; đặc tính thiết kế dùng để lọc trên cửa hàng.",
+      "pricing": "Giá riêng của SKU để trống thì dùng giá bán chung.",
+      "sizeChart": "Mặc định theo loại sản phẩm; chọn bảng khác nếu mẫu này có form riêng (VD form ôm).",
+      "notReady": "Hoàn thành các mục bên dưới để mở bán."
+    },
+    "placeholders": {
+      "basePrice": "Vui lòng nhập giá",
+      "leadTimeDays": "Vui lòng nhập",
+      "vi": {
+        "name": "Vui lòng nhập tên sản phẩm",
+        "description": "Vui lòng nhập mô tả"
+      },
+      "en": {
+        "name": "Vui lòng nhập tên sản phẩm (tiếng Anh)",
+        "description": "Vui lòng nhập mô tả (tiếng Anh)"
+      }
+    },
+    "set": {
+      "title": "Các món trong bộ",
+      "min": "Bộ cần ít nhất 2 món.",
+      "quantity": "Số lượng",
+      "material": "Chất liệu",
+      "materialInherit": "Theo chất liệu chính",
+      "remove": "Bỏ món",
+      "add": "Thêm món",
+      "placeholder": {
+        "vi": "Vui lòng nhập tên món, VD Áo dài",
+        "en": "Vui lòng nhập tên món (tiếng Anh)"
+      }
+    },
+    "custom": {
+      "measurements": "Số đo khách cần gửi",
+      "inherited": "theo nhóm hàng",
+      "days": "ngày"
+    },
+    "design": {
+      "manage": "Thiếu lựa chọn?",
+      "manageLink": "Thêm ở màn Thuộc tính"
+    },
+    "material": {
+      "label": "Chất liệu chính",
+      "none": "— Chưa chọn —",
+      "open": "Hồ sơ",
+      "care": "Bảo quản",
+      "yield": "Định mức: {top} m/áo · {pants} m/quần"
+    },
+    "sku": {
+      "colors": "Màu",
+      "colorsHint": "Chọn màu từ thuộc tính màu; không chọn màu thì mỗi size một SKU.",
+      "noColors": "Chưa có thuộc tính màu nào.",
+      "sizes": "Size",
+      "sizesFromChart": "theo bảng size",
+      "sizesFromAttributes": "theo thuộc tính size (chưa gắn bảng size)",
+      "rule": "Mã tự sinh: {example}",
+      "generate": "Sinh {count} SKU",
+      "allGenerated": "Đã đủ tổ hợp",
+      "empty": "Chưa có SKU — chọn màu, size rồi bấm sinh SKU.",
+      "color": "Màu",
+      "size": "Size",
+      "code": "Mã SKU",
+      "price": "Giá riêng",
+      "stock": "Tồn",
+      "stockMeters": "Tồn (m)",
+      "noColor": "Không màu",
+      "sizeInvalid": "Size không hợp với hình thức bán / bảng size hiện tại",
+      "codePlaceholder": "Vui lòng nhập mã",
+      "manual": "Nhập mã tay",
+      "auto": "Dùng mã tự sinh",
+      "basePrice": "Giá chung",
+      "remove": "Xóa SKU",
+      "inUse": "SKU đã có đơn hàng hoặc trong giỏ — không xóa được",
+      "customSize": "May đo",
+      "freeSize": "Một cỡ"
+    },
+    "ready": {
+      "IMAGES": "Ảnh đại diện + ít nhất 1 ảnh mô tả",
+      "PRICE": "Giá bán lớn hơn 0",
+      "SKUS": "Có ít nhất 1 SKU",
+      "DUPLICATE_SKU": "Không trùng màu + size",
+      "SET_ITEMS": "Bộ có ít nhất 2 món"
+    },
+    "inherit": {
+      "title": "Kế thừa từ danh mục",
+      "hint": "Đổi ở màn Loại sản phẩm / Bảng size — sản phẩm tự áp dụng theo.",
+      "group": "Nhóm hàng",
+      "sellUnit": "Đơn vị bán",
+      "custom": "May đo",
+      "noCustom": "Không nhận",
+      "measure": {
+        "FULL": "Số đo đầy đủ",
+        "PANTS": "Số đo quần"
+      },
+      "sizes": "Size",
+      "sizesFromAttributes": "Thuộc tính size",
+      "modes": "Hình thức được bán"
+    },
+    "sizeChartInherit": "Theo loại sản phẩm ({name})",
+    "sizeChartNone": "Loại chưa gắn bảng size",
     "image": {
       "add": "Thêm ảnh",
       "uploading": "Đang tải...",
@@ -656,32 +794,6 @@
       "cover": "Ảnh đại diện",
       "makeCover": "Đặt đại diện",
       "hint": "Tối đa {max} ảnh, mỗi ảnh dưới 5MB, bắt buộc ảnh dọc 3:4 hoặc 9:16. Ảnh tự nén sang WebP. Ảnh đầu tiên là ảnh đại diện, các ảnh còn lại là ảnh mô tả."
-    },
-    "variant": {
-      "size": "Size",
-      "color": "Màu",
-      "sku": "Mã SKU",
-      "price": "Giá riêng",
-      "stock": "Tồn kho",
-      "sizePlaceholder": "M",
-      "colorPlaceholder": "Đỏ",
-      "skuPlaceholder": "Nhập mã SKU",
-      "pricePlaceholder": "Nhập giá",
-      "autoSku": "Tự sinh",
-      "useBasePrice": "Giá chung",
-      "collectionCode": "Mã bộ sưu tập",
-      "collectionCodePlaceholder": "VD: TET26, trống thì lấy theo tên",
-      "add": "Thêm biến thể",
-      "remove": "Xóa biến thể",
-      "hint": "Mã tự sinh theo quy tắc AD-TET26-DO-S (Áo dài - BST - Màu - Size). Tắt \"Tự sinh\" hoặc \"Giá chung\" thì bắt buộc nhập tay. SKU đã có đơn hàng hoặc đang trong giỏ của khách thì không xóa được.",
-      "sizeNotInChart": "Size “{size}” không có trong bảng size"
-    },
-    "detail": {
-      "title": "Chi tiết sản phẩm",
-      "slug": "Đường dẫn",
-      "noDescription": "Chưa có mô tả.",
-      "noVariants": "Sản phẩm chưa có SKU nào.",
-      "sizeChartInherited": "theo loại"
     }
   },
   "tailoring": {
@@ -756,7 +868,6 @@
       "open": "Tạo bộ sưu tập",
       "title": "Tạo bộ sưu tập",
       "description": "Bắt đầu ở trạng thái nháp. Các thông tin khác điền ở bước tiếp theo.",
-      "namePlaceholder": "VD: Tết Bính Ngọ 2026",
       "codeHint": "2–12 chữ in hoa hoặc số, dùng trong mã SKU. Khóa lại sau khi công bố.",
       "submit": "Tạo và soạn tiếp",
       "success": "Đã tạo bộ sưu tập nháp."
@@ -830,22 +941,36 @@
       "hidden": "Đã ẩn hoàn toàn"
     },
     "field": {
+      "codePlaceholder": "Vui lòng nhập mã bộ sưu tập",
+      "placeholders": {
+        "vi": {
+          "name": "Vui lòng nhập tên bộ sưu tập",
+          "season": "Vui lòng nhập nhãn mùa",
+          "tagline": "Vui lòng nhập câu giới thiệu ngắn",
+          "description": "Vui lòng nhập mô tả bộ sưu tập",
+          "story": "Vui lòng nhập câu chuyện lookbook"
+        },
+        "en": {
+          "name": "Vui lòng nhập tên bộ sưu tập (tiếng Anh)",
+          "season": "Vui lòng nhập nhãn mùa (tiếng Anh)",
+          "tagline": "Vui lòng nhập câu giới thiệu ngắn (tiếng Anh)",
+          "description": "Vui lòng nhập mô tả bộ sưu tập (tiếng Anh)",
+          "story": "Vui lòng nhập câu chuyện lookbook (tiếng Anh)"
+        }
+      },
       "name": "Tên bộ sưu tập",
       "code": "Mã bộ sưu tập",
       "codeHint": "Dùng sinh SKU, VD AD-TET26-DO-S.",
       "codeLocked": "Đã công bố nên không đổi được — mã đã nằm trong SKU.",
       "season": "Nhãn mùa",
       "seasonHint": "Hiện phía trên tên ở banner.",
-      "seasonPlaceholder": "VD: Xuân 2026",
       "tagline": "Câu giới thiệu ngắn",
-      "taglinePlaceholder": "Một câu cho banner và quảng cáo",
       "description": "Mô tả",
       "accent": "Màu nhấn của mùa",
       "accentCustom": "Chọn màu khác",
       "accentNone": "Chưa chọn",
       "accentClear": "Bỏ màu",
       "autoPushOos": "Tự đẩy hàng hết xuống cuối",
-      "storyPlaceholder": "Câu chuyện của mùa: cảm hứng, chất liệu, người thợ...",
       "launchAt": "Ngày mở bán",
       "endAt": "Ngày hết mùa",
       "scheduleHint": "Ngày mở bán bắt buộc khi công bố \"sắp ra mắt\". Hệ thống nhắc khi tới mốc, không tự đổi trạng thái.",
@@ -853,11 +978,16 @@
       "homepageArchived": "Bộ sưu tập lưu trữ không hiện ở trang chủ.",
       "homepageOrder": "Thứ tự trên trang chủ",
       "homepageOrderHint": "Số nhỏ hiện trước.",
-      "showInLookbook": "Đưa vào lookbook khi lưu trữ",
+      "showInLookbook": "Lưu trữ lookbook",
       "lookbookHint": "Giữ trang mùa cũ làm nội dung quảng bá và SEO."
     },
     "editor": {
-      "back": "Về danh sách bộ sưu tập",
+      "langTabs": {
+        "label": "Ngôn ngữ nội dung",
+        "untranslated": "Chưa có bản tiếng Anh"
+      },
+      "advanced": "Tùy chọn nâng cao",
+      "back": "Bộ sưu tập",
       "untitled": "Bộ sưu tập chưa đặt tên",
       "unsaved": "Chưa lưu",
       "preview": "Xem trước",
@@ -872,17 +1002,20 @@
         "productsHint": "Thứ tự trong danh sách là thứ tự hiển thị. Tối đa 3 sản phẩm nổi bật.",
         "story": "Câu chuyện lookbook",
         "storyHint": "Hiện ở trang bộ sưu tập và thư viện lookbook mùa cũ.",
-        "english": "Bản tiếng Anh",
         "englishHint": "Để trống thì dùng nội dung tiếng Việt.",
         "seo": "SEO",
         "seoHint": "Tiêu đề và mô tả hiện trên kết quả tìm kiếm.",
         "lifecycle": "Vòng đời",
         "schedule": "Lịch",
-        "visibility": "Hiển thị",
         "warnings": "Cần chú ý"
       }
     },
     "warnings": {
+      "noProducts": "Chưa có sản phẩm nào trong bộ sưu tập.",
+      "noCover": "Chưa có ảnh bìa desktop.",
+      "noCoverMobile": "Chưa có ảnh bìa mobile.",
+      "noLaunchAt": "Chưa đặt ngày mở bán.",
+      "none": "Đã đủ thông tin, chưa có gì cần chú ý.",
       "hiddenInActive": "{count} sản phẩm đang ẩn nên khách không thấy trong bộ sưu tập.",
       "notReady": "{count} sản phẩm chưa đủ điều kiện mở bán (ảnh, giá, SKU) — khi mở bán sẽ vẫn ẩn.",
       "sellingBeforeLaunch": "{count} sản phẩm đang bán trước ngày ra mắt (không thuộc bộ sưu tập đang mở bán nào khác).",
@@ -940,6 +1073,14 @@
       "pickedCount": "Đã chọn {count}",
       "cancel": "Hủy",
       "addPicked": "Thêm vào bộ sưu tập"
+    },
+    "seoDialog": {
+      "open": "SEO & đường dẫn",
+      "auto": "Tự lấy từ tên và câu giới thiệu",
+      "customized": "Đã tùy chỉnh tiêu đề / mô tả",
+      "hasError": "Có lỗi cần sửa",
+      "done": "Xong",
+      "saveNote": "Bấm “Lưu thay đổi” để áp dụng."
     },
     "seo": {
       "slug": "Đường dẫn",
@@ -1041,8 +1182,6 @@
     "expandAll": "Mở tất cả",
     "collapseAll": "Thu gọn",
     "summary": "{roots} nhóm gốc · {children} loại con",
-    "dragHint": "Kéo tay nắm ⠿ để đổi thứ tự hiển thị trong cùng cấp",
-    "dragDisabled": "Bỏ tìm kiếm và bộ lọc để kéo thả đổi thứ tự",
     "noResults": "Không có loại sản phẩm nào khớp.",
     "empty": "Chưa có loại sản phẩm nào.",
     "expand": "Mở {name}",
@@ -1050,8 +1189,6 @@
     "hidden": "Đang ẩn",
     "noChart": "Chưa gắn bảng size",
     "inheritChart": "Theo nhóm gốc",
-    "products": "SP",
-    "addChildTo": "Thêm loại con vào {name}",
     "reordered": "Đã lưu thứ tự hiển thị",
     "hiddenSuccess": "Đã ẩn loại sản phẩm khỏi cửa hàng",
     "shownSuccess": "Đã hiện loại sản phẩm trên cửa hàng",
@@ -1074,7 +1211,6 @@
     "editor": {
       "createRootTitle": "Thêm nhóm gốc",
       "createChildTitle": "Thêm loại con vào {name}",
-      "editTitle": "Sửa {name}",
       "description": "Nhóm hàng quyết định cách may đo, đơn vị bán và bảng size áp dụng cho sản phẩm thuộc loại này.",
       "rootOption": "— Là nhóm gốc —",
       "parentLocked": "Đang có loại con nên luôn là nhóm gốc",
@@ -1085,20 +1221,34 @@
       "create": "Thêm loại",
       "save": "Lưu thay đổi",
       "created": "Đã thêm loại sản phẩm",
-      "updated": "Đã lưu loại sản phẩm"
+      "updated": "Đã lưu loại sản phẩm",
+      "langLabel": "Ngôn ngữ nội dung",
+      "slugHint": "Phần cuối của đường dẫn trang loại trên cửa hàng. Để trống thì tự tạo từ tên.",
+      "placeholders": {
+        "slug": "Vui lòng nhập đường dẫn",
+        "vi": {
+          "name": "Vui lòng nhập tên loại sản phẩm",
+          "description": "Vui lòng nhập mô tả"
+        },
+        "en": {
+          "name": "Vui lòng nhập tên loại sản phẩm (tiếng Anh)",
+          "description": "Vui lòng nhập mô tả (tiếng Anh)"
+        }
+      },
+      "editTitle": "Sửa loại: {name}",
+      "dialogDescription": "Tên, nhóm cha, nhóm hàng và bảng size của loại sản phẩm.",
+      "cancel": "Hủy",
+      "nameRequired": "Vui lòng nhập tên loại sản phẩm",
+      "groupLabel": "Nhóm hàng & bảng size"
     },
     "field": {
-      "group": "Nhóm hàng",
       "name": "Tên loại",
-      "namePlaceholder": "VD: Áo dài cách tân",
-      "nameEn": "Tên tiếng Anh",
       "slug": "Đường dẫn (slug)",
       "parent": "Thuộc nhóm",
       "parentShort": "Nhóm",
       "sizeChart": "Bảng size mặc định",
       "sizeChartShort": "Bảng size",
       "description": "Mô tả",
-      "descriptionEn": "Mô tả tiếng Anh",
       "isActive": "Hiển thị trên cửa hàng",
       "isActiveHint": "Tắt để ẩn loại này khỏi menu và bộ lọc mà không xóa dữ liệu."
     },
@@ -1107,6 +1257,60 @@
       "description": "“{name}” sẽ bị xóa vĩnh viễn. Loại này không còn sản phẩm hay loại con nào.",
       "confirm": "Xóa",
       "success": "Đã xóa loại sản phẩm"
+    },
+    "reorderDisabled": "Bỏ tìm kiếm và bộ lọc để đổi thứ tự",
+    "status": {
+      "active": "Đang hiển thị",
+      "hidden": "Đang ẩn"
+    },
+    "column": {
+      "name": "Tên loại"
+    },
+    "detail": {
+      "back": "Loại sản phẩm",
+      "childOf": "Thuộc",
+      "childCount": "{count} loại con",
+      "noChildren": "Chưa có loại con nào.",
+      "sections": {
+        "general": "Thông tin chung",
+        "group": "Nhóm hàng & bảng size",
+        "overview": "Tổng quan",
+        "children": "Loại con"
+      },
+      "stats": {
+        "products": "Sản phẩm",
+        "skus": "SKU",
+        "children": "Loại con"
+      },
+      "info": {
+        "nameVi": "Tên (Tiếng Việt)",
+        "nameEn": "Tên (English)",
+        "descriptionVi": "Mô tả (Tiếng Việt)",
+        "descriptionEn": "Mô tả (English)",
+        "noEnglish": "Chưa có bản tiếng Anh",
+        "none": "Chưa có",
+        "isRoot": "Là nhóm gốc"
+      }
+    },
+    "list": {
+      "title": "Thứ tự hiển thị",
+      "columnStatus": "Hiển thị",
+      "dragHint": "Kéo biểu tượng ⋮⋮ để đổi thứ tự trong cùng cấp — khách thấy danh mục theo đúng thứ tự này.",
+      "dragHandle": "Kéo để đổi thứ tự {name}",
+      "toggleLabel": "Hiển thị {name} trên cửa hàng"
+    },
+    "row": {
+      "children": "{count} loại con",
+      "products": "{count} sản phẩm"
+    },
+    "diagram": {
+      "title": "Sơ đồ danh mục",
+      "description": "Cách khách duyệt danh mục trên cửa hàng. Trỏ vào một dòng bên danh sách để xem vị trí của nó.",
+      "legendHidden": "Đang ẩn",
+      "legendProducts": "Vạch dài theo số sản phẩm",
+      "hidden": "Đang ẩn",
+      "storeMeta": "{count} danh mục",
+      "collapsed": "Đang thu gọn {count} loại con"
     }
   },
   "sizeCharts": {
@@ -1259,6 +1463,335 @@
       "sizeColumn": "Size",
       "guideImageAlt": "Hình minh họa vị trí đo",
       "emptyGuide": "Chưa có hướng dẫn đo."
+    }
+  },
+  "materials": {
+    "searchPlaceholder": "Tìm theo tên, mã, xuất xứ...",
+    "filterAll": "Tất cả",
+    "filterSeason": "Mùa",
+    "filterStatus": "Trạng thái",
+    "summary": "{count} chất liệu",
+    "empty": "Chưa có chất liệu nào.",
+    "noResults": "Không có chất liệu nào khớp.",
+    "cancel": "Hủy",
+    "processing": "Đang xử lý...",
+    "view": {
+      "label": "Kiểu hiển thị",
+      "cards": "Mẫu vải",
+      "matrix": "Ma trận"
+    },
+    "status": {
+      "active": "Đang dùng",
+      "inactive": "Ngừng dùng"
+    },
+    "card": {
+      "noOrigin": "Chưa ghi xuất xứ",
+      "perTop": "Định mức / áo",
+      "stock": "Kho · {rolls} cây",
+      "tops": "{count} áo"
+    },
+    "matrix": {
+      "material": "Chất liệu",
+      "stock": "Tồn kho",
+      "seasons": "Mùa",
+      "perTop": "m / áo"
+    },
+    "create": {
+      "open": "Thêm chất liệu",
+      "title": "Thêm chất liệu vải",
+      "description": "Nhập tên và mã, các thông số còn lại điền ở màn chi tiết.",
+      "submit": "Tạo và nhập thông số",
+      "success": "Đã thêm chất liệu"
+    },
+    "editor": {
+      "back": "Chất liệu vải",
+      "save": "Lưu thay đổi",
+      "saved": "Đã lưu chất liệu",
+      "unsaved": "Chưa lưu",
+      "langLabel": "Ngôn ngữ nội dung",
+      "langHint": "Áp dụng cho tên, xuất xứ, mô tả, quy trình và ghi chú bảo quản."
+    },
+    "delete": {
+      "open": "Xóa",
+      "title": "Xóa chất liệu?",
+      "description": "\"{name}\" sẽ bị xóa vĩnh viễn.",
+      "body": "Chỉ xóa được khi chưa có cây vải nào trong kho thuộc chất liệu này.",
+      "confirm": "Xóa chất liệu",
+      "success": "Đã xóa chất liệu"
+    },
+    "sections": {
+      "identity": "Nhận diện",
+      "metrics": "Thanh đo vật lý",
+      "media": "Ảnh cận & video",
+      "process": "Quy trình làm vải",
+      "care": "Bảo quản",
+      "yield": "Định mức vải"
+    },
+    "field": {
+      "name": "Tên chất liệu",
+      "code": "Mã",
+      "origin": "Xuất xứ",
+      "description": "Mô tả",
+      "composition": "Thành phần sợi",
+      "seasons": "Mùa phù hợp",
+      "videoUrl": "Video vải chuyển động",
+      "careNote": "Ghi chú thêm",
+      "widthCm": "Khổ vải",
+      "metersPerTop": "Mét vải / thân áo",
+      "metersPerPants": "Mét vải / quần",
+      "isActive": "Đang dùng"
+    },
+    "hints": {
+      "code": "Mã ngắn in trên phiếu nhập kho và tem cây vải, chỉ gồm chữ không dấu, số và gạch nối.",
+      "composition": "Tổng các thành phần phải đủ 100%.",
+      "metrics": "Thang 1–5 thống nhất cho mọi chất liệu để so sánh và tư vấn khách. Bấm lại nấc đang chọn để bỏ đánh giá.",
+      "media": "Ảnh đầu tiên là ảnh mẫu vải trên danh sách. Video nên quay vải bay hoặc phủ trên tay để thấy độ rủ và độ bóng.",
+      "process": "Các bước làm ra tấm vải, kể cho khách ở trang sản phẩm.",
+      "care": "Chọn các ký hiệu in trên nhãn may và trang sản phẩm.",
+      "yield": "Xưởng dùng để chuẩn bị vải; kho dùng để tính số áo còn may được. Size lớn tốn thêm vải theo bảng size.",
+      "isActive": "Tắt khi không nhập vải này nữa — sản phẩm cũ vẫn giữ thông tin."
+    },
+    "placeholders": {
+      "code": "Vui lòng nhập mã, VD LUA-TO-TAM",
+      "videoUrl": "Vui lòng nhập đường dẫn video (https://...)",
+      "widthCm": "Vui lòng nhập khổ",
+      "meters": "Vui lòng nhập số mét",
+      "vi": {
+        "name": "Vui lòng nhập tên chất liệu",
+        "origin": "Vui lòng nhập nơi sản xuất",
+        "description": "Vui lòng nhập mô tả",
+        "stepTitle": "Vui lòng nhập tên bước",
+        "stepDetail": "Vui lòng nhập mô tả bước",
+        "careNote": "Vui lòng nhập ghi chú bảo quản"
+      },
+      "en": {
+        "name": "Vui lòng nhập tên chất liệu (tiếng Anh)",
+        "origin": "Vui lòng nhập nơi sản xuất (tiếng Anh)",
+        "description": "Vui lòng nhập mô tả (tiếng Anh)",
+        "stepTitle": "Vui lòng nhập tên bước (tiếng Anh)",
+        "stepDetail": "Vui lòng nhập mô tả bước (tiếng Anh)",
+        "careNote": "Vui lòng nhập ghi chú bảo quản (tiếng Anh)"
+      }
+    },
+    "composition": {
+      "empty": "Chưa khai thành phần sợi",
+      "fiber": "Sợi",
+      "percent": "Tỉ lệ",
+      "add": "Thêm sợi",
+      "remove": "Bỏ sợi",
+      "total": "Tổng {total}%",
+      "notFull": "Thành phần chưa đủ 100%."
+    },
+    "fiber": {
+      "SILK": "Tơ tằm",
+      "COTTON": "Cotton",
+      "LINEN": "Lanh",
+      "HEMP": "Gai dầu",
+      "BAMBOO": "Sợi tre",
+      "VISCOSE": "Viscose",
+      "POLYESTER": "Polyester",
+      "SPANDEX": "Spandex",
+      "NYLON": "Nylon",
+      "WOOL": "Len",
+      "OTHER": "Khác"
+    },
+    "metrics": {
+      "stretch": {
+        "label": "Độ co giãn",
+        "short": "Giãn",
+        "low": "Không giãn",
+        "high": "Giãn nhiều"
+      },
+      "thickness": {
+        "label": "Độ dày",
+        "short": "Dày",
+        "low": "Mỏng nhẹ",
+        "high": "Dày đứng"
+      },
+      "drape": {
+        "label": "Độ mềm rủ",
+        "short": "Rủ",
+        "low": "Cứng, giữ phom",
+        "high": "Mềm, rủ theo dáng"
+      },
+      "sheerness": {
+        "label": "Độ xuyên thấu",
+        "short": "Thấu",
+        "low": "Kín, không lộ",
+        "high": "Trong suốt"
+      },
+      "sheen": {
+        "label": "Độ bóng bề mặt",
+        "short": "Bóng",
+        "low": "Mờ, lì",
+        "high": "Bóng sáng"
+      }
+    },
+    "season": {
+      "SPRING": "Xuân",
+      "SUMMER": "Hạ",
+      "AUTUMN": "Thu",
+      "WINTER": "Đông"
+    },
+    "media": {
+      "cover": "Ảnh mẫu",
+      "add": "Thêm ảnh ({count})",
+      "uploading": "Đang tải...",
+      "remove": "Gỡ ảnh",
+      "moveLeft": "Chuyển lên trước",
+      "moveRight": "Chuyển ra sau",
+      "openVideo": "Mở video"
+    },
+    "process": {
+      "empty": "Chưa có bước nào. VD: trồng dâu → ươm tơ → dệt khung → nhuộm lá.",
+      "add": "Thêm bước",
+      "remove": "Xóa bước",
+      "moveUp": "Lên trên",
+      "moveDown": "Xuống dưới"
+    },
+    "care": {
+      "labelPreview": "Nhãn may xem trước",
+      "labelEmpty": "Chưa chọn ký hiệu nào"
+    },
+    "careCode": {
+      "HAND_WASH": "Giặt tay nhẹ",
+      "MACHINE_GENTLE": "Giặt máy chế độ nhẹ",
+      "COLD_WATER": "Nước lạnh dưới 30°C",
+      "NO_BLEACH": "Không dùng chất tẩy",
+      "NO_WRING": "Không vắt xoắn",
+      "DRY_SHADE": "Phơi nơi thoáng mát",
+      "IRON_LOW": "Ủi nhiệt thấp, mặt trái",
+      "STEAM": "Là hơi",
+      "DRY_CLEAN": "Giặt khô",
+      "STORE_HANGING": "Treo móc, tránh gấp nếp"
+    },
+    "yield": {
+      "perSet": "Một bộ áo + quần cần khoảng {meters} m vải."
+    },
+    "stock": {
+      "title": "Kho vải",
+      "meters": "mét · {rolls} cây",
+      "tops": "thân áo còn may được",
+      "needYield": "Nhập định mức mét / thân áo để tính số áo.",
+      "empty": "Chưa có cây vải nào thuộc chất liệu này."
+    }
+  },
+  "attributes": {
+    "searchPlaceholder": "Tìm trong nhóm đang chọn...",
+    "groupsLabel": "Nhóm thuộc tính",
+    "addValue": "Thêm {group}",
+    "empty": "Nhóm này chưa có giá trị nào.",
+    "noResults": "Không có giá trị nào khớp.",
+    "cancel": "Hủy",
+    "processing": "Đang xử lý...",
+    "hiddenSuccess": "Đã ẩn giá trị",
+    "shownSuccess": "Đã hiện giá trị",
+    "skuCount": "{count} SKU",
+    "section": {
+      "variant": "Biến thể SKU",
+      "design": "Đặc tính thiết kế"
+    },
+    "status": {
+      "hidden": "Đang ẩn"
+    },
+    "size": {
+      "tapeHint": "Thứ tự trên thước là thứ tự hiện ở trang sản phẩm. Bấm một size để sửa."
+    },
+    "menu": {
+      "label": "Thao tác với {name}",
+      "edit": "Sửa",
+      "hide": "Ẩn",
+      "show": "Hiện",
+      "moveUp": "Lên trước",
+      "moveDown": "Ra sau",
+      "delete": "Xóa",
+      "deleteBlocked": "Đang dùng ở {count} SKU — chỉ ẩn được"
+    },
+    "field": {
+      "name": "Tên",
+      "code": "Mã",
+      "description": "Mô tả ngắn",
+      "hex": "Mã màu",
+      "family": "Họ màu",
+      "isActive": "Đang dùng"
+    },
+    "hints": {
+      "code": "Mã ổn định trong nhóm; size dùng đúng ký hiệu in trên SKU (S, XL, 35...).",
+      "family": "Dùng để gom bộ lọc màu trên cửa hàng.",
+      "isActive": "Tắt để ẩn khỏi bộ lọc và form sản phẩm mà không xóa."
+    },
+    "placeholders": {
+      "code": "Vui lòng nhập mã",
+      "vi": {
+        "name": "Vui lòng nhập tên {group}",
+        "description": "Vui lòng nhập mô tả"
+      },
+      "en": {
+        "name": "Vui lòng nhập tên {group} (tiếng Anh)",
+        "description": "Vui lòng nhập mô tả (tiếng Anh)"
+      }
+    },
+    "dialog": {
+      "createTitle": "Thêm {group}",
+      "editTitle": "Sửa: {name}",
+      "langLabel": "Ngôn ngữ nội dung",
+      "create": "Thêm",
+      "save": "Lưu thay đổi",
+      "created": "Đã thêm giá trị",
+      "updated": "Đã lưu giá trị",
+      "familySuggested": "Gợi ý theo mã màu: {family}"
+    },
+    "deleteDialog": {
+      "title": "Xóa giá trị?",
+      "description": "\"{name}\" sẽ bị xóa vĩnh viễn.",
+      "body": "Sản phẩm đã gắn đặc tính này sẽ không còn hiện nó trong bộ lọc.",
+      "confirm": "Xóa",
+      "success": "Đã xóa giá trị"
+    },
+    "group": {
+      "COLOR": {
+        "label": "Màu sắc",
+        "hint": "Màu của biến thể SKU. Gom theo họ màu để khách lọc trên cửa hàng."
+      },
+      "SIZE": {
+        "label": "Kích thước",
+        "hint": "Ký hiệu size của biến thể SKU, xếp từ nhỏ đến lớn — khớp với hàng trong bảng size."
+      },
+      "NECKLINE": {
+        "label": "Kiểu cổ áo",
+        "hint": "Cổ trụ, cổ thuyền, cổ tim... dùng để lọc và mô tả sản phẩm."
+      },
+      "SLEEVE": {
+        "label": "Kiểu tay áo",
+        "hint": "Tay dài, tay lửng, tay raglan..."
+      },
+      "PATTERN_TECHNIQUE": {
+        "label": "Kỹ thuật họa tiết",
+        "hint": "Thêu tay, vẽ tay, đính kết, in, dệt hoa văn..."
+      },
+      "FLAP_LENGTH": {
+        "label": "Chiều dài tà",
+        "hint": "Tà ngắn qua gối, tà dài chấm gót, tà xẻ cao..."
+      },
+      "OCCASION": {
+        "label": "Dịp sử dụng",
+        "hint": "Cưới hỏi, lễ Tết, công sở, chụp ảnh..."
+      }
+    },
+    "family": {
+      "RED": "Đỏ",
+      "PINK": "Hồng",
+      "ORANGE": "Cam",
+      "YELLOW": "Vàng",
+      "GREEN": "Xanh lá",
+      "BLUE": "Xanh dương",
+      "PURPLE": "Tím",
+      "BROWN": "Nâu",
+      "WHITE": "Trắng, kem",
+      "GRAY": "Xám",
+      "BLACK": "Đen",
+      "MULTI": "Nhiều màu",
+      "none": "Chưa phân họ"
     }
   }
 }

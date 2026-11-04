@@ -36,31 +36,6 @@ export function toSlug(value: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-const SKU_PREFIX = "AD";
-
-/** Một thành phần của SKU: bỏ dấu, viết liền, in hoa — "Đỏ" → "DO", "Hồng Sen" → "HONGSEN" */
-const toSkuPart = (value: string) => toSlug(value).replace(/-/g, "").toUpperCase();
-
-/** Mã mẫu khi chưa nhập mã BST: chữ đầu mỗi từ của tên, bỏ "Áo Dài" — "Áo Dài Gấm Hoa Sen" → "GHS" */
-function toDesignCode(productName: string): string {
-  return toSlug(productName)
-    .replace(/^ao-dai-?/, "")
-    .split("-")
-    .map((word) => word.charAt(0))
-    .join("")
-    .slice(0, 6)
-    .toUpperCase();
-}
-
-/** Quy tắc SKU: AD-<mã BST hoặc mã mẫu>-<màu>-<size>, VD AD-TET26-DO-S */
-export function buildSku(params: { collectionCode: string; productName: string; color: string; size: string }): string {
-  const { collectionCode, productName, color, size } = params;
-
-  return [SKU_PREFIX, collectionCode || toDesignCode(productName), toSkuPart(color), toSkuPart(size)]
-    .filter(Boolean)
-    .join("-");
-}
-
 /** Tổ hợp màu + size của một biến thể; hai dòng trùng khóa này là trùng size */
 export function toVariantKey(variant: { color?: string | null; size: string }): string {
   return `${(variant.color ?? "").trim().toLowerCase()}|${variant.size.trim().toLowerCase()}`;
@@ -71,18 +46,31 @@ export function hasDuplicateVariant(variants: { color?: string | null; size: str
   return new Set(variants.map(toVariantKey)).size !== variants.length;
 }
 
-/** Điều kiện mở bán: ảnh đại diện + ít nhất 1 ảnh mô tả, giá > 0, có SKU và không trùng size (tên, danh mục đã bắt buộc ở schema) */
-export function isProductReadyToActivate(product: {
+export type ActivationIssue = "IMAGES" | "PRICE" | "SKUS" | "DUPLICATE_SKU" | "SET_ITEMS";
+
+/**
+ * Các điều kiện mở bán còn thiếu (rỗng = đủ): ảnh đại diện + ít nhất 1 ảnh mô tả, giá > 0, có SKU,
+ * không trùng tổ hợp màu + size; bán theo bộ cần khai ít nhất 2 món
+ */
+export function getActivationIssues(product: {
   images: string[];
   basePrice: number;
   variants: { size: string; color?: string | null }[];
-}): boolean {
-  return (
-    product.images.length >= MIN_IMAGES_TO_ACTIVATE &&
-    product.basePrice > 0 &&
-    product.variants.length > 0 &&
-    !hasDuplicateVariant(product.variants)
-  );
+  saleMode?: string;
+  setItemCount?: number;
+}): ActivationIssue[] {
+  const issues: ActivationIssue[] = [];
+  if (product.images.length < MIN_IMAGES_TO_ACTIVATE) issues.push("IMAGES");
+  if (product.basePrice <= 0) issues.push("PRICE");
+  if (product.variants.length === 0) issues.push("SKUS");
+  if (hasDuplicateVariant(product.variants)) issues.push("DUPLICATE_SKU");
+  if (product.saleMode === "SET" && (product.setItemCount ?? 0) < 2) issues.push("SET_ITEMS");
+  return issues;
+}
+
+/** Đủ điều kiện mở bán hay chưa */
+export function isProductReadyToActivate(product: Parameters<typeof getActivationIssues>[0]): boolean {
+  return getActivationIssues(product).length === 0;
 }
 
 /** Danh sách giá trị không trùng, bỏ giá trị rỗng, sắp xếp để dùng cho bộ lọc */

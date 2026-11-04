@@ -35,7 +35,7 @@ function KpiCard({
   return (
     <section className={cn(ADMIN_CARD_CLASS, "flex min-w-0 flex-col gap-3 p-4 sm:gap-4 sm:p-5", className)}>
       <div className="flex min-h-7 flex-wrap items-center justify-between gap-2">
-        <span className="flex min-w-0 items-center gap-1.5 text-[11px] font-semibold uppercase leading-tight tracking-[0.5px] text-[#71717A] sm:gap-2 sm:text-xs">
+        <span className="flex min-w-0 items-center gap-1.5 text-sm font-medium leading-tight text-[#71717A] sm:gap-2">
           <Icon size={14} className="shrink-0" />
           {label}
         </span>
@@ -55,7 +55,7 @@ function Breakdown({ items, wide }: { items: { label: string; value: number }[];
     <dl className={cn("grid gap-1 sm:grid-cols-3 sm:gap-2", wide && "grid-cols-3 gap-2")}>
       {items.map((item) => (
         <div key={item.label} className={cn("gap-2 sm:block", wide ? "block" : "flex items-center justify-between")}>
-          <dt className="truncate text-[11px]">{item.label}</dt>
+          <dt className="truncate text-2xs">{item.label}</dt>
           <dd className="font-mono text-sm font-semibold text-[#09090B]">{item.value}</dd>
         </div>
       ))}
@@ -105,7 +105,7 @@ export function DashboardKpiCards({ kpis, isLoading }: DashboardKpiCardsProps) {
             <span>{t("outstanding")}</span>
             <span className="font-mono text-sm font-semibold text-amber-700">{formatVnd(finance.outstanding)}</span>
           </div>
-          <p className="mt-0.5 text-[11px]">{t("outstandingOrders", { count: finance.outstandingOrders })}</p>
+          <p className="mt-0.5 text-2xs">{t("outstandingOrders", { count: finance.outstandingOrders })}</p>
         </KpiCard>
       )}
 
@@ -129,7 +129,7 @@ export function DashboardKpiCards({ kpis, isLoading }: DashboardKpiCardsProps) {
           tone={urgent.dueSoon > 0 ? "warning" : "default"}
         >
           <p>{t("urgentHint", { days: URGENT_DAYS })}</p>
-          <p className={cn("mt-0.5 text-[11px] font-medium", urgent.overdue > 0 ? "text-rose-700" : "text-emerald-700")}>
+          <p className={cn("mt-0.5 text-2xs font-medium", urgent.overdue > 0 ? "text-rose-700" : "text-emerald-700")}>
             {urgent.overdue > 0 ? t("overdue", { count: urgent.overdue }) : t("noOverdue")}
           </p>
         </KpiCard>

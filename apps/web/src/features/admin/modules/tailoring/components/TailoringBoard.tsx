@@ -124,7 +124,7 @@ export function TailoringBoard({ initialItems }: TailoringBoardProps) {
                 <div>
                   <div className="flex items-start justify-between gap-2 mb-3">
                     <div>
-                      <span className="font-mono text-xs font-bold text-[#09090B]">
+                      <span className="font-mono text-xs font-semibold text-[#09090B]">
                         {item.orderNumber}
                       </span>
                       <h4 className="font-semibold text-sm text-[#09090B] mt-0.5 line-clamp-1">
@@ -132,7 +132,7 @@ export function TailoringBoard({ initialItems }: TailoringBoardProps) {
                       </h4>
                     </div>
                     <span
-                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold border ${
+                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-2xs font-semibold border ${
                         currentStepObj?.color || "bg-zinc-50 text-zinc-700 border-[#E4E4E7]"
                       }`}
                     >
@@ -154,21 +154,21 @@ export function TailoringBoard({ initialItems }: TailoringBoardProps) {
                   </div>
 
                   {/* Quick measurements preview */}
-                  <div className="grid grid-cols-4 gap-1.5 bg-zinc-50 p-2.5 rounded-lg border border-[#E4E4E7] text-[11px] mb-3">
+                  <div className="grid grid-cols-4 gap-1.5 bg-zinc-50 p-2.5 rounded-lg border border-[#E4E4E7] text-2xs mb-3">
                     <div>
-                      <span className="text-zinc-400 block text-[9px]">{tm("bustShort")}</span>
+                      <span className="text-zinc-400 block text-2xs">{tm("bustShort")}</span>
                       <span className="font-mono font-semibold text-zinc-800">{item.bust || "--"} cm</span>
                     </div>
                     <div>
-                      <span className="text-zinc-400 block text-[9px]">Eo</span>
+                      <span className="text-zinc-400 block text-2xs">Eo</span>
                       <span className="font-mono font-semibold text-zinc-800">{item.waist || "--"} cm</span>
                     </div>
                     <div>
-                      <span className="text-zinc-400 block text-[9px]">{tm("hipsShort")}</span>
+                      <span className="text-zinc-400 block text-2xs">{tm("hipsShort")}</span>
                       <span className="font-mono font-semibold text-zinc-800">{item.hips || "--"} cm</span>
                     </div>
                     <div>
-                      <span className="text-zinc-400 block text-[9px]">{tm("shirtLength")}</span>
+                      <span className="text-zinc-400 block text-2xs">{tm("shirtLength")}</span>
                       <span className="font-mono font-semibold text-zinc-800">{item.shirtLength || "--"} cm</span>
                     </div>
                   </div>
@@ -192,10 +192,10 @@ export function TailoringBoard({ initialItems }: TailoringBoardProps) {
           <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl border border-[#E4E4E7] space-y-6 animate-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between border-b border-[#E4E4E7] pb-4">
               <div>
-                <div className="text-xs font-semibold text-[#71717A] uppercase tracking-wider">
+                <div className="text-sm font-medium text-[#71717A]">
                   {t("ticketTitle", { number: selectedItem.orderNumber })}
                 </div>
-                <h3 className="text-lg font-bold text-[#09090B]">{selectedItem.productName}</h3>
+                <h3 className="text-lg font-semibold text-[#09090B]">{selectedItem.productName}</h3>
               </div>
               <div className="flex items-center gap-2">
                 <button
@@ -215,7 +215,7 @@ export function TailoringBoard({ initialItems }: TailoringBoardProps) {
 
             {/* Bảng chi tiết 12 thông số vàng của Áo Dài */}
             <div>
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-[#71717A] mb-3 flex items-center gap-1.5">
+              <h4 className="text-body font-semibold text-[#3F3F46] mb-3 flex items-center gap-1.5">
                 <Ruler size={14} /> {t("measurementsTitle")}
               </h4>
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 bg-zinc-50 p-4 rounded-xl border border-[#E4E4E7]">
@@ -234,8 +234,8 @@ export function TailoringBoard({ initialItems }: TailoringBoardProps) {
                   { label: tm("thigh"), val: selectedItem.thigh ? `${selectedItem.thigh} cm` : "--" },
                 ].map((stat, idx) => (
                   <div key={idx} className="bg-white p-2.5 rounded-lg border border-[#E4E4E7]">
-                    <span className="text-[10px] text-[#71717A] block uppercase font-medium">{stat.label}</span>
-                    <span className="font-mono font-bold text-sm text-[#09090B]">{stat.val}</span>
+                    <span className="text-xs text-[#71717A] block font-medium">{stat.label}</span>
+                    <span className="font-mono font-semibold text-sm text-[#09090B]">{stat.val}</span>
                   </div>
                 ))}
               </div>
@@ -249,7 +249,7 @@ export function TailoringBoard({ initialItems }: TailoringBoardProps) {
 
             {/* {t("moveStage")} may */}
             <div className="space-y-3">
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-[#71717A] flex items-center gap-1.5">
+              <h4 className="text-body font-semibold text-[#3F3F46] flex items-center gap-1.5">
                 <Scissors size={14} /> {t("moveStage")}
               </h4>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">

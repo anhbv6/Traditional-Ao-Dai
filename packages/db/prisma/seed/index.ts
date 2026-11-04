@@ -9,6 +9,7 @@
 import { prisma } from '../../src'
 import { seedAccounts } from './accounts'
 import { seedCatalog } from './catalog'
+import { seedAttributes, seedMaterials } from './materials'
 import { seedOperations } from './operations'
 import { type SeedConfig } from './types'
 
@@ -36,10 +37,13 @@ async function main() {
   console.log(`🌱 Seeding database (dữ liệu demo: ${config.demo ? 'BẬT' : 'TẮT'})`)
 
   const accounts = await seedAccounts(config)
-  const catalog = await seedCatalog({ demo: config.demo })
+  // Thuộc tính trước sản phẩm (màu của SKU), chất liệu demo trước sản phẩm demo (gắn chất liệu)
+  await seedAttributes()
+  const materials = config.demo ? await seedMaterials() : {}
+  const catalog = await seedCatalog({ demo: config.demo, materials })
 
   if (config.demo) {
-    await seedOperations({ catalog, accounts })
+    await seedOperations({ catalog, accounts, materials })
   }
 
   console.log('🎉 Seed hoàn tất.')
