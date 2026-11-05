@@ -4,76 +4,67 @@ import { prisma, type Prisma, type ProductGroup } from '../../src'
 // - Loại sản phẩm: tạo mới nếu chưa có; loại cũ còn nằm ở gốc (dữ liệu trước khi có cây) được gắn vào nhóm cha.
 // - Bảng size: tạo nếu chưa có bảng cùng tên; loại sản phẩm chỉ nhận bảng mặc định khi đang trống.
 
-interface CategoryNode {
+// Nhóm hàng (bản chất: may đo, đơn vị bán, có size) khai ở NHÓM GỐC; loại con luôn thừa hưởng, không khai riêng
+interface CategoryLeaf {
   slug: string
   name: string
   nameEn: string
-  group: ProductGroup
   sizeChart?: string
-  children?: Omit<CategoryNode, 'children'>[]
+}
+
+interface CategoryNode extends CategoryLeaf {
+  group: ProductGroup
+  children?: CategoryLeaf[]
 }
 
 const CATEGORY_TREE: CategoryNode[] = [
   {
-    slug: 'ao-dai-nu',
-    name: 'Áo dài nữ',
-    nameEn: "Women's ao dai",
+    // Mỗi nhóm hàng đúng một nhóm gốc (cố định, admin không tạo / xóa); nữ / nam / trẻ em là các loại bên trong
+    slug: 'ao-dai',
+    name: 'Áo dài',
+    nameEn: 'Ao dai',
     group: 'AO_DAI',
     children: [
       {
         slug: 'ao-dai-truyen-thong',
         name: 'Áo dài truyền thống',
         nameEn: 'Traditional ao dai',
-        group: 'AO_DAI',
         sizeChart: 'traditional',
       },
       {
         slug: 'ao-dai-cach-tan',
         name: 'Áo dài cách tân',
         nameEn: 'Modern ao dai',
-        group: 'AO_DAI',
         sizeChart: 'modern',
       },
       {
         slug: 'ao-dai-cuoi-hoi',
         name: 'Áo dài cưới / lễ hội',
         nameEn: 'Wedding & festive ao dai',
-        group: 'AO_DAI',
         sizeChart: 'traditional',
       },
       {
         slug: 'ao-dai-ba-sui',
         name: 'Áo dài bà sui',
         nameEn: 'Mother of the bride ao dai',
-        group: 'AO_DAI',
         sizeChart: 'matron',
       },
-      { slug: 'ao-dai-suong', name: 'Áo dài suông', nameEn: 'Loose-fit ao dai', group: 'AO_DAI', sizeChart: 'modern' },
-      { slug: 'co-phuc-nhat-binh', name: 'Cổ phục / Nhật bình', nameEn: 'Heritage robes / Nhat binh', group: 'AO_DAI' },
-    ],
-  },
-  {
-    slug: 'ao-dai-nam-tre-em',
-    name: 'Áo dài nam & trẻ em',
-    nameEn: "Men's & kids' ao dai",
-    group: 'AO_DAI',
-    children: [
+      { slug: 'ao-dai-suong', name: 'Áo dài suông', nameEn: 'Loose-fit ao dai', sizeChart: 'modern' },
+      { slug: 'co-phuc-nhat-binh', name: 'Cổ phục / Nhật bình', nameEn: 'Heritage robes / Nhat binh' },
       {
         slug: 'ao-dai-ngu-than',
         name: 'Áo dài ngũ thân',
         nameEn: 'Five-panel ao dai',
-        group: 'AO_DAI',
         sizeChart: 'men',
       },
       {
         slug: 'ao-dai-cach-tan-nam',
         name: 'Áo dài cách tân nam',
         nameEn: "Men's modern ao dai",
-        group: 'AO_DAI',
         sizeChart: 'men',
       },
-      { slug: 'ao-dai-be-trai', name: 'Áo dài bé trai', nameEn: "Boys' ao dai", group: 'AO_DAI', sizeChart: 'kids' },
-      { slug: 'ao-dai-be-gai', name: 'Áo dài bé gái', nameEn: "Girls' ao dai", group: 'AO_DAI', sizeChart: 'kids' },
+      { slug: 'ao-dai-be-trai', name: 'Áo dài bé trai', nameEn: "Boys' ao dai", sizeChart: 'kids' },
+      { slug: 'ao-dai-be-gai', name: 'Áo dài bé gái', nameEn: "Girls' ao dai", sizeChart: 'kids' },
     ],
   },
   {
@@ -87,11 +78,10 @@ const CATEGORY_TREE: CategoryNode[] = [
         slug: 'quan-lua-ong-rong',
         name: 'Quần lụa ống rộng',
         nameEn: 'Wide-leg silk pants',
-        group: 'PANTS',
         sizeChart: 'pants',
       },
-      { slug: 'quan-phi-bong', name: 'Quần phi bóng', nameEn: 'Satin pants', group: 'PANTS', sizeChart: 'pants' },
-      { slug: 'quan-gam', name: 'Quần gấm', nameEn: 'Brocade pants', group: 'PANTS', sizeChart: 'pants' },
+      { slug: 'quan-phi-bong', name: 'Quần phi bóng', nameEn: 'Satin pants', sizeChart: 'pants' },
+      { slug: 'quan-gam', name: 'Quần gấm', nameEn: 'Brocade pants', sizeChart: 'pants' },
     ],
   },
   {
@@ -100,19 +90,26 @@ const CATEGORY_TREE: CategoryNode[] = [
     nameEn: 'Accessories',
     group: 'ACCESSORY',
     children: [
-      { slug: 'man-doi', name: 'Mấn đội', nameEn: 'Headpieces', group: 'ACCESSORY' },
-      { slug: 'kieng-co-ngoc-trai', name: 'Kiềng cổ / ngọc trai', nameEn: 'Necklaces & pearls', group: 'ACCESSORY' },
-      { slug: 'guoc-moc', name: 'Guốc mộc', nameEn: 'Wooden clogs', group: 'FOOTWEAR', sizeChart: 'clogs' },
-      { slug: 'tui-xach', name: 'Túi', nameEn: 'Bags', group: 'ACCESSORY' },
-      { slug: 'quat-theu', name: 'Quạt thêu', nameEn: 'Embroidered fans', group: 'ACCESSORY' },
+      { slug: 'man-doi', name: 'Mấn đội', nameEn: 'Headpieces' },
+      { slug: 'kieng-co-ngoc-trai', name: 'Kiềng cổ / ngọc trai', nameEn: 'Necklaces & pearls' },
+      { slug: 'tui-xach', name: 'Túi', nameEn: 'Bags' },
+      { slug: 'quat-theu', name: 'Quạt thêu', nameEn: 'Embroidered fans' },
     ],
+  },
+  {
+    // Guốc có bảng size cỡ chân riêng nên là một nhóm gốc, không nằm trong Phụ kiện
+    slug: 'giay-guoc',
+    name: 'Giày, guốc',
+    nameEn: 'Footwear',
+    group: 'FOOTWEAR',
+    children: [{ slug: 'guoc-moc', name: 'Guốc mộc', nameEn: 'Wooden clogs', sizeChart: 'clogs' }],
   },
   {
     slug: 'nguyen-lieu',
     name: 'Nguyên liệu',
     nameEn: 'Materials',
     group: 'MATERIAL',
-    children: [{ slug: 'vai-may-ao-dai', name: 'Vải may áo dài', nameEn: 'Ao dai fabric', group: 'MATERIAL' }],
+    children: [{ slug: 'vai-may-ao-dai', name: 'Vải may áo dài', nameEn: 'Ao dai fabric' }],
   },
 ]
 
@@ -367,7 +364,8 @@ async function seedSizeCharts(): Promise<Record<string, string>> {
 }
 
 async function upsertCategory(
-  node: Omit<CategoryNode, 'children'>,
+  node: CategoryLeaf,
+  group: ProductGroup,
   position: number,
   parentId: string | null,
   sizeChartIds: Record<string, string>
@@ -384,7 +382,7 @@ async function upsertCategory(
         slug: node.slug,
         name: node.name,
         nameEn: node.nameEn,
-        group: node.group,
+        group,
         position,
         parentId,
         defaultSizeChartId: sizeChartId,
@@ -399,7 +397,7 @@ async function upsertCategory(
   await prisma.category.update({
     where: { id: existing.id },
     data: {
-      ...(isLegacyRoot ? { parentId, position, group: node.group, name: node.name, nameEn: node.nameEn } : {}),
+      ...(isLegacyRoot ? { parentId, position, group, name: node.name, nameEn: node.nameEn } : {}),
       ...(existing.defaultSizeChartId === null && sizeChartId ? { defaultSizeChartId: sizeChartId } : {}),
     },
   })
@@ -412,10 +410,10 @@ export async function seedTaxonomy(): Promise<Record<string, string>> {
   const categoryIds: Record<string, string> = {}
 
   for (const [rootIndex, root] of CATEGORY_TREE.entries()) {
-    const rootId = await upsertCategory(root, rootIndex, null, sizeChartIds)
+    const rootId = await upsertCategory(root, root.group, rootIndex, null, sizeChartIds)
     categoryIds[root.slug] = rootId
     for (const [childIndex, child] of (root.children ?? []).entries()) {
-      categoryIds[child.slug] = await upsertCategory(child, childIndex, rootId, sizeChartIds)
+      categoryIds[child.slug] = await upsertCategory(child, root.group, childIndex, rootId, sizeChartIds)
     }
   }
 

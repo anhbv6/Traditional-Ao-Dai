@@ -1182,7 +1182,6 @@
   "categories": {
     "groupLabel": "Nhóm hàng",
     "filterAll": "Tất cả",
-    "createRoot": "Thêm nhóm gốc",
     "searchPlaceholder": "Tìm loại sản phẩm...",
     "expandAll": "Mở tất cả",
     "collapseAll": "Thu gọn",
@@ -1193,7 +1192,6 @@
     "collapse": "Thu gọn {name}",
     "hidden": "Đang ẩn",
     "noChart": "Chưa gắn bảng size",
-    "inheritChart": "Theo nhóm gốc",
     "reordered": "Đã lưu thứ tự hiển thị",
     "hiddenSuccess": "Đã ẩn loại sản phẩm khỏi cửa hàng",
     "shownSuccess": "Đã hiện loại sản phẩm trên cửa hàng",
@@ -1202,7 +1200,7 @@
     "menu": {
       "label": "Thao tác với {name}",
       "edit": "Sửa",
-      "addChild": "Thêm loại con",
+      "addChild": "Thêm loại sản phẩm",
       "moveUp": "Lên trên",
       "moveDown": "Xuống dưới",
       "delete": "Xóa",
@@ -1210,15 +1208,11 @@
       "show": "Hiện trên cửa hàng"
     },
     "deleteBlocked": {
-      "children": "Còn loại con — xóa hoặc chuyển chúng trước",
       "products": "Còn sản phẩm — chuyển sản phẩm hoặc ẩn loại này"
     },
     "editor": {
-      "createRootTitle": "Thêm nhóm gốc",
-      "createChildTitle": "Thêm loại con vào {name}",
-      "description": "Nhóm hàng quyết định cách may đo, đơn vị bán và bảng size áp dụng cho sản phẩm thuộc loại này.",
-      "rootOption": "— Là nhóm gốc —",
-      "parentLocked": "Đang có loại con nên luôn là nhóm gốc",
+      "createChildTitle": "Thêm loại sản phẩm vào {name}",
+      "description": "Nhóm hàng do nhóm gốc quyết định: cách may đo, đơn vị bán và bảng size cho mọi loại sản phẩm bên trong.",
       "chartNone": "Chưa gắn bảng size",
       "chartInherit": "Theo bảng size của nhóm gốc",
       "chartInactive": "chưa áp dụng",
@@ -1241,10 +1235,47 @@
         }
       },
       "editTitle": "Sửa loại: {name}",
-      "dialogDescription": "Tên, nhóm cha, nhóm hàng và bảng size của loại sản phẩm.",
+      "dialogDescription": "Tên, nhóm gốc và bảng size của loại sản phẩm.",
       "cancel": "Hủy",
       "nameRequired": "Vui lòng nhập tên loại sản phẩm",
-      "groupLabel": "Nhóm hàng & bảng size"
+      "groupLabel": "Nhóm hàng & bảng size",
+      "createTitle": "Thêm loại sản phẩm",
+      "parentPlaceholder": "Vui lòng chọn nhóm",
+      "parentRequired": "Vui lòng chọn nhóm cho loại sản phẩm",
+      "parentHint": "Nhóm gốc là nhóm hàng (Áo dài, Quần, Phụ kiện, Giày guốc, Nguyên liệu) — quyết định may đo, đơn vị bán và có size hay không. Loại sản phẩm bên trong thừa hưởng.",
+      "groupPending": "Chọn “Thuộc nhóm” trước — nhóm hàng của loại sản phẩm lấy theo nhóm gốc.",
+      "groupInherited": "Theo nhóm gốc {name}",
+      "editRootTitle": "Sửa nhóm gốc: {name}",
+      "rootDescription": "Nhóm gốc cố định theo nhóm hàng — sửa được tên, mô tả, hiển thị và bảng size mặc định.",
+      "groupFixed": "Nhóm gốc cố định theo nhóm hàng này",
+      "createdWithChart": "Đã thêm loại sản phẩm kèm bảng size riêng",
+      "sizeMode": {
+        "recommended": "Nên dùng",
+        "custom": {
+          "title": "Nhập bảng size riêng",
+          "description": "Nhập số đo theo từng size cho loại này ngay tại đây — bảng size được lưu cùng loại sản phẩm.",
+          "empty": "Chưa nhập bảng size",
+          "required": "Vui lòng nhập số đo cho bảng size",
+          "summary": "{sizes} · {columns} thông số",
+          "enter": "Nhập bảng size",
+          "edit": "Sửa bảng size"
+        },
+        "preset": {
+          "title": "Dùng bảng size mẫu có sẵn",
+          "description": "Gắn một bảng size đã có cùng nhóm hàng, hoặc theo bảng size của nhóm gốc."
+        }
+      },
+      "slugGenerate": "Tạo đường dẫn gọn từ tên",
+      "sizeDialog": {
+        "title": "Nhập bảng size",
+        "titleNamed": "Bảng size: {name}",
+        "description": "Hàng là size, cột là thông số đo; mỗi ô nhập khoảng từ – đến. Dán được cả vùng ô từ Excel / Google Sheets.",
+        "issues": "Còn {count} ô số đo chưa hợp lệ",
+        "empty": "Cần ít nhất một thông số và một hàng size",
+        "missingRows": "Còn {count} hàng size chưa có số đo",
+        "cancel": "Hủy",
+        "done": "Xong"
+      }
     },
     "field": {
       "name": "Tên loại",
@@ -1273,14 +1304,12 @@
     },
     "detail": {
       "back": "Loại sản phẩm",
-      "childOf": "Thuộc",
-      "childCount": "{count} loại con",
       "noChildren": "Chưa có loại con nào.",
       "sections": {
         "general": "Thông tin chung",
-        "group": "Nhóm hàng & bảng size",
         "overview": "Tổng quan",
-        "children": "Loại con"
+        "children": "Loại con",
+        "sizeChart": "Bảng size"
       },
       "stats": {
         "products": "Sản phẩm",
@@ -1288,13 +1317,20 @@
         "children": "Loại con"
       },
       "info": {
-        "nameVi": "Tên (Tiếng Việt)",
-        "nameEn": "Tên (English)",
-        "descriptionVi": "Mô tả (Tiếng Việt)",
-        "descriptionEn": "Mô tả (English)",
         "noEnglish": "Chưa có bản tiếng Anh",
         "none": "Chưa có",
-        "isRoot": "Là nhóm gốc"
+        "group": "Nhóm hàng"
+      },
+      "lang": {
+        "vi": "Tiếng Việt",
+        "en": "English"
+      },
+      "chart": {
+        "open": "Mở bảng size",
+        "own": "Bảng riêng của loại này",
+        "inherited": "Theo bảng size của nhóm gốc {name}",
+        "size": "Size",
+        "empty": "Bảng size chưa có số đo nào."
       }
     },
     "list": {
@@ -1317,7 +1353,8 @@
       "hidden": "Đang ẩn",
       "storeMeta": "{count} danh mục",
       "collapsed": "Đang thu gọn {count} loại con"
-    }
+    },
+    "createType": "Thêm loại sản phẩm"
   },
   "sizeCharts": {
     "create": {

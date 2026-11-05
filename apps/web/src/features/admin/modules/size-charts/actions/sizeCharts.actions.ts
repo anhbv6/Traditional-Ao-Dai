@@ -2,7 +2,6 @@
 
 import { type z } from "zod";
 import { revalidatePath } from "next/cache";
-import { PRODUCT_GROUP_TRAITS } from "@repo/shared/sizing";
 import { type Prisma } from "@repo/db";
 import { prisma } from "../../../core/server/db.server";
 import { authorizeAdminAction } from "../../../core/server/adminAuth.server";
@@ -17,7 +16,7 @@ import {
   sizeChartIdSchema,
   toggleSizeChartSchema,
 } from "../schemas/sizeCharts.schemas";
-import { DEFAULT_VALID_RANGE } from "../utils/sizeChartPresets";
+import { buildStarterSizeChart } from "../utils/sizeChartStarter";
 
 const ACCESS = ADMIN_MODULE_ACCESS.sizeCharts;
 
@@ -45,14 +44,7 @@ export async function createSizeChartAction(raw: z.input<typeof createSizeChartS
         group,
         // Bảng mới chưa có số liệu → chưa áp dụng để khách không thấy bảng rỗng
         isActive: false,
-        columns: {
-          create: PRODUCT_GROUP_TRAITS[group].suggestedKeys.map((key, position) => ({
-            key,
-            position,
-            validMin: DEFAULT_VALID_RANGE[key][0],
-            validMax: DEFAULT_VALID_RANGE[key][1],
-          })),
-        },
+        ...buildStarterSizeChart(group),
       },
       select: { id: true },
     });

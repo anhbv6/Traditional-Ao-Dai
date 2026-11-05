@@ -1182,7 +1182,6 @@
   "categories": {
     "groupLabel": "Product group",
     "filterAll": "All",
-    "createRoot": "Add root group",
     "searchPlaceholder": "Search product types...",
     "expandAll": "Expand all",
     "collapseAll": "Collapse",
@@ -1193,7 +1192,6 @@
     "collapse": "Collapse {name}",
     "hidden": "Hidden",
     "noChart": "No size chart",
-    "inheritChart": "From root group",
     "reordered": "Display order saved",
     "hiddenSuccess": "Product type hidden from the store",
     "shownSuccess": "Product type shown in the store",
@@ -1202,7 +1200,7 @@
     "menu": {
       "label": "Actions for {name}",
       "edit": "Edit",
-      "addChild": "Add subtype",
+      "addChild": "Add product type",
       "moveUp": "Move up",
       "moveDown": "Move down",
       "delete": "Delete",
@@ -1210,15 +1208,11 @@
       "show": "Show in store"
     },
     "deleteBlocked": {
-      "children": "Has subtypes — delete or move them first",
       "products": "Has products — move them or hide this type"
     },
     "editor": {
-      "createRootTitle": "Add root group",
-      "createChildTitle": "Add a subtype to {name}",
-      "description": "The product group decides tailoring, sell unit and which size chart applies to its products.",
-      "rootOption": "— Root group —",
-      "parentLocked": "Has subtypes, so it stays a root group",
+      "createChildTitle": "Add a product type to {name}",
+      "description": "The root group decides the product group: tailoring, sell unit and size charts for every product type inside.",
       "chartNone": "No size chart",
       "chartInherit": "Use the root group's size chart",
       "chartInactive": "inactive",
@@ -1241,10 +1235,47 @@
         }
       },
       "editTitle": "Edit category: {name}",
-      "dialogDescription": "Name, parent, product group and size chart of the category.",
+      "dialogDescription": "Name, root group and size chart of the product type.",
       "cancel": "Cancel",
       "nameRequired": "Please enter the category name",
-      "groupLabel": "Product group & size chart"
+      "groupLabel": "Product group & size chart",
+      "createTitle": "Add product type",
+      "parentPlaceholder": "Please choose a group",
+      "parentRequired": "Please choose a group for this product type",
+      "parentHint": "Root groups are the product groups (Ao dai, Pants, Accessories, Footwear, Materials) — they decide tailoring, sell unit and sizing. Product types inside inherit them.",
+      "groupPending": "Choose the parent group first — a product type takes its product group from the root.",
+      "groupInherited": "Inherited from {name}",
+      "editRootTitle": "Edit root group: {name}",
+      "rootDescription": "Root groups are fixed per product group — you can edit the name, description, visibility and default size chart.",
+      "groupFixed": "This root group is fixed to this product group",
+      "createdWithChart": "Product type added with its own size chart",
+      "sizeMode": {
+        "recommended": "Recommended",
+        "custom": {
+          "title": "Enter a dedicated size chart",
+          "description": "Enter the measurements for each size right here — the chart is saved together with the product type.",
+          "empty": "No size chart entered yet",
+          "required": "Please enter the size chart measurements",
+          "summary": "{sizes} · {columns, plural, one {# measurement} other {# measurements}}",
+          "enter": "Enter size chart",
+          "edit": "Edit size chart"
+        },
+        "preset": {
+          "title": "Use an existing size chart",
+          "description": "Attach an existing chart of the same product group, or follow the root group's chart."
+        }
+      },
+      "slugGenerate": "Generate a short slug from the name",
+      "sizeDialog": {
+        "title": "Enter size chart",
+        "titleNamed": "Size chart: {name}",
+        "description": "Rows are sizes, columns are measurements; each cell takes a from – to range. You can paste a block of cells from Excel / Google Sheets.",
+        "issues": "{count, plural, one {# measurement cell is} other {# measurement cells are}} invalid",
+        "empty": "Add at least one measurement and one size row",
+        "missingRows": "{count, plural, one {# size row has} other {# size rows have}} no measurements",
+        "cancel": "Cancel",
+        "done": "Done"
+      }
     },
     "field": {
       "name": "Type name",
@@ -1273,14 +1304,12 @@
     },
     "detail": {
       "back": "Categories",
-      "childOf": "In",
-      "childCount": "{count, plural, one {# subcategory} other {# subcategories}}",
       "noChildren": "No subcategories yet.",
       "sections": {
         "general": "General information",
-        "group": "Product group & size chart",
         "overview": "Overview",
-        "children": "Subcategories"
+        "children": "Subcategories",
+        "sizeChart": "Size chart"
       },
       "stats": {
         "products": "Products",
@@ -1288,13 +1317,20 @@
         "children": "Subcategories"
       },
       "info": {
-        "nameVi": "Name (Vietnamese)",
-        "nameEn": "Name (English)",
-        "descriptionVi": "Description (Vietnamese)",
-        "descriptionEn": "Description (English)",
         "noEnglish": "No English version yet",
         "none": "None",
-        "isRoot": "Top-level group"
+        "group": "Product group"
+      },
+      "lang": {
+        "vi": "Vietnamese",
+        "en": "English"
+      },
+      "chart": {
+        "open": "Open size chart",
+        "own": "This type's own chart",
+        "inherited": "Following the root group {name}'s chart",
+        "size": "Size",
+        "empty": "This size chart has no measurements yet."
       }
     },
     "list": {
@@ -1317,7 +1353,8 @@
       "hidden": "Hidden",
       "storeMeta": "{count, plural, one {# category} other {# categories}}",
       "collapsed": "{count, plural, one {# subcategory collapsed} other {# subcategories collapsed}}"
-    }
+    },
+    "createType": "Add product type"
   },
   "sizeCharts": {
     "create": {

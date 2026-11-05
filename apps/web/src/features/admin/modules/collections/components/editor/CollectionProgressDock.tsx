@@ -52,7 +52,7 @@ export function CollectionProgressDock({
           />
         )}
         {/* Mở popover thì nút thu nhỏ + mờ đi như nút trợ lý AI (popover mở đè đúng chỗ nút) */}
-        <AdminTooltip content={open ? null : t("editor.progressOpen")} side="left">
+        <AdminTooltip content={t("editor.progressOpen")} disabled={open} side="left">
           <Popover.Trigger
             aria-label={t("editor.progressOpen")}
             className="relative grid size-full cursor-pointer place-items-center rounded-full border border-[#E4E4E7] bg-white text-[#09090B] shadow-[0_12px_24px_-12px_rgba(9,9,11,0.45)] outline-none transition-[opacity,scale,background-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[#FAFAFA] focus-visible:ring-4 focus-visible:ring-[#18181B]/15 data-popup-open:pointer-events-none data-popup-open:scale-80 data-popup-open:opacity-0"

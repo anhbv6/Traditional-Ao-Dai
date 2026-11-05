@@ -157,18 +157,21 @@ export function CategoryTreeRow({
       disabled: isLast || reorderDisabled,
       onSelect: () => handlers.onMove(node, 1),
     },
-    { type: "separator", key: "sep-delete" },
-    {
-      key: "delete",
-      label: t("menu.delete"),
-      description: canDelete
-        ? undefined
-        : t(node.children.length > 0 ? "deleteBlocked.children" : "deleteBlocked.products"),
-      icon: Trash2,
-      tone: "danger",
-      disabled: !canDelete,
-      onSelect: () => handlers.onDelete(node),
-    },
+    // Nhóm gốc cố định theo nhóm hàng — không có mục xóa (chỉ ẩn)
+    ...(isRoot
+      ? []
+      : [
+          { type: "separator" as const, key: "sep-delete" },
+          {
+            key: "delete",
+            label: t("menu.delete"),
+            description: canDelete ? undefined : t("deleteBlocked.products"),
+            icon: Trash2,
+            tone: "danger" as const,
+            disabled: !canDelete,
+            onSelect: () => handlers.onDelete(node),
+          },
+        ]),
   ];
 
   return (

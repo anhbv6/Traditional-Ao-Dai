@@ -158,13 +158,16 @@ export function AdminDatePicker({
         className="h-9 w-full min-w-0 flex-1 rounded-xl border border-[#E4E4E7] bg-white px-3 text-sm tabular-nums text-[#09090B] outline-none placeholder:text-[#A1A1AA] focus:border-[#18181B] disabled:cursor-not-allowed disabled:bg-[#FAFAFA] aria-invalid:border-rose-400"
       />
       <Popover.Root open={open} onOpenChange={handleOpenChange}>
-        <Popover.Trigger
-          disabled={disabled}
-          aria-label={t("open")}
-          className="grid size-9 shrink-0 cursor-pointer place-items-center rounded-xl border border-[#E4E4E7] bg-white text-[#52525B] outline-none transition-colors hover:bg-[#FAFAFA] hover:text-[#09090B] focus-visible:border-[#18181B] disabled:cursor-not-allowed disabled:opacity-60 data-popup-open:border-[#18181B]"
-        >
-          <CalendarDays size={16} aria-hidden />
-        </Popover.Trigger>
+        {/* Khung flex không gap giữ các thẻ chặn focus Base UI chèn cạnh nút khi mở lịch — tránh `gap` của hàng làm ô nhảy */}
+        <span className="flex shrink-0">
+          <Popover.Trigger
+            disabled={disabled}
+            aria-label={t("open")}
+            className="grid size-9 shrink-0 cursor-pointer place-items-center rounded-xl border border-[#E4E4E7] bg-white text-[#52525B] outline-none transition-colors hover:bg-[#FAFAFA] hover:text-[#09090B] focus-visible:border-[#18181B] disabled:cursor-not-allowed disabled:opacity-60 data-popup-open:border-[#18181B]"
+          >
+            <CalendarDays size={16} aria-hidden />
+          </Popover.Trigger>
+        </span>
         <Popover.Portal>
           <Popover.Positioner
             positionMethod={positionMethod}

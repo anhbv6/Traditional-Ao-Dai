@@ -2,7 +2,7 @@
 
 import { useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
-import { ChevronRight, Pencil, Plus, Trash2 } from "lucide-react";
+import { ArrowUpRight, ChevronRight, Pencil, Plus, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { PRODUCT_GROUP_TRAITS } from "@repo/shared/sizing";
 import { Link, useRouter } from "@/i18n/routing";
@@ -12,7 +12,9 @@ import {
   ADMIN_PRIMARY_BUTTON_CLASS,
   ADMIN_SECONDARY_BUTTON_CLASS,
   AdminDetailHeader,
+  AdminInfoTip,
 } from "@/features/admin/core/ui";
+import { type AdminSizeChartDetail } from "@/features/admin/modules/size-charts";
 import { type AdminCategoryNode, type SizeChartOption } from "../../types/categories.types";
 import {
   PRODUCT_GROUP_COLORS,
@@ -21,11 +23,10 @@ import {
   groupUsesSizeChart,
 } from "../../utils/productGroupMeta";
 import { CategoryStatusBadge } from "../shared/CategoryStatusBadge";
+import { CategorySizeChartTable } from "./CategorySizeChartTable";
 
 // Dialog chỉ cần khi thao tác nên tách khỏi bundle đầu trang
-const CategoryEditorDialog = dynamic(() =>
-  import("../tree/CategoryEditorDialog").then((m) => m.CategoryEditorDialog)
-);
+const CategoryEditorDialog = dynamic(() => import("../tree/CategoryEditorDialog").then((m) => m.CategoryEditorDialog));
 const ConfirmDeleteCategoryDialog = dynamic(() =>
   import("../tree/ConfirmDeleteCategoryDialog").then((m) => m.ConfirmDeleteCategoryDialog)
 );
@@ -42,12 +43,25 @@ function Card({ title, aside, children }: { title: string; aside?: ReactNode; ch
   );
 }
 
-/** Một dòng thông tin: nhãn trái, giá trị phải (xuống dòng ở màn nhỏ) */
-function InfoRow({ label, children }: { label: string; children: ReactNode }) {
+/** Nội dung hiển thị của một ngôn ngữ: nhãn ngôn ngữ, tên, mô tả */
+function LangBlock({
+  lang,
+  name,
+  description,
+  emptyLabel,
+}: {
+  lang: string;
+  name: ReactNode;
+  description: ReactNode;
+  emptyLabel: string;
+}) {
   return (
-    <div className="grid gap-1 py-2.5 sm:grid-cols-[160px_minmax(0,1fr)] sm:gap-4">
-      <dt className="text-xs text-[#71717A]">{label}</dt>
-      <dd className="min-w-0 text-sm text-[#09090B]">{children}</dd>
+    <div className="min-w-0 py-1">
+      <p className="mb-1.5 text-xs font-medium text-[#71717A]">{lang}</p>
+      <p className="text-body font-semibold text-[#09090B]">{name || <Empty>{emptyLabel}</Empty>}</p>
+      <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-[#3F3F46]">
+        {description || <Empty>{emptyLabel}</Empty>}
+      </p>
     </div>
   );
 }
@@ -78,13 +92,16 @@ interface CategoryDetailProps {
   node: AdminCategoryNode;
   roots: AdminCategoryNode[];
   sizeCharts: SizeChartOption[];
+  /** Bảng size đang áp dụng (riêng của loại hoặc theo nhóm gốc) — chỉ xem */
+  sizeChart: { chart: AdminSizeChartDetail; source: "own" | "inherited" } | null;
 }
 
 /**
- * Màn chi tiết loại sản phẩm (chỉ xem): trái là thông tin chung + nhóm hàng & bảng size, phải là thẻ Tổng quan
- * (trạng thái, số liệu, loại con / nhóm cha). Sửa và thêm loại con mở CategoryEditorDialog.
+ * Màn chi tiết loại sản phẩm (chỉ xem). Mỗi thông tin hiện đúng một chỗ:
+ * đầu trang = tên, trạng thái, nhóm gốc, đường dẫn · trái = nội dung VI | EN rồi bảng size (chỉ xem) ·
+ * phải = Tổng quan (nhóm hàng, số liệu, loại con / nhóm gốc). Sửa và thêm loại mở CategoryEditorDialog.
  */
-export function CategoryDetail({ node, roots, sizeCharts }: CategoryDetailProps) {
+export function CategoryDetail({ node, roots, sizeCharts, sizeChart }: CategoryDetailProps) {
   const t = useTranslations("AdminPage.categories");
   const tSizing = useTranslations("AdminPage.sizing");
   const router = useRouter();
@@ -104,22 +121,11 @@ export function CategoryDetail({ node, roots, sizeCharts }: CategoryDetailProps)
   const children = node.children;
   const productCount = node.productCount + children.reduce((sum, child) => sum + child.productCount, 0);
   const skuCount = node.skuCount + children.reduce((sum, child) => sum + child.skuCount, 0);
-  const canDelete = children.length === 0 && node.productCount === 0;
+  // Nhóm gốc cố định theo nhóm hàng → không xóa
+  const canDelete = node.parentId !== null && node.productCount === 0;
 
-  // Bảng size: của riêng loại này, hoặc thừa hưởng nhóm gốc khi cùng nhóm hàng (cùng quy tắc với bảng danh sách)
-  const chartMap = new Map(sizeCharts.map((chart) => [chart.id, chart]));
-  const chart = node.defaultSizeChartId ? chartMap.get(node.defaultSizeChartId) : undefined;
-  const inherited =
-    !chart && parentNode?.defaultSizeChartId && parentNode.group === node.group
-      ? chartMap.get(parentNode.defaultSizeChartId)
-      : undefined;
   const traits = PRODUCT_GROUP_TRAITS[node.group];
-
-  const chartLink = (target: SizeChartOption) => (
-    <Link href={`/admin/catalog/size-charts/${target.id}`} className="font-medium hover:underline">
-      {target.name}
-    </Link>
-  );
+  const usesChart = groupUsesSizeChart(node.group);
 
   return (
     <div className="space-y-5">
@@ -128,27 +134,8 @@ export function CategoryDetail({ node, roots, sizeCharts }: CategoryDetailProps)
         backLabel={t("detail.back")}
         title={node.name}
         badge={<CategoryStatusBadge isActive={node.isActive} />}
-        subtitle={
-          <>
-            {isRoot ? (
-              <span className="mr-2">{t("detail.childCount", { count: children.length })} ·</span>
-            ) : (
-              parentNode && (
-                <span className="mr-2">
-                  {t("detail.childOf")}{" "}
-                  <Link
-                    href={`/admin/catalog/categories/${parentNode.id}`}
-                    className="font-medium text-[#3F3F46] hover:underline"
-                  >
-                    {parentNode.name}
-                  </Link>{" "}
-                  ·
-                </span>
-              )
-            )}
-            <span className="font-mono">/{node.slug}</span>
-          </>
-        }
+        // Chỉ đường dẫn — nhóm gốc / số loại con đã có ở thẻ Tổng quan bên phải
+        subtitle={<span className="font-mono">/{node.slug}</span>}
         actions={
           <>
             {canDelete && (
@@ -165,96 +152,91 @@ export function CategoryDetail({ node, roots, sizeCharts }: CategoryDetailProps)
 
       <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
         <div className="min-w-0 space-y-5">
+          {/* Nội dung hiển thị trên cửa hàng — hai ngôn ngữ đặt cạnh nhau để so */}
           <Card title={t("detail.sections.general")}>
-            <dl className="-my-2.5 divide-y divide-dashed divide-[#E4E4E7]">
-              <InfoRow label={t("detail.info.nameVi")}>
-                <span className="font-medium">{node.name}</span>
-              </InfoRow>
-              <InfoRow label={t("detail.info.nameEn")}>
-                {node.nameEn || <Empty>{t("detail.info.noEnglish")}</Empty>}
-              </InfoRow>
-              <InfoRow label={t("field.slug")}>
-                <span className="font-mono text-xs">/{node.slug}</span>
-              </InfoRow>
-              <InfoRow label={t("field.parent")}>
-                {parentNode ? (
-                  <Link href={`/admin/catalog/categories/${parentNode.id}`} className="font-medium hover:underline">
-                    {parentNode.name}
-                  </Link>
-                ) : (
-                  t("detail.info.isRoot")
-                )}
-              </InfoRow>
-              <InfoRow label={t("detail.info.descriptionVi")}>
-                {node.description ? (
-                  <span className="whitespace-pre-line leading-relaxed">{node.description}</span>
-                ) : (
-                  <Empty>{t("detail.info.none")}</Empty>
-                )}
-              </InfoRow>
-              <InfoRow label={t("detail.info.descriptionEn")}>
-                {node.descriptionEn ? (
-                  <span className="whitespace-pre-line leading-relaxed">{node.descriptionEn}</span>
-                ) : (
-                  <Empty>{t("detail.info.none")}</Empty>
-                )}
-              </InfoRow>
-            </dl>
-          </Card>
-
-          <Card title={t("detail.sections.group")}>
-            <div className="flex items-start gap-3">
-              <span aria-hidden className={cn("grid size-10 shrink-0 place-items-center rounded-lg", groupColor.tile)}>
-                <GroupIcon size={18} />
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-[#09090B]">{tSizing(`group.${node.group}`)}</p>
-                <p className="mt-0.5 text-xs leading-relaxed text-[#71717A]">{tSizing(`groupHint.${node.group}`)}</p>
-                <div className="mt-2 flex flex-wrap gap-1.5">
-                  {[
-                    ...getGroupTraitKeys(node.group).map((trait) => tSizing(`trait.${trait}`)),
-                    tSizing(`sellUnit.${traits.sellUnit}`),
-                  ].map((label) => (
-                    <span
-                      key={label}
-                      className="rounded border border-[#E4E4E7] bg-white px-1.5 py-px text-2xs text-[#52525B]"
-                    >
-                      {label}
-                    </span>
-                  ))}
-                </div>
-              </div>
+            <div className="grid gap-4 sm:grid-cols-2 sm:gap-0 sm:divide-x sm:divide-dashed sm:divide-[#E4E4E7] [&>*]:sm:px-5 [&>*:first-child]:sm:pl-0 [&>*:last-child]:sm:pr-0">
+              <LangBlock
+                lang={t("detail.lang.vi")}
+                name={node.name}
+                description={node.description}
+                emptyLabel={t("detail.info.none")}
+              />
+              <LangBlock
+                lang={t("detail.lang.en")}
+                name={node.nameEn}
+                description={node.descriptionEn}
+                emptyLabel={t("detail.info.noEnglish")}
+              />
             </div>
-
-            {groupUsesSizeChart(node.group) && (
-              <>
-                <DashedDivider />
-                <dl>
-                  <InfoRow label={t("field.sizeChart")}>
-                    {chart ? (
-                      <>
-                        {chartLink(chart)}
-                        {!chart.isActive && <Empty> ({t("editor.chartInactive")})</Empty>}
-                      </>
-                    ) : inherited ? (
-                      <>
-                        {chartLink(inherited)} <Empty>· {t("inheritChart")}</Empty>
-                      </>
-                    ) : (
-                      <span className="text-amber-700">{t("noChart")}</span>
-                    )}
-                  </InfoRow>
-                </dl>
-              </>
-            )}
           </Card>
+
+          {usesChart && (
+            <Card
+              title={t("detail.sections.sizeChart")}
+              aside={
+                sizeChart && (
+                  <Link
+                    href={`/admin/catalog/size-charts/${sizeChart.chart.id}`}
+                    className="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-sm font-medium text-[#3F3F46] hover:bg-[#F4F4F5] hover:text-[#09090B]"
+                  >
+                    {t("detail.chart.open")} <ArrowUpRight size={14} aria-hidden />
+                  </Link>
+                )
+              }
+            >
+              {sizeChart ? (
+                <>
+                  <p className="-mt-2 mb-3 text-xs text-[#71717A]">
+                    <span className="font-medium text-[#3F3F46]">{sizeChart.chart.name}</span>
+                    {" · "}
+                    {sizeChart.source === "own"
+                      ? t("detail.chart.own")
+                      : t("detail.chart.inherited", { name: parentNode?.name ?? "" })}
+                    {!sizeChart.chart.isActive && (
+                      <span className="text-amber-700"> · {t("editor.chartInactive")}</span>
+                    )}
+                  </p>
+                  <CategorySizeChartTable chart={sizeChart.chart} />
+                </>
+              ) : (
+                <p className="text-sm text-amber-700">{t("noChart")}</p>
+              )}
+            </Card>
+          )}
         </div>
 
         <aside className="lg:sticky lg:top-[8rem]">
           <Card title={t("detail.sections.overview")}>
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-xs text-[#71717A]">{t("field.isActive")}</span>
-              <CategoryStatusBadge isActive={node.isActive} />
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-xs text-[#71717A]">{t("field.isActive")}</span>
+                <CategoryStatusBadge isActive={node.isActive} />
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-xs text-[#71717A]">{t("detail.info.group")}</span>
+                <span className="flex min-w-0 items-center gap-1.5">
+                  <span
+                    aria-hidden
+                    className={cn("grid size-6 shrink-0 place-items-center rounded-md", groupColor.tile)}
+                  >
+                    <GroupIcon size={13} />
+                  </span>
+                  <span className="truncate text-sm font-medium text-[#09090B]">{tSizing(`group.${node.group}`)}</span>
+                  <AdminInfoTip
+                    content={
+                      <>
+                        <span className="block">{tSizing(`groupHint.${node.group}`)}</span>
+                        <span className="mt-1 block text-white/70">
+                          {[
+                            ...getGroupTraitKeys(node.group).map((trait) => tSizing(`trait.${trait}`)),
+                            tSizing(`sellUnit.${traits.sellUnit}`),
+                          ].join(" · ")}
+                        </span>
+                      </>
+                    }
+                  />
+                </span>
+              </div>
             </div>
 
             <DashedDivider />

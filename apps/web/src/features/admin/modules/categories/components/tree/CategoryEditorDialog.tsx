@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { FolderPlus, Pencil } from "lucide-react";
+import { FilePenLine, Library, Pencil, WandSparkles } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { PRODUCT_GROUPS, PRODUCT_GROUP_TRAITS, type ProductGroup } from "@repo/shared/sizing";
+import { PRODUCT_GROUP_TRAITS } from "@repo/shared/sizing";
 import { useNotify } from "@/hooks/useNotify";
 import { cn } from "@/lib/utils";
 import {
@@ -13,18 +13,24 @@ import {
   AdminField,
   AdminFilterSelect,
   AdminInfoTip,
-  AdminLangSwitch,
   AdminTextArea,
   AdminTextField,
+  AdminTooltip,
   type AdminContentLang,
 } from "@/features/admin/core/ui";
 import { toSlug } from "@/features/admin/modules/products";
+import { createStarterGrid } from "@/features/admin/modules/size-charts";
 import { createCategoryAction, updateCategoryAction } from "../../actions/categories.actions";
-import { type CategoryFormValues } from "../../schemas/categories.schemas";
+import { type CategoryFormValues, type SizeChartMode } from "../../schemas/categories.schemas";
 import { type AdminCategoryNode, type SizeChartOption } from "../../types/categories.types";
 import { PRODUCT_GROUP_ICONS, getGroupTraitKeys, groupUsesSizeChart } from "../../utils/productGroupMeta";
+import { compactSlug } from "../../utils/categorySlug";
+import {
+  CategorySizeChartDialog,
+  isSizeChartGridComplete,
+  type CategorySizeChartGrid,
+} from "./CategorySizeChartDialog";
 
-const ROOT_PARENT = "__root__";
 const NO_CHART = "__none__";
 type ContentLang = AdminContentLang;
 
@@ -54,17 +60,12 @@ function initialValues(node: AdminCategoryNode | null, parent: AdminCategoryNode
     slug: "",
     description: "",
     descriptionEn: "",
-    // Loại con mặc định cùng nhóm hàng với cha (đổi được — VD guốc mộc nằm trong Phụ kiện nhưng bán theo cỡ chân)
+    // Loại con luôn thừa hưởng nhóm hàng của nhóm gốc (server cũng ép lại)
     group: parent?.group ?? "AO_DAI",
     isActive: true,
     defaultSizeChartId: "",
     parentId: parent?.id ?? null,
   };
-}
-
-/** Nét đứt ngăn các phần trong thân dialog */
-function DashedDivider() {
-  return <div aria-hidden className="border-t border-dashed border-[#E4E4E7]" />;
 }
 
 interface CategoryEditorDialogProps {
@@ -80,8 +81,10 @@ interface CategoryEditorDialogProps {
 }
 
 /**
- * Dialog thêm / sửa loại sản phẩm: thông tin chung (tab VI/EN, slug, nhóm cha, mô tả) → nhóm hàng & bảng size
- * → hiển thị trên cửa hàng.
+ * Dialog thêm / sửa loại sản phẩm: thông tin chung (tên, slug, nhóm gốc, mô tả) → nhóm hàng & bảng size → hiển thị.
+ * Nhóm gốc cố định theo nhóm hàng (Áo dài, Quần, Phụ kiện, Giày guốc, Nguyên liệu): chỉ sửa được tên / mô tả / hiển thị /
+ * bảng size mặc định. Loại sản phẩm luôn thuộc một nhóm gốc và thừa hưởng nhóm hàng của gốc.
+ * Thêm loại có size: mặc định NHẬP bảng size riêng (lưu xong mở màn nhập số đo); dùng bảng size mẫu là lựa chọn phụ.
  */
 export function CategoryEditorDialog({
   node,
@@ -99,29 +102,57 @@ export function CategoryEditorDialog({
   const [slugTouched, setSlugTouched] = useState(Boolean(node));
   const [contentLang, setContentLang] = useState<ContentLang>(locale === "en" ? "en" : "vi");
   const [nameError, setNameError] = useState(false);
+  // Thêm loại từ nút chung (chưa có nhóm gốc sẵn) phải chủ động chọn "Thuộc nhóm"
+  const [parentChosen, setParentChosen] = useState(node !== null || parent !== null);
+  const [parentError, setParentError] = useState(false);
+  const [sizeChartMode, setSizeChartMode] = useState<SizeChartMode>("custom");
+  // Bảng size riêng nhập ngay trong dialog con — chỉ lưu cùng loại sản phẩm khi bấm "Thêm loại"
+  const [grid, setGrid] = useState<CategorySizeChartGrid | null>(null);
+  const [gridOpen, setGridOpen] = useState(false);
+  const [gridError, setGridError] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   const isNew = node === null;
-  const hasChildren = (node?.children.length ?? 0) > 0;
+  // Đang sửa một nhóm gốc (cố định) — không có ô "Thuộc nhóm", nhóm hàng chỉ hiển thị
+  const isRoot = node !== null && node.parentId === null;
   const effectiveSlug = slugTouched ? values.slug : toSlug(values.name);
   const usesChart = groupUsesSizeChart(values.group);
   const traits = PRODUCT_GROUP_TRAITS[values.group];
   const chartOptions = sizeCharts.filter((chart) => chart.group === values.group);
   const langFields = LANG_FIELDS[contentLang];
+  const customChart = isNew && usesChart && sizeChartMode === "custom";
 
   const set = <K extends keyof CategoryFormValues>(key: K, value: CategoryFormValues[K]) =>
     setValues((prev) => ({ ...prev, [key]: value }));
 
-  const changeGroup = (group: ProductGroup) =>
-    // Bảng size thuộc nhóm cũ không áp được cho nhóm mới
-    setValues((prev) => ({ ...prev, group, defaultSizeChartId: "" }));
+  const changeParent = (value: string) => {
+    const root = roots.find((item) => item.id === value);
+    if (!root) return;
+    setParentChosen(true);
+    setParentError(false);
+    // Bảng size đã nhập thuộc nhóm hàng cũ (cột số đo khác) → bỏ khi đổi sang gốc khác nhóm hàng
+    if (root.group !== values.group) setGrid(null);
+    // Loại sản phẩm thừa hưởng nhóm hàng của nhóm gốc; đổi nhóm hàng thì bỏ bảng size của nhóm cũ
+    setValues((prev) => ({
+      ...prev,
+      parentId: root.id,
+      group: root.group,
+      defaultSizeChartId: prev.group === root.group ? prev.defaultSizeChartId : "",
+    }));
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!values.name.trim()) {
-      // Tên tiếng Việt bắt buộc — chuyển về tab VI để thấy ô lỗi
-      setContentLang("vi");
-      setNameError(true);
+    const missingName = !values.name.trim();
+    const missingGrid = customChart && !isSizeChartGridComplete(grid);
+    if (missingName || !parentChosen || missingGrid) {
+      if (missingName) {
+        // Tên tiếng Việt bắt buộc — chuyển về tab VI để thấy ô lỗi
+        setContentLang("vi");
+        setNameError(true);
+      }
+      setParentError(!parentChosen);
+      setGridError(missingGrid);
       return;
     }
     setIsSaving(true);
@@ -129,16 +160,38 @@ export function CategoryEditorDialog({
       const payload = {
         ...values,
         slug: effectiveSlug,
-        defaultSizeChartId: usesChart ? values.defaultSizeChartId : "",
+        defaultSizeChartId: usesChart && !customChart ? values.defaultSizeChartId : "",
       };
-      const res = isNew
-        ? await createCategoryAction(payload)
-        : await updateCategoryAction({ ...payload, categoryId: node.id });
-      if (!res.success) {
-        notify.error(res.error, isNew ? "CATEGORY_CREATE_FAILED" : "CATEGORY_UPDATE_FAILED");
+      if (isNew) {
+        if (!payload.parentId) return;
+        const sizeChart =
+          customChart && grid
+            ? {
+                columns: grid.columns,
+                rows: grid.rows.map((row) => ({ sizeLabel: row.sizeLabel.trim(), values: row.values })),
+              }
+            : null;
+        const res = await createCategoryAction({
+          ...payload,
+          parentId: payload.parentId,
+          sizeChartMode: customChart ? "custom" : "preset",
+          sizeChart,
+        });
+        if (!res.success) {
+          notify.error(res.error, "CATEGORY_CREATE_FAILED");
+          return;
+        }
+        notify.success(res.data.sizeChartId ? t("editor.createdWithChart") : t("editor.created"));
+        onSaved(res.data.tree);
+        onOpenChange(false);
         return;
       }
-      notify.success(isNew ? t("editor.created") : t("editor.updated"));
+      const res = await updateCategoryAction({ ...payload, categoryId: node.id });
+      if (!res.success) {
+        notify.error(res.error, "CATEGORY_UPDATE_FAILED");
+        return;
+      }
+      notify.success(t("editor.updated"));
       onSaved(res.data.tree);
       onOpenChange(false);
     } finally {
@@ -146,43 +199,43 @@ export function CategoryEditorDialog({
     }
   };
 
-  const parentOptions = [
-    { value: ROOT_PARENT, label: t("editor.rootOption") },
-    ...roots.filter((root) => root.id !== node?.id).map((root) => ({ value: root.id, label: root.name })),
-  ];
-
-  const title = isNew
-    ? parent
-      ? t("editor.createChildTitle", { name: parent.name })
-      : t("editor.createRootTitle")
-    : t("editor.editTitle", { name: node.name });
+  const parentOptions = roots.map((root) => ({ value: root.id, label: root.name }));
+  const chosenParent = roots.find((root) => root.id === values.parentId);
+  const GroupIcon = PRODUCT_GROUP_ICONS[values.group];
+  const title = isRoot
+    ? t("editor.editRootTitle", { name: node.name })
+    : !isNew
+      ? t("editor.editTitle", { name: node.name })
+      : chosenParent
+        ? t("editor.createChildTitle", { name: chosenParent.name })
+        : t("editor.createTitle");
 
   return (
     <AdminDialog
       open
       onOpenChange={onOpenChange}
-      icon={isNew ? FolderPlus : Pencil}
+      // icon={isNew ? FolderPlus : Pencil}
       title={title}
-      description={t("editor.dialogDescription")}
+      description={t(isRoot ? "editor.rootDescription" : "editor.dialogDescription")}
       size="2xl"
       onSubmit={handleSubmit}
       bodyClassName="space-y-5"
-      headerAside={
-        <AdminLangSwitch
-          value={contentLang}
-          onChange={setContentLang}
-          label={t("editor.langLabel")}
-          status={{ en: values.nameEn ? undefined : "missing" }}
-          className="mt-1"
-        />
-      }
+      // headerAside={
+      //   <AdminLangSwitch
+      //     value={contentLang}
+      //     onChange={setContentLang}
+      //     label={t("editor.langLabel")}
+      //     status={{ en: values.nameEn ? undefined : "missing" }}
+      //     className="mt-1"
+      //   />
+      // }
       footer={
         <>
           <button type="button" onClick={() => onOpenChange(false)} className={ADMIN_DIALOG_SECONDARY_BUTTON_CLASS}>
             {t("editor.cancel")}
           </button>
           <button type="submit" disabled={isSaving} className={ADMIN_DIALOG_PRIMARY_BUTTON_CLASS}>
-            {isSaving ? t("processing") : isNew ? t("editor.create") : t("editor.save")}
+            {isSaving ? t("processing") : !isNew ? t("editor.save") : t("editor.create")}
           </button>
         </>
       }
@@ -191,7 +244,7 @@ export function CategoryEditorDialog({
         <AdminTextField
           autoFocus
           required={contentLang === "vi"}
-          className="sm:col-span-2"
+          className={cn(!isRoot && "sm:col-span-2")}
           label={t("field.name")}
           value={values[langFields.name]}
           onValueChange={(value) => {
@@ -211,16 +264,41 @@ export function CategoryEditorDialog({
           }}
           placeholder={t("editor.placeholders.slug")}
           inputClassName="font-mono"
+          suffix={
+            <AdminTooltip content={t("editor.slugGenerate")}>
+              <button
+                type="button"
+                aria-label={t("editor.slugGenerate")}
+                disabled={!values.name.trim()}
+                onClick={() => {
+                  setSlugTouched(true);
+                  set("slug", compactSlug(values.name));
+                }}
+                className="-mr-1.5 grid size-7 cursor-pointer place-items-center rounded-md text-[#09090B] outline-none transition-colors hover:bg-[#F4F4F5] focus-visible:bg-[#F4F4F5] disabled:cursor-not-allowed disabled:text-[#D4D4D8] disabled:hover:bg-transparent"
+              >
+                <WandSparkles size={15} aria-hidden />
+              </button>
+            </AdminTooltip>
+          }
         />
-        <AdminField label={t("field.parent")} hint={hasChildren ? t("editor.parentLocked") : undefined}>
-          <AdminFilterSelect
-            label={t("field.parentShort")}
-            value={values.parentId ?? ROOT_PARENT}
-            options={hasChildren ? parentOptions.slice(0, 1) : parentOptions}
-            onChange={(value) => set("parentId", value === ROOT_PARENT ? null : value)}
-            className="h-10 w-full"
-          />
-        </AdminField>
+        {!isRoot && (
+          <AdminField
+            required
+            label={t("field.parent")}
+            hint={t("editor.parentHint")}
+            error={parentError ? t("editor.parentRequired") : undefined}
+          >
+            <AdminFilterSelect
+              label={t("field.parentShort")}
+              value={parentChosen ? (values.parentId ?? "") : ""}
+              options={parentOptions}
+              onChange={changeParent}
+              placeholder={t("editor.parentPlaceholder")}
+              invalid={parentError}
+              className="h-10 w-full"
+            />
+          </AdminField>
+        )}
         <AdminTextArea
           className="sm:col-span-2"
           label={t("field.description")}
@@ -231,75 +309,124 @@ export function CategoryEditorDialog({
         />
       </div>
 
-      <DashedDivider />
-
-      <div className="space-y-3">
-        <span className="flex items-center gap-1.5 text-sm font-medium text-[#3F3F46]">
-          {t("editor.groupLabel")}
-          <AdminInfoTip content={t("editor.description")} />
-        </span>
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(104px,1fr))] gap-2">
-          {PRODUCT_GROUPS.map((group) => {
-            const Icon = PRODUCT_GROUP_ICONS[group];
-            const selected = values.group === group;
-            return (
-              <button
-                key={group}
-                type="button"
-                aria-pressed={selected}
-                onClick={() => changeGroup(group)}
-                className={cn(
-                  "flex cursor-pointer flex-col items-start gap-2 rounded-lg border px-3 py-2.5 text-left transition-colors",
-                  selected
-                    ? "border-[#18181B] bg-[#18181B] text-white"
-                    : "border-[#E4E4E7] bg-white text-[#3F3F46] hover:border-[#A1A1AA]"
-                )}
-              >
-                <Icon size={16} aria-hidden />
-                <span className="text-xs font-semibold leading-tight">{tSizing(`group.${group}`)}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Nhóm hàng đang chọn nghĩa là gì: mô tả + đặc tính may đo / đơn vị bán */}
-        <div className="rounded-lg bg-[#FAFAFA] px-3 py-2.5 text-xs leading-relaxed text-[#3F3F46]">
-          <p>{tSizing(`groupHint.${values.group}`)}</p>
-          <div className="mt-1.5 flex flex-wrap gap-1.5">
-            {[
-              ...getGroupTraitKeys(values.group).map((trait) => tSizing(`trait.${trait}`)),
-              tSizing(`sellUnit.${traits.sellUnit}`),
-            ].map((label) => (
-              <span
-                key={label}
-                className="rounded border border-[#E4E4E7] bg-white px-1.5 py-px text-2xs text-[#52525B]"
-              >
-                {label}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {usesChart && (
-          <AdminField label={t("field.sizeChart")} hint={t("editor.chartHint")}>
-            <AdminFilterSelect
-              label={t("field.sizeChartShort")}
-              value={values.defaultSizeChartId || NO_CHART}
-              options={[
-                { value: NO_CHART, label: values.parentId ? t("editor.chartInherit") : t("editor.chartNone") },
-                ...chartOptions.map((chart) => ({
-                  value: chart.id,
-                  label: chart.isActive ? chart.name : `${chart.name} (${t("editor.chartInactive")})`,
-                })),
-              ]}
-              onChange={(value) => set("defaultSizeChartId", value === NO_CHART ? "" : value)}
-              className="h-10 w-full"
+      {/* Chưa chọn nhóm gốc thì chưa biết nhóm hàng → ẩn cả phần nhóm hàng & bảng size */}
+      {parentChosen && (
+        // Một khung viền duy nhất, tiêu đề nằm trên đường viền (legend); nguồn gốc + đặc tính nhóm hàng gom vào ⓘ
+        <fieldset className="space-y-3 rounded-xl border border-[#E4E4E7] px-4 pb-4 pt-2">
+          <legend className="px-1.5 text-sm font-medium text-[#3F3F46]">{t("editor.groupLabel")}</legend>
+          <div className="flex items-center gap-2.5">
+            <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-[#F4F4F5] text-[#09090B]">
+              <GroupIcon size={16} aria-hidden />
+            </span>
+            <span className="text-sm font-semibold text-[#09090B]">{tSizing(`group.${values.group}`)}</span>
+            <AdminInfoTip
+              content={
+                <>
+                  <span className="block font-medium">
+                    {isRoot ? t("editor.groupFixed") : t("editor.groupInherited", { name: chosenParent?.name ?? "" })}
+                  </span>
+                  <span className="mt-1 block">{tSizing(`groupHint.${values.group}`)}</span>
+                  <span className="mt-1 block text-white/70">
+                    {[
+                      ...getGroupTraitKeys(values.group).map((trait) => tSizing(`trait.${trait}`)),
+                      tSizing(`sellUnit.${traits.sellUnit}`),
+                    ].join(" · ")}
+                  </span>
+                </>
+              }
             />
-          </AdminField>
-        )}
-      </div>
+          </div>
 
-      <DashedDivider />
+          {/* Thêm loại có size: nhập bảng size riêng là cách chính, bảng size mẫu là lựa chọn phụ */}
+          {parentChosen && usesChart && isNew && (
+            <div role="radiogroup" aria-label={t("field.sizeChart")} className="space-y-2">
+              <span className="block text-sm font-medium text-[#3F3F46]">{t("field.sizeChart")}</span>
+              <SizeModeOption
+                selected={sizeChartMode === "custom"}
+                onSelect={() => {
+                  setSizeChartMode("custom");
+                  setGridOpen(true);
+                }}
+                icon={FilePenLine}
+                title={t("editor.sizeMode.custom.title")}
+                description={t("editor.sizeMode.custom.description")}
+                badge={t("editor.sizeMode.recommended")}
+                invalid={gridError && !isSizeChartGridComplete(grid)}
+              >
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span
+                    className={cn(
+                      "text-xs",
+                      isSizeChartGridComplete(grid) ? "text-[#3F3F46]" : gridError ? "text-rose-600" : "text-[#71717A]"
+                    )}
+                  >
+                    {isSizeChartGridComplete(grid)
+                      ? t("editor.sizeMode.custom.summary", {
+                          sizes: grid.rows.map((row) => row.sizeLabel.trim()).join(" · "),
+                          columns: grid.columns.length,
+                        })
+                      : gridError
+                        ? t("editor.sizeMode.custom.required")
+                        : t("editor.sizeMode.custom.empty")}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setGridOpen(true)}
+                    className="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-lg border border-[#E4E4E7] bg-white px-3 text-sm font-medium text-[#09090B] transition-colors hover:bg-[#FAFAFA]"
+                  >
+                    <Pencil size={14} aria-hidden />
+                    {grid ? t("editor.sizeMode.custom.edit") : t("editor.sizeMode.custom.enter")}
+                  </button>
+                </div>
+              </SizeModeOption>
+              <SizeModeOption
+                selected={sizeChartMode === "preset"}
+                onSelect={() => setSizeChartMode("preset")}
+                icon={Library}
+                title={t("editor.sizeMode.preset.title")}
+                description={t("editor.sizeMode.preset.description")}
+                secondary
+              >
+                <AdminFilterSelect
+                  label={t("field.sizeChartShort")}
+                  value={values.defaultSizeChartId || NO_CHART}
+                  options={chartSelectOptions(t, chartOptions, true)}
+                  onChange={(value) => set("defaultSizeChartId", value === NO_CHART ? "" : value)}
+                  className="h-10 w-full"
+                />
+              </SizeModeOption>
+            </div>
+          )}
+
+          {parentChosen && usesChart && !isNew && (
+            <AdminField label={t("field.sizeChart")} hint={t("editor.chartHint")}>
+              <AdminFilterSelect
+                label={t("field.sizeChartShort")}
+                value={values.defaultSizeChartId || NO_CHART}
+                options={chartSelectOptions(t, chartOptions, !isRoot)}
+                onChange={(value) => set("defaultSizeChartId", value === NO_CHART ? "" : value)}
+                className="h-10 w-full"
+              />
+            </AdminField>
+          )}
+        </fieldset>
+      )}
+
+      {gridOpen && (
+        <CategorySizeChartDialog
+          group={values.group}
+          typeName={values.name}
+          initial={grid ?? createStarterGrid(values.group)}
+          onCancel={() => setGridOpen(false)}
+          onDone={(next) => {
+            setGrid(next);
+            setGridError(false);
+            setGridOpen(false);
+          }}
+        />
+      )}
+
+      {/* <DashedDivider /> */}
 
       <label className="flex cursor-pointer items-start justify-between gap-3">
         <span className="min-w-0">
@@ -329,5 +456,90 @@ export function CategoryEditorDialog({
         </span>
       </label>
     </AdminDialog>
+  );
+}
+
+type Translate = ReturnType<typeof useTranslations>;
+
+/** Lựa chọn bảng size: "theo nhóm gốc" (loại sản phẩm) hoặc "chưa gắn" (nhóm gốc) + các bảng size cùng nhóm hàng */
+function chartSelectOptions(t: Translate, charts: SizeChartOption[], inheritFromRoot: boolean) {
+  return [
+    { value: NO_CHART, label: inheritFromRoot ? t("editor.chartInherit") : t("editor.chartNone") },
+    ...charts.map((chart) => ({
+      value: chart.id,
+      label: chart.isActive ? chart.name : `${chart.name} (${t("editor.chartInactive")})`,
+    })),
+  ];
+}
+
+interface SizeModeOptionProps {
+  selected: boolean;
+  onSelect: () => void;
+  icon: typeof FilePenLine;
+  title: string;
+  description: string;
+  badge?: string;
+  /** Lựa chọn phụ: thẻ nhạt hơn, chữ nhỏ hơn */
+  secondary?: boolean;
+  /** Nội dung thêm khi đang chọn (VD ô chọn bảng size mẫu) */
+  children?: React.ReactNode;
+  /** Viền đỏ khi lựa chọn này bắt buộc nhập mà chưa nhập */
+  invalid?: boolean;
+}
+
+/** Thẻ chọn cách gắn bảng size (radio) — lựa chọn chính nổi hơn, lựa chọn phụ nhạt hơn */
+function SizeModeOption({
+  selected,
+  onSelect,
+  icon: Icon,
+  title,
+  description,
+  badge,
+  secondary,
+  children,
+  invalid,
+}: SizeModeOptionProps) {
+  return (
+    <div
+      className={cn(
+        "rounded-xl border transition-colors",
+        invalid ? "border-rose-400" : selected ? "border-[#18181B]" : "border-[#E4E4E7] hover:border-[#A1A1AA]",
+        secondary && !selected && "bg-[#FAFAFA]"
+      )}
+    >
+      <button
+        type="button"
+        role="radio"
+        aria-checked={selected}
+        onClick={onSelect}
+        className={cn(
+          "flex w-full cursor-pointer items-start gap-3 text-left outline-none",
+          secondary ? "px-3 py-2.5" : "px-3 py-3"
+        )}
+      >
+        <span
+          aria-hidden
+          className={cn(
+            "mt-0.5 grid size-4 shrink-0 place-items-center rounded-full border",
+            selected ? "border-[#18181B]" : "border-[#D4D4D8]"
+          )}
+        >
+          {selected && <span className="size-2 rounded-full bg-[#18181B]" />}
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="flex flex-wrap items-center gap-2">
+            <Icon size={15} aria-hidden className={secondary ? "text-[#71717A]" : "text-[#09090B]"} />
+            <span className={cn("font-semibold", secondary ? "text-sm text-[#3F3F46]" : "text-body text-[#09090B]")}>
+              {title}
+            </span>
+            {badge && (
+              <span className="rounded-full bg-[#F4F4F5] px-2 py-0.5 text-2xs font-medium text-[#3F3F46]">{badge}</span>
+            )}
+          </span>
+          <span className="mt-0.5 block text-xs leading-relaxed text-[#71717A]">{description}</span>
+        </span>
+      </button>
+      {selected && children && <div className="px-3 pb-3 pl-10">{children}</div>}
+    </div>
   );
 }

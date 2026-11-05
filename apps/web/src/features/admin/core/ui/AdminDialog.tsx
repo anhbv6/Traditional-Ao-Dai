@@ -22,6 +22,8 @@ const SIZE_CLASS = {
   xl: "sm:max-w-xl",
   "2xl": "sm:max-w-2xl",
   "3xl": "sm:max-w-3xl",
+  /** Lưới nhập liệu rộng (VD bảng size: size × thông số đo) */
+  "5xl": "sm:max-w-5xl",
   /** Xem trước cỡ lớn: gần kín màn hình, cao cố định */
   full: "h-[92dvh] max-w-[calc(100%-1.5rem)] sm:max-w-[min(1280px,calc(100%-3rem))]",
 } as const;
@@ -35,7 +37,7 @@ export function AdminDialogDivider() {
 export function AdminDialogFooter({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <>
-      <AdminDialogDivider />
+      {/* <AdminDialogDivider /> */}
       <div className={cn("flex shrink-0 flex-wrap items-center justify-end gap-2 px-5 py-4", className)}>
         {children}
       </div>

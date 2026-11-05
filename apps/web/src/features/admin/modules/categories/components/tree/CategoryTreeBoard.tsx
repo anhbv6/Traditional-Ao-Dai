@@ -168,7 +168,7 @@ export function CategoryTreeBoard({
         title={tPage("title")}
         description={tPage("description")}
         search={{ value: search, onChange: setSearch, placeholder: t("searchPlaceholder") }}
-        action={{ label: t("createRoot"), onClick: () => setEditor({ node: null, parent: null }) }}
+        action={{ label: t("createType"), onClick: () => setEditor({ node: null, parent: null }) }}
         filters={
           <AdminFilterSelect
             label={t("groupLabel")}

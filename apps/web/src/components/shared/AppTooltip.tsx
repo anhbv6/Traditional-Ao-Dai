@@ -122,7 +122,11 @@ export function AppTooltip({
   onOpenChange,
   className,
 }: AppTooltipProps) {
-  if (content === null || content === undefined || content === "" || content === false) return children;
+  /*
+   * Nội dung rỗng → chỉ tắt tooltip, KHÔNG trả thẳng children: đổi cấu trúc cây khi nội dung bật / tắt (VD tooltip ẩn lúc
+   * popover đang mở) làm phần tử mở bị dựng lại → popover / focus mất điểm neo, nhảy về góc màn hình.
+   */
+  const isEmpty = content === null || content === undefined || content === "" || content === false;
 
   const handleOpenChange = (nextOpen: boolean, details: Tooltip.Root.ChangeEventDetails) => {
     // Chữ hiển thị đủ → không cần tooltip (tránh lặp lại đúng nội dung đang thấy)
@@ -141,7 +145,7 @@ export function AppTooltip({
       open={open}
       defaultOpen={defaultOpen}
       onOpenChange={handleOpenChange}
-      disabled={disabled}
+      disabled={disabled || isEmpty}
       trackCursorAxis={trackCursorAxis}
       disableHoverablePopup={!hoverable}
     >

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { PRODUCT_GROUPS } from "@repo/shared/sizing";
+import { sizeChartGridSchema } from "@/features/admin/modules/size-charts";
 
 const categoryFields = z.object({
   name: z.string().trim().min(1, "CATEGORY_NAME_REQUIRED").max(120),
@@ -14,11 +15,21 @@ const categoryFields = z.object({
   group: z.enum(PRODUCT_GROUPS),
   isActive: z.boolean(),
   defaultSizeChartId: z.uuid().or(z.literal("")),
-  /** null = nhóm gốc */
+  /** null = nhóm gốc (chỉ khi sửa nhóm gốc có sẵn) */
   parentId: z.uuid().nullable(),
 });
 
-export const createCategorySchema = categoryFields;
+/** Cách gắn bảng size khi thêm loại: tự nhập bảng riêng (mặc định) hoặc dùng bảng size mẫu có sẵn */
+export const SIZE_CHART_MODES = ["custom", "preset"] as const;
+export type SizeChartMode = (typeof SIZE_CHART_MODES)[number];
+
+/** Chỉ thêm LOẠI SẢN PHẨM — nhóm gốc cố định theo nhóm hàng, không tạo từ giao diện */
+export const createCategorySchema = categoryFields.extend({
+  parentId: z.uuid("CATEGORY_PARENT_REQUIRED"),
+  sizeChartMode: z.enum(SIZE_CHART_MODES),
+  /** Bảng size nhập ngay trong dialog khi `sizeChartMode = "custom"` (nhóm hàng có size) */
+  sizeChart: sizeChartGridSchema.nullable(),
+});
 export const updateCategorySchema = categoryFields.extend({ categoryId: z.uuid() });
 
 export const reorderCategoriesSchema = z.object({

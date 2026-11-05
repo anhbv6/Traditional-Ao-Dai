@@ -1,6 +1,7 @@
 "use server";
 
 import { type z } from "zod";
+import { type Prisma } from "@repo/db";
 import { revalidatePath } from "next/cache";
 import { prisma } from "../../../core/server/db.server";
 import { authorizeAdminAction } from "../../../core/server/adminAuth.server";
@@ -8,6 +9,8 @@ import { recordAudit } from "../../../core/server/audit.server";
 import { ADMIN_MODULE_ACCESS } from "../../../core/session/permissions";
 import { parseActionInput } from "@/features/admin/core/server/actionInput";
 import { toSlug } from "@/features/admin/modules/products";
+import { PRODUCT_GROUP_TRAITS, type ProductGroup } from "@repo/shared/sizing";
+import { rowHasMeasurement } from "@/features/admin/modules/size-charts";
 import { getCategoryTreeQuery } from "../queries/categories.queries";
 import {
   categoryIdSchema,
@@ -36,42 +39,48 @@ async function resolveUniqueSlug(base: string, excludeId?: string) {
   return slug;
 }
 
+/** Trường form, trừ nhóm cha (truyền riêng — tạo mới luôn có cha, sửa nhóm gốc thì null) */
+type CategoryFields = Omit<CategoryFormValues, "parentId">;
+type StructureCheck = { error: string } | { group: ProductGroup };
+
 /**
- * Kiểm tra chung cho tạo/sửa: cây chỉ 2 cấp (nhóm gốc → loại con) và bảng size phải cùng nhóm hàng
- * — bảng size áo dài không gắn được cho quần hay guốc.
+ * Kiểm tra cấu trúc khi thêm / sửa LOẠI SẢN PHẨM:
+ * - Nhóm gốc cố định (mỗi nhóm hàng một gốc, tạo sẵn bằng migration / seed) — loại sản phẩm luôn nằm trong một nhóm gốc.
+ * - Nhóm hàng (bản chất may đo / đơn vị bán / có size) lấy theo nhóm gốc, bỏ qua giá trị client gửi lên.
+ * - Bảng size phải cùng nhóm hàng — bảng size áo dài không gắn được cho quần hay guốc.
  */
-async function validateStructure(values: CategoryFormValues, categoryId?: string) {
-  if (values.parentId) {
-    if (values.parentId === categoryId) return "CATEGORY_PARENT_INVALID";
-    const parent = await prisma.category.findUnique({ where: { id: values.parentId }, select: { parentId: true } });
-    if (!parent || parent.parentId !== null) return "CATEGORY_PARENT_INVALID";
-    if (categoryId && (await prisma.category.count({ where: { parentId: categoryId } })) > 0) {
-      return "CATEGORY_HAS_CHILDREN";
-    }
-  }
-  if (values.defaultSizeChartId) {
-    const chart = await prisma.sizeChart.findUnique({ where: { id: values.defaultSizeChartId }, select: { group: true } });
-    if (!chart) return "SIZE_CHART_NOT_FOUND";
-    if (chart.group !== values.group) return "CATEGORY_SIZE_CHART_GROUP_MISMATCH";
-  }
-  return null;
+async function resolveStructure(values: CategoryFields, parentId: string): Promise<StructureCheck> {
+  const parent = await prisma.category.findUnique({ where: { id: parentId }, select: { parentId: true, group: true } });
+  if (!parent || parent.parentId !== null) return { error: "CATEGORY_PARENT_INVALID" };
+  return checkSizeChart(values.defaultSizeChartId, parent.group);
 }
 
-function toCategoryData(values: CategoryFormValues) {
+async function checkSizeChart(sizeChartId: string, group: ProductGroup): Promise<StructureCheck> {
+  if (sizeChartId) {
+    const chart = await prisma.sizeChart.findUnique({ where: { id: sizeChartId }, select: { group: true } });
+    if (!chart) return { error: "SIZE_CHART_NOT_FOUND" };
+    if (chart.group !== group) return { error: "CATEGORY_SIZE_CHART_GROUP_MISMATCH" };
+  }
+  return { group };
+}
+
+function toCategoryData(values: CategoryFields, group: ProductGroup, parentId: string | null) {
   return {
     name: values.name,
     nameEn: values.nameEn || null,
     description: values.description || null,
     descriptionEn: values.descriptionEn || null,
-    group: values.group,
+    group,
     isActive: values.isActive,
     defaultSizeChartId: values.defaultSizeChartId || null,
-    parentId: values.parentId,
+    parentId,
   };
 }
 
 /**
- * Server Action: thêm loại sản phẩm (nhóm gốc hoặc loại con), xếp cuối danh sách cùng cấp
+ * Server Action: thêm loại sản phẩm vào một nhóm gốc, xếp cuối danh sách.
+ * `sizeChartMode = "custom"` (nhóm hàng có bảng size): tạo bảng size riêng từ lưới admin vừa nhập trong dialog và gắn cho
+ * loại. `"preset"`: dùng bảng size mẫu đã chọn (hoặc theo bảng của nhóm gốc).
  */
 export async function createCategoryAction(raw: z.input<typeof createCategorySchema>) {
   const auth = await authorizeAdminAction(ACCESS);
@@ -79,21 +88,64 @@ export async function createCategoryAction(raw: z.input<typeof createCategorySch
 
   const input = parseActionInput(createCategorySchema, raw);
   if (!input.success) return input;
-  const values = input.data;
+  const { sizeChartMode, sizeChart, parentId, ...values } = input.data;
 
   try {
-    const invalid = await validateStructure(values);
-    if (invalid) return { success: false as const, error: invalid };
+    const customChart = sizeChartMode === "custom";
+    const structure = await resolveStructure(customChart ? { ...values, defaultSizeChartId: "" } : values, parentId);
+    if ("error" in structure) return { success: false as const, error: structure.error };
+    const { group } = structure;
+    const withChart = customChart && PRODUCT_GROUP_TRAITS[group].sizing !== "NONE";
+    // Bảng size riêng phải nhập đủ: có cột, có hàng, hàng nào cũng có số đo
+    if (
+      withChart &&
+      (!sizeChart || sizeChart.columns.length === 0 || sizeChart.rows.length === 0 || !sizeChart.rows.every(rowHasMeasurement))
+    ) {
+      return { success: false as const, error: "CATEGORY_SIZE_CHART_REQUIRED" };
+    }
 
     const last = await prisma.category.findFirst({
-      where: { parentId: values.parentId },
+      where: { parentId },
       orderBy: { position: "desc" },
       select: { position: true },
     });
     const slug = await resolveUniqueSlug(values.slug || toSlug(values.name));
-    const created = await prisma.category.create({
-      data: { ...toCategoryData(values), slug, position: (last?.position ?? -1) + 1 },
-      select: { id: true },
+
+    const created = await prisma.$transaction(async (tx) => {
+      // Bảng size riêng nhập ngay trong dialog → đã có số liệu nên áp dụng luôn
+      const columnKeys = new Set(sizeChart?.columns.map((column) => column.key));
+      const chart =
+        withChart && sizeChart
+          ? await tx.sizeChart.create({
+              data: {
+                name: values.name,
+                nameEn: values.nameEn || null,
+                group,
+                isActive: true,
+                columns: { create: sizeChart.columns.map((column, position) => ({ ...column, position })) },
+                rows: {
+                  create: sizeChart.rows.map((row, position) => ({
+                    sizeLabel: row.sizeLabel,
+                    position,
+                    // Chỉ giữ số đo của các cột còn trong bảng
+                    values: Object.fromEntries(
+                      Object.entries(row.values).filter(([key]) => columnKeys.has(key as (typeof sizeChart.columns)[number]["key"]))
+                    ) as Prisma.InputJsonObject,
+                  })),
+                },
+              },
+              select: { id: true },
+            })
+          : null;
+      const category = await tx.category.create({
+        data: {
+          ...toCategoryData(customChart ? { ...values, defaultSizeChartId: chart?.id ?? "" } : values, group, parentId),
+          slug,
+          position: (last?.position ?? -1) + 1,
+        },
+        select: { id: true },
+      });
+      return { id: category.id, sizeChartId: chart?.id ?? null };
     });
 
     await recordAudit({
@@ -101,11 +153,15 @@ export async function createCategoryAction(raw: z.input<typeof createCategorySch
       action: "CATEGORY_CREATED",
       targetType: "CATEGORY",
       targetId: created.id,
-      metadata: { name: values.name, group: values.group, parentId: values.parentId },
+      metadata: { name: values.name, group, parentId, sizeChartId: created.sizeChartId },
     });
     revalidateCategories();
+    if (created.sizeChartId) revalidatePath("/admin/catalog/size-charts");
 
-    return { success: true as const, data: { id: created.id, tree: await getCategoryTreeQuery() } };
+    return {
+      success: true as const,
+      data: { id: created.id, sizeChartId: created.sizeChartId, tree: await getCategoryTreeQuery() },
+    };
   } catch (error) {
     console.error("Lỗi createCategoryAction:", error);
     return { success: false as const, error: "CATEGORY_CREATE_FAILED" };
@@ -113,7 +169,9 @@ export async function createCategoryAction(raw: z.input<typeof createCategorySch
 }
 
 /**
- * Server Action: sửa loại sản phẩm. Đổi nhóm hàng của nhóm gốc thì loại con đang cùng nhóm cũ đổi theo.
+ * Server Action: sửa nhóm gốc hoặc loại sản phẩm.
+ * Nhóm gốc: chỉ sửa tên, mô tả, hiển thị, bảng size mặc định — không đổi nhóm hàng, không thành loại con.
+ * Loại sản phẩm: chuyển được sang nhóm gốc khác (nhóm hàng đổi theo gốc mới), không thành nhóm gốc.
  */
 export async function updateCategoryAction(raw: z.input<typeof updateCategorySchema>) {
   const auth = await authorizeAdminAction(ACCESS);
@@ -130,28 +188,31 @@ export async function updateCategoryAction(raw: z.input<typeof updateCategorySch
     });
     if (!existing) return { success: false as const, error: "CATEGORY_NOT_FOUND" };
 
-    const invalid = await validateStructure(values, categoryId);
-    if (invalid) return { success: false as const, error: invalid };
+    const isRoot = existing.parentId === null;
+    if (isRoot && values.parentId !== null) return { success: false as const, error: "CATEGORY_ROOT_LOCKED" };
+    if (!isRoot && values.parentId === null) return { success: false as const, error: "CATEGORY_PARENT_REQUIRED" };
+
+    const parentId = values.parentId;
+    const structure = parentId
+      ? await resolveStructure(values, parentId)
+      : await checkSizeChart(values.defaultSizeChartId, existing.group);
+    if ("error" in structure) return { success: false as const, error: structure.error };
+    const { group } = structure;
 
     const slug = values.slug && values.slug !== existing.slug ? await resolveUniqueSlug(values.slug, categoryId) : existing.slug;
-    // Chuyển sang cha khác thì xếp cuối danh sách của cha mới
+    // Chuyển sang nhóm gốc khác thì xếp cuối danh sách của gốc mới
     const movedPosition =
-      values.parentId !== existing.parentId
-        ? ((await prisma.category.findFirst({ where: { parentId: values.parentId }, orderBy: { position: "desc" } }))?.position ?? -1) + 1
+      parentId !== existing.parentId
+        ? ((await prisma.category.findFirst({ where: { parentId }, orderBy: { position: "desc" } }))?.position ?? -1) + 1
         : undefined;
 
-    await prisma.$transaction(async (tx) => {
-      await tx.category.update({
-        where: { id: categoryId },
-        data: { ...toCategoryData(values), slug, ...(movedPosition !== undefined ? { position: movedPosition } : {}) },
-      });
-      if (existing.parentId === null && values.group !== existing.group) {
-        // Bảng size gắn ở loại con thuộc nhóm cũ không còn hợp → gỡ để không áp nhầm form
-        await tx.category.updateMany({
-          where: { parentId: categoryId, group: existing.group },
-          data: { group: values.group, defaultSizeChartId: null },
-        });
-      }
+    await prisma.category.update({
+      where: { id: categoryId },
+      data: {
+        ...toCategoryData(values, group, parentId),
+        slug,
+        ...(movedPosition !== undefined ? { position: movedPosition } : {}),
+      },
     });
 
     await recordAudit({
@@ -159,7 +220,7 @@ export async function updateCategoryAction(raw: z.input<typeof updateCategorySch
       action: "CATEGORY_UPDATED",
       targetType: "CATEGORY",
       targetId: categoryId,
-      metadata: { group: { before: existing.group, after: values.group }, parentId: { before: existing.parentId, after: values.parentId } },
+      metadata: { group: { before: existing.group, after: group }, parentId: { before: existing.parentId, after: parentId } },
     });
     revalidateCategories();
 
@@ -201,7 +262,7 @@ export async function reorderCategoriesAction(raw: z.input<typeof reorderCategor
 }
 
 /**
- * Server Action: xóa loại sản phẩm trống. Còn sản phẩm (khóa ngoại bắt buộc) hoặc loại con thì chặn — dùng "Ẩn" thay vì xóa.
+ * Server Action: xóa loại sản phẩm trống. Nhóm gốc không xóa được; còn sản phẩm (khóa ngoại bắt buộc) thì chặn — dùng "Ẩn".
  */
 export async function deleteCategoryAction(categoryId: string) {
   const auth = await authorizeAdminAction(ACCESS);
@@ -213,9 +274,11 @@ export async function deleteCategoryAction(categoryId: string) {
   try {
     const existing = await prisma.category.findUnique({
       where: { id: categoryId },
-      select: { name: true, slug: true, _count: { select: { products: true, children: true } } },
+      select: { name: true, slug: true, parentId: true, _count: { select: { products: true, children: true } } },
     });
     if (!existing) return { success: false as const, error: "CATEGORY_NOT_FOUND" };
+    // Nhóm gốc cố định theo nhóm hàng — không xóa, chỉ ẩn
+    if (existing.parentId === null) return { success: false as const, error: "CATEGORY_ROOT_LOCKED" };
     if (existing._count.children > 0) return { success: false as const, error: "CATEGORY_HAS_CHILDREN" };
     if (existing._count.products > 0) return { success: false as const, error: "CATEGORY_IN_USE" };
 
