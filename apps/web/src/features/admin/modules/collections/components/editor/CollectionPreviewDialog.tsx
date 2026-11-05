@@ -5,7 +5,7 @@ import { Eye, Monitor, Shirt, Smartphone, Star } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { formatVnd, type Locale } from "@repo/shared";
 import { cn } from "@/lib/utils";
-import { AdminDialog } from "@/features/admin/core/ui";
+import { AdminDialog, AdminLangSwitch } from "@/features/admin/core/ui";
 import { type SaveCollectionValues } from "../../schemas/collections.schemas";
 import { type CollectionPickerProduct, type CollectionStatus } from "../../types/collections.types";
 import { daysUntil, fromDateInputValue, orderCollectionProducts } from "../../utils/collectionLifecycle";
@@ -20,6 +20,15 @@ interface CollectionPreviewDialogProps {
 }
 
 type Device = "desktop" | "mobile";
+
+const DEVICES = [
+  { value: "desktop", icon: Monitor },
+  { value: "mobile", icon: Smartphone },
+] as const;
+
+/* Cùng kiểu AdminLangSwitch: khung trắng cao 32px, mục đang chọn nền xám nhạt */
+const SEGMENT_CLASS =
+  "flex h-full cursor-pointer items-center gap-1.5 rounded-md px-2.5 text-xs font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[#18181B]/15";
 
 /**
  * Xem trước trang bộ sưu tập như khách thấy, dựng từ dữ liệu ĐANG SOẠN (chưa cần lưu).
@@ -74,56 +83,56 @@ export function CollectionPreviewDialog({
       title={t("title")}
       description={t(`statusNote.${status}`)}
       size="full"
-      bodyClassName="bg-[#E4E4E7] p-3 sm:p-6"
-      headerAside={
-        <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
-          <div className="flex rounded-lg border border-[#E4E4E7] p-0.5">
-            {(
-              [
-                { value: "desktop", icon: Monitor },
-                { value: "mobile", icon: Smartphone },
-              ] as const
-            ).map(({ value, icon: Icon }) => (
+      bodyClassName="bg-[#F4F4F5] p-3 sm:p-6"
+      toolbar={
+        <div className="flex items-center justify-between gap-3">
+          <div
+            role="group"
+            aria-label={t("deviceLabel")}
+            className="inline-flex h-8 items-center gap-0.5 rounded-lg border border-[#E4E4E7] bg-white p-0.5"
+          >
+            {DEVICES.map(({ value, icon: Icon }) => (
               <button
                 key={value}
                 type="button"
                 aria-pressed={device === value}
-                aria-label={t(`device.${value}`)}
                 onClick={() => setDevice(value)}
                 className={cn(
-                  "grid h-7 w-8 cursor-pointer place-items-center rounded-md",
-                  device === value ? "bg-[#18181B] text-white" : "text-[#71717A] hover:text-[#09090B]"
+                  SEGMENT_CLASS,
+                  device === value
+                    ? "bg-[#F4F4F5] text-[#09090B]"
+                    : "text-[#71717A] hover:bg-[#FAFAFA] hover:text-[#09090B]"
                 )}
               >
-                <Icon size={14} />
+                <Icon size={14} aria-hidden /> {t(`device.${value}`)}
               </button>
             ))}
           </div>
-          <div className="flex rounded-lg border border-[#E4E4E7] p-0.5">
-            {(["vi", "en"] as const).map((code) => (
-              <button
-                key={code}
-                type="button"
-                aria-pressed={locale === code}
-                onClick={() => setLocale(code)}
-                className={cn(
-                  "h-7 cursor-pointer rounded-md px-2 text-xs font-medium uppercase",
-                  locale === code ? "bg-[#18181B] text-white" : "text-[#71717A] hover:text-[#09090B]"
-                )}
-              >
-                {code}
-              </button>
-            ))}
-          </div>
+          <AdminLangSwitch value={locale} onChange={setLocale} label={t("languageLabel")} />
         </div>
       }
     >
       <div
         className={cn(
-          "mx-auto overflow-hidden bg-(--bg-main) text-(--text-main) shadow-xl transition-[max-width] duration-300",
-          isMobile ? "max-w-[390px] rounded-[28px] border-8 border-[#18181B]" : "max-w-full rounded-lg"
+          "@container mx-auto overflow-hidden bg-(--bg-main) text-(--text-main) shadow-[0_24px_48px_-24px_rgba(9,9,11,0.35)] transition-[max-width] duration-300",
+          isMobile
+            ? "max-w-[390px] rounded-[32px] border-[10px] border-[#18181B]"
+            : "max-w-[1200px] rounded-xl border border-[#E4E4E7]"
         )}
       >
+        {!isMobile && (
+          <div aria-hidden className="flex items-center gap-3 border-b border-[#E4E4E7] bg-[#FAFAFA] px-4 py-2.5">
+            <span className="flex gap-1.5">
+              <span className="size-2.5 rounded-full bg-[#E4E4E7]" />
+              <span className="size-2.5 rounded-full bg-[#E4E4E7]" />
+              <span className="size-2.5 rounded-full bg-[#E4E4E7]" />
+            </span>
+            <span className="mx-auto w-full max-w-md truncate rounded-md border border-[#E4E4E7] bg-white px-3 py-1 text-center font-mono text-2xs text-[#71717A]">
+              tiemthiencanh.vn/{locale}/bo-suu-tap/{values.slug}
+            </span>
+            <span className="w-[42px]" />
+          </div>
+        )}
         {status !== "ACTIVE" && (
           <div className="px-4 py-2 text-center text-xs font-medium text-white" style={{ backgroundColor: accent }}>
             {status === "COMING_SOON"
@@ -140,35 +149,25 @@ export function CollectionPreviewDialog({
             <img src={hero} alt="" className="absolute inset-0 size-full object-cover" />
           )}
           <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent" />
-          <div className={cn("absolute inset-x-0 bottom-0 text-white", isMobile ? "p-5" : "p-10")}>
+          <div className="absolute inset-x-0 bottom-0 p-5 text-white @2xl:p-8 @4xl:p-10">
             {season && <p className="text-xs font-medium uppercase tracking-[0.3em] text-white/85">{season}</p>}
-            <h1
-              className={cn(
-                "mt-2 font-(family-name:--font-playfair) font-semibold leading-tight",
-                isMobile ? "text-3xl" : "text-5xl"
-              )}
-            >
+            <h1 className="mt-2 font-(family-name:--font-playfair) text-3xl font-semibold leading-tight @2xl:text-4xl @4xl:text-5xl">
               {name || t("untitled")}
             </h1>
-            {tagline && <p className={cn("mt-2 text-white/90", isMobile ? "text-sm" : "text-lg")}>{tagline}</p>}
+            {tagline && <p className="mt-2 text-sm text-white/90 @2xl:text-base @4xl:text-lg">{tagline}</p>}
             <span aria-hidden className="mt-4 block h-0.5 w-16" style={{ backgroundColor: accent }} />
           </div>
         </section>
 
-        <div className={cn("space-y-10", isMobile ? "px-4 py-8" : "px-10 py-12")}>
+        <div className="space-y-10 px-4 py-8 @2xl:px-8 @4xl:px-10 @4xl:py-12">
           {description && (
-            <p
-              className={cn(
-                "mx-auto max-w-2xl text-center leading-relaxed text-(--text-light)",
-                isMobile ? "text-sm" : "text-base"
-              )}
-            >
+            <p className="mx-auto max-w-2xl text-center text-sm leading-relaxed text-(--text-light) @2xl:text-base">
               {description}
             </p>
           )}
 
           {highlighted.length > 0 && (
-            <div className={cn("grid gap-4", isMobile ? "grid-cols-1" : "grid-cols-3")}>
+            <div className="grid grid-cols-1 gap-4 @lg:grid-cols-2 @3xl:grid-cols-3">
               {highlighted.map((product) => (
                 <PreviewProduct
                   key={product.id}
@@ -183,7 +182,7 @@ export function CollectionPreviewDialog({
           )}
 
           {rest.length > 0 ? (
-            <div className={cn("grid gap-x-4 gap-y-6", isMobile ? "grid-cols-2" : "grid-cols-4")}>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-6 @3xl:grid-cols-3 @4xl:grid-cols-4">
               {rest.map((product) => (
                 <PreviewProduct key={product.id} product={product} price={price} status={status} locale={locale} />
               ))}
@@ -200,12 +199,7 @@ export function CollectionPreviewDialog({
 
           {(story || values.gallery.length > 0) && (
             <section className="space-y-5">
-              <h2
-                className={cn(
-                  "text-center font-(family-name:--font-playfair) font-semibold text-(--primary-ink)",
-                  isMobile ? "text-2xl" : "text-3xl"
-                )}
-              >
+              <h2 className="text-center font-(family-name:--font-playfair) text-2xl font-semibold text-(--primary-ink) @3xl:text-3xl">
                 {t("lookbook")}
               </h2>
               {story && (
@@ -214,7 +208,7 @@ export function CollectionPreviewDialog({
                 </p>
               )}
               {values.gallery.length > 0 && (
-                <div className={cn("grid gap-2", isMobile ? "grid-cols-2" : "grid-cols-4")}>
+                <div className="grid grid-cols-2 gap-2 @3xl:grid-cols-4">
                   {values.gallery.map((url, index) => (
                     // eslint-disable-next-line @next/next/no-img-element -- ảnh từ URL tùy ý (blob xem trước / avatar / ảnh do admin nhập), không tối ưu được bằng next/image
                     <img

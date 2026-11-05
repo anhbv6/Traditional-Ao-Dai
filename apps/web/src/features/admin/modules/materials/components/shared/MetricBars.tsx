@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
+import { AdminTooltip } from "@/features/admin/core/ui";
 import { type MaterialMetrics } from "../../types/materials.types";
 import { MATERIAL_METRICS, METRIC_LEVELS } from "../../utils/materialMeta";
 
@@ -16,17 +17,22 @@ export function MetricBars({ metrics, className }: { metrics: MaterialMetrics; c
       {MATERIAL_METRICS.map((key) => {
         const value = metrics[key];
         return (
-          <div key={key} className="flex flex-col items-center gap-1" title={`${t(`${key}.label`)}: ${value ?? "—"}/5`}>
-            <div className="flex h-7 w-2.5 flex-col-reverse gap-px">
-              {METRIC_LEVELS.map((level) => (
-                <span
-                  key={level}
-                  className={cn("flex-1 rounded-[1px]", value !== null && level <= value ? "bg-[#18181B]" : "bg-[#E4E4E7]")}
-                />
-              ))}
+          <AdminTooltip key={key} content={`${t(`${key}.label`)}: ${value ?? "—"}/5`}>
+            <div className="flex flex-col items-center gap-1">
+              <div className="flex h-7 w-2.5 flex-col-reverse gap-px">
+                {METRIC_LEVELS.map((level) => (
+                  <span
+                    key={level}
+                    className={cn(
+                      "flex-1 rounded-[1px]",
+                      value !== null && level <= value ? "bg-[#18181B]" : "bg-[#E4E4E7]"
+                    )}
+                  />
+                ))}
+              </div>
+              <span className="text-2xs leading-none text-[#71717A]">{t(`${key}.short`)}</span>
             </div>
-            <span className="text-2xs leading-none text-[#71717A]">{t(`${key}.short`)}</span>
-          </div>
+          </AdminTooltip>
         );
       })}
     </div>

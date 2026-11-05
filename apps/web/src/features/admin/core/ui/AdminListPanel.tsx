@@ -1,7 +1,8 @@
 import { type ReactNode } from "react";
-import { Search, type LucideIcon } from "lucide-react";
+import { type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ADMIN_CARD_CLASS } from "./AdminPage";
+import { AdminSearchInput } from "./AdminSearchInput";
 
 interface AdminListPanelProps {
   icon: LucideIcon;
@@ -38,17 +39,12 @@ export function AdminListPanel({ icon: Icon, title, description, filters, search
 
         {/* Cụm tìm kiếm + nút tạo luôn dạt phải; thiếu chỗ (có cột ghi chú) thì tự xuống dòng */}
         <div className="flex min-w-[280px] flex-1 items-center justify-end gap-2">
-          <div className="relative min-w-0 flex-1 sm:max-w-72">
-            <Search size={15} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[#A1A1AA]" aria-hidden />
-            <input
-              type="search"
-              value={search.value}
-              onChange={(e) => search.onChange(e.target.value)}
-              aria-label={search.placeholder}
-              placeholder={search.placeholder}
-              className="h-9 w-full rounded-lg border border-[#E4E4E7] bg-white pl-8 pr-3 text-sm text-[#09090B] outline-none placeholder:text-[#A1A1AA] focus:border-[#18181B]"
-            />
-          </div>
+          <AdminSearchInput
+            value={search.value}
+            onChange={search.onChange}
+            placeholder={search.placeholder}
+            className="flex-1 sm:max-w-72"
+          />
           {action && (
             <button
               type="button"

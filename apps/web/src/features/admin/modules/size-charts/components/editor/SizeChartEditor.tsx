@@ -14,6 +14,8 @@ import {
   ADMIN_SECONDARY_BUTTON_CLASS,
   AdminDetailHeader,
   AdminSegmentedControl,
+  AdminTextArea,
+  AdminTextField,
 } from "@/features/admin/core/ui";
 import { PRODUCT_GROUP_ICONS, groupUsesSizeChart } from "@/features/admin/modules/categories";
 import { compressCollectionImage } from "@/features/admin/modules/collections";
@@ -33,10 +35,6 @@ const SizeChartPreviewDialog = dynamic(() =>
   import("../preview/SizeChartPreviewDialog").then((m) => m.SizeChartPreviewDialog)
 );
 
-const INPUT_CLASS =
-  "h-10 w-full rounded-lg border border-[#E4E4E7] bg-white px-3 text-sm text-[#09090B] outline-none placeholder:text-[#A1A1AA] focus:border-[#18181B]";
-const TEXTAREA_CLASS =
-  "w-full resize-y rounded-lg border border-[#E4E4E7] bg-white px-3 py-2 text-sm leading-relaxed text-[#09090B] outline-none placeholder:text-[#A1A1AA] focus:border-[#18181B]";
 const SECTION_TITLE = "text-lg font-semibold text-[#09090B]";
 const SIZED_GROUPS: ProductGroup[] = ["AO_DAI", "PANTS", "FOOTWEAR"];
 
@@ -187,17 +185,11 @@ export function SizeChartEditor({ initialChart }: { initialChart: AdminSizeChart
         <section className={cn(ADMIN_CARD_CLASS, "space-y-4 p-4 sm:p-5")}>
           <h2 className={SECTION_TITLE}>{t("editor.infoTitle")}</h2>
           <div className="grid gap-4 sm:grid-cols-2">
-            <label className="block space-y-1.5">
-              <span className="text-xs font-medium text-[#3F3F46]">{t("field.name")} *</span>
-              <input value={info.name} onChange={(e) => set("name", e.target.value)} className={INPUT_CLASS} />
-            </label>
-            <label className="block space-y-1.5">
-              <span className="text-xs font-medium text-[#3F3F46]">{t("field.nameEn")}</span>
-              <input value={info.nameEn} onChange={(e) => set("nameEn", e.target.value)} className={INPUT_CLASS} />
-            </label>
+            <AdminTextField required label={t("field.name")} value={info.name} onValueChange={(value) => set("name", value)} />
+            <AdminTextField label={t("field.nameEn")} value={info.nameEn} onValueChange={(value) => set("nameEn", value)} />
           </div>
           <fieldset className="space-y-1.5">
-            <legend className="text-xs font-medium text-[#3F3F46]">{t("field.group")}</legend>
+            <legend className="text-sm font-medium text-[#3F3F46]">{t("field.group")}</legend>
             <div className="grid grid-cols-3 gap-2">
               {SIZED_GROUPS.filter(groupUsesSizeChart).map((group) => {
                 const Icon = PRODUCT_GROUP_ICONS[group];
@@ -222,15 +214,12 @@ export function SizeChartEditor({ initialChart }: { initialChart: AdminSizeChart
             </div>
             {groupLocked && <p className="text-xs text-[#71717A]">{t("editor.groupLocked")}</p>}
           </fieldset>
-          <label className="block space-y-1.5">
-            <span className="text-xs font-medium text-[#3F3F46]">{t("field.description")}</span>
-            <textarea
-              rows={2}
-              value={info.description}
-              onChange={(e) => set("description", e.target.value)}
-              className={TEXTAREA_CLASS}
-            />
-          </label>
+          <AdminTextArea
+            label={t("field.description")}
+            rows={2}
+            value={info.description}
+            onValueChange={(value) => set("description", value)}
+          />
           <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-[#E4E4E7] px-3 py-3">
             <input
               type="checkbox"
@@ -253,7 +242,7 @@ export function SizeChartEditor({ initialChart }: { initialChart: AdminSizeChart
             <p className="mt-1 text-xs text-[#71717A]">{t("editor.bigsizeDescription")}</p>
           </div>
           <div className="space-y-1.5">
-            <span className="block text-xs font-medium text-[#3F3F46]">{t("field.surchargeType")}</span>
+            <span className="block text-sm font-medium text-[#3F3F46]">{t("field.surchargeType")}</span>
             <AdminSegmentedControl<SurchargeOption>
               value={surchargeOption}
               onChange={(value) => {
@@ -268,40 +257,26 @@ export function SizeChartEditor({ initialChart }: { initialChart: AdminSizeChart
             />
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            <label className="block space-y-1.5">
-              <span className="text-xs font-medium text-[#3F3F46]">{t("field.surchargeValue")}</span>
-              <span
-                className={cn(
-                  "flex h-10 items-center rounded-lg border bg-white pr-3 focus-within:border-[#18181B]",
-                  surchargeInvalid ? "border-rose-400" : "border-[#E4E4E7]",
-                  info.surchargeType === null && "bg-[#FAFAFA]"
-                )}
-              >
-                <input
-                  inputMode="numeric"
-                  disabled={info.surchargeType === null}
-                  value={info.surchargeValue ?? ""}
-                  onChange={(e) => set("surchargeValue", parseNumberInput(e.target.value.replace(/\./g, "")))}
-                  placeholder={info.surchargeType === "PERCENTAGE" ? "15" : "150000"}
-                  className="h-full min-w-0 flex-1 bg-transparent px-3 text-sm tabular-nums outline-none disabled:text-[#A1A1AA]"
-                />
-                <span className="text-xs text-[#71717A]">{info.surchargeType === "PERCENTAGE" ? "%" : "₫"}</span>
-              </span>
-              {surchargeInvalid && <span className="block text-xs text-rose-600">{t("editor.surchargeInvalid")}</span>}
-            </label>
-            <label className="block space-y-1.5">
-              <span className="text-xs font-medium text-[#3F3F46]">{t("field.extraFabric")}</span>
-              <span className="flex h-10 items-center rounded-lg border border-[#E4E4E7] bg-white pr-3 focus-within:border-[#18181B]">
-                <input
-                  inputMode="decimal"
-                  value={info.extraFabric ?? ""}
-                  onChange={(e) => set("extraFabric", parseNumberInput(e.target.value))}
-                  placeholder="0.8"
-                  className="h-full min-w-0 flex-1 bg-transparent px-3 text-sm tabular-nums outline-none"
-                />
-                <span className="text-xs text-[#71717A]">m</span>
-              </span>
-            </label>
+            <AdminTextField
+              label={t("field.surchargeValue")}
+              inputMode="numeric"
+              disabled={info.surchargeType === null}
+              value={info.surchargeValue === null ? "" : String(info.surchargeValue)}
+              onValueChange={(value) => set("surchargeValue", parseNumberInput(value.replace(/./g, "")))}
+              placeholder={info.surchargeType === "PERCENTAGE" ? "15" : "150000"}
+              error={surchargeInvalid ? t("editor.surchargeInvalid") : undefined}
+              suffix={<span className="text-xs">{info.surchargeType === "PERCENTAGE" ? "%" : "₫"}</span>}
+              inputClassName="tabular-nums"
+            />
+            <AdminTextField
+              label={t("field.extraFabric")}
+              inputMode="decimal"
+              value={info.extraFabric === null ? "" : String(info.extraFabric)}
+              onValueChange={(value) => set("extraFabric", parseNumberInput(value))}
+              placeholder="0.8"
+              suffix={<span className="text-xs">m</span>}
+              inputClassName="tabular-nums"
+            />
           </div>
           <p className="rounded-lg bg-[#FAFAFA] px-3 py-2 text-xs leading-relaxed text-[#52525B]">
             {t("editor.bigsizeColumnsHint", {
@@ -317,27 +292,21 @@ export function SizeChartEditor({ initialChart }: { initialChart: AdminSizeChart
           <p className="mt-1 text-xs text-[#71717A]">{t("editor.guideDescription")}</p>
         </div>
         <div className="grid gap-4 lg:grid-cols-[1fr_1fr_220px]">
-          <label className="block space-y-1.5">
-            <span className="text-xs font-medium text-[#3F3F46]">{t("field.measurementGuide")}</span>
-            <textarea
-              rows={7}
-              value={info.measurementGuide}
-              onChange={(e) => set("measurementGuide", e.target.value)}
-              placeholder={t("editor.guidePlaceholder")}
-              className={TEXTAREA_CLASS}
-            />
-          </label>
-          <label className="block space-y-1.5">
-            <span className="text-xs font-medium text-[#3F3F46]">{t("field.measurementGuideEn")}</span>
-            <textarea
-              rows={7}
-              value={info.measurementGuideEn}
-              onChange={(e) => set("measurementGuideEn", e.target.value)}
-              className={TEXTAREA_CLASS}
-            />
-          </label>
+          <AdminTextArea
+            label={t("field.measurementGuide")}
+            rows={7}
+            value={info.measurementGuide}
+            onValueChange={(value) => set("measurementGuide", value)}
+            placeholder={t("editor.guidePlaceholder")}
+          />
+          <AdminTextArea
+            label={t("field.measurementGuideEn")}
+            rows={7}
+            value={info.measurementGuideEn}
+            onValueChange={(value) => set("measurementGuideEn", value)}
+          />
           <div className="space-y-1.5">
-            <span className="block text-xs font-medium text-[#3F3F46]">{t("field.guideImage")}</span>
+            <span className="block text-sm font-medium text-[#3F3F46]">{t("field.guideImage")}</span>
             {info.guideImage ? (
               <div className="relative overflow-hidden rounded-lg border border-[#E4E4E7]">
                 {/* eslint-disable-next-line @next/next/no-img-element -- ảnh tải lên Cloudinary, chưa khai báo remotePatterns */}

@@ -10,12 +10,17 @@ import { Link } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
 import {
   ADMIN_CARD_CLASS,
+  ADMIN_INPUT_CLASS,
   ADMIN_PRIMARY_BUTTON_CLASS,
   AdminDetailHeader,
+  AdminField,
   AdminFilterSelect,
   AdminInfoTip,
   AdminLangSwitch,
+  AdminTextArea,
+  AdminTextField,
   type AdminContentLang,
+  AdminTooltip,
 } from "@/features/admin/core/ui";
 import { PRODUCT_GROUP_COLORS, PRODUCT_GROUP_ICONS } from "@/features/admin/modules/categories";
 import { updateProductAction } from "../../actions/products.actions";
@@ -35,8 +40,6 @@ import { ProductMaterialField } from "./ProductMaterialField";
 import { ProductSetItemsField } from "./ProductSetItemsField";
 import { ProductSkuField } from "./ProductSkuField";
 
-const INPUT_CLASS =
-  "h-10 w-full rounded-lg border border-[#E4E4E7] bg-white px-3 text-sm text-[#09090B] outline-none placeholder:text-[#A1A1AA] focus:border-[#18181B]";
 type Lang = AdminContentLang;
 const LANG_FIELDS = {
   vi: { name: "name", description: "description" },
@@ -55,18 +58,6 @@ function Card({ title, hint, children }: { title: string; hint?: string; childre
       </h2>
       {children}
     </section>
-  );
-}
-
-function Field({ label, hint, children, className }: { label: string; hint?: string; children: ReactNode; className?: string }) {
-  return (
-    <label className={cn("block min-w-0 space-y-1.5", className)}>
-      <span className="flex items-center gap-1.5 text-sm font-medium text-[#3F3F46]">
-        {label}
-        {hint && <AdminInfoTip content={hint} />}
-      </span>
-      {children}
-    </label>
   );
 }
 
@@ -270,16 +261,16 @@ export function ProductEditor({
           {/* 1. Thông tin chung */}
           <Card title={t("sections.general")}>
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label={`${t("field.name")}${lang === "vi" ? " *" : ""}`} className="sm:col-span-2">
-                <input
-                  key={`name-${lang}`}
-                  value={values[fields.name]}
-                  onChange={(e) => set(fields.name, e.target.value)}
-                  placeholder={t(`placeholders.${lang}.name`)}
-                  className={INPUT_CLASS}
-                />
-              </Field>
-              <Field label={t("field.category")} hint={t("hints.category")} className="sm:col-span-2">
+              <AdminTextField
+                key={`name-${lang}`}
+                required={lang === "vi"}
+                className="sm:col-span-2"
+                label={t("field.name")}
+                value={values[fields.name]}
+                onValueChange={(value) => set(fields.name, value)}
+                placeholder={t(`placeholders.${lang}.name`)}
+              />
+              <AdminField label={t("field.category")} hint={t("hints.category")} className="sm:col-span-2">
                 <div className="flex flex-wrap items-center gap-2">
                   <AdminFilterSelect
                     label={t("field.categoryShort")}
@@ -292,17 +283,16 @@ export function ProductEditor({
                     <GroupIcon size={13} aria-hidden /> {tSizing(`group.${group}`)}
                   </span>
                 </div>
-              </Field>
-              <Field label={t("field.description")} className="sm:col-span-2">
-                <textarea
-                  key={`description-${lang}`}
-                  value={values[fields.description]}
-                  onChange={(e) => set(fields.description, e.target.value)}
-                  rows={4}
-                  placeholder={t(`placeholders.${lang}.description`)}
-                  className={cn(INPUT_CLASS, "h-auto resize-y py-2")}
-                />
-              </Field>
+              </AdminField>
+              <AdminTextArea
+                key={`description-${lang}`}
+                className="sm:col-span-2"
+                label={t("field.description")}
+                value={values[fields.description]}
+                onValueChange={(value) => set(fields.description, value)}
+                rows={4}
+                placeholder={t(`placeholders.${lang}.description`)}
+              />
             </div>
             <div className="mt-5 border-t border-dashed border-[#E4E4E7] pt-4">
               <h3 className="mb-3 flex items-center gap-1.5 text-body font-semibold text-[#09090B]">
@@ -321,24 +311,26 @@ export function ProductEditor({
                 const enabled = allowedModes.includes(mode);
                 const selected = values.saleMode === mode;
                 return (
-                  <button
-                    key={mode}
-                    type="button"
-                    disabled={!enabled}
-                    aria-pressed={selected}
-                    onClick={() => changeMode(mode)}
-                    title={enabled ? undefined : t("mode.notAllowedFor", { group: tSizing(`group.${group}`) })}
-                    className={cn(
-                      "flex cursor-pointer flex-col items-start gap-1 rounded-lg border px-3 py-2.5 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-40",
-                      selected ? "border-[#18181B] bg-[#18181B] text-white" : "border-[#E4E4E7] text-[#3F3F46] hover:border-[#A1A1AA]"
-                    )}
-                  >
-                    <Icon size={16} aria-hidden />
-                    <span className="text-sm font-semibold">{t(`mode.${mode}.label`)}</span>
-                    <span className={cn("text-2xs leading-4", selected ? "text-white/70" : "text-[#71717A]")}>
-                      {t(`mode.${mode}.short`)}
+                  <AdminTooltip key={mode} content={enabled ? null : t("mode.notAllowedFor", { group: tSizing(`group.${group}`) })}>
+                    <span className="grid" tabIndex={enabled ? undefined : 0}>
+                      <button
+                        type="button"
+                        disabled={!enabled}
+                        aria-pressed={selected}
+                        onClick={() => changeMode(mode)}
+                        className={cn(
+                          "flex w-full cursor-pointer flex-col items-start gap-1 rounded-lg border px-3 py-2.5 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-40",
+                          selected ? "border-[#18181B] bg-[#18181B] text-white" : "border-[#E4E4E7] text-[#3F3F46] hover:border-[#A1A1AA]"
+                        )}
+                      >
+                        <Icon size={16} aria-hidden />
+                        <span className="text-sm font-semibold">{t(`mode.${mode}.label`)}</span>
+                        <span className={cn("text-2xs leading-4", selected ? "text-white/70" : "text-[#71717A]")}>
+                          {t(`mode.${mode}.short`)}
+                        </span>
+                      </button>
                     </span>
-                  </button>
+                  </AdminTooltip>
                 );
               })}
             </div>
@@ -351,7 +343,7 @@ export function ProductEditor({
                   onChange={(items) => set("setItems", items)}
                   materials={options.materials}
                   lang={lang}
-                  inputClassName={INPUT_CLASS}
+                  inputClassName={ADMIN_INPUT_CLASS}
                 />
                 {values.setItems.length < 2 && <p className="mt-2 text-xs text-amber-700">{t("set.min")}</p>}
               </div>
@@ -384,24 +376,19 @@ export function ProductEditor({
                     ))}
                   </div>
                 </div>
-                <Field label={t("field.leadTimeDays")}>
-                  <div className="relative">
-                    <input
-                      type="number"
-                      min={1}
-                      max={180}
-                      value={values.leadTimeDays ?? ""}
-                      onChange={(e) =>
-                        set("leadTimeDays", e.target.value === "" ? null : Math.max(1, Math.min(180, Math.round(Number(e.target.value)))))
-                      }
-                      placeholder={t("placeholders.leadTimeDays")}
-                      className={cn(INPUT_CLASS, "pr-12 font-mono tabular-nums")}
-                    />
-                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#A1A1AA]">
-                      {t("custom.days")}
-                    </span>
-                  </div>
-                </Field>
+                <AdminTextField
+                  type="number"
+                  label={t("field.leadTimeDays")}
+                  min={1}
+                  max={180}
+                  value={values.leadTimeDays === null ? "" : String(values.leadTimeDays)}
+                  onValueChange={(value) =>
+                    set("leadTimeDays", value === "" ? null : Math.max(1, Math.min(180, Math.round(Number(value)))))
+                  }
+                  placeholder={t("placeholders.leadTimeDays")}
+                  suffix={<span className="text-xs text-[#A1A1AA]">{t("custom.days")}</span>}
+                  inputClassName="font-mono tabular-nums"
+                />
               </div>
             )}
           </Card>
@@ -456,22 +443,20 @@ export function ProductEditor({
           {/* 4. Giá & SKU */}
           <Card title={t("sections.pricing")} hint={t("hints.pricing")}>
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label={`${t("field.basePrice")} *`}>
-                <div className="relative">
-                  <input
-                    type="number"
-                    min={0}
-                    step={10000}
-                    value={values.basePrice || ""}
-                    onChange={(e) => set("basePrice", Math.max(0, Math.round(Number(e.target.value) || 0)))}
-                    placeholder={t("placeholders.basePrice")}
-                    className={cn(INPUT_CLASS, "pr-8 font-mono tabular-nums")}
-                  />
-                  <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#A1A1AA]">₫</span>
-                </div>
-              </Field>
+              <AdminTextField
+                required
+                label={t("field.basePrice")}
+                /* Mask tiền: hiện 1.250.000, `raw` chỉ còn chữ số để lưu số nguyên VND */
+                mask="currency"
+                currencyOptions={{ thousandSeparator: locale === "vi" ? "." : "," }}
+                value={values.basePrice ? String(values.basePrice) : ""}
+                onValueChange={(_display, raw) => set("basePrice", Math.max(0, Math.round(Number(raw) || 0)))}
+                placeholder={t("placeholders.basePrice")}
+                suffix={<span className="text-xs text-[#A1A1AA]">₫</span>}
+                inputClassName="font-mono tabular-nums"
+              />
               {axis.kind !== "custom" && traits.sizing !== "NONE" && (
-                <Field label={t("field.sizeChart")} hint={t("hints.sizeChart")}>
+                <AdminField label={t("field.sizeChart")} hint={t("hints.sizeChart")}>
                   <AdminFilterSelect
                     label={t("field.sizeChartShort")}
                     value={values.sizeChartId || INHERIT_CHART}
@@ -489,7 +474,7 @@ export function ProductEditor({
                     onChange={(value) => set("sizeChartId", value === INHERIT_CHART ? "" : value)}
                     className="h-10 w-full"
                   />
-                </Field>
+                </AdminField>
               )}
             </div>
             <div className="mt-5 border-t border-dashed border-[#E4E4E7] pt-4">

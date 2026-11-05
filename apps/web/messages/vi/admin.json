@@ -23,13 +23,13 @@
     "USER_NOT_FOUND": "Tài khoản quản trị không tồn tại trong hệ thống.",
     "ADMIN_LOGIN_SUCCESS": "Đăng nhập quản trị viên thành công!",
     "ADMIN_LOGOUT_SUCCESS": "Đăng xuất quản trị viên thành công!",
-    "brand": "Thiên Canh Admin",
+    "brand": "Thiên Canh",
     "eyebrow": "Khu quản trị",
     "secureNote": "Phiên quản trị tách riêng với tài khoản mua hàng và tự hết hạn sau 8 giờ không hoạt động.",
     "staffOnly": "Chỉ dành cho nhân viên và quản trị viên. Chưa có tài khoản hoặc quên mật khẩu? Liên hệ quản trị viên cấp cao."
   },
   "header": {
-    "systemTitle": "Thiên Canh Admin",
+    "systemTitle": "Thiên Canh",
     "viewStore": "Xem cửa hàng",
     "defaultAdminName": "Quản trị viên",
     "superAdminRole": "Super Admin",
@@ -986,7 +986,7 @@
         "label": "Ngôn ngữ nội dung",
         "untranslated": "Chưa có bản tiếng Anh"
       },
-      "advanced": "Tùy chọn nâng cao",
+      "advanced": "Tùy chọn",
       "back": "Bộ sưu tập",
       "untitled": "Bộ sưu tập chưa đặt tên",
       "unsaved": "Chưa lưu",
@@ -1005,10 +1005,12 @@
         "englishHint": "Để trống thì dùng nội dung tiếng Việt.",
         "seo": "SEO",
         "seoHint": "Tiêu đề và mô tả hiện trên kết quả tìm kiếm.",
-        "lifecycle": "Vòng đời",
+        "lifecycle": "Tiến trình",
         "schedule": "Lịch",
         "warnings": "Cần chú ý"
-      }
+      },
+      "progressOpen": "Xem tiến trình bộ sưu tập",
+      "progressClose": "Đóng tiến trình"
     },
     "warnings": {
       "noProducts": "Chưa có sản phẩm nào trong bộ sưu tập.",
@@ -1034,9 +1036,7 @@
     },
     "media": {
       "cover": "Ảnh bìa",
-      "coverMobile": "Ảnh bìa mobile",
       "banner": "Banner",
-      "bannerMobile": "Banner mobile",
       "lookbook": "Ảnh lookbook",
       "upload": "Tải ảnh",
       "uploading": "Đang tải...",
@@ -1046,7 +1046,10 @@
       "remove": "Gỡ ảnh",
       "moveLeft": "Chuyển sang trái",
       "moveRight": "Chuyển sang phải",
-      "addLookbook": "Thêm ảnh"
+      "addLookbook": "Thêm ảnh",
+      "desktop": "Máy tính",
+      "mobile": "Điện thoại",
+      "lookbookCount": "{count}/{max} ảnh"
     },
     "products": {
       "summary": "{count} sản phẩm · {selling} đang bán · {highlighted} nổi bật",
@@ -1120,7 +1123,9 @@
       "outOfStock": "Hết hàng",
       "comingSoonPrice": "{price} · Sắp mở bán",
       "stillSelling": "Vẫn còn bán",
-      "pastSeason": "Mùa trước"
+      "pastSeason": "Mùa trước",
+      "deviceLabel": "Thiết bị xem trước",
+      "languageLabel": "Ngôn ngữ xem trước"
     }
   },
   "sizing": {
@@ -1198,11 +1203,11 @@
       "label": "Thao tác với {name}",
       "edit": "Sửa",
       "addChild": "Thêm loại con",
-      "hide": "Ẩn khỏi cửa hàng",
-      "show": "Hiện trên cửa hàng",
       "moveUp": "Lên trên",
       "moveDown": "Xuống dưới",
-      "delete": "Xóa"
+      "delete": "Xóa",
+      "hide": "Ẩn khỏi cửa hàng",
+      "show": "Hiện trên cửa hàng"
     },
     "deleteBlocked": {
       "children": "Còn loại con — xóa hoặc chuyển chúng trước",
@@ -1297,7 +1302,8 @@
       "columnStatus": "Hiển thị",
       "dragHint": "Kéo biểu tượng ⋮⋮ để đổi thứ tự trong cùng cấp — khách thấy danh mục theo đúng thứ tự này.",
       "dragHandle": "Kéo để đổi thứ tự {name}",
-      "toggleLabel": "Hiển thị {name} trên cửa hàng"
+      "toggleLabel": "Hiển thị {name} trên cửa hàng",
+      "columnProducts": "Sản phẩm"
     },
     "row": {
       "children": "{count} loại con",

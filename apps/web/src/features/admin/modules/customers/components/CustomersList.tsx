@@ -18,6 +18,7 @@ import {
   XCircle,
   ChevronRight,
 } from "lucide-react";
+import { AdminTooltip } from "@/features/admin/core/ui";
 
 interface CustomersListProps {
   initialCustomers: AdminCustomerItem[];
@@ -128,26 +129,30 @@ export function CustomersList({ initialCustomers }: CustomersListProps) {
                       )}
                     </td>
                     <td className="py-3.5 px-4" onClick={(e) => e.stopPropagation()}>
-                      <button
-                        disabled={isPending || !canToggleActive}
-                        onClick={() => handleToggleActive(cust.id, cust.isActive)}
-                        title={canToggleActive ? undefined : t("toggleSuperAdminOnly")}
-                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border transition-colors ${canToggleActive ? "cursor-pointer" : "cursor-default"} ${
-                          cust.isActive
-                            ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                            : "bg-rose-50 text-rose-700 border-rose-200"
-                        }`}
-                      >
-                        {cust.isActive ? (
-                          <>
-                            <CheckCircle size={12} /> {t("active")}
-                          </>
-                        ) : (
-                          <>
-                            <XCircle size={12} /> {t("locked")}
-                          </>
-                        )}
-                      </button>
+                      {/* Nút tắt không nhận sự kiện chuột → tooltip gắn vào span bọc ngoài */}
+                      <AdminTooltip content={canToggleActive ? null : t("toggleSuperAdminOnly")}>
+                        <span className="inline-flex" tabIndex={canToggleActive ? undefined : 0}>
+                          <button
+                            disabled={isPending || !canToggleActive}
+                            onClick={() => handleToggleActive(cust.id, cust.isActive)}
+                            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border transition-colors ${canToggleActive ? "cursor-pointer" : "cursor-default"} ${
+                              cust.isActive
+                                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                : "bg-rose-50 text-rose-700 border-rose-200"
+                            }`}
+                          >
+                            {cust.isActive ? (
+                              <>
+                                <CheckCircle size={12} /> {t("active")}
+                              </>
+                            ) : (
+                              <>
+                                <XCircle size={12} /> {t("locked")}
+                              </>
+                            )}
+                          </button>
+                        </span>
+                      </AdminTooltip>
                     </td>
                     <td className="py-3.5 px-4 text-right">
                       <button className="p-1.5 text-zinc-400 hover:text-[#09090B] rounded-lg hover:bg-zinc-100 transition-colors">

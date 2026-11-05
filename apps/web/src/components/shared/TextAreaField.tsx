@@ -1,15 +1,18 @@
 "use client";
 
-import { useId, useState, type ChangeEvent, type ComponentProps, type ReactNode } from "react";
+import { useId, useState, type ChangeEvent, type ComponentProps, type CSSProperties, type ReactNode } from "react";
 import { AlertCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
+import { textFieldToneVars, type TextFieldAppearance, type TextFieldTone } from "./textFieldTone";
 
 export interface TextAreaFieldProps extends Omit<ComponentProps<"textarea">, "value" | "defaultValue"> {
   /** Nhãn — không truyền thì nên truyền `aria-label` */
   label?: ReactNode;
   /** `underline` (mặc định, giống TextField / màn Liên hệ): chỉ gạch chân. `outline`: viền hộp */
-  appearance?: "underline" | "outline";
+  appearance?: TextFieldAppearance;
+  /** Tông màu theo nền đặt ô — cùng bảng màu với TextField (`default` | `onPrimary` | `admin`) */
+  tone?: TextFieldTone;
   /** Chữ gợi ý dưới ô */
   helperText?: ReactNode;
   /** Lỗi xác thực: chuỗi/node = hiện thông báo; `true` = chỉ tô viền lỗi */
@@ -28,15 +31,17 @@ export interface TextAreaFieldProps extends Omit<ComponentProps<"textarea">, "va
   className?: string;
   /** Class cho thẻ <textarea> */
   textareaClassName?: string;
+  /** Class cho nhãn */
+  labelClassName?: string;
 }
 
-/* Cùng ngôn ngữ thiết kế với TextField: nhãn in hoa nhỏ giãn chữ, đổi màu khi focus; gạch chân / viền đỏ đô khi focus */
+/* Cùng ngôn ngữ thiết kế với TextField: nhãn in hoa nhỏ giãn chữ, đổi màu khi focus. Màu chỉ đọc biến --tf-* theo tone */
 const LABEL_CLASS =
-  "block text-[11px] font-semibold uppercase tracking-[2.5px] text-[var(--text-light)] transition-colors duration-300 group-focus-within/field:text-[var(--primary-ink)]";
+  "block text-[11px] font-semibold uppercase tracking-[2.5px] text-[var(--tf-label)] transition-colors duration-300 group-focus-within/field:text-[var(--tf-label-focus)]";
 
-const APPEARANCE_CLASS: Record<NonNullable<TextAreaFieldProps["appearance"]>, string> = {
+const APPEARANCE_CLASS: Record<TextFieldAppearance, string> = {
   underline: "border-0 border-b bg-transparent px-0",
-  outline: "border bg-[var(--bg-card)] px-3 focus:ring-2 focus:ring-[color-mix(in_oklab,var(--ring)_25%,transparent)]",
+  outline: "border bg-[var(--tf-field-bg)] px-3 focus:ring-2 focus:ring-[var(--tf-ring)]",
 };
 
 /**
@@ -48,6 +53,7 @@ const APPEARANCE_CLASS: Record<NonNullable<TextAreaFieldProps["appearance"]>, st
 export function TextAreaField({
   label,
   appearance = "underline",
+  tone = "default",
   helperText,
   error,
   showCount = false,
@@ -60,7 +66,9 @@ export function TextAreaField({
   id: idProp,
   className,
   textareaClassName,
+  labelClassName,
   disabled,
+  style,
   "aria-describedby": ariaDescribedByProp,
   ...props
 }: TextAreaFieldProps) {
@@ -88,9 +96,12 @@ export function TextAreaField({
   };
 
   return (
-    <div className={cn("group/field w-full", disabled && "cursor-not-allowed opacity-55", className)}>
+    <div
+      className={cn("group/field w-full", disabled && "cursor-not-allowed opacity-55", className)}
+      style={{ ...textFieldToneVars(tone, appearance), ...style } as CSSProperties}
+    >
       {label ? (
-        <label htmlFor={textareaId} className={cn(LABEL_CLASS, "mb-2")}>
+        <label htmlFor={textareaId} className={cn(LABEL_CLASS, "mb-2", hasError && "text-[var(--tf-invalid)] group-focus-within/field:text-[var(--tf-invalid)]", labelClassName)}>
           {label}
         </label>
       ) : null}
@@ -107,12 +118,12 @@ export function TextAreaField({
         /* Lăn chuột cuộn nội dung ô (Lenis mặc định chiếm wheel để cuộn trang) */
         data-lenis-prevent
         className={cn(
-          "scrollbar-brand block w-full overscroll-contain py-2.5 text-[15px] leading-7 text-[var(--text-main)] outline-none transition-[border-color,box-shadow] duration-300",
+          "scrollbar-brand block w-full overscroll-contain py-2.5 text-[15px] leading-7 text-[var(--tf-text)] outline-none transition-[border-color,box-shadow] duration-300",
           autoResize ? "field-sizing-content max-h-[19rem] resize-none" : "resize-y",
-          "border-[var(--border)] placeholder:text-[color-mix(in_oklab,var(--text-light)_55%,transparent)]",
-          "hover:not-focus:border-[color-mix(in_oklab,var(--text-light)_60%,transparent)] focus:border-[var(--primary-color)] disabled:cursor-not-allowed",
+          "border-[var(--tf-border)] placeholder:text-[var(--tf-placeholder)]",
+          "hover:not-focus:border-[var(--tf-border-hover)] focus:border-[var(--tf-border-focus)] disabled:cursor-not-allowed",
           APPEARANCE_CLASS[appearance],
-          hasError && "border-[var(--destructive)] hover:not-focus:border-[var(--destructive)]",
+          hasError && "border-[var(--tf-invalid)] hover:not-focus:border-[var(--tf-invalid)] focus:border-[var(--tf-invalid)]",
           textareaClassName,
         )}
         {...props}
@@ -122,13 +133,13 @@ export function TextAreaField({
         <div className="mt-1.5 flex items-start justify-between gap-4 text-xs leading-5">
           <div className="min-w-0 space-y-0.5">
             {errorMessage ? (
-              <p id={messageId} role="alert" className="flex items-start gap-1.5 text-[var(--destructive)] motion-safe:animate-shake">
+              <p id={messageId} role="alert" className="flex items-start gap-1.5 text-[var(--tf-invalid)] motion-safe:animate-shake">
                 <AlertCircle aria-hidden="true" className="mt-0.5 size-3.5 shrink-0" />
                 <span>{errorMessage}</span>
               </p>
             ) : null}
             {helperText ? (
-              <p id={helperId} className="text-[var(--text-light)]">
+              <p id={helperId} className="text-[var(--tf-muted)]">
                 {helperText}
               </p>
             ) : null}
@@ -142,8 +153,8 @@ export function TextAreaField({
                   : t("counterNoMax", { count: currentValue.length })
               }
               className={cn(
-                "shrink-0 tabular-nums text-[var(--text-light)]",
-                maxLength !== undefined && currentValue.length >= maxLength && "text-[var(--destructive)]",
+                "shrink-0 tabular-nums text-[var(--tf-muted)]",
+                maxLength !== undefined && currentValue.length >= maxLength && "text-[var(--tf-invalid)]",
               )}
             >
               {maxLength ? `${currentValue.length}/${maxLength}` : currentValue.length}

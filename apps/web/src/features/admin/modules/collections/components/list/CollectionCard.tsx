@@ -10,6 +10,7 @@ import { DEFAULT_ACCENT } from "../../utils/collectionStatusMeta";
 import { CollectionStatusBadge } from "../shared/CollectionStatusBadge";
 import { CollectionTimelineHint } from "../shared/CollectionTimelineHint";
 import { CollectionCardMenu } from "./CollectionCardMenu";
+import { AdminTooltip } from "@/features/admin/core/ui";
 
 type MenuHandlers = Omit<ComponentProps<typeof CollectionCardMenu>, "collection" | "className">;
 
@@ -41,43 +42,50 @@ export function CollectionCard({ collection, ...menu }: { collection: AdminColle
   const t = useTranslations("AdminPage.collections");
 
   return (
-    <article className="group overflow-hidden rounded-xl border border-[#E4E4E7] bg-white transition-shadow hover:shadow-[0_10px_30px_-18px_rgba(9,9,11,0.35)]">
+    <article className="@container group overflow-hidden rounded-xl border border-[#E4E4E7] bg-white transition-shadow hover:shadow-[0_10px_30px_-18px_rgba(9,9,11,0.35)]">
       <Link href={`/admin/catalog/collections/${collection.id}`} className="relative block outline-none">
         <CollectionCover
           collection={collection}
           className="aspect-[4/5] transition-transform duration-500 group-hover:scale-[1.02]"
         />
-        <span className="absolute inset-x-0 top-0 flex items-start justify-between p-2.5">
+        <span className="absolute inset-x-0 top-0 flex items-start justify-between gap-1.5 p-2">
           <CollectionStatusBadge status={collection.status} className="bg-white/95 shadow-2xs backdrop-blur" />
           {collection.showOnHomepage && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-[#18181B]/85 px-2 py-0.5 text-[11px] font-medium text-white backdrop-blur">
-              <Star size={11} className="fill-current" aria-hidden /> {t("homepageBadge")}
-            </span>
+            // Thẻ hẹp chỉ hiện ngôi sao (chữ vẫn có cho trình đọc màn hình / rê chuột)
+            <AdminTooltip content={t("homepageBadge")}>
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[#18181B]/85 px-1.5 py-0.5 text-2xs font-medium text-white backdrop-blur">
+                <Star size={11} className="fill-current" aria-hidden />
+                <span className="sr-only @min-[13rem]:not-sr-only">{t("homepageBadge")}</span>
+              </span>
+            </AdminTooltip>
           )}
         </span>
-        <span className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/75 via-black/30 to-transparent p-4 pt-12 text-white">
+        <span className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/75 via-black/30 to-transparent p-3 pt-10 text-white">
           {collection.season && (
-            <span className="block text-[11px] font-medium uppercase tracking-[0.18em] text-white/80">
+            <span className="block truncate text-2xs font-medium uppercase tracking-[0.16em] text-white/80">
               {collection.season}
             </span>
           )}
-          <span className="mt-0.5 block text-lg font-semibold leading-snug">{collection.name}</span>
+          <span className="mt-0.5 line-clamp-2 block text-body font-semibold leading-snug">{collection.name}</span>
           {collection.tagline && (
             <span className="mt-0.5 line-clamp-1 block text-xs text-white/80">{collection.tagline}</span>
           )}
         </span>
       </Link>
 
-      <div className="flex items-center gap-2 px-3 py-2.5">
+      <div className="flex items-center gap-2 py-2 pl-3 pr-1.5">
         <span
           aria-hidden
           className="size-2.5 shrink-0 rounded-full ring-2 ring-white"
           style={{ backgroundColor: collection.accentColor ?? DEFAULT_ACCENT }}
         />
         <div className="min-w-0 flex-1 text-xs leading-tight">
-          <div className="flex items-center gap-1.5 text-[#09090B]">
+          {/* Thẻ hẹp: số sản phẩm xuống dòng riêng thay vì bị cắt còn vài chữ; thẻ rộng: cùng một dòng */}
+          <div className="flex flex-col text-[#09090B] @min-[14rem]:flex-row @min-[14rem]:items-center @min-[14rem]:gap-1.5">
             <span className="font-mono font-semibold">{collection.code}</span>
-            <span className="text-[#D4D4D8]">·</span>
+            <span aria-hidden className="hidden text-[#D4D4D8] @min-[14rem]:inline">
+              ·
+            </span>
             <span className="truncate tabular-nums text-[#3F3F46]">
               {t("productSummary", { count: collection.productCount, selling: collection.sellingCount })}
             </span>

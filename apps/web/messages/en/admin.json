@@ -23,13 +23,13 @@
     "USER_NOT_FOUND": "Admin account not found in system.",
     "ADMIN_LOGIN_SUCCESS": "Admin login successful!",
     "ADMIN_LOGOUT_SUCCESS": "Admin logout successful!",
-    "brand": "Thiên Canh Admin",
+    "brand": "Thiên Canh",
     "eyebrow": "Admin area",
     "secureNote": "The admin session is separate from your shopping account and expires after 8 hours of inactivity.",
     "staffOnly": "For staff and administrators only. No account or forgot your password? Contact a super admin."
   },
   "header": {
-    "systemTitle": "Thiên Canh Admin",
+    "systemTitle": "Thiên Canh",
     "viewStore": "View Storefront",
     "defaultAdminName": "Administrator",
     "superAdminRole": "Super Admin",
@@ -1005,10 +1005,12 @@
         "englishHint": "Leave empty to fall back to Vietnamese.",
         "seo": "SEO",
         "seoHint": "Title and description shown in search results.",
-        "lifecycle": "Lifecycle",
+        "lifecycle": "Progress",
         "schedule": "Schedule",
         "warnings": "Needs attention"
-      }
+      },
+      "progressOpen": "View collection progress",
+      "progressClose": "Close progress"
     },
     "warnings": {
       "noProducts": "The collection has no products yet.",
@@ -1034,9 +1036,7 @@
     },
     "media": {
       "cover": "Cover",
-      "coverMobile": "Mobile cover",
       "banner": "Banner",
-      "bannerMobile": "Mobile banner",
       "lookbook": "Lookbook images",
       "upload": "Upload",
       "uploading": "Uploading...",
@@ -1046,7 +1046,10 @@
       "remove": "Remove image",
       "moveLeft": "Move left",
       "moveRight": "Move right",
-      "addLookbook": "Add images"
+      "addLookbook": "Add images",
+      "desktop": "Desktop",
+      "mobile": "Mobile",
+      "lookbookCount": "{count}/{max} images"
     },
     "products": {
       "summary": "{count, plural, one {# product} other {# products}} · {selling} on sale · {highlighted} highlighted",
@@ -1120,7 +1123,9 @@
       "outOfStock": "Out of stock",
       "comingSoonPrice": "{price} · Coming soon",
       "stillSelling": "Still available",
-      "pastSeason": "Past season"
+      "pastSeason": "Past season",
+      "deviceLabel": "Preview device",
+      "languageLabel": "Preview language"
     }
   },
   "sizing": {
@@ -1198,11 +1203,11 @@
       "label": "Actions for {name}",
       "edit": "Edit",
       "addChild": "Add subtype",
-      "hide": "Hide from store",
-      "show": "Show in store",
       "moveUp": "Move up",
       "moveDown": "Move down",
-      "delete": "Delete"
+      "delete": "Delete",
+      "hide": "Hide from store",
+      "show": "Show in store"
     },
     "deleteBlocked": {
       "children": "Has subtypes — delete or move them first",
@@ -1297,7 +1302,8 @@
       "columnStatus": "Visible",
       "dragHint": "Drag the ⋮⋮ handle to reorder within the same level — shoppers see categories in this order.",
       "dragHandle": "Drag to reorder {name}",
-      "toggleLabel": "Show {name} on the store"
+      "toggleLabel": "Show {name} on the store",
+      "columnProducts": "Products"
     },
     "row": {
       "children": "{count, plural, one {# subcategory} other {# subcategories}}",

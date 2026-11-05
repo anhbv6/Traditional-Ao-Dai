@@ -26,7 +26,7 @@ export function AdminInfoTip({ content, className }: { content: ReactNode; class
         aria-label={t("label")}
         render={<span role="button" tabIndex={0} />}
         className={cn(
-          "inline-grid size-4 shrink-0 cursor-help place-items-center rounded-full text-[#A1A1AA] outline-none transition-colors hover:text-[#52525B] focus-visible:ring-2 focus-visible:ring-[#18181B]/20 data-popup-open:text-[#09090B]",
+          "inline-grid ml-1 size-4 shrink-0 cursor-help place-items-center rounded-full text-[#A1A1AA] outline-none transition-colors hover:text-[#52525B] focus-visible:ring-2 focus-visible:ring-[#18181B]/20 data-popup-open:text-[#09090B]",
           className
         )}
       >

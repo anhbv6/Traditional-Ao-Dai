@@ -7,6 +7,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { ASSISTANT_SUGGESTIONS, pickAssistantReply } from "../data/assistantMock";
 import { useAssistantStore } from "../store/assistantStore";
+import { AdminTooltip } from "../../ui";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -84,15 +85,16 @@ export function AdminAssistantPanel() {
           </p>
         </div>
         {messages.length > 0 && (
-          <button
-            type="button"
-            onClick={reset}
-            aria-label={t("reset")}
-            title={t("reset")}
-            className="grid size-9 shrink-0 cursor-pointer place-items-center rounded-lg text-[#71717A] transition-colors hover:bg-[#F4F4F5] hover:text-[#09090B]"
-          >
-            <RotateCcw size={16} aria-hidden />
-          </button>
+          <AdminTooltip content={t("reset")}>
+            <button
+              type="button"
+              onClick={reset}
+              aria-label={t("reset")}
+              className="grid size-9 shrink-0 cursor-pointer place-items-center rounded-lg text-[#71717A] transition-colors hover:bg-[#F4F4F5] hover:text-[#09090B]"
+            >
+              <RotateCcw size={16} aria-hidden />
+            </button>
+          </AdminTooltip>
         )}
         <button
           type="button"

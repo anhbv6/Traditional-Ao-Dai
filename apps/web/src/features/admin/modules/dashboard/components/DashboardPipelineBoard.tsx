@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight, GripVertical } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { formatVnd } from "@repo/shared";
 import { cn } from "@/lib/utils";
-import { ADMIN_CARD_CLASS } from "@/features/admin/core/ui";
+import { ADMIN_CARD_CLASS, AdminTooltip } from "@/features/admin/core/ui";
 import { PIPELINE_STAGES, type PipelineCard, type PipelineStage } from "../types/dashboard.types";
 
 interface DashboardPipelineBoardProps {
@@ -28,7 +28,11 @@ function DueChip({ days }: { days: number | null }) {
     <span
       className={cn(
         "rounded-md px-1.5 py-0.5 text-2xs font-semibold",
-        days <= 1 ? "bg-rose-50 text-rose-700" : days <= 3 ? "bg-amber-50 text-amber-700" : "bg-[#F4F4F5] text-[#71717A]"
+        days <= 1
+          ? "bg-rose-50 text-rose-700"
+          : days <= 3
+            ? "bg-amber-50 text-amber-700"
+            : "bg-[#F4F4F5] text-[#71717A]"
       )}
     >
       {label}
@@ -70,14 +74,17 @@ function OrderCard({
           <p className="truncate text-body font-semibold text-[#09090B]">{card.customerName}</p>
           <p className="font-mono text-2xs text-[#71717A]">{card.orderNumber}</p>
         </div>
-        {draggable ? <GripVertical size={14} className="mt-0.5 shrink-0 text-[#D4D4D8] group-hover:text-[#A1A1AA]" /> : null}
+        {draggable ? (
+          <GripVertical size={14} className="mt-0.5 shrink-0 text-[#D4D4D8] group-hover:text-[#A1A1AA]" />
+        ) : null}
       </div>
 
       <p className="mt-2 line-clamp-2 text-xs text-[#3F3F46]">{card.productNames.join(", ")}</p>
 
       <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
         <DueChip days={card.daysLeft} />
-        {card.stage === "sewing" && ["FABRIC_CUTTING", "SEWING", "EMBROIDERY_BEADING"].includes(card.tailoringStatus) ? (
+        {card.stage === "sewing" &&
+        ["FABRIC_CUTTING", "SEWING", "EMBROIDERY_BEADING"].includes(card.tailoringStatus) ? (
           <span className="rounded-md border border-[#E4E4E7] px-1.5 py-0.5 text-2xs text-[#3F3F46]">
             {t(`tailoringStatus.${card.tailoringStatus}`)}
           </span>
@@ -87,7 +94,10 @@ function OrderCard({
       {/* Tiến độ thu tiền: cọc / tổng — còn nợ thì tô amber */}
       <div className="mt-3">
         <div className="h-1 overflow-hidden rounded-full bg-[#F4F4F5]">
-          <div className={cn("h-full", debt > 0 ? "bg-amber-500" : "bg-emerald-500")} style={{ width: `${paidRatio}%` }} />
+          <div
+            className={cn("h-full", debt > 0 ? "bg-amber-500" : "bg-emerald-500")}
+            style={{ width: `${paidRatio}%` }}
+          />
         </div>
         <p className="mt-1 text-2xs text-[#71717A]">
           {debt > 0 ? t("debt", { amount: formatVnd(debt) }) : t("paidInFull")}
@@ -96,15 +106,16 @@ function OrderCard({
 
       <div className="mt-2 flex justify-between gap-1">
         {prev && canMoveTo(prev) ? (
-          <button
-            type="button"
-            onClick={() => onMove(card.orderId, prev)}
-            aria-label={t("movePrev", { stage: t(`stages.${prev}.title`) })}
-            title={t("movePrev", { stage: t(`stages.${prev}.title`) })}
-            className="grid size-7 cursor-pointer place-items-center rounded-md text-[#71717A] transition-colors hover:bg-[#F4F4F5] hover:text-[#09090B]"
-          >
-            <ChevronLeft size={15} />
-          </button>
+          <AdminTooltip content={t("movePrev", { stage: t(`stages.${prev}.title`) })}>
+            <button
+              type="button"
+              onClick={() => onMove(card.orderId, prev)}
+              aria-label={t("movePrev", { stage: t(`stages.${prev}.title`) })}
+              className="grid size-7 cursor-pointer place-items-center rounded-md text-[#71717A] transition-colors hover:bg-[#F4F4F5] hover:text-[#09090B]"
+            >
+              <ChevronLeft size={15} />
+            </button>
+          </AdminTooltip>
         ) : (
           <span />
         )}
@@ -179,13 +190,17 @@ export function DashboardPipelineBoard({ cards, isLoading, canMoveTo, onMove }: 
 
               <div className="flex max-h-[520px] flex-1 flex-col gap-2 overflow-y-auto px-0.5 pb-1">
                 {isLoading ? (
-                  Array.from({ length: 2 }).map((_, i) => <div key={i} className="h-32 animate-pulse rounded-lg bg-[#F4F4F5]" />)
+                  Array.from({ length: 2 }).map((_, i) => (
+                    <div key={i} className="h-32 animate-pulse rounded-lg bg-[#F4F4F5]" />
+                  ))
                 ) : columnCards.length === 0 ? (
                   <p className="rounded-lg border border-dashed border-[#E4E4E7] py-6 text-center text-2xs text-[#A1A1AA]">
                     {t("empty")}
                   </p>
                 ) : (
-                  columnCards.map((card) => <OrderCard key={card.orderId} card={card} canMoveTo={canMoveTo} onMove={onMove} />)
+                  columnCards.map((card) => (
+                    <OrderCard key={card.orderId} card={card} canMoveTo={canMoveTo} onMove={onMove} />
+                  ))
                 )}
               </div>
             </div>

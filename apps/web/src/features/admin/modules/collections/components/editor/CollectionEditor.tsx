@@ -14,8 +14,10 @@ import {
   ADMIN_SECONDARY_BUTTON_CLASS,
   AdminDatePicker,
   AdminDetailHeader,
-  AdminInfoTip,
+  AdminField,
   AdminLangSwitch,
+  AdminTextArea,
+  AdminTextField,
   type AdminContentLang,
 } from "@/features/admin/core/ui";
 import { saveCollectionAction } from "../../actions/collections.actions";
@@ -34,11 +36,12 @@ import {
 } from "../../utils/collectionLifecycle";
 import { ACCENT_PRESETS, DEFAULT_ACCENT } from "../../utils/collectionStatusMeta";
 import { CollectionStatusBadge } from "../shared/CollectionStatusBadge";
-import { GalleryField, ImageSlot } from "./CollectionImageFields";
+import { GalleryField, ImageSlot, MediaGroup } from "./CollectionImageFields";
 import { CollectionLifecyclePanel } from "./CollectionLifecyclePanel";
 import { CollectionAdvancedAction, CollectionAdvancedOptions } from "./CollectionAdvancedOptions";
 import { CollectionNoticeHint, type CollectionNotice } from "./CollectionNoticeHint";
 import { CollectionProductsField } from "./CollectionProductsField";
+import { CollectionProgressDock } from "./CollectionProgressDock";
 
 const CollectionPreviewDialog = dynamic(() =>
   import("./CollectionPreviewDialog").then((m) => m.CollectionPreviewDialog)
@@ -47,9 +50,6 @@ const CollectionSeoDialog = dynamic(() => import("./CollectionSeoDialog").then((
 const ChangeCollectionStatusDialog = dynamic(() =>
   import("../shared/ChangeCollectionStatusDialog").then((m) => m.ChangeCollectionStatusDialog)
 );
-
-const INPUT_CLASS =
-  "w-full rounded-lg border border-[#E4E4E7] bg-white px-3 text-sm text-[#09090B] outline-none placeholder:text-[#A1A1AA] focus:border-[#18181B] aria-invalid:border-rose-500 disabled:bg-[#F4F4F5] disabled:text-[#71717A]";
 
 interface CollectionEditorProps {
   collection: AdminCollectionDetail;
@@ -114,7 +114,8 @@ function Section({
   aside?: ReactNode;
 }) {
   return (
-    <section className={cn(ADMIN_CARD_CLASS, "p-4 sm:p-5")}>
+    // @container: phần đầu thẻ co giãn theo độ rộng thẻ (cột chính hẹp lại ở iPad / khi mở panel bên phải)
+    <section className={cn(ADMIN_CARD_CLASS, "@container p-4 sm:p-5")}>
       <header className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-[12rem] flex-1">
           <h2 className="text-lg font-semibold text-[#09090B]">{title}</h2>
@@ -124,32 +125,6 @@ function Section({
       </header>
       {children}
     </section>
-  );
-}
-
-function Field({
-  label,
-  error,
-  hint,
-  children,
-  className,
-}: {
-  label: string;
-  error?: string;
-  hint?: ReactNode;
-  children: ReactNode;
-  className?: string;
-}) {
-  return (
-    <label className={cn("block min-w-0 space-y-1.5", className)}>
-      {/* Hướng dẫn không chiếm dòng dưới ô nữa: gom vào icon ⓘ cạnh nhãn */}
-      <span className="flex items-center gap-1.5 text-sm font-medium text-[#3F3F46]">
-        {label}
-        {hint && <AdminInfoTip content={hint} />}
-      </span>
-      {children}
-      {error && <span className="block text-xs text-rose-700">{error}</span>}
-    </label>
   );
 }
 
@@ -261,6 +236,14 @@ export function CollectionEditor({ collection: initial, products, homepageUsedBy
 
   const homepageFull = !saved.showOnHomepage && homepageUsedByOthers >= HOMEPAGE_COLLECTION_LIMIT;
 
+  // Nhãn "đang nằm trên trang chủ" — hiện ở cột phải (PC) và trong popover Tiến trình (iPad / điện thoại)
+  const homepageBadge =
+    saved.showOnHomepage && saved.status !== "ARCHIVED" ? (
+      <p className="flex items-center gap-1.5 px-1 text-xs text-[#71717A]">
+        <Star size={13} className="fill-[#18181B] text-[#18181B]" aria-hidden /> {t("homepageBadge")}
+      </p>
+    ) : null;
+
   // SEO nằm trong dialog nên lỗi ở đó không nhìn thấy trên form — bấm lưu mà lỗi ở SEO thì mở dialog ra
   const seoError = Boolean(
     errors.slug || errors.seoTitle || errors.seoTitleEn || errors.seoDescription || errors.seoDescriptionEn
@@ -323,7 +306,12 @@ export function CollectionEditor({ collection: initial, products, homepageUsedBy
         }
         actions={
           <>
-            <button type="button" onClick={() => setIsPreviewing(true)} className={ADMIN_SECONDARY_BUTTON_CLASS}>
+            {/* Không xem trước trên điện thoại: màn quá hẹp để mô phỏng trang khách (chỉ iPad / PC) */}
+            <button
+              type="button"
+              onClick={() => setIsPreviewing(true)}
+              className={cn(ADMIN_SECONDARY_BUTTON_CLASS, "max-sm:hidden")}
+            >
               <Eye size={15} aria-hidden /> {t("editor.preview")}
             </button>
             <button type="submit" disabled={!isDirty || isSaving} className={ADMIN_PRIMARY_BUTTON_CLASS}>
@@ -333,26 +321,16 @@ export function CollectionEditor({ collection: initial, products, homepageUsedBy
         }
       />
 
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_320px]">
         <div className="min-w-0 space-y-5">
           <Section
             title={t("editor.sections.info")}
             description={t("editor.sections.infoHint")}
             aside={
-              <div className="flex flex-wrap items-center gap-2">
+              // Một hàng: thẻ hẹp → trải hết chiều rộng dưới tiêu đề (Tùy chọn trái, VI / EN phải); thẻ rộng → cạnh tiêu đề
+              <div className="flex w-full items-center justify-between gap-2 @lg:w-auto @lg:justify-end">
                 {/* Ngôn ngữ chỉ áp dụng cho thẻ này: hai ngôn ngữ dùng CHUNG một bộ trường (LANG_FIELDS) nên form luôn giống
                     hệt nhau; đổi ngôn ngữ thì gắn lại form theo tên trường của ngôn ngữ đó */}
-                <AdminLangSwitch
-                  value={contentLang}
-                  onChange={setContentLang}
-                  label={t("editor.langTabs.label")}
-                  hint={t("editor.sections.englishHint")}
-                  missingLabel={t("editor.langTabs.untranslated")}
-                  status={{
-                    vi: errors.name || errors.code ? "error" : undefined,
-                    en: values.nameEn ? undefined : "missing",
-                  }}
-                />
                 <CollectionAdvancedOptions
                   label={t("editor.advanced")}
                   activeCount={Number(values.showOnHomepage) + Number(values.showInLookbook)}
@@ -378,15 +356,16 @@ export function CollectionEditor({ collection: initial, products, homepageUsedBy
                     )}
                   />
                   {values.showOnHomepage && (
-                    <Field label={t("field.homepageOrder")} hint={t("field.homepageOrderHint")}>
-                      <input
-                        type="number"
-                        min={0}
-                        max={99}
-                        {...form.register("homepageOrder", { valueAsNumber: true })}
-                        className={cn(INPUT_CLASS, "h-9 w-24")}
-                      />
-                    </Field>
+                    <AdminTextField
+                      type="number"
+                      label={t("field.homepageOrder")}
+                      hint={t("field.homepageOrderHint")}
+                      size="sm"
+                      min={0}
+                      max={99}
+                      {...form.register("homepageOrder", { valueAsNumber: true })}
+                      fieldClassName="w-24"
+                    />
                   )}
                   <Controller
                     control={form.control}
@@ -414,70 +393,68 @@ export function CollectionEditor({ collection: initial, products, homepageUsedBy
                     onClick={() => setIsSeoOpen(true)}
                   />
                 </CollectionAdvancedOptions>
+                <AdminLangSwitch
+                  value={contentLang}
+                  onChange={setContentLang}
+                  label={t("editor.langTabs.label")}
+                  hint={t("editor.sections.englishHint")}
+                  missingLabel={t("editor.langTabs.untranslated")}
+                  status={{
+                    vi: errors.name || errors.code ? "error" : undefined,
+                    en: values.nameEn ? undefined : "missing",
+                  }}
+                />
               </div>
             }
           >
             <div key={contentLang} role="tabpanel" className="grid gap-4 sm:grid-cols-2">
-              <Field
-                label={`${t("field.name")}${isEnglish ? "" : " *"}`}
-                error={isEnglish ? undefined : err(errors.name?.message)}
+              <AdminTextField
+                {...form.register(langFields.name)}
+                required={!isEnglish}
                 className="sm:col-span-2"
-              >
-                <input
-                  {...form.register(langFields.name)}
-                  aria-invalid={!isEnglish && Boolean(errors.name)}
-                  placeholder={t(`field.placeholders.${contentLang}.name`)}
-                  className={cn(INPUT_CLASS, "h-10")}
-                />
-              </Field>
-              <Field label={t("field.season")} hint={t("field.seasonHint")}>
-                <input
-                  {...form.register(langFields.season)}
-                  placeholder={t(`field.placeholders.${contentLang}.season`)}
-                  className={cn(INPUT_CLASS, "h-10")}
-                />
-              </Field>
-              <Field
+                label={t("field.name")}
+                error={isEnglish ? undefined : err(errors.name?.message)}
+                shakeKey={form.formState.submitCount}
+                placeholder={t(`field.placeholders.${contentLang}.name`)}
+              />
+              <AdminTextField
+                {...form.register(langFields.season)}
+                label={t("field.season")}
+                hint={t("field.seasonHint")}
+                placeholder={t(`field.placeholders.${contentLang}.season`)}
+              />
+              <AdminTextField
+                {...form.register("code")}
+                disabled={locked}
                 label={t("field.code")}
-                error={err(errors.code?.message)}
                 hint={locked ? t("field.codeLocked") : t("field.codeHint")}
-              >
-                <div className="relative">
-                  <input
-                    {...form.register("code")}
-                    disabled={locked}
-                    placeholder={t("field.codePlaceholder")}
-                    aria-invalid={Boolean(errors.code)}
-                    className={cn(INPUT_CLASS, "h-10 pr-8 font-mono uppercase tracking-wider")}
-                  />
-                  {locked && (
-                    <Lock size={13} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#A1A1AA]" aria-hidden />
-                  )}
-                </div>
-              </Field>
-              <Field label={t("field.tagline")} className="sm:col-span-2">
-                <input
-                  {...form.register(langFields.tagline)}
-                  placeholder={t(`field.placeholders.${contentLang}.tagline`)}
-                  className={cn(INPUT_CLASS, "h-10")}
-                />
-              </Field>
-              <Field label={t("field.description")} className="sm:col-span-2">
-                <textarea
-                  {...form.register(langFields.description)}
-                  rows={3}
-                  placeholder={t(`field.placeholders.${contentLang}.description`)}
-                  className={cn(INPUT_CLASS, "py-2")}
-                />
-              </Field>
-              <Field label={t("editor.sections.story")} hint={t("editor.sections.storyHint")} className="sm:col-span-2">
-                <textarea
-                  {...form.register(langFields.story)}
-                  rows={5}
-                  placeholder={t(`field.placeholders.${contentLang}.story`)}
-                  className={cn(INPUT_CLASS, "py-2 leading-relaxed")}
-                />
-              </Field>
+                error={err(errors.code?.message)}
+                shakeKey={form.formState.submitCount}
+                placeholder={t("field.codePlaceholder")}
+                inputClassName="font-mono uppercase tracking-wider"
+                suffix={locked ? <Lock size={13} className="text-[#A1A1AA]" aria-hidden /> : undefined}
+              />
+              <AdminTextField
+                {...form.register(langFields.tagline)}
+                className="sm:col-span-2"
+                label={t("field.tagline")}
+                placeholder={t(`field.placeholders.${contentLang}.tagline`)}
+              />
+              <AdminTextArea
+                {...form.register(langFields.description)}
+                className="sm:col-span-2"
+                label={t("field.description")}
+                rows={3}
+                placeholder={t(`field.placeholders.${contentLang}.description`)}
+              />
+              <AdminTextArea
+                {...form.register(langFields.story)}
+                className="sm:col-span-2"
+                label={t("editor.sections.story")}
+                hint={t("editor.sections.storyHint")}
+                rows={5}
+                placeholder={t(`field.placeholders.${contentLang}.story`)}
+              />
               <div className="sm:col-span-2">
                 <span className="mb-1.5 block text-sm font-medium text-[#3F3F46]">{t("field.accent")}</span>
                 <Controller
@@ -525,49 +502,99 @@ export function CollectionEditor({ collection: initial, products, homepageUsedBy
                 />
               </div>
             </div>
+            <div className="@container mt-5 border-t border-dashed border-[#E4E4E7] pt-4">
+              <h3 className="mb-3 text-body font-semibold text-[#09090B]">{t("editor.sections.schedule")}</h3>
+              <div className="grid gap-4 @md:grid-cols-2">
+                <AdminField label={t("field.launchAt")} hint={t("field.scheduleHint")}>
+                  <Controller
+                    control={form.control}
+                    name="launchAt"
+                    render={({ field }) => (
+                      <AdminDatePicker value={field.value ?? ""} onChange={field.onChange} onBlur={field.onBlur} />
+                    )}
+                  />
+                </AdminField>
+                <AdminField label={t("field.endAt")} error={err(errors.endAt?.message)}>
+                  <Controller
+                    control={form.control}
+                    name="endAt"
+                    render={({ field }) => (
+                      <AdminDatePicker
+                        value={field.value ?? ""}
+                        onChange={field.onChange}
+                        onBlur={field.onBlur}
+                        // Hết mùa không thể trước ngày mở bán
+                        min={values.launchAt || undefined}
+                        invalid={Boolean(errors.endAt)}
+                      />
+                    )}
+                  />
+                </AdminField>
+              </div>
+            </div>
           </Section>
 
           <Section title={t("editor.sections.media")} description={t("editor.sections.mediaHint")}>
-            <div className="grid gap-4 sm:grid-cols-[repeat(2,minmax(0,140px))_minmax(0,1fr)_minmax(0,110px)]">
-              {(
-                [
-                  { name: "coverImage", device: "desktop", label: t("media.cover"), aspect: "aspect-[3/4]" },
-                  {
-                    name: "coverImageMobile",
-                    device: "mobile",
-                    label: t("media.coverMobile"),
-                    aspect: "aspect-[3/4]",
-                    fallbackOf: "coverImage",
-                  },
-                  { name: "bannerImage", device: "desktop", label: t("media.banner"), aspect: "aspect-[16/7]" },
-                  {
-                    name: "bannerImageMobile",
-                    device: "mobile",
-                    label: t("media.bannerMobile"),
-                    aspect: "aspect-[4/5]",
-                    fallbackOf: "bannerImage",
-                  },
-                ] as const
-              ).map((slot) => (
-                <Controller
-                  key={slot.name}
-                  control={form.control}
-                  name={slot.name}
-                  render={({ field }) => (
-                    <ImageSlot
-                      label={slot.label}
-                      device={slot.device}
-                      value={field.value}
-                      onChange={field.onChange}
-                      aspectClass={slot.aspect}
-                      fallback={"fallbackOf" in slot ? values[slot.fallbackOf] : undefined}
+            {/*
+              Bố cục theo độ rộng THẺ (container query), không theo màn hình: cột chính hẹp lại khi mở panel bên phải.
+              Hẹp: ảnh bìa và banner xếp chồng; rộng (@2xl): hai nhóm nằm cạnh nhau.
+            */}
+            <div className="@container">
+              <div className="grid gap-6 @2xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+                <MediaGroup title={t("media.cover")} ratio="3:4">
+                  <div className="grid max-w-80 grid-cols-2 gap-3">
+                    <Controller
+                      control={form.control}
+                      name="coverImage"
+                      render={({ field }) => (
+                        <ImageSlot device="desktop" value={field.value} onChange={field.onChange} aspectClass="aspect-[3/4]" />
+                      )}
                     />
-                  )}
-                />
-              ))}
+                    <Controller
+                      control={form.control}
+                      name="coverImageMobile"
+                      render={({ field }) => (
+                        <ImageSlot
+                          device="mobile"
+                          value={field.value}
+                          onChange={field.onChange}
+                          aspectClass="aspect-[3/4]"
+                          fallback={values.coverImage}
+                        />
+                      )}
+                    />
+                  </div>
+                </MediaGroup>
+
+                <MediaGroup title={t("media.banner")} ratio="16:7 · 4:5">
+                  {/* Bản điện thoại 4:5 chiếm ~30% để cao gần bằng bản máy tính 16:7 */}
+                  <div className="grid grid-cols-[minmax(0,1fr)_minmax(5.75rem,30%)] items-start gap-3">
+                    <Controller
+                      control={form.control}
+                      name="bannerImage"
+                      render={({ field }) => (
+                        <ImageSlot device="desktop" value={field.value} onChange={field.onChange} aspectClass="aspect-[16/7]" />
+                      )}
+                    />
+                    <Controller
+                      control={form.control}
+                      name="bannerImageMobile"
+                      render={({ field }) => (
+                        <ImageSlot
+                          device="mobile"
+                          value={field.value}
+                          onChange={field.onChange}
+                          aspectClass="aspect-[4/5]"
+                          fallback={values.bannerImage}
+                        />
+                      )}
+                    />
+                  </div>
+                </MediaGroup>
+              </div>
             </div>
-            <div className="mt-5">
-              <span className="mb-1.5 block text-sm font-medium text-[#3F3F46]">{t("media.lookbook")}</span>
+
+            <div className="mt-5 border-t border-dashed border-[#E4E4E7] pt-4">
               <Controller
                 control={form.control}
                 name="gallery"
@@ -615,49 +642,35 @@ export function CollectionEditor({ collection: initial, products, homepageUsedBy
           </Section>
         </div>
 
-        <aside className="space-y-5 lg:sticky lg:top-[8rem] lg:self-start">
+        <aside className="hidden space-y-5 xl:sticky xl:top-[8rem] xl:block xl:self-start">
           <Section title={t("editor.sections.lifecycle")} aside={<CollectionNoticeHint notices={warnings} />}>
             <CollectionLifecyclePanel collection={saved} isDirty={isDirty} onChangeStatus={setStatusTarget} />
           </Section>
-
-          <Section title={t("editor.sections.schedule")}>
-            {/* Một cột: cột phải hẹp, hai ô cạnh nhau sẽ cắt chữ ngày */}
-            <div className="grid gap-3">
-              <Field label={t("field.launchAt")} hint={t("field.scheduleHint")}>
-                <Controller
-                  control={form.control}
-                  name="launchAt"
-                  render={({ field }) => (
-                    <AdminDatePicker value={field.value ?? ""} onChange={field.onChange} onBlur={field.onBlur} />
-                  )}
-                />
-              </Field>
-              <Field label={t("field.endAt")} error={err(errors.endAt?.message)}>
-                <Controller
-                  control={form.control}
-                  name="endAt"
-                  render={({ field }) => (
-                    <AdminDatePicker
-                      value={field.value ?? ""}
-                      onChange={field.onChange}
-                      onBlur={field.onBlur}
-                      // Hết mùa không thể trước ngày mở bán
-                      min={values.launchAt || undefined}
-                      invalid={Boolean(errors.endAt)}
-                    />
-                  )}
-                />
-              </Field>
-            </div>
-          </Section>
-
-          {saved.showOnHomepage && saved.status !== "ARCHIVED" && (
-            <p className="flex items-center gap-1.5 px-1 text-xs text-[#71717A]">
-              <Star size={13} className="fill-[#18181B] text-[#18181B]" aria-hidden /> {t("homepageBadge")}
-            </p>
-          )}
+          {homepageBadge}
         </aside>
       </div>
+
+      {/* iPad / điện thoại: thẻ Tiến trình chuyển vào nút nổi cạnh nút trợ lý AI */}
+      <CollectionProgressDock
+        status={saved.status}
+        tone={warnings.some((w) => w.tone === "warn") ? "warn" : warnings.length > 0 ? "info" : "ok"}
+        title={t("editor.sections.lifecycle")}
+        aside={<CollectionNoticeHint notices={warnings} />}
+      >
+        {(close) => (
+          <div className="space-y-4">
+            <CollectionLifecyclePanel
+              collection={saved}
+              isDirty={isDirty}
+              onChangeStatus={(target) => {
+                close();
+                setStatusTarget(target);
+              }}
+            />
+            {homepageBadge}
+          </div>
+        )}
+      </CollectionProgressDock>
 
       {isPreviewing && (
         <CollectionPreviewDialog

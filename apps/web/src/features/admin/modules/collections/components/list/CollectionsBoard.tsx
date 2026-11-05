@@ -114,7 +114,8 @@ export function CollectionsBoard({ initialCollections }: { initialCollections: A
           {t("noResults")}
         </p>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+        // Tự chia cột theo chỗ trống: mỗi cột rộng tối thiểu max(10rem, 1/5 khung) → không bao giờ quá 5 thẻ / hàng
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(max(10rem,calc((100%-3rem)/5)),1fr))] gap-3">
           {visible.map((collection) => (
             <CollectionCard key={collection.id} collection={collection} {...menuHandlers} />
           ))}

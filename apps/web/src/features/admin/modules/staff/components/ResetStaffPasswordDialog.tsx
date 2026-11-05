@@ -8,6 +8,7 @@ import {
   ADMIN_DIALOG_PRIMARY_BUTTON_CLASS,
   ADMIN_DIALOG_SECONDARY_BUTTON_CLASS,
   AdminDialog,
+  AdminTextField,
 } from "@/features/admin/core/ui";
 import { resetStaffPasswordAction } from "../actions/staff.actions";
 import { type StaffMemberItem } from "../types/staff.types";
@@ -17,9 +18,6 @@ interface ResetStaffPasswordDialogProps {
   staff: StaffMemberItem | null;
   onClose: () => void;
 }
-
-const INPUT_CLASS =
-  "h-9 w-full rounded-lg border border-[#E4E4E7] bg-white px-3 text-xs text-[#09090B] placeholder:text-zinc-400 transition-all focus:border-[#09090B] focus:outline-none focus:ring-2 focus:ring-zinc-900/10";
 
 /**
  * Super Admin đặt mật khẩu mới cho nhân viên — mọi phiên của nhân viên bị đăng xuất
@@ -72,19 +70,15 @@ export function ResetStaffPasswordDialog({ staff, onClose }: ResetStaffPasswordD
         </>
       }
     >
-      <label className="block space-y-1">
-        <span className="text-sm font-medium text-[#3F3F46]">
-          {t("form.password")} <span className="text-rose-500">*</span>
-        </span>
-        <input
-          type="password"
-          value={newPassword}
-          required
-          autoComplete="new-password"
-          onChange={(e) => setNewPassword(e.target.value)}
-          className={INPUT_CLASS}
-        />
-      </label>
+      <AdminTextField
+        type="password"
+        label={t("form.password")}
+        value={newPassword}
+        required
+        passwordToggle
+        autoComplete="new-password"
+        onValueChange={setNewPassword}
+      />
     </AdminDialog>
   );
 }

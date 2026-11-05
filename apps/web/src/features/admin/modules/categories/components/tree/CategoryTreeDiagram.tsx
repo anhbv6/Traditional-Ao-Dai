@@ -1,5 +1,6 @@
 "use client";
 
+import { useSyncExternalStore } from "react";
 import { AnimatePresence, MotionConfig, motion } from "motion/react";
 import { EyeOff, Store } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -18,10 +19,20 @@ interface CategoryTreeDiagramProps {
 }
 
 // Chiều cao cố định của từng nút để dây nối rẽ đúng vào giữa nút (px)
-const ROOT_NODE_H = 48;
-const CHILD_NODE_H = 40;
-const ITEM_GAP = 10;
+const ROOT_NODE_H = 56;
+const CHILD_NODE_H = 48;
+const ITEM_GAP = 12;
 const BRANCH_W = 20;
+
+/* Điện thoại không có danh sách bên trái → nút sơ đồ là lối vào màn chi tiết; iPad / PC chỉ minh họa */
+const MOBILE_QUERY = "(max-width: 767px)";
+function subscribeMobile(onChange: () => void) {
+  const media = window.matchMedia(MOBILE_QUERY);
+  media.addEventListener("change", onChange);
+  return () => media.removeEventListener("change", onChange);
+}
+const getMobile = () => window.matchMedia(MOBILE_QUERY).matches;
+const getMobileOnServer = () => false;
 
 const totalProducts = (node: AdminCategoryNode) =>
   node.productCount + node.children.reduce((sum, child) => sum + child.productCount, 0);
@@ -76,6 +87,7 @@ function Branch({
  */
 export function CategoryTreeDiagram({ tree, isExpanded, activeId, onActivate }: CategoryTreeDiagramProps) {
   const t = useTranslations("AdminPage.categories");
+  const isMobile = useSyncExternalStore(subscribeMobile, getMobile, getMobileOnServer);
   const maxProducts = Math.max(
     1,
     ...tree.flatMap((root) => [totalProducts(root), ...root.children.map(totalProducts)])
@@ -94,35 +106,34 @@ export function CategoryTreeDiagram({ tree, isExpanded, activeId, onActivate }: 
     const color = PRODUCT_GROUP_COLORS[item.group];
     const products = totalProducts(item);
     const active = activeId === item.id;
-    return (
-      <Link
-        href={`/admin/catalog/categories/${item.id}`}
-        onMouseEnter={() => onActivate(item.id)}
-        onMouseLeave={() => onActivate(null)}
-        onFocus={() => onActivate(item.id)}
-        onBlur={() => onActivate(null)}
-        style={{ height: isRoot ? ROOT_NODE_H : CHILD_NODE_H }}
-        className={cn(
-          "flex min-w-0 items-center gap-2.5 rounded-xl border bg-white px-2.5 outline-none transition-[opacity,box-shadow,border-color] duration-200",
-          item.isActive ? "border-[#E4E4E7]" : "border-dashed border-[#D4D4D8]",
-          active ? "border-[#18181B] shadow-[0_6px_16px_-10px_rgba(9,9,11,0.45)]" : "hover:border-[#A1A1AA]",
-          dimmed(item.id) && "opacity-40"
-        )}
-      >
+    const nodeProps = {
+      onMouseEnter: () => onActivate(item.id),
+      onMouseLeave: () => onActivate(null),
+      style: { height: isRoot ? ROOT_NODE_H : CHILD_NODE_H },
+      className: cn(
+        "flex min-w-0 select-none items-center gap-3 rounded-xl border bg-white px-3 outline-none transition-[opacity,box-shadow,border-color] duration-200",
+        isMobile ? "cursor-pointer focus-visible:border-[#18181B]" : "cursor-default",
+        item.isActive ? "border-[#E4E4E7]" : "border-dashed border-[#D4D4D8]",
+        active ? "border-[#18181B] shadow-[0_6px_16px_-10px_rgba(9,9,11,0.45)]" : "hover:border-[#A1A1AA]",
+        dimmed(item.id) && "opacity-40"
+      ),
+    };
+    const content = (
+      <>
         <span
           aria-hidden
           className={cn(
             "grid shrink-0 place-items-center rounded-lg",
-            isRoot ? cn("size-8", color.tile) : cn("size-6", color.chip),
+            isRoot ? cn("size-9", color.tile) : cn("size-7", color.chip),
             !item.isActive && "grayscale"
           )}
         >
-          <Icon size={isRoot ? 15 : 13} />
+          <Icon size={isRoot ? 16 : 14} />
         </span>
         <span className="min-w-0 flex-1">
           <span
             className={cn(
-              "flex items-center gap-1 truncate text-sm",
+              "flex items-center gap-1 truncate text-sm leading-tight",
               isRoot ? "font-semibold" : "font-medium",
               item.isActive ? "text-[#09090B]" : "text-[#A1A1AA]"
             )}
@@ -131,7 +142,7 @@ export function CategoryTreeDiagram({ tree, isExpanded, activeId, onActivate }: 
             {!item.isActive && <EyeOff size={12} className="shrink-0" aria-label={t("diagram.hidden")} />}
           </span>
           {/* Vạch số sản phẩm: dài theo tỉ lệ với loại nhiều sản phẩm nhất */}
-          <span className="mt-1 flex items-center gap-1.5">
+          <span className="mt-2 flex items-center gap-2">
             <span className="h-1 flex-1 overflow-hidden rounded-full bg-[#F4F4F5]">
               <motion.span
                 className={cn("block h-full rounded-full", item.isActive ? color.line : "bg-[#D4D4D8]")}
@@ -140,10 +151,18 @@ export function CategoryTreeDiagram({ tree, isExpanded, activeId, onActivate }: 
                 transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
               />
             </span>
-            <span className="font-mono text-2xs tabular-nums text-[#71717A]">{products}</span>
+            <span className="min-w-4 text-right font-mono text-2xs tabular-nums text-[#71717A]">{products}</span>
           </span>
         </span>
+      </>
+    );
+    // iPad / PC: chỉ minh họa — trỏ chuột làm sáng đường đi, không chuyển màn (thao tác ở danh sách bên trái)
+    return isMobile ? (
+      <Link href={`/admin/catalog/categories/${item.id}`} {...nodeProps}>
+        {content}
       </Link>
+    ) : (
+      <div {...nodeProps}>{content}</div>
     );
   };
 
@@ -151,7 +170,7 @@ export function CategoryTreeDiagram({ tree, isExpanded, activeId, onActivate }: 
     <section className={cn(ADMIN_CARD_CLASS, "p-4 sm:p-5")}>
       <header>
         <h2 className="text-lg font-semibold text-[#09090B]">{t("diagram.title")}</h2>
-        <p className="mt-0.5 text-xs text-[#71717A]">{t("diagram.description")}</p>
+        {/* <p className="mt-0.5 text-xs text-[#71717A]">{t("diagram.description")}</p> */}
         <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[#71717A]">
           <span className="inline-flex items-center gap-1.5">
             <span aria-hidden className="h-3.5 w-5 rounded border border-dashed border-[#A1A1AA]" />
@@ -218,7 +237,7 @@ export function CategoryTreeDiagram({ tree, isExpanded, activeId, onActivate }: 
                           animate={{ height: "auto", opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
                           transition={{ duration: 0.25, ease: "easeOut" }}
-                          className="ml-[26px] overflow-hidden"
+                          className="ml-[30px] overflow-hidden"
                         >
                           {root.children.map((child, childIndex) => (
                             <motion.li
@@ -240,7 +259,7 @@ export function CategoryTreeDiagram({ tree, isExpanded, activeId, onActivate }: 
                       )}
                     </AnimatePresence>
                     {!expanded && root.children.length > 0 && (
-                      <p className="ml-[52px] mt-1.5 text-2xs text-[#A1A1AA]">
+                      <p className="ml-[56px] mt-2 text-2xs text-[#A1A1AA]">
                         {t("diagram.collapsed", { count: root.children.length })}
                       </p>
                     )}

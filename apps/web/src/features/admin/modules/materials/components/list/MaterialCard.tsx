@@ -4,7 +4,7 @@ import { MapPin } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
-import { ADMIN_CARD_CLASS } from "@/features/admin/core/ui";
+import { ADMIN_CARD_CLASS, AdminTooltip } from "@/features/admin/core/ui";
 import { type AdminMaterialListItem } from "../../types/materials.types";
 import { SEASONS, SEASON_ICONS } from "../../utils/materialMeta";
 import { CompositionBar } from "../shared/CompositionBar";
@@ -53,16 +53,18 @@ export function MaterialCard({ material }: { material: AdminMaterialListItem }) 
               const Icon = SEASON_ICONS[season];
               const on = material.seasons.includes(season);
               return (
-                <span
-                  key={season}
-                  title={t(`season.${season}`)}
-                  className={cn(
-                    "grid size-6 place-items-center rounded-md",
-                    on ? "bg-[#18181B] text-white" : "bg-[#F4F4F5] text-[#D4D4D8]"
-                  )}
-                >
-                  <Icon size={12} aria-hidden />
-                </span>
+                <AdminTooltip key={season} content={t(`season.${season}`)}>
+                  <span
+                    role="img"
+                    aria-label={t(`season.${season}`)}
+                    className={cn(
+                      "grid size-6 place-items-center rounded-md",
+                      on ? "bg-[#18181B] text-white" : "bg-[#F4F4F5] text-[#D4D4D8]"
+                    )}
+                  >
+                    <Icon size={12} aria-hidden />
+                  </span>
+                </AdminTooltip>
               );
             })}
           </div>

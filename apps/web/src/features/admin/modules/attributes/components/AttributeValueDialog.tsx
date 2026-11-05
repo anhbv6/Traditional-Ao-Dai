@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import { Pencil, Plus } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useNotify } from "@/hooks/useNotify";
@@ -11,6 +11,8 @@ import {
   AdminDialog,
   AdminInfoTip,
   AdminLangSwitch,
+  AdminTextArea,
+  AdminTextField,
   type AdminContentLang,
 } from "@/features/admin/core/ui";
 import { toSlug } from "@/features/admin/modules/products";
@@ -25,25 +27,11 @@ import {
   type ColorFamily,
 } from "../utils/attributeMeta";
 
-const INPUT_CLASS =
-  "h-10 w-full rounded-lg border border-[#E4E4E7] bg-white px-3 text-sm text-[#09090B] outline-none placeholder:text-[#A1A1AA] focus:border-[#18181B]";
 type Lang = AdminContentLang;
 const LANG_FIELDS = {
   vi: { name: "name", description: "description" },
   en: { name: "nameEn", description: "descriptionEn" },
 } as const satisfies Record<Lang, Record<string, keyof AttributeFormValues>>;
-
-function Field({ label, hint, children }: { label: string; hint?: string; children: ReactNode }) {
-  return (
-    <label className="block min-w-0 space-y-1.5">
-      <span className="flex items-center gap-1.5 text-sm font-medium text-[#3F3F46]">
-        {label}
-        {hint && <AdminInfoTip content={hint} />}
-      </span>
-      {children}
-    </label>
-  );
-}
 
 function initialValues(group: AttributeGroup, value: AdminAttributeValue | null): AttributeFormValues {
   return {
@@ -152,56 +140,53 @@ export function AttributeValueDialog({
       }
     >
       <div key={lang} role="tabpanel" className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_160px]">
-        <Field label={`${t("field.name")}${lang === "vi" ? " *" : ""}`}>
-          <input
-            autoFocus
-            value={values[fields.name]}
-            onChange={(e) => set(fields.name, e.target.value)}
-            placeholder={t(`placeholders.${lang}.name`, { group: groupLabel.toLowerCase() })}
-            className={INPUT_CLASS}
-          />
-        </Field>
-        <Field label={t("field.code")} hint={t("hints.code")}>
-          <input
-            value={effectiveCode}
-            onChange={(e) => {
-              setCodeTouched(true);
-              set("code", e.target.value.toUpperCase().replace(/[^A-Z0-9_-]/g, ""));
-            }}
-            placeholder={t("placeholders.code")}
-            className={cn(INPUT_CLASS, "font-mono")}
-          />
-        </Field>
-      </div>
-      <Field label={t("field.description")}>
-        <textarea
-          value={values[fields.description]}
-          onChange={(e) => set(fields.description, e.target.value)}
-          rows={2}
-          placeholder={t(`placeholders.${lang}.description`)}
-          className={cn(INPUT_CLASS, "h-auto resize-y py-2")}
+        <AdminTextField
+          autoFocus
+          required={lang === "vi"}
+          label={t("field.name")}
+          value={values[fields.name]}
+          onValueChange={(value) => set(fields.name, value)}
+          placeholder={t(`placeholders.${lang}.name`, { group: groupLabel.toLowerCase() })}
         />
-      </Field>
+        <AdminTextField
+          label={t("field.code")}
+          hint={t("hints.code")}
+          value={effectiveCode}
+          onValueChange={(value) => {
+            setCodeTouched(true);
+            set("code", value.toUpperCase().replace(/[^A-Z0-9_-]/g, ""));
+          }}
+          placeholder={t("placeholders.code")}
+          inputClassName="font-mono"
+        />
+      </div>
+      <AdminTextArea
+        label={t("field.description")}
+        value={values[fields.description]}
+        onValueChange={(value) => set(fields.description, value)}
+        rows={2}
+        placeholder={t(`placeholders.${lang}.description`)}
+      />
 
       {isColor && (
         <div className="space-y-4 border-t border-dashed border-[#E4E4E7] pt-4">
-          <Field label={t("field.hex")}>
-            <div className="flex items-center gap-3">
+          <AdminTextField
+            label={t("field.hex")}
+            value={values.hex}
+            onValueChange={(value) => set("hex", value.toUpperCase().slice(0, 7))}
+            placeholder="#8B1E3F"
+            inputClassName="font-mono uppercase"
+            prefix={
+              /* Ô chọn màu nằm trong slot đầu — gõ mã hex hoặc chọn bằng bảng màu đều được */
               <input
                 type="color"
                 value={/^#[0-9A-F]{6}$/i.test(values.hex) ? values.hex : "#000000"}
                 onChange={(e) => set("hex", e.target.value.toUpperCase())}
                 aria-label={t("field.hex")}
-                className="h-10 w-14 shrink-0 cursor-pointer rounded-lg border border-[#E4E4E7] bg-white p-1"
+                className="size-6 cursor-pointer rounded-md border-0 bg-transparent p-0"
               />
-              <input
-                value={values.hex}
-                onChange={(e) => set("hex", e.target.value.toUpperCase().slice(0, 7))}
-                placeholder="#8B1E3F"
-                className={cn(INPUT_CLASS, "font-mono uppercase")}
-              />
-            </div>
-          </Field>
+            }
+          />
           <fieldset className="space-y-1.5">
             <legend className="flex items-center gap-1.5 text-sm font-medium text-[#3F3F46]">
               {t("field.family")}

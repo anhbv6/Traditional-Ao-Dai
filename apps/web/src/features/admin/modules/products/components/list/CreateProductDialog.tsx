@@ -10,15 +10,15 @@ import {
   ADMIN_DIALOG_PRIMARY_BUTTON_CLASS,
   ADMIN_DIALOG_SECONDARY_BUTTON_CLASS,
   AdminDialog,
+  AdminField,
   AdminFilterSelect,
+  AdminTextField,
+  AdminTooltip,
 } from "@/features/admin/core/ui";
 import { PRODUCT_GROUP_COLORS, PRODUCT_GROUP_ICONS } from "@/features/admin/modules/categories";
 import { createProductAction } from "../../actions/products.actions";
 import { type AdminProductCategory } from "../../types/products.types";
 import { SALE_MODES, SALE_MODE_ICONS, allowedSaleModes, type SaleMode } from "../../utils/saleModes";
-
-const INPUT_CLASS =
-  "h-10 w-full rounded-lg border border-[#E4E4E7] bg-white px-3 text-sm text-[#09090B] outline-none placeholder:text-[#A1A1AA] focus:border-[#18181B]";
 
 /**
  * Tạo nhanh sản phẩm: tên → loại sản phẩm → hình thức bán (chỉ những hình thức nhóm hàng của loại cho phép),
@@ -88,19 +88,16 @@ export function CreateProductDialog({
         </>
       }
     >
-      <label className="block space-y-1.5">
-        <span className="text-sm font-medium text-[#3F3F46]">{t("field.name")} *</span>
-        <input
-          autoFocus
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder={t("placeholders.vi.name")}
-          className={INPUT_CLASS}
-        />
-      </label>
+      <AdminTextField
+        autoFocus
+        required
+        label={t("field.name")}
+        value={name}
+        onValueChange={setName}
+        placeholder={t("placeholders.vi.name")}
+      />
 
-      <div className="space-y-1.5">
-        <span className="text-sm font-medium text-[#3F3F46]">{t("field.category")} *</span>
+      <AdminField required label={t("field.category")}>
         <AdminFilterSelect
           label={t("field.categoryShort")}
           value={categoryId}
@@ -121,7 +118,7 @@ export function CreateProductDialog({
             {t("create.inheritHint")}
           </p>
         )}
-      </div>
+      </AdminField>
 
       <fieldset className="space-y-1.5">
         <legend className="text-sm font-medium text-[#3F3F46]">{t("field.saleMode")}</legend>
@@ -131,26 +128,28 @@ export function CreateProductDialog({
             const enabled = allowed.includes(value);
             const selected = saleMode === value;
             return (
-              <button
-                key={value}
-                type="button"
-                disabled={!enabled}
-                aria-pressed={selected}
-                onClick={() => setMode(value)}
-                title={enabled ? undefined : t("mode.notAllowed")}
-                className={cn(
-                  "flex cursor-pointer flex-col items-start gap-1 rounded-lg border px-3 py-2.5 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-40",
-                  selected
-                    ? "border-[#18181B] bg-[#18181B] text-white"
-                    : "border-[#E4E4E7] text-[#3F3F46] hover:border-[#A1A1AA]"
-                )}
-              >
-                <Icon size={16} aria-hidden />
-                <span className="text-sm font-semibold">{t(`mode.${value}.label`)}</span>
-                <span className={cn("text-2xs leading-4", selected ? "text-white/70" : "text-[#71717A]")}>
-                  {t(`mode.${value}.short`)}
+              <AdminTooltip key={value} content={enabled ? null : t("mode.notAllowed")}>
+                <span className="grid" tabIndex={enabled ? undefined : 0}>
+                  <button
+                    type="button"
+                    disabled={!enabled}
+                    aria-pressed={selected}
+                    onClick={() => setMode(value)}
+                    className={cn(
+                      "flex w-full cursor-pointer flex-col items-start gap-1 rounded-lg border px-3 py-2.5 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-40",
+                      selected
+                        ? "border-[#18181B] bg-[#18181B] text-white"
+                        : "border-[#E4E4E7] text-[#3F3F46] hover:border-[#A1A1AA]"
+                    )}
+                  >
+                    <Icon size={16} aria-hidden />
+                    <span className="text-sm font-semibold">{t(`mode.${value}.label`)}</span>
+                    <span className={cn("text-2xs leading-4", selected ? "text-white/70" : "text-[#71717A]")}>
+                      {t(`mode.${value}.short`)}
+                    </span>
+                  </button>
                 </span>
-              </button>
+              </AdminTooltip>
             );
           })}
         </div>

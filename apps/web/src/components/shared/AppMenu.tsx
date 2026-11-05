@@ -95,7 +95,8 @@ const ADMIN_SURFACE_CLASS = cn(
   "[--bg-card:#FFFFFF] [--bg-secondary:#F4F4F5] [--border:#E4E4E7] [--text-main:#09090B] [--text-light:#71717A]",
   "[--primary-ink:#09090B] [--primary-color:#18181B] [--accent-color:#71717A]",
 );
-const ADMIN_ITEM_CLASS = "min-h-9 rounded-lg px-3";
+/* Khoảng hở 2px giữa các mục: nền "đang chọn" và nền hover / focus bàn phím của hai mục kề nhau không dính liền */
+const ADMIN_ITEM_CLASS = "min-h-9 rounded-lg px-3 not-first:mt-0.5";
 
 const ITEM_CLASS = cn(
   "group/item relative flex min-h-10 w-full cursor-pointer select-none items-center gap-3 px-4 py-2 text-left text-[13px] leading-snug outline-none",

@@ -5,7 +5,7 @@ import { ArrowDown, ArrowUp } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
-import { ADMIN_CARD_CLASS } from "@/features/admin/core/ui";
+import { ADMIN_CARD_CLASS, AdminTooltip } from "@/features/admin/core/ui";
 import { type AdminMaterialListItem } from "../../types/materials.types";
 import { MATERIAL_METRICS, SEASONS, SEASON_ICONS, type MaterialMetric } from "../../utils/materialMeta";
 import { MaterialSwatch } from "../shared/MaterialSwatch";
@@ -50,18 +50,21 @@ export function MaterialMatrix({ materials }: { materials: AdminMaterialListItem
                   className={cn("px-1.5 py-2.5", active && "bg-[#F4F4F5]")}
                   aria-sort={active ? (sort.dir === "desc" ? "descending" : "ascending") : "none"}
                 >
-                  <button
-                    type="button"
-                    onClick={() => toggleSort(key)}
-                    className={cn(
-                      "inline-flex cursor-pointer items-center gap-1 uppercase hover:text-[#09090B]",
-                      active && "text-[#09090B]"
-                    )}
-                  >
-                    {/* Tiêu đề ngắn cho vừa bảng; tên đầy đủ ở tooltip */}
-                    <span title={t(`metrics.${key}.label`)}>{t(`metrics.${key}.short`)}</span>
-                    {active && <Arrow size={12} aria-hidden />}
-                  </button>
+                  {/* Tiêu đề ngắn cho vừa bảng; tên đầy đủ ở tooltip */}
+                  <AdminTooltip content={t(`metrics.${key}.label`)}>
+                    <button
+                      type="button"
+                      aria-label={t(`metrics.${key}.label`)}
+                      onClick={() => toggleSort(key)}
+                      className={cn(
+                        "inline-flex cursor-pointer items-center gap-1 uppercase hover:text-[#09090B]",
+                        active && "text-[#09090B]"
+                      )}
+                    >
+                      <span aria-hidden>{t(`metrics.${key}.short`)}</span>
+                      {active && <Arrow size={12} aria-hidden />}
+                    </button>
+                  </AdminTooltip>
                 </th>
               );
             })}

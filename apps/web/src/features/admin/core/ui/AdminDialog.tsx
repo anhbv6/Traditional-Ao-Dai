@@ -46,7 +46,7 @@ export function AdminDialogFooter({ children, className }: { children: ReactNode
 interface AdminDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  icon: LucideIcon;
+  icon?: LucideIcon;
   title: ReactNode;
   description?: ReactNode;
   /** `danger`: thao tác xóa / không hoàn tác — icon đỏ hồng (nút chính dùng ADMIN_DIALOG_DANGER_BUTTON_CLASS) */
@@ -113,14 +113,14 @@ export function AdminDialog({
         )}
       >
         <header className="flex shrink-0 items-start gap-3 px-5 pb-4 pt-5">
-          <span
+          {Icon && <span
             className={cn(
               "grid size-10 shrink-0 place-items-center rounded-full border",
               tone === "danger" ? "border-rose-200 bg-rose-50 text-rose-600" : "border-[#E4E4E7] text-[#52525B]"
             )}
           >
             <Icon size={18} aria-hidden />
-          </span>
+          </span>}
           <div className="min-w-0 flex-1 pt-0.5">
             <DialogTitle className="text-lg font-semibold leading-tight text-[#09090B]">{title}</DialogTitle>
             {description && (

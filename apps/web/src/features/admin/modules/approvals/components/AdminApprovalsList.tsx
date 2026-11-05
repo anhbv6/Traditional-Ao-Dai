@@ -149,7 +149,7 @@ export function AdminApprovalsList({ view }: { view: ApprovalView }) {
                 options={VIEW_FILTERS[view].map((value) => ({ value, label: t(`filter.${value}`) }))}
               />
             )}
-            <AdminSecondaryButton onClick={fetchRequests} disabled={isLoading} title={t("refresh")}>
+            <AdminSecondaryButton onClick={fetchRequests} disabled={isLoading}>
               <RefreshCw size={14} className={isLoading ? "animate-spin" : ""} />
               <span>{t("refresh")}</span>
             </AdminSecondaryButton>

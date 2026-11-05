@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Lock, Sparkles, Trash2, Unlock } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-import { AdminInfoTip } from "@/features/admin/core/ui";
+import { AdminInfoTip, AdminTooltip } from "@/features/admin/core/ui";
 import { type AdminProductAttributeOption } from "../../types/products.types";
 import {
   CUSTOM_SIZE,
@@ -224,15 +224,16 @@ export function ProductSkuField({
                       </span>
                     </td>
                     <td className="px-2 py-2">
-                      <span
-                        className={cn(
-                          "font-mono text-xs font-semibold",
-                          sizeInvalid(row.size) ? "rounded bg-rose-50 px-1 text-rose-700" : "text-[#09090B]"
-                        )}
-                        title={sizeInvalid(row.size) ? t("sizeInvalid") : undefined}
-                      >
-                        {sizeLabel(row.size)}
-                      </span>
+                      <AdminTooltip content={sizeInvalid(row.size) ? t("sizeInvalid") : null}>
+                        <span
+                          className={cn(
+                            "font-mono text-xs font-semibold",
+                            sizeInvalid(row.size) ? "rounded bg-rose-50 px-1 text-rose-700" : "text-[#09090B]"
+                          )}
+                        >
+                          {sizeLabel(row.size)}
+                        </span>
+                      </AdminTooltip>
                     </td>
                     <td className="px-2 py-2">
                       {/* SKU đã lưu giữ nguyên (đã in tem / có đơn) — chỉ dòng mới mới sinh hoặc nhập mã */}
@@ -252,15 +253,16 @@ export function ProductSkuField({
                             className={cn(CELL_INPUT, "font-mono text-xs")}
                           />
                         )}
-                        <button
-                          type="button"
-                          onClick={() => update(row.key, { skuAuto: !row.skuAuto, sku: row.skuAuto ? row.sku || previewSku(row) : row.sku })}
-                          aria-label={row.skuAuto ? t("manual") : t("auto")}
-                          title={row.skuAuto ? t("manual") : t("auto")}
-                          className="grid size-7 shrink-0 cursor-pointer place-items-center rounded-md text-[#A1A1AA] hover:bg-[#F4F4F5] hover:text-[#09090B]"
-                        >
-                          {row.skuAuto ? <Lock size={13} /> : <Unlock size={13} />}
-                        </button>
+                        <AdminTooltip content={row.skuAuto ? t("manual") : t("auto")}>
+                          <button
+                            type="button"
+                            onClick={() => update(row.key, { skuAuto: !row.skuAuto, sku: row.skuAuto ? row.sku || previewSku(row) : row.sku })}
+                            aria-label={row.skuAuto ? t("manual") : t("auto")}
+                            className="grid size-7 shrink-0 cursor-pointer place-items-center rounded-md text-[#A1A1AA] hover:bg-[#F4F4F5] hover:text-[#09090B]"
+                          >
+                            {row.skuAuto ? <Lock size={13} /> : <Unlock size={13} />}
+                          </button>
+                        </AdminTooltip>
                       </div>
                       )}
                     </td>
@@ -289,16 +291,20 @@ export function ProductSkuField({
                       </td>
                     )}
                     <td className="py-2 text-right">
-                      <button
-                        type="button"
-                        disabled={row.inUse}
-                        onClick={() => onChange(rows.filter((r) => r.key !== row.key))}
-                        aria-label={t("remove")}
-                        title={row.inUse ? t("inUse") : t("remove")}
-                        className="grid size-7 cursor-pointer place-items-center rounded-md text-[#A1A1AA] hover:bg-[#F4F4F5] hover:text-rose-600 disabled:cursor-not-allowed disabled:opacity-40"
-                      >
-                        <Trash2 size={13} />
-                      </button>
+                      {/* SKU đang dùng thì nút xóa tắt — span bọc ngoài để vẫn rê chuột xem lý do */}
+                      <AdminTooltip content={row.inUse ? t("inUse") : t("remove")}>
+                        <span className="inline-grid" tabIndex={row.inUse ? 0 : undefined}>
+                          <button
+                            type="button"
+                            disabled={row.inUse}
+                            onClick={() => onChange(rows.filter((r) => r.key !== row.key))}
+                            aria-label={t("remove")}
+                            className="grid size-7 cursor-pointer place-items-center rounded-md text-[#A1A1AA] hover:bg-[#F4F4F5] hover:text-rose-600 disabled:cursor-not-allowed disabled:opacity-40"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </span>
+                      </AdminTooltip>
                     </td>
                   </tr>
                 );

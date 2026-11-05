@@ -8,6 +8,7 @@ import {
   ADMIN_DIALOG_PRIMARY_BUTTON_CLASS,
   ADMIN_DIALOG_SECONDARY_BUTTON_CLASS,
   AdminDialog,
+  AdminTextField,
 } from "@/features/admin/core/ui";
 import { createStaffAction } from "../actions/staff.actions";
 import { type StaffMemberItem } from "../types/staff.types";
@@ -23,9 +24,6 @@ const EMPTY_FORM = { name: "", email: "", phone: "", password: "" };
 
 /** Mặc định nhân viên mới chỉ được xử lý đơn và cập nhật may đo (quyền tối thiểu cho vận hành) */
 const DEFAULT_PERMISSIONS: Permission[] = ["MANAGE_ORDERS", "UPDATE_TAILORING"];
-
-const INPUT_CLASS =
-  "h-9 w-full rounded-lg border border-[#E4E4E7] bg-white px-3 text-xs text-[#09090B] placeholder:text-zinc-400 transition-all focus:border-[#09090B] focus:outline-none focus:ring-2 focus:ring-zinc-900/10";
 
 /**
  * Hộp thoại Super Admin tạo tài khoản nhân viên kèm bộ quyền chi tiết ban đầu
@@ -60,19 +58,16 @@ export function CreateStaffDialog({ open, onOpenChange, onCreated }: CreateStaff
     }
   };
 
-  const field = (key: keyof typeof EMPTY_FORM, type: string, required = true) => (
-    <label className="block space-y-1">
-      <span className="text-sm font-medium text-[#3F3F46]">
-        {t(`form.${key}`)} {required && <span className="text-rose-500">*</span>}
-      </span>
-      <input
-        type={type}
-        value={form[key]}
-        required={required}
-        onChange={(e) => setForm((prev) => ({ ...prev, [key]: e.target.value }))}
-        className={INPUT_CLASS}
-      />
-    </label>
+  const field = (key: keyof typeof EMPTY_FORM, type: "text" | "tel" | "email" | "password", required = true) => (
+    <AdminTextField
+      type={type}
+      label={t(`form.${key}`)}
+      value={form[key]}
+      required={required}
+      passwordToggle={type === "password"}
+      autoComplete={type === "password" ? "new-password" : undefined}
+      onValueChange={(value) => setForm((prev) => ({ ...prev, [key]: value }))}
+    />
   );
 
   return (

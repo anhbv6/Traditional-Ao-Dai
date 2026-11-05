@@ -16,6 +16,7 @@ import { type SizeChartColumnValue, type SizeChartRowValue } from "../../types/s
 import { parseNumberInput } from "../../utils/sizeChartData";
 import { applyPastedGrid, createNextRow, getCellIssue, type GridIssues } from "../../utils/sizeChartGrid";
 import { DEFAULT_VALID_RANGE, MAX_SIZE_CHART_ROWS, SIZE_LABEL_PRESETS, nextSizeLabel } from "../../utils/sizeChartPresets";
+import { AdminTooltip } from "@/features/admin/core/ui";
 
 const NUMBER_CLASS =
   "h-8 w-full min-w-0 rounded-md border bg-white px-1.5 text-center text-sm tabular-nums text-[#09090B] outline-none placeholder:text-[#D4D4D8] focus:border-[#18181B] focus:ring-2 focus:ring-[#18181B]/10";
@@ -168,28 +169,29 @@ export function SizeChartGrid({ group, columns, rows, issues, onColumnsChange, o
                       const range = row.values[column.key];
                       const issue = getCellIssue(range, column);
                       return (
-                        <td
+                        <AdminTooltip
                           key={column.key}
-                          className="border-b border-r border-[#E4E4E7] px-2 py-1.5"
-                          title={issue ? t(`issue.${issue}`, { min: column.validMin ?? "–", max: column.validMax ?? "–" }) : undefined}
+                          content={issue ? t(`issue.${issue}`, { min: column.validMin ?? "–", max: column.validMax ?? "–" }) : null}
                         >
-                          <div className="flex items-center gap-1">
-                            {(["min", "max"] as const).map((bound, boundIndex) => (
-                              <span key={bound} className="contents">
-                                {boundIndex === 1 && <span className="text-[#A1A1AA]">–</span>}
-                                <NumberCell
-                                  value={range?.[bound] ?? null}
-                                  onValueChange={(value) => updateCell(row, column.key, bound, value)}
-                                  onPaste={(e) => handlePaste(e, rowIndex, columnIndex)}
-                                  aria-label={`${row.sizeLabel || rowIndex + 1} · ${tSizing(`measurement.${column.key}`)} ${t(bound)}`}
-                                  aria-invalid={issue !== null}
-                                  placeholder={t(bound)}
-                                  className={cn(NUMBER_CLASS, issue ? "border-rose-400 bg-rose-50 text-rose-700" : "border-[#E4E4E7]")}
-                                />
-                              </span>
-                            ))}
-                          </div>
-                        </td>
+                          <td className="border-b border-r border-[#E4E4E7] px-2 py-1.5">
+                            <div className="flex items-center gap-1">
+                              {(["min", "max"] as const).map((bound, boundIndex) => (
+                                <span key={bound} className="contents">
+                                  {boundIndex === 1 && <span className="text-[#A1A1AA]">–</span>}
+                                  <NumberCell
+                                    value={range?.[bound] ?? null}
+                                    onValueChange={(value) => updateCell(row, column.key, bound, value)}
+                                    onPaste={(e) => handlePaste(e, rowIndex, columnIndex)}
+                                    aria-label={`${row.sizeLabel || rowIndex + 1} · ${tSizing(`measurement.${column.key}`)} ${t(bound)}`}
+                                    aria-invalid={issue !== null}
+                                    placeholder={t(bound)}
+                                    className={cn(NUMBER_CLASS, issue ? "border-rose-400 bg-rose-50 text-rose-700" : "border-[#E4E4E7]")}
+                                  />
+                                </span>
+                              ))}
+                            </div>
+                          </td>
+                        </AdminTooltip>
                       );
                     })}
                     <td className="border-b border-[#E4E4E7] px-1 py-1.5">

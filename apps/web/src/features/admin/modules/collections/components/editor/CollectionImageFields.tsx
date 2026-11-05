@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type ChangeEvent } from "react";
+import { useRef, useState, type ChangeEvent, type ReactNode } from "react";
 import { ArrowLeft, ArrowRight, ImagePlus, Loader2, Monitor, Smartphone, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useNotify } from "@/hooks/useNotify";
@@ -38,16 +38,40 @@ function useImageUploader() {
   return { upload, isUploading };
 }
 
+/**
+ * Nhóm ảnh cùng một chỗ hiển thị (ảnh bìa, banner): tiêu đề + tỉ lệ khung, bên dưới là cặp bản máy tính / điện thoại.
+ */
+export function MediaGroup({
+  title,
+  ratio,
+  children,
+  className,
+}: {
+  title: string;
+  /** Tỉ lệ khung gợi ý, VD "3:4" — dữ liệu kỹ thuật, không dịch */
+  ratio: string;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={cn("min-w-0", className)}>
+      <div className="mb-2.5 flex items-baseline justify-between gap-2">
+        <h3 className="truncate text-body font-semibold text-[#09090B]">{title}</h3>
+        <span className="shrink-0 font-mono text-2xs text-[#A1A1AA]">{ratio}</span>
+      </div>
+      {children}
+    </div>
+  );
+}
+
 /** Một ô ảnh: bấm để chọn, có nút gỡ; `aspectClass` quyết định khung hiển thị đúng tỉ lệ nơi dùng */
 export function ImageSlot({
-  label,
   device,
   value,
   onChange,
   aspectClass,
   fallback,
 }: {
-  label: string;
   device: "desktop" | "mobile";
   value: string;
   onChange: (url: string) => void;
@@ -71,12 +95,8 @@ export function ImageSlot({
 
   return (
     <div className="min-w-0">
-      <div className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-[#3F3F46]">
-        <DeviceIcon size={13} className="text-[#71717A]" aria-hidden />
-        {label}
-      </div>
       <div
-        className={cn("group relative overflow-hidden rounded-lg border border-[#E4E4E7] bg-[#F4F4F5]", aspectClass)}
+        className={cn("group relative overflow-hidden rounded-xl border border-[#E4E4E7] bg-[#F4F4F5]", aspectClass)}
       >
         {shown ? (
           // eslint-disable-next-line @next/next/no-img-element -- ảnh từ URL tùy ý (blob xem trước / avatar / ảnh do admin nhập), không tối ưu được bằng next/image
@@ -112,6 +132,10 @@ export function ImageSlot({
           </button>
         )}
       </div>
+      <div className="mt-1.5 flex min-w-0 items-center gap-1.5 text-xs text-[#71717A]">
+        <DeviceIcon size={13} className="shrink-0" aria-hidden />
+        <span className="truncate">{t(device)}</span>
+      </div>
       <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={handleFile} />
     </div>
   );
@@ -140,11 +164,17 @@ export function GalleryField({ value, onChange }: { value: string[]; onChange: (
 
   return (
     <div>
-      <div className="grid grid-cols-3 gap-2 sm:grid-cols-5 lg:grid-cols-6">
+      <div className="mb-2.5 flex items-baseline justify-between gap-2">
+        <h3 className="truncate text-body font-semibold text-[#09090B]">{t("lookbook")}</h3>
+        <span className="shrink-0 text-xs tabular-nums text-[#A1A1AA]">
+          {t("lookbookCount", { count: value.length, max: MAX_GALLERY_IMAGES })}
+        </span>
+      </div>
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(5.5rem,1fr))] gap-2.5">
         {value.map((url, index) => (
           <div
             key={url}
-            className="group relative aspect-[3/4] overflow-hidden rounded-lg border border-[#E4E4E7] bg-[#F4F4F5]"
+            className="group relative aspect-[3/4] overflow-hidden rounded-xl border border-[#E4E4E7] bg-[#F4F4F5]"
           >
             {/* eslint-disable-next-line @next/next/no-img-element -- ảnh từ URL tùy ý (blob xem trước / avatar / ảnh do admin nhập), không tối ưu được bằng next/image */}
             <img src={url} alt="" className="size-full object-cover" />
@@ -183,7 +213,7 @@ export function GalleryField({ value, onChange }: { value: string[]; onChange: (
             type="button"
             disabled={isUploading}
             onClick={() => inputRef.current?.click()}
-            className="flex aspect-[3/4] cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-[#D4D4D8] bg-white text-xs text-[#71717A] transition-colors hover:bg-[#FAFAFA] hover:text-[#09090B] disabled:cursor-wait"
+            className="flex aspect-[3/4] cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-[#D4D4D8] bg-white text-xs text-[#71717A] transition-colors hover:bg-[#FAFAFA] hover:text-[#09090B] disabled:cursor-wait"
           >
             {isUploading ? <Loader2 size={18} className="animate-spin" /> : <ImagePlus size={18} />}
             {isUploading ? t("uploading") : t("addLookbook")}

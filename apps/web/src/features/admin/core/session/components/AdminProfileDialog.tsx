@@ -11,6 +11,7 @@ import {
   ADMIN_DIALOG_SECONDARY_BUTTON_CLASS,
   AdminDialog,
   AdminDialogFooter,
+  AdminTooltip,
 } from "../../ui";
 import { changeAdminPasswordAction, updateAdminProfileAction } from "../actions/session.actions";
 import { useAdminSession, useAdminSessionCache } from "../hooks/useAdminSession";
@@ -198,15 +199,17 @@ export function AdminProfileDialog({ open, onOpenChange }: AdminProfileDialogPro
                   )}
                 </div>
 
-                <button
-                  type="button"
-                  disabled={isUploadingAvatar}
-                  onClick={() => fileInputRef.current?.click()}
-                  className="absolute bottom-0 right-0 p-1.5 rounded-full bg-[#18181B] text-white hover:bg-[#09090B] shadow-md cursor-pointer transition-transform hover:scale-105"
-                  title={t("changeAvatar")}
-                >
-                  {isUploadingAvatar ? <Loader2 size={12} className="animate-spin" /> : <Camera size={12} />}
-                </button>
+                <AdminTooltip content={t("changeAvatar")}>
+                  <button
+                    type="button"
+                    disabled={isUploadingAvatar}
+                    onClick={() => fileInputRef.current?.click()}
+                    aria-label={t("changeAvatar")}
+                    className="absolute bottom-0 right-0 p-1.5 rounded-full bg-[#18181B] text-white hover:bg-[#09090B] shadow-md cursor-pointer transition-transform hover:scale-105"
+                  >
+                    {isUploadingAvatar ? <Loader2 size={12} className="animate-spin" /> : <Camera size={12} />}
+                  </button>
+                </AdminTooltip>
                 <input
                   ref={fileInputRef}
                   type="file"

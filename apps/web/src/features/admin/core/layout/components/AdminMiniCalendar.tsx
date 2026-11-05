@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
+import { AdminTooltip } from "../../ui";
 
 // 01/01/2024 là thứ Hai — mốc để lấy tên thứ theo ngôn ngữ, tuần bắt đầu từ thứ Hai như lịch Việt
 const WEEKDAYS = Array.from({ length: 7 }, (_, i) => new Date(2024, 0, 1 + i));
@@ -33,15 +34,17 @@ export function AdminMiniCalendar() {
   return (
     <div className="px-4 pb-3 pt-4">
       <div className="mb-2 flex items-center gap-1">
-        <button
-          type="button"
-          onClick={() => setMonth(new Date(today.getFullYear(), today.getMonth(), 1))}
-          disabled={isCurrentMonth}
-          title={isCurrentMonth ? undefined : t("backToToday")}
-          className="min-w-0 flex-1 cursor-pointer truncate text-left text-sm font-semibold text-[#09090B] first-letter:uppercase disabled:cursor-default"
-        >
-          {format.dateTime(month, { month: "long", year: "numeric" })}
-        </button>
+        {/* Đang ở tháng hiện tại thì nút tắt → không cần tooltip */}
+        <AdminTooltip content={isCurrentMonth ? null : t("backToToday")} align="start">
+          <button
+            type="button"
+            onClick={() => setMonth(new Date(today.getFullYear(), today.getMonth(), 1))}
+            disabled={isCurrentMonth}
+            className="min-w-0 flex-1 cursor-pointer truncate text-left text-sm font-semibold text-[#09090B] first-letter:uppercase disabled:cursor-default"
+          >
+            {format.dateTime(month, { month: "long", year: "numeric" })}
+          </button>
+        </AdminTooltip>
         <button
           type="button"
           onClick={() => shift(-1)}
@@ -60,7 +63,11 @@ export function AdminMiniCalendar() {
         </button>
       </div>
 
-      <div className="grid grid-cols-7 text-center" role="grid" aria-label={format.dateTime(month, { month: "long", year: "numeric" })}>
+      <div
+        className="grid grid-cols-7 text-center"
+        role="grid"
+        aria-label={format.dateTime(month, { month: "long", year: "numeric" })}
+      >
         {WEEKDAYS.map((day, index) => (
           <span
             key={day.getTime()}
@@ -90,7 +97,9 @@ export function AdminMiniCalendar() {
                   isToday
                     ? "bg-[#18181B] font-semibold text-white"
                     : inMonth
-                      ? (day.getDay() === 0 ? "text-[#71717A]" : "text-[#09090B]")
+                      ? day.getDay() === 0
+                        ? "text-[#71717A]"
+                        : "text-[#09090B]"
                       : "text-[#D4D4D8]"
                 )}
               >

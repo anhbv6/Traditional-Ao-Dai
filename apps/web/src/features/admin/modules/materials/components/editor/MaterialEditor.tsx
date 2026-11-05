@@ -8,6 +8,7 @@ import { useRouter } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
 import {
   ADMIN_CARD_CLASS,
+  ADMIN_INPUT_CLASS,
   ADMIN_DIALOG_DANGER_BUTTON_CLASS,
   ADMIN_DIALOG_SECONDARY_BUTTON_CLASS,
   ADMIN_PRIMARY_BUTTON_CLASS,
@@ -16,6 +17,8 @@ import {
   AdminDialog,
   AdminInfoTip,
   AdminLangSwitch,
+  AdminTextArea,
+  AdminTextField,
   type AdminContentLang,
 } from "@/features/admin/core/ui";
 import { deleteMaterialAction, updateMaterialAction } from "../../actions/materials.actions";
@@ -38,8 +41,6 @@ import { MaterialCompositionField } from "./MaterialCompositionField";
 import { MaterialMediaField } from "./MaterialMediaField";
 import { MaterialProcessField } from "./MaterialProcessField";
 
-const INPUT_CLASS =
-  "h-10 w-full rounded-lg border border-[#E4E4E7] bg-white px-3 text-sm text-[#09090B] outline-none placeholder:text-[#A1A1AA] focus:border-[#18181B]";
 type ContentLang = AdminContentLang;
 
 /** Trường văn bản theo ngôn ngữ — cột gốc tiếng Việt, cột `En` cho tiếng Anh */
@@ -100,36 +101,16 @@ function Card({
   );
 }
 
-function Field({
-  label,
-  hint,
-  children,
-  className,
-}: {
-  label: string;
-  hint?: string;
-  children: ReactNode;
-  className?: string;
-}) {
-  return (
-    <label className={cn("block min-w-0 space-y-1.5", className)}>
-      <span className="flex items-center gap-1.5 text-sm font-medium text-[#3F3F46]">
-        {label}
-        {hint && <AdminInfoTip content={hint} />}
-      </span>
-      {children}
-    </label>
-  );
-}
-
 /** Ô số có đơn vị ở cuối (m, cm) */
 function UnitInput({
+  label,
   value,
   onChange,
   unit,
   step,
   placeholder,
 }: {
+  label: string;
   value: number | null;
   onChange: (value: number | null) => void;
   unit: string;
@@ -137,19 +118,17 @@ function UnitInput({
   placeholder: string;
 }) {
   return (
-    <div className="relative">
-      <input
-        type="number"
-        inputMode="decimal"
-        min={0}
-        step={step}
-        value={value ?? ""}
-        onChange={(e) => onChange(e.target.value === "" ? null : Number(e.target.value))}
-        placeholder={placeholder}
-        className={cn(INPUT_CLASS, "pr-10 font-mono tabular-nums")}
-      />
-      <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#A1A1AA]">{unit}</span>
-    </div>
+    <AdminTextField
+      type="number"
+      label={label}
+      min={0}
+      step={step}
+      value={value === null ? "" : String(value)}
+      onValueChange={(next) => onChange(next === "" ? null : Number(next))}
+      placeholder={placeholder}
+      suffix={<span className="text-xs text-[#A1A1AA]">{unit}</span>}
+      inputClassName="font-mono tabular-nums"
+    />
   );
 }
 
@@ -275,42 +254,39 @@ export function MaterialEditor({ initialMaterial }: { initialMaterial: AdminMate
 
           <Card title={t("sections.identity")}>
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label={`${t("field.name")}${lang === "vi" ? " *" : ""}`}>
-                <input
-                  key={`name-${lang}`}
-                  value={values[fields.name]}
-                  onChange={(e) => set(fields.name, e.target.value)}
-                  placeholder={t(`placeholders.${lang}.name`)}
-                  className={INPUT_CLASS}
-                />
-              </Field>
-              <Field label={t("field.code")} hint={t("hints.code")}>
-                <input
-                  value={values.code}
-                  onChange={(e) => set("code", e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, ""))}
-                  placeholder={t("placeholders.code")}
-                  className={cn(INPUT_CLASS, "font-mono")}
-                />
-              </Field>
-              <Field label={t("field.origin")} className="sm:col-span-2">
-                <input
-                  key={`origin-${lang}`}
-                  value={values[fields.origin]}
-                  onChange={(e) => set(fields.origin, e.target.value)}
-                  placeholder={t(`placeholders.${lang}.origin`)}
-                  className={INPUT_CLASS}
-                />
-              </Field>
-              <Field label={t("field.description")} className="sm:col-span-2">
-                <textarea
-                  key={`description-${lang}`}
-                  value={values[fields.description]}
-                  onChange={(e) => set(fields.description, e.target.value)}
-                  rows={3}
-                  placeholder={t(`placeholders.${lang}.description`)}
-                  className={cn(INPUT_CLASS, "h-auto resize-y py-2")}
-                />
-              </Field>
+              <AdminTextField
+                key={`name-${lang}`}
+                required={lang === "vi"}
+                label={t("field.name")}
+                value={values[fields.name]}
+                onValueChange={(value) => set(fields.name, value)}
+                placeholder={t(`placeholders.${lang}.name`)}
+              />
+              <AdminTextField
+                label={t("field.code")}
+                hint={t("hints.code")}
+                value={values.code}
+                onValueChange={(value) => set("code", value.toUpperCase().replace(/[^A-Z0-9-]/g, ""))}
+                placeholder={t("placeholders.code")}
+                inputClassName="font-mono"
+              />
+              <AdminTextField
+                key={`origin-${lang}`}
+                className="sm:col-span-2"
+                label={t("field.origin")}
+                value={values[fields.origin]}
+                onValueChange={(value) => set(fields.origin, value)}
+                placeholder={t(`placeholders.${lang}.origin`)}
+              />
+              <AdminTextArea
+                key={`description-${lang}`}
+                className="sm:col-span-2"
+                label={t("field.description")}
+                value={values[fields.description]}
+                onValueChange={(value) => set(fields.description, value)}
+                rows={3}
+                placeholder={t(`placeholders.${lang}.description`)}
+              />
             </div>
 
             <div className="mt-5 border-t border-dashed border-[#E4E4E7] pt-4">
@@ -321,7 +297,7 @@ export function MaterialEditor({ initialMaterial }: { initialMaterial: AdminMate
               <MaterialCompositionField
                 items={values.composition}
                 onChange={(items) => set("composition", items)}
-                inputClassName={INPUT_CLASS}
+                inputClassName={ADMIN_INPUT_CLASS}
               />
             </div>
           </Card>
@@ -379,7 +355,7 @@ export function MaterialEditor({ initialMaterial }: { initialMaterial: AdminMate
               onImagesChange={(images) => set("closeupImages", images)}
               videoUrl={values.videoUrl}
               onVideoUrlChange={(url) => set("videoUrl", url)}
-              inputClassName={INPUT_CLASS}
+              inputClassName={ADMIN_INPUT_CLASS}
             />
           </Card>
 
@@ -388,7 +364,7 @@ export function MaterialEditor({ initialMaterial }: { initialMaterial: AdminMate
               steps={values.processSteps}
               onChange={(steps) => set("processSteps", steps)}
               lang={lang}
-              inputClassName={INPUT_CLASS}
+              inputClassName={ADMIN_INPUT_CLASS}
             />
           </Card>
 
@@ -418,16 +394,14 @@ export function MaterialEditor({ initialMaterial }: { initialMaterial: AdminMate
                     );
                   })}
                 </div>
-                <Field label={t("field.careNote")}>
-                  <textarea
-                    key={`care-${lang}`}
-                    value={values[fields.careNote]}
-                    onChange={(e) => set(fields.careNote, e.target.value)}
-                    rows={2}
-                    placeholder={t(`placeholders.${lang}.careNote`)}
-                    className={cn(INPUT_CLASS, "h-auto resize-y py-2")}
-                  />
-                </Field>
+                <AdminTextArea
+                  key={`care-${lang}`}
+                  label={t("field.careNote")}
+                  value={values[fields.careNote]}
+                  onValueChange={(value) => set(fields.careNote, value)}
+                  rows={2}
+                  placeholder={t(`placeholders.${lang}.careNote`)}
+                />
               </div>
               <div className="max-w-xs">
                 <p className="mb-2 text-xs text-[#71717A]">{t("care.labelPreview")}</p>
@@ -438,33 +412,30 @@ export function MaterialEditor({ initialMaterial }: { initialMaterial: AdminMate
 
           <Card title={t("sections.yield")} hint={t("hints.yield")}>
             <div className="grid gap-4 sm:grid-cols-3">
-              <Field label={t("field.widthCm")}>
                 <UnitInput
+                  label={t("field.widthCm")}
                   value={values.widthCm}
                   onChange={(value) => set("widthCm", value === null ? null : Math.round(value))}
                   unit="cm"
                   step={1}
                   placeholder={t("placeholders.widthCm")}
                 />
-              </Field>
-              <Field label={t("field.metersPerTop")}>
                 <UnitInput
+                  label={t("field.metersPerTop")}
                   value={values.metersPerTop}
                   onChange={(value) => set("metersPerTop", value)}
                   unit="m"
                   step={0.1}
                   placeholder={t("placeholders.meters")}
                 />
-              </Field>
-              <Field label={t("field.metersPerPants")}>
                 <UnitInput
+                  label={t("field.metersPerPants")}
                   value={values.metersPerPants}
                   onChange={(value) => set("metersPerPants", value)}
                   unit="m"
                   step={0.1}
                   placeholder={t("placeholders.meters")}
                 />
-              </Field>
             </div>
             {perSet !== null && (
               <p className="mt-3 rounded-lg bg-[#FAFAFA] px-3 py-2 text-xs text-[#52525B]">

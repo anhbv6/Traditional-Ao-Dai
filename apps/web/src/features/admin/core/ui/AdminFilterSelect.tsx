@@ -40,7 +40,7 @@ export function AdminFilterSelect<T extends string>({ label, value, options, onC
           type="button"
           aria-label={`${label}: ${selectedLabel}`}
           className={cn(
-            "group flex h-9 min-w-0 cursor-pointer items-center rounded-lg border border-[#E4E4E7] bg-white text-sm shadow-2xs outline-none transition-colors hover:bg-[#FAFAFA] focus-visible:border-[#18181B] data-popup-open:border-[#18181B]",
+            "group flex h-9 min-w-0 cursor-pointer items-center rounded-xl border border-[#E4E4E7] bg-white text-sm shadow-2xs outline-none transition-colors hover:bg-[#FAFAFA] focus-visible:border-[#18181B] data-popup-open:border-[#18181B]",
             className
           )}
         >

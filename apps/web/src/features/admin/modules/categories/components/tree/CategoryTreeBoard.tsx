@@ -186,8 +186,12 @@ export function CategoryTreeBoard({
         }
       />
 
-      <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(320px,0.8fr)]">
-        <section className={cn(ADMIN_CARD_CLASS, "p-4 sm:p-5")}>
+      {/*
+        Mobile: chỉ sơ đồ (bấm nút vào màn chi tiết). iPad: hai bảng trái / phải bằng nhau để so sánh.
+        PC: danh sách rộng hơn, sơ đồ dính khi cuộn.
+      */}
+      <div className="grid items-start gap-5 md:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(320px,0.8fr)]">
+        <section className={cn(ADMIN_CARD_CLASS, "hidden p-4 sm:p-5 md:block")}>
           <header className="flex flex-wrap items-start justify-between gap-3">
             <div className="min-w-0">
               <h2 className="text-lg font-semibold text-[#09090B]">{t("list.title")}</h2>
@@ -214,12 +218,13 @@ export function CategoryTreeBoard({
               <div
                 className={cn(
                   CATEGORY_LIST_GRID,
-                  "border-b border-dashed border-[#E4E4E7] px-2 py-3 text-body font-semibold text-[#3F3F46]"
+                  "border-b border-dashed border-[#E4E4E7] px-1.5 py-3 text-sm font-semibold text-[#3F3F46] xl:px-2 xl:text-body"
                 )}
               >
-                <span aria-hidden />
+                <span aria-hidden className="hidden xl:block" />
                 <span>{t("column.name")}</span>
-                <span>{t("list.columnStatus")}</span>
+                <span className="pr-1 text-right xl:pr-4">{t("list.columnProducts")}</span>
+                <span className="hidden xl:block">{t("list.columnStatus")}</span>
                 <span aria-hidden />
               </div>
               <ol className="divide-y divide-dashed divide-[#E4E4E7]">
@@ -266,7 +271,12 @@ export function CategoryTreeBoard({
             </>
           )}
 
-          <p className="mt-2 flex items-center gap-2 border-t border-dashed border-[#E4E4E7] pt-4 text-xs text-[#71717A]">
+          <p
+            className={cn(
+              "mt-2 flex items-center gap-2 border-t border-dashed border-[#E4E4E7] pt-4 text-xs text-[#71717A]",
+              !isFiltering && "max-xl:hidden"
+            )}
+          >
             <Info size={14} className="shrink-0" aria-hidden />
             {isFiltering ? t("reorderDisabled") : t("list.dragHint")}
           </p>

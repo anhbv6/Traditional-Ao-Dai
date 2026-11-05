@@ -3,7 +3,7 @@
 import { ExternalLink } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
-import { AdminFilterSelect } from "@/features/admin/core/ui";
+import { AdminFilterSelect, AdminTooltip } from "@/features/admin/core/ui";
 import {
   CARE_ICONS,
   CompositionBar,
@@ -73,13 +73,15 @@ export function ProductMaterialField({
                 {selected.careCodes.filter(isCareCode).map((code) => {
                   const Icon = CARE_ICONS[code];
                   return (
-                    <span
-                      key={code}
-                      title={tCare(code)}
-                      className="grid size-6 place-items-center rounded-full border border-[#D4D4D8] bg-white text-[#3F3F46]"
-                    >
-                      <Icon size={12} aria-hidden />
-                    </span>
+                    <AdminTooltip key={code} content={tCare(code)}>
+                      <span
+                        role="img"
+                        aria-label={tCare(code)}
+                        className="grid size-6 place-items-center rounded-full border border-[#D4D4D8] bg-white text-[#3F3F46]"
+                      >
+                        <Icon size={12} aria-hidden />
+                      </span>
+                    </AdminTooltip>
                   );
                 })}
               </div>

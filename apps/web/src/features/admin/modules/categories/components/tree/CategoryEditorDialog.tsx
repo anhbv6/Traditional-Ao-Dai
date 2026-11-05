@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import { FolderPlus, Pencil } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { PRODUCT_GROUPS, PRODUCT_GROUP_TRAITS, type ProductGroup } from "@repo/shared/sizing";
@@ -10,9 +10,12 @@ import {
   ADMIN_DIALOG_PRIMARY_BUTTON_CLASS,
   ADMIN_DIALOG_SECONDARY_BUTTON_CLASS,
   AdminDialog,
+  AdminField,
   AdminFilterSelect,
   AdminInfoTip,
   AdminLangSwitch,
+  AdminTextArea,
+  AdminTextField,
   type AdminContentLang,
 } from "@/features/admin/core/ui";
 import { toSlug } from "@/features/admin/modules/products";
@@ -21,8 +24,6 @@ import { type CategoryFormValues } from "../../schemas/categories.schemas";
 import { type AdminCategoryNode, type SizeChartOption } from "../../types/categories.types";
 import { PRODUCT_GROUP_ICONS, getGroupTraitKeys, groupUsesSizeChart } from "../../utils/productGroupMeta";
 
-const INPUT_CLASS =
-  "h-10 w-full rounded-lg border border-[#E4E4E7] bg-white px-3 text-sm text-[#09090B] outline-none placeholder:text-[#A1A1AA] focus:border-[#18181B] disabled:bg-[#FAFAFA] disabled:text-[#71717A]";
 const ROOT_PARENT = "__root__";
 const NO_CHART = "__none__";
 type ContentLang = AdminContentLang;
@@ -59,28 +60,6 @@ function initialValues(node: AdminCategoryNode | null, parent: AdminCategoryNode
     defaultSizeChartId: "",
     parentId: parent?.id ?? null,
   };
-}
-
-function Field({
-  label,
-  hint,
-  children,
-  className,
-}: {
-  label: string;
-  hint?: string;
-  children: ReactNode;
-  className?: string;
-}) {
-  return (
-    <label className={cn("block min-w-0 space-y-1.5", className)}>
-      <span className="flex items-center gap-1.5 text-sm font-medium text-[#3F3F46]">
-        {label}
-        {hint && <AdminInfoTip content={hint} />}
-      </span>
-      {children}
-    </label>
-  );
 }
 
 /** Nét đứt ngăn các phần trong thân dialog */
@@ -209,34 +188,31 @@ export function CategoryEditorDialog({
       }
     >
       <div key={contentLang} role="tabpanel" className="grid gap-4 sm:grid-cols-2">
-        <Field label={`${t("field.name")}${contentLang === "vi" ? " *" : ""}`} className="sm:col-span-2">
-          <input
-            autoFocus
-            value={values[langFields.name]}
-            onChange={(e) => {
-              set(langFields.name, e.target.value);
-              if (contentLang === "vi") setNameError(false);
-            }}
-            placeholder={t(`editor.placeholders.${contentLang}.name`)}
-            aria-invalid={contentLang === "vi" && nameError}
-            className={cn(INPUT_CLASS, "aria-invalid:border-rose-500")}
-          />
-          {contentLang === "vi" && nameError && (
-            <span className="text-xs text-rose-600">{t("editor.nameRequired")}</span>
-          )}
-        </Field>
-        <Field label={t("field.slug")} hint={t("editor.slugHint")}>
-          <input
-            value={effectiveSlug}
-            onChange={(e) => {
-              setSlugTouched(true);
-              set("slug", toSlug(e.target.value));
-            }}
-            placeholder={t("editor.placeholders.slug")}
-            className={cn(INPUT_CLASS, "font-mono")}
-          />
-        </Field>
-        <Field label={t("field.parent")} hint={hasChildren ? t("editor.parentLocked") : undefined}>
+        <AdminTextField
+          autoFocus
+          required={contentLang === "vi"}
+          className="sm:col-span-2"
+          label={t("field.name")}
+          value={values[langFields.name]}
+          onValueChange={(value) => {
+            set(langFields.name, value);
+            if (contentLang === "vi") setNameError(false);
+          }}
+          placeholder={t(`editor.placeholders.${contentLang}.name`)}
+          error={contentLang === "vi" && nameError ? t("editor.nameRequired") : undefined}
+        />
+        <AdminTextField
+          label={t("field.slug")}
+          hint={t("editor.slugHint")}
+          value={effectiveSlug}
+          onValueChange={(value) => {
+            setSlugTouched(true);
+            set("slug", toSlug(value));
+          }}
+          placeholder={t("editor.placeholders.slug")}
+          inputClassName="font-mono"
+        />
+        <AdminField label={t("field.parent")} hint={hasChildren ? t("editor.parentLocked") : undefined}>
           <AdminFilterSelect
             label={t("field.parentShort")}
             value={values.parentId ?? ROOT_PARENT}
@@ -244,16 +220,15 @@ export function CategoryEditorDialog({
             onChange={(value) => set("parentId", value === ROOT_PARENT ? null : value)}
             className="h-10 w-full"
           />
-        </Field>
-        <Field label={t("field.description")} className="sm:col-span-2">
-          <textarea
-            value={values[langFields.description]}
-            onChange={(e) => set(langFields.description, e.target.value)}
-            rows={2}
-            placeholder={t(`editor.placeholders.${contentLang}.description`)}
-            className={cn(INPUT_CLASS, "h-auto resize-y py-2")}
-          />
-        </Field>
+        </AdminField>
+        <AdminTextArea
+          className="sm:col-span-2"
+          label={t("field.description")}
+          value={values[langFields.description]}
+          onValueChange={(value) => set(langFields.description, value)}
+          rows={2}
+          placeholder={t(`editor.placeholders.${contentLang}.description`)}
+        />
       </div>
 
       <DashedDivider />
@@ -306,7 +281,7 @@ export function CategoryEditorDialog({
         </div>
 
         {usesChart && (
-          <Field label={t("field.sizeChart")} hint={t("editor.chartHint")}>
+          <AdminField label={t("field.sizeChart")} hint={t("editor.chartHint")}>
             <AdminFilterSelect
               label={t("field.sizeChartShort")}
               value={values.defaultSizeChartId || NO_CHART}
@@ -320,7 +295,7 @@ export function CategoryEditorDialog({
               onChange={(value) => set("defaultSizeChartId", value === NO_CHART ? "" : value)}
               className="h-10 w-full"
             />
-          </Field>
+          </AdminField>
         )}
       </div>
 
