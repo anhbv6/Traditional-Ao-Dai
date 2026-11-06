@@ -58,7 +58,11 @@ const step = (last: number | null, prev: number | null) =>
  * Hàng mới: nếu đã có ≥ 2 hàng thì nội suy theo bước nhảy của 2 hàng cuối (S→M tăng 4cm thì L tăng tiếp 4cm),
  * admin chỉ cần sửa lại vài ô thay vì gõ cả hàng.
  */
-export function createNextRow(columns: SizeChartColumnValue[], rows: SizeChartRowValue[], sizeLabel: string): SizeChartRowValue {
+export function createNextRow(
+  columns: SizeChartColumnValue[],
+  rows: SizeChartRowValue[],
+  sizeLabel: string
+): SizeChartRowValue {
   const last = rows.at(-1);
   const prev = rows.at(-2);
   const values: SizeChartRowValue["values"] = {};

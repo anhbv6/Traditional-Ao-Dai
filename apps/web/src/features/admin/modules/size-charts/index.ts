@@ -7,4 +7,5 @@ export * from "./utils/sizeChartGrid";
 export * from "./utils/sizeChartGridValidation";
 export * from "./components/editor/SizeChartGrid";
 export * from "./components/list/SizeChartsBoard";
-export * from "./components/editor/SizeChartEditor";
+export * from "./components/detail/SizeChartDetail";
+export * from "./components/shared/SizeChartTable";

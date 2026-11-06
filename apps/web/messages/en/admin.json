@@ -1130,7 +1130,7 @@
   },
   "sizing": {
     "group": {
-      "AO_DAI": "Áo dài",
+      "AO_DAI": "Ao dai",
       "PANTS": "Pants",
       "ACCESSORY": "Accessories",
       "FOOTWEAR": "Footwear",
@@ -1214,9 +1214,7 @@
       "createChildTitle": "Add a product type to {name}",
       "description": "The root group decides the product group: tailoring, sell unit and size charts for every product type inside.",
       "chartNone": "No size chart",
-      "chartInherit": "Use the root group's size chart",
       "chartInactive": "inactive",
-      "chartHint": "Products of this type use this chart for size suggestions; each product can still pick its own.",
       "create": "Add type",
       "save": "Save changes",
       "created": "Product type added",
@@ -1238,16 +1236,13 @@
       "dialogDescription": "Name, root group and size chart of the product type.",
       "cancel": "Cancel",
       "nameRequired": "Please enter the category name",
-      "groupLabel": "Product group & size chart",
       "createTitle": "Add product type",
       "parentPlaceholder": "Please choose a group",
       "parentRequired": "Please choose a group for this product type",
       "parentHint": "Root groups are the product groups (Ao dai, Pants, Accessories, Footwear, Materials) — they decide tailoring, sell unit and sizing. Product types inside inherit them.",
-      "groupPending": "Choose the parent group first — a product type takes its product group from the root.",
-      "groupInherited": "Inherited from {name}",
+      "groupInherited": "Product group: {name}",
       "editRootTitle": "Edit root group: {name}",
-      "rootDescription": "Root groups are fixed per product group — you can edit the name, description, visibility and default size chart.",
-      "groupFixed": "This root group is fixed to this product group",
+      "rootDescription": "Fixed root group — the name is fixed; edit only the description and visibility. Size charts are set on each product type.",
       "createdWithChart": "Product type added with its own size chart",
       "sizeMode": {
         "recommended": "Recommended",
@@ -1262,7 +1257,7 @@
         },
         "preset": {
           "title": "Use an existing size chart",
-          "description": "Attach an existing chart of the same product group, or follow the root group's chart."
+          "description": "Attach an existing size chart template of the same product group."
         }
       },
       "slugGenerate": "Generate a short slug from the name",
@@ -1275,7 +1270,8 @@
         "missingRows": "{count, plural, one {# size row has} other {# size rows have}} no measurements",
         "cancel": "Cancel",
         "done": "Done"
-      }
+      },
+      "noSizeChart": "This product group does not use size charts."
     },
     "field": {
       "name": "Type name",
@@ -1321,29 +1317,21 @@
         "none": "None",
         "group": "Product group"
       },
-      "lang": {
-        "vi": "Vietnamese",
-        "en": "English"
-      },
       "chart": {
-        "open": "Open size chart",
-        "own": "This type's own chart",
-        "inherited": "Following the root group {name}'s chart",
-        "size": "Size",
-        "empty": "This size chart has no measurements yet."
+        "open": "Open size chart"
       }
     },
     "list": {
-      "title": "Display order",
+      "title": "Product types",
       "columnStatus": "Visible",
-      "dragHint": "Drag the ⋮⋮ handle to reorder within the same level — shoppers see categories in this order.",
-      "dragHandle": "Drag to reorder {name}",
-      "toggleLabel": "Show {name} on the store",
-      "columnProducts": "Products"
+      "columnProducts": "Products",
+      "columnSkus": "SKUs",
+      "columnActions": "Actions"
     },
     "row": {
       "children": "{count, plural, one {# subcategory} other {# subcategories}}",
-      "products": "{count, plural, one {# product} other {# products}}"
+      "products": "{count, plural, one {# product} other {# products}}",
+      "parent": "In {name}"
     },
     "diagram": {
       "title": "Category map",
@@ -1352,18 +1340,19 @@
       "legendProducts": "Bar length = product count",
       "hidden": "Hidden",
       "storeMeta": "{count, plural, one {# category} other {# categories}}",
-      "collapsed": "{count, plural, one {# subcategory collapsed} other {# subcategories collapsed}}"
+      "collapsed": "{count, plural, one {# subcategory collapsed} other {# subcategories collapsed}}",
+      "dragHint": "Drag the ⋮⋮ handle on the map to reorder within the same level — shoppers see categories in this order.",
+      "dragHandle": "Drag to reorder {name}"
     },
     "createType": "Add product type"
   },
   "sizeCharts": {
     "create": {
-      "open": "New size chart",
-      "title": "New size chart",
-      "description": "Name it and pick a product group — suitable measurements are suggested for you.",
-      "namePlaceholder": "e.g. Traditional áo dài, fitted",
-      "groupHint": "Accessories and fabric sold by the meter don't need a size chart.",
-      "submit": "Create and enter data",
+      "open": "Create size chart",
+      "title": "Create size chart template",
+      "description": "Enter the details, measuring guide and bigsize surcharge — sizes are entered on the detail page.",
+      "groupHint": "Accessories and fabric sold by the metre don't need a size chart.",
+      "submit": "Create size chart",
       "success": "Size chart created"
     },
     "groupLabel": "Product group",
@@ -1373,16 +1362,11 @@
     "noResults": "No size charts match.",
     "column": {
       "name": "Chart",
-      "group": "Product group",
-      "sizes": "Sizes",
       "products": "Products using",
       "status": "Status",
       "actions": "Actions"
     },
-    "columnsCount": "{count, plural, one {# measurement} other {# measurements}}",
-    "bigsizeConfigured": "bigsize thresholds set",
     "noRows": "No sizes yet",
-    "categoriesCount": "{count, plural, one {# product type} other {# product types}}",
     "status": {
       "active": "Active",
       "inactive": "Inactive"
@@ -1396,11 +1380,11 @@
     "processing": "Processing...",
     "menu": {
       "label": "Actions for {name}",
-      "edit": "Edit data",
-      "preview": "Preview size advisor",
+      "view": "View details",
+      "edit": "Edit details",
       "duplicate": "Duplicate",
-      "activate": "Activate",
-      "deactivate": "Deactivate",
+      "activate": "Apply",
+      "deactivate": "Stop applying",
       "delete": "Delete"
     },
     "surcharge": {
@@ -1410,41 +1394,16 @@
     },
     "field": {
       "name": "Chart name",
-      "nameEn": "English name",
       "group": "Product group",
-      "description": "Internal note",
+      "description": "Note",
       "isActive": "Active in store",
       "isActiveHint": "Customers see the size chart and can use “Find my size” on product pages.",
       "isActiveEmpty": "Add at least one size row before activating.",
       "surchargeType": "Surcharge type",
       "surchargeValue": "Surcharge",
       "extraFabric": "Extra fabric",
-      "measurementGuide": "How to measure",
-      "measurementGuideEn": "How to measure (English)",
+      "measurementGuide": "Self-measuring guide",
       "guideImage": "Measurement guide image"
-    },
-    "editor": {
-      "back": "Size charts",
-      "untitled": "Untitled size chart",
-      "usage": "Used by {products, plural, one {# product} other {# products}} · {categories, plural, one {# product type} other {# product types}}",
-      "unsaved": "Unsaved",
-      "preview": "Preview",
-      "save": "Save chart",
-      "saved": "Size chart saved",
-      "gridTitle": "Measurements",
-      "gridDescription": "Each row is a size, each cell a min – max range. Red cells fall outside the column's valid range.",
-      "issues": "{count, plural, one {# cell to fix} other {# cells to fix}}",
-      "infoTitle": "Details",
-      "groupLocked": "This chart is assigned to product types, so its group can't change.",
-      "bigsizeTitle": "Bigsize & tailoring surcharge",
-      "bigsizeDescription": "Tailored orders exceeding “Bigsize from” in any column get a surcharge and the workshop is told to prepare extra fabric.",
-      "surchargeInvalid": "Enter a surcharge above 0 (percent at most 100).",
-      "bigsizeColumnsHint": "{count, plural, =0 {No column has a bigsize threshold yet — fill the “Bigsize from” row at the bottom of the grid.} one {# column has a bigsize threshold (“Bigsize from” row of the grid).} other {# columns have a bigsize threshold (“Bigsize from” row of the grid).}}",
-      "guideTitle": "Measuring guide",
-      "guideDescription": "Shown in the “How to measure” tab of the size advisor.",
-      "guidePlaceholder": "e.g. Waist — measure around the narrowest part, about 2–3 cm above the navel, snug but not tight.",
-      "uploadImage": "Upload image",
-      "removeImage": "Remove image"
     },
     "grid": {
       "pickColumns": "Measurements (click to add / remove a column)",
@@ -1472,40 +1431,61 @@
         "MIN_GT_MAX": "“From” is larger than “to”"
       }
     },
-    "preview": {
-      "title": "Size advisor preview",
-      "description": "What customers see on a phone. Uses the data being edited, no need to save."
+    "dialog": {
+      "editTitle": "Edit size chart: {name}",
+      "description": "General details, product group, measuring guide and bigsize surcharge of the size chart.",
+      "langLabel": "Content language",
+      "langHint": "Name, note and measuring guide change with the language; the other fields are shared.",
+      "untranslated": "No English version yet",
+      "nameRequired": "Please enter the size chart name",
+      "groupLocked": "This chart is attached to product types, so its product group can't change.",
+      "guideHint": "Shown in “How to measure” when shoppers pick a size.",
+      "bigsizeHint": "Tailoring orders with any measurement above a column's “Bigsize from” threshold get a surcharge and the workshop is told to prepare extra fabric. Thresholds are set in the size chart.",
+      "surchargeInvalid": "Enter a surcharge above 0 (percentage up to 100).",
+      "uploadImage": "Upload image",
+      "removeImage": "Remove image",
+      "save": "Save changes",
+      "saved": "Size chart saved",
+      "placeholders": {
+        "vi": {
+          "name": "Enter the size chart name",
+          "description": "Enter a note",
+          "guide": "E.g. Waist — measure around the narrowest part of the torso, 2–3 cm above the navel, snug but not tight."
+        },
+        "en": {
+          "name": "Enter the size chart name (English)",
+          "description": "Enter a note (English)",
+          "guide": "Enter the measuring guide (English)"
+        }
+      },
+      "guideSection": "Measuring guide & bigsize"
     },
-    "advisor": {
-      "eyebrow": "Size advisor",
-      "tab": {
-        "finder": "Find size",
-        "table": "Size chart",
-        "guide": "How to measure"
+    "gridDialog": {
+      "title": "Size chart: {name}",
+      "description": "Rows are sizes, columns are measurements; each cell is a from – to range. Red cells are outside the valid range. You can paste a cell range from Excel / Google Sheets.",
+      "issues": "{count, plural, one {# cell to fix} other {# cells to fix}}",
+      "save": "Save size chart",
+      "saved": "Size chart saved"
+    },
+    "detail": {
+      "back": "Size charts",
+      "editGrid": "Edit size chart",
+      "enterGrid": "Enter sizes",
+      "sections": {
+        "general": "General information",
+        "guide": "Measuring guide",
+        "bigsize": "Bigsize & tailoring surcharge",
+        "grid": "Size chart"
       },
-      "emptyChart": "This size chart has no data yet.",
-      "finderIntro": "Enter the measurements you know — not all are needed; more numbers mean a better match.",
-      "issue": {
-        "BELOW_MIN": "This looks too small (minimum {limit} {unit}) — please double-check.",
-        "ABOVE_MAX": "This looks too large (maximum {limit} {unit}) — wrong unit perhaps?"
-      },
-      "result": {
-        "size": "Size {size}",
-        "fit": "Size {size} fits you.",
-        "tight": "Size {size} fits, but the {keys} is a bit snug — choose a stretch silk or order a tailored fit.",
-        "tightWithNext": "Size {size} fits, but the {keys} is a bit snug — choose a stretch silk, go up to {next} or order a tailored fit.",
-        "noFit": "Your measurements don't match any ready-made size (closest is {size}).",
-        "noFitCustom": "Your measurements don't match any ready-made size — Thiên Canh recommends a tailored fit for the best result.",
-        "insufficient": "Add your bust, waist or hips for a more accurate suggestion.",
-        "loose": "The {keys} will be a little loose in this size.",
-        "bigsize": "Your {keys} falls in the bigsize range for tailoring.",
-        "surcharge": "Surcharge {amount}.",
-        "extraFabric": "About {meters} m of extra fabric is needed."
-      },
-      "fullTable": "See the full size chart",
+      "noNote": "No note yet",
+      "noGuide": "No measuring guide yet",
+      "noEnglish": "No English version yet",
+      "surchargeNone": "No surcharge",
+      "bigsizeColumns": "Bigsize thresholds",
+      "bigsizeNone": "None yet",
       "sizeColumn": "Size",
-      "guideImageAlt": "Measurement guide",
-      "emptyGuide": "No measuring guide yet."
+      "emptyGrid": "This size chart has no measurements yet.",
+      "actions": "Actions"
     }
   },
   "materials": {
@@ -1791,36 +1771,6 @@
       "confirm": "Delete",
       "success": "Value deleted"
     },
-    "group": {
-      "COLOR": {
-        "label": "Colors",
-        "hint": "SKU variant colors, grouped into families for storefront filters."
-      },
-      "SIZE": {
-        "label": "Sizes",
-        "hint": "SKU size labels from small to large — matching size chart rows."
-      },
-      "NECKLINE": {
-        "label": "Necklines",
-        "hint": "Mandarin, boat, V-neck... for filtering and describing products."
-      },
-      "SLEEVE": {
-        "label": "Sleeves",
-        "hint": "Long, three-quarter, raglan..."
-      },
-      "PATTERN_TECHNIQUE": {
-        "label": "Pattern techniques",
-        "hint": "Hand embroidery, hand painting, beading, print, woven motif..."
-      },
-      "FLAP_LENGTH": {
-        "label": "Flap length",
-        "hint": "Knee-length, ankle-length, high slit..."
-      },
-      "OCCASION": {
-        "label": "Occasions",
-        "hint": "Wedding, Tết, office, photoshoot..."
-      }
-    },
     "family": {
       "RED": "Red",
       "PINK": "Pink",
@@ -1835,6 +1785,37 @@
       "BLACK": "Black",
       "MULTI": "Multicolor",
       "none": "No family"
+    },
+    "addGroup": "Add attribute group",
+    "groupMenu": {
+      "label": "Actions for group {name}",
+      "edit": "Edit group",
+      "delete": "Delete group",
+      "deleteBlocked": "Still has values — delete them first"
+    },
+    "groupDialog": {
+      "createTitle": "Add attribute group",
+      "editTitle": "Edit group: {name}",
+      "description": "A new design attribute group (e.g. Style, Trim) — products can pick several values to filter and describe them.",
+      "name": "Group name",
+      "nameRequired": "Please enter the group name",
+      "codeHint": "Stable group code, generated from the name. Letters without accents, digits and hyphens only.",
+      "codeLocked": "Built-in system group — the code is fixed; only the name and description can change.",
+      "placeholders": {
+        "vi": {
+          "name": "Enter the group name",
+          "description": "Enter a description"
+        },
+        "en": {
+          "name": "Enter the group name (English)",
+          "description": "Enter a description (English)"
+        }
+      },
+      "created": "Attribute group added",
+      "updated": "Attribute group saved",
+      "deleted": "Attribute group deleted",
+      "deleteTitle": "Delete attribute group?",
+      "deleteBody": "The group is empty, so no product is affected."
     }
   }
 }

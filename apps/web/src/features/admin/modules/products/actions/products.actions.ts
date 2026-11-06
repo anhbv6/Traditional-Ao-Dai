@@ -29,7 +29,8 @@ import {
 } from "../utils/saleModes";
 
 const ACCESS = ADMIN_MODULE_ACCESS.products;
-const DESIGN_GROUPS = ["NECKLINE", "SLEEVE", "PATTERN_TECHNIQUE", "FLAP_LENGTH", "OCCASION"] as const;
+/** Nhóm tạo biến thể SKU — mọi nhóm khác (có sẵn hoặc admin thêm) là đặc tính thiết kế */
+const VARIANT_GROUP_CODES = ["COLOR", "SIZE"];
 
 function revalidateProducts(productId?: string) {
   revalidatePath("/admin/products");
@@ -220,8 +221,13 @@ export async function updateProductAction(raw: z.input<typeof updateProductSchem
         ? prisma.sizeChart.findUnique({ where: { id: normalized.sizeChartId }, select: { group: true } })
         : null,
       prisma.material.count({ where: { id: { in: [...new Set(materialIds)] } } }),
-      prisma.attributeValue.findMany({ where: { id: { in: colorIds }, group: "COLOR" }, select: { id: true, code: true, name: true } }),
-      prisma.attributeValue.count({ where: { id: { in: normalized.attributeIds }, group: { in: [...DESIGN_GROUPS] } } }),
+      prisma.attributeValue.findMany({
+        where: { id: { in: colorIds }, group: { code: "COLOR" } },
+        select: { id: true, code: true, name: true },
+      }),
+      prisma.attributeValue.count({
+        where: { id: { in: normalized.attributeIds }, group: { code: { notIn: VARIANT_GROUP_CODES } } },
+      }),
     ]);
     if (normalized.sizeChartId && (!chart || chart.group !== category.group)) {
       return { success: false as const, error: "PRODUCT_SIZE_CHART_GROUP_MISMATCH" };
@@ -332,7 +338,13 @@ export async function updateProductAction(raw: z.input<typeof updateProductSchem
 async function hasUnreadyProduct(productIds: string[]) {
   const products = await prisma.product.findMany({
     where: { id: { in: productIds } },
-    select: { images: true, basePrice: true, saleMode: true, setItems: true, variants: { select: { size: true, color: true } } },
+    select: {
+      images: true,
+      basePrice: true,
+      saleMode: true,
+      setItems: true,
+      variants: { select: { size: true, color: true } },
+    },
   });
   return products.some(
     (p) =>

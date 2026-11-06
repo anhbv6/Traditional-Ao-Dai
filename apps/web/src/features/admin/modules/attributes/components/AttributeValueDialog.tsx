@@ -18,12 +18,12 @@ import {
 import { toSlug } from "@/features/admin/modules/products";
 import { createAttributeAction, updateAttributeAction } from "../actions/attributes.actions";
 import { type AttributeFormValues } from "../schemas/attributes.schemas";
-import { type AdminAttributeValue } from "../types/attributes.types";
+import { type AdminAttributeData, type AdminAttributeGroup, type AdminAttributeValue } from "../types/attributes.types";
 import {
   COLOR_FAMILIES,
   COLOR_FAMILY_HEX,
+  localizedGroup,
   suggestColorFamily,
-  type AttributeGroup,
   type ColorFamily,
 } from "../utils/attributeMeta";
 
@@ -33,15 +33,15 @@ const LANG_FIELDS = {
   en: { name: "nameEn", description: "descriptionEn" },
 } as const satisfies Record<Lang, Record<string, keyof AttributeFormValues>>;
 
-function initialValues(group: AttributeGroup, value: AdminAttributeValue | null): AttributeFormValues {
+function initialValues(group: AdminAttributeGroup, value: AdminAttributeValue | null): AttributeFormValues {
   return {
-    group,
+    groupId: group.id,
     code: value?.code ?? "",
     name: value?.name ?? "",
     nameEn: value?.nameEn ?? "",
     description: value?.description ?? "",
     descriptionEn: value?.descriptionEn ?? "",
-    hex: value?.hex ?? (group === "COLOR" ? "#8B1E3F" : ""),
+    hex: value?.hex ?? (group.code === "COLOR" ? "#8B1E3F" : ""),
     family: value?.family ?? "",
     isActive: value?.isActive ?? true,
   };
@@ -54,11 +54,11 @@ export function AttributeValueDialog({
   onOpenChange,
   onSaved,
 }: {
-  group: AttributeGroup;
+  group: AdminAttributeGroup;
   /** null = thêm mới */
   value: AdminAttributeValue | null;
   onOpenChange: (open: boolean) => void;
-  onSaved: (values: AdminAttributeValue[]) => void;
+  onSaved: (data: AdminAttributeData) => void;
 }) {
   const t = useTranslations("AdminPage.attributes");
   const locale = useLocale();
@@ -69,7 +69,7 @@ export function AttributeValueDialog({
   const [isSaving, setIsSaving] = useState(false);
 
   const isNew = value === null;
-  const isColor = group === "COLOR";
+  const isColor = group.code === "COLOR";
   const fields = LANG_FIELDS[lang];
   // Mã gợi ý từ tên: "Đỏ đô" → "DO-DO"; size giữ nguyên ký hiệu "XL", "35"
   const effectiveCode = codeTouched ? values.code : toSlug(values.name).toUpperCase();
@@ -97,33 +97,30 @@ export function AttributeValueDialog({
         return;
       }
       notify.success(isNew ? t("dialog.created") : t("dialog.updated"));
-      onSaved(res.data.values);
+      onSaved(res.data);
       onOpenChange(false);
     } finally {
       setIsSaving(false);
     }
   };
 
-  const groupLabel = t(`group.${group}.label`);
+  const { name: groupLabel, description: groupDescription } = localizedGroup(group, locale);
 
   return (
     <AdminDialog
       open
       onOpenChange={onOpenChange}
       icon={isNew ? Plus : Pencil}
-      title={isNew ? t("dialog.createTitle", { group: groupLabel.toLowerCase() }) : t("dialog.editTitle", { name: value.name })}
-      description={t(`group.${group}.hint`)}
+      title={
+        isNew
+          ? t("dialog.createTitle", { group: groupLabel.toLowerCase() })
+          : t("dialog.editTitle", { name: value.name })
+      }
+      description={groupDescription || undefined}
       size="lg"
       onSubmit={handleSubmit}
       bodyClassName="space-y-4"
-      headerAside={
-        <AdminLangSwitch
-          value={lang}
-          onChange={setLang}
-          label={t("dialog.langLabel")}
-          className="mt-1"
-        />
-      }
+      headerAside={<AdminLangSwitch value={lang} onChange={setLang} label={t("dialog.langLabel")} className="mt-1" />}
       footer={
         <>
           <button type="button" onClick={() => onOpenChange(false)} className={ADMIN_DIALOG_SECONDARY_BUTTON_CLASS}>
@@ -219,7 +216,9 @@ export function AttributeValueDialog({
               })}
             </div>
             {!values.family && suggested && (
-              <p className="text-xs text-[#71717A]">{t("dialog.familySuggested", { family: t(`family.${suggested}`) })}</p>
+              <p className="text-xs text-[#71717A]">
+                {t("dialog.familySuggested", { family: t(`family.${suggested}`) })}
+              </p>
             )}
           </fieldset>
         </div>

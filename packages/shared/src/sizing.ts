@@ -7,6 +7,18 @@
 export const PRODUCT_GROUPS = ['AO_DAI', 'PANTS', 'ACCESSORY', 'FOOTWEAR', 'MATERIAL'] as const
 export type ProductGroup = (typeof PRODUCT_GROUPS)[number]
 
+/**
+ * Tên CỐ ĐỊNH của nhóm gốc theo nhóm hàng (mỗi nhóm hàng đúng một nhóm gốc) — tiệm chuyên áo dài nên các đầu mục chính
+ * không cho đổi tên. Nguồn duy nhất cho seed, server (ép lại khi sửa) và migration đồng bộ tên.
+ */
+export const PRODUCT_GROUP_NAMES: Record<ProductGroup, { name: string; nameEn: string }> = {
+  AO_DAI: { name: 'Áo dài', nameEn: 'Ao dai' },
+  PANTS: { name: 'Quần', nameEn: 'Pants' },
+  ACCESSORY: { name: 'Phụ kiện', nameEn: 'Accessories' },
+  FOOTWEAR: { name: 'Giày guốc', nameEn: 'Footwear' },
+  MATERIAL: { name: 'Nguyên liệu', nameEn: 'Materials' },
+}
+
 export const MEASUREMENT_KEYS = [
   'height',
   'weight',

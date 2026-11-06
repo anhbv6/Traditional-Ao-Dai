@@ -150,16 +150,6 @@ enum Season {
 }
 
 // Nhóm thuộc tính dùng chung: biến thể SKU (màu, size) và đặc tính thiết kế để lọc / mô tả sản phẩm
-enum AttributeGroup {
-  COLOR
-  SIZE
-  NECKLINE          // Kiểu cổ áo
-  SLEEVE            // Kiểu tay áo
-  PATTERN_TECHNIQUE // Kỹ thuật họa tiết: thêu tay, vẽ tay, đính kết, in...
-  FLAP_LENGTH       // Chiều dài tà
-  OCCASION          // Dịp sử dụng
-}
-
 // ==========================================
 // USER & AUTHENTICATION
 // ==========================================
@@ -924,9 +914,31 @@ model Material {
 }
 
 // Giá trị thuộc tính theo nhóm (màu, size, kiểu cổ...). Màu có mã hex + họ màu để lọc trên cửa hàng.
+// Nhóm thuộc tính (thuộc tính cha). Nhóm hệ thống tạo bằng migration / seed và không xóa được:
+// COLOR, SIZE (biến thể SKU, có hành vi riêng) và NECKLINE, SLEEVE, PATTERN_TECHNIQUE, FLAP_LENGTH, OCCASION
+// (đặc tính thiết kế). Admin thêm được nhóm đặc tính thiết kế mới (VD "Chất liệu viền", "Phong cách").
+model AttributeGroup {
+  id            String           @id @default(uuid())
+  code          String           @unique // Mã ổn định, VD "COLOR", "NECKLINE", "PHONG-CACH"
+  name          String
+  nameEn        String?
+  description   String?
+  descriptionEn String?
+  isSystem      Boolean          @default(false)
+  position      Int              @default(0)
+
+  values        AttributeValue[]
+
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  @@index([position])
+}
+
 model AttributeValue {
   id            String         @id @default(uuid())
-  group         AttributeGroup
+  groupId       String
+  group         AttributeGroup @relation(fields: [groupId], references: [id], onDelete: Restrict)
   code          String         // Mã ổn định trong nhóm, VD: "DO-DO", "S", "CO-TRU"
   name          String
   nameEn        String?
@@ -943,8 +955,8 @@ model AttributeValue {
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
 
-  @@unique([group, code])
-  @@index([group, position])
+  @@unique([groupId, code])
+  @@index([groupId, position])
 }
 
 // Đặc tính thiết kế của sản phẩm (kiểu cổ, tay, họa tiết, tà, dịp) — nhiều - nhiều với AttributeValue

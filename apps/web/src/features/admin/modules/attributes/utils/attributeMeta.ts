@@ -1,23 +1,11 @@
-import { CalendarHeart, Hand, MoveVertical, Palette, Ruler, Shirt, Sparkles, type LucideIcon } from "lucide-react";
+import { CalendarHeart, Hand, MoveVertical, Palette, Ruler, Shirt, Sparkles, Tag, type LucideIcon } from "lucide-react";
 
-export const ATTRIBUTE_GROUPS = [
-  "COLOR",
-  "SIZE",
-  "NECKLINE",
-  "SLEEVE",
-  "PATTERN_TECHNIQUE",
-  "FLAP_LENGTH",
-  "OCCASION",
-] as const;
-export type AttributeGroup = (typeof ATTRIBUTE_GROUPS)[number];
+/** Nhóm tạo biến thể SKU — có hành vi riêng (bảng màu, thước size); mọi nhóm khác là đặc tính thiết kế */
+export const VARIANT_GROUP_CODES = ["COLOR", "SIZE"] as const;
+export const isVariantGroup = (code: string) => (VARIANT_GROUP_CODES as readonly string[]).includes(code);
 
-/** Hai khối trên thanh chọn: tạo biến thể SKU và đặc tính thiết kế để lọc / mô tả sản phẩm */
-export const ATTRIBUTE_SECTIONS = [
-  { key: "variant", groups: ["COLOR", "SIZE"] },
-  { key: "design", groups: ["NECKLINE", "SLEEVE", "PATTERN_TECHNIQUE", "FLAP_LENGTH", "OCCASION"] },
-] as const satisfies readonly { key: string; groups: readonly AttributeGroup[] }[];
-
-export const ATTRIBUTE_GROUP_ICONS: Record<AttributeGroup, LucideIcon> = {
+/** Icon theo mã nhóm hệ thống; nhóm admin thêm dùng icon nhãn chung */
+export const ATTRIBUTE_GROUP_ICONS: Partial<Record<string, LucideIcon>> = {
   COLOR: Palette,
   SIZE: Ruler,
   NECKLINE: Shirt,
@@ -26,6 +14,21 @@ export const ATTRIBUTE_GROUP_ICONS: Record<AttributeGroup, LucideIcon> = {
   FLAP_LENGTH: MoveVertical,
   OCCASION: CalendarHeart,
 };
+
+/** Icon cho nhóm admin tự thêm */
+export const DEFAULT_GROUP_ICON: LucideIcon = Tag;
+
+/** Tên / mô tả nhóm theo ngôn ngữ admin (`en` dùng cột `En`, chưa nhập thì lùi về tiếng Việt) */
+export function localizedGroup(
+  group: { name: string; nameEn: string | null; description: string | null; descriptionEn: string | null },
+  locale: string
+) {
+  const isEn = locale === "en";
+  return {
+    name: isEn && group.nameEn ? group.nameEn : group.name,
+    description: (isEn && group.descriptionEn ? group.descriptionEn : group.description) ?? "",
+  };
+}
 
 /** Họ màu để gom bộ lọc màu trên cửa hàng (nhiều sắc "đỏ đô, đỏ son" → một ô "Đỏ") */
 export const COLOR_FAMILIES = [

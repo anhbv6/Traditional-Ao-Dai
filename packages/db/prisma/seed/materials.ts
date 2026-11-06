@@ -1,4 +1,62 @@
-import { prisma, type AttributeGroup, type Season } from '../../src'
+import { prisma, type Season } from '../../src'
+
+/**
+ * Nhóm thuộc tính hệ thống (không xóa được) — khớp migration 20261108020000_attribute_groups_table.
+ * COLOR, SIZE tạo biến thể SKU; các nhóm còn lại là đặc tính thiết kế. Admin thêm được nhóm đặc tính mới.
+ */
+const ATTRIBUTE_SYSTEM_GROUPS = [
+  {
+    code: 'COLOR',
+    name: 'Màu sắc',
+    nameEn: 'Colours',
+    description: 'Màu của biến thể SKU. Gom theo họ màu để khách lọc trên cửa hàng.',
+    descriptionEn: 'SKU variant colours, grouped into colour families for store filters.',
+  },
+  {
+    code: 'SIZE',
+    name: 'Kích thước',
+    nameEn: 'Sizes',
+    description: 'Ký hiệu size của biến thể SKU, xếp từ nhỏ đến lớn — khớp với hàng trong bảng size.',
+    descriptionEn: 'SKU size labels from smallest to largest — matching size chart rows.',
+  },
+  {
+    code: 'NECKLINE',
+    name: 'Kiểu cổ áo',
+    nameEn: 'Necklines',
+    description: 'Cổ trụ, cổ thuyền, cổ tim... dùng để lọc và mô tả sản phẩm.',
+    descriptionEn: 'Mandarin, boat, V-neck... used to filter and describe products.',
+  },
+  {
+    code: 'SLEEVE',
+    name: 'Kiểu tay áo',
+    nameEn: 'Sleeves',
+    description: 'Tay dài, tay lửng, tay raglan...',
+    descriptionEn: 'Long, three-quarter, raglan...',
+  },
+  {
+    code: 'PATTERN_TECHNIQUE',
+    name: 'Kỹ thuật họa tiết',
+    nameEn: 'Pattern techniques',
+    description: 'Thêu tay, vẽ tay, đính kết, in, dệt hoa văn...',
+    descriptionEn: 'Hand embroidery, hand painting, beading, print, woven motifs...',
+  },
+  {
+    code: 'FLAP_LENGTH',
+    name: 'Chiều dài tà',
+    nameEn: 'Flap lengths',
+    description: 'Tà ngắn qua gối, tà dài chấm gót, tà xẻ cao...',
+    descriptionEn: 'Knee-length, ankle-length, high slit...',
+  },
+  {
+    code: 'OCCASION',
+    name: 'Dịp sử dụng',
+    nameEn: 'Occasions',
+    description: 'Cưới hỏi, lễ Tết, công sở, chụp ảnh...',
+    descriptionEn: 'Weddings, Tết, office, photoshoots...',
+  },
+] as const
+
+type AttributeGroupCode = (typeof ATTRIBUTE_SYSTEM_GROUPS)[number]['code']
 
 type AttributeSeed = {
   code: string
@@ -11,7 +69,7 @@ type AttributeSeed = {
 }
 
 /** Thuộc tính chuẩn của tiệm — luôn tạo (cả production) vì form sản phẩm và bộ lọc dựa vào đây */
-const ATTRIBUTES: Record<AttributeGroup, AttributeSeed[]> = {
+const ATTRIBUTES: Record<AttributeGroupCode, AttributeSeed[]> = {
   COLOR: [
     { code: 'HONG-SEN', name: 'Hồng Sen', nameEn: 'Lotus Pink', hex: '#E7A1B0', family: 'PINK' },
     { code: 'DO-NHUNG', name: 'Đỏ Nhung', nameEn: 'Velvet Red', hex: '#8B1E2D', family: 'RED' },
@@ -164,15 +222,21 @@ export const DEMO_MATERIALS: MaterialSeed[] = [
   },
 ]
 
-/** Thuộc tính chuẩn: tạo nếu chưa có (không ghi đè chỉnh sửa của admin) */
+/** Nhóm hệ thống + thuộc tính chuẩn: tạo nếu chưa có (không ghi đè chỉnh sửa của admin) */
 export async function seedAttributes() {
   let count = 0
-  for (const [group, values] of Object.entries(ATTRIBUTES) as [AttributeGroup, AttributeSeed[]][]) {
-    for (const [position, value] of values.entries()) {
+  for (const [position, group] of ATTRIBUTE_SYSTEM_GROUPS.entries()) {
+    const saved = await prisma.attributeGroup.upsert({
+      where: { code: group.code },
+      update: { isSystem: true },
+      create: { ...group, isSystem: true, position },
+      select: { id: true },
+    })
+    for (const [valuePosition, value] of ATTRIBUTES[group.code].entries()) {
       await prisma.attributeValue.upsert({
-        where: { group_code: { group, code: value.code } },
+        where: { groupId_code: { groupId: saved.id, code: value.code } },
         update: {},
-        create: { group, position, ...value },
+        create: { groupId: saved.id, position: valuePosition, ...value },
       })
       count++
     }

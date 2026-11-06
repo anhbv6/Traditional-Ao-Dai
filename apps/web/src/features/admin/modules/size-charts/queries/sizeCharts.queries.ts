@@ -6,16 +6,12 @@ import { type AdminSizeChartDetail, type AdminSizeChartListItem } from "../types
 import { parseRowValues } from "../utils/sizeChartData";
 
 /**
- * Sản phẩm đang dùng bảng size: gắn trực tiếp, hoặc chưa gắn riêng và thừa hưởng từ loại sản phẩm
- * (loại con chưa gắn thì lấy của nhóm gốc). Cùng quy tắc với storefront khi chọn bảng size hiển thị.
+ * Sản phẩm đang dùng bảng size: gắn trực tiếp, hoặc chưa gắn riêng và theo bảng của loại sản phẩm
+ * (nhóm gốc không có bảng size). Cùng quy tắc với storefront khi chọn bảng size hiển thị.
  */
 export function sizeChartUsageWhere(sizeChartId: string): Prisma.ProductWhereInput {
   return {
-    OR: [
-      { sizeChartId },
-      { sizeChartId: null, category: { defaultSizeChartId: sizeChartId } },
-      { sizeChartId: null, category: { defaultSizeChartId: null, parent: { defaultSizeChartId: sizeChartId } } },
-    ],
+    OR: [{ sizeChartId }, { sizeChartId: null, category: { defaultSizeChartId: sizeChartId } }],
   };
 }
 

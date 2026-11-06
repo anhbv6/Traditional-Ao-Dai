@@ -262,7 +262,11 @@ export function TraitGrid({ values, reorderDisabled, ...handlers }: ViewProps) {
           <span className="grid size-7 shrink-0 place-items-center rounded-md bg-[#F4F4F5] font-mono text-xs font-semibold text-[#52525B]">
             {String(index + 1).padStart(2, "0")}
           </span>
-          <button type="button" onClick={() => handlers.onEdit(value)} className="min-w-0 flex-1 cursor-pointer text-left">
+          <button
+            type="button"
+            onClick={() => handlers.onEdit(value)}
+            className="min-w-0 flex-1 cursor-pointer text-left"
+          >
             <p className="flex items-center gap-2 text-sm font-semibold text-[#09090B]">
               <span className="truncate">{value.name}</span>
               {!value.isActive && <HiddenTag />}

@@ -1,12 +1,13 @@
 import { notFound } from "next/navigation";
-import { SizeChartEditor, getAdminSizeChartDetailQuery } from "@/features/admin/modules/size-charts";
+import { SizeChartDetail, getAdminSizeChartDetailQuery } from "@/features/admin/modules/size-charts";
 import { requireAdminPage } from "@/features/admin/core/server/adminAuth.server";
 import { ADMIN_MODULE_ACCESS } from "@/features/admin/core/session/permissions";
 import { AdminPage } from "@/features/admin/core/ui";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminSizeChartEditorPage({ params }: { params: Promise<{ id: string }> }) {
+/** Màn chi tiết (chỉ xem) bảng size mẫu — sửa thông tin / số đo mở dialog */
+export default async function AdminSizeChartDetailPage({ params }: { params: Promise<{ id: string }> }) {
   await requireAdminPage(ADMIN_MODULE_ACCESS.sizeCharts);
   const { id } = await params;
 
@@ -16,7 +17,7 @@ export default async function AdminSizeChartEditorPage({ params }: { params: Pro
 
   return (
     <AdminPage>
-      <SizeChartEditor key={chart.updatedAt} initialChart={chart} />
+      <SizeChartDetail chart={chart} />
     </AdminPage>
   );
 }

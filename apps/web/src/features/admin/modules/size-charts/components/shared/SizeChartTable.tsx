@@ -2,20 +2,21 @@
 
 import { useTranslations } from "next-intl";
 import { MEASUREMENT_UNITS } from "@repo/shared/sizing";
-import { formatRange, type AdminSizeChartDetail } from "@/features/admin/modules/size-charts";
+import { type AdminSizeChartDetail } from "../../types/sizeCharts.types";
+import { formatRange } from "../../utils/sizeChartData";
 
 /**
- * Bảng size chỉ xem trong màn chi tiết loại sản phẩm: hàng = size, cột = thông số đo (khoảng từ – đến).
- * Sửa số đo ở màn Bảng size mẫu.
+ * Bảng size chỉ xem: hàng = size, cột = thông số đo (khoảng từ – đến). Dùng ở màn chi tiết bảng size mẫu và màn chi
+ * tiết loại sản phẩm; sửa số đo qua dialog nhập bảng size.
  */
-export function CategorySizeChartTable({ chart }: { chart: Pick<AdminSizeChartDetail, "columns" | "rows"> }) {
-  const t = useTranslations("AdminPage.categories.detail.chart");
+export function SizeChartTable({ chart }: { chart: Pick<AdminSizeChartDetail, "columns" | "rows"> }) {
+  const t = useTranslations("AdminPage.sizeCharts.detail");
   const tSizing = useTranslations("AdminPage.sizing");
 
   if (chart.rows.length === 0 || chart.columns.length === 0) {
     return (
       <p className="rounded-lg border border-dashed border-[#E4E4E7] px-3 py-6 text-center text-xs text-[#71717A]">
-        {t("empty")}
+        {t("emptyGrid")}
       </p>
     );
   }
@@ -26,7 +27,7 @@ export function CategorySizeChartTable({ chart }: { chart: Pick<AdminSizeChartDe
         <thead>
           <tr className="text-left">
             <th className="sticky left-0 z-10 border-b border-dashed border-[#E4E4E7] bg-white px-3 py-2.5 text-body font-semibold text-[#09090B]">
-              {t("size")}
+              {t("sizeColumn")}
             </th>
             {chart.columns.map((column) => (
               <th

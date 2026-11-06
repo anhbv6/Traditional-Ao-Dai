@@ -108,11 +108,19 @@ export interface AdminProductMaterialOption {
 /** Giá trị thuộc tính dùng trong form sản phẩm (màu, size, đặc tính thiết kế) */
 export interface AdminProductAttributeOption {
   id: string;
-  group: "COLOR" | "SIZE" | "NECKLINE" | "SLEEVE" | "PATTERN_TECHNIQUE" | "FLAP_LENGTH" | "OCCASION";
+  /** Mã nhóm thuộc tính: COLOR, SIZE hoặc nhóm đặc tính thiết kế (có sẵn hoặc admin thêm) */
+  group: string;
   code: string;
   name: string;
   hex: string | null;
   isActive: boolean;
+}
+
+/** Nhóm đặc tính thiết kế (không gồm màu / size) theo thứ tự ở màn Thuộc tính */
+export interface AdminProductDesignGroup {
+  code: string;
+  name: string;
+  nameEn: string | null;
 }
 
 /** Dữ liệu tham chiếu cho màn chi tiết sản phẩm */
@@ -121,4 +129,5 @@ export interface AdminProductEditorOptions {
   sizeCharts: AdminProductSizeChart[];
   materials: AdminProductMaterialOption[];
   attributes: AdminProductAttributeOption[];
+  designGroups: AdminProductDesignGroup[];
 }

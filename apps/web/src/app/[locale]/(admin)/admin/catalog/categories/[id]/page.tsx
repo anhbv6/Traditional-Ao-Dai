@@ -20,12 +20,9 @@ export default async function AdminCategoryDetailPage({ params }: { params: Prom
   const node = findCategory(tree, id);
   if (!node) notFound();
 
-  // Bảng size đang áp dụng: của riêng loại, hoặc thừa hưởng nhóm gốc (cùng quy tắc với bảng danh sách)
-  const parent = tree.find((root) => root.id === node.parentId);
-  const ownChartId = node.defaultSizeChartId;
-  const inheritedChartId = !ownChartId && parent?.group === node.group ? parent.defaultSizeChartId : null;
-  const chartId = ownChartId ?? inheritedChartId;
-  const chart = chartId ? await getAdminSizeChartDetailQuery(chartId) : null;
+  // Bảng size gắn ở loại sản phẩm (nhóm gốc không có bảng size)
+  const chart =
+    node.parentId && node.defaultSizeChartId ? await getAdminSizeChartDetailQuery(node.defaultSizeChartId) : null;
 
   return (
     <AdminPage>
@@ -33,7 +30,7 @@ export default async function AdminCategoryDetailPage({ params }: { params: Prom
         node={node}
         roots={tree}
         sizeCharts={sizeCharts}
-        sizeChart={chart ? { chart, source: ownChartId ? "own" : "inherited" } : null}
+        sizeChart={chart}
       />
     </AdminPage>
   );

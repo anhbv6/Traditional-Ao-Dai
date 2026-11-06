@@ -19,18 +19,26 @@ const categoryFields = z.object({
   parentId: z.uuid().nullable(),
 });
 
-/** Cách gắn bảng size khi thêm loại: tự nhập bảng riêng (mặc định) hoặc dùng bảng size mẫu có sẵn */
+/** Cách gắn bảng size cho loại sản phẩm (thêm / sửa): tự nhập bảng riêng hoặc dùng bảng size mẫu có sẵn */
 export const SIZE_CHART_MODES = ["custom", "preset"] as const;
 export type SizeChartMode = (typeof SIZE_CHART_MODES)[number];
+
+const sizeChartFields = {
+  sizeChartMode: z.enum(SIZE_CHART_MODES),
+  /**
+   * Bảng size nhập ngay trong dialog khi `sizeChartMode = "custom"` (nhóm hàng có size).
+   * Khi sửa: null = giữ nguyên bảng đang gắn.
+   */
+  sizeChart: sizeChartGridSchema.nullable(),
+};
 
 /** Chỉ thêm LOẠI SẢN PHẨM — nhóm gốc cố định theo nhóm hàng, không tạo từ giao diện */
 export const createCategorySchema = categoryFields.extend({
   parentId: z.uuid("CATEGORY_PARENT_REQUIRED"),
-  sizeChartMode: z.enum(SIZE_CHART_MODES),
-  /** Bảng size nhập ngay trong dialog khi `sizeChartMode = "custom"` (nhóm hàng có size) */
-  sizeChart: sizeChartGridSchema.nullable(),
+  ...sizeChartFields,
 });
-export const updateCategorySchema = categoryFields.extend({ categoryId: z.uuid() });
+/** Sửa nhóm gốc (chỉ tên, mô tả, hiển thị — không có bảng size) hoặc loại sản phẩm */
+export const updateCategorySchema = categoryFields.extend({ categoryId: z.uuid(), ...sizeChartFields });
 
 export const reorderCategoriesSchema = z.object({
   parentId: z.uuid().nullable(),

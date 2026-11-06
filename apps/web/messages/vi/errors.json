@@ -217,5 +217,14 @@
   "PRODUCT_CUSTOM_FIT_NOT_ALLOWED": "Nhóm hàng của loại sản phẩm này không nhận may đo.",
   "PRODUCT_SIZE_INVALID": "Có SKU mang size không hợp với hình thức bán — hãy xóa hoặc sinh lại SKU.",
   "PRODUCT_SET_ITEMS_MIN": "Bán theo bộ cần ít nhất 2 món.",
-  "PRODUCT_SET_ITEM_REQUIRED": "Vui lòng nhập tên từng món trong bộ."
+  "PRODUCT_SET_ITEM_REQUIRED": "Vui lòng nhập tên từng món trong bộ.",
+  "CATEGORY_LOAD_FAILED": "Không tải được bảng size của loại sản phẩm.",
+  "ATTRIBUTE_GROUP_NAME_REQUIRED": "Vui lòng nhập tên nhóm.",
+  "ATTRIBUTE_GROUP_CODE_TAKEN": "Mã nhóm đã tồn tại.",
+  "ATTRIBUTE_GROUP_NOT_FOUND": "Không tìm thấy nhóm thuộc tính.",
+  "ATTRIBUTE_GROUP_SYSTEM_LOCKED": "Nhóm có sẵn của hệ thống không xóa được.",
+  "ATTRIBUTE_GROUP_NOT_EMPTY": "Nhóm còn giá trị — xóa hết giá trị trước khi xóa nhóm.",
+  "ATTRIBUTE_GROUP_CREATE_FAILED": "Không thêm được nhóm thuộc tính.",
+  "ATTRIBUTE_GROUP_UPDATE_FAILED": "Không lưu được nhóm thuộc tính.",
+  "ATTRIBUTE_GROUP_DELETE_FAILED": "Không xóa được nhóm thuộc tính."
 }

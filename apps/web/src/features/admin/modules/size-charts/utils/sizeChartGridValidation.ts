@@ -37,7 +37,8 @@ type GridData = {
 export function refineSizeChartGrid(data: GridData, ctx: z.RefinementCtx) {
   const keys = new Set<string>();
   data.columns.forEach((column, index) => {
-    if (keys.has(column.key)) ctx.addIssue({ code: "custom", path: ["columns", index], message: "SIZE_CHART_COLUMN_DUPLICATE" });
+    if (keys.has(column.key))
+      ctx.addIssue({ code: "custom", path: ["columns", index], message: "SIZE_CHART_COLUMN_DUPLICATE" });
     keys.add(column.key);
     if (column.validMin !== null && column.validMax !== null && column.validMin > column.validMax) {
       ctx.addIssue({ code: "custom", path: ["columns", index, "validMax"], message: "SIZE_CHART_RANGE_INVALID" });
@@ -47,7 +48,8 @@ export function refineSizeChartGrid(data: GridData, ctx: z.RefinementCtx) {
   const labels = new Set<string>();
   data.rows.forEach((row, rowIndex) => {
     const label = row.sizeLabel.toUpperCase();
-    if (labels.has(label)) ctx.addIssue({ code: "custom", path: ["rows", rowIndex, "sizeLabel"], message: "SIZE_LABEL_DUPLICATE" });
+    if (labels.has(label))
+      ctx.addIssue({ code: "custom", path: ["rows", rowIndex, "sizeLabel"], message: "SIZE_LABEL_DUPLICATE" });
     labels.add(label);
 
     for (const column of data.columns) {
@@ -59,10 +61,15 @@ export function refineSizeChartGrid(data: GridData, ctx: z.RefinementCtx) {
       const outOfRange = [range.min, range.max].some(
         (value) =>
           value !== null &&
-          ((column.validMin !== null && value < column.validMin) || (column.validMax !== null && value > column.validMax))
+          ((column.validMin !== null && value < column.validMin) ||
+            (column.validMax !== null && value > column.validMax))
       );
       if (outOfRange) {
-        ctx.addIssue({ code: "custom", path: ["rows", rowIndex, column.key], message: "SIZE_CHART_VALUE_OUT_OF_RANGE" });
+        ctx.addIssue({
+          code: "custom",
+          path: ["rows", rowIndex, column.key],
+          message: "SIZE_CHART_VALUE_OUT_OF_RANGE",
+        });
       }
     }
   });
@@ -73,5 +80,6 @@ export const sizeChartGridSchema = z.object(sizeChartGridFields).superRefine(ref
 export type SizeChartGridInput = z.input<typeof sizeChartGridSchema>;
 
 /** Hàng size có ít nhất một số đo — bảng "đã nhập" khi mọi hàng đều có số */
-export const rowHasMeasurement = (row: { values: Partial<Record<string, { min: number | null; max: number | null }>> }) =>
-  Object.values(row.values).some((range) => range && (range.min !== null || range.max !== null));
+export const rowHasMeasurement = (row: {
+  values: Partial<Record<string, { min: number | null; max: number | null }>>;
+}) => Object.values(row.values).some((range) => range && (range.min !== null || range.max !== null));

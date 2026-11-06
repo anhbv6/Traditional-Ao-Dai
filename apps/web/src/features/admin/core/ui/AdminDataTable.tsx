@@ -88,6 +88,10 @@ interface AdminDataTableProps<T> {
   empty?: ReactNode;
   /** Bề rộng tối thiểu của bảng trước khi cuộn ngang */
   minWidth?: number;
+  /** Dòng đang được trỏ từ nơi khác (vd sơ đồ đi kèm) — tô nền như dòng đang rê chuột */
+  activeRowId?: string | null;
+  /** Rê chuột vào / ra một dòng (null khi rời) — để đồng bộ với thành phần đi kèm */
+  onRowHover?: (row: T | null) => void;
 }
 
 const CELL_X = "px-3 first:pl-2 last:pr-2";
@@ -106,6 +110,8 @@ export function AdminDataTable<T>({
   mobileRow,
   empty,
   minWidth = 720,
+  activeRowId,
+  onRowHover,
 }: AdminDataTableProps<T>) {
   if (rows.length === 0) {
     return empty ? (
@@ -190,7 +196,10 @@ export function AdminDataTable<T>({
                 <tr
                   key={id}
                   data-selected={isSelected || undefined}
-                  className="group/row transition-colors hover:bg-[#FAFAFA] data-selected:bg-[#F4F4F5]/70 [&>td]:border-b [&>td]:border-dashed [&>td]:border-[#E4E4E7] last:[&>td]:border-b-0 [&>td:first-child]:rounded-l-xl [&>td:last-child]:rounded-r-xl"
+                  data-active={activeRowId === id || undefined}
+                  onMouseEnter={onRowHover && (() => onRowHover(row))}
+                  onMouseLeave={onRowHover && (() => onRowHover(null))}
+                  className="group/row transition-colors hover:bg-[#FAFAFA] data-active:bg-[#F4F4F5] data-selected:bg-[#F4F4F5]/70 [&>td]:border-b [&>td]:border-dashed [&>td]:border-[#E4E4E7] last:[&>td]:border-b-0 [&>td:first-child]:rounded-l-xl [&>td:last-child]:rounded-r-xl"
                 >
                   {selection && (
                     <td className="py-4 pl-2 pr-1">

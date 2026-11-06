@@ -40,13 +40,14 @@ export function AdminDetailHeader({
         <div className="min-w-[min(100%,14rem)] flex-1">
           <Link
             href={backHref}
-            className="mb-1 inline-flex items-center gap-1 text-sm font-medium text-[#71717A] hover:text-[#09090B]"
+            // Liên kết quay về nhỏ hẳn (10px — ngoại lệ thang chữ, theo yêu cầu thiết kế) để tiêu đề nổi bật
+            className="mb-1 inline-flex items-center gap-1 text-[10px] font-medium text-[#71717A] hover:text-[#09090B]"
           >
-            <ArrowLeft size={14} aria-hidden /> {backLabel}
+            <ArrowLeft size={11} aria-hidden /> {backLabel}
           </Link>
           <div className="flex min-w-0 items-center gap-2">
             {icon}
-            <h1 className="truncate text-xl font-semibold tracking-tight text-[#09090B]">{title}</h1>
+            <h1 className="truncate text-3xl font-semibold tracking-tight text-[#09090B]">{title}</h1>
             {badge}
           </div>
           {subtitle && <p className="mt-0.5 text-sm text-[#71717A]">{subtitle}</p>}

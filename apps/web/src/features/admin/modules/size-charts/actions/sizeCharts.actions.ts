@@ -8,13 +8,17 @@ import { authorizeAdminAction } from "../../../core/server/adminAuth.server";
 import { recordAudit } from "../../../core/server/audit.server";
 import { ADMIN_MODULE_ACCESS } from "../../../core/session/permissions";
 import { parseActionInput } from "@/features/admin/core/server/actionInput";
-import { getAdminSizeChartDetailQuery, getAdminSizeChartsQuery, sizeChartUsageWhere } from "../queries/sizeCharts.queries";
-import { toPreviewData } from "../utils/sizeChartData";
+import {
+  getAdminSizeChartDetailQuery,
+  getAdminSizeChartsQuery,
+  sizeChartUsageWhere,
+} from "../queries/sizeCharts.queries";
 import {
   createSizeChartSchema,
-  saveSizeChartSchema,
+  saveSizeChartGridSchema,
   sizeChartIdSchema,
   toggleSizeChartSchema,
+  updateSizeChartInfoSchema,
 } from "../schemas/sizeCharts.schemas";
 import { buildStarterSizeChart } from "../utils/sizeChartStarter";
 
@@ -26,8 +30,28 @@ function revalidateSizeCharts(sizeChartId?: string) {
   revalidatePath("/admin/catalog/categories");
 }
 
+type SizeChartInfo = z.infer<typeof createSizeChartSchema>;
+
+/** Cột thông tin của bảng size để ghi Prisma (chuỗi rỗng → null, không có phụ phí thì bỏ mức phụ phí) */
+function toSizeChartInfoData(values: SizeChartInfo) {
+  return {
+    name: values.name,
+    nameEn: values.nameEn || null,
+    group: values.group,
+    description: values.description || null,
+    descriptionEn: values.descriptionEn || null,
+    measurementGuide: values.measurementGuide || null,
+    measurementGuideEn: values.measurementGuideEn || null,
+    guideImage: values.guideImage || null,
+    bigsizeSurchargeType: values.surchargeType,
+    bigsizeSurchargeValue: values.surchargeType ? values.surchargeValue : null,
+    bigsizeExtraFabric: values.extraFabric,
+  };
+}
+
 /**
- * Server Action: tạo bảng size trống với các cột gợi ý theo nhóm hàng, rồi chuyển sang trình soạn
+ * Server Action: tạo bảng size từ dialog (đủ thông tin) với các cột số đo gợi ý theo nhóm hàng — số liệu nhập sau ở
+ * màn chi tiết. Bảng mới chưa có hàng size nên luôn ở trạng thái chưa áp dụng.
  */
 export async function createSizeChartAction(raw: z.input<typeof createSizeChartSchema>) {
   const auth = await authorizeAdminAction(ACCESS);
@@ -35,16 +59,15 @@ export async function createSizeChartAction(raw: z.input<typeof createSizeChartS
 
   const input = parseActionInput(createSizeChartSchema, raw);
   if (!input.success) return input;
-  const { name, group } = input.data;
+  const values = input.data;
 
   try {
     const created = await prisma.sizeChart.create({
       data: {
-        name,
-        group,
+        ...toSizeChartInfoData(values),
         // Bảng mới chưa có số liệu → chưa áp dụng để khách không thấy bảng rỗng
         isActive: false,
-        ...buildStarterSizeChart(group),
+        ...buildStarterSizeChart(values.group),
       },
       select: { id: true },
     });
@@ -54,7 +77,7 @@ export async function createSizeChartAction(raw: z.input<typeof createSizeChartS
       action: "SIZE_CHART_CREATED",
       targetType: "SIZE_CHART",
       targetId: created.id,
-      metadata: { name, group },
+      metadata: { name: values.name, group: values.group },
     });
     revalidateSizeCharts();
 
@@ -66,45 +89,65 @@ export async function createSizeChartAction(raw: z.input<typeof createSizeChartS
 }
 
 /**
- * Server Action: lưu toàn bộ bảng size (thông tin, cột, hàng, phụ phí). Cột/hàng ghi lại từ đầu trong một transaction
- * vì trình soạn luôn gửi đủ bảng.
+ * Server Action: sửa thông tin bảng size từ dialog (tên, ghi chú, nhóm hàng, hướng dẫn đo, phụ phí bigsize, áp dụng).
+ * Lưới số đo lưu riêng bằng `saveSizeChartGridAction`.
  */
-export async function saveSizeChartAction(raw: z.input<typeof saveSizeChartSchema>) {
+export async function updateSizeChartInfoAction(raw: z.input<typeof updateSizeChartInfoSchema>) {
   const auth = await authorizeAdminAction(ACCESS);
   if (!auth.success) return auth;
 
-  const input = parseActionInput(saveSizeChartSchema, raw);
+  const input = parseActionInput(updateSizeChartInfoSchema, raw);
   if (!input.success) return input;
-  const { sizeChartId, columns, rows, ...values } = input.data;
+  const { sizeChartId, isActive, ...values } = input.data;
 
   try {
-    const existing = await prisma.sizeChart.findUnique({ where: { id: sizeChartId }, select: { group: true } });
+    const existing = await prisma.sizeChart.findUnique({
+      where: { id: sizeChartId },
+      select: { group: true, _count: { select: { rows: true, categories: true } } },
+    });
     if (!existing) return { success: false as const, error: "SIZE_CHART_NOT_FOUND" };
     // Bảng đang gắn cho loại sản phẩm thì không đổi nhóm hàng — tránh áp bảng áo dài cho quần/guốc
-    if (values.group !== existing.group && (await prisma.category.count({ where: { defaultSizeChartId: sizeChartId } })) > 0) {
+    if (values.group !== existing.group && existing._count.categories > 0) {
       return { success: false as const, error: "SIZE_CHART_GROUP_LOCKED" };
     }
-    if (values.isActive && rows.length === 0) return { success: false as const, error: "SIZE_CHART_EMPTY" };
+    if (isActive && existing._count.rows === 0) return { success: false as const, error: "SIZE_CHART_EMPTY" };
 
-    const columnKeys = new Set(columns.map((column) => column.key));
+    await prisma.sizeChart.update({ where: { id: sizeChartId }, data: { ...toSizeChartInfoData(values), isActive } });
+
+    await recordAudit({
+      actorId: auth.user.id,
+      action: "SIZE_CHART_UPDATED",
+      targetType: "SIZE_CHART",
+      targetId: sizeChartId,
+      metadata: { name: values.name, group: values.group, isActive },
+    });
+    revalidateSizeCharts(sizeChartId);
+
+    return { success: true as const, data: { id: sizeChartId } };
+  } catch (error) {
+    console.error("Lỗi updateSizeChartInfoAction:", error);
+    return { success: false as const, error: "SIZE_CHART_UPDATE_FAILED" };
+  }
+}
+
+/**
+ * Server Action: lưu lưới số đo (cột + hàng) từ dialog nhập bảng size. Ghi lại từ đầu trong một transaction vì dialog
+ * luôn gửi đủ bảng; xóa hết hàng thì bảng tự ngừng áp dụng (khách không thấy bảng rỗng).
+ */
+export async function saveSizeChartGridAction(raw: z.input<typeof saveSizeChartGridSchema>) {
+  const auth = await authorizeAdminAction(ACCESS);
+  if (!auth.success) return auth;
+
+  const input = parseActionInput(saveSizeChartGridSchema, raw);
+  if (!input.success) return input;
+  const { sizeChartId, columns, rows } = input.data;
+
+  try {
+    const existing = await prisma.sizeChart.findUnique({ where: { id: sizeChartId }, select: { id: true } });
+    if (!existing) return { success: false as const, error: "SIZE_CHART_NOT_FOUND" };
+
+    const columnKeys = new Set<string>(columns.map((column) => column.key));
     await prisma.$transaction([
-      prisma.sizeChart.update({
-        where: { id: sizeChartId },
-        data: {
-          name: values.name,
-          nameEn: values.nameEn || null,
-          group: values.group,
-          description: values.description || null,
-          descriptionEn: values.descriptionEn || null,
-          measurementGuide: values.measurementGuide || null,
-          measurementGuideEn: values.measurementGuideEn || null,
-          guideImage: values.guideImage || null,
-          isActive: values.isActive,
-          bigsizeSurchargeType: values.surchargeType,
-          bigsizeSurchargeValue: values.surchargeType ? values.surchargeValue : null,
-          bigsizeExtraFabric: values.extraFabric,
-        },
-      }),
       prisma.sizeChartColumn.deleteMany({ where: { sizeChartId } }),
       prisma.sizeChartRow.deleteMany({ where: { sizeChartId } }),
       prisma.sizeChartColumn.createMany({
@@ -114,13 +157,16 @@ export async function saveSizeChartAction(raw: z.input<typeof saveSizeChartSchem
         data: rows.map((row, position) => ({
           sizeChartId,
           position,
-          sizeLabel: row.sizeLabel,
+          sizeLabel: row.sizeLabel.trim(),
           // Chỉ giữ số đo của các cột còn trong bảng
           values: Object.fromEntries(
-            Object.entries(row.values).filter(([key]) => columnKeys.has(key as (typeof columns)[number]["key"]))
+            Object.entries(row.values).filter(([key]) => columnKeys.has(key))
           ) as Prisma.InputJsonObject,
         })),
       }),
+      ...(rows.length === 0
+        ? [prisma.sizeChart.update({ where: { id: sizeChartId }, data: { isActive: false } })]
+        : [prisma.sizeChart.update({ where: { id: sizeChartId }, data: { updatedAt: new Date() } })]),
     ]);
 
     await recordAudit({
@@ -128,13 +174,13 @@ export async function saveSizeChartAction(raw: z.input<typeof saveSizeChartSchem
       action: "SIZE_CHART_UPDATED",
       targetType: "SIZE_CHART",
       targetId: sizeChartId,
-      metadata: { name: values.name, columns: columns.length, rows: rows.length, isActive: values.isActive },
+      metadata: { columns: columns.length, rows: rows.length },
     });
     revalidateSizeCharts(sizeChartId);
 
     return { success: true as const, data: { id: sizeChartId } };
   } catch (error) {
-    console.error("Lỗi saveSizeChartAction:", error);
+    console.error("Lỗi saveSizeChartGridAction:", error);
     return { success: false as const, error: "SIZE_CHART_UPDATE_FAILED" };
   }
 }
@@ -279,16 +325,16 @@ export async function deleteSizeChartAction(sizeChartId: string) {
 }
 
 /**
- * Server Action (chỉ đọc): dữ liệu bảng size để xem trước widget tư vấn size từ màn danh sách
+ * Server Action (chỉ đọc): chi tiết bảng size để mở dialog sửa thông tin ngay từ màn danh sách
  */
-export async function getSizeChartPreviewAction(sizeChartId: string) {
+export async function getSizeChartDetailAction(sizeChartId: string) {
   const auth = await authorizeAdminAction(ACCESS);
   if (!auth.success) return auth;
 
   const input = parseActionInput(sizeChartIdSchema, { sizeChartId });
   if (!input.success) return input;
 
-  const detail = await getAdminSizeChartDetailQuery(sizeChartId);
+  const detail = await getAdminSizeChartDetailQuery(input.data.sizeChartId);
   if (!detail) return { success: false as const, error: "SIZE_CHART_NOT_FOUND" };
-  return { success: true as const, data: toPreviewData(detail) };
+  return { success: true as const, data: detail };
 }

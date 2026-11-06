@@ -133,7 +133,7 @@ export async function getAdminProductDetailQuery(productId: string): Promise<Adm
   };
 }
 
-/** Query: loại sản phẩm theo thứ tự cây, kèm nhóm hàng và bảng size thừa hưởng */
+/** Query: loại sản phẩm theo thứ tự cây, kèm nhóm hàng và bảng size mặc định (nhóm gốc không có bảng size) */
 export async function getAdminProductCategoriesQuery(): Promise<AdminProductCategory[]> {
   const categories = await prisma.category.findMany({
     select: { id: true, name: true, group: true, parentId: true, position: true, defaultSizeChartId: true },
@@ -149,7 +149,7 @@ export async function getAdminProductCategoriesQuery(): Promise<AdminProductCate
         name: child.name,
         label: `${root.name} › ${child.name}`,
         group: child.group,
-        defaultSizeChartId: child.defaultSizeChartId ?? (child.group === root.group ? root.defaultSizeChartId : null),
+        defaultSizeChartId: child.defaultSizeChartId,
       })),
   ]);
 }
@@ -159,7 +159,7 @@ export async function getAdminProductCategoriesQuery(): Promise<AdminProductCate
  * thuộc tính màu / size / đặc tính thiết kế
  */
 export async function getAdminProductEditorOptionsQuery(): Promise<AdminProductEditorOptions> {
-  const [categories, charts, materials, attributes] = await Promise.all([
+  const [categories, charts, materials, attributes, designGroups] = await Promise.all([
     getAdminProductCategoriesQuery(),
     prisma.sizeChart.findMany({
       select: {
@@ -172,7 +172,16 @@ export async function getAdminProductEditorOptionsQuery(): Promise<AdminProductE
       orderBy: { name: "asc" },
     }),
     prisma.material.findMany({ orderBy: [{ position: "asc" }, { name: "asc" }] }),
-    prisma.attributeValue.findMany({ orderBy: [{ group: "asc" }, { position: "asc" }] }),
+    prisma.attributeValue.findMany({
+      orderBy: [{ group: { position: "asc" } }, { position: "asc" }],
+      include: { group: { select: { code: true } } },
+    }),
+    // Màu / size là biến thể SKU, còn lại là đặc tính thiết kế (kể cả nhóm admin tự thêm)
+    prisma.attributeGroup.findMany({
+      where: { code: { notIn: ["COLOR", "SIZE"] } },
+      orderBy: [{ position: "asc" }, { createdAt: "asc" }],
+      select: { code: true, name: true, nameEn: true },
+    }),
   ]);
 
   const sizeCharts: AdminProductSizeChart[] = charts.map(({ rows, ...chart }) => ({
@@ -207,12 +216,12 @@ export async function getAdminProductEditorOptionsQuery(): Promise<AdminProductE
 
   const attributeOptions: AdminProductAttributeOption[] = attributes.map((a) => ({
     id: a.id,
-    group: a.group,
+    group: a.group.code,
     code: a.code,
     name: a.name,
     hex: a.hex,
     isActive: a.isActive,
   }));
 
-  return { categories, sizeCharts, materials: materialOptions, attributes: attributeOptions };
+  return { categories, sizeCharts, materials: materialOptions, attributes: attributeOptions, designGroups };
 }

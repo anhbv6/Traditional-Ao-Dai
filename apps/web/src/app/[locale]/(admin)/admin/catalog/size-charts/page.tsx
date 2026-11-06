@@ -11,7 +11,7 @@ export default async function AdminSizeChartsPage() {
 
   return (
     <AdminPage>
-      <SizeChartsBoard initialCharts={charts} />
+      <SizeChartsBoard charts={charts} />
     </AdminPage>
   );
 }

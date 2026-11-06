@@ -15,7 +15,12 @@ import { cn } from "@/lib/utils";
 import { type SizeChartColumnValue, type SizeChartRowValue } from "../../types/sizeCharts.types";
 import { parseNumberInput } from "../../utils/sizeChartData";
 import { applyPastedGrid, createNextRow, getCellIssue, type GridIssues } from "../../utils/sizeChartGrid";
-import { DEFAULT_VALID_RANGE, MAX_SIZE_CHART_ROWS, SIZE_LABEL_PRESETS, nextSizeLabel } from "../../utils/sizeChartPresets";
+import {
+  DEFAULT_VALID_RANGE,
+  MAX_SIZE_CHART_ROWS,
+  SIZE_LABEL_PRESETS,
+  nextSizeLabel,
+} from "../../utils/sizeChartPresets";
 import { AdminTooltip } from "@/features/admin/core/ui";
 
 const NUMBER_CLASS =
@@ -47,7 +52,10 @@ export function SizeChartGrid({ group, columns, rows, issues, onColumnsChange, o
       return;
     }
     // Giữ thứ tự cột theo thứ tự chuẩn của MEASUREMENT_KEYS để bảng nào cũng đọc giống nhau
-    const added = [...columns, { key, validMin: DEFAULT_VALID_RANGE[key][0], validMax: DEFAULT_VALID_RANGE[key][1], bigsizeFrom: null }];
+    const added = [
+      ...columns,
+      { key, validMin: DEFAULT_VALID_RANGE[key][0], validMax: DEFAULT_VALID_RANGE[key][1], bigsizeFrom: null },
+    ];
     onColumnsChange(added.sort((a, b) => MEASUREMENT_KEYS.indexOf(a.key) - MEASUREMENT_KEYS.indexOf(b.key)));
   };
 
@@ -72,7 +80,17 @@ export function SizeChartGrid({ group, columns, rows, issues, onColumnsChange, o
 
   const addRow = () => {
     if (rows.length >= MAX_SIZE_CHART_ROWS) return;
-    onRowsChange([...rows, createNextRow(columns, rows, nextSizeLabel(group, rows.map((row) => row.sizeLabel)))]);
+    onRowsChange([
+      ...rows,
+      createNextRow(
+        columns,
+        rows,
+        nextSizeLabel(
+          group,
+          rows.map((row) => row.sizeLabel)
+        )
+      ),
+    ]);
   };
 
   /** Chỉ chặn dán mặc định khi dữ liệu là vùng nhiều ô (có tab/xuống dòng) */
@@ -133,7 +151,9 @@ export function SizeChartGrid({ group, columns, rows, issues, onColumnsChange, o
                 </th>
                 {columns.map((column) => (
                   <th key={column.key} className="border-b border-r border-[#E4E4E7] px-2 py-2 font-medium">
-                    <span className="block text-body font-semibold text-[#09090B]">{tSizing(`measurement.${column.key}`)}</span>
+                    <span className="block text-body font-semibold text-[#09090B]">
+                      {tSizing(`measurement.${column.key}`)}
+                    </span>
                     <span className="text-2xs">
                       {t("rangeHeader", { unit: tSizing(`unit.${MEASUREMENT_UNITS[column.key]}`) })}
                     </span>
@@ -171,7 +191,11 @@ export function SizeChartGrid({ group, columns, rows, issues, onColumnsChange, o
                       return (
                         <AdminTooltip
                           key={column.key}
-                          content={issue ? t(`issue.${issue}`, { min: column.validMin ?? "–", max: column.validMax ?? "–" }) : null}
+                          content={
+                            issue
+                              ? t(`issue.${issue}`, { min: column.validMin ?? "–", max: column.validMax ?? "–" })
+                              : null
+                          }
                         >
                           <td className="border-b border-r border-[#E4E4E7] px-2 py-1.5">
                             <div className="flex items-center gap-1">
@@ -185,7 +209,10 @@ export function SizeChartGrid({ group, columns, rows, issues, onColumnsChange, o
                                     aria-label={`${row.sizeLabel || rowIndex + 1} · ${tSizing(`measurement.${column.key}`)} ${t(bound)}`}
                                     aria-invalid={issue !== null}
                                     placeholder={t(bound)}
-                                    className={cn(NUMBER_CLASS, issue ? "border-rose-400 bg-rose-50 text-rose-700" : "border-[#E4E4E7]")}
+                                    className={cn(
+                                      NUMBER_CLASS,
+                                      issue ? "border-rose-400 bg-rose-50 text-rose-700" : "border-[#E4E4E7]"
+                                    )}
                                   />
                                 </span>
                               ))}
@@ -240,14 +267,20 @@ export function SizeChartGrid({ group, columns, rows, issues, onColumnsChange, o
                         value={column.validMin}
                         onValueChange={(value) => updateColumn(column.key, { validMin: value })}
                         aria-label={`${tSizing(`measurement.${column.key}`)} ${t("validMin")}`}
-                        className={cn(NUMBER_CLASS, issues.invalidColumns.has(column.key) ? "border-rose-400" : "border-[#E4E4E7]")}
+                        className={cn(
+                          NUMBER_CLASS,
+                          issues.invalidColumns.has(column.key) ? "border-rose-400" : "border-[#E4E4E7]"
+                        )}
                       />
                       <span className="text-[#A1A1AA]">–</span>
                       <NumberCell
                         value={column.validMax}
                         onValueChange={(value) => updateColumn(column.key, { validMax: value })}
                         aria-label={`${tSizing(`measurement.${column.key}`)} ${t("validMax")}`}
-                        className={cn(NUMBER_CLASS, issues.invalidColumns.has(column.key) ? "border-rose-400" : "border-[#E4E4E7]")}
+                        className={cn(
+                          NUMBER_CLASS,
+                          issues.invalidColumns.has(column.key) ? "border-rose-400" : "border-[#E4E4E7]"
+                        )}
                       />
                     </div>
                   </td>

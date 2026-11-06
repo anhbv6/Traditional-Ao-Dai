@@ -1,10 +1,12 @@
 import { prisma, type Prisma, type ProductGroup } from '../../src'
+import { PRODUCT_GROUP_NAMES } from '@repo/shared/sizing'
 
 // Cây loại sản phẩm + bảng size mẫu. Idempotent và KHÔNG ghi đè chỉnh sửa của admin:
 // - Loại sản phẩm: tạo mới nếu chưa có; loại cũ còn nằm ở gốc (dữ liệu trước khi có cây) được gắn vào nhóm cha.
 // - Bảng size: tạo nếu chưa có bảng cùng tên; loại sản phẩm chỉ nhận bảng mặc định khi đang trống.
 
-// Nhóm hàng (bản chất: may đo, đơn vị bán, có size) khai ở NHÓM GỐC; loại con luôn thừa hưởng, không khai riêng
+// Nhóm hàng (bản chất: may đo, đơn vị bán, có size) khai ở NHÓM GỐC; loại con luôn thừa hưởng, không khai riêng.
+// Bảng size chỉ gắn ở loại con — nhóm gốc không có bảng size.
 interface CategoryLeaf {
   slug: string
   name: string
@@ -12,7 +14,7 @@ interface CategoryLeaf {
   sizeChart?: string
 }
 
-interface CategoryNode extends CategoryLeaf {
+interface CategoryNode extends Omit<CategoryLeaf, 'sizeChart'> {
   group: ProductGroup
   children?: CategoryLeaf[]
 }
@@ -21,8 +23,7 @@ const CATEGORY_TREE: CategoryNode[] = [
   {
     // Mỗi nhóm hàng đúng một nhóm gốc (cố định, admin không tạo / xóa); nữ / nam / trẻ em là các loại bên trong
     slug: 'ao-dai',
-    name: 'Áo dài',
-    nameEn: 'Ao dai',
+    ...PRODUCT_GROUP_NAMES.AO_DAI,
     group: 'AO_DAI',
     children: [
       {
@@ -69,10 +70,8 @@ const CATEGORY_TREE: CategoryNode[] = [
   },
   {
     slug: 'quan-ao-dai',
-    name: 'Quần (đồ lẻ)',
-    nameEn: 'Pants (separates)',
+    ...PRODUCT_GROUP_NAMES.PANTS,
     group: 'PANTS',
-    sizeChart: 'pants',
     children: [
       {
         slug: 'quan-lua-ong-rong',
@@ -86,8 +85,7 @@ const CATEGORY_TREE: CategoryNode[] = [
   },
   {
     slug: 'phu-kien-ao-dai',
-    name: 'Phụ kiện',
-    nameEn: 'Accessories',
+    ...PRODUCT_GROUP_NAMES.ACCESSORY,
     group: 'ACCESSORY',
     children: [
       { slug: 'man-doi', name: 'Mấn đội', nameEn: 'Headpieces' },
@@ -99,15 +97,13 @@ const CATEGORY_TREE: CategoryNode[] = [
   {
     // Guốc có bảng size cỡ chân riêng nên là một nhóm gốc, không nằm trong Phụ kiện
     slug: 'giay-guoc',
-    name: 'Giày, guốc',
-    nameEn: 'Footwear',
+    ...PRODUCT_GROUP_NAMES.FOOTWEAR,
     group: 'FOOTWEAR',
     children: [{ slug: 'guoc-moc', name: 'Guốc mộc', nameEn: 'Wooden clogs', sizeChart: 'clogs' }],
   },
   {
     slug: 'nguyen-lieu',
-    name: 'Nguyên liệu',
-    nameEn: 'Materials',
+    ...PRODUCT_GROUP_NAMES.MATERIAL,
     group: 'MATERIAL',
     children: [{ slug: 'vai-may-ao-dai', name: 'Vải may áo dài', nameEn: 'Ao dai fabric' }],
   },

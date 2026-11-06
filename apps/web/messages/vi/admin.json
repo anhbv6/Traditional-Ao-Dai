@@ -1133,7 +1133,7 @@
       "AO_DAI": "Áo dài",
       "PANTS": "Quần",
       "ACCESSORY": "Phụ kiện",
-      "FOOTWEAR": "Giày, guốc",
+      "FOOTWEAR": "Giày guốc",
       "MATERIAL": "Nguyên liệu"
     },
     "groupHint": {
@@ -1214,9 +1214,7 @@
       "createChildTitle": "Thêm loại sản phẩm vào {name}",
       "description": "Nhóm hàng do nhóm gốc quyết định: cách may đo, đơn vị bán và bảng size cho mọi loại sản phẩm bên trong.",
       "chartNone": "Chưa gắn bảng size",
-      "chartInherit": "Theo bảng size của nhóm gốc",
       "chartInactive": "chưa áp dụng",
-      "chartHint": "Sản phẩm thuộc loại này dùng bảng size này để gợi ý size; từng sản phẩm vẫn chọn được bảng riêng.",
       "create": "Thêm loại",
       "save": "Lưu thay đổi",
       "created": "Đã thêm loại sản phẩm",
@@ -1238,16 +1236,13 @@
       "dialogDescription": "Tên, nhóm gốc và bảng size của loại sản phẩm.",
       "cancel": "Hủy",
       "nameRequired": "Vui lòng nhập tên loại sản phẩm",
-      "groupLabel": "Nhóm hàng & bảng size",
       "createTitle": "Thêm loại sản phẩm",
       "parentPlaceholder": "Vui lòng chọn nhóm",
       "parentRequired": "Vui lòng chọn nhóm cho loại sản phẩm",
       "parentHint": "Nhóm gốc là nhóm hàng (Áo dài, Quần, Phụ kiện, Giày guốc, Nguyên liệu) — quyết định may đo, đơn vị bán và có size hay không. Loại sản phẩm bên trong thừa hưởng.",
-      "groupPending": "Chọn “Thuộc nhóm” trước — nhóm hàng của loại sản phẩm lấy theo nhóm gốc.",
-      "groupInherited": "Theo nhóm gốc {name}",
+      "groupInherited": "Nhóm hàng: {name}",
       "editRootTitle": "Sửa nhóm gốc: {name}",
-      "rootDescription": "Nhóm gốc cố định theo nhóm hàng — sửa được tên, mô tả, hiển thị và bảng size mặc định.",
-      "groupFixed": "Nhóm gốc cố định theo nhóm hàng này",
+      "rootDescription": "Nhóm gốc cố định theo nhóm hàng — tên giữ cố định, chỉ sửa mô tả và hiển thị. Bảng size gắn ở từng loại sản phẩm.",
       "createdWithChart": "Đã thêm loại sản phẩm kèm bảng size riêng",
       "sizeMode": {
         "recommended": "Nên dùng",
@@ -1262,7 +1257,7 @@
         },
         "preset": {
           "title": "Dùng bảng size mẫu có sẵn",
-          "description": "Gắn một bảng size đã có cùng nhóm hàng, hoặc theo bảng size của nhóm gốc."
+          "description": "Gắn một bảng size mẫu đã có cùng nhóm hàng."
         }
       },
       "slugGenerate": "Tạo đường dẫn gọn từ tên",
@@ -1275,7 +1270,8 @@
         "missingRows": "Còn {count} hàng size chưa có số đo",
         "cancel": "Hủy",
         "done": "Xong"
-      }
+      },
+      "noSizeChart": "Nhóm hàng này không dùng bảng size."
     },
     "field": {
       "name": "Tên loại",
@@ -1321,29 +1317,21 @@
         "none": "Chưa có",
         "group": "Nhóm hàng"
       },
-      "lang": {
-        "vi": "Tiếng Việt",
-        "en": "English"
-      },
       "chart": {
-        "open": "Mở bảng size",
-        "own": "Bảng riêng của loại này",
-        "inherited": "Theo bảng size của nhóm gốc {name}",
-        "size": "Size",
-        "empty": "Bảng size chưa có số đo nào."
+        "open": "Mở bảng size"
       }
     },
     "list": {
-      "title": "Thứ tự hiển thị",
+      "title": "Danh sách loại sản phẩm",
       "columnStatus": "Hiển thị",
-      "dragHint": "Kéo biểu tượng ⋮⋮ để đổi thứ tự trong cùng cấp — khách thấy danh mục theo đúng thứ tự này.",
-      "dragHandle": "Kéo để đổi thứ tự {name}",
-      "toggleLabel": "Hiển thị {name} trên cửa hàng",
-      "columnProducts": "Sản phẩm"
+      "columnProducts": "Sản phẩm",
+      "columnSkus": "SKU",
+      "columnActions": "Thao tác"
     },
     "row": {
       "children": "{count} loại con",
-      "products": "{count} sản phẩm"
+      "products": "{count} sản phẩm",
+      "parent": "Thuộc {name}"
     },
     "diagram": {
       "title": "Sơ đồ danh mục",
@@ -1352,7 +1340,9 @@
       "legendProducts": "Vạch dài theo số sản phẩm",
       "hidden": "Đang ẩn",
       "storeMeta": "{count} danh mục",
-      "collapsed": "Đang thu gọn {count} loại con"
+      "collapsed": "Đang thu gọn {count} loại con",
+      "dragHint": "Kéo biểu tượng ⋮⋮ trên sơ đồ để đổi thứ tự trong cùng cấp — khách thấy danh mục theo đúng thứ tự này.",
+      "dragHandle": "Kéo để đổi thứ tự {name}"
     },
     "createType": "Thêm loại sản phẩm"
   },
@@ -1360,10 +1350,9 @@
     "create": {
       "open": "Tạo bảng size",
       "title": "Tạo bảng size mẫu",
-      "description": "Đặt tên và chọn nhóm hàng — hệ thống gợi ý sẵn các thông số đo phù hợp.",
-      "namePlaceholder": "VD: Áo dài truyền thống form ôm",
+      "description": "Nhập thông tin, hướng dẫn đo và phụ phí bigsize — số đo từng size nhập ở màn chi tiết.",
       "groupHint": "Phụ kiện và vải bán theo mét không cần bảng size.",
-      "submit": "Tạo và nhập số liệu",
+      "submit": "Tạo bảng size",
       "success": "Đã tạo bảng size"
     },
     "groupLabel": "Nhóm hàng",
@@ -1373,16 +1362,11 @@
     "noResults": "Không có bảng size nào khớp.",
     "column": {
       "name": "Tên bảng",
-      "group": "Nhóm hàng",
-      "sizes": "Các size",
       "products": "Sản phẩm dùng",
       "status": "Trạng thái",
       "actions": "Thao tác"
     },
-    "columnsCount": "{count} thông số",
-    "bigsizeConfigured": "có ngưỡng bigsize",
     "noRows": "Chưa nhập size",
-    "categoriesCount": "{count} loại sản phẩm",
     "status": {
       "active": "Đang áp dụng",
       "inactive": "Chưa áp dụng"
@@ -1396,8 +1380,8 @@
     "processing": "Đang xử lý...",
     "menu": {
       "label": "Thao tác với {name}",
-      "edit": "Sửa số liệu",
-      "preview": "Xem trước popup tư vấn",
+      "view": "Xem chi tiết",
+      "edit": "Sửa thông tin",
       "duplicate": "Nhân bản",
       "activate": "Áp dụng",
       "deactivate": "Ngừng áp dụng",
@@ -1410,9 +1394,8 @@
     },
     "field": {
       "name": "Tên bảng",
-      "nameEn": "Tên tiếng Anh",
       "group": "Nhóm hàng",
-      "description": "Ghi chú nội bộ",
+      "description": "Ghi chú",
       "isActive": "Áp dụng cho cửa hàng",
       "isActiveHint": "Khách thấy bảng size và dùng được “Tìm size vừa với tôi” trên trang sản phẩm.",
       "isActiveEmpty": "Cần nhập ít nhất một hàng size trước khi áp dụng.",
@@ -1420,31 +1403,7 @@
       "surchargeValue": "Mức phụ phí",
       "extraFabric": "Vải cộng thêm",
       "measurementGuide": "Hướng dẫn tự đo",
-      "measurementGuideEn": "Hướng dẫn tự đo (tiếng Anh)",
       "guideImage": "Hình minh họa vị trí đo"
-    },
-    "editor": {
-      "back": "Bảng size mẫu",
-      "untitled": "Bảng size chưa đặt tên",
-      "usage": "{products} sản phẩm · {categories} loại sản phẩm đang dùng",
-      "unsaved": "Chưa lưu",
-      "preview": "Xem trước",
-      "save": "Lưu bảng size",
-      "saved": "Đã lưu bảng size",
-      "gridTitle": "Bảng thông số",
-      "gridDescription": "Mỗi hàng là một size, mỗi ô là khoảng số đo nhỏ nhất – lớn nhất. Ô đỏ là số nằm ngoài ngưỡng hợp lệ của cột.",
-      "issues": "{count} ô cần sửa",
-      "infoTitle": "Thông tin",
-      "groupLocked": "Bảng đang gắn cho loại sản phẩm nên không đổi được nhóm hàng.",
-      "bigsizeTitle": "Bigsize & phụ phí may đo",
-      "bigsizeDescription": "Đơn may đo có số đo vượt ngưỡng “Bigsize từ” ở bất kỳ cột nào sẽ cộng phụ phí và báo xưởng chuẩn bị thêm vải.",
-      "surchargeInvalid": "Nhập mức phụ phí lớn hơn 0 (phần trăm tối đa 100).",
-      "bigsizeColumnsHint": "{count, plural, =0 {Chưa cột nào có ngưỡng bigsize — nhập ở hàng “Bigsize từ” cuối bảng thông số.} other {# cột đã có ngưỡng bigsize (hàng “Bigsize từ” cuối bảng thông số).}}",
-      "guideTitle": "Hướng dẫn đo",
-      "guideDescription": "Hiển thị trong tab “Cách đo” của popup tư vấn size.",
-      "guidePlaceholder": "VD: Vòng eo — đo quanh chỗ nhỏ nhất của bụng, cao hơn rốn khoảng 2–3 cm, thước vừa sát không siết.",
-      "uploadImage": "Tải ảnh lên",
-      "removeImage": "Xóa ảnh"
     },
     "grid": {
       "pickColumns": "Thông số đo (bấm để thêm / bỏ cột)",
@@ -1472,40 +1431,61 @@
         "MIN_GT_MAX": "Số “từ” lớn hơn số “đến”"
       }
     },
-    "preview": {
-      "title": "Xem trước popup tư vấn size",
-      "description": "Khách thấy như thế này trên điện thoại. Dữ liệu đang soạn, chưa cần lưu."
+    "dialog": {
+      "editTitle": "Sửa bảng size: {name}",
+      "description": "Thông tin chung, nhóm hàng, hướng dẫn đo và phụ phí bigsize của bảng size.",
+      "langLabel": "Ngôn ngữ nội dung",
+      "langHint": "Tên, ghi chú và hướng dẫn đo đổi theo ngôn ngữ; các trường còn lại dùng chung.",
+      "untranslated": "Chưa có bản tiếng Anh",
+      "nameRequired": "Vui lòng nhập tên bảng size",
+      "groupLocked": "Bảng đang gắn cho loại sản phẩm nên không đổi được nhóm hàng.",
+      "guideHint": "Hiển thị trong phần “Cách đo” khi khách chọn size.",
+      "bigsizeHint": "Đơn may đo có số đo vượt ngưỡng “Bigsize từ” ở bất kỳ cột nào sẽ cộng phụ phí và báo xưởng chuẩn bị thêm vải. Ngưỡng nhập ở bảng size.",
+      "surchargeInvalid": "Nhập mức phụ phí lớn hơn 0 (phần trăm tối đa 100).",
+      "uploadImage": "Tải ảnh lên",
+      "removeImage": "Xóa ảnh",
+      "save": "Lưu thay đổi",
+      "saved": "Đã lưu bảng size",
+      "placeholders": {
+        "vi": {
+          "name": "Vui lòng nhập tên bảng size",
+          "description": "Vui lòng nhập ghi chú",
+          "guide": "VD: Vòng eo — đo quanh chỗ nhỏ nhất của bụng, cao hơn rốn khoảng 2–3 cm, thước vừa sát không siết."
+        },
+        "en": {
+          "name": "Vui lòng nhập tên bảng size (tiếng Anh)",
+          "description": "Vui lòng nhập ghi chú (tiếng Anh)",
+          "guide": "Vui lòng nhập hướng dẫn đo (tiếng Anh)"
+        }
+      },
+      "guideSection": "Hướng dẫn đo & bigsize"
     },
-    "advisor": {
-      "eyebrow": "Tư vấn chọn size",
-      "tab": {
-        "finder": "Tìm size",
-        "table": "Bảng size",
-        "guide": "Cách đo"
+    "gridDialog": {
+      "title": "Bảng size: {name}",
+      "description": "Hàng là size, cột là thông số đo; mỗi ô là khoảng từ – đến. Ô đỏ là số nằm ngoài ngưỡng hợp lệ. Dán được vùng ô từ Excel / Google Sheets.",
+      "issues": "{count} ô cần sửa",
+      "save": "Lưu bảng size",
+      "saved": "Đã lưu bảng size"
+    },
+    "detail": {
+      "back": "Bảng size mẫu",
+      "editGrid": "Sửa bảng size",
+      "enterGrid": "Nhập bảng size",
+      "sections": {
+        "general": "Thông tin chung",
+        "guide": "Hướng dẫn đo",
+        "bigsize": "Bigsize & phụ phí may đo",
+        "grid": "Bảng size"
       },
-      "emptyChart": "Bảng size chưa có số liệu.",
-      "finderIntro": "Nhập số đo bạn nhớ — không cần đủ hết, càng nhiều số càng chính xác.",
-      "issue": {
-        "BELOW_MIN": "Số này có vẻ quá nhỏ (tối thiểu {limit} {unit}) — bạn kiểm tra lại nhé.",
-        "ABOVE_MAX": "Số này có vẻ quá lớn (tối đa {limit} {unit}) — có thể gõ nhầm đơn vị?"
-      },
-      "result": {
-        "size": "Size {size}",
-        "fit": "Bạn mặc vừa Size {size}.",
-        "tight": "Bạn mặc vừa Size {size}, nhưng {keys} hơi sát — nên chọn lụa có co giãn hoặc đặt may riêng.",
-        "tightWithNext": "Bạn mặc vừa Size {size}, nhưng {keys} hơi sát — nên chọn lụa có co giãn, lên Size {next} hoặc đặt may riêng.",
-        "noFit": "Số đo của bạn chưa khớp size may sẵn nào (gần nhất là {size}).",
-        "noFitCustom": "Số đo của bạn chưa khớp size may sẵn nào — Thiên Canh khuyên bạn đặt may theo số đo để áo vừa vặn nhất.",
-        "insufficient": "Nhập thêm vòng ngực, eo hoặc mông để gợi ý chính xác hơn.",
-        "loose": "Ở size này {keys} sẽ hơi rộng.",
-        "bigsize": "Số đo {keys} thuộc nhóm bigsize khi may đo.",
-        "surcharge": "Phụ phí {amount}.",
-        "extraFabric": "Cần thêm khoảng {meters} m vải."
-      },
-      "fullTable": "Xem cả bảng size",
+      "noNote": "Chưa có ghi chú",
+      "noGuide": "Chưa có hướng dẫn đo",
+      "noEnglish": "Chưa có bản tiếng Anh",
+      "surchargeNone": "Không có phụ phí",
+      "bigsizeColumns": "Ngưỡng bigsize",
+      "bigsizeNone": "Chưa có ngưỡng",
       "sizeColumn": "Size",
-      "guideImageAlt": "Hình minh họa vị trí đo",
-      "emptyGuide": "Chưa có hướng dẫn đo."
+      "emptyGrid": "Bảng size chưa có số đo nào.",
+      "actions": "Thao tác"
     }
   },
   "materials": {
@@ -1791,36 +1771,6 @@
       "confirm": "Xóa",
       "success": "Đã xóa giá trị"
     },
-    "group": {
-      "COLOR": {
-        "label": "Màu sắc",
-        "hint": "Màu của biến thể SKU. Gom theo họ màu để khách lọc trên cửa hàng."
-      },
-      "SIZE": {
-        "label": "Kích thước",
-        "hint": "Ký hiệu size của biến thể SKU, xếp từ nhỏ đến lớn — khớp với hàng trong bảng size."
-      },
-      "NECKLINE": {
-        "label": "Kiểu cổ áo",
-        "hint": "Cổ trụ, cổ thuyền, cổ tim... dùng để lọc và mô tả sản phẩm."
-      },
-      "SLEEVE": {
-        "label": "Kiểu tay áo",
-        "hint": "Tay dài, tay lửng, tay raglan..."
-      },
-      "PATTERN_TECHNIQUE": {
-        "label": "Kỹ thuật họa tiết",
-        "hint": "Thêu tay, vẽ tay, đính kết, in, dệt hoa văn..."
-      },
-      "FLAP_LENGTH": {
-        "label": "Chiều dài tà",
-        "hint": "Tà ngắn qua gối, tà dài chấm gót, tà xẻ cao..."
-      },
-      "OCCASION": {
-        "label": "Dịp sử dụng",
-        "hint": "Cưới hỏi, lễ Tết, công sở, chụp ảnh..."
-      }
-    },
     "family": {
       "RED": "Đỏ",
       "PINK": "Hồng",
@@ -1835,6 +1785,37 @@
       "BLACK": "Đen",
       "MULTI": "Nhiều màu",
       "none": "Chưa phân họ"
+    },
+    "addGroup": "Thêm nhóm thuộc tính",
+    "groupMenu": {
+      "label": "Thao tác với nhóm {name}",
+      "edit": "Sửa nhóm",
+      "delete": "Xóa nhóm",
+      "deleteBlocked": "Còn giá trị — xóa hết giá trị trước"
+    },
+    "groupDialog": {
+      "createTitle": "Thêm nhóm thuộc tính",
+      "editTitle": "Sửa nhóm: {name}",
+      "description": "Nhóm đặc tính thiết kế mới (VD Phong cách, Kiểu viền) — chọn được nhiều giá trị cho sản phẩm để lọc và mô tả.",
+      "name": "Tên nhóm",
+      "nameRequired": "Vui lòng nhập tên nhóm",
+      "codeHint": "Mã ổn định của nhóm, tự tạo từ tên. Chỉ gồm chữ không dấu, số, gạch nối.",
+      "codeLocked": "Nhóm có sẵn của hệ thống — mã cố định, chỉ sửa tên và mô tả.",
+      "placeholders": {
+        "vi": {
+          "name": "Vui lòng nhập tên nhóm",
+          "description": "Vui lòng nhập mô tả"
+        },
+        "en": {
+          "name": "Vui lòng nhập tên nhóm (tiếng Anh)",
+          "description": "Vui lòng nhập mô tả (tiếng Anh)"
+        }
+      },
+      "created": "Đã thêm nhóm thuộc tính",
+      "updated": "Đã lưu nhóm thuộc tính",
+      "deleted": "Đã xóa nhóm thuộc tính",
+      "deleteTitle": "Xóa nhóm thuộc tính?",
+      "deleteBody": "Nhóm đã trống nên xóa không ảnh hưởng sản phẩm nào."
     }
   }
 }

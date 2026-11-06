@@ -123,7 +123,10 @@ export async function seedCatalog({
   const products: SeededCatalog = {}
   if (!demo) return products
 
-  const colors = await prisma.attributeValue.findMany({ where: { group: 'COLOR' }, select: { id: true, code: true, name: true } })
+  const colors = await prisma.attributeValue.findMany({
+    where: { group: { code: 'COLOR' } },
+    select: { id: true, code: true, name: true },
+  })
   let variantCount = 0
   for (const { slug, categorySlug, code, colorCode, materialCode, variants, setItems, ...data } of DEMO_PRODUCTS) {
     const productData = {

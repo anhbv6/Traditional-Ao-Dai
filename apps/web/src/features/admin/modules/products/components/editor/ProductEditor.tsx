@@ -45,7 +45,6 @@ const LANG_FIELDS = {
   vi: { name: "name", description: "description" },
   en: { name: "nameEn", description: "descriptionEn" },
 } as const;
-const DESIGN_GROUPS = ["NECKLINE", "SLEEVE", "PATTERN_TECHNIQUE", "FLAP_LENGTH", "OCCASION"] as const;
 const INHERIT_CHART = "__inherit__";
 const ISSUES: ActivationIssue[] = ["IMAGES", "PRICE", "SKUS", "DUPLICATE_SKU", "SET_ITEMS"];
 
@@ -75,7 +74,12 @@ function Switch({
   disabled?: boolean;
 }) {
   return (
-    <label className={cn("flex items-start justify-between gap-3", disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer")}>
+    <label
+      className={cn(
+        "flex items-start justify-between gap-3",
+        disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"
+      )}
+    >
       <span className="min-w-0">
         <span className="block text-sm font-semibold text-[#09090B]">{label}</span>
         {hint && <span className="mt-0.5 block text-2xs leading-4 text-[#A1A1AA]">{hint}</span>}
@@ -121,7 +125,6 @@ export function ProductEditor({
 }) {
   const t = useTranslations("AdminPage.products");
   const tSizing = useTranslations("AdminPage.sizing");
-  const tAttr = useTranslations("AdminPage.attributes");
   const locale = useLocale();
   const notify = useNotify();
   const [product, setProduct] = useState(initialProduct);
@@ -189,7 +192,10 @@ export function ProductEditor({
     }));
 
   const toggleAttribute = (id: string) =>
-    set("attributeIds", values.attributeIds.includes(id) ? values.attributeIds.filter((a) => a !== id) : [...values.attributeIds, id]);
+    set(
+      "attributeIds",
+      values.attributeIds.includes(id) ? values.attributeIds.filter((a) => a !== id) : [...values.attributeIds, id]
+    );
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -257,7 +263,6 @@ export function ProductEditor({
 
       <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
         <div className="min-w-0 space-y-5">
-
           {/* 1. Thông tin chung */}
           <Card title={t("sections.general")}>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -279,7 +284,12 @@ export function ProductEditor({
                     onChange={changeCategory}
                     className="h-10 min-w-0 flex-1"
                   />
-                  <span className={cn("inline-flex h-7 items-center gap-1 rounded-md px-2 text-xs font-medium", groupColor.chip)}>
+                  <span
+                    className={cn(
+                      "inline-flex h-7 items-center gap-1 rounded-md px-2 text-xs font-medium",
+                      groupColor.chip
+                    )}
+                  >
                     <GroupIcon size={13} aria-hidden /> {tSizing(`group.${group}`)}
                   </span>
                 </div>
@@ -311,7 +321,10 @@ export function ProductEditor({
                 const enabled = allowedModes.includes(mode);
                 const selected = values.saleMode === mode;
                 return (
-                  <AdminTooltip key={mode} content={enabled ? null : t("mode.notAllowedFor", { group: tSizing(`group.${group}`) })}>
+                  <AdminTooltip
+                    key={mode}
+                    content={enabled ? null : t("mode.notAllowedFor", { group: tSizing(`group.${group}`) })}
+                  >
                     <span className="grid" tabIndex={enabled ? undefined : 0}>
                       <button
                         type="button"
@@ -320,7 +333,9 @@ export function ProductEditor({
                         onClick={() => changeMode(mode)}
                         className={cn(
                           "flex w-full cursor-pointer flex-col items-start gap-1 rounded-lg border px-3 py-2.5 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-40",
-                          selected ? "border-[#18181B] bg-[#18181B] text-white" : "border-[#E4E4E7] text-[#3F3F46] hover:border-[#A1A1AA]"
+                          selected
+                            ? "border-[#18181B] bg-[#18181B] text-white"
+                            : "border-[#E4E4E7] text-[#3F3F46] hover:border-[#A1A1AA]"
                         )}
                       >
                         <Icon size={16} aria-hidden />
@@ -370,7 +385,10 @@ export function ProductEditor({
                   </p>
                   <div className="flex flex-wrap gap-1">
                     {traits.suggestedKeys.map((key) => (
-                      <span key={key} className="rounded border border-[#E4E4E7] bg-white px-1.5 py-0.5 text-2xs text-[#52525B]">
+                      <span
+                        key={key}
+                        className="rounded border border-[#E4E4E7] bg-white px-1.5 py-0.5 text-2xs text-[#52525B]"
+                      >
                         {tSizing(`measurement.${key}`)}
                       </span>
                     ))}
@@ -401,14 +419,17 @@ export function ProductEditor({
               materials={options.materials}
             />
             <div className="mt-5 space-y-3 border-t border-dashed border-[#E4E4E7] pt-4">
-              {DESIGN_GROUPS.map((designGroup) => {
+              {/* Nhóm đặc tính lấy từ màn Thuộc tính — nhóm admin thêm mới cũng hiện ở đây */}
+              {options.designGroups.map((designGroup) => {
                 const choices = options.attributes.filter(
-                  (a) => a.group === designGroup && (a.isActive || values.attributeIds.includes(a.id))
+                  (a) => a.group === designGroup.code && (a.isActive || values.attributeIds.includes(a.id))
                 );
                 if (choices.length === 0) return null;
                 return (
-                  <div key={designGroup} className="grid gap-1.5 sm:grid-cols-[140px_minmax(0,1fr)] sm:gap-4">
-                    <span className="pt-1 text-sm font-medium text-[#3F3F46]">{tAttr(`group.${designGroup}.label`)}</span>
+                  <div key={designGroup.code} className="grid gap-1.5 sm:grid-cols-[140px_minmax(0,1fr)] sm:gap-4">
+                    <span className="pt-1 text-sm font-medium text-[#3F3F46]">
+                      {locale === "en" && designGroup.nameEn ? designGroup.nameEn : designGroup.name}
+                    </span>
                     <div className="flex flex-wrap gap-1.5">
                       {choices.map((choice) => {
                         const on = values.attributeIds.includes(choice.id);
@@ -420,7 +441,9 @@ export function ProductEditor({
                             onClick={() => toggleAttribute(choice.id)}
                             className={cn(
                               "h-7 cursor-pointer rounded-full border px-2.5 text-xs font-medium transition-colors",
-                              on ? "border-[#18181B] bg-[#18181B] text-white" : "border-[#E4E4E7] text-[#3F3F46] hover:border-[#A1A1AA]"
+                              on
+                                ? "border-[#18181B] bg-[#18181B] text-white"
+                                : "border-[#E4E4E7] text-[#3F3F46] hover:border-[#A1A1AA]"
                             )}
                           >
                             {choice.name}
@@ -506,7 +529,9 @@ export function ProductEditor({
               </span>
               <div className="min-w-0">
                 <p className="font-mono text-2xs text-[#71717A]">{product.code}</p>
-                <p className="line-clamp-2 text-sm font-semibold text-[#09090B]">{values[fields.name] || values.name}</p>
+                <p className="line-clamp-2 text-sm font-semibold text-[#09090B]">
+                  {values[fields.name] || values.name}
+                </p>
                 <p className="mt-1 font-mono text-sm font-semibold tabular-nums text-[#09090B]">
                   {values.basePrice > 0 ? formatVnd(values.basePrice, locale as Locale) : "—"}
                 </p>
@@ -520,13 +545,20 @@ export function ProductEditor({
                 hint={issues.length > 0 && !values.isActive ? t("hints.notReady") : undefined}
                 disabled={!values.isActive && issues.length > 0}
               />
-              <Switch checked={values.isFeatured} onChange={(checked) => set("isFeatured", checked)} label={t("field.isFeatured")} />
+              <Switch
+                checked={values.isFeatured}
+                onChange={(checked) => set("isFeatured", checked)}
+                label={t("field.isFeatured")}
+              />
             </div>
             <ul className="space-y-1.5 border-t border-dashed border-[#E4E4E7] px-4 py-3">
               {ISSUES.filter((issue) => issue !== "SET_ITEMS" || values.saleMode === "SET").map((issue) => {
                 const ok = !issues.includes(issue);
                 return (
-                  <li key={issue} className={cn("flex items-center gap-2 text-xs", ok ? "text-[#71717A]" : "text-[#09090B]")}>
+                  <li
+                    key={issue}
+                    className={cn("flex items-center gap-2 text-xs", ok ? "text-[#71717A]" : "text-[#09090B]")}
+                  >
                     {ok ? (
                       <Check size={13} className="text-emerald-600" aria-hidden />
                     ) : (
@@ -547,7 +579,9 @@ export function ProductEditor({
             <dl className="space-y-2.5 text-xs">
               <div className="flex items-center justify-between gap-2">
                 <dt className="text-[#71717A]">{t("inherit.group")}</dt>
-                <dd className={cn("inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 font-medium", groupColor.chip)}>
+                <dd
+                  className={cn("inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 font-medium", groupColor.chip)}
+                >
                   <GroupIcon size={12} aria-hidden /> {tSizing(`group.${group}`)}
                 </dd>
               </div>
@@ -564,15 +598,21 @@ export function ProductEditor({
               <div className="flex items-start justify-between gap-2">
                 <dt className="text-[#71717A]">{t("inherit.sizes")}</dt>
                 <dd className="min-w-0 text-right font-medium text-[#09090B]">
-                  {axis.kind === "custom"
-                    ? t("sku.customSize")
-                    : axis.kind === "free"
-                      ? t("sku.freeSize")
-                      : axis.source === "chart" && chart
-                        ? <Link href={`/admin/catalog/size-charts/${chart.id}`} className="hover:underline">{chart.name}</Link>
-                        : t("inherit.sizesFromAttributes")}
+                  {axis.kind === "custom" ? (
+                    t("sku.customSize")
+                  ) : axis.kind === "free" ? (
+                    t("sku.freeSize")
+                  ) : axis.source === "chart" && chart ? (
+                    <Link href={`/admin/catalog/size-charts/${chart.id}`} className="hover:underline">
+                      {chart.name}
+                    </Link>
+                  ) : (
+                    t("inherit.sizesFromAttributes")
+                  )}
                   {axis.kind === "sized" && (
-                    <span className="block font-mono text-2xs font-normal text-[#71717A]">{axis.sizes.join(" · ")}</span>
+                    <span className="block font-mono text-2xs font-normal text-[#71717A]">
+                      {axis.sizes.join(" · ")}
+                    </span>
                   )}
                 </dd>
               </div>

@@ -1,4 +1,4 @@
-import { type MeasurementKey, type ProductGroup, type SizeChartData, type SizeRange } from "@repo/shared/sizing";
+import { type MeasurementKey, type ProductGroup, type SizeRange } from "@repo/shared/sizing";
 
 export type SurchargeType = "PERCENTAGE" | "FIXED_AMOUNT";
 
@@ -52,15 +52,4 @@ export interface AdminSizeChartDetail {
   productCount: number;
   categoryNames: string[];
   updatedAt: string;
-}
-
-/** Dữ liệu tối thiểu để dựng bảng size và widget tư vấn cho khách */
-export interface SizeChartPreviewData extends SizeChartData {
-  name: string;
-  group: ProductGroup;
-  measurementGuide: string;
-  guideImage: string;
-  surchargeType: SurchargeType | null;
-  surchargeValue: number | null;
-  extraFabric: number | null;
 }

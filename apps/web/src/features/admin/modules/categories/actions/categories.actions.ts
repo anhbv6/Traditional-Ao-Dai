@@ -9,8 +9,8 @@ import { recordAudit } from "../../../core/server/audit.server";
 import { ADMIN_MODULE_ACCESS } from "../../../core/session/permissions";
 import { parseActionInput } from "@/features/admin/core/server/actionInput";
 import { toSlug } from "@/features/admin/modules/products";
-import { PRODUCT_GROUP_TRAITS, type ProductGroup } from "@repo/shared/sizing";
-import { rowHasMeasurement } from "@/features/admin/modules/size-charts";
+import { PRODUCT_GROUP_NAMES, PRODUCT_GROUP_TRAITS, type ProductGroup } from "@repo/shared/sizing";
+import { getAdminSizeChartDetailQuery, rowHasMeasurement } from "@/features/admin/modules/size-charts";
 import { getCategoryTreeQuery } from "../queries/categories.queries";
 import {
   categoryIdSchema,
@@ -64,6 +64,72 @@ async function checkSizeChart(sizeChartId: string, group: ProductGroup): Promise
   return { group };
 }
 
+/** Lưới bảng size nhập trong dialog (đã qua Zod) */
+type CategorySizeChartGrid = NonNullable<z.infer<typeof createCategorySchema>["sizeChart"]>;
+
+/** Bảng size riêng phải nhập đủ: có cột, có hàng, hàng nào cũng có số đo */
+function isGridComplete(grid: CategorySizeChartGrid | null): grid is CategorySizeChartGrid {
+  return grid !== null && grid.columns.length > 0 && grid.rows.length > 0 && grid.rows.every(rowHasMeasurement);
+}
+
+/** Cột + hàng của bảng size để ghi Prisma — chỉ giữ số đo của các cột còn trong bảng */
+function gridData(grid: CategorySizeChartGrid) {
+  const columnKeys = new Set<string>(grid.columns.map((column) => column.key));
+  return {
+    columns: grid.columns.map((column, position) => ({ ...column, position })),
+    rows: grid.rows.map((row, position) => ({
+      sizeLabel: row.sizeLabel.trim(),
+      position,
+      values: Object.fromEntries(
+        Object.entries(row.values).filter(([key]) => columnKeys.has(key))
+      ) as Prisma.InputJsonObject,
+    })),
+  };
+}
+
+/** Tạo bảng size riêng của một loại sản phẩm — đã có số liệu nên áp dụng luôn */
+async function createOwnSizeChart(
+  tx: Prisma.TransactionClient,
+  values: Pick<CategoryFields, "name" | "nameEn">,
+  group: ProductGroup,
+  grid: CategorySizeChartGrid
+) {
+  const { columns, rows } = gridData(grid);
+  return tx.sizeChart.create({
+    data: {
+      name: values.name,
+      nameEn: values.nameEn || null,
+      group,
+      isActive: true,
+      columns: { create: columns },
+      rows: { create: rows },
+    },
+    select: { id: true },
+  });
+}
+
+/**
+ * Bảng đang gắn chỉ thuộc riêng loại này (không loại nào khác gắn, không sản phẩm nào chọn riêng) → sửa thẳng được;
+ * ngược lại là bảng dùng chung, phải tạo bảng mới để không đổi số đo của nơi khác.
+ */
+async function isExclusiveSizeChart(sizeChartId: string, categoryId: string, group: ProductGroup) {
+  const chart = await prisma.sizeChart.findUnique({
+    where: { id: sizeChartId },
+    select: {
+      group: true,
+      _count: { select: { products: true } },
+      categories: { select: { id: true } },
+    },
+  });
+  return (
+    chart !== null &&
+    chart.group === group &&
+    chart._count.products === 0 &&
+    chart.categories.length === 1 &&
+    chart.categories[0]?.id === categoryId
+  );
+}
+
 function toCategoryData(values: CategoryFields, group: ProductGroup, parentId: string | null) {
   return {
     name: values.name,
@@ -96,11 +162,7 @@ export async function createCategoryAction(raw: z.input<typeof createCategorySch
     if ("error" in structure) return { success: false as const, error: structure.error };
     const { group } = structure;
     const withChart = customChart && PRODUCT_GROUP_TRAITS[group].sizing !== "NONE";
-    // Bảng size riêng phải nhập đủ: có cột, có hàng, hàng nào cũng có số đo
-    if (
-      withChart &&
-      (!sizeChart || sizeChart.columns.length === 0 || sizeChart.rows.length === 0 || !sizeChart.rows.every(rowHasMeasurement))
-    ) {
+    if (withChart && !isGridComplete(sizeChart)) {
       return { success: false as const, error: "CATEGORY_SIZE_CHART_REQUIRED" };
     }
 
@@ -112,31 +174,7 @@ export async function createCategoryAction(raw: z.input<typeof createCategorySch
     const slug = await resolveUniqueSlug(values.slug || toSlug(values.name));
 
     const created = await prisma.$transaction(async (tx) => {
-      // Bảng size riêng nhập ngay trong dialog → đã có số liệu nên áp dụng luôn
-      const columnKeys = new Set(sizeChart?.columns.map((column) => column.key));
-      const chart =
-        withChart && sizeChart
-          ? await tx.sizeChart.create({
-              data: {
-                name: values.name,
-                nameEn: values.nameEn || null,
-                group,
-                isActive: true,
-                columns: { create: sizeChart.columns.map((column, position) => ({ ...column, position })) },
-                rows: {
-                  create: sizeChart.rows.map((row, position) => ({
-                    sizeLabel: row.sizeLabel,
-                    position,
-                    // Chỉ giữ số đo của các cột còn trong bảng
-                    values: Object.fromEntries(
-                      Object.entries(row.values).filter(([key]) => columnKeys.has(key as (typeof sizeChart.columns)[number]["key"]))
-                    ) as Prisma.InputJsonObject,
-                  })),
-                },
-              },
-              select: { id: true },
-            })
-          : null;
+      const chart = withChart && sizeChart ? await createOwnSizeChart(tx, values, group, sizeChart) : null;
       const category = await tx.category.create({
         data: {
           ...toCategoryData(customChart ? { ...values, defaultSizeChartId: chart?.id ?? "" } : values, group, parentId),
@@ -170,8 +208,11 @@ export async function createCategoryAction(raw: z.input<typeof createCategorySch
 
 /**
  * Server Action: sửa nhóm gốc hoặc loại sản phẩm.
- * Nhóm gốc: chỉ sửa tên, mô tả, hiển thị, bảng size mặc định — không đổi nhóm hàng, không thành loại con.
- * Loại sản phẩm: chuyển được sang nhóm gốc khác (nhóm hàng đổi theo gốc mới), không thành nhóm gốc.
+ * Nhóm gốc: chỉ sửa mô tả, hiển thị — tên cố định hai ngôn ngữ (`PRODUCT_GROUP_NAMES`), không có bảng size,
+ * không đổi nhóm hàng, không thành loại con.
+ * Loại sản phẩm: chuyển được sang nhóm gốc khác (nhóm hàng đổi theo gốc mới), không thành nhóm gốc. Bảng size như lúc
+ * thêm: `"custom"` = nhập bảng riêng (bảng đang gắn chỉ thuộc loại này thì sửa thẳng, bảng dùng chung thì tạo bảng mới;
+ * không gửi lưới thì giữ bảng đang gắn), `"preset"` = gắn bảng size mẫu.
  */
 export async function updateCategoryAction(raw: z.input<typeof updateCategorySchema>) {
   const auth = await authorizeAdminAction(ACCESS);
@@ -179,40 +220,82 @@ export async function updateCategoryAction(raw: z.input<typeof updateCategorySch
 
   const input = parseActionInput(updateCategorySchema, raw);
   if (!input.success) return input;
-  const { categoryId, ...values } = input.data;
+  const { categoryId, sizeChartMode, sizeChart, ...rawValues } = input.data;
 
   try {
     const existing = await prisma.category.findUnique({
       where: { id: categoryId },
-      select: { group: true, slug: true, parentId: true },
+      select: { group: true, slug: true, parentId: true, defaultSizeChartId: true },
     });
     if (!existing) return { success: false as const, error: "CATEGORY_NOT_FOUND" };
 
     const isRoot = existing.parentId === null;
-    if (isRoot && values.parentId !== null) return { success: false as const, error: "CATEGORY_ROOT_LOCKED" };
-    if (!isRoot && values.parentId === null) return { success: false as const, error: "CATEGORY_PARENT_REQUIRED" };
+    if (isRoot && rawValues.parentId !== null) return { success: false as const, error: "CATEGORY_ROOT_LOCKED" };
+    if (!isRoot && rawValues.parentId === null) return { success: false as const, error: "CATEGORY_PARENT_REQUIRED" };
 
-    const parentId = values.parentId;
-    const structure = parentId
-      ? await resolveStructure(values, parentId)
-      : await checkSizeChart(values.defaultSizeChartId, existing.group);
+    const parentId = rawValues.parentId;
+    // Nhóm gốc không có bảng size; "custom" xử lý bảng riêng ở dưới nên bỏ id client gửi
+    const customChart = !isRoot && sizeChartMode === "custom";
+    const values = {
+      ...rawValues,
+      // Tên nhóm gốc cố định — bỏ qua tên client gửi lên
+      ...(isRoot ? PRODUCT_GROUP_NAMES[existing.group] : {}),
+      defaultSizeChartId: isRoot || customChart ? "" : rawValues.defaultSizeChartId,
+    };
+    const structure = parentId ? await resolveStructure(values, parentId) : { group: existing.group };
     if ("error" in structure) return { success: false as const, error: structure.error };
     const { group } = structure;
 
-    const slug = values.slug && values.slug !== existing.slug ? await resolveUniqueSlug(values.slug, categoryId) : existing.slug;
+    // Bảng size riêng: lưới mới (sửa thẳng bảng riêng hoặc tạo bảng mới), hoặc giữ bảng đang gắn nếu cùng nhóm hàng
+    let ownChart: { grid: CategorySizeChartGrid; replaceId: string | null } | null = null;
+    if (customChart && PRODUCT_GROUP_TRAITS[group].sizing !== "NONE") {
+      if (sizeChart) {
+        if (!isGridComplete(sizeChart)) return { success: false as const, error: "CATEGORY_SIZE_CHART_REQUIRED" };
+        const currentId = existing.defaultSizeChartId;
+        const replaceId = currentId && (await isExclusiveSizeChart(currentId, categoryId, group)) ? currentId : null;
+        ownChart = { grid: sizeChart, replaceId };
+      } else {
+        const kept = existing.defaultSizeChartId ? await checkSizeChart(existing.defaultSizeChartId, group) : null;
+        if (!existing.defaultSizeChartId || !kept || "error" in kept) {
+          return { success: false as const, error: "CATEGORY_SIZE_CHART_REQUIRED" };
+        }
+        values.defaultSizeChartId = existing.defaultSizeChartId;
+      }
+    }
+
+    const slug =
+      values.slug && values.slug !== existing.slug ? await resolveUniqueSlug(values.slug, categoryId) : existing.slug;
     // Chuyển sang nhóm gốc khác thì xếp cuối danh sách của gốc mới
     const movedPosition =
       parentId !== existing.parentId
-        ? ((await prisma.category.findFirst({ where: { parentId }, orderBy: { position: "desc" } }))?.position ?? -1) + 1
+        ? ((await prisma.category.findFirst({ where: { parentId }, orderBy: { position: "desc" } }))?.position ?? -1) +
+          1
         : undefined;
 
-    await prisma.category.update({
-      where: { id: categoryId },
-      data: {
-        ...toCategoryData(values, group, parentId),
-        slug,
-        ...(movedPosition !== undefined ? { position: movedPosition } : {}),
-      },
+    const sizeChartId = await prisma.$transaction(async (tx) => {
+      let chartId = values.defaultSizeChartId;
+      if (ownChart?.replaceId) {
+        // Bảng riêng của loại này: thay toàn bộ cột / hàng bằng lưới vừa nhập
+        const { columns, rows } = gridData(ownChart.grid);
+        await tx.sizeChartColumn.deleteMany({ where: { sizeChartId: ownChart.replaceId } });
+        await tx.sizeChartRow.deleteMany({ where: { sizeChartId: ownChart.replaceId } });
+        await tx.sizeChart.update({
+          where: { id: ownChart.replaceId },
+          data: { columns: { create: columns }, rows: { create: rows } },
+        });
+        chartId = ownChart.replaceId;
+      } else if (ownChart) {
+        chartId = (await createOwnSizeChart(tx, values, group, ownChart.grid)).id;
+      }
+      await tx.category.update({
+        where: { id: categoryId },
+        data: {
+          ...toCategoryData({ ...values, defaultSizeChartId: chartId }, group, parentId),
+          slug,
+          ...(movedPosition !== undefined ? { position: movedPosition } : {}),
+        },
+      });
+      return chartId || null;
     });
 
     await recordAudit({
@@ -220,9 +303,14 @@ export async function updateCategoryAction(raw: z.input<typeof updateCategorySch
       action: "CATEGORY_UPDATED",
       targetType: "CATEGORY",
       targetId: categoryId,
-      metadata: { group: { before: existing.group, after: group }, parentId: { before: existing.parentId, after: parentId } },
+      metadata: {
+        group: { before: existing.group, after: group },
+        parentId: { before: existing.parentId, after: parentId },
+        sizeChartId: { before: existing.defaultSizeChartId, after: sizeChartId },
+      },
     });
     revalidateCategories();
+    if (ownChart) revalidatePath("/admin/catalog/size-charts");
 
     return { success: true as const, data: { tree: await getCategoryTreeQuery() } };
   } catch (error) {
@@ -296,5 +384,42 @@ export async function deleteCategoryAction(categoryId: string) {
   } catch (error) {
     console.error("Lỗi deleteCategoryAction:", error);
     return { success: false as const, error: "CATEGORY_DELETE_FAILED" };
+  }
+}
+
+/**
+ * Server Action (chỉ đọc): bảng size đang gắn của một loại sản phẩm — để dialog sửa nạp lưới vào "Nhập bảng size riêng".
+ * `exclusive` = bảng chỉ thuộc riêng loại này (lưu sẽ sửa thẳng bảng); ngược lại là bảng mẫu dùng chung.
+ */
+export async function getCategorySizeChartAction(categoryId: string) {
+  const auth = await authorizeAdminAction(ACCESS);
+  if (!auth.success) return auth;
+
+  const input = parseActionInput(categoryIdSchema, { categoryId });
+  if (!input.success) return input;
+
+  try {
+    const category = await prisma.category.findUnique({
+      where: { id: input.data.categoryId },
+      select: { group: true, parentId: true, defaultSizeChartId: true },
+    });
+    if (!category) return { success: false as const, error: "CATEGORY_NOT_FOUND" };
+    // Nhóm gốc không có bảng size
+    const chartId = category.parentId ? category.defaultSizeChartId : null;
+    const chart = chartId ? await getAdminSizeChartDetailQuery(chartId) : null;
+    if (!chart) return { success: true as const, data: null };
+
+    return {
+      success: true as const,
+      data: {
+        id: chart.id,
+        name: chart.name,
+        grid: { columns: chart.columns, rows: chart.rows },
+        exclusive: await isExclusiveSizeChart(chart.id, input.data.categoryId, category.group),
+      },
+    };
+  } catch (error) {
+    console.error("Lỗi getCategorySizeChartAction:", error);
+    return { success: false as const, error: "CATEGORY_LOAD_FAILED" };
   }
 }

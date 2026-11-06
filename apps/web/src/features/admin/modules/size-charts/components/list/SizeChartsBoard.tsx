@@ -3,44 +3,51 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import { Copy, Eye, MoreHorizontal, Pencil, Power, PowerOff, Ruler, Trash2 } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { PRODUCT_GROUPS, type ProductGroup } from "@repo/shared/sizing";
 import { AppMenu, type AppMenuEntry } from "@/components/shared/AppMenu";
 import { useNotify } from "@/hooks/useNotify";
 import { Link, useRouter } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
-import { ADMIN_CARD_CLASS, AdminFilterSelect, AdminListPanel } from "@/features/admin/core/ui";
-import { PRODUCT_GROUP_ICONS, groupUsesSizeChart } from "@/features/admin/modules/categories";
+import {
+  ADMIN_ROW_ICON_BUTTON_CLASS,
+  AdminDataTable,
+  AdminListPanel,
+  AdminStatusText,
+  type AdminTableColumn,
+} from "@/features/admin/core/ui";
+import { PRODUCT_GROUP_COLORS, PRODUCT_GROUP_ICONS, groupUsesSizeChart } from "@/features/admin/modules/categories";
 import {
   deleteSizeChartAction,
   duplicateSizeChartAction,
-  getSizeChartPreviewAction,
+  getSizeChartDetailAction,
   toggleSizeChartAction,
 } from "../../actions/sizeCharts.actions";
-import { type AdminSizeChartListItem, type SizeChartPreviewData } from "../../types/sizeCharts.types";
+import { type AdminSizeChartDetail, type AdminSizeChartListItem } from "../../types/sizeCharts.types";
 
-const CreateSizeChartDialog = dynamic(() => import("./CreateSizeChartDialog").then((m) => m.CreateSizeChartDialog));
-const SizeChartPreviewDialog = dynamic(() =>
-  import("../preview/SizeChartPreviewDialog").then((m) => m.SizeChartPreviewDialog)
-);
+const SizeChartInfoDialog = dynamic(() => import("../shared/SizeChartInfoDialog").then((m) => m.SizeChartInfoDialog));
 
-type GroupFilter = "ALL" | ProductGroup;
-// Phụ kiện, vải bán theo mét không có bảng size nên không cần tab
-const SIZED_GROUPS = PRODUCT_GROUPS.filter(groupUsesSizeChart);
-const MAX_SIZE_CHIPS = 6;
+type GroupTab = "ALL" | ProductGroup;
+// Phụ kiện, vải bán theo mét không có bảng size → 4 tab: Tất cả, Áo dài, Quần, Giày guốc
+const GROUP_TABS: GroupTab[] = ["ALL", ...PRODUCT_GROUPS.filter(groupUsesSizeChart)];
 
-/** Màn danh sách bảng size mẫu: một khối bảng (tab nhóm hàng → tìm kiếm → bảng), thao tác dòng trong menu ⋯ */
-export function SizeChartsBoard({ initialCharts }: { initialCharts: AdminSizeChartListItem[] }) {
+/** Đang mở dialog: tạo mới (`chart` null) hoặc sửa thông tin một bảng */
+type DialogState = { chart: AdminSizeChartDetail | null };
+
+/**
+ * Màn danh sách bảng size mẫu: tìm kiếm + nút tạo ở đầu, tab nhóm hàng (gạch chân) ngay trên bảng dữ liệu gọn (tên + các size, số sản phẩm dùng,
+ * trạng thái), mọi thao tác trong menu ⋯. Tạo mới / sửa thông tin mở SizeChartInfoDialog; số đo sửa ở màn chi tiết.
+ */
+export function SizeChartsBoard({ charts }: { charts: AdminSizeChartListItem[] }) {
   const t = useTranslations("AdminPage.sizeCharts");
   const tPage = useTranslations("AdminPage.pages.sizeCharts");
   const tSizing = useTranslations("AdminPage.sizing");
+  const locale = useLocale();
   const notify = useNotify();
   const router = useRouter();
-  const [charts, setCharts] = useState(initialCharts);
-  const [groupFilter, setGroupFilter] = useState<GroupFilter>("ALL");
+  const [tab, setTab] = useState<GroupTab>("ALL");
   const [search, setSearch] = useState("");
-  const [isCreating, setIsCreating] = useState(false);
-  const [preview, setPreview] = useState<SizeChartPreviewData | null>(null);
+  const [dialog, setDialog] = useState<DialogState | null>(null);
 
   const keyword = search.trim().toLowerCase();
   const searched = charts.filter(
@@ -48,60 +55,56 @@ export function SizeChartsBoard({ initialCharts }: { initialCharts: AdminSizeCha
       !keyword ||
       [chart.name, chart.nameEn ?? "", ...chart.sizeLabels].some((value) => value.toLowerCase().includes(keyword))
   );
-  const visible = groupFilter === "ALL" ? searched : searched.filter((chart) => chart.group === groupFilter);
+  const visible = tab === "ALL" ? searched : searched.filter((chart) => chart.group === tab);
+  const nameOf = (chart: AdminSizeChartListItem) => (locale === "en" && chart.nameEn ? chart.nameEn : chart.name);
 
-  const handleToggle = async (chart: AdminSizeChartListItem) => {
-    const res = await toggleSizeChartAction({ sizeChartId: chart.id, isActive: !chart.isActive });
+  /** Thao tác xong thì tải lại dữ liệu server (danh sách đọc thẳng từ props) */
+  const run = async <T,>(
+    action: () => Promise<{ success: true; data: T } | { success: false; error: string }>,
+    fallback: string,
+    successMessage: string
+  ) => {
+    const res = await action();
     if (!res.success) {
-      notify.error(res.error, "SIZE_CHART_UPDATE_FAILED");
-      return;
+      notify.error(res.error, fallback);
+      return null;
     }
-    setCharts((prev) => prev.map((c) => (c.id === chart.id ? { ...c, isActive: res.data.isActive } : c)));
-    notify.success(res.data.isActive ? t("activated") : t("deactivated"));
+    notify.success(successMessage);
+    router.refresh();
+    return res.data;
   };
 
-  const handleDuplicate = async (chart: AdminSizeChartListItem) => {
-    const res = await duplicateSizeChartAction(chart.id);
-    if (!res.success) {
-      notify.error(res.error, "SIZE_CHART_CREATE_FAILED");
-      return;
-    }
-    setCharts(res.data.charts);
-    notify.success(t("duplicated"));
-    router.push(`/admin/catalog/size-charts/${res.data.id}`);
-  };
-
-  const handlePreview = async (chart: AdminSizeChartListItem) => {
-    const res = await getSizeChartPreviewAction(chart.id);
+  const openEdit = async (chart: AdminSizeChartListItem) => {
+    const res = await getSizeChartDetailAction(chart.id);
     if (!res.success) {
       notify.error(res.error, "SIZE_CHART_NOT_FOUND");
       return;
     }
-    setPreview(res.data);
-  };
-
-  const handleDelete = async (chart: AdminSizeChartListItem) => {
-    const res = await deleteSizeChartAction(chart.id);
-    if (!res.success) {
-      notify.error(res.error, "SIZE_CHART_DELETE_FAILED");
-      return;
-    }
-    setCharts((prev) => prev.filter((c) => c.id !== chart.id));
-    notify.success(t("deleted"));
+    setDialog({ chart: res.data });
   };
 
   const menuItems = (chart: AdminSizeChartListItem): AppMenuEntry[] => {
     const inUse = chart.productCount > 0 || chart.categoryCount > 0;
     return [
-      { key: "edit", label: t("menu.edit"), icon: Pencil, href: `/admin/catalog/size-charts/${chart.id}` },
-      { key: "preview", label: t("menu.preview"), icon: Eye, onSelect: () => void handlePreview(chart) },
-      { key: "duplicate", label: t("menu.duplicate"), icon: Copy, onSelect: () => void handleDuplicate(chart) },
+      { key: "view", label: t("menu.view"), icon: Eye, href: `/admin/catalog/size-charts/${chart.id}` },
+      { key: "edit", label: t("menu.edit"), icon: Pencil, onSelect: () => void openEdit(chart) },
+      {
+        key: "duplicate",
+        label: t("menu.duplicate"),
+        icon: Copy,
+        onSelect: () => void run(() => duplicateSizeChartAction(chart.id), "SIZE_CHART_CREATE_FAILED", t("duplicated")),
+      },
       {
         key: "toggle",
         label: chart.isActive ? t("menu.deactivate") : t("menu.activate"),
         icon: chart.isActive ? PowerOff : Power,
         disabled: !chart.isActive && chart.sizeLabels.length === 0,
-        onSelect: () => void handleToggle(chart),
+        onSelect: () =>
+          void run(
+            () => toggleSizeChartAction({ sizeChartId: chart.id, isActive: !chart.isActive }),
+            "SIZE_CHART_UPDATE_FAILED",
+            chart.isActive ? t("deactivated") : t("activated")
+          ),
       },
       { type: "separator", key: "sep" },
       {
@@ -111,10 +114,60 @@ export function SizeChartsBoard({ initialCharts }: { initialCharts: AdminSizeCha
         icon: Trash2,
         tone: "danger",
         disabled: inUse,
-        onSelect: () => void handleDelete(chart),
+        onSelect: () => void run(() => deleteSizeChartAction(chart.id), "SIZE_CHART_DELETE_FAILED", t("deleted")),
       },
     ];
   };
+
+  const nameCell = (chart: AdminSizeChartListItem) => {
+    const Icon = PRODUCT_GROUP_ICONS[chart.group];
+    return (
+      <div className="flex min-w-0 items-center gap-3">
+        <span
+          aria-hidden
+          className={cn("grid size-9 shrink-0 place-items-center rounded-xl", PRODUCT_GROUP_COLORS[chart.group].tile)}
+        >
+          <Icon size={16} />
+        </span>
+        <div className="min-w-0">
+          <Link href={`/admin/catalog/size-charts/${chart.id}`} className="font-medium text-[#09090B] hover:underline">
+            {nameOf(chart)}
+          </Link>
+          {/* Dòng phụ: các size (tab Tất cả thêm nhóm hàng) — chi tiết số đo xem ở màn chi tiết */}
+          <p className="mt-0.5 text-xs leading-relaxed text-[#71717A]">
+            {tab === "ALL" && `${tSizing(`group.${chart.group}`)} · `}
+            {chart.sizeLabels.length > 0 ? (
+              <span className="font-mono">{chart.sizeLabels.join(" · ")}</span>
+            ) : (
+              <span className="text-amber-700">{t("noRows")}</span>
+            )}
+          </p>
+        </div>
+      </div>
+    );
+  };
+
+  const status = (chart: AdminSizeChartListItem) => (
+    <AdminStatusText tone={chart.isActive ? "success" : "neutral"}>
+      {chart.isActive ? t("status.active") : t("status.inactive")}
+    </AdminStatusText>
+  );
+
+  const columns: AdminTableColumn<AdminSizeChartListItem>[] = [
+    { key: "name", header: t("column.name"), cell: nameCell },
+    {
+      key: "products",
+      header: t("column.products"),
+      align: "right",
+      className: "w-32 whitespace-nowrap",
+      cell: (chart) => (
+        <span className={cn("font-mono tabular-nums", chart.productCount > 0 ? "text-[#09090B]" : "text-[#A1A1AA]")}>
+          {chart.productCount}
+        </span>
+      ),
+    },
+    { key: "status", header: t("column.status"), className: "w-36 whitespace-nowrap", cell: status },
+  ];
 
   return (
     <>
@@ -123,133 +176,70 @@ export function SizeChartsBoard({ initialCharts }: { initialCharts: AdminSizeCha
         title={tPage("title")}
         description={tPage("description")}
         search={{ value: search, onChange: setSearch, placeholder: t("searchPlaceholder") }}
-        action={{ label: t("create.open"), onClick: () => setIsCreating(true) }}
-        filters={
-          <AdminFilterSelect
-            label={t("groupLabel")}
-            value={groupFilter}
-            onChange={setGroupFilter}
-            options={(["ALL", ...SIZED_GROUPS] as const).map((group) => ({
-              value: group,
-              label: `${group === "ALL" ? t("filterAll") : tSizing(`group.${group}`)} (${
-                group === "ALL" ? searched.length : searched.filter((c) => c.group === group).length
-              })`,
-            }))}
-            className="w-full sm:w-60"
-          />
-        }
+        action={{ label: t("create.open"), onClick: () => setDialog({ chart: null }) }}
       />
 
-      <section className={ADMIN_CARD_CLASS}>
-        {visible.length === 0 ? (
-          <p className="py-16 text-center text-sm text-[#71717A]">
-            {charts.length === 0 ? t("empty") : t("noResults")}
-          </p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[860px] text-body">
-              <thead>
-                <tr className="whitespace-nowrap border-b border-[#E4E4E7] text-left text-body font-semibold text-[#3F3F46]">
-                  <th className="px-4 py-2.5">{t("column.name")}</th>
-                  <th className="px-4 py-2.5">{t("column.group")}</th>
-                  <th className="px-4 py-2.5">{t("column.sizes")}</th>
-                  <th className="px-4 py-2.5 text-right">{t("column.products")}</th>
-                  <th className="px-4 py-2.5">{t("column.status")}</th>
-                  <th className="w-12 px-2 py-2.5" aria-label={t("column.actions")} />
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#F4F4F5]">
-                {visible.map((chart) => {
-                  const Icon = PRODUCT_GROUP_ICONS[chart.group];
-                  const extra = chart.sizeLabels.length - MAX_SIZE_CHIPS;
-                  return (
-                    <tr key={chart.id} className="transition-colors hover:bg-[#FAFAFA]">
-                      <td className="px-4 py-3">
-                        <Link
-                          href={`/admin/catalog/size-charts/${chart.id}`}
-                          className="font-medium text-[#09090B] hover:underline"
-                        >
-                          {chart.name}
-                        </Link>
-                        <p className="mt-0.5 text-xs text-[#71717A]">
-                          {t("columnsCount", { count: chart.columnKeys.length })}
-                          {chart.hasBigsize && ` · ${t("bigsizeConfigured")}`}
-                        </p>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className="inline-flex items-center gap-1.5 text-[#3F3F46]">
-                          <Icon size={14} aria-hidden /> {tSizing(`group.${chart.group}`)}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        {chart.sizeLabels.length === 0 ? (
-                          <span className="text-xs text-amber-700">{t("noRows")}</span>
-                        ) : (
-                          <span className="flex flex-wrap gap-1">
-                            {chart.sizeLabels.slice(0, MAX_SIZE_CHIPS).map((label) => (
-                              <span
-                                key={label}
-                                className="rounded-md border border-[#E4E4E7] px-1.5 py-px font-mono text-xs text-[#3F3F46]"
-                              >
-                                {label}
-                              </span>
-                            ))}
-                            {extra > 0 && <span className="px-1 text-xs text-[#71717A]">+{extra}</span>}
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        <span className="font-mono font-semibold tabular-nums text-[#09090B]">
-                          {chart.productCount}
-                        </span>
-                        {chart.categoryCount > 0 && (
-                          <p className="text-xs text-[#71717A]">
-                            {t("categoriesCount", { count: chart.categoryCount })}
-                          </p>
-                        )}
-                      </td>
-                      <td className="px-4 py-3">
-                        <span
-                          className={cn(
-                            "inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-xs font-medium",
-                            chart.isActive ? "bg-emerald-50 text-emerald-700" : "bg-[#F4F4F5] text-[#71717A]"
-                          )}
-                        >
-                          <span
-                            className={cn("size-1.5 rounded-full", chart.isActive ? "bg-emerald-500" : "bg-[#A1A1AA]")}
-                          />
-                          {chart.isActive ? t("status.active") : t("status.inactive")}
-                        </span>
-                      </td>
-                      <td className="px-2 py-3">
-                        <AppMenu
-                          tone="admin"
-                          width={232}
-                          align="end"
-                          sideOffset={4}
-                          items={menuItems(chart)}
-                          trigger={
-                            <button
-                              type="button"
-                              aria-label={t("menu.label", { name: chart.name })}
-                              className="grid size-8 cursor-pointer place-items-center rounded-md text-[#71717A] outline-none transition-colors hover:bg-[#F4F4F5] hover:text-[#09090B] data-popup-open:bg-[#F4F4F5]"
-                            >
-                              <MoreHorizontal size={16} />
-                            </button>
-                          }
-                        />
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+      {/* Tab nhóm hàng ngay trên bảng — kiểu gạch chân tối giản (đơn sắc theo quy chuẩn admin) */}
+      <div role="tablist" aria-label={t("groupLabel")} className="flex gap-1 border-b border-[#E4E4E7]">
+        {GROUP_TABS.map((value) => (
+          <button
+            key={value}
+            type="button"
+            role="tab"
+            aria-selected={tab === value}
+            onClick={() => setTab(value)}
+            className={cn(
+              "-mb-px shrink-0 cursor-pointer whitespace-nowrap border-b-2 px-4 py-2.5 text-body transition-colors",
+              tab === value
+                ? "border-[#18181B] font-semibold text-[#09090B]"
+                : "border-transparent text-[#71717A] hover:text-[#09090B]"
+            )}
+          >
+            {value === "ALL" ? t("filterAll") : tSizing(`group.${value}`)}
+          </button>
+        ))}
+      </div>
+
+      <AdminDataTable
+        rows={visible}
+        columns={columns}
+        getRowId={(chart) => chart.id}
+        rowActions={(chart) => (
+          <AppMenu
+            tone="admin"
+            width={232}
+            align="end"
+            sideOffset={4}
+            items={menuItems(chart)}
+            trigger={
+              <button
+                type="button"
+                aria-label={t("menu.label", { name: nameOf(chart) })}
+                className={ADMIN_ROW_ICON_BUTTON_CLASS}
+              >
+                <MoreHorizontal size={18} />
+              </button>
+            }
+          />
+        )}
+        actionsLabel={t("column.actions")}
+        minWidth={560}
+        empty={charts.length === 0 ? t("empty") : t("noResults")}
+        mobileRow={(chart) => (
+          <div className="space-y-1.5">
+            {nameCell(chart)}
+            <div className="pl-12 text-xs">{status(chart)}</div>
           </div>
         )}
-      </section>
+      />
 
-      {isCreating && <CreateSizeChartDialog onOpenChange={setIsCreating} />}
-      <SizeChartPreviewDialog chart={preview} onOpenChange={(open) => !open && setPreview(null)} />
+      {dialog && (
+        <SizeChartInfoDialog
+          key={dialog.chart?.id ?? "new"}
+          chart={dialog.chart}
+          onOpenChange={(open) => !open && setDialog(null)}
+        />
+      )}
     </>
   );
 }
