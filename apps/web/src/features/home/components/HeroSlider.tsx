@@ -57,7 +57,7 @@ export function HeroSlider() {
       onMouseLeave={() => setIsHovering(false)}
     >
       {/* Khung viền mảnh lệch phía sau — tạo chiều sâu, gợi khung tranh */}
-      <div aria-hidden="true" className="absolute inset-0 translate-x-4 translate-y-4 border border-[var(--accent-color)]/60 sm:translate-x-5 sm:translate-y-5" />
+      <div aria-hidden="true" className="absolute inset-0 translate-x-2.5 translate-y-2.5 border border-[var(--accent-color)]/60 sm:translate-x-5 sm:translate-y-5" />
 
       {/* Ảnh trượt */}
       <div

@@ -11,6 +11,7 @@ export default getRequestConfig(async ({requestLocale}) => {
     // Parallel dynamic import of split JSON translation files
     const [
       about,
+      afterSales,
       auth,
       breadcrumbs,
       bespoke,
@@ -18,12 +19,14 @@ export default getRequestConfig(async ({requestLocale}) => {
       checkout,
       common,
       contact,
+      fabrics,
       footer,
       home,
       news,
       product,
       products,
       profile,
+      orders,
       faqs,
       wishlist,
       terms,
@@ -33,6 +36,7 @@ export default getRequestConfig(async ({requestLocale}) => {
       errors
     ] = await Promise.all([
       import(`../../messages/${locale}/about.json`).then(m => m.default),
+      import(`../../messages/${locale}/aftersales.json`).then(m => m.default),
       import(`../../messages/${locale}/auth.json`).then(m => m.default),
       import(`../../messages/${locale}/breadcrumbs.json`).then(m => m.default),
       import(`../../messages/${locale}/bespoke.json`).then(m => m.default),
@@ -40,12 +44,14 @@ export default getRequestConfig(async ({requestLocale}) => {
       import(`../../messages/${locale}/checkout.json`).then(m => m.default),
       import(`../../messages/${locale}/common.json`).then(m => m.default),
       import(`../../messages/${locale}/contact.json`).then(m => m.default),
+      import(`../../messages/${locale}/fabrics.json`).then(m => m.default),
       import(`../../messages/${locale}/footer.json`).then(m => m.default),
       import(`../../messages/${locale}/home.json`).then(m => m.default),
       import(`../../messages/${locale}/news.json`).then(m => m.default),
       import(`../../messages/${locale}/product.json`).then(m => m.default),
       import(`../../messages/${locale}/products.json`).then(m => m.default),
       import(`../../messages/${locale}/profile.json`).then(m => m.default),
+      import(`../../messages/${locale}/orders.json`).then(m => m.default),
       import(`../../messages/${locale}/faqs.json`).then(m => m.default),
       import(`../../messages/${locale}/wishlist.json`).then(m => m.default),
       import(`../../messages/${locale}/terms.json`).then(m => m.default),
@@ -59,6 +65,7 @@ export default getRequestConfig(async ({requestLocale}) => {
         locale,
         messages: {
             AboutPage: about,
+            AfterSalesPage: afterSales,
             Auth: {
               ...auth,
               responses: {
@@ -78,6 +85,7 @@ export default getRequestConfig(async ({requestLocale}) => {
               }
             },
             ContactPage: contact,
+            FabricsPage: fabrics,
             Footer: footer,
             HomePage: home,
             NewsPage: news,
@@ -88,6 +96,13 @@ export default getRequestConfig(async ({requestLocale}) => {
               responses: {
                 ...errors,
                 ...(profile.responses || {})
+              }
+            },
+            OrdersPage: {
+              ...orders,
+              responses: {
+                ...errors,
+                ...(orders.responses || {})
               }
             },
             FaqsPage: faqs,

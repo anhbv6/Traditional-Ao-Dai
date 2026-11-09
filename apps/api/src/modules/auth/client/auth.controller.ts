@@ -277,3 +277,23 @@ export async function resetPasswordPhone(req: Request, res: Response, next: Next
     return next(error)
   }
 }
+
+/**
+ * Tạo tài khoản từ đơn khách vãng lai rồi đăng nhập luôn (đặt cookie phiên storefront)
+ */
+export async function registerFromOrder(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const result = await authService.registerFromOrder(req.body, {
+      userAgent: req.headers['user-agent'],
+      ipAddress: getClientIp(req),
+    })
+    setCustomerSessionCookies(res, result.refreshToken, result.rememberMe, result.refreshTokenExpiresAt)
+    return sendSuccess(res, {
+      data: { accessToken: result.accessToken },
+      message: 'REGISTER_FROM_ORDER_SUCCESS',
+      statusCode: 201,
+    })
+  } catch (error) {
+    return next(error)
+  }
+}

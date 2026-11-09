@@ -95,6 +95,11 @@ export function ProductEventBanner() {
         />
       </div>
 
+      {/* Bóng xám mờ ở chân banner: ảnh sáng (lụa trắng, nền kem) vẫn đọc rõ dãy số 01 / 02 / 03 */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/70 via-black/40 to-transparent sm:h-36"
+      />
       {/* Khối nội dung: chữ + CTA đi cùng nhau, thanh số ở đáy — tất cả nằm trong luồng nên không đè lên nhau */}
       <div className={containerClassName({ className: 'relative flex h-full flex-col pb-6 lg:pb-8' })}>
         <div className="flex flex-1 flex-col justify-end lg:justify-center lg:pt-6">
@@ -162,10 +167,10 @@ export function ProductEventBanner() {
                   aria-current={isActive}
                   className="group/dot w-full cursor-pointer pb-2 pt-1 text-left"
                 >
-                  <span className={cn('text-[11px] tabular-nums transition-colors', isActive ? 'text-white' : 'text-white/45 group-hover/dot:text-white/80')}>
+                  <span className={cn('text-[11px] tabular-nums transition-colors', isActive ? 'font-semibold text-white' : 'text-white/70 group-hover/dot:text-white')}>
                     {String(i + 1).padStart(2, '0')}
                   </span>
-                  <span className="mt-2 block h-px overflow-hidden bg-white/20">
+                  <span className="mt-2 block h-px overflow-hidden bg-white/35">
                     {isActive ? (
                       <span
                         key={`${item.id}-${index}`}

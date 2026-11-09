@@ -9,15 +9,18 @@ interface RelatedProductsProps {
   title: string;
 }
 
-/** Sản phẩm liên quan: băng chuyền dùng chung ContentCarousel (kéo/vuốt, tự trôi, nút Trước / Sau) — thẻ nhỏ (5–6 thẻ / hàng trên desktop) vì trang mở tràn bề rộng */
+/**
+ * Sản phẩm liên quan: tối đa 5 thẻ nhỏ (server đã cắt) — desktop vừa đủ một hàng, không phải trượt;
+ * màn nhỏ hơn dùng băng chuyền ContentCarousel để kéo / vuốt.
+ */
 export default function RelatedProducts({ relatedProducts, title }: RelatedProductsProps) {
   return (
     <ContentCarousel
-      className="mt-14 sm:mt-16 lg:mt-20"
+      className="mt-12 pt-10 sm:mt-14 lg:mt-16 lg:pt-12"
       title={title}
       items={relatedProducts}
       getKey={(item) => item.id}
-      slideClassName="basis-[56%] sm:basis-1/3 md:basis-1/4 lg:basis-1/5 2xl:basis-1/6"
+      slideClassName="basis-[46%] sm:basis-1/3 md:basis-1/4 lg:basis-1/5"
       renderItem={(item) => (
         <ProductCard
           imageSrc={item.imageSrc}

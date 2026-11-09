@@ -28,7 +28,7 @@ export function BespokeService() {
       <div aria-hidden="true" className="pointer-events-none absolute -right-40 -top-40 size-[520px] rounded-full border border-white/10" />
       <div aria-hidden="true" className="pointer-events-none absolute -right-24 -top-24 size-[360px] rounded-full border border-white/10" />
 
-      <div className={containerClassName({ className: 'relative grid gap-14 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-20 xl:gap-28' })}>
+      <div className={containerClassName({ className: 'relative grid gap-10 sm:gap-14 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-20 xl:gap-28' })}>
         {/* ---------- Cột trái: tiêu đề + CTA + ảnh ---------- */}
         <div className="lg:sticky lg:top-28 lg:self-start">
           <SectionHeading index="04" tone="dark" align="left" eyebrow={t('eyebrow')} title={t('title')} description={t('description')} className="mb-8 sm:mb-8" />
@@ -78,7 +78,7 @@ export function BespokeService() {
 
           {BESPOKE_STEPS.map((step, i) => (
             <li key={step} className="group relative border-b border-white/15 last:border-b-0">
-              <Reveal delay={i * 0.1} className="flex gap-6 py-7 sm:gap-8 sm:py-8">
+              <Reveal delay={i * 0.1} className="flex gap-4 py-5 sm:gap-8 sm:py-8">
                 {/* Mốc thoi đánh số — nền đỏ để che đường nối phía sau */}
                 <span className="relative flex size-12 shrink-0 items-center justify-center">
                   <span
@@ -91,10 +91,10 @@ export function BespokeService() {
                 </span>
 
                 <div className="pt-1.5 transition-transform duration-500 ease-out group-hover:translate-x-1">
-                  <h3 className="font-[family-name:var(--font-playfair)] text-xl font-semibold text-white sm:text-2xl">
+                  <h3 className="font-[family-name:var(--font-playfair)] text-lg font-semibold text-white sm:text-2xl">
                     {t(`steps.${step}.title`)}
                   </h3>
-                  <p className="mt-2 max-w-md text-[15px] leading-7 text-white/85">{t(`steps.${step}.desc`)}</p>
+                  <p className="mt-1.5 max-w-md text-sm leading-6 text-white/85 sm:mt-2 sm:text-[15px] sm:leading-7">{t(`steps.${step}.desc`)}</p>
                 </div>
               </Reveal>
             </li>

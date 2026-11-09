@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { formatVnd, type Locale } from "@repo/shared";
 import { Link } from "@/i18n/routing";
-import { type ActiveDiscount, type CartTotals } from "@/features/cart";
+import { type CartTotals } from "@/features/cart";
 import { type CartItem, type PaymentMethod, type ShippingData } from "../types/checkout.types";
 
 /** Vạch kẻ nét đứt kiểu hoá đơn in */
@@ -17,10 +17,9 @@ const TORN_EDGE =
 interface CheckoutOrderSummaryProps {
   cartItems: CartItem[];
   totals: CartTotals;
-  discount: ActiveDiscount | null;
   locale: Locale;
-  /** Có sau bước Thanh toán → in "Số đơn" */
-  orderId?: string;
+  /** Giỏ có mã giảm giá demo → ghi chú mã chưa áp dụng khi đặt online */
+  hasCartDiscount?: boolean;
   /** Có sau bước Giao hàng → in tên khách */
   shipping?: ShippingData | null;
   /** Có sau bước Thanh toán → in phương thức */
@@ -47,9 +46,8 @@ function MetaRow({ label, value }: { label: string; value: string }) {
 export function CheckoutOrderSummary({
   cartItems,
   totals,
-  discount,
   locale,
-  orderId,
+  hasCartDiscount,
   shipping,
   paymentMethod,
 }: CheckoutOrderSummaryProps) {
@@ -70,7 +68,6 @@ export function CheckoutOrderSummary({
           <p className="mt-4 text-[11px] font-semibold uppercase tracking-[3px] text-[var(--text-main)]">{t("summary.receipt")}</p>
 
           <dl className={`mt-4 space-y-1.5 pt-4 text-left text-xs ${DASHED}`}>
-            <MetaRow label={t("summary.orderNo")} value={orderId || pending} />
             <MetaRow label={t("summary.date")} value={today} />
             <MetaRow label={t("summary.customer")} value={shipping?.fullName || pending} />
             <MetaRow label={t("summary.payment")} value={paymentMethod ? t(`payment.methods.${paymentMethod}.title`) : pending} />
@@ -119,10 +116,7 @@ export function CheckoutOrderSummary({
             </div>
             {discountAmount > 0 ? (
               <div className="flex items-center justify-between gap-4">
-                <dt className="text-[var(--text-light)]">
-                  {t("summary.discount")}
-                  {discount ? <span className="ml-1.5 text-[11px] font-semibold tracking-[1px] text-[var(--sale-gold)]">{discount.code}</span> : null}
-                </dt>
+                <dt className="text-[var(--text-light)]">{t("summary.discount")}</dt>
                 <dd className="text-[var(--sale-gold)]">−{formatVnd(discountAmount, locale)}</dd>
               </div>
             ) : null}
@@ -160,6 +154,10 @@ export function CheckoutOrderSummary({
             <p className="mt-1.5 text-right text-xs text-[var(--sale-gold)]">
               {t("summary.savings")} <span className="font-semibold">{formatVnd(totalSaved, locale)}</span>
             </p>
+          ) : null}
+
+          {hasCartDiscount ? (
+            <p className="mt-2 text-xs leading-5 text-[var(--text-light)]">{t("summary.discountNotApplied")}</p>
           ) : null}
 
           <p className="mt-4 text-center font-[family-name:var(--font-playfair)] text-[13px] italic text-[var(--text-light)]">{t("summary.thanks")}</p>

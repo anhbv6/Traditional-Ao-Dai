@@ -118,14 +118,14 @@ export default function ProductReviews({ locale }: ProductReviewsProps) {
 
   /* ---------- Form viết đánh giá ---------- */
   const reviewForm = (
-      <form id={REVIEW_FORM_ID} noValidate onSubmit={handleSubmit} className="space-y-6">
+      <form id={REVIEW_FORM_ID} noValidate onSubmit={handleSubmit} className="space-y-5">
         <div>
           <p id="review-rating-label" className="text-[11px] font-semibold uppercase tracking-[2.5px] text-[var(--text-light)]">
             {t('yourRating')}
           </p>
-          <div className="mt-3">
+          <div className="mt-2">
             <Rating
-              style={{ maxWidth: 150 }}
+              style={{ maxWidth: 120 }}
               value={rating}
               onChange={(value: number) => {
                 setRating(value);
@@ -143,37 +143,43 @@ export default function ProductReviews({ locale }: ProductReviewsProps) {
           ) : null}
         </div>
 
-        <TextField
-          label={t('nameLabel')}
-          placeholder={t('namePlaceholder')}
-          autoComplete="name"
-          value={name}
-          onValueChange={(value) => {
-            setName(value);
-            clearError('name');
-          }}
-          error={errors.name}
-          shakeKey={submitCount}
-        />
+        {/* Tên + email chung một hàng từ tablet — form ngắn, không phải cuộn trong hộp thoại */}
+        <div className="grid gap-5 sm:grid-cols-2 sm:gap-4">
+          <TextField
+            size="md"
+            label={t('nameLabel')}
+            placeholder={t('namePlaceholder')}
+            autoComplete="name"
+            value={name}
+            onValueChange={(value) => {
+              setName(value);
+              clearError('name');
+            }}
+            error={errors.name}
+            shakeKey={submitCount}
+          />
 
-        <TextField
-          type="email"
-          label={t('emailLabel')}
-          placeholder={t('emailPlaceholder')}
-          autoComplete="email"
-          value={email}
-          onValueChange={(value) => {
-            setEmail(value);
-            clearError('email');
-          }}
-          error={errors.email}
-          shakeKey={submitCount}
-        />
+          <TextField
+            size="md"
+            type="email"
+            label={t('emailLabel')}
+            placeholder={t('emailPlaceholder')}
+            autoComplete="email"
+            value={email}
+            onValueChange={(value) => {
+              setEmail(value);
+              clearError('email');
+            }}
+            error={errors.email}
+            shakeKey={submitCount}
+          />
+        </div>
 
         <TextAreaField
           label={t('reviewLabel')}
           placeholder={t('reviewPlaceholder')}
-          rows={4}
+          rows={3}
+          autoResize
           maxLength={REVIEW_MAX_LENGTH}
           showCount
           value={content}
@@ -237,7 +243,7 @@ export default function ProductReviews({ locale }: ProductReviewsProps) {
           onOpenChange={setIsFormOpen}
           icon={PenLine}
           title={t('addReview')}
-          size="lg"
+          size="md"
           confirm={{ label: t('submitReview'), form: REVIEW_FORM_ID }}
           cancel={{ label: t('replyCancel') }}
         >

@@ -4,6 +4,7 @@
   "products": "Products",
   "shop": "Shop",
   "ourStory": "Our Story",
+  "fabrics": "Fabric library",
   "blog": "Stories of Silk & Clouds",
   "contact": "Contact Us",
   "cart": "Cart",
@@ -80,6 +81,23 @@
     "cancel": "Cancel",
     "close": "Close"
   },
+  "adminBar": {
+    "label": "Admin toolbar",
+    "previewing": "Viewing the store",
+    "roles": {
+      "ADMIN": "Administrator",
+      "STAFF": "Staff"
+    },
+    "shortcutsLabel": "Admin shortcuts",
+    "shortcuts": {
+      "orders": "Orders",
+      "tailoring": "Workshop",
+      "products": "Products",
+      "inventory": "Inventory"
+    },
+    "openDashboard": "Admin dashboard",
+    "openDashboardShort": "Admin"
+  },
   "adminDashboard": "Go to admin",
   "mediaUploader": {
     "dropTitle": "Add photos or videos",
@@ -117,5 +135,10 @@
     "suggestions": "You might like",
     "metaTitle": "Access denied — Thiên Canh"
   },
-  "notifications": "Notifications"
+  "notifications": "Notifications",
+  "mobileMenu": {
+    "open": "Open navigation menu",
+    "nav": "Navigation",
+    "admin": "Go to admin area"
+  }
 }

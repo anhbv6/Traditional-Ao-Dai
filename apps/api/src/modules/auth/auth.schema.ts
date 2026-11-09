@@ -149,3 +149,28 @@ export const verifyResetPasswordPhoneSchema = z.object({
 })
 
 export type VerifyResetPasswordPhoneInput = z.infer<typeof verifyResetPasswordPhoneSchema>
+
+/**
+ * Tạo tài khoản từ đơn khách vãng lai (trang cảm ơn): chứng minh sở hữu SĐT của đơn bằng OTP (purpose CLAIM),
+ * rồi đặt mật khẩu HOẶC liên kết Google.
+ */
+const orderLinkTokenSchema = z.string().trim().min(20, 'ORDER_LINK_INVALID').max(200, 'ORDER_LINK_INVALID')
+
+export const registerFromOrderSchema = z.object({
+  body: z.discriminatedUnion('method', [
+    z.object({
+      method: z.literal('password'),
+      token: orderLinkTokenSchema,
+      code: verificationCodeSchema,
+      password: newPasswordSchema,
+    }),
+    z.object({
+      method: z.literal('google'),
+      token: orderLinkTokenSchema,
+      code: verificationCodeSchema,
+      credential: z.string().min(1, 'GOOGLE_CREDENTIAL_REQUIRED'),
+    }),
+  ]),
+})
+
+export type RegisterFromOrderInput = z.infer<typeof registerFromOrderSchema>

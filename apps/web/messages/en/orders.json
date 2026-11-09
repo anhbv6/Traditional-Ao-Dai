@@ -1,0 +1,271 @@
+{
+  "responses": {
+    "ORDER_PLACED": "Order placed",
+    "ORDER_FOUND": "Order found",
+    "OTP_SENT_SUCCESS": "Verification code sent",
+    "ORDER_EDIT_VERIFIED": "Verified — you can edit for 15 minutes",
+    "ORDER_ADDRESS_UPDATED": "Shipping address updated",
+    "ORDER_MEASUREMENTS_UPDATED": "Measurements updated — the tailor will cut with the new ones",
+    "REGISTER_FROM_ORDER_SUCCESS": "Account created and order linked",
+    "DEV_VERIFICATION_CODE": "OTP code (dev only)"
+  },
+  "status": {
+    "PENDING": "Awaiting confirmation",
+    "CONFIRMED": "Confirmed",
+    "IN_PRODUCTION": "Being tailored",
+    "READY_TO_SHIP": "Ready to ship",
+    "SHIPPING": "Shipping",
+    "DELIVERED": "Delivered",
+    "CANCELLED": "Cancelled",
+    "REFUNDED": "Refunded"
+  },
+  "stage": {
+    "ALL": "All",
+    "AWAITING_PAYMENT": "Awaiting payment",
+    "PROCESSING": "Processing",
+    "TAILORING": "Tailoring",
+    "SHIPPING": "Shipping",
+    "COMPLETED": "Completed",
+    "CANCELLED": "Cancelled"
+  },
+  "paymentMethod": {
+    "COD": "Cash on delivery",
+    "BANK_TRANSFER": "Full bank transfer",
+    "DEPOSIT": "Deposit + cash on delivery"
+  },
+  "paymentStatus": {
+    "UNPAID": "unpaid",
+    "PARTIALLY_PAID": "deposit paid",
+    "PAID": "paid in full",
+    "REFUNDED": "refunded"
+  },
+  "steps": {
+    "label": "Tailoring progress",
+    "current": "In progress",
+    "cancelled": "Order stopped",
+    "MEASUREMENTS_RECEIVED": {
+      "title": "Measurements in",
+      "description": "Tailor checks sizes & design"
+    },
+    "FABRIC_CUTTING": {
+      "title": "Cutting",
+      "description": "Fabric laid out and cut"
+    },
+    "SEWING": {
+      "title": "Sewing",
+      "description": "Panels, embroidery, beading"
+    },
+    "FINAL_CHECK": {
+      "title": "Final check",
+      "description": "Fit check and pressing"
+    },
+    "SHIPPING": {
+      "title": "Shipping",
+      "description": "Boxed and on its way"
+    }
+  },
+  "tailoringStatus": {
+    "NOT_APPLICABLE": "Ready-made",
+    "WAITING_FABRIC": "Measurements received, fabric being prepared",
+    "FABRIC_CUTTING": "Cutting the fabric",
+    "SEWING": "Sewing",
+    "EMBROIDERY_BEADING": "Embroidery / beading",
+    "FITTING_IRONING": "Fit check & pressing",
+    "COMPLETED": "Tailoring finished"
+  },
+  "appointmentType": {
+    "MEASUREMENT": "Measuring at the atelier",
+    "FITTING": "Fitting",
+    "PICKUP": "Pick-up"
+  },
+  "appointmentStatus": {
+    "SCHEDULED": "Scheduled",
+    "DONE": "Done",
+    "CANCELLED": "Cancelled",
+    "NO_SHOW": "Missed"
+  },
+  "measurement": {
+    "height": "Height",
+    "weight": "Weight",
+    "bust": "Bust",
+    "waist": "Waist",
+    "hips": "Hips",
+    "shoulder": "Shoulder",
+    "armLength": "Sleeve length",
+    "armpit": "Armhole",
+    "neck": "Neck",
+    "shirtLength": "Dress length",
+    "pantsLength": "Pants length",
+    "thigh": "Thigh"
+  },
+  "lookup": {
+    "eyebrow": "Order lookup",
+    "title": "Follow your ao dai",
+    "subtitle": "Enter your order code and the phone number or email used on the order — no sign-in needed.",
+    "orderCode": "Order code",
+    "orderCodePlaceholder": "TC-2611-AB7K",
+    "orderCodeHint": "Found in your confirmation email / text",
+    "contact": "Phone number or email",
+    "contactPlaceholder": "0912 345 678 or you@email.com",
+    "submit": "See progress",
+    "submitting": "Looking…",
+    "privacyNote": "For privacy, this page only shows progress. Address, measurements and workshop photos are behind the link in your confirmation email.",
+    "custom": "made to measure",
+    "linkHint": "Want workshop photos or to change measurements? Open the “Follow tailoring progress” link in your confirmation email.",
+    "emptyTitle": "Every ao dai has its journey",
+    "emptyDescription": "Enter your order code to see which step your piece is at: measurements, cutting, sewing, final check or on its way."
+  },
+  "track": {
+    "eyebrow": "Order progress",
+    "title": "Your ao dai's journey",
+    "subtitle": "This link is view-only. To change measurements or the address, the atelier texts a verification code to the order's phone number.",
+    "missing": {
+      "title": "Tracking link missing",
+      "description": "Open the link in your confirmation email, or look the order up by code and phone number."
+    },
+    "invalid": {
+      "title": "This link is no longer valid",
+      "description": "It may have expired or been mistyped. You can still look the order up by code and phone number.",
+      "action": "Look up by order code"
+    }
+  },
+  "timeline": {
+    "orderCode": "Order code",
+    "placedOn": "Placed {date}",
+    "dueDate": "Due {date}",
+    "progressTitle": "Tailoring progress",
+    "workshopTitle": "Workshop diary",
+    "workshopEmpty": "No diary entries yet. Workshop photos appear here once your piece is being cut and sewn.",
+    "viewPhoto": "Open workshop photo",
+    "photoAlt": "Your ao dai in the workshop",
+    "itemsTitle": "Items & measurements",
+    "lineQuantity": "{count} × {price}",
+    "measurementsTitle": "Measurements",
+    "measureAtStudio": "Measurements will be taken when you visit the atelier.",
+    "editMeasurements": "Edit measurements",
+    "measurementsLocked": "Already cut",
+    "addressTitle": "Ship to",
+    "editAddress": "Edit",
+    "addressLocked": "The order is with the carrier — the address can no longer change.",
+    "appointmentsTitle": "Atelier appointments",
+    "amountsTitle": "Payment",
+    "paymentLine": "{method} · {status}"
+  },
+  "amounts": {
+    "subTotal": "Subtotal",
+    "discount": "Discount",
+    "shipping": "Shipping",
+    "free": "Free",
+    "total": "Total",
+    "deposit": "Deposit",
+    "prepay": "Transfer up front",
+    "paid": "Paid",
+    "balance": "Balance due",
+    "codRemainder": "The balance is paid in cash on delivery."
+  },
+  "payment": {
+    "title": "Pay by VietQR transfer",
+    "description": "Open your banking app and scan — the amount and reference are pre-filled. The atelier confirms during working hours.",
+    "qrAlt": "VietQR code to transfer {amount}",
+    "bank": "Bank",
+    "accountNumber": "Account number",
+    "accountName": "Account holder",
+    "amount": "Amount",
+    "content": "Transfer reference",
+    "contentHint": "Keep the reference exactly so the payment is matched automatically"
+  },
+  "edit": {
+    "otpTitle": "Verify before editing",
+    "otpDescription": "To protect your order, we text a 6-digit code to the order's phone number ({phone}). The code works once and unlocks editing for 15 minutes.",
+    "verifiedDescription": "Verified. Changes are saved to the order right away.",
+    "sendCode": "Send code",
+    "resend": "Resend code",
+    "codeLabel": "Verification code",
+    "verify": "Verify",
+    "save": "Save changes",
+    "cancel": "Close",
+    "addressTitle": "Edit shipping address",
+    "measurementsTitle": "Edit measurements — {item}",
+    "province": "Province / City",
+    "district": "District",
+    "ward": "Ward / Commune",
+    "addressLine": "Street address"
+  },
+  "thankYou": {
+    "eyebrow": "Order placed",
+    "title": "Thank you for trusting Thiên Canh with your ao dai",
+    "description": "Your order is in. A progress link has been sent to your email and phone.",
+    "orderCode": "Order code",
+    "keepCode": "Keep this code with your phone number to look the order up any time.",
+    "depositTitle": "Pay a {amount} deposit so we can start cutting",
+    "codNote": "You pay in cash on delivery. We will call to confirm within 24 working hours.",
+    "progressTitle": "Tailoring progress",
+    "amountsTitle": "Payment",
+    "trackAction": "Follow progress",
+    "continue": "Keep shopping",
+    "emailNote": "No email? Check your spam folder, or look the order up by code on the Order lookup page.",
+    "invalidTitle": "Couldn't open the order",
+    "invalidDescription": "This thank-you link has expired or is wrong. You can still look the order up by code and phone number.",
+    "lookupAction": "Look up an order"
+  },
+  "claim": {
+    "eyebrow": "Save this order to an account",
+    "title": "All it takes is a password",
+    "description": "Your name, phone, address and measurements are already on this order. Create an account so you never retype measurements and see every order in one place.",
+    "sendCode": "Text a code to the order's phone",
+    "codeSentTo": "Enter the 6-digit code sent to {phone}.",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "At least 6 characters",
+    "submit": "Create account",
+    "or": "or",
+    "google": "Continue with Google",
+    "codeFirst": "Enter the verification code before creating the account.",
+    "existsTitle": "You already have a Thiên Canh account",
+    "existsDescription": "The details on this order belong to an existing account. Please sign in to see it and keep your measurements.",
+    "signIn": "Sign in",
+    "createdTitle": "Account created",
+    "createdDescription": "This order now lives in your account, with your address and measurements. Your email is saved as unverified — verify it under Personal info.",
+    "viewOrders": "View my orders"
+  },
+  "account": {
+    "filtersLabel": "Filter orders by status",
+    "tailored": "Tailored",
+    "itemCount": "{count, plural, one {# item} other {# items}}",
+    "detail": "Details",
+    "viewTimeline": "Progress",
+    "empty": {
+      "title": "No orders yet",
+      "description": "Once you order, your orders and tailoring progress will show here.",
+      "action": "Explore the collection",
+      "track": "Look up an order placed as a guest"
+    },
+    "emptyFilter": "No orders with this status.",
+    "loadError": "Couldn't load your orders.",
+    "retry": "Try again",
+    "pagination": "Order pages",
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {page} of {total}",
+    "backToList": "My orders",
+    "notFoundTitle": "Order not found",
+    "notFoundDescription": "The order doesn't exist or doesn't belong to this account.",
+    "editHint": "Need to change measurements or the address? We'll text a verification code to the order's phone.",
+    "editViaLink": "Edit measurements / address"
+  },
+  "myOrders": {
+    "eyebrow": "Account",
+    "title": "My orders",
+    "navLabel": "Order sections",
+    "accountLink": "Account",
+    "tabs": {
+      "orders": {
+        "label": "Orders",
+        "subtitle": "Track your orders, remaining deposits and the tailoring progress of each piece."
+      },
+      "addresses": {
+        "label": "Address book",
+        "subtitle": "Delivery addresses used at checkout — add, edit or choose your default."
+      }
+    }
+  }
+}

@@ -8,7 +8,10 @@
   "exports": {
     ".": "./src/index.ts",
     "./validation": "./src/validation.ts",
-    "./sizing": "./src/sizing.ts"
+    "./sizing": "./src/sizing.ts",
+    "./orders": "./src/orders.ts",
+    "./bespoke": "./src/bespoke.ts",
+    "./materials": "./src/materials.ts"
   },
   "typesVersions": {
     "*": {
@@ -17,6 +20,15 @@
       ],
       "sizing": [
         "./src/sizing.ts"
+      ],
+      "orders": [
+        "./src/orders.ts"
+      ],
+      "bespoke": [
+        "./src/bespoke.ts"
+      ],
+      "materials": [
+        "./src/materials.ts"
       ]
     }
   },

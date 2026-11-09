@@ -4,7 +4,6 @@ export * from "./components/AboutHero";
 export * from "./components/AboutStory";
 export * from "./components/AboutManifesto";
 export * from "./components/AboutPainSolution";
-export * from "./components/FitModel";
 export * from "./components/AboutAtelier";
 export * from "./components/AboutCta";
 export * from "./types/about.types";

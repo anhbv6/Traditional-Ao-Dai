@@ -1,0 +1,95 @@
+{
+  "meta": {
+    "title": "Thư mục vải — Thiên Canh",
+    "description": "Album những tấm lụa, gấm, đũi, linen Thiên Canh đang có: xuất xứ, thành phần sợi, độ rủ, độ dày, mùa mặc và cách giữ vải bền màu."
+  },
+  "eyebrow": "Thư mục vải",
+  "title": "Album những tấm vải trong tiệm",
+  "subtitle": "Mỗi tấm vải ở đây đều đã qua tay thợ: sờ mặt lụa, soi dưới nắng, thử độ rủ trước khi lên áo. Lật từng trang để chọn chất vải hợp dáng, hợp mùa của bạn.",
+  "count": "{count} tấm vải",
+  "filters": {
+    "season": "Theo mùa",
+    "fiber": "Theo sợi",
+    "all": "Tất cả"
+  },
+  "card": {
+    "open": "Xem chi tiết vải {name}",
+    "originUnknown": "Tiệm tuyển chọn"
+  },
+  "availability": {
+    "AVAILABLE": "Còn vải sẵn",
+    "LIMITED": "Còn ít — vài áo cuối",
+    "ON_REQUEST": "Đặt dệt theo yêu cầu"
+  },
+  "availabilityHint": {
+    "AVAILABLE": "Tiệm còn đủ vải để may ngay, không phải chờ hàng.",
+    "LIMITED": "Cây vải sắp hết, chỉ đủ cho vài thân áo — nhắn tiệm để giữ vải giúp bạn.",
+    "ON_REQUEST": "Hiện chưa có vải sẵn; tiệm đặt dệt lô mới, thời gian chờ thêm khoảng 1–2 tuần."
+  },
+  "detail": {
+    "gallery": "Ảnh cận mặt vải",
+    "photo": "Ảnh {index}",
+    "video": "Video độ rủ của vải",
+    "noPhoto": "Hình minh hoạ — ảnh thật đang được chụp",
+    "width": "Khổ {cm} cm",
+    "colors": "Màu đang có",
+    "composition": "Thành phần sợi",
+    "feel": "Cảm giác khi mặc",
+    "level": "{value}/5",
+    "seasons": "Mùa hợp mặc",
+    "care": "Giữ vải bền màu",
+    "process": "Từ sợi đến vải",
+    "askSample": "Hỏi mẫu vải",
+    "tailor": "May áo với vải này"
+  },
+  "metric": {
+    "stretch": "Co giãn",
+    "thickness": "Độ dày",
+    "drape": "Độ rủ",
+    "sheerness": "Xuyên thấu",
+    "sheen": "Độ bóng"
+  },
+  "season": {
+    "SPRING": "Xuân",
+    "SUMMER": "Hạ",
+    "AUTUMN": "Thu",
+    "WINTER": "Đông"
+  },
+  "fiber": {
+    "SILK": "Tơ tằm",
+    "COTTON": "Cotton",
+    "LINEN": "Lanh (linen)",
+    "HEMP": "Gai dầu",
+    "BAMBOO": "Sợi tre",
+    "VISCOSE": "Viscose",
+    "POLYESTER": "Polyester",
+    "SPANDEX": "Spandex",
+    "NYLON": "Nylon",
+    "WOOL": "Len",
+    "OTHER": "Sợi khác"
+  },
+  "care": {
+    "HAND_WASH": "Giặt tay nhẹ nhàng",
+    "MACHINE_GENTLE": "Giặt máy chế độ nhẹ",
+    "COLD_WATER": "Nước lạnh dưới 30°C",
+    "NO_BLEACH": "Không dùng chất tẩy",
+    "NO_WRING": "Không vắt xoắn",
+    "DRY_SHADE": "Phơi nơi râm mát",
+    "IRON_LOW": "Là ở nhiệt độ thấp",
+    "STEAM": "Là hơi",
+    "DRY_CLEAN": "Giặt khô",
+    "STORE_HANGING": "Treo móc khi cất"
+  },
+  "empty": {
+    "title": "Album đang được sắp lại",
+    "description": "Tiệm đang chụp và ghi chép những tấm vải mới. Nhắn cho Thiên Canh để được gửi mẫu vải tận tay.",
+    "unavailableTitle": "Chưa mở được album vải",
+    "unavailableDescription": "Kết nối tới kho vải đang gián đoạn. Bạn thử tải lại trang sau ít phút, hoặc nhắn tiệm để hỏi trực tiếp.",
+    "action": "Nhắn cho tiệm",
+    "filteredTitle": "Chưa có tấm vải nào khớp",
+    "filteredDescription": "Thử chọn mùa hoặc loại sợi khác để xem thêm vải."
+  },
+  "responses": {
+    "MATERIALS_FOUND": "Đã tải thư mục vải"
+  }
+}

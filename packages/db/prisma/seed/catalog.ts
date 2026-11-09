@@ -1,3 +1,4 @@
+import { BESPOKE_PRODUCT_SLUG } from '@repo/shared/bespoke'
 import { prisma, type SaleMode } from '../../src'
 import { seedTaxonomy } from './taxonomy'
 import { type SeededCatalog } from './types'
@@ -121,6 +122,7 @@ export async function seedCatalog({
   const categoryIds = await seedTaxonomy()
 
   const products: SeededCatalog = {}
+  await seedBespokeProduct(categoryIds['ao-dai-truyen-thong'])
   if (!demo) return products
 
   const colors = await prisma.attributeValue.findMany({
@@ -162,4 +164,31 @@ export async function seedCatalog({
   console.log(`   📦 ${DEMO_PRODUCTS.length} sản phẩm demo, ${variantCount} biến thể`)
 
   return products
+}
+
+/**
+ * Sản phẩm gốc của áo dài thiết kế riêng (trang /custom) — luôn tạo vì đơn đặt may theo thiết kế gắn vào đây.
+ * Giá thật do API tính theo cấu hình (`quoteBespoke`), `basePrice` chỉ là giá khởi điểm hiển thị.
+ * Mã không theo dãy số AD0001… để không chiếm số thứ tự của sản phẩm admin tạo.
+ */
+async function seedBespokeProduct(categoryId: string | undefined) {
+  if (!categoryId) return
+  const data = {
+    name: 'Áo Dài Thiết Kế Riêng',
+    nameEn: 'Bespoke Ao Dai',
+    description: 'Áo dài may đo theo thiết kế khách chọn ở trang thiết kế riêng: kiểu dáng, chất liệu, trang trí và số đo.',
+    descriptionEn: 'Made-to-measure ao dai built from the options chosen on the bespoke page.',
+    saleMode: 'CUSTOM' as SaleMode,
+    isCustomFit: true,
+    leadTimeDays: 10,
+    basePrice: 1_400_000,
+    images: ['/images/ex6.jpg'],
+    categoryId,
+  }
+  await prisma.product.upsert({
+    where: { slug: BESPOKE_PRODUCT_SLUG },
+    update: data,
+    create: { slug: BESPOKE_PRODUCT_SLUG, code: 'AD-TKR', ...data },
+  })
+  console.log('   ✂️  Sản phẩm áo dài thiết kế riêng')
 }

@@ -134,6 +134,11 @@ enum CollectionStatus {
   ARCHIVED
 }
 
+// Quyền của link tra cứu đơn: READ chỉ xem; sửa số đo / địa chỉ phải xác minh OTP gửi tới SĐT của đơn
+enum OrderAccessScope {
+  READ
+}
+
 // Hình thức bán: một món (may sẵn theo size), theo bộ (nhiều món bán chung một giá), may đo theo số đo
 enum SaleMode {
   SINGLE
@@ -582,7 +587,9 @@ model Voucher {
 
 model Order {
   id              String         @id @default(uuid())
-  orderNumber     String         @unique // Format: AD-YYYYMMDD-XXXX
+  // Mã tra cứu công khai TC-YYMM-XXXX — phần đuôi ngẫu nhiên (không tuần tự) để không đoán được đơn khác.
+  // Đơn cũ / seed giữ định dạng cũ (AD-...)
+  orderNumber     String         @unique
 
   userId          String?
   user            User?          @relation("CustomerOrders", fields: [userId], references: [id])
@@ -611,11 +618,18 @@ model Order {
   // Trạng thái
   orderStatus     OrderStatus    @default(PENDING)
   paymentStatus   PaymentStatus  @default(UNPAID)
-  paymentMethod   String         // COD, VNPAY, MOMO, BANK_TRANSFER
+  paymentMethod   String         // COD (trả hết khi nhận) · BANK_TRANSFER (chuyển khoản 100%) · DEPOSIT (chuyển khoản cọc, còn lại COD)
+  // Số tiền phải chuyển khoản trước (cọc hoặc toàn bộ) — server tính; 0 với COD. Đơn may đo luôn > 0
+  depositAmount   Decimal        @default(0) @db.Decimal(12, 2)
+  // Đơn có ít nhất một món may đo (saleMode CUSTOM hoặc có số đo) → bắt buộc cọc, có timeline xưởng
+  isTailored      Boolean        @default(false)
+  // Địa chỉ dạng cấu trúc { province, district, ward, addressLine } — để sửa địa chỉ / tạo UserAddress khi khách tạo tài khoản
+  shippingDetail  Json?
 
   items           OrderItem[]
   tailoringLogs   TailoringLog[]
   appointments    Appointment[]
+  accessTokens    OrderAccessToken[]
 
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
@@ -624,6 +638,24 @@ model Order {
   @@index([userId])
   @@index([orderStatus])
   @@index([dueDate])
+}
+
+// Link tra cứu đơn (magic link) cho khách vãng lai — chỉ lưu hash của token, token gốc chỉ nằm trong link gửi khách
+model OrderAccessToken {
+  id         String           @id @default(uuid())
+  tokenHash  String           @unique
+  scope      OrderAccessScope @default(READ)
+
+  orderId    String
+  order      Order            @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  expiresAt  DateTime
+  lastUsedAt DateTime?
+  revokedAt  DateTime?
+  createdAt  DateTime         @default(now())
+
+  @@index([orderId])
+  @@index([expiresAt])
 }
 
 model OrderItem {
@@ -683,6 +715,7 @@ model TailoringLog {
 
   status      TailoringStatus
   note        String?
+  images      String[]        @default([]) // Ảnh xưởng (Cloudinary) — khách xem ở timeline
   staffId     String
   staff       User            @relation("TailorStaff", fields: [staffId], references: [id])
   createdAt   DateTime        @default(now())

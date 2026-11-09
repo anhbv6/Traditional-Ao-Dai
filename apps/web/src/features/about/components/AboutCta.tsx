@@ -14,9 +14,16 @@ export function AboutCta() {
 
   return (
     <section className="bg-(--bg-wine) text-white">
-      <Reveal className={containerClassName({ spacing: 'section', className: 'grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end lg:gap-16' })}>
+      <Reveal
+        className={containerClassName({
+          spacing: "section",
+          className: "grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end lg:gap-16",
+        })}
+      >
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[3px] text-[var(--accent-color)]">{t("eyebrow")}</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[3px] text-[var(--accent-color)]">
+            {t("eyebrow")}
+          </p>
           <h2 className="mt-4 max-w-2xl font-[family-name:var(--font-playfair)] text-[1.75rem] font-semibold leading-tight text-white sm:text-[2.375rem]">
             {t("title")}
           </h2>

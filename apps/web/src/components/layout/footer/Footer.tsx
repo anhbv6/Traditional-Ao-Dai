@@ -51,9 +51,10 @@ export async function Footer() {
       title: t('customerCare.title'),
       links: [
         { label: t('customerCare.sizeGuide'), href: '/faqs#size-guide' },
-        { label: t('customerCare.returnPolicy'), href: '/faqs#return-policy' },
+        { label: t('customerCare.returnPolicy'), href: '/alterations-returns' },
         { label: t('customerCare.customFit'), href: '/products?service=custom-fit' },
         { label: t('customerCare.careGuide'), href: '/news/cach-giat-bao-quan-ao-dai' },
+        { label: t('customerCare.fabrics'), href: '/fabrics' },
       ],
     },
     {

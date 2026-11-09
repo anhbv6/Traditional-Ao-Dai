@@ -1,0 +1,163 @@
+{
+  "meta": {
+    "title": "Alterations & Returns | Thiên Canh",
+    "description": "Free fit adjustments, size exchanges, returns and seam warranty at Thiên Canh — send a request online with just your order code."
+  },
+  "eyebrow": "Thiên Canh aftercare",
+  "title": "Alterations & Returns",
+  "subtitle": "Our work doesn't end when the áo dài leaves the shop. If it doesn't fit quite right, needs another size, or a seam comes loose, send it back — our tailors will stitch until you're happy.",
+  "policy": {
+    "window": "Within {days} days",
+    "services": {
+      "ALTERATION": {
+        "title": "Alterations",
+        "short": "Adjust waist, bust, hem or sleeves for a better fit",
+        "description": "Take in the waist, ease the bust, shorten the hem or adjust sleeves until it fits. The first adjustment is free, including made-to-measure pieces.",
+        "scope": "Applies to: every áo dài bought from us"
+      },
+      "EXCHANGE": {
+        "title": "Size / style exchange",
+        "short": "Swap for another size, colour or style",
+        "description": "Swap for another size, colour or style at the same price or pay the difference. We cover return shipping when the fault is ours.",
+        "scope": "Applies to: ready-to-wear, accessories"
+      },
+      "RETURN": {
+        "title": "Returns",
+        "short": "Refund when the item isn't as described",
+        "description": "Refunded to your account within 3–5 business days after we receive and inspect the item.",
+        "scope": "Applies to: ready-to-wear, accessories"
+      },
+      "WARRANTY": {
+        "title": "Seam warranty",
+        "short": "Loose seams, broken buttons / zips, loose embroidery",
+        "description": "Loose seams, broken buttons or zips, lost beads or loosened hand embroidery — repaired free of charge, no questions asked.",
+        "scope": "Applies to: every piece, including made-to-measure"
+      }
+    },
+    "conditionsEyebrow": "General conditions",
+    "conditionsTitle": "For a quick turnaround",
+    "conditions": {
+      "tags": "Items for exchange / return must keep their tags, be unwashed, unironed and odour-free.",
+      "unworn": "Alterations and warranty repairs accept worn pieces — just make sure they're clean.",
+      "receipt": "Time limits count from the delivery date; we match by order code, no paper receipt needed.",
+      "custom": "Made-to-measure pieces can't be exchanged or returned, but are always altered and repaired."
+    }
+  },
+  "request": {
+    "eyebrow": "Send a request",
+    "heading": "Three steps, under two minutes",
+    "intro": "Enter your order code so we know which piece needs care — no sign-in required.",
+    "customFit": "Made to measure",
+    "notForCustomFit": "Not available for made-to-measure pieces",
+    "notEligible": "This order is currently “{status}”. Alteration and return requests open once you've received your order.",
+    "lookup": {
+      "title": "Verify your order",
+      "description": "Your order code is in the confirmation email / SMS, formatted TC-YYMM-XXXX.",
+      "orderCode": "Order code",
+      "orderCodePlaceholder": "TC-2611-AB12",
+      "contact": "Phone or email used to order",
+      "contactPlaceholder": "0909 000 000",
+      "submit": "Find order",
+      "again": "Search again",
+      "privacyNote": "Used only to verify your order — your address and measurements are never shown."
+    },
+    "choose": {
+      "title": "Choose item & request type",
+      "description": "One request per item — send another afterwards for more items.",
+      "item": "Item",
+      "service": "What should we do?"
+    },
+    "detail": {
+      "title": "Details & hand-over",
+      "description": "The more specific you are, the better our tailors can prepare — photos of the issue help a lot.",
+      "reason": "Reason",
+      "descriptionLabel": "Details",
+      "placeholder": {
+        "ALTERATION": "E.g. waist is about 2cm too loose, the hem is 3cm longer than I'd like…",
+        "EXCHANGE": "E.g. I'd like size L instead of M, same colour…",
+        "RETURN": "E.g. the fabric is darker than in the photos…",
+        "WARRANTY": "E.g. the left underarm seam has come loose by about 3cm…"
+      },
+      "photos": "Photos (optional)",
+      "handoverLabel": "How will you send it to us?",
+      "submit": "Send request",
+      "submitting": "Sending…",
+      "responseNote": "We'll call to confirm within 24 business hours."
+    },
+    "handover": {
+      "STORE": {
+        "title": "Bring it to the shop",
+        "description": "Our tailor re-measures and may adjust it on the spot — fastest."
+      },
+      "POST": {
+        "title": "Send by post",
+        "description": "We'll send packing instructions; shipping is on us when the fault is ours."
+      }
+    }
+  },
+  "reasons": {
+    "ALTERATION": {
+      "TOO_LOOSE": "Too loose",
+      "TOO_TIGHT": "Too tight",
+      "LENGTH": "Hem / trouser length",
+      "SLEEVE": "Sleeves",
+      "OTHER": "Other"
+    },
+    "EXCHANGE": {
+      "WRONG_SIZE": "Wrong size",
+      "CHANGE_COLOR": "Different colour",
+      "CHANGE_STYLE": "Different style",
+      "OTHER": "Other"
+    },
+    "RETURN": {
+      "NOT_AS_DESCRIBED": "Not as described",
+      "WRONG_ITEM": "Wrong item delivered",
+      "CHANGED_MIND": "No longer needed",
+      "OTHER": "Other"
+    },
+    "WARRANTY": {
+      "SEAM": "Loose seam",
+      "BUTTON_ZIP": "Broken button / zip",
+      "EMBROIDERY": "Loose embroidery / beads",
+      "FABRIC_DEFECT": "Fabric defect",
+      "OTHER": "Other"
+    }
+  },
+  "process": {
+    "title": "How we handle it",
+    "steps": {
+      "SUBMIT": {
+        "title": "Send a request",
+        "description": "You get a request code right away."
+      },
+      "CONFIRM": {
+        "title": "We call to confirm",
+        "description": "Within 24 business hours a tailor asks for details and books a time."
+      },
+      "HANDOVER": {
+        "title": "Hand the piece over",
+        "description": "Bring it to the showroom or post it following our guide."
+      },
+      "DONE": {
+        "title": "Done & returned",
+        "description": "Alterations take 3–5 days; exchanges / refunds follow inspection."
+      }
+    }
+  },
+  "help": {
+    "description": "Can't find your order code, or want to ask first? Drop us a message.",
+    "contact": "Send a message",
+    "hotline": "Call 0909 000 000",
+    "hotlineValue": "0909000000"
+  },
+  "success": {
+    "title": "We've received your request",
+    "description": "A Thiên Canh tailor will call within 24 business hours to confirm and arrange a time. Please keep the request code below.",
+    "requestCode": "Request code",
+    "orderCode": "Order code",
+    "item": "Item",
+    "service": "Request type",
+    "another": "Send another request",
+    "continueShopping": "Continue shopping"
+  }
+}

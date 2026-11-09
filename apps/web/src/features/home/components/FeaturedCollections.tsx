@@ -25,21 +25,21 @@ export function FeaturedCollections() {
     <section className={containerClassName({ spacing: 'section' })}>
       <SectionHeading index="01" eyebrow={t('eyebrow')} title={t('title')} description={t('description')} />
 
-      <div className="grid gap-5 lg:grid-cols-[1.15fr_1fr] lg:grid-rows-2 lg:gap-6">
+      <div className="grid gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-[1.15fr_1fr] lg:grid-rows-2 lg:gap-6">
         {COLLECTIONS.map((item, i) => (
-          <Reveal key={item.key} delay={i * 0.12} className={cn(item.featured && 'lg:row-span-2')}>
+          <Reveal key={item.key} delay={i * 0.12} className={cn(item.featured && 'sm:col-span-2 lg:col-span-1 lg:row-span-2')}>
             <Link
               href="/products"
               className={cn(
                 'group relative block h-full overflow-hidden bg-[var(--bg-secondary)]',
-                item.featured ? 'aspect-[4/5] lg:aspect-auto lg:min-h-[720px]' : 'aspect-[4/3] lg:aspect-auto lg:min-h-[348px]',
+                item.featured ? 'aspect-[4/5] sm:aspect-[16/9] lg:aspect-auto lg:min-h-[720px]' : 'aspect-[4/3] sm:aspect-[4/5] lg:aspect-auto lg:min-h-[348px]',
               )}
             >
               <Image
                 src={item.image}
                 alt={t(`items.${item.key}.name`)}
                 fill
-                sizes={item.featured ? '(max-width: 1024px) 100vw, 55vw' : '(max-width: 1024px) 100vw, 45vw'}
+                sizes={item.featured ? '(max-width: 1024px) 100vw, 55vw' : '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 45vw'}
                 className={cn(
                   'object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.05]',
                   item.position,
@@ -49,17 +49,17 @@ export function FeaturedCollections() {
               {/* Khung viền mảnh hiện ra khi rê chuột — chi tiết sang trọng, không phô trương */}
               <div aria-hidden="true" className="absolute inset-4 border border-white/0 transition-colors duration-500 group-hover:border-white/50" />
 
-              <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-6 p-6 sm:p-8">
+              <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 sm:gap-6 sm:p-6 lg:p-8">
                 <div className="max-w-md">
                   <p className="font-[family-name:var(--font-playfair)] text-sm text-white/70">0{i + 1}</p>
-                  <h3 className="mt-1 font-[family-name:var(--font-playfair)] text-2xl font-semibold text-white sm:text-3xl">
+                  <h3 className="mt-1 font-[family-name:var(--font-playfair)] text-xl font-semibold text-white sm:text-2xl lg:text-3xl">
                     {t(`items.${item.key}.name`)}
                   </h3>
-                  <p className="mt-2 text-sm leading-6 text-white/80 lg:max-h-0 lg:overflow-hidden lg:opacity-0 lg:transition-all lg:duration-500 lg:group-hover:max-h-24 lg:group-hover:opacity-100">
+                  <p className="mt-1.5 line-clamp-2 text-[13px] leading-5 text-white/80 sm:mt-2 sm:text-sm sm:leading-6 lg:line-clamp-none lg:max-h-0 lg:overflow-hidden lg:opacity-0 lg:transition-all lg:duration-500 lg:group-hover:max-h-24 lg:group-hover:opacity-100">
                     {t(`items.${item.key}.desc`)}
                   </p>
                 </div>
-                <span className="flex size-11 shrink-0 items-center justify-center rounded-full border border-white/60 text-white transition-colors duration-300 group-hover:bg-[var(--bg-card)] group-hover:text-[var(--primary-ink)]">
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-full border border-white/60 sm:size-11 text-white transition-colors duration-300 group-hover:bg-[var(--bg-card)] group-hover:text-[var(--primary-ink)]">
                   <ArrowUpRight size={18} strokeWidth={1.5} />
                   <span className="sr-only">{t('explore')}</span>
                 </span>

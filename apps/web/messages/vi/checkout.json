@@ -37,20 +37,23 @@
     "title": "Phương thức thanh toán",
     "description": "Chọn cách bạn muốn thanh toán cho đơn hàng.",
     "methods": {
-      "cod": {
+      "COD": {
         "title": "Thanh toán khi nhận hàng (COD)",
         "description": "Trả tiền mặt cho nhân viên giao hàng sau khi nhận và kiểm tra áo."
       },
-      "bank": {
-        "title": "Chuyển khoản ngân hàng",
-        "description": "Thông tin tài khoản hiển thị ở bước xác nhận. Đơn được xử lý khi nhận được tiền."
+      "BANK_TRANSFER": {
+        "title": "Chuyển khoản toàn bộ (VietQR)",
+        "description": "Quét mã VietQR ở trang cảm ơn — số tiền và nội dung điền sẵn."
       },
-      "card": {
-        "title": "Thẻ tín dụng / ghi nợ",
-        "description": "Visa, Mastercard, JCB và thẻ nội địa."
+      "DEPOSIT": {
+        "title": "Đặt cọc 30–50%, còn lại COD",
+        "description": "Chuyển khoản cọc qua VietQR để tiệm cắt vải; phần còn lại trả khi nhận áo."
       }
     },
-    "cardNote": "Sau khi đặt hàng, bạn sẽ được chuyển tới cổng thanh toán bảo mật để nhập thông tin thẻ. Thiên Canh không lưu số thẻ của bạn."
+    "tailoredNote": "Đơn có áo may đo nên không nhận COD 100%: vải được cắt riêng theo số đo của bạn. Chọn đặt cọc hoặc chuyển khoản toàn bộ.",
+    "depositLabel": "Mức cọc",
+    "depositSummary": "Cọc {deposit} · còn lại {rest} trả khi nhận áo",
+    "qrNote": "Mã VietQR (đã điền số tiền và nội dung “THIENCANH <mã đơn>”) hiện ngay sau khi đặt hàng."
   },
   "review": {
     "title": "Xác nhận đơn hàng",
@@ -59,16 +62,11 @@
     "paymentTitle": "Thanh toán",
     "notes": "Ghi chú",
     "edit": "Sửa",
-    "bank": {
-      "title": "Thông tin chuyển khoản",
-      "bankName": "Ngân hàng",
-      "accountNumber": "Số tài khoản",
-      "accountHolder": "Chủ tài khoản",
-      "content": "Nội dung chuyển khoản",
-      "contentHint": "Ghi đúng nội dung để đơn được xác nhận nhanh"
-    },
-    "customNote": "Đơn có sản phẩm may đo: thợ sẽ gọi xác nhận số đo trước khi cắt vải (7–10 ngày hoàn thiện).",
-    "agreement": "Bằng việc bấm “Đặt hàng”, bạn đồng ý với chính sách mua hàng và đổi trả của Thiên Canh."
+    "customNote": "Đơn có sản phẩm may đo: thợ đối chiếu số đo trước khi cắt vải. Bạn sửa được số đo qua link theo dõi đơn cho tới khi xưởng cắt vải.",
+    "agreement": "Bằng việc bấm “Đặt hàng”, bạn đồng ý với chính sách mua hàng và đổi trả của Thiên Canh.",
+    "depositLine": "Cọc {percent}%: {deposit} · còn lại {rest} COD",
+    "transferLine": "Chuyển khoản {amount}",
+    "qrAfter": "Mã QR chuyển khoản sẽ hiện ở trang cảm ơn sau khi bạn bấm “Đặt hàng”."
   },
   "actions": {
     "back": "Quay lại",
@@ -92,7 +90,6 @@
     "savings": "Bạn tiết kiệm",
     "receipt": "Hoá đơn bán hàng",
     "brandLine": "Áo dài truyền thống & may đo",
-    "orderNo": "Số đơn",
     "date": "Ngày",
     "customer": "Khách hàng",
     "payment": "Thanh toán",
@@ -101,30 +98,12 @@
     "amountColumn": "Thành tiền",
     "lineQuantity": "{count} × {price}",
     "grandTotal": "Tổng cộng",
-    "thanks": "Cảm ơn quý khách đã chọn Thiên Canh"
+    "thanks": "Cảm ơn quý khách đã chọn Thiên Canh",
+    "discountNotApplied": "Mã giảm giá ở giỏ hàng chưa áp dụng khi đặt online — tiệm sẽ liên hệ nếu đơn được ưu đãi."
   },
   "empty": {
     "title": "Chưa có sản phẩm để thanh toán",
     "description": "Giỏ hàng đang trống. Hãy chọn thiết kế bạn yêu thích trước khi thanh toán.",
     "action": "Khám phá bộ sưu tập"
-  },
-  "success": {
-    "eyebrow": "Đặt hàng thành công",
-    "title": "Cảm ơn bạn đã chọn Thiên Canh",
-    "description": "Đơn hàng đã được ghi nhận và đang được chuẩn bị.",
-    "orderId": "Mã đơn hàng",
-    "total": "Tổng thanh toán",
-    "method": "Thanh toán",
-    "emailNote": "Xác nhận đơn hàng đã được gửi tới {email}.",
-    "bankReminder": "Vui lòng chuyển khoản với nội dung bên dưới để đơn được xử lý sớm nhất.",
-    "cardReminder": "Bạn sẽ nhận email hướng dẫn hoàn tất thanh toán thẻ qua cổng bảo mật.",
-    "nextTitle": "Tiếp theo",
-    "next": {
-      "confirm": "Nhân viên gọi xác nhận đơn trong 24 giờ làm việc.",
-      "prepare": "Áo được kiểm tra, là phẳng và đóng hộp quà.",
-      "ship": "Giao hàng 2–4 ngày (may đo 7–10 ngày)."
-    },
-    "continue": "Tiếp tục mua sắm",
-    "viewOrders": "Xem đơn hàng của tôi"
   }
 }

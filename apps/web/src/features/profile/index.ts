@@ -2,7 +2,6 @@ export * from "./api/profile.api";
 export * from "./components/ProfileShell";
 export * from "./components/ProfileSection";
 export * from "./components/personal-info/PersonalInfoTab";
-export * from "./components/order-history/OrderHistoryTab";
 export * from "./components/manage-address/ManageAddressTab";
 export * from "./components/manage-payment/ManagePaymentTab";
 export * from "./components/security/SecurityTab";

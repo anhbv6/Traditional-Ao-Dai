@@ -36,20 +36,21 @@ export function HeroBanner({
     <section className="relative overflow-hidden bg-[var(--bg-main)]">
       <FallingPetals />
 
-      <div className={containerClassName({ className: 'relative grid items-center gap-12 pb-16 pt-10 lg:min-h-[calc(100svh-80px)] lg:grid-cols-[1fr_0.9fr] lg:gap-16 lg:py-14' })}>
-        <div className="relative z-10 flex max-w-2xl flex-col animate-fade-in-up">
-          <p className="text-[11px] font-semibold uppercase tracking-[3.5px] text-[var(--primary-ink)]">
+      <div className={containerClassName({ className: 'relative grid items-center gap-10 pb-12 pt-6 sm:gap-12 sm:pb-16 sm:pt-10 lg:min-h-[calc(100svh-80px)] lg:grid-cols-[1fr_0.9fr] lg:gap-16 lg:py-14' })}>
+        {/* Tablet (1 cột, ảnh nằm dưới): căn giữa khối chữ cho cân với ảnh; desktop căn trái cạnh ảnh */}
+        <div className="relative z-10 flex max-w-2xl flex-col animate-fade-in-up sm:mx-auto sm:items-center sm:text-center lg:mx-0 lg:items-start lg:text-left">
+          <p className="text-[10px] font-semibold uppercase tracking-[2.5px] text-[var(--primary-ink)] sm:text-[11px] sm:tracking-[3.5px]">
             {eyebrow}
           </p>
-          <h1 className="mt-5 font-[family-name:var(--font-playfair)] text-[2.75rem] font-semibold leading-[1.05] text-[var(--primary-ink)] sm:text-[3.25rem] lg:text-[4rem] xl:text-[4.5rem] 2xl:text-[5rem]">
+          <h1 className="mt-4 font-[family-name:var(--font-playfair)] text-[2.125rem] font-semibold leading-[1.1] text-[var(--primary-ink)] sm:mt-5 sm:text-[2.625rem] md:text-[2.875rem] lg:text-[4rem] lg:leading-[1.05] xl:text-[4.5rem] 2xl:text-[5rem]">
             {title}
           </h1>
-          <SectionOrnament className="mt-7" />
-          <p className="mt-7 max-w-[540px] text-base leading-8 text-[var(--text-main)]/85 sm:text-lg">
+          <SectionOrnament className="mt-5 sm:mt-6 lg:mt-7" />
+          <p className="mt-5 max-w-[540px] text-[15px] leading-7 text-[var(--text-main)]/85 sm:mt-6 sm:text-base sm:leading-7 lg:mt-7 lg:text-lg lg:leading-8">
             {subtitle}
           </p>
 
-          <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="mt-7 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:items-center sm:justify-center lg:mt-9 lg:justify-start">
             {/* CTA chính: xem bộ sưu tập — CTA phụ: liên hệ đặt may (viền mảnh) */}
             <ActionLink
               href="/products"
@@ -65,11 +66,11 @@ export function HeroBanner({
             </ActionLink>
           </div>
 
-          <dl className="mt-12 grid max-w-lg grid-cols-3 divide-x divide-[var(--border)] border-t border-[var(--border)] pt-6">
+          <dl className="mt-8 grid w-full max-w-lg grid-cols-3 divide-x divide-[var(--border)] border-t border-[var(--border)] pt-5 sm:mt-10 sm:pt-6 lg:mt-12">
             {metrics.map((metric) => (
-              <div key={metric.label} className="flex flex-col-reverse justify-end px-4 first:pl-0">
-                <dt className="mt-1 text-xs leading-5 text-[var(--text-light)]">{metric.label}</dt>
-                <dd className="font-[family-name:var(--font-playfair)] text-2xl font-semibold text-[var(--primary-ink)] sm:text-[1.75rem]">
+              <div key={metric.label} className="flex flex-col-reverse justify-end px-3 first:pl-0 sm:px-4 sm:first:pl-4 lg:first:pl-0">
+                <dt className="mt-1 text-[11px] leading-4 text-[var(--text-light)] sm:text-xs sm:leading-5">{metric.label}</dt>
+                <dd className="font-[family-name:var(--font-playfair)] text-xl font-semibold text-[var(--primary-ink)] sm:text-[1.75rem]">
                   {metric.value}
                 </dd>
               </div>
@@ -80,7 +81,7 @@ export function HeroBanner({
         {/* Cột phải: chỗ đặt ảnh / minh hoạ — truyền qua prop `media`.
             Chưa có media: chỉ giữ khoảng ở desktop, mobile ẩn để không chừa khoảng trắng lớn dưới phần chữ. */}
         <div
-          className={`relative z-10 mx-auto aspect-[3/4] w-full max-w-[460px] lg:mr-0 xl:max-w-[500px] ${media ? '' : 'hidden lg:block'}`}
+          className={`relative z-10 mx-auto aspect-[4/5] w-[calc(100%-0.75rem)] max-w-[360px] sm:aspect-[3/4] sm:w-full sm:max-w-[460px] lg:mr-0 xl:max-w-[500px] ${media ? '' : 'hidden lg:block'}`}
         >
           {media}
         </div>

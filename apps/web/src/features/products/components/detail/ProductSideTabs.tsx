@@ -37,7 +37,7 @@ export default function ProductSideTabs({ value, onValueChange, locale, infoPane
           <TabsTrigger
             key={key}
             value={key}
-            className="relative flex-none shrink-0 items-baseline gap-1.5 rounded-none border-0 px-0 pb-3 font-[family-name:var(--font-playfair)] text-base font-medium normal-case tracking-normal text-[var(--text-light)] transition-colors duration-300 after:hidden hover:text-[var(--text-main)] data-active:text-[var(--primary-ink)] sm:text-lg"
+            className="relative flex-none shrink-0 items-baseline gap-1.5 rounded-none border-0 px-0 pb-3 font-[family-name:var(--font-playfair)] text-[15px] font-medium normal-case tracking-normal text-[var(--text-light)] transition-colors duration-300 after:hidden hover:text-[var(--text-main)] data-active:text-[var(--primary-ink)] sm:text-base"
           >
             {t(key === 'info' ? 'productInfo' : 'reviews')}
             {key === 'reviews' ? (
@@ -55,10 +55,10 @@ export default function ProductSideTabs({ value, onValueChange, locale, infoPane
         ))}
       </TabsList>
 
-      <TabsContent value="info" keepMounted className="w-full pt-6 data-[hidden]:hidden">
+      <TabsContent value="info" keepMounted className="w-full pt-5 data-[hidden]:hidden">
         {infoPanel}
       </TabsContent>
-      <TabsContent value="reviews" className="w-full pt-6 text-[0.9375rem] text-[var(--text-main)]">
+      <TabsContent value="reviews" className="w-full pt-5 text-sm text-[var(--text-main)]">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, ease: EASE }}>
           <ProductReviews locale={locale} />
         </motion.div>

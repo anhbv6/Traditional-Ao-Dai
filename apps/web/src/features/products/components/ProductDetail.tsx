@@ -8,6 +8,9 @@ import { productCatalog } from '../data/mockProducts';
 import { mockDetailProducts } from '../data/detailMockProduct';
 import { type MeasurementField } from '../data/detailMockProduct';
 
+/** Số sản phẩm liên quan tối đa ở cuối trang chi tiết */
+const RELATED_LIMIT = 5;
+
 interface ProductDetailProps {
   slug: string;
   locale: 'vi' | 'en';
@@ -73,7 +76,7 @@ export function ProductDetail({ slug, locale }: ProductDetailProps) {
       related: locale === 'vi' ? 'Sản phẩm liên quan' : 'Related Products',
     };
 
-    relatedProducts = mock.related_products.map(p => {
+    relatedProducts = mock.related_products.slice(0, RELATED_LIMIT).map(p => {
       const catalogItem = productCatalog.find(item => item.id === p.slug || item.id === p.id);
       return {
         id: p.id,
@@ -106,8 +109,8 @@ export function ProductDetail({ slug, locale }: ProductDetailProps) {
     const rawRelated = productCatalog
       .filter((item) => item.id !== product.id)
       .sort((a, b) => Number(b.category === product.category) - Number(a.category === product.category))
-      // Đủ thẻ cho băng chuyền kéo / tự trôi (ưu tiên cùng danh mục)
-      .slice(0, 10);
+      // Chỉ 5 mẫu (ưu tiên cùng danh mục) — đủ gợi ý mà không rối mắt
+      .slice(0, RELATED_LIMIT);
 
     relatedProducts = rawRelated.map(p => ({
       id: p.id,

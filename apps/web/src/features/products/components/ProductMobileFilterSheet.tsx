@@ -33,7 +33,7 @@ export function ProductMobileFilterSheet({ activeFilterCount, onClearAll, result
       <DrawerTrigger asChild>
         <button
           type="button"
-          className="relative flex h-10 shrink-0 cursor-pointer items-center gap-2 border border-[var(--text-main)]/80 px-3.5 text-xs font-semibold uppercase tracking-[1.5px] text-[var(--text-main)] transition-colors active:bg-[var(--bg-secondary)] lg:hidden"
+          className="relative flex h-10 shrink-0 cursor-pointer items-center gap-2 border border-[var(--border)] bg-[var(--bg-card)] px-4 text-sm font-semibold text-[var(--text-main)] transition-colors hover:border-[var(--primary-color)] active:bg-[var(--bg-secondary)] lg:hidden"
         >
           <SlidersHorizontal size={15} strokeWidth={1.6} />
           {t('title')}

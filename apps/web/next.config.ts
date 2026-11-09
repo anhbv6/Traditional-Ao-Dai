@@ -35,7 +35,19 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "res.cloudinary.com",
       },
+      {
+        // QR chuyển khoản động (VietQR) — ảnh đã chứa số tiền + nội dung, hiển thị unoptimized để giữ nét khi quét
+        protocol: "https",
+        hostname: "img.vietqr.io",
+      },
     ],
+  },
+  // Đơn hàng + sổ địa chỉ đã tách khỏi trang tài khoản sang /my-orders — giữ link cũ (email, bookmark) không chết
+  async redirects() {
+    return [
+      { source: "/:locale(vi|en)/profile/orders/:path*", destination: "/:locale/my-orders/:path*", permanent: false },
+      { source: "/:locale(vi|en)/profile/addresses", destination: "/:locale/my-orders/addresses", permanent: false },
+    ];
   },
   async rewrites() {
     return [

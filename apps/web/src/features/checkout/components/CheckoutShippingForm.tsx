@@ -11,10 +11,11 @@ import { TextAreaField } from "@/components/shared/TextAreaField";
 import { useNotify } from "@/hooks/useNotify";
 import { ORDER_NOTES_MAX_LENGTH } from "../validations/checkout.validation";
 import { type ShippingData, type ShippingFormInput } from "../types/checkout.types";
-import { StepPanel } from "@/components/shared/StepPanel";
+import { CheckoutStepCard } from "./CheckoutStepCard";
 
-/** Nhãn nhóm ô nhập — cùng kiểu nhãn của TextField */
-const LEGEND_CLASS = "mb-5 text-[11px] font-semibold uppercase tracking-[2.5px] text-[var(--primary-ink)]";
+/** Nhãn nhóm ô nhập: chữ nhỏ đỏ đô + vạch mảnh kéo hết hàng để tách nhóm rõ ràng */
+const LEGEND_CLASS =
+  "mb-4 flex w-full items-center gap-3 text-[11px] font-semibold uppercase tracking-[2.5px] text-[var(--primary-ink)] after:h-px after:flex-1 after:bg-[var(--border)] after:content-['']";
 
 interface CheckoutShippingFormProps {
   form: UseFormReturn<ShippingFormInput, unknown, ShippingData>;
@@ -38,8 +39,7 @@ export function CheckoutShippingForm({ form, onSubmit }: CheckoutShippingFormPro
 
   return (
     <form onSubmit={onSubmit} noValidate>
-      <StepPanel
-        index={1}
+      <CheckoutStepCard
         title={t("shipping.title")}
         description={t("shipping.description")}
         actions={
@@ -55,7 +55,7 @@ export function CheckoutShippingForm({ form, onSubmit }: CheckoutShippingFormPro
       >
         <fieldset>
           <legend className={LEGEND_CLASS}>{t("shipping.receiverGroup")}</legend>
-          <div className="grid gap-7 sm:grid-cols-2 sm:gap-x-8">
+          <div className="grid gap-6 sm:grid-cols-2 sm:gap-x-6">
             <TextField
               required
               label={t("shipping.fullName")}
@@ -92,9 +92,9 @@ export function CheckoutShippingForm({ form, onSubmit }: CheckoutShippingFormPro
           </div>
         </fieldset>
 
-        <fieldset className="mt-10">
+        <fieldset className="mt-8">
           <legend className={LEGEND_CLASS}>{t("shipping.addressGroup")}</legend>
-          <div className="grid gap-7 sm:grid-cols-3 sm:gap-x-8">
+          <div className="grid gap-6 sm:grid-cols-3 sm:gap-x-6">
             <TextField
               required
               label={t("shipping.province")}
@@ -136,15 +136,16 @@ export function CheckoutShippingForm({ form, onSubmit }: CheckoutShippingFormPro
         </fieldset>
 
         <TextAreaField
-          className="mt-10"
+          className="mt-8"
           label={t("shipping.notes")}
           placeholder={t("shipping.notesPlaceholder")}
-          rows={3}
+          rows={2}
+          autoResize
           maxLength={ORDER_NOTES_MAX_LENGTH}
           showCount
           {...register("notes")}
         />
-      </StepPanel>
+      </CheckoutStepCard>
     </form>
   );
 }

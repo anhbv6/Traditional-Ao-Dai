@@ -59,9 +59,9 @@ export function CartButton({ label = 'Cart', preview = false }: CartButtonProps)
           data-cart-target
           aria-label={totalQuantity > 0 ? `${label} (${totalQuantity})` : label}
           onClick={close}
-          className="relative grid h-11 w-11 place-items-center text-primary-ink transition-opacity hover:opacity-75"
+          className="relative grid size-10 place-items-center text-primary-ink sm:size-11 transition-opacity hover:opacity-75"
         >
-          <ShoppingBag size={22} strokeWidth={1.5} aria-hidden="true" />
+          <ShoppingBag strokeWidth={1.5} aria-hidden="true" className="size-5 sm:size-[22px]" />
           <CountBadge count={totalQuantity} ready={cartReady} />
         </Link>
       }

@@ -42,6 +42,12 @@ const envSchema = z.object({
   // Brevo HTTP API key (dạng xkeysib-..., KHÔNG phải SMTP key xsmtpsib-...). Có key thì ưu tiên hơn SMTP.
   BREVO_API_KEY: z.string().optional(),
   
+  // Tài khoản nhận chuyển khoản (VietQR). BANK_BIN là mã BIN ngân hàng theo NAPAS (Techcombank = 970407)
+  BANK_BIN: z.string().default('970407'),
+  BANK_NAME: z.string().default('Techcombank'),
+  BANK_ACCOUNT_NUMBER: z.string().default('19034567891011'),
+  BANK_ACCOUNT_NAME: z.string().default('TIEM AO DAI THIEN CANH'),
+
   CLOUDINARY_CLOUD_NAME: z.string().min(1, 'CLOUDINARY_CLOUD_NAME is required'),
   CLOUDINARY_API_KEY: z.string().min(1, 'CLOUDINARY_API_KEY is required'),
   CLOUDINARY_API_SECRET: z.string().min(1, 'CLOUDINARY_API_SECRET is required'),

@@ -15,6 +15,7 @@ import {
   resetPasswordPhoneSchema,
   verifyResetPasswordEmailSchema,
   verifyResetPasswordPhoneSchema,
+  registerFromOrderSchema,
 } from './auth.schema'
 import { requireAuth } from '../../core/middlewares/authGuard'
 import { rateLimit } from '../../core/middlewares/rateLimit'
@@ -141,6 +142,36 @@ router.post(
  *         description: OTP_TOO_MANY_ATTEMPTS, VERIFICATION_TOO_MANY_ATTEMPTS, TOO_MANY_REQUESTS
  */
 router.post('/register', validate(registerSchema), byIp('register-ip', 10, 60 * MINUTE), clientAuthController.register)
+
+/**
+ * @openapi
+ * /api/auth/register/from-order:
+ *   post:
+ *     summary: Tạo tài khoản từ đơn khách vãng lai (trang cảm ơn)
+ *     description: |
+ *       Bước 1 gọi POST /api/orders/track/otp với purpose CLAIM (OTP tới SĐT của đơn). Bước 2 gọi endpoint này kèm `code` và
+ *       `method` = password (đặt mật khẩu; email của đơn lưu chưa xác minh) hoặc google (`credential`; email Google đã xác minh).
+ *       Tài khoản nhận tên, SĐT (đã xác minh), email, địa chỉ, số đo từ đơn; đơn được gắn vào tài khoản; đăng nhập luôn.
+ *       Trùng tài khoản chỉ được báo SAU khi OTP đúng và không nói rõ trường nào trùng.
+ *     tags: [Auth]
+ *     responses:
+ *       201:
+ *         description: REGISTER_FROM_ORDER_SUCCESS — data { accessToken }, đặt cookie refreshToken + has_session
+ *       400:
+ *         description: VALIDATION_ERROR, PASSWORD_MIN_LENGTH, OTP_EXPIRED_OR_NOT_FOUND, OTP_INCORRECT, GOOGLE_AUTH_FAILED, GOOGLE_TOKEN_INVALID, GOOGLE_EMAIL_NOT_VERIFIED, INVALID_PHONE_NUMBER
+ *       404:
+ *         description: ORDER_LINK_INVALID
+ *       409:
+ *         description: ORDER_ACCOUNT_EXISTS (mời đăng nhập), ORDER_ALREADY_LINKED
+ *       429:
+ *         description: OTP_TOO_MANY_ATTEMPTS, TOO_MANY_REQUESTS
+ */
+router.post(
+  '/register/from-order',
+  validate(registerFromOrderSchema),
+  byIp('register-order-ip', 10, 60 * MINUTE),
+  clientAuthController.registerFromOrder
+)
 
 /**
  * @openapi

@@ -1,6 +1,7 @@
 import createMiddleware from 'next-intl/middleware';
 import { type NextRequest, NextResponse } from 'next/server';
 import { routing } from './i18n/routing';
+import { detectPreferredLocale } from './i18n/detectLocale';
 import { AUTH_COOKIES } from '@repo/shared';
 import { verifyAdminToken, verifyStoreRefreshToken } from './lib/jwt.server';
 
@@ -20,10 +21,17 @@ export default function proxy(request: NextRequest) {
   const pathnameSegments = pathname.split('/').filter(Boolean);
   const firstSegment = pathnameSegments[0];
   const isLocale = (routing.locales as readonly string[]).includes(firstSegment);
-  const currentLocale = isLocale ? firstSegment : routing.defaultLocale;
-  const pathWithoutLocale = isLocale
-    ? `/${pathnameSegments.slice(1).join('/')}`
-    : pathname;
+
+  // URL chưa có tiền tố ngôn ngữ → tự nhận diện (cookie đã chọn → Accept-Language), không phải vi / en thì dùng en.
+  // Chuyển hướng ngay tại đây để mọi bước bảo vệ bên dưới luôn làm việc với đường dẫn có locale.
+  if (!isLocale) {
+    const url = request.nextUrl.clone();
+    url.pathname = `/${detectPreferredLocale(request)}${pathname === '/' ? '' : pathname}`;
+    return NextResponse.redirect(url);
+  }
+
+  const currentLocale = firstSegment;
+  const pathWithoutLocale = `/${pathnameSegments.slice(1).join('/')}`;
 
   // 2. Đọc cookie xác thực
   // admin_token phải được xác minh chữ ký RS256 + hạn dùng + audience `admin`; vai trò lấy từ payload đã ký,
@@ -87,10 +95,12 @@ export default function proxy(request: NextRequest) {
     return intlMiddleware(request);
   }
 
-  // 4. Bảo vệ trang cá nhân khách hàng (/profile, /profile/orders..., /notifications)
+  // 4. Bảo vệ trang cá nhân khách hàng (/profile/*, /my-orders/*, /notifications)
   if (
     pathWithoutLocale === '/profile' ||
     pathWithoutLocale.startsWith('/profile/') ||
+    pathWithoutLocale === '/my-orders' ||
+    pathWithoutLocale.startsWith('/my-orders/') ||
     pathWithoutLocale === '/notifications'
   ) {
     if (!userLoggedIn) {

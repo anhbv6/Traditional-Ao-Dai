@@ -2,15 +2,14 @@ import { AboutHero } from "./AboutHero";
 import { AboutStory } from "./AboutStory";
 import { AboutManifesto } from "./AboutManifesto";
 import { AboutPainSolution } from "./AboutPainSolution";
-import { FitModel } from "./FitModel";
 import { AboutAtelier } from "./AboutAtelier";
 import { AboutCta } from "./AboutCta";
 
 /**
- * Trang Câu chuyện — gọn và khác nhịp với trang chủ:
- * Hero nền tối → I. Câu chuyện & ý nghĩa tên → Triết lý → II. Vấn đề & cách xử lý → III. Phom dáng → IV. Nghệ nhân & con số → Lời mời.
- * Tiêu đề chương căn trái, đánh số La Mã; cuộn tự nhiên, hoạt ảnh chậm và nhẹ.
- * (Cảm nhận khách hàng đã có ở trang chủ nên không lặp lại ở đây.)
+ * Trang Câu chuyện — giữ ít khối để đọc liền mạch:
+ * Hero → Câu chuyện (ảnh + lời kể, giải nghĩa tên Thiên · Canh) → Triết lý → Vấn đề & cách xử lý
+ * → Người giữ nghề & con số → Lời mời.
+ * (Quy trình may đo, cảm nhận khách hàng đã có ở trang chủ nên không lặp lại.)
  */
 export function AboutExperience() {
   return (
@@ -19,7 +18,6 @@ export function AboutExperience() {
       <AboutStory />
       <AboutManifesto />
       <AboutPainSolution />
-      <FitModel />
       <AboutAtelier />
       <AboutCta />
     </>

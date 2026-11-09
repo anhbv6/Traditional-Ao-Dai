@@ -7,7 +7,8 @@ import { normalizeVietnamPhone } from '../../core/utils/phone'
 import { assertRateLimit } from '../../core/security/rateLimit'
 import { issueVerificationCode, verifyVerificationCode } from '../../core/security/verificationCode'
 
-export type OtpPurpose = 'REGISTER' | 'LOGIN' | 'RESET_PASSWORD' | 'VERIFY_PHONE'
+/** ORDER_EDIT / ORDER_CLAIM: mã gửi tới SĐT của đơn (sửa số đo / địa chỉ, tạo tài khoản từ đơn) — scope = orderId */
+export type OtpPurpose = 'REGISTER' | 'LOGIN' | 'RESET_PASSWORD' | 'VERIFY_PHONE' | 'ORDER_EDIT' | 'ORDER_CLAIM'
 
 /** Kết quả gửi OTP. `devCode` chỉ có ngoài production (SMS đang là mock) để web hiện mã lên màn khi test. */
 export type SendOtpResult = { success: boolean; ttl: number; devCode?: string }
@@ -61,7 +62,7 @@ export async function deliverOtp(
 /**
  * Gửi OTP cho các luồng công khai (đăng ký, đăng nhập, quên mật khẩu)
  */
-export async function sendOtp(phone: string, purpose: Exclude<OtpPurpose, 'VERIFY_PHONE'>): Promise<SendOtpResult> {
+export async function sendOtp(phone: string, purpose: Exclude<OtpPurpose, 'VERIFY_PHONE' | 'ORDER_EDIT' | 'ORDER_CLAIM'>): Promise<SendOtpResult> {
   const normalizedPhone = normalizeVietnamPhone(phone)
   if (!normalizedPhone) {
     throw new AppError(400, 'INVALID_PHONE_NUMBER')

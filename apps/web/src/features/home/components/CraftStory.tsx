@@ -153,7 +153,7 @@ export function CraftStory() {
                 /* Bước "đang xem" = bước đi qua dải giữa màn hình (cắt 45% trên + 45% dưới) — ổn định kể cả khi 2 bước cùng hiện */
                 viewport={{ margin: '-45% 0px -45% 0px' }}
                 /* Mỗi bước cao tối thiểu 40vh (trước 60vh) → tổng quãng cuộn ngắn lại ~1/3, ảnh dính vẫn đổi kịp theo bước */
-                className="relative flex gap-6 pb-14 last:pb-0 lg:min-h-[40vh] lg:items-center lg:pb-0"
+                className="relative flex gap-4 pb-10 last:pb-0 sm:gap-6 sm:pb-14 lg:min-h-[40vh] lg:items-center lg:pb-0"
               >
                 <button
                   type="button"
@@ -169,20 +169,27 @@ export function CraftStory() {
                   0{i + 1}
                 </button>
 
-                <div className={cn('transition-opacity duration-700', isActive ? 'opacity-100' : 'lg:opacity-40')}>
-                  <div className="relative mb-6 aspect-[4/3] overflow-hidden bg-[var(--bg-secondary)] lg:hidden">
+                {/* Tablet: ảnh trái + chữ phải trong mỗi bước (không còn ảnh nửa khổ chừa trống bên phải) */}
+                <div
+                  className={cn(
+                    'min-w-0 flex-1 transition-opacity duration-700 sm:max-lg:grid sm:max-lg:grid-cols-2 sm:max-lg:items-center sm:max-lg:gap-6',
+                    isActive ? 'opacity-100' : 'lg:opacity-40',
+                  )}
+                >
+                  <div className="relative mb-5 aspect-[16/10] overflow-hidden bg-[var(--bg-secondary)] sm:mb-0 sm:aspect-[4/5] lg:hidden">
                     <Image
                       src={step.image}
                       alt={t(`steps.${step.key}.title`)}
                       fill
-                      sizes="90vw"
+                      sizes="(max-width: 640px) 90vw, 45vw"
                       className={cn('object-cover', step.imageClass)}
                     />
                   </div>
+                  <div>
                   <p className="text-[11px] font-semibold uppercase tracking-[3px] text-[var(--accent-color)]">
                     {t(`steps.${step.key}.label`)}
                   </p>
-                  <h3 className="mt-2 font-[family-name:var(--font-playfair)] text-2xl font-semibold text-[var(--primary-ink)] sm:text-[2rem]">
+                  <h3 className="mt-2 font-[family-name:var(--font-playfair)] text-xl font-semibold text-[var(--primary-ink)] sm:text-[1.5rem] lg:text-[2rem]">
                     <button
                       type="button"
                       onClick={() => scrollToStep(i)}
@@ -191,16 +198,17 @@ export function CraftStory() {
                       {t(`steps.${step.key}.title`)}
                     </button>
                   </h3>
-                  <p className="mt-4 max-w-md text-[15px] leading-8 text-[var(--text-main)]/80">{t(`steps.${step.key}.content`)}</p>
+                  <p className="mt-3 max-w-md text-sm leading-7 text-[var(--text-main)]/80 sm:mt-3 sm:leading-7 lg:mt-4 lg:text-[15px] lg:leading-8">{t(`steps.${step.key}.content`)}</p>
                   {i === CRAFT_STEPS.length - 1 ? (
                     <Link
                       href="/about"
-                      className="group mt-8 inline-flex items-center gap-3 border-b border-[var(--primary-color)]/40 pb-1 text-xs font-semibold uppercase tracking-[2px] text-[var(--primary-ink)] hover:border-[var(--primary-color)]"
+                      className="group mt-6 inline-flex sm:mt-8 items-center gap-3 border-b border-[var(--primary-color)]/40 pb-1 text-xs font-semibold uppercase tracking-[2px] text-[var(--primary-ink)] hover:border-[var(--primary-color)]"
                     >
                       {t('cta')}
                       <ArrowRight size={15} strokeWidth={1.6} className="transition-transform duration-300 group-hover:translate-x-1" />
                     </Link>
                   ) : null}
+                  </div>
                 </div>
               </motion.li>
             );

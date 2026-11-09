@@ -4,12 +4,11 @@ import React from "react";
 import { ArrowLeft, Check, Info, PenLine } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { ActionButton } from "@/components/shared/ActionButton";
-import { TextField } from "@/components/shared/TextField";
-import { BANK_ACCOUNT, buildTransferContent } from "../constants/bankAccount";
+import { formatVnd, type Locale } from "@repo/shared";
 import { type CheckoutStep, type PaymentMethod, type ShippingData } from "../types/checkout.types";
-import { StepPanel } from "@/components/shared/StepPanel";
+import { CheckoutStepCard } from "./CheckoutStepCard";
 
-/** Tiêu đề khối nhỏ + nút "Sửa" quay về bước tương ứng */
+/** Khối thông tin gọn: tiêu đề nhỏ + nút "Sửa" quay về bước tương ứng, nội dung trên nền nhạt */
 function ReviewBlock({
   title,
   editLabel,
@@ -22,19 +21,19 @@ function ReviewBlock({
   children: React.ReactNode;
 }) {
   return (
-    <div className="border-t border-[var(--border)] pt-5 first:border-t-0 first:pt-0">
-      <div className="flex items-center justify-between gap-4">
+    <div className="border border-[var(--border)] bg-[var(--bg-main)]/50">
+      <div className="flex items-center justify-between gap-4 border-b border-[var(--border)] px-4 py-2.5">
         <h3 className="m-0 text-[11px] font-semibold uppercase tracking-[2.5px] text-[var(--primary-ink)]">{title}</h3>
         <button
           type="button"
           onClick={onEdit}
-          className="inline-flex cursor-pointer items-center gap-1.5 text-[11px] uppercase tracking-[1.5px] text-[var(--text-light)] transition-colors hover:text-[var(--primary-ink)]"
+          className="-mr-1.5 inline-flex cursor-pointer items-center gap-1.5 px-1.5 py-1 text-xs text-[var(--text-light)] transition-colors hover:text-[var(--primary-ink)]"
         >
-          <PenLine size={12} strokeWidth={1.6} />
+          <PenLine size={12} strokeWidth={1.6} aria-hidden="true" />
           {editLabel}
         </button>
       </div>
-      <div className="mt-3 text-sm leading-6 text-[var(--text-main)]">{children}</div>
+      <div className="px-4 py-3.5 text-sm leading-6 text-[var(--text-main)]">{children}</div>
     </div>
   );
 }
@@ -42,7 +41,10 @@ function ReviewBlock({
 interface CheckoutReviewProps {
   shipping: ShippingData;
   paymentMethod: PaymentMethod;
-  orderId: string;
+  depositPercent: number;
+  prepayAmount: number;
+  total: number;
+  locale: Locale;
   hasCustomItems: boolean;
   isPlacing: boolean;
   onEdit: (step: CheckoutStep) => void;
@@ -52,13 +54,16 @@ interface CheckoutReviewProps {
 
 /**
  * Bước 3 — xác nhận: người nhận + địa chỉ, phương thức thanh toán (mỗi khối có nút "Sửa" quay về đúng bước).
- * Chuyển khoản → hiện tài khoản + nội dung CK (TextField chỉ đọc, sao chép một chạm).
+ * Chuyển khoản / cọc → hiện số tiền phải chuyển trước; mã QR VietQR (đã điền số tiền + "THIENCANH <mã đơn>") hiện ở trang cảm ơn.
  * Nút "Đặt hàng" khoá + hiện spinner trong lúc gửi, tránh bấm nhiều lần tạo đơn trùng.
  */
 export function CheckoutReview({
   shipping,
   paymentMethod,
-  orderId,
+  depositPercent,
+  prepayAmount,
+  total,
+  locale,
   hasCustomItems,
   isPlacing,
   onEdit,
@@ -69,8 +74,7 @@ export function CheckoutReview({
   const address = [shipping.address, shipping.ward, shipping.district, shipping.province].join(", ");
 
   return (
-    <StepPanel
-      index={3}
+    <CheckoutStepCard
       title={t("review.title")}
       description={t("review.description")}
       actions={
@@ -78,13 +82,13 @@ export function CheckoutReview({
           <ActionButton variant="cancel" size="md" icon={<ArrowLeft />} onClick={onBack} disabled={isPlacing}>
             {t("actions.back")}
           </ActionButton>
-          <ActionButton variant="confirm" size="lg" icon={<Check />} loading={isPlacing} onClick={onPlaceOrder}>
+          <ActionButton variant="confirm" size="md" icon={<Check />} loading={isPlacing} onClick={onPlaceOrder}>
             {isPlacing ? t("actions.placing") : t("actions.placeOrder")}
           </ActionButton>
         </>
       }
     >
-      <div className="space-y-5">
+      <div className="space-y-4">
         <ReviewBlock title={t("review.shippingTitle")} editLabel={t("review.edit")} onEdit={() => onEdit("shipping")}>
           <p className="font-semibold">{shipping.fullName}</p>
           <p className="text-[var(--text-light)]">
@@ -100,25 +104,19 @@ export function CheckoutReview({
 
         <ReviewBlock title={t("review.paymentTitle")} editLabel={t("review.edit")} onEdit={() => onEdit("payment")}>
           <p className="font-semibold">{t(`payment.methods.${paymentMethod}.title`)}</p>
-          {paymentMethod === "card" ? <p className="text-[13px] text-[var(--text-light)]">{t("payment.cardNote")}</p> : null}
-
-          {paymentMethod === "bank" ? (
-            <div className="mt-4 bg-[var(--bg-secondary)]/60 p-4 sm:p-5">
-              <p className="text-[11px] font-semibold uppercase tracking-[2px] text-[var(--text-light)]">{t("review.bank.title")}</p>
-              <div className="mt-4 grid gap-5 sm:grid-cols-2">
-                <TextField readOnly label={t("review.bank.bankName")} value={BANK_ACCOUNT.bankName} />
-                <TextField readOnly copyable label={t("review.bank.accountNumber")} value={BANK_ACCOUNT.accountNumber} />
-                <TextField readOnly label={t("review.bank.accountHolder")} value={BANK_ACCOUNT.accountHolder} />
-                <TextField
-                  readOnly
-                  copyable
-                  label={t("review.bank.content")}
-                  value={buildTransferContent(orderId)}
-                  helperText={t("review.bank.contentHint")}
-                />
-              </div>
-            </div>
+          {paymentMethod === "DEPOSIT" ? (
+            <p className="text-[13px] text-[var(--text-light)]">
+              {t("review.depositLine", {
+                percent: depositPercent,
+                deposit: formatVnd(prepayAmount, locale),
+                rest: formatVnd(Math.max(0, total - prepayAmount), locale),
+              })}
+            </p>
           ) : null}
+          {paymentMethod === "BANK_TRANSFER" ? (
+            <p className="text-[13px] text-[var(--text-light)]">{t("review.transferLine", { amount: formatVnd(prepayAmount, locale) })}</p>
+          ) : null}
+          {paymentMethod !== "COD" ? <p className="mt-2 text-xs text-[var(--text-light)]">{t("review.qrAfter")}</p> : null}
         </ReviewBlock>
 
         {hasCustomItems ? (
@@ -130,7 +128,7 @@ export function CheckoutReview({
 
         <p className="text-xs leading-5 text-[var(--text-light)]">{t("review.agreement")}</p>
       </div>
-    </StepPanel>
+    </CheckoutStepCard>
   );
 }
 export default CheckoutReview;

@@ -1,0 +1,95 @@
+{
+  "meta": {
+    "title": "Fabric library — Thiên Canh",
+    "description": "An album of the silks, brocades, raw silks and linens at Thiên Canh: origin, fibre content, drape, weight, best seasons and how to care for each."
+  },
+  "eyebrow": "Fabric library",
+  "title": "An album of the fabrics in our atelier",
+  "subtitle": "Every fabric here has passed through a tailor’s hands: felt, held up to the sun, draped before it ever becomes an áo dài. Turn the pages to find the one that suits your figure and your season.",
+  "count": "{count, plural, one {# fabric} other {# fabrics}}",
+  "filters": {
+    "season": "By season",
+    "fiber": "By fibre",
+    "all": "All"
+  },
+  "card": {
+    "open": "View details of {name}",
+    "originUnknown": "Atelier selection"
+  },
+  "availability": {
+    "AVAILABLE": "In stock",
+    "LIMITED": "Low — last few pieces",
+    "ON_REQUEST": "Woven to order"
+  },
+  "availabilityHint": {
+    "AVAILABLE": "We have enough fabric to start your piece right away.",
+    "LIMITED": "This roll is nearly gone, enough for only a few tops — message us and we will hold it for you.",
+    "ON_REQUEST": "Not in stock right now; we will order a new weave, adding about 1–2 weeks."
+  },
+  "detail": {
+    "gallery": "Close-up photos",
+    "photo": "Photo {index}",
+    "video": "Drape video",
+    "noPhoto": "Illustration — real photos coming soon",
+    "width": "{cm} cm wide",
+    "colors": "Colours in stock",
+    "composition": "Fibre content",
+    "feel": "How it wears",
+    "level": "{value}/5",
+    "seasons": "Best seasons",
+    "care": "Caring for the fabric",
+    "process": "From fibre to fabric",
+    "askSample": "Ask for a swatch",
+    "tailor": "Tailor with this fabric"
+  },
+  "metric": {
+    "stretch": "Stretch",
+    "thickness": "Weight",
+    "drape": "Drape",
+    "sheerness": "Sheerness",
+    "sheen": "Sheen"
+  },
+  "season": {
+    "SPRING": "Spring",
+    "SUMMER": "Summer",
+    "AUTUMN": "Autumn",
+    "WINTER": "Winter"
+  },
+  "fiber": {
+    "SILK": "Silk",
+    "COTTON": "Cotton",
+    "LINEN": "Linen",
+    "HEMP": "Hemp",
+    "BAMBOO": "Bamboo",
+    "VISCOSE": "Viscose",
+    "POLYESTER": "Polyester",
+    "SPANDEX": "Spandex",
+    "NYLON": "Nylon",
+    "WOOL": "Wool",
+    "OTHER": "Other fibre"
+  },
+  "care": {
+    "HAND_WASH": "Gentle hand wash",
+    "MACHINE_GENTLE": "Machine wash, gentle cycle",
+    "COLD_WATER": "Cold water below 30°C",
+    "NO_BLEACH": "Do not bleach",
+    "NO_WRING": "Do not wring",
+    "DRY_SHADE": "Dry in the shade",
+    "IRON_LOW": "Iron on low heat",
+    "STEAM": "Steam",
+    "DRY_CLEAN": "Dry clean",
+    "STORE_HANGING": "Store on a hanger"
+  },
+  "empty": {
+    "title": "The album is being rearranged",
+    "description": "We are photographing and cataloguing new fabrics. Message Thiên Canh and we will send swatches to your door.",
+    "unavailableTitle": "We could not open the fabric album",
+    "unavailableDescription": "Our fabric store is briefly unreachable. Please reload in a few minutes, or message us directly.",
+    "action": "Message the atelier",
+    "filteredTitle": "No fabric matches yet",
+    "filteredDescription": "Try another season or fibre to see more fabrics."
+  },
+  "responses": {
+    "MATERIALS_FOUND": "Fabric library loaded"
+  }
+}

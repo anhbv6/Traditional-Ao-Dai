@@ -8,10 +8,10 @@ const minutesAgo = (minutes: number) => new Date(Date.now() - minutes * 60_000).
  * Nội dung hiển thị nằm trong messages/<locale>/notifications.json → `items.<id>`.
  */
 export const MOCK_NOTIFICATIONS: AppNotification[] = [
-  { id: "orderShipped", type: "order", createdAt: minutesAgo(12), href: "/profile/orders" },
-  { id: "tailoringReady", type: "tailoring", createdAt: minutesAgo(95), href: "/profile/orders" },
+  { id: "orderShipped", type: "order", createdAt: minutesAgo(12), href: "/my-orders" },
+  { id: "tailoringReady", type: "tailoring", createdAt: minutesAgo(95), href: "/my-orders" },
   { id: "flashSale", type: "promotion", createdAt: minutesAgo(60 * 5), href: "/products" },
-  { id: "orderConfirmed", type: "order", createdAt: minutesAgo(60 * 26), href: "/profile/orders" },
+  { id: "orderConfirmed", type: "order", createdAt: minutesAgo(60 * 26), href: "/my-orders" },
   { id: "measurementReminder", type: "tailoring", createdAt: minutesAgo(60 * 50), href: "/custom" },
   { id: "newCollection", type: "promotion", createdAt: minutesAgo(60 * 24 * 4), href: "/products" },
   { id: "securityLogin", type: "system", createdAt: minutesAgo(60 * 24 * 6), href: "/profile" },

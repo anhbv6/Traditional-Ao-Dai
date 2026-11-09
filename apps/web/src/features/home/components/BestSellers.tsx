@@ -48,7 +48,7 @@ export function BestSellers() {
       <div className={containerClassName()}>
         <SectionHeading index="02" eyebrow={t('eyebrow')} title={t('title')} description={t('description')} />
 
-        <div role="tablist" aria-label={t('eyebrow')} className="-mt-2 mb-10 flex justify-center gap-1 sm:gap-2">
+        <div role="tablist" aria-label={t('eyebrow')} className="-mx-(--page-gutter) -mt-2 mb-8 flex justify-start gap-0 overflow-x-auto px-(--page-gutter) [scrollbar-width:none] sm:mx-0 sm:mb-10 sm:justify-center sm:gap-2 sm:px-0 [&::-webkit-scrollbar]:hidden">
           {OCCASION_TABS.map((tab) => {
             const isActive = tab.key === activeTab;
             return (
@@ -59,7 +59,7 @@ export function BestSellers() {
                 aria-selected={isActive}
                 onClick={() => setActiveTab(tab.key)}
                 className={cn(
-                  'relative shrink-0 cursor-pointer px-4 py-2 text-xs font-semibold uppercase tracking-[2px] transition-colors duration-300',
+                  'relative shrink-0 cursor-pointer whitespace-nowrap px-3 py-2 text-[11px] font-semibold uppercase tracking-[1.5px] transition-colors duration-300 sm:px-4 sm:text-xs sm:tracking-[2px]',
                   isActive ? 'text-[var(--primary-ink)]' : 'text-[var(--text-light)] hover:text-[var(--primary-ink)]',
                 )}
               >
@@ -67,7 +67,7 @@ export function BestSellers() {
                 <span
                   aria-hidden="true"
                   className={cn(
-                    'absolute inset-x-4 -bottom-px h-px origin-center bg-[var(--primary-color)] transition-transform duration-300',
+                    'absolute inset-x-3 -bottom-px h-px sm:inset-x-4 origin-center bg-[var(--primary-color)] transition-transform duration-300',
                     isActive ? 'scale-x-100' : 'scale-x-0',
                   )}
                 />
@@ -76,7 +76,7 @@ export function BestSellers() {
           })}
         </div>
 
-        <div key={activeTab} role="tabpanel" className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8">
+        <div key={activeTab} role="tabpanel" className="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-6 sm:gap-y-10 lg:grid-cols-4 xl:gap-x-8">
           {products.map((product, index) => (
             <div key={product.id} className="animate-fade-in-soft" style={{ animationDelay: `${index * 120}ms` }}>
               <ProductCard
@@ -100,7 +100,7 @@ export function BestSellers() {
           ))}
         </div>
 
-        <div className="mt-14 flex justify-center">
+        <div className="mt-10 flex justify-center sm:mt-14">
           <Link
             href="/products"
             className="group inline-flex items-center gap-3 border-b border-[var(--primary-color)]/40 pb-1 text-xs font-semibold uppercase tracking-[2px] text-[var(--primary-ink)] transition-colors hover:border-[var(--primary-color)]"

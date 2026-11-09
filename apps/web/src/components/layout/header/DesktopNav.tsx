@@ -21,7 +21,8 @@ export function DesktopNav({ items }: DesktopNavProps) {
             key={item.href}
             href={item.href}
             className={[
-              'relative flex items-center gap-1.5 whitespace-nowrap py-1 text-[13px] uppercase tracking-[1px] 2xl:text-[14px] font-[family-name:var(--font-lora)] transition-colors duration-200',
+              item.desktopFrom2xl ? 'hidden 2xl:flex' : 'flex',
+              'relative items-center gap-1.5 whitespace-nowrap py-1 text-[13px] uppercase tracking-[1px] 2xl:text-[14px] font-[family-name:var(--font-lora)] transition-colors duration-200',
               isActive
                 ? 'text-primary-ink font-semibold after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-full after:bg-primary'
                 : 'text-foreground font-normal hover:text-primary-ink after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-0 after:bg-primary hover:after:w-full after:transition-all after:duration-200',

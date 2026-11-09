@@ -15,6 +15,7 @@ import { usePersonalInfo } from "../../hooks/useProfile";
 import { useContactVerification } from "../../hooks/useContactVerification";
 import { usePersonalInfoStore } from "../../store/personalInfoStore";
 import { ProfileSection } from "../ProfileSection";
+import { MeasurementsSection } from "../measurements/MeasurementsSection";
 import { ContactVerificationDialog } from "./ContactVerificationDialog";
 
 type Gender = "male" | "female" | "other";
@@ -47,13 +48,15 @@ function getInitials(name?: string | null) {
 }
 
 /**
- * Thông tin cá nhân:
- * - Khối "Thông tin cơ bản": xem dạng danh sách; bấm "Thay đổi thông tin" → form (ảnh đại diện, họ tên, ngày sinh, giới tính).
+ * Thông tin cá nhân — MỘT thẻ gộp hồ sơ + liên hệ, bên dưới là thẻ "Số đo của tôi":
+ * - Chế độ xem: đầu thẻ ảnh · tên · nút "Thay đổi thông tin"; lưới 2 cột ngày sinh, giới tính, email, SĐT.
+ * - Bấm "Thay đổi thông tin" → form (ảnh đại diện, họ tên, ngày sinh, giới tính).
  *   Họ tên bắt buộc; ngày sinh tuỳ chọn nhưng nếu nhập phải là ngày hợp lệ trong quá khứ.
- * - Khối "Thông tin liên hệ": email / SĐT không sửa trực tiếp — thêm, đổi hay xác minh đều qua hộp thoại mã 6 số.
+ * - Email / SĐT không sửa trực tiếp — thêm, đổi hay xác minh đều qua hộp thoại mã 6 số.
  */
 export function PersonalInfoTab() {
   const t = useTranslations("ProfilePage.personal");
+  const tProfile = useTranslations("ProfilePage");
   const {
     fullName,
     setFullName,
@@ -158,7 +161,7 @@ export function PersonalInfoTab() {
         aria-label={t("previewAvatar")}
         className="block cursor-pointer rounded-full outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] disabled:cursor-default"
       >
-        <Avatar size="xl" className="size-20 border border-[var(--border)] sm:size-24">
+        <Avatar size="xl" className="size-16 border border-[var(--border)] sm:size-20">
           {displayAvatar ? <AvatarImage src={displayAvatar} alt={displayName ?? ""} className="object-cover" /> : null}
           <AvatarFallback className="bg-[var(--bg-main)] text-xl font-semibold uppercase text-[var(--primary-ink)]">
             {getInitials(displayName) || <UserRound size={28} strokeWidth={1.4} aria-hidden="true" />}
@@ -175,27 +178,48 @@ export function PersonalInfoTab() {
 
   return (
     <>
-      <ProfileSection
-        title={t("basicTitle")}
-        description={t("basicDesc")}
-        action={
-          !isEditing ? (
-            <ActionButton variant="dialog" size="sm" icon={<PencilLine />} onClick={startEdit}>
-              {t("changeInfoBtn")}
-            </ActionButton>
-          ) : undefined
-        }
-      >
+      <ProfileSection title={t("profileTitle")} description={t("profileDesc")}>
         {!isEditing ? (
-          /* ---------- Chế độ xem ---------- */
-          <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-8">
-            {avatar}
-            <dl className="grid flex-1 gap-x-8 gap-y-5 sm:grid-cols-2">
-              <InfoItem label={t("fullName")} value={user?.name} emptyLabel={t("notProvided")} />
+          /* ---------- Chế độ xem: đầu thẻ (ảnh · tên · nút sửa) → lưới 2 cột ngày sinh, giới tính, email, SĐT ---------- */
+          <>
+            <div className="flex flex-wrap items-center gap-4 border-b border-[var(--border)] pb-5 sm:gap-5">
+              {avatar}
+              <div className="min-w-0 flex-1">
+                <p
+                  className={cn(
+                    "truncate font-[family-name:var(--font-playfair)] text-xl font-semibold sm:text-2xl",
+                    displayName ? "text-[var(--primary-ink)]" : "italic text-[var(--text-light)]",
+                  )}
+                >
+                  {displayName || t("notProvided")}
+                </p>
+                <p className="mt-1 text-xs text-[var(--text-light)]">{tProfile("memberSince")}</p>
+              </div>
+              <ActionButton variant="dialog" size="sm" icon={<PencilLine />} onClick={startEdit}>
+                {t("changeInfoBtn")}
+              </ActionButton>
+            </div>
+
+            <dl className="grid gap-x-10 gap-y-5 pt-5 sm:grid-cols-2">
               <InfoItem label={t("dob")} value={isoToDisplay(dob)} emptyLabel={t("notProvided")} />
               <InfoItem label={t("gender")} value={genderLabel[(gender as Gender) ?? "other"] ?? genderLabel.other} emptyLabel={t("notProvided")} />
+              <ContactItem
+                label={t("email")}
+                icon={Mail}
+                value={user?.email ?? ""}
+                isVerified={Boolean(user?.emailVerified)}
+                onAction={() => contactVerification.open("email")}
+              />
+              <ContactItem
+                label={t("phone")}
+                icon={Phone}
+                value={user?.phone ?? ""}
+                isVerified={Boolean(user?.phoneVerified)}
+                onAction={() => contactVerification.open("phone")}
+              />
             </dl>
-          </div>
+            <p className="mt-5 border-t border-[var(--border)] pt-4 text-xs leading-5 text-[var(--text-light)]">{t("contactDesc")}</p>
+          </>
         ) : (
           /* ---------- Chế độ sửa ---------- */
           <form onSubmit={onSave} noValidate className="space-y-6">
@@ -278,24 +302,7 @@ export function PersonalInfoTab() {
         )}
       </ProfileSection>
 
-      <ProfileSection title={t("contactTitle")} description={t("contactDesc")} flush>
-        <ul className="divide-y divide-[var(--border)]">
-          <ContactRow
-            label={t("email")}
-            icon={Mail}
-            value={user?.email ?? ""}
-            isVerified={Boolean(user?.emailVerified)}
-            onAction={() => contactVerification.open("email")}
-          />
-          <ContactRow
-            label={t("phone")}
-            icon={Phone}
-            value={user?.phone ?? ""}
-            isVerified={Boolean(user?.phoneVerified)}
-            onAction={() => contactVerification.open("phone")}
-          />
-        </ul>
-      </ProfileSection>
+      <MeasurementsSection />
 
       <AppDialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen} title={t("previewAvatar")} size="sm" cancel={false}>
         {displayAvatar ? (
@@ -309,10 +316,12 @@ export function PersonalInfoTab() {
   );
 }
 
+const LABEL_CLASS = "text-[11px] font-semibold uppercase tracking-[2px] text-[var(--text-light)]";
+
 function InfoItem({ label, value, emptyLabel }: { label: string; value?: string | null; emptyLabel: string }) {
   return (
     <div>
-      <dt className="text-[11px] font-semibold uppercase tracking-[2px] text-[var(--text-light)]">{label}</dt>
+      <dt className={LABEL_CLASS}>{label}</dt>
       <dd className={cn("mt-1.5 text-[15px]", value ? "text-[var(--text-main)]" : "italic text-[var(--text-light)]")}>
         {value || emptyLabel}
       </dd>
@@ -320,7 +329,7 @@ function InfoItem({ label, value, emptyLabel }: { label: string; value?: string 
   );
 }
 
-interface ContactRowProps {
+interface ContactItemProps {
   label: string;
   icon: LucideIcon;
   value: string;
@@ -328,37 +337,43 @@ interface ContactRowProps {
   onAction: () => void;
 }
 
-/** Một dòng liên hệ: icon · nhãn + giá trị · trạng thái xác minh · nút Thêm / Xác minh / Đổi */
-function ContactRow({ label, icon: Icon, value, isVerified, onAction }: ContactRowProps) {
+/**
+ * Ô liên hệ trong lưới thông tin: nhãn + trạng thái xác minh → giá trị + liên kết Thêm / Xác minh / Đổi.
+ * Email / SĐT không sửa trực tiếp — mọi thay đổi qua hộp thoại mã 6 số.
+ */
+function ContactItem({ label, icon: Icon, value, isVerified, onAction }: ContactItemProps) {
   const t = useTranslations("ProfilePage.personal");
   const actionLabel = !value ? t("addBtn") : isVerified ? t("changeBtn") : t("verifyBtn");
 
   return (
-    <li className="flex flex-wrap items-center gap-x-4 gap-y-3 px-5 py-4 sm:px-6">
-      <span className="relative grid size-10 shrink-0 place-items-center text-[var(--primary-ink)]">
-        <span aria-hidden="true" className="absolute inset-1.5 rotate-45 border border-[var(--primary-color)]/35" />
-        <Icon size={16} strokeWidth={1.5} className="relative" aria-hidden="true" />
-      </span>
-      <div className="min-w-0 flex-1">
-        <p className="text-[11px] font-semibold uppercase tracking-[2px] text-[var(--text-light)]">{label}</p>
-        <p className={cn("mt-1 truncate text-[15px]", value ? "text-[var(--text-main)]" : "italic text-[var(--text-light)]")}>
+    <div className="min-w-0">
+      <dt className="flex items-center gap-2">
+        <span className={LABEL_CLASS}>{label}</span>
+        {value ? (
+          <span
+            className={cn(
+              "inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[1px]",
+              isVerified ? "text-emerald-700 dark:text-emerald-400" : "text-amber-700 dark:text-amber-400",
+            )}
+          >
+            {isVerified ? <BadgeCheck className="size-3" aria-hidden="true" /> : null}
+            {isVerified ? t("verified") : t("unverified")}
+          </span>
+        ) : null}
+      </dt>
+      <dd className="mt-1.5 flex items-center gap-3">
+        <Icon size={15} strokeWidth={1.5} className="shrink-0 text-[var(--primary-ink)]" aria-hidden="true" />
+        <span className={cn("min-w-0 flex-1 truncate text-[15px]", value ? "text-[var(--text-main)]" : "italic text-[var(--text-light)]")}>
           {value || t("notProvided")}
-        </p>
-      </div>
-      {value ? (
-        <span
-          className={cn(
-            "inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-[1px]",
-            isVerified ? "text-emerald-700 dark:text-emerald-400" : "text-amber-700 dark:text-amber-400",
-          )}
-        >
-          {isVerified ? <BadgeCheck className="size-3.5" aria-hidden="true" /> : null}
-          {isVerified ? t("verified") : t("unverified")}
         </span>
-      ) : null}
-      <ActionButton variant="dialog" size="sm" onClick={onAction}>
-        {actionLabel}
-      </ActionButton>
-    </li>
+        <button
+          type="button"
+          onClick={onAction}
+          className="shrink-0 cursor-pointer text-xs font-semibold text-[var(--primary-ink)] underline-offset-4 hover:underline"
+        >
+          {actionLabel}
+        </button>
+      </dd>
+    </div>
   );
 }

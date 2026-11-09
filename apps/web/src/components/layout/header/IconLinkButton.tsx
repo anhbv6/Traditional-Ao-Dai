@@ -17,9 +17,9 @@ export function IconLinkButton({ href, label, icon: Icon, count, countReady }: I
     <Link
       href={href}
       aria-label={count ? `${label} (${count})` : label}
-      className="relative grid h-11 w-11 place-items-center text-primary-ink transition-opacity hover:opacity-75"
+      className="relative grid size-10 place-items-center text-primary-ink sm:size-11 transition-opacity hover:opacity-75"
     >
-      <Icon size={22} strokeWidth={1.5} aria-hidden="true" />
+      <Icon strokeWidth={1.5} aria-hidden="true" className="size-5 sm:size-[22px]" />
       {count !== undefined ? <CountBadge count={count} ready={countReady} /> : null}
     </Link>
   );

@@ -153,18 +153,18 @@ export default function ProductInfo({
     <div className="min-w-0 lg:pt-1">
       <motion.div variants={stagger} initial="hidden" animate="show">
         <motion.div variants={rise} className="flex items-start justify-between gap-6">
-          <h1 className="text-[1.75rem] font-semibold leading-tight text-[var(--primary-ink)] sm:text-[2.25rem] lg:text-[2.5rem]">{product.name}</h1>
-          <span className="mt-1.5 shrink-0 bg-[var(--bg-secondary)] px-3 py-1 text-xs font-semibold text-[var(--primary-ink)]">
+          <h1 className="text-[1.5rem] font-semibold leading-tight text-[var(--primary-ink)] sm:text-[1.75rem] xl:text-[2rem]">{product.name}</h1>
+          <span className="mt-1 shrink-0 bg-[var(--bg-secondary)] px-2.5 py-1 text-[11px] font-semibold text-[var(--primary-ink)]">
             {product.stock}
           </span>
         </motion.div>
 
-        <motion.p variants={rise} className="mt-2 text-base text-[var(--text-light)]">
+        <motion.p variants={rise} className="mt-1.5 text-sm text-[var(--text-light)]">
           {product.description}
         </motion.p>
 
-        <motion.div variants={rise} className="mt-4 flex flex-wrap items-center gap-2 text-sm text-[var(--text-light)]">
-          <Rating style={{ maxWidth: 85 }} value={parseFloat(product.rating) || 5} itemStyles={ratingStyles} readOnly />
+        <motion.div variants={rise} className="mt-3 flex flex-wrap items-center gap-2 text-[13px] text-[var(--text-light)]">
+          <Rating style={{ maxWidth: 76 }} value={parseFloat(product.rating) || 5} itemStyles={ratingStyles} readOnly />
           <span className="font-semibold text-[var(--text-main)]">{product.rating}</span>
           {onShowReviews ? (
             <button
@@ -180,7 +180,7 @@ export default function ProductInfo({
         </motion.div>
 
         {/* Giá: đổi size có giá khác -> giá mới "lăn" lên */}
-        <motion.div variants={rise} className="mt-4 flex h-9 items-baseline gap-3 overflow-hidden" aria-live="polite">
+        <motion.div variants={rise} className="mt-3 flex h-8 items-baseline gap-3 overflow-hidden" aria-live="polite">
           <AnimatePresence mode="popLayout" initial={false}>
             <motion.span
               key={priceText}
@@ -188,7 +188,7 @@ export default function ProductInfo({
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: '-100%', opacity: 0 }}
               transition={{ duration: 0.45, ease: EASE }}
-              className="text-[1.625rem]/9 font-semibold text-[var(--primary-ink)]"
+              className="text-[1.375rem]/8 font-semibold text-[var(--primary-ink)]"
             >
               {priceText}
             </motion.span>
@@ -198,7 +198,7 @@ export default function ProductInfo({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="text-base text-[var(--text-light)]/70 line-through"
+                className="text-sm text-[var(--text-light)]/70 line-through"
               >
                 {originalPriceText}
               </motion.span>
@@ -206,17 +206,17 @@ export default function ProductInfo({
           </AnimatePresence>
         </motion.div>
 
-        <motion.p variants={rise} className="mt-4 max-w-2xl text-[0.9375rem] leading-7 text-[var(--text-main)]">
+        <motion.p variants={rise} className="mt-3 max-w-xl text-sm leading-6 text-[var(--text-main)]/90">
           {product.longDescription}
         </motion.p>
 
         {/* Màu sắc: khung viền trượt theo màu đang chọn */}
         {product.colors.length > 0 ? (
-          <motion.div variants={rise} className="mt-6">
-            <h2 className="text-sm font-semibold text-[var(--text-main)]">
+          <motion.div variants={rise} className="mt-5">
+            <h2 className="text-[13px] font-semibold text-[var(--text-main)]">
               {t('details.color')}: <span className="font-normal text-[var(--text-light)]">{selectedColor}</span>
             </h2>
-            <div className="mt-3 flex flex-wrap gap-2.5">
+            <div className="mt-2 flex flex-wrap gap-2">
               {product.colors.map((color) => {
                 const isActive = selectedColor === color.name;
                 return (
@@ -227,7 +227,7 @@ export default function ProductInfo({
                     aria-label={color.name}
                     aria-pressed={isActive}
                     onClick={() => onColorSelect(color.name, color.imageSrc)}
-                    className="relative grid size-9 cursor-pointer place-items-center"
+                    className="relative grid size-8 cursor-pointer place-items-center"
                   >
                     {isActive ? (
                       <motion.span
@@ -237,7 +237,7 @@ export default function ProductInfo({
                       />
                     ) : null}
                     <span
-                      className="size-6 border border-black/10 transition-transform duration-300 hover:scale-110"
+                      className="size-5 border border-black/10 transition-transform duration-300 hover:scale-110"
                       style={{ backgroundColor: color.hex }}
                     />
                   </button>
@@ -249,9 +249,9 @@ export default function ProductInfo({
 
         {/* Kích thước: nền đỏ đô trượt sang size đang chọn */}
         {product.sizes.length > 0 ? (
-          <motion.div variants={rise} className="mt-6">
-            <h2 className="text-sm font-semibold text-[var(--text-main)]">{t('details.size')}</h2>
-            <div className="mt-3 flex flex-wrap gap-2">
+          <motion.div variants={rise} className="mt-5">
+            <h2 className="text-[13px] font-semibold text-[var(--text-main)]">{t('details.size')}</h2>
+            <div className="mt-2 flex flex-wrap gap-2">
               {product.sizes.map((size) => {
                 const isActive = selectedSize === size;
                 return (
@@ -260,7 +260,7 @@ export default function ProductInfo({
                     type="button"
                     aria-pressed={isActive}
                     onClick={() => onSizeSelect(size)}
-                    className={`relative h-9 min-w-9 cursor-pointer border px-3 text-xs font-semibold transition-colors duration-300 ${
+                    className={`relative h-8 min-w-8 cursor-pointer border px-2.5 text-xs font-semibold transition-colors duration-300 ${
                       isActive
                         ? 'border-[var(--primary-color)] text-white'
                         : 'border-[var(--border)] text-[var(--text-main)] hover:border-[var(--primary-color)]'
@@ -335,7 +335,7 @@ export default function ProductInfo({
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, delay: 0.75, ease: EASE }}
-        className="mt-8 flex w-full flex-row items-center gap-2 sm:gap-3"
+        className="mt-6 flex w-full flex-row items-center gap-2 sm:gap-3"
       >
         <QuantitySelector
           value={quantity}
@@ -344,7 +344,7 @@ export default function ProductInfo({
           labels={{ decrease: t('quantity.decrease'), increase: t('quantity.increase') }}
         />
 
-        <ActionButton variant="confirm" size="lg" onClick={handleAddToCart} className={cn('min-h-11 flex-1 sm:min-h-12', addedClass)}>
+        <ActionButton variant="confirm" size="md" onClick={handleAddToCart} className={cn('min-h-11 flex-1 sm:w-60 sm:flex-none', addedClass)}>
           {addButtonContent}
         </ActionButton>
 
@@ -355,8 +355,8 @@ export default function ProductInfo({
           labelOn={t('removeFromWishlist')}
           labelOff={t('addToWishlist')}
           tone="onSurface"
-          iconSize={24}
-          className="size-11 shrink-0 sm:size-12"
+          iconSize={22}
+          className="size-11 shrink-0"
         />
       </motion.div>
 
@@ -365,7 +365,7 @@ export default function ProductInfo({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 0.9 }}
-        className="mt-6 grid gap-2 border-t border-[var(--border)] pt-5 text-sm text-[var(--text-light)] sm:grid-cols-2"
+        className="mt-6 grid gap-x-6 gap-y-1.5 border-t border-[var(--border)] pt-4 text-[13px] text-[var(--text-light)] sm:grid-cols-2"
       >
         <div>
           <dt className="inline font-semibold text-[var(--text-main)]">{t('details.sku')}:</dt> <dd className="inline">{product.id}</dd>

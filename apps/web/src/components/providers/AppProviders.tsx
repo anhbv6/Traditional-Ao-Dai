@@ -7,6 +7,7 @@ import { SmoothScrollProvider } from './SmoothScrollProvider';
 import { useAuthStore, establishCustomerSession } from '@/features/auth';
 import { rehydrateCart } from '@/features/cart';
 import { rehydrateWishlist } from '@/features/wishlist';
+import { rehydrateMeasurementDraft } from '@/features/bespoke';
 import { hasCustomerSession, refreshBrowserToken, HttpError } from '@/lib/api-client';
 
 export function AppProviders({ children }: { children: ReactNode }) {
@@ -27,6 +28,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
     // Nạp giỏ hàng & danh sách yêu thích từ localStorage sau khi hydrate (store dùng skipHydration để tránh lệch SSR)
     rehydrateCart();
     rehydrateWishlist();
+    rehydrateMeasurementDraft();
   }, []);
 
   // Khôi phục phiên KHÁCH HÀNG một lần khi tải ứng dụng:

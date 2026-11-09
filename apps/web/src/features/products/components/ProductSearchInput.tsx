@@ -61,11 +61,7 @@ export function ProductSearchInput({ value, onChange, className }: ProductSearch
         >
           <X size={14} strokeWidth={1.8} />
         </button>
-      ) : (
-        <kbd className="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 border border-[var(--border)] px-1.5 font-sans text-[10px] text-[var(--text-light)] lg:block">
-          /
-        </kbd>
-      )}
+      ) : null}
     </label>
   );
 }

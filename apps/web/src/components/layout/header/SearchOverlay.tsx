@@ -442,9 +442,9 @@ export function SearchOverlay({ label, placeholder }: SearchOverlayProps) {
         aria-label={label}
         aria-haspopup="dialog"
         aria-expanded={open}
-        className="grid h-11 w-11 cursor-pointer place-items-center text-primary-ink transition-opacity hover:opacity-75"
+        className="grid size-10 cursor-pointer place-items-center text-primary-ink sm:size-11 transition-opacity hover:opacity-75"
       >
-        <Search size={22} strokeWidth={1.5} aria-hidden="true" />
+        <Search strokeWidth={1.5} aria-hidden="true" className="size-5 sm:size-[22px]" />
       </button>
       {/* Portal ra body: tránh bị giới hạn bởi stacking context của header dính */}
       {hasOpened ? createPortal(panel, document.body) : null}

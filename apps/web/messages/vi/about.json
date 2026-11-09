@@ -7,18 +7,14 @@
     "eyebrow": "Câu chuyện thương hiệu",
     "title": "Thiên Canh",
     "subtitle": "Canh vải dưới trời mây, khâu tay từng tấc lụa.",
+    "imageAlt": "Nghệ nhân đo may áo dài truyền thống",
+    "primaryAction": "Đặt lịch may đo",
+    "since": "Từ vùng cao Tây Bắc",
     "badges": {
       "grain": "Canh sợi vải chuẩn từng milimet",
       "measure": "Hạ kéo theo số đo của riêng bạn",
       "handStitch": "Khâu tay từng mũi"
-    },
-    "imageAlt": "Nghệ nhân đo may áo dài truyền thống",
-    "measureTitle": "Tỉ mỉ từng số đo",
-    "measureText": "Đội ngũ chuyên nghiệp thực hiện tối thiểu 12 phép đo cơ thể để đảm bảo độ khít hoàn hảo.",
-    "primaryAction": "Đặt lịch may đo",
-    "secondaryAction": "Xem bộ sưu tập",
-    "secondaryImageAlt": "Chi tiết áo dài gấm thêu hoa sen",
-    "since": "Từ vùng cao Tây Bắc"
+    }
   },
   "pain": {
     "eyebrow": "Vấn đề của tà áo dài truyền thống",
@@ -27,76 +23,60 @@
     "cards": {
       "armhole": {
         "title": "Căng nách khó chịu",
-        "text": "Đường cắt nách quá hẹp hoặc không đúng góc khiến bạn không thể nhấc tay thoải mái.",
         "fix": "Hạ và mở rộng góc nách 1,5–2cm, giữ đường vai gọn để giơ tay thoải mái mà áo không bị kéo."
       },
       "belly": {
         "title": "Lộ khuyết điểm eo bụng",
-        "text": "Chất vải ôm sát không có sự co giãn hoặc tà eo xẻ quá cao dễ làm lộ khuyết điểm khi ngồi.",
         "fix": "Tinh chỉnh độ rủ thân trước và hạ điểm xẻ tà vừa đủ, che khéo vùng bụng khi ngồi hay cúi."
       },
       "fit": {
         "title": "Phom dáng chung chung",
-        "text": "May đo công nghiệp theo size rập chuẩn chung thường không vừa vặn với các dáng người thực tế.",
         "fix": "Cắt rập riêng theo 12 số đo của chính bạn, thử áo và chỉnh lại trước khi hoàn thiện."
       }
     },
-    "solutionEyebrow": "Giải pháp từ Thiên Canh",
-    "solutionText": "Chúng tôi nghiên cứu và tinh chỉnh các chi tiết nách, eo, và tà xẻ để tà áo dài vừa giữ nét tôn dáng, vừa thoải mái tối đa khi mặc cả ngày.",
     "problemLabel": "Vấn đề thường gặp",
     "fixLabel": "Cách Thiên Canh xử lý"
   },
-  "fit": {
-    "eyebrow": "Thử nghiệm phom dáng",
-    "title": "Phù hợp với từng vóc dáng thực tế",
-    "description": "Chúng tôi phân tích và thiết kế dựa trên các dáng người khác nhau để đảm bảo sự vừa vặn tối ưu.",
-    "beforeLabel": "Trước cải tiến",
-    "afterLabel": "Sau cải tiến từ Thiên Canh",
-    "profiles": {
-      "slender": {
-        "label": "Dáng người thanh mảnh",
-        "note": "Tối ưu hóa đường cong cơ thể tự nhiên và độ rủ mềm mại của tà áo.",
-        "before": "Tà áo bị phẳng, thiếu đường cong eo, có nếp nhăn dọc ngực và vai.",
-        "after": "Tôn dáng ngực đầy đặn hơn, vai ôm khít mềm mại và eo thon gọn tinh tế.",
-        "imageAlt": "Áo dài trên dáng người thanh mảnh",
-        "stats": {
-          "shoulder": {
-            "label": "Độ mở vai",
-            "value": "Cân đối"
-          },
-          "waist": {
-            "label": "Đường eo",
-            "value": "Ôm mềm"
-          },
-          "panel": {
-            "label": "Độ rủ tà",
-            "value": "Mượt mà"
-          }
-        }
+  "manifesto": {
+    "eyebrow": "Triết lý của chúng tôi",
+    "text": "Một tà áo dài đẹp là khi người mặc quên rằng mình đang mặc nó — chỉ còn lại sự tự tin, thoải mái và nét duyên rất riêng.",
+    "author": "Linh An — Người sáng lập Thiên Canh"
+  },
+  "cta": {
+    "eyebrow": "Bắt đầu cùng Thiên Canh",
+    "title": "Tà áo của riêng bạn, bắt đầu từ một buổi trò chuyện",
+    "description": "Hẹn lịch tư vấn miễn phí tại xưởng hoặc trực tuyến — chúng tôi lắng nghe, đo đạc và phác thảo cùng bạn.",
+    "primaryAction": "Đặt lịch tư vấn",
+    "secondaryAction": "Câu hỏi thường gặp"
+  },
+  "story": {
+    "eyebrow": "Về Thiên Canh",
+    "title": "Vì sao tiệm tên là Thiên Canh",
+    "paragraphs": {
+      "origin": "Khác với những xưởng may công nghiệp hối hả nơi phố thị, mỗi tà áo dài của Thiên Canh được bắt đầu từ sự tĩnh lặng của vùng cao Tây Bắc.",
+      "craft": "Tại Thiên Canh, không có những chiếc áo rập khuôn hàng loạt. Mỗi tấm lụa được hạ kéo đều dựa trên chính số đo, dáng vai và thói quen cử động của riêng bạn. Chậm rãi, cần mẫn và trọn vẹn tâm huyết trong từng mũi khâu tay."
+    },
+    "meanings": {
+      "sky": {
+        "word": "Thiên",
+        "title": "Trời mây Tây Bắc",
+        "text": "Nơi khởi nguồn của tiệm – giữa vùng cao quanh năm mây phủ, không khí tĩnh lặng và trong trẻo."
       },
-      "curvy": {
-        "label": "Dáng người đầy đặn",
-        "note": "Nới lỏng thông minh ở nách và làm mềm các điểm chuyển tiếp vùng hông.",
-        "before": "Nách bị bó chật, hông bị kéo căng ngang và lộ khuyết điểm eo khi ngồi.",
-        "after": "Nách thoải mái tăng 2cm cử động, eo hạ tà che khuyết điểm, hông co giãn nhẹ.",
-        "imageAlt": "Áo dài trên dáng người đầy đặn",
-        "stats": {
-          "armhole": {
-            "label": "Vòng nách",
-            "value": "+2cm"
-          },
-          "belly": {
-            "label": "Vùng bụng",
-            "value": "Ẩn khéo"
-          },
-          "hip": {
-            "label": "Vòng hông",
-            "value": "Co giãn nhẹ"
-          }
-        }
+      "grain": {
+        "word": "Canh",
+        "title": "Canh vải thiên",
+        "text": "Kỹ thuật cắt vải xéo 45 độ tinh tế nhất trong nghề may áo dài, giúp tà áo có độ rũ tự nhiên và ôm trọn đường cong cơ thể mà không gây gò bó."
+      },
+      "watch": {
+        "word": "Canh",
+        "title": "Canh khuya / Canh cửi",
+        "text": "Hình ảnh người thợ vùng cao cần mẫn, thức khuya dậy sớm bên ánh đèn và bàn may, chăm chút từng đường kim mũi đột cho kịp ngày vui của khách."
       }
     },
-    "compareLabel": "So sánh trước và sau"
+    "nameLabel": "Hai chữ trong một cái tên",
+    "canhLabel": "Hai tầng nghĩa của chữ Canh",
+    "imageAlt": "Tà áo dài lụa Thiên Canh dưới nắng vùng cao",
+    "imageCaption": "Lụa được canh sợi trước khi hạ kéo"
   },
   "atelier": {
     "eyebrow": "Nghệ nhân & Xưởng may",
@@ -134,44 +114,6 @@
       "consulting": {
         "value": "1-1",
         "label": "Tư vấn số đo cá nhân"
-      }
-    }
-  },
-  "manifesto": {
-    "eyebrow": "Triết lý của chúng tôi",
-    "text": "Một tà áo dài đẹp là khi người mặc quên rằng mình đang mặc nó — chỉ còn lại sự tự tin, thoải mái và nét duyên rất riêng.",
-    "author": "Linh An — Người sáng lập Thiên Canh"
-  },
-  "cta": {
-    "eyebrow": "Bắt đầu cùng Thiên Canh",
-    "title": "Tà áo của riêng bạn, bắt đầu từ một buổi trò chuyện",
-    "description": "Hẹn lịch tư vấn miễn phí tại xưởng hoặc trực tuyến — chúng tôi lắng nghe, đo đạc và phác thảo cùng bạn.",
-    "primaryAction": "Đặt lịch tư vấn",
-    "secondaryAction": "Câu hỏi thường gặp"
-  },
-  "story": {
-    "eyebrow": "Về Thiên Canh",
-    "title": "Vì sao tiệm tên là Thiên Canh",
-    "paragraphs": {
-      "origin": "Khác với những xưởng may công nghiệp hối hả nơi phố thị, mỗi tà áo dài của Thiên Canh được bắt đầu từ sự tĩnh lặng của vùng cao Tây Bắc.",
-      "name": "Chúng tôi đặt tên tiệm là Thiên Canh — vừa là bầu trời mây trắng nơi rẻo cao, vừa là kỹ thuật \"canh sợi vải\" chuẩn xác đến từng milimet, và cũng là những \"canh giờ\" miệt mài của người thợ thủ công bên bàn cắt.",
-      "craft": "Tại Thiên Canh, không có những chiếc áo rập khuôn hàng loạt. Mỗi tấm lụa được hạ kéo đều dựa trên chính số đo, dáng vai và thói quen cử động của riêng bạn. Chậm rãi, cần mẫn và trọn vẹn tâm huyết trong từng mũi khâu tay."
-    },
-    "meanings": {
-      "sky": {
-        "word": "Thiên",
-        "title": "Trời mây Tây Bắc",
-        "text": "Nơi khởi nguồn của tiệm – giữa vùng cao quanh năm mây phủ, không khí tĩnh lặng và trong trẻo."
-      },
-      "grain": {
-        "word": "Canh",
-        "title": "Canh vải thiên",
-        "text": "Kỹ thuật cắt vải xéo 45 độ tinh tế nhất trong nghề may áo dài, giúp tà áo có độ rũ tự nhiên và ôm trọn đường cong cơ thể mà không gây gò bó."
-      },
-      "watch": {
-        "word": "Canh",
-        "title": "Canh khuya / Canh cửi",
-        "text": "Hình ảnh người thợ vùng cao cần mẫn, thức khuya dậy sớm bên ánh đèn và bàn may, chăm chút từng đường kim mũi đột cho kịp ngày vui của khách."
       }
     }
   }

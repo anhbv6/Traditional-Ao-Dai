@@ -129,7 +129,7 @@ const TONE_CLASS = {
  *   header={<UserCard />}
  *   items={[
  *     { key: "profile", label: t("profile"), icon: UserRound, href: "/profile" },
- *     { key: "orders", label: t("orders"), icon: Package, href: "/profile/orders" },
+ *     { key: "orders", label: t("orders"), icon: Package, href: "/my-orders" },
  *     { type: "separator", key: "sep" },
  *     { key: "logout", label: t("logout"), icon: LogOut, tone: "danger", onSelect: () => setConfirmOpen(true) },
  *   ]}

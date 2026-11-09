@@ -10,16 +10,18 @@ import { CheckoutProgress } from "./CheckoutProgress";
 import { CheckoutShippingForm } from "./CheckoutShippingForm";
 import { CheckoutPaymentForm } from "./CheckoutPaymentForm";
 import { CheckoutReview } from "./CheckoutReview";
-import { CheckoutSuccess } from "./CheckoutSuccess";
 import { CheckoutOrderSummary } from "./CheckoutOrderSummary";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-/** Khung bước trượt vào theo hướng đi: tiến → vào từ phải, lùi → vào từ trái (bước cũ trượt ra phía ngược lại) */
+/**
+ * Chuyển bước nhẹ: bước mới hiện dần + nhích 16px theo hướng đi (tiến → từ phải, lùi → từ trái) và 8px từ dưới;
+ * bước cũ mờ nhanh. Không trượt cả khối form lớn qua màn hình nên không bị giật.
+ */
 const stepVariants: Variants = {
-  enter: (direction: number) => ({ opacity: 0, x: direction * 48 }),
-  center: { opacity: 1, x: 0, transition: { duration: 0.5, ease: EASE } },
-  exit: (direction: number) => ({ opacity: 0, x: direction * -32, transition: { duration: 0.25, ease: EASE } }),
+  enter: (direction: number) => ({ opacity: 0, x: direction * 16, y: 8 }),
+  center: { opacity: 1, x: 0, y: 0, transition: { duration: 0.4, ease: EASE } },
+  exit: (direction: number) => ({ opacity: 0, x: direction * -12, transition: { duration: 0.2, ease: EASE } }),
 };
 
 /** Khung chờ khi giỏ đang nạp từ localStorage */
@@ -37,7 +39,7 @@ function CheckoutSkeleton() {
  * - Trái: mũi tên về Giỏ hàng + eyebrow → tiêu đề → thanh 3 bước → khung của bước hiện tại.
  * - Phải (desktop): tóm tắt đơn ghim cố định, cao vừa màn hình (danh sách cuộn riêng, tổng tiền luôn thấy).
  * - Mobile / tablet: tóm tắt nằm dưới khung bước.
- * - Giỏ trống → EmptyState; đặt hàng xong → màn thành công (căn giữa, không còn cột tóm tắt).
+ * - Giỏ trống → EmptyState; đặt hàng xong → chuyển sang trang cảm ơn `/checkout/thank-you?token=…`.
  */
 export function CheckoutExperience() {
   const {
@@ -46,7 +48,7 @@ export function CheckoutExperience() {
     isLoaded,
     cartItems,
     totals,
-    discount,
+    hasCartDiscount,
     hasCustomItems,
     step,
     direction,
@@ -57,30 +59,22 @@ export function CheckoutExperience() {
     submitShipping,
     paymentMethod,
     setPaymentMethod,
+    depositPercent,
+    setDepositPercent,
+    prepayAmount,
     submitPayment,
-    orderId,
     isPlacing,
     placeOrder,
-    placedOrder,
   } = useCheckout();
 
-  if (placedOrder) {
-    return (
-      <MotionConfig reducedMotion="user">
-        <CheckoutSuccess order={placedOrder} locale={locale} />
-      </MotionConfig>
-    );
-  }
-
   const hasItems = isLoaded && cartItems.length > 0;
-  // Hoá đơn điền dần: tên khách sau bước 1, phương thức + số đơn sau bước 2
+  // Hoá đơn điền dần: tên khách sau bước 1, phương thức sau bước 2 (mã đơn do server cấp khi đặt)
   const summary = (
     <CheckoutOrderSummary
       cartItems={cartItems}
       totals={totals}
-      discount={discount}
+      hasCartDiscount={hasCartDiscount}
       locale={locale}
-      orderId={orderId}
       shipping={shipping}
       paymentMethod={maxStepIndex >= 2 ? paymentMethod : null}
     />
@@ -96,7 +90,7 @@ export function CheckoutExperience() {
       >
         <div className="min-w-0">
           {/* Tiêu đề: mũi tên về Giỏ hàng + eyebrow → tiêu đề + mô tả */}
-          <header className="mb-8 sm:mb-10">
+          <header className="mb-6 sm:mb-8">
             <motion.div
               initial={{ opacity: 0, x: -8 }}
               animate={{ opacity: 1, x: 0 }}
@@ -146,8 +140,14 @@ export function CheckoutExperience() {
                 {step === "payment" ? (
                   <motion.div key="payment" custom={direction} variants={stepVariants} initial="enter" animate="center" exit="exit">
                     <CheckoutPaymentForm
+                      locale={locale}
+                      total={totals.total}
+                      hasCustomItems={hasCustomItems}
                       paymentMethod={paymentMethod}
                       onPaymentMethodChange={setPaymentMethod}
+                      depositPercent={depositPercent}
+                      onDepositPercentChange={setDepositPercent}
+                      prepayAmount={prepayAmount}
                       onBack={() => goToStep("shipping")}
                       onSubmit={submitPayment}
                     />
@@ -158,7 +158,10 @@ export function CheckoutExperience() {
                     <CheckoutReview
                       shipping={shipping}
                       paymentMethod={paymentMethod}
-                      orderId={orderId}
+                      depositPercent={depositPercent}
+                      prepayAmount={prepayAmount}
+                      total={totals.total}
+                      locale={locale}
                       hasCustomItems={hasCustomItems}
                       isPlacing={isPlacing}
                       onEdit={goToStep}

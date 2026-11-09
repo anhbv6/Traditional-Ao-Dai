@@ -28,14 +28,14 @@ export function SectionHeading({
   return (
     <div
       className={cn(
-        'mb-10 flex max-w-3xl flex-col sm:mb-12',
+        'mb-8 flex max-w-3xl flex-col sm:mb-12',
         align === 'center' ? 'mx-auto items-center text-center' : 'items-start text-left',
         className,
       )}
     >
       <p
         className={cn(
-          'flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[3px]',
+          'flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[2.5px] sm:text-[11px] sm:tracking-[3px]',
           isDark ? 'text-[var(--accent-on-primary)]' : 'text-[var(--primary-ink)]',
         )}
       >
@@ -45,7 +45,7 @@ export function SectionHeading({
       </p>
       <h2
         className={cn(
-          'mt-3 font-[family-name:var(--font-playfair)] text-[1.875rem] font-semibold leading-tight sm:text-[2.625rem]',
+          'mt-3 font-[family-name:var(--font-playfair)] text-[1.625rem] font-semibold leading-tight sm:text-[2.25rem] lg:text-[2.625rem]',
           isDark ? 'text-white' : 'text-[var(--primary-ink)]',
         )}
       >
@@ -55,7 +55,7 @@ export function SectionHeading({
       {description ? (
         <p
           className={cn(
-            'mt-4 max-w-2xl text-sm leading-7 sm:text-base',
+            'mt-4 max-w-2xl text-[13px] leading-6 sm:text-base sm:leading-7',
             isDark ? 'text-white/75' : 'text-[var(--text-light)]',
           )}
         >

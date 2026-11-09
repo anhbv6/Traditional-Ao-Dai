@@ -57,9 +57,9 @@ export function NotificationButton({ label = 'Notifications', preview = false }:
           href="/notifications"
           aria-label={unreadCount > 0 ? `${label} (${unreadCount})` : label}
           onClick={close}
-          className="relative grid h-11 w-11 place-items-center text-primary-ink transition-opacity hover:opacity-75"
+          className="relative grid size-10 place-items-center text-primary-ink sm:size-11 transition-opacity hover:opacity-75"
         >
-          <Bell size={22} strokeWidth={1.5} aria-hidden="true" />
+          <Bell strokeWidth={1.5} aria-hidden="true" className="size-5 sm:size-[22px]" />
           <CountBadge count={unreadCount} />
         </Link>
       }

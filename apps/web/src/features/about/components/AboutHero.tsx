@@ -30,8 +30,11 @@ export function AboutHero() {
   const imageY = useTransform(scrollYProgress, [0, 1], reduceMotion ? ["0%", "0%"] : ["0%", "12%"]);
 
   return (
-    <section ref={sectionRef} className="grid overflow-hidden bg-(--bg-wine) text-white lg:min-h-[calc(100svh-150px)] lg:grid-cols-2">
-      <div className="relative min-h-[420px] overflow-hidden sm:min-h-[520px]">
+    <section
+      ref={sectionRef}
+      className="grid overflow-hidden bg-(--bg-wine) text-white lg:min-h-[calc(100svh-150px)] lg:grid-cols-2"
+    >
+      <div className="relative min-h-[340px] overflow-hidden sm:min-h-[460px]">
         <motion.div
           style={{ y: imageY }}
           // initial giống nhau ở server/client (tránh hydration mismatch); giảm chuyển động -> thời lượng 0
@@ -50,12 +53,20 @@ export function AboutHero() {
             className="object-cover object-[50%_30%]"
           />
         </motion.div>
-        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-(--bg-wine)/70 via-transparent to-transparent lg:bg-gradient-to-r lg:from-transparent lg:via-transparent lg:to-(--bg-wine)/40" />
-        <p className="absolute bottom-5 left-5 text-[10px] uppercase tracking-[3px] text-white/70 sm:left-8">{t("since")}</p>
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-gradient-to-t from-(--bg-wine)/70 via-transparent to-transparent lg:bg-gradient-to-r lg:from-transparent lg:via-transparent lg:to-(--bg-wine)/40"
+        />
+        <p className="absolute bottom-5 left-5 text-[10px] uppercase tracking-[3px] text-white/70 sm:left-8">
+          {t("since")}
+        </p>
       </div>
 
-      <div className="flex flex-col justify-center px-5 py-14 sm:px-10 sm:py-20 lg:px-16 xl:px-20">
-        <motion.p {...fadeUp(0.2)} className="text-[11px] font-semibold uppercase tracking-[3.5px] text-[var(--accent-color)]">
+      <div className="flex flex-col justify-center px-5 py-12 sm:px-10 sm:py-16 lg:px-16 xl:px-20">
+        <motion.p
+          {...fadeUp(0.2)}
+          className="text-[11px] font-semibold uppercase tracking-[3.5px] text-[var(--accent-color)]"
+        >
           {t("eyebrow")}
         </motion.p>
         <motion.h1
@@ -68,15 +79,17 @@ export function AboutHero() {
           {t("subtitle")}
         </motion.p>
 
-        <motion.ul {...fadeUp(0.56)} className="mt-8 flex flex-col gap-2.5 border-l border-[var(--accent-color)]/60 pl-5">
-          {HERO_BADGES.map((key) => (
-            <li key={key} className="text-sm text-white/90">
+        {/* Ba cam kết hiện lần lượt, mỗi dòng có vạch vàng chạy vào trước chữ */}
+        <ul className="mt-8 flex flex-col gap-3">
+          {HERO_BADGES.map((key, i) => (
+            <motion.li key={key} {...fadeUp(0.56 + i * 0.1)} className="flex items-center gap-3 text-sm text-white/90">
+              <span aria-hidden="true" className="h-px w-6 bg-[var(--accent-color)]" />
               {t(`badges.${key}`)}
-            </li>
+            </motion.li>
           ))}
-        </motion.ul>
+        </ul>
 
-        <motion.div {...fadeUp(0.68)} className="mt-10">
+        <motion.div {...fadeUp(0.9)} className="mt-8 sm:mt-10">
           {/* Nền tối → bộ màu ON_PRIMARY_COLORS (đồng bộ CTA banner Cửa hàng, khối May đo trang chủ) */}
           <ActionLink
             href="/contact"

@@ -51,6 +51,8 @@ E-commerce Áo Dài truyền thống (có may đo theo số đo) của tiệm **
 
 - Chỉ đặt thứ **cả FE và BE** cùng dùng; chỉ code thuần (không Express/Next/React/Prisma). Không `enum`/`namespace` — dùng `as const` + union. Mỗi entry **một file**, không import tương đối; entry mới khai báo cả `exports` lẫn `typesVersions`. `"sideEffects": false`.
 - `@repo/shared` (**không import zod**): `LOCALES`, `pickLocalized`, `ROLES`, `PERMISSIONS`, `USER_STATUSES`, `GENDERS`, `AUTH_PROVIDERS`, `isAdminAreaRole`, `normalizeEmail`, `AUTH_COOKIES`, `TOKEN_AUDIENCES`, `AuthTokenClaims`, `UserDto`, `ApiResponse<T>`, hằng số phiên admin, `normalizeVietnamPhone`, `formatVnd`, `toVnd`, `MAX_IMAGE_BYTES`, `isProductImageRatio`.
+- `@repo/shared/orders`: mã đơn `TC-YYMM-XXXX` (`ORDER_CODE_REGEX`, `normalizeOrderCode`), `PAYMENT_METHODS` (COD / BANK_TRANSFER / DEPOSIT), `isPaymentMethodAllowed` (đơn may đo không COD 100%), `computePrepayAmount` (cọc 30–50%), `buildTransferContent` (`THIENCANH <mã>`), `TRACKING_STEPS` + `resolveTrackingProgress` (5 bước may), `CUSTOMER_ORDER_FILTERS` + `resolveCustomerOrderStage`, DTO đơn.
+- `@repo/shared/bespoke`: bảng tuỳ chọn + `quoteBespoke` của áo dài thiết kế riêng — API báo giá lại từ cấu hình, không tin giá client.
 - `@repo/shared/sizing`: `PRODUCT_GROUPS`, `PRODUCT_GROUP_TRAITS` (nguồn duy nhất cho bản chất nhóm hàng), `PRODUCT_GROUP_NAMES` (tên cố định vi/en của nhóm gốc), `MEASUREMENT_KEYS`, `validateMeasurements`, `detectBigsize`, `suggestSize` — server luôn tính lại phụ phí bigsize.
 - `@repo/shared/validation` (Zod): `vietnamPhoneSchema`, `emailSchema`, `newPasswordSchema`, `loginPasswordSchema`, `verificationCodeSchema`, regex & độ dài. Thông điệp lỗi luôn là mã KEY.
 - **Response API:**
@@ -69,7 +71,7 @@ src/
 ├── config/                          # env.ts (Zod), swagger.ts
 ├── infra/                           # redis, cloudinary, mailer, sms
 ├── core/{http,middlewares,security,utils}/
-└── modules/<module>/                # auth (client|admin), otp, user, upload
+└── modules/<module>/                # auth (client|admin), otp, user, upload, orders
     ├── <module>.routes.ts           # endpoint + Swagger JSDoc @openapi (liệt kê mã lỗi theo status)
     ├── <module>.controller.ts       # mỏng: req -> service -> sendSuccess / next(error)
     ├── <module>.service.ts          # nghiệp vụ + Prisma
@@ -80,7 +82,7 @@ src/
 - Phụ thuộc một chiều: `modules` → `core` / `infra` / `config`; `core` → `infra` / `config`. Import Prisma từ `@repo/db` (không `@prisma/client`). Đăng ký router ở `src/routes.ts`. Chỉ dùng Express (không Nest/Fastify).
 - Thứ tự middleware: `validate(schema)` → `rateLimit(...)` → `requireAuth` → `requireRoles([...])` → controller. Controller luôn `try/catch` + `return next(error)`.
 - Lỗi nghiệp vụ `throw new AppError(status, 'MA_KEY')`; thành công `sendSuccess(res, { data, message: 'MA_KEY' })`. Mỗi KEY mới: ghi `KEYS.md` + dịch vi/en ở `apps/web/messages/*/errors.json`. Không trả stack/thông điệp nội bộ ở production.
-- **Dùng sẵn, không viết lại:** `AppError`; `rateLimit()` (middleware) / `assertRateLimit()` (service, Redis); `issueVerificationCode()` / `verifyVerificationCode()`; `set|clear{Customer,Admin}SessionCookies()` (`authCookies.ts` — nơi DUY NHẤT đặt cookie phiên); `hashToken()`, `cleanupUserSessions()`, `revokeAllUserSessions()`, `isSessionUsable()`; `sendVerificationCodeEmail()`; `toUserDto()` (`modules/user/user.mapper.ts` — trả người dùng ra ngoài luôn qua đây).
+- **Dùng sẵn, không viết lại:** `AppError`; `rateLimit()` (middleware) / `assertRateLimit()` (service, Redis); `issueVerificationCode()` / `verifyVerificationCode()`; `set|clear{Customer,Admin}SessionCookies()` (`authCookies.ts` — nơi DUY NHẤT đặt cookie phiên); `hashToken()`, `cleanupUserSessions()`, `revokeAllUserSessions()`, `isSessionUsable()`; `sendVerificationCodeEmail()`; `toUserDto()` (`modules/user/user.mapper.ts` — trả người dùng ra ngoài luôn qua đây); `createOrderAccessToken()` / `resolveOrderAccessToken()` (`core/security/orderAccess.ts` — magic link đơn hàng, DB chỉ lưu hash).
 - Vận hành: `helmet`, body tối đa 100kb, `requestLogger` (không log body/header), `/api/health` kiểm tra DB + Redis, Swagger `/api-docs` chỉ ngoài production. Không log mật khẩu/token/OTP (riêng mock SMS/email ở dev). Production chạy `tsx src/server.ts` (không `node dist`).
 
 ## 6. Xác thực & bảo mật
@@ -123,7 +125,7 @@ src/
 │   └── providers/   # AppProviders (React Query, khôi phục phiên, giỏ hàng)
 ├── features/<feature>/   # api, components, constants, data (mock tạm), hooks, store, types, utils, validations, index.ts
 ├── hooks/  i18n/  lib/   # lib: api-client, messages, utils (cn, resolveClassName), input-mask, jwt.server
-└── proxy.ts              # i18n + chặn sớm /admin, /profile
+└── proxy.ts              # i18n + chặn sớm /admin, /profile, /my-orders
 ```
 
 - **Feature:** `index.ts` là barrel DUY NHẤT; `components/` chia thư mục con kebab-case theo màn, không lồng `components/`, không barrel con. Phụ thuộc một chiều `components` → `hooks/store/api` → `utils/constants/data/types` (tầng dưới không import `components/`). Trong feature dùng đường dẫn tương đối, giữa feature dùng `@/features/<x>`.
@@ -223,9 +225,9 @@ Menu chia nhóm (cấu hình ở `core/layout/utils/navigation.ts`; URL → modu
 
 ## 9. Database (`packages/db`)
 
-**Schema** (31 model, 20 enum):
+**Schema** (32 model, 21 enum):
 - **Người dùng & phiên:** `User` (email chữ thường — CHECK constraint; `emailVerifiedAt` / `phoneVerifiedAt`, `passwordHash`, `status` ACTIVE/LOCKED/DELETED, `permissions` của STAFF), `SocialAccount` (`provider` enum, unique `userId + provider`), `UserSession` (`kind` STORE/ADMIN, `refreshTokenHash` chỉ ở STORE, `familyId`, `lastUsedAt`), `UserAddress`, `UserMeasurement`.
-- **Catalog & bán hàng:** `Category` (cây 2 cấp, `group` ProductGroup quyết định may đo / đơn vị bán / có size hay không, `position`, `isActive`, `defaultSizeChartId`), `SizeChart` + `SizeChartColumn` (thông số `key` theo `MEASUREMENT_KEYS`, `validMin`/`validMax`, `bigsizeFrom`) + `SizeChartRow` (`sizeLabel` khớp `ProductVariant.size`, `values` JSON `{ key: { min, max } }`), `Material` (chất liệu vải: thành phần JSON, thanh đo 1–5 có CHECK, `seasons`, `careCodes`, định mức) — khác `Fabric` là từng cây vải trong kho (`Fabric.materialId`), `AttributeGroup` (nhóm thuộc tính: `code` unique, tên vi/en, `isSystem` cho 7 nhóm có sẵn), `AttributeValue` (`groupId` → nhóm, unique `groupId + code`, `hex`/`family` cho màu), `Collection` (bộ sưu tập theo mùa: `status` DRAFT → COMING_SOON → ACTIVE → ARCHIVED, ảnh desktop + mobile, trang chủ, lookbook, SEO, xóa mềm `deletedAt`), `CollectionProduct` (nhiều - nhiều, `position`, `isHighlighted`), `Product` (`code` mã tự sinh theo nhóm hàng, `saleMode` SINGLE/SET/CUSTOM, `setItems` JSON các món trong bộ, `leadTimeDays` may đo, `materialId`, `sizeChartId` riêng — null = theo loại sản phẩm), `ProductVariant` (`size` gồm `FREE_SIZE` / `CUSTOM`, `colorId` → thuộc tính màu + `color` tên lưu kèm), `ProductAttribute` (đặc tính thiết kế của sản phẩm), `Cart`, `CartItem`, `Voucher`, `Order` (`paidAmount`, `dueDate`), `OrderItem` (snapshot sản phẩm + số đo), `TailoringLog`, `Review`, `ReviewMedia`.
+- **Catalog & bán hàng:** `Category` (cây 2 cấp, `group` ProductGroup quyết định may đo / đơn vị bán / có size hay không, `position`, `isActive`, `defaultSizeChartId`), `SizeChart` + `SizeChartColumn` (thông số `key` theo `MEASUREMENT_KEYS`, `validMin`/`validMax`, `bigsizeFrom`) + `SizeChartRow` (`sizeLabel` khớp `ProductVariant.size`, `values` JSON `{ key: { min, max } }`), `Material` (chất liệu vải: thành phần JSON, thanh đo 1–5 có CHECK, `seasons`, `careCodes`, định mức) — khác `Fabric` là từng cây vải trong kho (`Fabric.materialId`), `AttributeGroup` (nhóm thuộc tính: `code` unique, tên vi/en, `isSystem` cho 7 nhóm có sẵn), `AttributeValue` (`groupId` → nhóm, unique `groupId + code`, `hex`/`family` cho màu), `Collection` (bộ sưu tập theo mùa: `status` DRAFT → COMING_SOON → ACTIVE → ARCHIVED, ảnh desktop + mobile, trang chủ, lookbook, SEO, xóa mềm `deletedAt`), `CollectionProduct` (nhiều - nhiều, `position`, `isHighlighted`), `Product` (`code` mã tự sinh theo nhóm hàng, `saleMode` SINGLE/SET/CUSTOM, `setItems` JSON các món trong bộ, `leadTimeDays` may đo, `materialId`, `sizeChartId` riêng — null = theo loại sản phẩm), `ProductVariant` (`size` gồm `FREE_SIZE` / `CUSTOM`, `colorId` → thuộc tính màu + `color` tên lưu kèm), `ProductAttribute` (đặc tính thiết kế của sản phẩm), `Cart`, `CartItem`, `Voucher`, `Order` (`orderNumber` = mã công khai `TC-YYMM-XXXX` đuôi ngẫu nhiên, `paidAmount`, `depositAmount` = số phải chuyển trước, `isTailored`, `shippingDetail` JSON, `dueDate`), `OrderAccessToken` (magic link READ: `tokenHash`, `expiresAt`, `revokedAt`), `OrderItem` (snapshot sản phẩm + số đo), `TailoringLog` (`images` ảnh xưởng khách xem ở timeline), `Review`, `ReviewMedia`.
 - **Vận hành:** `ApprovalRequest` (`actionType` enum, `targetId`), `AuditLog` (chỉ ghi thêm), `Article`, `Faq`, `Appointment`, `Fabric`.
 
 **Quy ước schema**
@@ -263,8 +265,10 @@ Menu chia nhóm (cấu hình ở `core/layout/utils/navigation.ts`; URL → modu
 
 | Hạng mục | Hiện trạng | Hướng xử lý |
 | :--- | :--- | :--- |
-| Dữ liệu storefront | Sản phẩm, tin tức, wishlist, FAQ, lịch sử đơn... vẫn là **mock** | Xây module `products`, `orders`, `cart` ở Express theo §5; trang SEO dùng Server Component |
-| Giỏ hàng | localStorage + mã giảm giá demo phía client | API giỏ hàng + gộp giỏ khách vãng lai khi đăng nhập; voucher xác thực ở server |
+| Dữ liệu storefront | Sản phẩm, tin tức, wishlist, FAQ... vẫn là **mock**. Đặt hàng / tra cứu / đơn của tôi đã qua API `orders`, nhưng sản phẩm mock không có trong DB nên chỉ đặt được áo thiết kế riêng (`ao-dai-thiet-ke-rieng`) và sản phẩm seed | Xây module `products`, `cart` ở Express theo §5; trang SEO dùng Server Component |
+| Giỏ hàng | localStorage + mã giảm giá demo phía client (KHÔNG áp khi đặt hàng — server bỏ qua) | API giỏ hàng + gộp giỏ khách vãng lai khi đăng nhập; voucher xác thực ở server |
+| Thanh toán | VietQR tĩnh theo `BANK_*`; đối soát chuyển khoản / cập nhật `paidAmount` làm tay ở admin | Webhook ngân hàng (Casso / SePay) đối soát theo nội dung `THIENCANH <mã>` |
+| Đơn khách vãng lai | Chỉ gắn vào tài khoản khi tạo tài khoản ở trang cảm ơn | Tự gắn đơn cũ theo SĐT / email đã xác minh khi đăng nhập |
 | Địa chỉ | Vẫn còn cấp huyện | Theo địa giới mới từ 07/2025 (tỉnh + xã/phường) |
 | Test | Chưa có test tự động | Ưu tiên test tích hợp auth (supertest) và hàm tính tiền |
 | Prettier | Có cấu hình nhưng chưa định dạng toàn repo nên chưa vào CI | Một commit riêng chỉ chạy `pnpm format`, rồi thêm `format:check` vào CI |

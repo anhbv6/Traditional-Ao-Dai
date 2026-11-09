@@ -101,3 +101,13 @@ Web và API chạy cùng origin (Next.js rewrites `/api/*`), mọi cookie dướ
 - `POST /auth/admin/logout` không yêu cầu header Bearer: đọc `admin_token` từ cookie, thu hồi phiên và luôn xóa cookie.
 - Refresh thất bại → Backend xóa `refreshToken` + `has_session`.
 
+
+
+## Tạo tài khoản từ đơn (trang cảm ơn)
+
+| KEY | HTTP Status | Tiếng Việt (Vietnamese) | English Meaning | Ngữ cảnh sử dụng / Description |
+| :--- | :---: | :--- | :--- | :--- |
+| `REGISTER_FROM_ORDER_SUCCESS` | 201 | Đã tạo tài khoản và gắn đơn hàng | Account created and order linked | POST /auth/register/from-order |
+| `ORDER_ACCOUNT_EXISTS` | 409 | Thông tin của đơn đã gắn với một tài khoản Thiên Canh. Vui lòng đăng nhập để xem đơn. | The details on this order already belong to a Thiên Canh account. Please sign in instead. | SĐT đã xác minh / email / Google đã có tài khoản — chỉ báo sau khi OTP đúng |
+| `ORDER_ALREADY_LINKED` | 409 | Đơn này đã thuộc một tài khoản. | This order already belongs to an account. | Tạo tài khoản từ đơn đã gắn tài khoản |
+| `ORDER_LINK_INVALID` | 404 | Link theo dõi đơn không hợp lệ hoặc đã hết hạn. | This order link is invalid or has expired. | Token magic link sai / hết hạn / bị thu hồi |

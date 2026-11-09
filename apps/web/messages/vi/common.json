@@ -4,6 +4,7 @@
   "products": "Sản phẩm",
   "shop": "Cửa hàng",
   "ourStory": "Câu chuyện",
+  "fabrics": "Thư mục vải",
   "blog": "Chuyện Của Lụa & Mây",
   "contact": "Liên hệ",
   "cart": "Giỏ hàng",
@@ -80,6 +81,23 @@
     "cancel": "Huỷ",
     "close": "Đóng"
   },
+  "adminBar": {
+    "label": "Thanh công cụ quản trị",
+    "previewing": "Đang xem cửa hàng",
+    "roles": {
+      "ADMIN": "Quản trị viên",
+      "STAFF": "Nhân viên"
+    },
+    "shortcutsLabel": "Lối tắt quản trị",
+    "shortcuts": {
+      "orders": "Đơn hàng",
+      "tailoring": "Xưởng may",
+      "products": "Sản phẩm",
+      "inventory": "Kho"
+    },
+    "openDashboard": "Trang quản trị",
+    "openDashboardShort": "Quản trị"
+  },
   "adminDashboard": "Về trang quản trị",
   "mediaUploader": {
     "dropTitle": "Thêm ảnh hoặc video thực tế",
@@ -117,5 +135,10 @@
     "suggestions": "Bạn có thể ghé",
     "metaTitle": "Không có quyền truy cập — Thiên Canh"
   },
-  "notifications": "Thông báo"
+  "notifications": "Thông báo",
+  "mobileMenu": {
+    "open": "Mở menu điều hướng",
+    "nav": "Điều hướng",
+    "admin": "Về trang quản trị"
+  }
 }

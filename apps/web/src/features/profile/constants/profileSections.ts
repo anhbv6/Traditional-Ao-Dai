@@ -1,6 +1,6 @@
-import { CreditCard, MapPin, Package, Settings, ShieldCheck, UserRound, type LucideIcon } from "lucide-react";
+import { CreditCard, Settings, ShieldCheck, UserRound, type LucideIcon } from "lucide-react";
 
-export type ProfileSectionId = "personal" | "orders" | "address" | "payment" | "security" | "setting";
+export type ProfileSectionId = "personal" | "payment" | "security" | "setting";
 
 export interface ProfileSectionConfig {
   id: ProfileSectionId;
@@ -9,11 +9,12 @@ export interface ProfileSectionConfig {
   icon: LucideIcon;
 }
 
-/** Thứ tự mục trong menu tài khoản. Nhãn: ProfilePage.tabs.<id>, mô tả: ProfilePage.<id>.subtitle */
+/**
+ * Thứ tự mục trong menu tài khoản. Nhãn: ProfilePage.tabs.<id>, mô tả: ProfilePage.<id>.subtitle.
+ * Đơn hàng + Sổ địa chỉ đã tách sang màn riêng /my-orders (ProfileShell chỉ đặt một liên kết sang đó).
+ */
 export const PROFILE_SECTIONS: readonly ProfileSectionConfig[] = [
   { id: "personal", href: "/profile", icon: UserRound },
-  { id: "orders", href: "/profile/orders", icon: Package },
-  { id: "address", href: "/profile/addresses", icon: MapPin },
   { id: "payment", href: "/profile/payment", icon: CreditCard },
   { id: "security", href: "/profile/security", icon: ShieldCheck },
   { id: "setting", href: "/profile/settings", icon: Settings },

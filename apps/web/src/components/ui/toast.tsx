@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { usePathname } from "next/navigation"
 import { Toast as ToastPrimitive } from "@base-ui/react/toast"
 
 import { cn } from "@/lib/utils"
@@ -41,10 +42,10 @@ function resolveClassName<T>(
 }
 
 /**
- * Vùng hiện toast (góc trên bên phải):
- * - Trang CÓ header dính: nằm ngay dưới header — `HeaderHeightSync` gắn `data-site-header` lên <html> và ghi chiều cao
+ * Vùng hiện toast (góc trên bên phải). Vị trí / bề rộng riêng của từng khu truyền qua `className` (xem AREA_CLASS):
+ * - Storefront CÓ header dính: nằm ngay dưới header — `HeaderHeightSync` gắn `data-site-header` lên <html> và ghi chiều cao
  *   thật vào `--site-header-h`, nên không che logo / giỏ hàng / nút đăng nhập dù header đổi cao theo breakpoint.
- * - Trang KHÔNG có header (đăng nhập, 403…): sát góc trên như thông thường.
+ * - Trang KHÔNG có header (đăng nhập, 403…) và khu admin: sát góc trên như thông thường.
  */
 function ToastViewport({ className, ...props }: ToastPrimitive.Viewport.Props) {
   return (
@@ -52,8 +53,7 @@ function ToastViewport({ className, ...props }: ToastPrimitive.Viewport.Props) {
       data-slot="toast-viewport"
       className={(state) =>
         cn(
-          "pointer-events-none fixed inset-x-3 top-3 z-[9999] outline-none sm:left-auto sm:right-6 sm:top-5 sm:w-[22rem]",
-          "[html[data-site-header]_&]:top-[calc(var(--site-header-h)+0.75rem)]",
+          "pointer-events-none fixed inset-x-3 top-3 z-[9999] outline-none sm:left-auto sm:right-6 sm:top-5",
           resolveClassName(className, state)
         )
       }
@@ -68,7 +68,7 @@ function Toast({ className, ...props }: ToastPrimitive.Root.Props) {
       data-slot="toast"
       className={(state) =>
         cn(
-          "group/toast pointer-events-auto absolute right-0 top-0 z-[calc(1000-var(--toast-index))] w-full origin-top overflow-hidden border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-main)] shadow-[0_14px_36px_-18px_rgba(42,37,37,0.32)] outline-none select-none",
+          "group/toast pointer-events-auto absolute right-0 top-0 z-[calc(1000-var(--toast-index))] w-full origin-top overflow-hidden outline-none select-none",
           "[--gap:0.5rem] [--height:var(--toast-frontmost-height,var(--toast-height))] [--offset-y:calc(var(--toast-offset-y)*1+calc(var(--toast-index)*var(--gap)*1)+var(--toast-swipe-movement-y))] [--peek:0.75rem] [--scale:calc(max(0,1-(var(--toast-index)*0.1)))] [--shrink:calc(1-var(--scale))]",
           "h-(--height) [transform:translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)+(var(--toast-index)*var(--peek))+(var(--shrink)*var(--height))))_scale(var(--scale))] [transition:transform_400ms_cubic-bezier(0.22,1,0.36,1),opacity_400ms,height_150ms]",
           "after:absolute after:top-full after:left-0 after:h-[calc(var(--gap)+1px)] after:w-full after:content-['']",
@@ -97,10 +97,7 @@ function ToastContent({ className, ...props }: ToastPrimitive.Content.Props) {
     <ToastPrimitive.Content
       data-slot="toast-content"
       className={(state) =>
-        cn(
-          "flex h-full items-start gap-3 overflow-hidden py-3 pl-4 pr-2",
-          resolveClassName(className, state)
-        )
+        cn("flex h-full items-start gap-3 overflow-hidden", resolveClassName(className, state))
       }
       {...props}
     />
@@ -112,7 +109,7 @@ function ToastTitle({ className, ...props }: ToastPrimitive.Title.Props) {
     <ToastPrimitive.Title
       data-slot="toast-title"
       className={(state) =>
-        cn("text-[13px] font-semibold leading-5 text-[var(--text-main)]", resolveClassName(className, state))
+        cn("leading-5", resolveClassName(className, state))
       }
       {...props}
     />
@@ -127,7 +124,7 @@ function ToastDescription({
     <ToastPrimitive.Description
       data-slot="toast-description"
       className={(state) =>
-        cn("text-xs leading-5 text-[var(--text-light)]", resolveClassName(className, state))
+        cn("mt-0.5 text-[13px] leading-5", resolveClassName(className, state))
       }
       {...props}
     />
@@ -141,7 +138,7 @@ function ToastAction({ className, ...props }: ToastPrimitive.Action.Props) {
       data-slot="toast-action"
       className={(state) =>
         cn(
-          "-my-0.5 inline-flex h-7 shrink-0 cursor-pointer items-center gap-1 px-2 text-[11px] font-semibold uppercase tracking-[1.5px] text-[var(--primary-ink)] transition-colors hover:bg-[var(--bg-secondary)]",
+          "inline-flex h-7 shrink-0 cursor-pointer items-center gap-1 px-2 transition-colors",
           resolveClassName(className, state)
         )
       }
@@ -163,7 +160,7 @@ function ToastClose({
       render={render}
       className={(state) =>
         cn(
-          "relative -my-0.5 size-7 shrink-0 rounded-none text-[var(--text-light)] transition-colors hover:bg-transparent hover:text-[var(--text-main)] after:absolute after:-inset-1 after:content-['']",
+          "relative size-7 shrink-0 transition-colors after:absolute after:-inset-1 after:content-['']",
           resolveClassName(className, state)
         )
       }
@@ -176,51 +173,114 @@ function ToastClose({
   )
 }
 
-/** Biểu tượng + màu nhấn theo loại thông báo — tông trầm, chỉ icon và vạch trái có màu (không tô cả nền) */
-const TOAST_TONES: Record<string, { icon: React.ComponentType<{ className?: string }>; color: string; bar: string }> = {
-  success: { icon: CircleCheckIcon, color: "text-emerald-700 dark:text-emerald-400", bar: "bg-emerald-700/70 dark:bg-emerald-400/70" },
-  info: { icon: InfoIcon, color: "text-[var(--primary-ink)]", bar: "bg-[var(--primary-color)]/60" },
-  warning: { icon: TriangleAlertIcon, color: "text-amber-700 dark:text-amber-400", bar: "bg-amber-600/70" },
-  error: { icon: OctagonXIcon, color: "text-[var(--destructive)]", bar: "bg-[var(--destructive)]/70" },
-  loading: { icon: Loader2Icon, color: "text-[var(--text-light)]", bar: "bg-[var(--border)]" },
-  undo: { icon: Undo2Icon, color: "text-[var(--text-light)]", bar: "bg-[var(--text-light)]/40" },
+type ToastArea = "store" | "admin"
+
+const TOAST_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  success: CircleCheckIcon,
+  info: InfoIcon,
+  warning: TriangleAlertIcon,
+  error: OctagonXIcon,
+  loading: Loader2Icon,
+  undo: Undo2Icon,
 }
 
-function ToastIcon({ type }: { type: string | undefined }) {
-  const tone = TOAST_TONES[type ?? ""]
-  if (!tone) return null
-  const Icon = tone.icon
+/**
+ * Màu theo loại thông báo, riêng cho từng khu:
+ * - store: tông thương hiệu (đỏ đô cho thông tin), icon nằm trong vòng tròn nền nhạt, vạch đếm ngược cùng màu.
+ * - admin: đơn sắc — chỉ icon mang màu ngữ nghĩa (emerald / amber / rose), theo AGENTS.md §8.
+ */
+const TONES: Record<ToastArea, Record<string, { icon: string; badge?: string; bar: string }>> = {
+  store: {
+    success: { icon: "text-emerald-700 dark:text-emerald-400", badge: "bg-emerald-700/10 dark:bg-emerald-400/15", bar: "bg-emerald-700/60 dark:bg-emerald-400/60" },
+    info: { icon: "text-[var(--primary-ink)]", badge: "bg-[var(--primary-color)]/10", bar: "bg-[var(--primary-color)]/50" },
+    warning: { icon: "text-amber-700 dark:text-amber-400", badge: "bg-amber-600/12 dark:bg-amber-400/15", bar: "bg-amber-600/60" },
+    error: { icon: "text-[var(--destructive)]", badge: "bg-[var(--destructive)]/10", bar: "bg-[var(--destructive)]/60" },
+    loading: { icon: "text-[var(--text-light)]", badge: "bg-[var(--bg-secondary)]", bar: "bg-[var(--border)]" },
+    undo: { icon: "text-[var(--primary-ink)]", badge: "bg-[var(--primary-color)]/10", bar: "bg-[var(--primary-color)]/50" },
+  },
+  admin: {
+    success: { icon: "text-emerald-600", bar: "bg-emerald-500/50" },
+    info: { icon: "text-[#09090B]", bar: "bg-[#18181B]/25" },
+    warning: { icon: "text-amber-600", bar: "bg-amber-500/50" },
+    error: { icon: "text-rose-600", bar: "bg-rose-500/50" },
+    loading: { icon: "text-[#71717A]", bar: "bg-[#E4E4E7]" },
+    undo: { icon: "text-[#71717A]", bar: "bg-[#18181B]/25" },
+  },
+}
 
+/** Kiểu từng phần của thẻ thông báo theo khu */
+const AREA_CLASS: Record<
+  ToastArea,
+  { viewport: string; root: string; content: string; title: string; description: string; action: string; close: string }
+> = {
+  store: {
+    viewport: "sm:w-[23rem] [html[data-site-header]_&]:top-[calc(var(--site-header-h)+0.75rem)]",
+    root: "border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-main)] shadow-[0_20px_44px_-22px_rgba(80,10,28,0.45)]",
+    content: "items-center gap-3.5 px-4 py-3.5",
+    title: "text-sm font-semibold text-[var(--text-main)]",
+    description: "text-[var(--text-light)]",
+    action:
+      "-ml-2 mt-1.5 self-start text-[11px] font-semibold uppercase tracking-[1.5px] text-[var(--primary-ink)] hover:bg-[var(--bg-secondary)]",
+    close: "-mr-1.5 rounded-none text-[var(--text-light)] hover:bg-transparent hover:text-[var(--primary-ink)]",
+  },
+  admin: {
+    viewport: "sm:right-5 sm:top-5 sm:w-[22rem]",
+    root: "admin-shell rounded-xl border border-[#E4E4E7] bg-white font-[family-name:var(--font-admin)] text-[#09090B] shadow-[0_12px_32px_-12px_rgba(9,9,11,0.22)]",
+    content: "items-center p-3.5 pr-2.5",
+    title: "text-sm font-medium text-[#09090B]",
+    description: "text-[#71717A]",
+    action: "-ml-2 mt-1.5 self-start rounded-md text-xs font-medium text-[#09090B] hover:bg-[#F4F4F5]",
+    close: "rounded-md text-[#71717A] hover:bg-[#F4F4F5] hover:text-[#09090B]",
+  },
+}
+
+function ToastIcon({ type, area }: { type: string | undefined; area: ToastArea }) {
+  const Icon = TOAST_ICONS[type ?? ""]
+  const tone = TONES[area][type ?? ""]
+  if (!Icon || !tone) return null
+  const spin = type === "loading" && "animate-spin"
+
+  if (area === "admin") {
+    return (
+      <span data-slot="toast-icon" className="flex h-5 shrink-0 items-center">
+        <Icon className={cn("size-[18px]", tone.icon, spin)} aria-hidden="true" />
+      </span>
+    )
+  }
   return (
-    <span data-slot="toast-icon" className="flex h-5 shrink-0 items-center">
-      <Icon className={cn("size-4", tone.color, type === "loading" && "animate-spin")} aria-hidden="true" />
+    <span data-slot="toast-icon" className={cn("grid size-9 shrink-0 place-items-center rounded-full", tone.badge)}>
+      <Icon className={cn("size-[18px]", tone.icon, spin)} aria-hidden="true" />
     </span>
   )
 }
 
-function ToastList() {
+function ToastList({ area }: { area: ToastArea }) {
   const { toasts } = ToastPrimitive.useToastManager()
+  const styles = AREA_CLASS[area]
 
   return toasts.map((toastItem) => {
-    const tone = TOAST_TONES[toastItem.type ?? ""]
+    const tone = TONES[area][toastItem.type ?? ""]
     return (
-      <Toast key={toastItem.id} toast={toastItem}>
-        {/* Vạch màu mảnh bên trái cho biết loại thông báo */}
-        {tone ? <span aria-hidden="true" className={cn("absolute inset-y-0 left-0 w-0.5", tone.bar)} /> : null}
-        <ToastContent>
-          <ToastIcon type={toastItem.type} />
+      <Toast key={toastItem.id} toast={toastItem} className={styles.root}>
+        <ToastContent className={styles.content}>
+          <ToastIcon type={toastItem.type} area={area} />
+          {/* Nút hành động (Hoàn tác) nằm dưới nội dung — chữ được trọn bề rộng, không bị bóp thành nhiều dòng */}
           <div className="flex min-w-0 flex-1 flex-col select-none">
-            {toastItem.title && <ToastTitle />}
-            {toastItem.description && <ToastDescription />}
+            {toastItem.title && <ToastTitle className={styles.title} />}
+            {toastItem.description && <ToastDescription className={styles.description} />}
+            {toastItem.actionProps ? <ToastAction className={styles.action} /> : null}
           </div>
-          {toastItem.actionProps ? <ToastAction /> : null}
-          <ToastClose />
+          <ToastClose className={styles.close} />
         </ToastContent>
-        {/* Thông báo có hoàn tác: vạch đếm ngược co dần ở đáy (tạm dừng khi rê chuột vào vùng thông báo) */}
-        {toastItem.type === "undo" && toastItem.timeout ? (
+        {/* Vạch đếm ngược co dần ở đáy — chỉ cho thông báo có Hoàn tác (biết còn bao lâu để bấm);
+            tạm dừng khi rê chuột vào vùng thông báo. Thông báo thường giữ tĩnh, gọn. */}
+        {tone && toastItem.timeout && toastItem.type === "undo" ? (
           <span
             aria-hidden="true"
-            className="absolute inset-x-0 bottom-0 h-0.5 origin-left bg-[var(--primary-color)]/40 [[data-slot=toast-viewport]:hover_&]:[animation-play-state:paused]"
+            className={cn(
+              "absolute inset-x-0 bottom-0 h-0.5 origin-left [[data-slot=toast-viewport]:hover_&]:[animation-play-state:paused]",
+              tone.bar
+            )}
             style={{ animation: `progress-fill ${toastItem.timeout}ms linear reverse forwards` }}
           />
         ) : null}
@@ -229,17 +289,23 @@ function ToastList() {
   })
 }
 
+/** Khu quản trị: `/admin` hoặc `/<locale>/admin/...` */
+const ADMIN_PATH = /^\/(?:[a-z]{2}\/)?admin(?:\/|$)/
+
 function Toaster({
   children,
   toastManager = toast,
   ...props
 }: ToastPrimitive.Provider.Props) {
+  // Toast gắn vào <body> qua portal (nằm ngoài khung .admin-shell) nên chọn kiểu theo đường dẫn hiện tại
+  const area: ToastArea = ADMIN_PATH.test(usePathname() ?? "") ? "admin" : "store"
+
   return (
     <ToastProvider toastManager={toastManager} {...props}>
       {children}
       <ToastPortal>
-        <ToastViewport>
-          <ToastList />
+        <ToastViewport className={AREA_CLASS[area].viewport}>
+          <ToastList area={area} />
         </ToastViewport>
       </ToastPortal>
     </ToastProvider>

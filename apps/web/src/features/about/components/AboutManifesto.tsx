@@ -18,32 +18,47 @@ export function AboutManifesto() {
   const words = t("text").split(" ");
 
   return (
-    <section className={containerClassName({ spacing: 'section', className: 'grid gap-6 lg:grid-cols-[80px_1fr] lg:gap-10' })}>
-      <p className="text-[11px] font-semibold uppercase tracking-[3px] text-[var(--accent-color)] lg:mt-3 lg:[writing-mode:vertical-rl] lg:rotate-180">
-        {t("eyebrow")}
-      </p>
+    <section className="bg-(--bg-secondary)">
+      <div
+        className={containerClassName({
+          spacing: "section",
+          className: "grid gap-6 lg:grid-cols-[80px_1fr] lg:gap-10",
+        })}
+      >
+        <p className="text-[11px] font-semibold uppercase tracking-[3px] text-[var(--accent-color)] lg:mt-3 lg:[writing-mode:vertical-rl] lg:rotate-180">
+          {t("eyebrow")}
+        </p>
 
-      <div className="max-w-5xl">
-        <p
-          ref={textRef}
-          className="font-[family-name:var(--font-playfair)] text-[1.625rem] leading-[1.45] text-[var(--primary-ink)] sm:text-[2.375rem] lg:text-[2.875rem]"
-        >
-          {words.map((word, i) => (
-            <Word key={i} progress={scrollYProgress} range={[i / words.length, (i + 1) / words.length]}>
-              {word}
-            </Word>
-          ))}
-        </p>
-        <p className="mt-8 flex items-center gap-4 text-xs uppercase tracking-[2.5px] text-[var(--text-light)]">
-          <span aria-hidden="true" className="h-px w-12 bg-[var(--accent-color)]" />
-          {t("author")}
-        </p>
+        <div className="max-w-5xl">
+          <p
+            ref={textRef}
+            className="font-[family-name:var(--font-playfair)] text-[1.5rem] leading-[1.45] text-[var(--primary-ink)] sm:text-[2.125rem] lg:text-[2.5rem]"
+          >
+            {words.map((word, i) => (
+              <Word key={i} progress={scrollYProgress} range={[i / words.length, (i + 1) / words.length]}>
+                {word}
+              </Word>
+            ))}
+          </p>
+          <p className="mt-8 flex items-center gap-4 text-xs uppercase tracking-[2.5px] text-[var(--text-light)]">
+            <span aria-hidden="true" className="h-px w-12 bg-[var(--accent-color)]" />
+            {t("author")}
+          </p>
+        </div>
       </div>
     </section>
   );
 }
 
-function Word({ children, progress, range }: { children: string; progress: MotionValue<number>; range: [number, number] }) {
+function Word({
+  children,
+  progress,
+  range,
+}: {
+  children: string;
+  progress: MotionValue<number>;
+  range: [number, number];
+}) {
   const opacity = useTransform(progress, range, [0.15, 1]);
   return (
     <motion.span style={{ opacity }} className="motion-reduce:opacity-100!">

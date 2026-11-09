@@ -16,6 +16,7 @@ import {
   type SendRegisterEmailCodeInput,
   type VerifyResetPasswordEmailInput,
   type VerifyResetPasswordPhoneInput,
+  type RegisterFromOrderInput,
 } from '../auth.schema'
 import { durationToMs } from '../../../core/utils/time'
 import { normalizeVietnamPhone } from '../../../core/utils/phone'
@@ -26,6 +27,7 @@ import { redis } from '../../../infra/redis'
 import { assertRateLimit } from '../../../core/security/rateLimit'
 import { issueVerificationCode, verifyVerificationCode } from '../../../core/security/verificationCode'
 import { cleanupUserSessions, hashToken, revokeAllUserSessions } from '../../../core/security/session'
+import { resolveOrderAccessToken } from '../../../core/security/orderAccess'
 
 const SESSION_REFRESH_EXPIRES_IN = '24h'
 const REMEMBER_REFRESH_EXPIRES_IN = '7d'
@@ -720,4 +722,114 @@ export async function resetPasswordByPhone(input: ResetPasswordPhoneInput['body'
   }
 
   await applyNewPassword(user.id, password)
+}
+
+// ─── Tạo tài khoản từ đơn khách vãng lai ───────────────────────────────────────
+
+/**
+ * Trang cảm ơn: khách vãng lai tạo tài khoản từ dữ liệu đơn (tên, SĐT, email, địa chỉ, số đo) và đơn được gắn vào tài khoản.
+ * - Sở hữu SĐT chứng minh bằng OTP gửi tới SĐT của đơn (purpose ORDER_CLAIM, gắn orderId) → SĐT được xác minh.
+ * - Chỉ kiểm tra trùng tài khoản SAU khi OTP đúng: người lạ không dùng endpoint này để dò email / SĐT.
+ *   Trùng (SĐT đã xác minh ở tài khoản khác, email đã có tài khoản, Google đã liên kết) → ORDER_ACCOUNT_EXISTS (mời đăng nhập),
+ *   không nói rõ trùng trường nào.
+ * - Mật khẩu: email lấy từ đơn nhưng CHƯA xác minh (xác minh sau ở hồ sơ). Google: email = email Google (đã xác minh).
+ */
+/** Nhiều bảng lồng nhau + DB từ xa (Neon) → nới thời gian transaction (mặc định 5 giây) */
+const ORDER_TX_OPTIONS = { maxWait: 10_000, timeout: 20_000 }
+
+export async function registerFromOrder(input: RegisterFromOrderInput['body'], meta: SessionMeta) {
+  const orderId = await resolveOrderAccessToken(input.token)
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+    include: { items: { where: { isCustomFit: true }, orderBy: { createdAt: 'asc' }, take: 1 } },
+  })
+  if (!order) throw new AppError(404, 'ORDER_LINK_INVALID')
+  if (order.userId) throw new AppError(409, 'ORDER_ALREADY_LINKED')
+
+  const phone = normalizeVietnamPhone(order.customerPhone)
+  if (!phone) throw new AppError(400, 'INVALID_PHONE_NUMBER')
+
+  await verifyOtp(phone, 'ORDER_CLAIM', input.code, order.id)
+
+  const google = input.method === 'google' ? await verifyGoogleCredential(input.credential) : null
+  const email = google ? google.email : normalizeEmail(order.customerEmail)
+
+  const [phoneHolder, emailHolder, linkedGoogle] = await Promise.all([
+    prisma.user.findUnique({ where: { phone }, select: { id: true, phoneVerifiedAt: true } }),
+    prisma.user.findUnique({ where: { email }, select: { id: true } }),
+    google
+      ? prisma.socialAccount.findUnique({
+          where: { provider_providerUserId: { provider: 'GOOGLE', providerUserId: google.sub } },
+          select: { id: true },
+        })
+      : null,
+  ])
+  if (phoneHolder?.phoneVerifiedAt || emailHolder || linkedGoogle) {
+    throw new AppError(409, 'ORDER_ACCOUNT_EXISTS')
+  }
+
+  const now = new Date()
+  const passwordHash = input.method === 'password' ? await hashPassword(input.password) : null
+  const detail = order.shippingDetail as { province?: string; district?: string; ward?: string; addressLine?: string } | null
+  const item = order.items[0]
+
+  const user = await prisma.$transaction(async (tx) => {
+    // Người vừa chứng minh sở hữu SĐT bằng OTP được nhận số: gỡ SĐT chưa xác minh khỏi tài khoản cũ (cùng luật đăng ký)
+    if (phoneHolder) await tx.user.update({ where: { id: phoneHolder.id }, data: { phone: null } })
+
+    const created = await tx.user.create({
+      data: {
+        name: order.customerName,
+        phone,
+        phoneVerifiedAt: now,
+        email,
+        emailVerifiedAt: google ? now : null,
+        passwordHash,
+        passwordChangedAt: passwordHash ? now : null,
+        avatarUrl: google?.picture ?? null,
+        socialAccounts: google
+          ? { create: { provider: 'GOOGLE', providerUserId: google.sub, email: google.email } }
+          : undefined,
+        addresses: {
+          create: {
+            receiverName: order.customerName,
+            receiverPhone: phone,
+            addressLine: detail?.addressLine ?? order.shippingAddress,
+            provinceName: detail?.province ?? null,
+            districtName: detail?.district ?? null,
+            wardName: detail?.ward ?? null,
+            isDefault: true,
+          },
+        },
+        measurements: item
+          ? {
+              create: {
+                profileName: order.customerName,
+                isDefault: true,
+                height: item.height,
+                weight: item.weight,
+                bust: item.bust,
+                waist: item.waist,
+                hips: item.hips,
+                shoulder: item.shoulder,
+                armLength: item.armLength,
+                armpit: item.armpit,
+                neck: item.neck,
+                shirtLength: item.shirtLength,
+                pantsLength: item.pantsLength,
+                thigh: item.thigh,
+                note: item.customNote,
+              },
+            }
+          : undefined,
+      },
+    })
+
+    // Chỉ gắn khi đơn vẫn chưa thuộc ai (chống hai yêu cầu song song)
+    const linked = await tx.order.updateMany({ where: { id: order.id, userId: null }, data: { userId: created.id } })
+    if (linked.count === 0) throw new AppError(409, 'ORDER_ALREADY_LINKED')
+    return created
+  }, ORDER_TX_OPTIONS)
+
+  return createStoreSession(user, meta, true)
 }

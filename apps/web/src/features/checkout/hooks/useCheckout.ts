@@ -3,22 +3,23 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import { useLocale, useTranslations } from "next-intl";
 import { useLenis } from "lenis/react";
 import { type Locale } from "@repo/shared";
-import { calculateCartTotals, useCartHydrated, useCartStore } from "@/features/cart";
-import { shippingSchema } from "../validations/checkout.validation";
 import {
-  CHECKOUT_STEPS,
-  type CheckoutStep,
+  DEPOSIT_PERCENT_DEFAULT,
+  computePrepayAmount,
+  isPaymentMethodAllowed,
   type PaymentMethod,
-  type PlacedOrder,
-  type ShippingData,
-  type ShippingFormInput,
-} from "../types/checkout.types";
-
-/** Thời gian giả lập gửi đơn (chưa có API đặt hàng) — đủ để thấy trạng thái "Đang đặt hàng…" */
-const PLACE_ORDER_DELAY_MS = 900;
+} from "@repo/shared/orders";
+import { calculateCartTotals, useCartHydrated, useCartStore } from "@/features/cart";
+import { clearMeasurementDraft } from "@/features/bespoke";
+import { placeOrderApi, type PlaceOrderPayload } from "@/features/orders";
+import { useNotify } from "@/hooks/useNotify";
+import { useRouter } from "@/i18n/routing";
+import { shippingSchema } from "../validations/checkout.validation";
+import { CHECKOUT_STEPS, type CartItem, type CheckoutStep, type ShippingData, type ShippingFormInput } from "../types/checkout.types";
 
 const EMPTY_SHIPPING: ShippingFormInput = {
   fullName: "",
@@ -31,22 +32,32 @@ const EMPTY_SHIPPING: ShippingFormInput = {
   notes: "",
 };
 
-/** Mã đơn tạm (Backend sẽ cấp khi có API) */
-const createOrderId = () => `AD${Math.floor(100000 + Math.random() * 900000)}`;
+/** Dòng giỏ → dòng gửi API. Chỉ gửi định danh + số đo; giá do server tính lại */
+function toOrderLine(item: CartItem): PlaceOrderPayload["items"][number] {
+  return {
+    productSlug: item.slug,
+    size: item.size,
+    color: item.color,
+    quantity: item.quantity,
+    measurements: item.measurementValues && Object.keys(item.measurementValues).length > 0 ? item.measurementValues : undefined,
+    bespoke: item.bespoke,
+  };
+}
 
 /**
- * Luồng thanh toán 3 bước: Giao hàng → Thanh toán → Xác nhận → (Thành công).
- * - Bước 1 dùng React Hook Form + Zod (validator chung @repo/shared); giá trị giữ nguyên khi qua lại giữa các bước.
- * - Chỉ quay lại được những bước đã hoàn thành (`maxStep`); mỗi lần đổi bước cuộn mượt về đầu trang.
- * - Đặt hàng: khoá nút trong lúc gửi, chụp lại thông tin đơn rồi mới xoá giỏ (màn thành công đọc từ ảnh chụp).
- * - Tổng tiền dùng chung công thức với giỏ hàng (kể cả mã giảm giá đã áp dụng). Backend tính lại khi có API.
+ * Luồng thanh toán 3 bước: Giao hàng → Thanh toán → Xác nhận → trang cảm ơn.
+ * - Đơn có món may đo: KHÔNG có COD 100% — chọn cọc 30–50% (còn lại COD) hoặc chuyển khoản toàn bộ qua VietQR.
+ * - Tiền hiển thị ở client chỉ để xem trước; API tính lại toàn bộ khi đặt. Mã giảm giá demo của giỏ không được áp khi đặt online.
+ * - Đặt xong: xoá giỏ + nháp số đo rồi chuyển sang `/checkout/thank-you?token=…` (F5 vẫn xem lại được đơn).
  */
 export function useCheckout() {
   const t = useTranslations("CheckoutPage");
   const locale = useLocale() as Locale;
   const lenis = useLenis();
+  const router = useRouter();
+  const notify = useNotify();
   const cartItems = useCartStore((state) => state.items);
-  const discount = useCartStore((state) => state.discount);
+  const cartDiscount = useCartStore((state) => state.discount);
   const isLoaded = useCartHydrated();
 
   const [step, setStep] = useState<CheckoutStep>("shipping");
@@ -55,10 +66,8 @@ export function useCheckout() {
   /** Hướng đổi bước gần nhất: 1 = tiến, -1 = lùi — khung bước trượt vào từ phía tương ứng */
   const [direction, setDirection] = useState<1 | -1>(1);
   const [shipping, setShipping] = useState<ShippingData | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cod");
-  const [orderId, setOrderId] = useState("");
-  const [isPlacing, setIsPlacing] = useState(false);
-  const [placedOrder, setPlacedOrder] = useState<PlacedOrder | null>(null);
+  const [selectedMethod, setPaymentMethod] = useState<PaymentMethod>("COD");
+  const [depositPercent, setDepositPercent] = useState(DEPOSIT_PERCENT_DEFAULT);
 
   const shippingForm = useForm<ShippingFormInput, unknown, ShippingData>({
     resolver: zodResolver(shippingSchema),
@@ -67,8 +76,16 @@ export function useCheckout() {
     defaultValues: EMPTY_SHIPPING,
   });
 
-  const totals = calculateCartTotals(cartItems, discount);
-  const hasCustomItems = cartItems.some((item) => Boolean(item.measurements));
+  // Không áp mã giảm giá demo: số tiền xem trước phải khớp số server tính
+  const totals = calculateCartTotals(cartItems, null);
+  const hasCustomItems = cartItems.some((item) => Boolean(item.measurements || item.bespoke));
+  // Đơn may đo mà đang chọn COD (VD vừa thêm món may đo) → tự chuyển sang cọc, không lưu state thừa
+  const paymentMethod: PaymentMethod = isPaymentMethodAllowed(selectedMethod, hasCustomItems)
+    ? selectedMethod === "DEPOSIT" && !hasCustomItems
+      ? "COD"
+      : selectedMethod
+    : "DEPOSIT";
+  const prepayAmount = computePrepayAmount(totals.total, paymentMethod, depositPercent);
 
   const scrollToTop = () => {
     if (lenis) lenis.scrollTo(0, { duration: 0.8 });
@@ -98,22 +115,30 @@ export function useCheckout() {
     unlockAndGo("payment");
   });
 
-  /** Bước 2 → 3: cấp mã đơn tạm để hiện nội dung chuyển khoản ở bước xác nhận */
-  const submitPayment = () => {
-    if (!orderId) setOrderId(createOrderId());
-    unlockAndGo("review");
-  };
+  const submitPayment = () => unlockAndGo("review");
 
-  const placeOrder = async () => {
-    if (!shipping || isPlacing) return;
-    setIsPlacing(true);
-    await new Promise((resolve) => setTimeout(resolve, PLACE_ORDER_DELAY_MS));
+  const placeMutation = useMutation({
+    mutationFn: (data: ShippingData) =>
+      placeOrderApi({
+        customer: { fullName: data.fullName, phone: data.phone, email: data.email },
+        shipping: { province: data.province, district: data.district, ward: data.ward, addressLine: data.address },
+        note: data.notes || undefined,
+        items: cartItems.map(toOrderLine),
+        paymentMethod,
+        depositPercent: paymentMethod === "DEPOSIT" ? depositPercent : undefined,
+        locale,
+      }),
+    onSuccess: ({ accessToken }) => {
+      useCartStore.getState().clear();
+      clearMeasurementDraft();
+      router.replace({ pathname: "/checkout/thank-you", query: { token: accessToken } });
+    },
+    onError: (error) => notify.error(error, "ORDER_CREATE_FAILED"),
+  });
 
-    // Chụp lại đơn TRƯỚC khi xoá giỏ (mini-cart ở header tự cập nhật vì dùng chung store)
-    setPlacedOrder({ orderId: orderId || createOrderId(), email: shipping.email, total: totals.total, paymentMethod });
-    useCartStore.getState().clear();
-    setIsPlacing(false);
-    scrollToTop();
+  const placeOrder = () => {
+    if (!shipping || placeMutation.isPending || placeMutation.isSuccess) return;
+    placeMutation.mutate(shipping);
   };
 
   return {
@@ -122,7 +147,7 @@ export function useCheckout() {
     isLoaded,
     cartItems,
     totals,
-    discount,
+    hasCartDiscount: cartDiscount !== null,
     hasCustomItems,
     step,
     direction,
@@ -133,11 +158,12 @@ export function useCheckout() {
     submitShipping,
     paymentMethod,
     setPaymentMethod,
+    depositPercent,
+    setDepositPercent,
+    prepayAmount,
     submitPayment,
-    orderId,
-    isPlacing,
+    isPlacing: placeMutation.isPending || placeMutation.isSuccess,
     placeOrder,
-    placedOrder,
   };
 }
 export default useCheckout;

@@ -1,0 +1,163 @@
+{
+  "meta": {
+    "title": "Sửa đồ & Đổi trả | Thiên Canh",
+    "description": "Chỉnh sửa áo dài cho vừa dáng, đổi size, trả hàng và bảo hành đường may tại Thiên Canh — gửi yêu cầu trực tuyến chỉ với mã đơn."
+  },
+  "eyebrow": "Hậu mãi Thiên Canh",
+  "title": "Sửa đồ & Đổi trả",
+  "subtitle": "Tấm áo rời tiệm chưa phải là xong việc. Nếu áo chưa thật vừa, cần đổi size hay có đường may nào lỏng, cứ gửi lại — thợ Thiên Canh sẽ khâu cho tới khi bạn ưng.",
+  "policy": {
+    "window": "Trong {days} ngày",
+    "services": {
+      "ALTERATION": {
+        "title": "Sửa đồ",
+        "short": "Chỉnh eo, ngực, chiều dài tà, tay áo cho vừa dáng",
+        "description": "Bóp eo, nới ngực, lên lai, chỉnh tay áo cho tới khi vừa dáng. Lần chỉnh đầu tiên miễn phí, kể cả áo may đo.",
+        "scope": "Áp dụng: mọi áo dài mua tại tiệm"
+      },
+      "EXCHANGE": {
+        "title": "Đổi size / mẫu",
+        "short": "Đổi sang size, màu hoặc mẫu khác",
+        "description": "Đổi sang size, màu hoặc mẫu khác cùng giá hoặc bù chênh lệch. Tiệm chịu phí gửi lại khi lỗi do tiệm.",
+        "scope": "Áp dụng: áo may sẵn, phụ kiện"
+      },
+      "RETURN": {
+        "title": "Trả hàng",
+        "short": "Hoàn tiền khi áo không đúng mô tả",
+        "description": "Hoàn tiền về tài khoản trong 3–5 ngày làm việc sau khi tiệm nhận và kiểm tra áo.",
+        "scope": "Áp dụng: áo may sẵn, phụ kiện"
+      },
+      "WARRANTY": {
+        "title": "Bảo hành đường may",
+        "short": "Bung chỉ, hỏng khuy / khóa, sút thêu",
+        "description": "Bung chỉ, hỏng khuy, khóa kéo, sút hạt cườm hay đường thêu tay — sửa miễn phí, không cần lý do.",
+        "scope": "Áp dụng: mọi áo, gồm áo may đo"
+      }
+    },
+    "conditionsEyebrow": "Điều kiện chung",
+    "conditionsTitle": "Để yêu cầu được xử lý nhanh",
+    "conditions": {
+      "tags": "Áo đổi / trả còn nguyên mác, chưa giặt, chưa là ủi và không có mùi lạ.",
+      "unworn": "Sửa đồ và bảo hành nhận cả áo đã mặc — chỉ cần áo sạch sẽ.",
+      "receipt": "Thời hạn tính từ ngày nhận hàng; tiệm đối chiếu theo mã đơn, không cần hoá đơn giấy.",
+      "custom": "Áo may đo theo số đo riêng không đổi / trả, nhưng luôn được chỉnh sửa và bảo hành."
+    }
+  },
+  "request": {
+    "eyebrow": "Gửi yêu cầu",
+    "heading": "Ba bước, chưa tới hai phút",
+    "intro": "Nhập mã đơn để tiệm biết tấm áo nào cần chăm sóc — không cần đăng nhập.",
+    "customFit": "May đo",
+    "notForCustomFit": "Không áp dụng cho áo may đo",
+    "notEligible": "Đơn đang ở trạng thái “{status}”. Yêu cầu sửa đồ / đổi trả mở sau khi bạn đã nhận áo.",
+    "lookup": {
+      "title": "Xác minh đơn hàng",
+      "description": "Mã đơn có trong email / SMS xác nhận, dạng TC-YYMM-XXXX.",
+      "orderCode": "Mã đơn",
+      "orderCodePlaceholder": "TC-2611-AB12",
+      "contact": "SĐT hoặc email đặt hàng",
+      "contactPlaceholder": "0909 000 000",
+      "submit": "Tìm đơn",
+      "again": "Tìm lại",
+      "privacyNote": "Thông tin chỉ dùng để xác minh đơn, không hiển thị địa chỉ hay số đo của bạn."
+    },
+    "choose": {
+      "title": "Chọn món & loại yêu cầu",
+      "description": "Mỗi yêu cầu cho một món — cần xử lý nhiều món thì gửi thêm sau.",
+      "item": "Món cần xử lý",
+      "service": "Bạn cần tiệm làm gì?"
+    },
+    "detail": {
+      "title": "Mô tả & cách gửi áo",
+      "description": "Càng cụ thể, thợ càng chuẩn bị đúng — ảnh chụp chỗ cần sửa rất có ích.",
+      "reason": "Lý do",
+      "descriptionLabel": "Mô tả chi tiết",
+      "placeholder": {
+        "ALTERATION": "Ví dụ: eo rộng khoảng 2cm, tà dài hơn mong muốn 3cm…",
+        "EXCHANGE": "Ví dụ: muốn đổi từ size M sang size L, giữ nguyên màu…",
+        "RETURN": "Ví dụ: màu vải thực tế đậm hơn ảnh trên web…",
+        "WARRANTY": "Ví dụ: đường may nách trái bị bung khoảng 3cm…"
+      },
+      "photos": "Ảnh chụp (không bắt buộc)",
+      "handoverLabel": "Cách gửi áo cho tiệm",
+      "submit": "Gửi yêu cầu",
+      "submitting": "Đang gửi…",
+      "responseNote": "Tiệm gọi lại xác nhận trong vòng 24 giờ làm việc."
+    },
+    "handover": {
+      "STORE": {
+        "title": "Mang tới tiệm",
+        "description": "Thợ đo lại và chỉnh ngay tại chỗ nếu kịp — nhanh nhất."
+      },
+      "POST": {
+        "title": "Gửi bưu điện",
+        "description": "Tiệm gửi hướng dẫn đóng gói; phí gửi do tiệm chịu khi lỗi từ tiệm."
+      }
+    }
+  },
+  "reasons": {
+    "ALTERATION": {
+      "TOO_LOOSE": "Áo rộng",
+      "TOO_TIGHT": "Áo chật",
+      "LENGTH": "Chiều dài tà / quần",
+      "SLEEVE": "Tay áo",
+      "OTHER": "Khác"
+    },
+    "EXCHANGE": {
+      "WRONG_SIZE": "Không vừa size",
+      "CHANGE_COLOR": "Đổi màu",
+      "CHANGE_STYLE": "Đổi mẫu",
+      "OTHER": "Khác"
+    },
+    "RETURN": {
+      "NOT_AS_DESCRIBED": "Không đúng mô tả",
+      "WRONG_ITEM": "Giao nhầm sản phẩm",
+      "CHANGED_MIND": "Không còn nhu cầu",
+      "OTHER": "Khác"
+    },
+    "WARRANTY": {
+      "SEAM": "Bung đường may",
+      "BUTTON_ZIP": "Hỏng khuy / khóa",
+      "EMBROIDERY": "Sút thêu / cườm",
+      "FABRIC_DEFECT": "Lỗi vải",
+      "OTHER": "Khác"
+    }
+  },
+  "process": {
+    "title": "Tiệm xử lý thế nào",
+    "steps": {
+      "SUBMIT": {
+        "title": "Gửi yêu cầu",
+        "description": "Bạn nhận mã yêu cầu ngay sau khi gửi."
+      },
+      "CONFIRM": {
+        "title": "Tiệm gọi xác nhận",
+        "description": "Trong 24 giờ làm việc, thợ hỏi thêm chi tiết và hẹn lịch."
+      },
+      "HANDOVER": {
+        "title": "Gửi áo cho tiệm",
+        "description": "Mang tới showroom hoặc gửi bưu điện theo hướng dẫn."
+      },
+      "DONE": {
+        "title": "Hoàn tất & gửi trả",
+        "description": "Sửa đồ 3–5 ngày; đổi / hoàn tiền sau khi kiểm tra áo."
+      }
+    }
+  },
+  "help": {
+    "description": "Không tìm thấy mã đơn, hay muốn hỏi trước khi gửi? Nhắn cho tiệm nhé.",
+    "contact": "Gửi lời nhắn",
+    "hotline": "Gọi 0909 000 000",
+    "hotlineValue": "0909000000"
+  },
+  "success": {
+    "title": "Tiệm đã nhận yêu cầu của bạn",
+    "description": "Thợ Thiên Canh sẽ gọi lại trong vòng 24 giờ làm việc để xác nhận và hẹn lịch nhận áo. Hãy giữ mã yêu cầu bên dưới.",
+    "requestCode": "Mã yêu cầu",
+    "orderCode": "Mã đơn",
+    "item": "Món",
+    "service": "Loại yêu cầu",
+    "another": "Gửi yêu cầu khác",
+    "continueShopping": "Tiếp tục mua sắm"
+  }
+}

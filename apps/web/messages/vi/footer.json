@@ -23,7 +23,8 @@
   "customerCare": {
     "title": "Hỗ trợ khách hàng",
     "sizeGuide": "Hướng dẫn chọn size / Bảng số đo chuẩn",
-    "returnPolicy": "Chính sách đổi trả & Bảo hành đường may",
+    "fabrics": "Thư mục vải của tiệm",
+    "returnPolicy": "Sửa đồ, đổi trả & Bảo hành đường may",
     "customFit": "Chính sách may đo theo yêu cầu",
     "careGuide": "Hướng dẫn giặt & Bảo quản áo dài"
   },

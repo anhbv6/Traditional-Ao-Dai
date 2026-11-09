@@ -1,7 +1,9 @@
 import { type ActiveDiscount, type CartItem, type CartTotals } from "../types/cart.types";
 
-/** Phí vận chuyển tiêu chuẩn — chỉ miễn phí khi áp mã FREESHIP (không còn ngưỡng theo giá trị đơn) */
-export const STANDARD_SHIPPING_FEE = 30_000;
+import { STANDARD_SHIPPING_FEE } from "@repo/shared/orders";
+
+/** Phí vận chuyển tiêu chuẩn — cùng giá trị API dùng khi tính lại đơn */
+export { STANDARD_SHIPPING_FEE };
 /**
  * Số lượng tối đa cho một dòng giỏ hàng (chống đặt nhầm số lượng lớn).
  * Tồn kho thật phải được Backend kiểm tra lại khi tạo đơn.

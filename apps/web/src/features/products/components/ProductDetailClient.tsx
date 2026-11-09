@@ -54,7 +54,7 @@ export function ProductDetailClient({
 
   return (
     <>
-      <div className="grid gap-10 lg:grid-cols-[minmax(0,0.85fr)_minmax(380px,1fr)] lg:gap-12">
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(360px,1fr)] lg:gap-12 xl:gap-16">
         {/* Gallery Section */}
         <ProductGallery
           galleryImages={galleryImages}

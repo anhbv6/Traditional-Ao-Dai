@@ -1,12 +1,12 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { type MockArticle } from "../../types/news.types";
 import { NEWS_BLOCK_TITLE_CLASS } from "./newsBlock";
+import { NewsCard } from "../NewsCard";
 
 interface RelatedNewsSidebarProps {
   articles: MockArticle[];
@@ -27,28 +27,7 @@ export function RelatedNewsSidebar({ articles, loc }: RelatedNewsSidebarProps) {
       <ul className="divide-y divide-[var(--border)]">
         {articles.map((article) => (
           <li key={article.id}>
-            <Link href={`/news/${article.slug}`} className="group flex gap-3.5 py-4">
-              <span className="relative aspect-[4/3] w-24 shrink-0 overflow-hidden bg-[var(--bg-secondary)]">
-                <Image
-                  src={article.imageSrc}
-                  alt=""
-                  fill
-                  sizes="96px"
-                  className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110"
-                />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block text-[10px] font-semibold uppercase tracking-[2px] text-[var(--primary-ink)]">
-                  {article.category[loc]}
-                </span>
-                <span className="mt-1 line-clamp-2 text-[14px] font-semibold leading-snug text-[var(--text-main)] transition-colors group-hover:text-[var(--primary-ink)]">
-                  {article.title[loc]}
-                </span>
-                <span className="mt-1.5 block text-[11px] text-[var(--text-light)]">
-                  {article.dateShort[loc]} · {article.readTime[loc]}
-                </span>
-              </span>
-            </Link>
+            <NewsCard variant="compact" article={article} locale={loc} className="py-4" />
           </li>
         ))}
       </ul>

@@ -1,14 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocale, useTranslations } from "next-intl";
 import { useLenis } from "lenis/react";
 import { type Locale } from "@repo/shared";
+import { type OrderMeasurements } from "@repo/shared/orders";
 import { useCartStore } from "@/features/cart";
 import { showToast } from "@/components/ui/toast";
 import {
+  BESPOKE_MEASUREMENT_TO_ORDER_KEY,
   COLORS,
   DEFAULT_CONFIG,
   MEASUREMENT_FIELDS,
@@ -19,6 +21,7 @@ import {
 } from "../constants/bespokeOptions";
 import { quoteBespoke } from "../utils/pricing";
 import { measurementsSchema, type MeasurementsInput } from "../validations/bespoke.validation";
+import { useMeasurementDraftStore } from "../store/measurementDraftStore";
 
 const EMPTY_MEASUREMENTS = Object.fromEntries(MEASUREMENT_FIELDS.map((field) => [field.id, ""])) as MeasurementsInput;
 
@@ -49,8 +52,26 @@ export function useBespoke() {
 
   const quote = quoteBespoke(config);
 
-  const setOption = <K extends keyof BespokeConfig>(key: K, value: BespokeConfig[K]) =>
+  // Lưu nháp số đo vào localStorage mỗi lần khách gõ (đăng ký theo dõi form, không setState trong effect)
+  useEffect(() => {
+    const { subscribe } = measurementsForm;
+    return subscribe({
+      formState: { values: true },
+      callback: ({ values }) => useMeasurementDraftStore.getState().save(values as Record<string, string>),
+    });
+  }, [measurementsForm]);
+
+  /** Mở "Tự nhập số đo" lần đầu → điền lại số đo nháp đã lưu (F5 không mất) */
+  const restoreDraft = () => {
+    const draft = useMeasurementDraftStore.getState().values;
+    const isEmpty = Object.values(measurementsForm.getValues()).every((value) => !value);
+    if (draft && isEmpty) measurementsForm.reset({ ...EMPTY_MEASUREMENTS, ...draft });
+  };
+
+  const setOption = <K extends keyof BespokeConfig>(key: K, value: BespokeConfig[K]) => {
+    if (key === "measureMode" && value === "custom") restoreDraft();
     setConfig((current) => ({ ...current, [key]: value }));
+  };
 
   /** Chọn dịp mặc → áp bộ gợi ý (giữ nguyên cách lấy số đo / size / thời gian khách đã chọn) */
   const selectOccasion = (occasion: Occasion) =>
@@ -101,6 +122,15 @@ export function useBespoke() {
       measurements = measurementsForm.getValues();
     }
 
+    const measurementValues: OrderMeasurements | undefined = measurements
+      ? Object.fromEntries(
+          MEASUREMENT_FIELDS.map((field) => [
+            BESPOKE_MEASUREMENT_TO_ORDER_KEY[field.id],
+            Number(measurements[field.id].replace(",", ".")),
+          ])
+        )
+      : undefined;
+
     const styleLabel = t(`options.style.${config.style}.label`);
     useCartStore.getState().addItem({
       name: t("cart.name", { style: styleLabel }),
@@ -111,6 +141,8 @@ export function useBespoke() {
       color: t(`options.color.${config.color}`),
       size: config.measureMode === "standard" ? config.size : t("summary.customMeasurements"),
       measurements: describe(measurements),
+      measurementValues,
+      bespoke: config,
     });
     showToast.success(t("cart.added"), `${styleLabel} · ${t(`options.fabric.${config.fabric}.label`)}`);
   };

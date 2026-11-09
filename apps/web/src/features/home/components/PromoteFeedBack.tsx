@@ -59,12 +59,16 @@ export function PromoteFeedBack() {
         onMouseLeave={() => setIsHovering(false)}
         onFocus={() => setIsHovering(true)}
         onBlur={() => setIsHovering(false)}
-        className={containerClassName({ className: 'grid gap-14 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:items-center lg:gap-20 xl:gap-28' })}
+        /* Từ tablet (md) đã chia 2 cột ảnh | trích dẫn — tránh ảnh căn giữa còn tiêu đề căn trái bị lệch nhau */
+        className={containerClassName({
+          className:
+            'grid gap-10 sm:gap-12 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] md:items-center md:gap-10 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-20 xl:gap-28',
+        })}
       >
         {/* ---------- Cột trái: ảnh khách + điểm đánh giá ---------- */}
-        <div className="relative mx-auto w-full max-w-[420px] pb-6 pl-6 lg:mx-0 lg:max-w-none">
+        <div className="relative mx-auto w-full max-w-[320px] pb-4 pl-4 sm:max-w-[380px] sm:pb-6 sm:pl-6 md:mx-0 md:max-w-none">
           {/* Khung viền mảnh lệch về góc dưới trái — đồng bộ ngôn ngữ khung tranh của banner */}
-          <div aria-hidden="true" className="absolute inset-0 left-0 top-6 right-6 border border-[var(--accent-color)]/60" />
+          <div aria-hidden="true" className="absolute inset-0 left-0 top-4 right-4 border sm:top-6 sm:right-6 border-[var(--accent-color)]/60" />
 
           <div className="relative aspect-[4/5] overflow-hidden bg-[var(--bg-card)] shadow-[0_40px_80px_-40px_rgba(128,0,32,0.45)]">
             <AnimatePresence initial={false}>
@@ -92,17 +96,18 @@ export function PromoteFeedBack() {
             score={RATING_SCORE}
             label={t('ratingLabel')}
             caption={t('ratingCount')}
-            className="absolute -right-2 bottom-12 z-10 sm:-right-10"
+            /* Tablet 2 cột: ảnh hẹp, thẻ sẽ che gần hết ảnh → ẩn (điểm vẫn có ở mobile / desktop) */
+            className="absolute -right-2 bottom-10 z-10 sm:-right-8 md:max-lg:hidden lg:-right-10"
           />
         </div>
 
         {/* ---------- Cột phải: trích dẫn + điều khiển ---------- */}
         <div>
-          <SectionHeading index="05" align="left" eyebrow={t('eyebrow')} title={t('title')} description={t('description')} className="mb-10 sm:mb-12" />
+          <SectionHeading index="05" align="left" eyebrow={t('eyebrow')} title={t('title')} description={t('description')} className="mb-6 sm:mb-8 lg:mb-12" />
 
           <figure aria-live="polite">
             {/* Dấu ngoặc kép trang trí */}
-            <span aria-hidden="true" className="block h-10 font-[family-name:var(--font-playfair)] text-[5.5rem] leading-none text-[var(--accent-color)]/60">
+            <span aria-hidden="true" className="block h-7 font-[family-name:var(--font-playfair)] text-[3.5rem] leading-none text-[var(--accent-color)]/60 lg:h-10 lg:text-[5.5rem]">
               &ldquo;
             </span>
 
@@ -114,13 +119,13 @@ export function PromoteFeedBack() {
                 exit={{ opacity: 0, y: reduceMotion ? 0 : -12 }}
                 transition={{ duration: 0.6, ease: EASE }}
               >
-                <blockquote className="min-h-[9.5rem] font-[family-name:var(--font-playfair)] text-xl italic leading-[1.65] text-[var(--text-main)] sm:min-h-[11rem] sm:text-[1.5625rem]">
+                <blockquote className="min-h-[7.5rem] font-[family-name:var(--font-playfair)] text-[1.0625rem] italic leading-[1.65] text-[var(--text-main)] sm:min-h-[8.5rem] sm:text-lg lg:min-h-[10rem] lg:text-[1.375rem]">
                   {t(`reviews.${review.key}.content`)}
                 </blockquote>
-                <figcaption className="mt-7 flex items-center gap-4">
+                <figcaption className="mt-5 flex items-center gap-4 sm:mt-7">
                   <span aria-hidden="true" className="h-px w-10 bg-[var(--accent-color)]" />
                   <span>
-                    <span className="block font-[family-name:var(--font-playfair)] text-lg font-semibold text-[var(--primary-ink)]">
+                    <span className="block font-[family-name:var(--font-playfair)] text-base font-semibold text-[var(--primary-ink)] sm:text-lg">
                       {t(`reviews.${review.key}.name`)}
                     </span>
                     <span className="mt-0.5 block text-[11px] uppercase tracking-[2px] text-[var(--text-light)]">
@@ -133,7 +138,7 @@ export function PromoteFeedBack() {
           </figure>
 
           {/* Thanh tiến trình tự chuyển */}
-          <div className="relative mt-10 h-px overflow-hidden bg-[var(--primary-color)]/15">
+          <div className="relative mt-8 h-px overflow-hidden bg-[var(--primary-color)]/15 lg:mt-10">
             <span
               key={current}
               aria-hidden="true"
@@ -148,7 +153,8 @@ export function PromoteFeedBack() {
 
           {/* Hàng điều khiển: ảnh đại diện (chọn nhanh) — số thứ tự — Trước / Sau */}
           <div className="mt-6 flex items-center justify-between gap-6">
-            <div className="hidden items-center gap-3 sm:flex">
+            {/* Ảnh chọn nhanh: ẩn ở tablet 2 cột (cột chữ hẹp, đẩy số thứ tự xuống dòng) */}
+            <div className="hidden items-center gap-3 sm:flex md:max-lg:hidden">
               {REVIEWS.map((item, i) => (
                 <button
                   key={item.key}

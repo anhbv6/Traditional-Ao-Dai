@@ -1,0 +1,271 @@
+{
+  "responses": {
+    "ORDER_PLACED": "Đặt hàng thành công",
+    "ORDER_FOUND": "Đã tìm thấy đơn",
+    "OTP_SENT_SUCCESS": "Đã gửi mã xác minh",
+    "ORDER_EDIT_VERIFIED": "Đã xác minh — bạn có thể chỉnh sửa trong 15 phút",
+    "ORDER_ADDRESS_UPDATED": "Đã cập nhật địa chỉ giao hàng",
+    "ORDER_MEASUREMENTS_UPDATED": "Đã cập nhật số đo — thợ sẽ dùng số đo mới khi cắt vải",
+    "REGISTER_FROM_ORDER_SUCCESS": "Đã tạo tài khoản và gắn đơn hàng",
+    "DEV_VERIFICATION_CODE": "Mã OTP (chỉ hiện khi dev)"
+  },
+  "status": {
+    "PENDING": "Chờ xác nhận",
+    "CONFIRMED": "Đã xác nhận",
+    "IN_PRODUCTION": "Đang may",
+    "READY_TO_SHIP": "Chờ giao",
+    "SHIPPING": "Đang giao",
+    "DELIVERED": "Đã giao",
+    "CANCELLED": "Đã hủy",
+    "REFUNDED": "Đã hoàn tiền"
+  },
+  "stage": {
+    "ALL": "Tất cả",
+    "AWAITING_PAYMENT": "Chờ thanh toán",
+    "PROCESSING": "Đang xử lý",
+    "TAILORING": "Đang may",
+    "SHIPPING": "Đang giao",
+    "COMPLETED": "Hoàn tất",
+    "CANCELLED": "Đã hủy"
+  },
+  "paymentMethod": {
+    "COD": "Trả khi nhận hàng (COD)",
+    "BANK_TRANSFER": "Chuyển khoản toàn bộ",
+    "DEPOSIT": "Đặt cọc + COD phần còn lại"
+  },
+  "paymentStatus": {
+    "UNPAID": "chưa thanh toán",
+    "PARTIALLY_PAID": "đã cọc",
+    "PAID": "đã thanh toán đủ",
+    "REFUNDED": "đã hoàn tiền"
+  },
+  "steps": {
+    "label": "Tiến độ may",
+    "current": "Đang thực hiện",
+    "cancelled": "Đơn đã dừng",
+    "MEASUREMENTS_RECEIVED": {
+      "title": "Nhận số đo",
+      "description": "Thợ đối chiếu số đo & mẫu"
+    },
+    "FABRIC_CUTTING": {
+      "title": "Cắt vải",
+      "description": "Canh vải, cắt theo dáng"
+    },
+    "SEWING": {
+      "title": "May & thêu",
+      "description": "Ráp tà, thêu, đính kết"
+    },
+    "FINAL_CHECK": {
+      "title": "Kiểm tra cuối",
+      "description": "Thử form, là phẳng"
+    },
+    "SHIPPING": {
+      "title": "Giao hàng",
+      "description": "Đóng hộp và gửi đi"
+    }
+  },
+  "tailoringStatus": {
+    "NOT_APPLICABLE": "May sẵn",
+    "WAITING_FABRIC": "Đã nhận số đo, chờ xuất vải",
+    "FABRIC_CUTTING": "Đang cắt vải",
+    "SEWING": "Đang may ráp",
+    "EMBROIDERY_BEADING": "Đang thêu / đính kết",
+    "FITTING_IRONING": "Kiểm tra form & là phẳng",
+    "COMPLETED": "May hoàn tất"
+  },
+  "appointmentType": {
+    "MEASUREMENT": "Hẹn đo tại tiệm",
+    "FITTING": "Hẹn thử áo",
+    "PICKUP": "Hẹn nhận áo"
+  },
+  "appointmentStatus": {
+    "SCHEDULED": "Đã hẹn",
+    "DONE": "Đã đến",
+    "CANCELLED": "Đã hủy",
+    "NO_SHOW": "Lỡ hẹn"
+  },
+  "measurement": {
+    "height": "Chiều cao",
+    "weight": "Cân nặng",
+    "bust": "Vòng ngực",
+    "waist": "Vòng eo",
+    "hips": "Vòng mông",
+    "shoulder": "Rộng vai",
+    "armLength": "Dài tay",
+    "armpit": "Vòng nách",
+    "neck": "Vòng cổ",
+    "shirtLength": "Dài áo",
+    "pantsLength": "Dài quần",
+    "thigh": "Vòng đùi"
+  },
+  "lookup": {
+    "eyebrow": "Tra cứu đơn",
+    "title": "Theo dõi tà áo của bạn",
+    "subtitle": "Nhập mã đơn và số điện thoại hoặc email đã dùng khi đặt — không cần đăng nhập.",
+    "orderCode": "Mã đơn hàng",
+    "orderCodePlaceholder": "TC-2611-AB7K",
+    "orderCodeHint": "Mã có trong email / tin nhắn xác nhận đơn",
+    "contact": "Số điện thoại hoặc email",
+    "contactPlaceholder": "0912 345 678 hoặc ban@email.com",
+    "submit": "Xem tiến độ",
+    "submitting": "Đang tìm…",
+    "privacyNote": "Vì lý do riêng tư, trang này chỉ hiện tiến độ. Địa chỉ, số đo và ảnh xưởng xem qua link trong email xác nhận.",
+    "custom": "may đo",
+    "linkHint": "Muốn xem ảnh xưởng hay sửa số đo? Mở link “Theo dõi tiến độ may” trong email xác nhận đơn.",
+    "emptyTitle": "Mỗi tà áo một hành trình",
+    "emptyDescription": "Nhập mã đơn để xem tà áo của bạn đang ở bước nào: nhận số đo, cắt vải, may, kiểm tra hay đang trên đường tới."
+  },
+  "track": {
+    "eyebrow": "Tiến độ đơn hàng",
+    "title": "Hành trình tà áo",
+    "subtitle": "Link này chỉ để xem. Muốn sửa số đo hay địa chỉ, tiệm sẽ gửi mã xác minh tới số điện thoại của đơn.",
+    "missing": {
+      "title": "Thiếu link theo dõi",
+      "description": "Hãy mở link trong email xác nhận đơn, hoặc tra cứu bằng mã đơn và số điện thoại."
+    },
+    "invalid": {
+      "title": "Link không còn hiệu lực",
+      "description": "Link có thể đã hết hạn hoặc bị gõ sai. Bạn vẫn tra cứu được bằng mã đơn và số điện thoại.",
+      "action": "Tra cứu bằng mã đơn"
+    }
+  },
+  "timeline": {
+    "orderCode": "Mã đơn",
+    "placedOn": "Đặt ngày {date}",
+    "dueDate": "Hẹn trả {date}",
+    "progressTitle": "Tiến độ may",
+    "workshopTitle": "Nhật ký xưởng",
+    "workshopEmpty": "Thợ chưa ghi nhật ký. Ảnh xưởng sẽ hiện ở đây khi tà áo bắt đầu được cắt may.",
+    "viewPhoto": "Xem ảnh xưởng cỡ lớn",
+    "photoAlt": "Ảnh tà áo tại xưởng",
+    "itemsTitle": "Sản phẩm & số đo",
+    "lineQuantity": "{count} × {price}",
+    "measurementsTitle": "Số đo",
+    "measureAtStudio": "Số đo sẽ được lấy khi bạn đến tiệm.",
+    "editMeasurements": "Sửa số đo",
+    "measurementsLocked": "Đã cắt vải",
+    "addressTitle": "Giao đến",
+    "editAddress": "Sửa",
+    "addressLocked": "Đơn đã giao cho vận chuyển — không đổi địa chỉ được nữa.",
+    "appointmentsTitle": "Lịch hẹn ở tiệm",
+    "amountsTitle": "Thanh toán",
+    "paymentLine": "{method} · {status}"
+  },
+  "amounts": {
+    "subTotal": "Tạm tính",
+    "discount": "Giảm giá",
+    "shipping": "Phí vận chuyển",
+    "free": "Miễn phí",
+    "total": "Tổng cộng",
+    "deposit": "Tiền cọc",
+    "prepay": "Chuyển khoản trước",
+    "paid": "Đã trả",
+    "balance": "Còn lại",
+    "codRemainder": "Phần còn lại trả bằng tiền mặt khi nhận áo."
+  },
+  "payment": {
+    "title": "Chuyển khoản qua VietQR",
+    "description": "Mở app ngân hàng và quét mã — số tiền và nội dung đã được điền sẵn. Tiệm xác nhận trong giờ làm việc.",
+    "qrAlt": "Mã VietQR chuyển khoản {amount}",
+    "bank": "Ngân hàng",
+    "accountNumber": "Số tài khoản",
+    "accountName": "Chủ tài khoản",
+    "amount": "Số tiền",
+    "content": "Nội dung chuyển khoản",
+    "contentHint": "Giữ đúng nội dung để đơn được đối soát tự động"
+  },
+  "edit": {
+    "otpTitle": "Xác minh trước khi chỉnh sửa",
+    "otpDescription": "Để bảo vệ đơn, tiệm gửi mã 6 số tới số điện thoại của đơn ({phone}). Mã dùng một lần, mở quyền sửa trong 15 phút.",
+    "verifiedDescription": "Đã xác minh. Thay đổi được lưu ngay vào đơn.",
+    "sendCode": "Gửi mã",
+    "resend": "Gửi lại mã",
+    "codeLabel": "Mã xác minh",
+    "verify": "Xác minh",
+    "save": "Lưu thay đổi",
+    "cancel": "Đóng",
+    "addressTitle": "Sửa địa chỉ giao hàng",
+    "measurementsTitle": "Sửa số đo — {item}",
+    "province": "Tỉnh / Thành phố",
+    "district": "Quận / Huyện",
+    "ward": "Phường / Xã",
+    "addressLine": "Địa chỉ chi tiết"
+  },
+  "thankYou": {
+    "eyebrow": "Đặt hàng thành công",
+    "title": "Cảm ơn bạn đã gửi gắm tà áo cho Thiên Canh",
+    "description": "Đơn đã được ghi nhận. Link theo dõi tiến độ đã được gửi tới email và số điện thoại của bạn.",
+    "orderCode": "Mã đơn hàng",
+    "keepCode": "Giữ mã này cùng số điện thoại để tra cứu đơn bất cứ lúc nào.",
+    "depositTitle": "Đặt cọc {amount} để tiệm bắt đầu cắt vải",
+    "codNote": "Bạn thanh toán bằng tiền mặt khi nhận hàng. Nhân viên sẽ gọi xác nhận đơn trong 24 giờ làm việc.",
+    "progressTitle": "Tiến độ may",
+    "amountsTitle": "Thanh toán",
+    "trackAction": "Theo dõi tiến độ",
+    "continue": "Tiếp tục mua sắm",
+    "emailNote": "Không thấy email? Kiểm tra thư mục spam, hoặc tra cứu bằng mã đơn ở trang Tra cứu đơn.",
+    "invalidTitle": "Không mở được đơn",
+    "invalidDescription": "Link trang cảm ơn đã hết hạn hoặc không đúng. Bạn vẫn tra cứu được bằng mã đơn và số điện thoại.",
+    "lookupAction": "Tra cứu đơn"
+  },
+  "claim": {
+    "eyebrow": "Lưu đơn vào tài khoản",
+    "title": "Chỉ cần một mật khẩu",
+    "description": "Tên, số điện thoại, địa chỉ và số đo đã có sẵn từ đơn này. Tạo tài khoản để lần sau không phải nhập lại số đo và xem mọi đơn ở một nơi.",
+    "sendCode": "Gửi mã tới số điện thoại của đơn",
+    "codeSentTo": "Nhập mã 6 số vừa gửi tới {phone}.",
+    "passwordLabel": "Mật khẩu",
+    "passwordPlaceholder": "Tối thiểu 6 ký tự",
+    "submit": "Tạo tài khoản",
+    "or": "hoặc",
+    "google": "Tạo bằng Google",
+    "codeFirst": "Nhập mã xác minh trước khi tạo tài khoản.",
+    "existsTitle": "Bạn đã có tài khoản Thiên Canh",
+    "existsDescription": "Thông tin trên đơn đã gắn với một tài khoản. Hãy đăng nhập để xem và lưu số đo.",
+    "signIn": "Đăng nhập",
+    "createdTitle": "Đã tạo tài khoản",
+    "createdDescription": "Đơn này đã nằm trong tài khoản của bạn, cùng địa chỉ và số đo. Email được lưu ở trạng thái chưa xác minh — xác minh trong mục Thông tin cá nhân.",
+    "viewOrders": "Xem đơn hàng của tôi"
+  },
+  "account": {
+    "filtersLabel": "Lọc đơn theo trạng thái",
+    "tailored": "May đo",
+    "itemCount": "{count} sản phẩm",
+    "detail": "Chi tiết",
+    "viewTimeline": "Tiến độ",
+    "empty": {
+      "title": "Chưa có đơn hàng",
+      "description": "Khi bạn đặt áo, đơn và tiến độ may sẽ hiện ở đây.",
+      "action": "Khám phá bộ sưu tập",
+      "track": "Tra cứu đơn đã đặt khi chưa đăng nhập"
+    },
+    "emptyFilter": "Không có đơn nào ở trạng thái này.",
+    "loadError": "Chưa tải được đơn hàng.",
+    "retry": "Thử lại",
+    "pagination": "Phân trang đơn hàng",
+    "previous": "Trước",
+    "next": "Sau",
+    "pageOf": "Trang {page} / {total}",
+    "backToList": "Đơn hàng của tôi",
+    "notFoundTitle": "Không tìm thấy đơn",
+    "notFoundDescription": "Đơn không tồn tại hoặc không thuộc tài khoản này.",
+    "editHint": "Cần sửa số đo hoặc địa chỉ? Tiệm sẽ gửi mã xác minh tới số điện thoại của đơn.",
+    "editViaLink": "Sửa số đo / địa chỉ"
+  },
+  "myOrders": {
+    "eyebrow": "Tài khoản",
+    "title": "Đơn hàng của tôi",
+    "navLabel": "Mục đơn hàng",
+    "accountLink": "Tài khoản",
+    "tabs": {
+      "orders": {
+        "label": "Đơn hàng",
+        "subtitle": "Theo dõi đơn đã đặt, tiền cọc còn lại và tiến độ may từng tà áo."
+      },
+      "addresses": {
+        "label": "Sổ địa chỉ",
+        "subtitle": "Địa chỉ nhận hàng dùng khi đặt đơn — thêm, sửa hoặc chọn địa chỉ mặc định."
+      }
+    }
+  }
+}

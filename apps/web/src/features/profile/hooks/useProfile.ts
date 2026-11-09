@@ -5,6 +5,5 @@ export * from "./usePersonalInfo";
 export * from "./useContactVerification";
 export * from "./useManageAddress";
 export * from "./useManagePayment";
-export * from "./useOrderHistory";
 export * from "./useSecurity";
 export * from "./useVietnamAddress";

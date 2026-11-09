@@ -1,19 +1,20 @@
 'use client';
 
 import { type ReactNode, useState } from 'react';
-import { ChevronDown, X } from 'lucide-react';
+import { ChevronDown, SlidersHorizontal, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { formatVnd } from '@repo/shared';
 import { cn } from '@/lib/utils';
 import type { MockProduct } from '../data/mockProducts';
 import { ProductSearchInput } from './ProductSearchInput';
 import { FilterChip } from './FilterChip';
+import { FilterOption } from './FilterOption';
 import { minPrice, maxPrice, purchaseOptions, colorOptions, materialOptions, collectionOptions, colorKeys, materialKeys, matchCollection } from '../constants/filters';
 
-/** Mức giá chọn nhanh (giá tối đa) — `maxPrice` nghĩa là không giới hạn */
-const pricePresets = [1500000, 2000000, 3000000, maxPrice];
+/** Mốc giá dưới thanh kéo (giá tối đa) — mốc cuối `maxPrice` nghĩa là không giới hạn */
+const pricePresets = [minPrice, 1500000, 3000000, maxPrice];
 
-/** Giá rút gọn cho chip: 1,5tr / 1.5M */
+/** Giá rút gọn cho mốc: 1,5tr / 1.5M */
 function formatPriceShort(value: number, locale: string) {
   const millions = value / 1000000;
   return locale === 'vi' ? `${String(millions).replace('.', ',')}tr` : `${millions}M`;
@@ -52,8 +53,8 @@ export interface FilterSummaryProps extends FilterGroupsProps {
 
 /**
  * Cột lọc bên trái (desktop), ghim theo khi cuộn:
- * - Phần đầu CỐ ĐỊNH: ô tìm kiếm → tiêu đề + "Xóa tất cả" → chip các bộ lọc đang bật (bấm để bỏ từng cái).
- * - Bên dưới là các nhóm lọc, tự cuộn riêng khi dài hơn khung nhìn — phần đầu không bị trôi theo.
+ * - Phần đầu CỐ ĐỊNH: ô tìm kiếm → tiêu đề "Bộ lọc" + "Xóa tất cả" → chip các bộ lọc đang bật (bấm để bỏ từng cái).
+ * - Bên dưới là các nhóm lọc dạng danh sách ô tích (gọn, dễ bấm), tự cuộn riêng khi dài hơn khung nhìn.
  * "Danh mục" đã có thanh tab phía trên lưới nên không lặp lại ở đây.
  */
 export function FilterSidebar({ searchQuery, onSearchChange, activeFilterCount, onClearAll, ...groupProps }: FilterSummaryProps) {
@@ -62,10 +63,13 @@ export function FilterSidebar({ searchQuery, onSearchChange, activeFilterCount, 
 
   return (
     <aside className="hidden lg:sticky lg:top-[calc(var(--site-header-h)+1rem)] lg:flex lg:max-h-[calc(100vh-var(--site-header-h)-2rem)] lg:flex-col lg:self-start">
-      <div className="shrink-0 space-y-4 border-b border-[var(--text-main)]/80 pb-4">
+      <div className="shrink-0 space-y-4 pb-2">
         <ProductSearchInput value={searchQuery} onChange={onSearchChange} />
-        <div className="flex items-baseline justify-between">
-          <h2 className="text-[11px] font-semibold uppercase tracking-[3px] text-[var(--text-main)]">{t('title')}</h2>
+        <div className="flex items-center justify-between border-b border-[var(--border)] pb-3">
+          <h2 className="flex items-center gap-2 font-[family-name:var(--font-playfair)] text-lg font-semibold text-[var(--text-main)]">
+            <SlidersHorizontal size={16} strokeWidth={1.6} className="text-[var(--primary-ink)]" />
+            {t('title')}
+          </h2>
           {canClear ? (
             <button
               type="button"
@@ -168,7 +172,7 @@ export function ActiveFilters({
   );
 }
 
-/** Các nhóm lọc (bộ sưu tập, hình thức mua, màu, chất liệu, giá) — dùng chung cho cột lọc desktop và sheet lọc mobile */
+/** Các nhóm lọc (bộ sưu tập, hình thức mua, giá, màu, chất liệu) — dùng chung cho cột lọc desktop và sheet lọc mobile */
 export function FilterGroups({
   locale,
   selectedCollections,
@@ -199,38 +203,66 @@ export function FilterGroups({
 
   return (
     <>
-      {/* Mặc định chỉ mở Bộ sưu tập; nhóm khác tự mở khi vào trang đã có lựa chọn (đến từ màn khác qua URL) */}
+      {/* Bộ sưu tập, hình thức mua, giá luôn mở; màu / chất liệu tự mở khi đã có lựa chọn (đến từ URL) */}
       <FilterSection title={t('collectionTitle')} defaultOpen activeCount={selectedCollections.length} onClear={clearGroup(setSelectedCollections)}>
-        <ChipGroup>
-          {collectionOptions.map((col) => (
-            <FilterChip
-              key={col.id}
-              label={tp(`collections.${col.id}`)}
-              count={productCatalog.filter((product) => matchCollection(product, col.id)).length}
-              selected={selectedCollections.includes(col.id)}
-              onToggle={() => toggleValue(col.id, selectedCollections, setSelectedCollections)}
-            />
-          ))}
-        </ChipGroup>
+        {collectionOptions.map((col) => (
+          <FilterOption
+            key={col.id}
+            label={tp(`collections.${col.id}`)}
+            count={productCatalog.filter((product) => matchCollection(product, col.id)).length}
+            selected={selectedCollections.includes(col.id)}
+            onToggle={() => toggleValue(col.id, selectedCollections, setSelectedCollections)}
+          />
+        ))}
       </FilterSection>
 
-      <FilterSection title={t('purchaseTypeTitle')} activeCount={selectedPurchaseTypes.length} onClear={clearGroup(setSelectedPurchaseTypes)}>
-        <ChipGroup>
-          {purchaseOptions.map((option) => (
-            <FilterChip
-              key={option.id}
-              label={tp(`purchaseTypes.${option.id}`)}
-              count={productCatalog.filter((product) => product.purchaseType === option.id).length}
-              selected={selectedPurchaseTypes.includes(option.id)}
-              onToggle={() => toggleValue(option.id, selectedPurchaseTypes, setSelectedPurchaseTypes)}
-            />
+      <FilterSection title={t('purchaseTypeTitle')} defaultOpen activeCount={selectedPurchaseTypes.length} onClear={clearGroup(setSelectedPurchaseTypes)}>
+        {purchaseOptions.map((option) => (
+          <FilterOption
+            key={option.id}
+            label={tp(`purchaseTypes.${option.id}`)}
+            count={productCatalog.filter((product) => product.purchaseType === option.id).length}
+            selected={selectedPurchaseTypes.includes(option.id)}
+            onToggle={() => toggleValue(option.id, selectedPurchaseTypes, setSelectedPurchaseTypes)}
+          />
+        ))}
+      </FilterSection>
+
+      <FilterSection title={t('priceTitle')} defaultOpen activeCount={priceLimit < maxPrice ? 1 : 0} onClear={() => applyPrice(maxPrice)}>
+        <p className="text-sm font-semibold text-[var(--text-main)]">
+          {priceLimit < maxPrice ? t('priceUpTo', { max: formatVnd(priceLimit, locale) }) : t('priceAll')}
+        </p>
+        <input
+          type="range"
+          min={minPrice}
+          max={maxPrice}
+          step={100000}
+          value={priceLimit}
+          aria-label={t('priceTitle')}
+          onChange={(event) => applyPrice(Number(event.target.value))}
+          className="mt-3 h-1 w-full cursor-pointer accent-[var(--primary-color)]"
+        />
+        {/* Mốc giá: bấm để nhảy nhanh tới mức hay dùng */}
+        <div className="mt-2 flex justify-between text-xs text-[var(--text-light)]">
+          {pricePresets.map((preset) => (
+            <button
+              key={preset}
+              type="button"
+              onClick={() => applyPrice(preset)}
+              className={cn(
+                'cursor-pointer tabular-nums transition-colors hover:text-[var(--primary-ink)]',
+                priceLimit === preset && 'font-semibold text-[var(--primary-ink)]'
+              )}
+            >
+              {formatPriceShort(preset, locale)}
+            </button>
           ))}
-        </ChipGroup>
+        </div>
       </FilterSection>
 
       <FilterSection title={t('colorTitle')} activeCount={selectedColors.length} onClear={clearGroup(setSelectedColors)}>
         {/* Ô màu kèm tên — không phải rê chuột mới biết là màu gì */}
-        <ChipGroup>
+        <div className="flex flex-wrap gap-1.5">
           {colorOptions.map((color) => (
             <FilterChip
               key={color.name}
@@ -240,52 +272,19 @@ export function FilterGroups({
               leading={<span aria-hidden="true" className="size-3.5 shrink-0 rounded-full border border-black/10" style={{ backgroundColor: color.hex }} />}
             />
           ))}
-        </ChipGroup>
+        </div>
       </FilterSection>
 
       <FilterSection title={t('materialTitle')} activeCount={selectedMaterials.length} onClear={clearGroup(setSelectedMaterials)}>
-        <ChipGroup>
-          {materialOptions.map((material) => (
-            <FilterChip
-              key={material}
-              label={getMaterialLabel(material, tp)}
-              count={productCatalog.filter((product) => product.material === material).length}
-              selected={selectedMaterials.includes(material)}
-              onToggle={() => toggleValue(material, selectedMaterials, setSelectedMaterials)}
-            />
-          ))}
-        </ChipGroup>
-      </FilterSection>
-
-      <FilterSection title={t('priceTitle')} activeCount={priceLimit < maxPrice ? 1 : 0} onClear={() => applyPrice(maxPrice)}>
-        {/* Bấm nhanh mức giá hay dùng; cần chính xác hơn thì kéo thanh bên dưới */}
-        <div className="grid grid-cols-4 gap-1.5">
-          {pricePresets.map((preset) => (
-            <FilterChip
-              key={preset}
-              label={preset === maxPrice ? t('priceAll') : `≤ ${formatPriceShort(preset, locale)}`}
-              selected={priceLimit === preset}
-              onToggle={() => applyPrice(preset)}
-              className="w-full justify-center px-1"
-            />
-          ))}
-        </div>
-        <input
-          type="range"
-          min={minPrice}
-          max={maxPrice}
-          step={100000}
-          value={priceLimit}
-          aria-label={t('priceTitle')}
-          onChange={(event) => applyPrice(Number(event.target.value))}
-          className="mt-4 h-1 w-full cursor-pointer accent-[var(--primary-color)]"
-        />
-        <p className="mt-2 flex justify-between text-xs text-[var(--text-light)]">
-          <span>{formatVnd(minPrice, locale)}</span>
-          <span className="font-semibold text-[var(--text-main)]">
-            {priceLimit < maxPrice ? t('priceUpTo', { max: formatVnd(priceLimit, locale) }) : t('priceAll')}
-          </span>
-        </p>
+        {materialOptions.map((material) => (
+          <FilterOption
+            key={material}
+            label={getMaterialLabel(material, tp)}
+            count={productCatalog.filter((product) => product.material === material).length}
+            selected={selectedMaterials.includes(material)}
+            onToggle={() => toggleValue(material, selectedMaterials, setSelectedMaterials)}
+          />
+        ))}
       </FilterSection>
     </>
   );
@@ -312,26 +311,26 @@ export function FilterSection({
   const t = useTranslations('ProductsPage.filter');
 
   return (
-    <section className="border-b border-[var(--border)] py-4 last:border-b-0">
-      <div className="flex items-center justify-between gap-3">
-        {/* Cả hàng tiêu đề là một nút mở/đóng — vùng bấm lớn, mũi tên chỉ là dấu hiệu */}
+    <section className="border-b border-[var(--border)] py-3.5 last:border-b-0">
+      <div className="flex items-center gap-3">
+        {/* Cả hàng tiêu đề là một nút mở/đóng — vùng bấm lớn */}
         <button
           type="button"
           aria-expanded={isOpen}
           onClick={() => setIsOpen(!isOpen)}
-          className="flex flex-1 cursor-pointer items-center gap-2 text-left text-sm font-semibold text-[var(--text-main)] transition-colors hover:text-[var(--primary-ink)]"
+          className="flex min-h-8 flex-1 cursor-pointer items-center gap-2 text-left text-[13px] font-semibold uppercase tracking-[1.5px] text-[var(--text-main)] transition-colors hover:text-[var(--primary-ink)]"
         >
-          <ChevronDown
-            size={15}
-            strokeWidth={1.6}
-            className={cn('shrink-0 text-[var(--text-light)] transition-transform duration-300', isOpen ? 'rotate-0' : '-rotate-90')}
-          />
           {title}
           {activeCount > 0 ? (
-            <span className="grid size-5 place-items-center rounded-full bg-[var(--primary-color)] text-[10px] font-semibold text-white">
+            <span className="grid size-[18px] place-items-center rounded-full bg-[var(--primary-color)] text-[10px] font-semibold tracking-normal text-white">
               {activeCount}
             </span>
           ) : null}
+          <ChevronDown
+            size={16}
+            strokeWidth={1.6}
+            className={cn('ml-auto shrink-0 text-[var(--text-light)] transition-transform duration-300', isOpen && 'rotate-180')}
+          />
         </button>
         {onClear && activeCount > 0 ? (
           <button
@@ -346,13 +345,10 @@ export function FilterSection({
       {/* Mở/đóng mượt bằng grid-rows 0fr -> 1fr (không cần đo chiều cao) */}
       <div className={cn('grid transition-[grid-template-rows] duration-300 ease-out', isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]')}>
         <div className="overflow-hidden">
-          <div className="pt-3">{children}</div>
+          <div className="pt-1.5">{children}</div>
         </div>
       </div>
     </section>
   );
 }
 
-function ChipGroup({ children }: { children: ReactNode }) {
-  return <div className="flex flex-wrap gap-1.5">{children}</div>;
-}

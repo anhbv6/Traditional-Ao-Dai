@@ -37,20 +37,23 @@
     "title": "Payment method",
     "description": "Choose how you would like to pay for your order.",
     "methods": {
-      "cod": {
+      "COD": {
         "title": "Cash on delivery (COD)",
-        "description": "Pay the courier in cash after receiving and checking your Ao Dai."
+        "description": "Pay the courier in cash after receiving and checking your piece."
       },
-      "bank": {
-        "title": "Bank transfer",
-        "description": "Account details are shown at the review step. Your order is processed once payment arrives."
+      "BANK_TRANSFER": {
+        "title": "Full bank transfer (VietQR)",
+        "description": "Scan the VietQR code on the thank-you page — amount and reference are pre-filled."
       },
-      "card": {
-        "title": "Credit / debit card",
-        "description": "Visa, Mastercard, JCB and domestic cards."
+      "DEPOSIT": {
+        "title": "30–50% deposit, balance on delivery",
+        "description": "Transfer a deposit by VietQR so we can cut the fabric; pay the rest when it arrives."
       }
     },
-    "cardNote": "After placing your order you will be redirected to a secure payment gateway to enter your card. Thiên Canh never stores your card number."
+    "tailoredNote": "Your order includes a made-to-measure piece, so 100% cash on delivery is not available: the fabric is cut to your measurements. Choose a deposit or a full transfer.",
+    "depositLabel": "Deposit",
+    "depositSummary": "Deposit {deposit} · {rest} due on delivery",
+    "qrNote": "A VietQR code (with the amount and “THIENCANH <order code>” filled in) appears right after you place the order."
   },
   "review": {
     "title": "Review your order",
@@ -59,16 +62,11 @@
     "paymentTitle": "Payment",
     "notes": "Notes",
     "edit": "Edit",
-    "bank": {
-      "title": "Bank transfer details",
-      "bankName": "Bank",
-      "accountNumber": "Account number",
-      "accountHolder": "Account holder",
-      "content": "Transfer reference",
-      "contentHint": "Use this exact reference so we can confirm your order quickly"
-    },
-    "customNote": "Your order includes made-to-measure items: our tailor will call to confirm measurements before cutting (7–10 days to complete).",
-    "agreement": "By clicking “Place order”, you agree to Thiên Canh's purchase and return policies."
+    "customNote": "Your order has made-to-measure items: the tailor double-checks measurements before cutting. You can edit them from the tracking link until the fabric is cut.",
+    "agreement": "By clicking “Place order”, you agree to Thiên Canh's purchase and return policies.",
+    "depositLine": "{percent}% deposit: {deposit} · {rest} cash on delivery",
+    "transferLine": "Transfer {amount}",
+    "qrAfter": "The transfer QR code appears on the thank-you page after you place the order."
   },
   "actions": {
     "back": "Back",
@@ -92,7 +90,6 @@
     "savings": "You save",
     "receipt": "Sales receipt",
     "brandLine": "Traditional & made-to-measure Ao Dai",
-    "orderNo": "Order no.",
     "date": "Date",
     "customer": "Customer",
     "payment": "Payment",
@@ -101,30 +98,12 @@
     "amountColumn": "Amount",
     "lineQuantity": "{count} × {price}",
     "grandTotal": "Grand total",
-    "thanks": "Thank you for choosing Thiên Canh"
+    "thanks": "Thank you for choosing Thiên Canh",
+    "discountNotApplied": "Bag discount codes are not applied to online orders yet — the atelier will contact you if a promotion applies."
   },
   "empty": {
     "title": "Nothing to check out yet",
     "description": "Your cart is empty. Pick the designs you love before checking out.",
     "action": "Explore the collection"
-  },
-  "success": {
-    "eyebrow": "Order placed",
-    "title": "Thank you for choosing Thiên Canh",
-    "description": "Your order has been received and is being prepared.",
-    "orderId": "Order number",
-    "total": "Total",
-    "method": "Payment",
-    "emailNote": "An order confirmation has been sent to {email}.",
-    "bankReminder": "Please transfer using the reference below so we can process your order as soon as possible.",
-    "cardReminder": "You will receive an email with instructions to complete your card payment through our secure gateway.",
-    "nextTitle": "What happens next",
-    "next": {
-      "confirm": "We call to confirm your order within 24 business hours.",
-      "prepare": "Your Ao Dai is inspected, pressed and gift-boxed.",
-      "ship": "Delivery in 2–4 days (7–10 days for made-to-measure)."
-    },
-    "continue": "Continue shopping",
-    "viewOrders": "View my orders"
   }
 }

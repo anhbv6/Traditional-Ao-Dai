@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { ORDER_MEASUREMENT_KEYS, type OrderMeasurements } from "@repo/shared/orders";
 import { useCartStore } from "@/features/cart";
 import { useIsWishlisted, useWishlistUndo } from "@/features/wishlist";
 import { showToast } from "@/components/ui/toast";
@@ -65,6 +66,7 @@ export function useProductDetail(
    */
   const handleAddToCart = (): boolean => {
     let measurements: Record<string, string> | undefined;
+    let measurementValues: OrderMeasurements | undefined;
 
     if (isCustomSize && measurementFields.length > 0) {
       const missing = measurementFields.some((field) => {
@@ -80,6 +82,13 @@ export function useProductDetail(
           .filter((field) => Number(customMeasurements[field.field_key]) > 0)
           .map((field) => [field.label, customMeasurements[field.field_key]])
       );
+      // Bản cấu trúc gửi API: chỉ các số đo đơn hàng lưu được (khóa ORDER_MEASUREMENT_KEYS)
+      measurementValues = Object.fromEntries(
+        measurementFields
+          .filter((field) => (ORDER_MEASUREMENT_KEYS as readonly string[]).includes(field.field_key))
+          .filter((field) => Number(customMeasurements[field.field_key]) > 0)
+          .map((field) => [field.field_key, Number(customMeasurements[field.field_key])])
+      );
     }
 
     const colorImage = product.colors.find((color) => color.name === selectedColor)?.imageSrc;
@@ -93,6 +102,7 @@ export function useProductDetail(
       size: selectedSize,
       color: selectedColor || undefined,
       measurements,
+      measurementValues,
       quantity,
     });
 

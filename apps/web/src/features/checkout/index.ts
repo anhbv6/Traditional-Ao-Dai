@@ -3,7 +3,6 @@ export * from "./components/CheckoutProgress";
 export * from "./components/CheckoutShippingForm";
 export * from "./components/CheckoutPaymentForm";
 export * from "./components/CheckoutReview";
-export * from "./components/CheckoutSuccess";
 export * from "./components/CheckoutOrderSummary";
 export * from "./types/checkout.types";
 export * from "./validations/checkout.validation";

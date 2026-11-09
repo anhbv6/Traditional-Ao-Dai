@@ -84,7 +84,7 @@ export function UserMenu({
 
   const links: MenuLink[] = [
     { key: 'profile', label: profileLabel, href: '/profile', icon: UserRound, active: pathname === '/profile' },
-    { key: 'orders', label: ordersLabel, href: '/profile/orders', icon: Package, active: pathname.startsWith('/profile/orders') },
+    { key: 'orders', label: ordersLabel, href: '/my-orders', icon: Package, active: pathname.startsWith('/my-orders') },
     // Thông báo chỉ dành cho khách hàng (phiên quản trị không có)
     ...(isAuthenticated
       ? [{ key: 'notifications', label: tCommon('notifications'), href: '/notifications', icon: Bell, active: pathname === '/notifications', count: unreadCount }]

@@ -76,17 +76,7 @@ export function ArticleNews() {
                 aria-label={`${i + 1} / ${total}`}
                 className="min-w-0 shrink-0 grow-0 basis-[85%] pl-5 sm:basis-1/2 lg:basis-1/3 lg:pl-7"
               >
-                <NewsCard
-                  slug={article.slug}
-                  category={article.category[locale] || article.category.vi}
-                  title={article.title[locale] || article.title.vi}
-                  description={article.description[locale] || article.description.vi}
-                  dateShort={article.dateShort[locale] || article.dateShort.vi}
-                  dateLong={article.dateLong[locale] || article.dateLong.vi}
-                  imageSrc={article.imageSrc}
-                  readTime={article.readTime[locale] || article.readTime.vi}
-                  readMoreLabel={t('readMore')}
-                />
+                <NewsCard article={article} locale={locale} actionLabel={t('readMore')} />
               </div>
             ))}
           </div>

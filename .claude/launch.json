@@ -2,7 +2,7 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "web-3005",
+      "name": "web-3000",
       "runtimeExecutable": "pnpm",
       "runtimeArgs": [
         "--filter",
@@ -11,9 +11,9 @@
         "next",
         "dev",
         "-p",
-        "3005"
+        "3000"
       ],
-      "port": 3005
+      "port": 3000
     },
     {
       "name": "web-3000-existing",
@@ -31,7 +31,7 @@
       "port": 3001
     },
     {
-      "name": "web-prod-3005",
+      "name": "web-prod-3000",
       "runtimeExecutable": "pnpm",
       "runtimeArgs": [
         "--filter",
@@ -40,9 +40,9 @@
         "next",
         "start",
         "-p",
-        "3005"
+        "3000"
       ],
-      "port": 3005
+      "port": 3000
     }
   ]
 }

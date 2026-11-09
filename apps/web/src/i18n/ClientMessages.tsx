@@ -15,15 +15,24 @@ export const CLIENT_NAMESPACES = {
   store: ["Common", "Errors", "Footer", "Chat", "CartPage", "NotificationsPage", "ProfilePage.logoutDialog"],
   auth: ["Common", "Auth"],
   admin: ["Common", "Errors", "AdminPage"],
-  profile: ["Common", "ProfilePage"],
+  /** Trang tài khoản — thông tin cá nhân + số đo (nhãn số đo lấy từ OrdersPage.measurement) */
+  profile: ["Common", "Errors", "ProfilePage", "OrdersPage.measurement"],
+  /** Màn Đơn hàng của tôi (/my-orders): danh sách, chi tiết đơn, sổ địa chỉ (ProfilePage.address) */
+  myOrders: ["Common", "Errors", "ProfilePage", "OrdersPage"],
   forbidden: ["Common"],
   home: ["Common", "HomePage", "Product", "ProductsPage", "WishlistPage"],
   about: ["AboutPage"],
+  /** Sửa đồ & đổi trả: form yêu cầu (tra đơn, ChoiceGroup, MediaUploader cần Common), nhãn trạng thái đơn */
+  afterSales: ["Common", "Errors", "AfterSalesPage", "OrdersPage.status"],
   cart: ["Common", "CartPage", "Product"],
   checkout: ["Common", "Errors", "CheckoutPage"],
+  /** Tra cứu đơn (mã + SĐT), magic link, trang cảm ơn (kèm hộp tạo tài khoản dùng nút Google của Auth) */
+  orders: ["Common", "Errors", "OrdersPage"],
   contact: ["Common", "ContactPage"],
   custom: ["Common", "Errors", "BespokePage"],
   faqs: ["Common", "FaqsPage"],
+  /** Thư mục vải: bộ lọc, thẻ album, hộp thoại chi tiết (AppDialog cần Common) */
+  fabrics: ["Common", "FabricsPage"],
   news: ["NewsPage"],
   newsDetail: ["Common", "Breadcrumbs", "NewsPage"],
   notifications: ["Common", "NotificationsPage"],

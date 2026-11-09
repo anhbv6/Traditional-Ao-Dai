@@ -20,16 +20,16 @@ export function HomeTrustStrip() {
         {TRUST_ITEMS.map(({ key, Icon }) => (
           <li
             key={key}
-            className="flex items-center gap-4 border-[var(--border)] py-6 max-lg:[&:nth-child(-n+2)]:border-b lg:justify-center lg:border-r lg:last:border-r-0 lg:px-6"
+            className="flex items-center gap-3 border-[var(--border)] py-4 max-lg:even:pl-3 max-lg:odd:pr-2 max-lg:[&:nth-child(-n+2)]:border-b sm:gap-4 sm:py-6 lg:justify-center lg:border-r lg:last:border-r-0 lg:px-6"
           >
-            <span className="flex size-11 shrink-0 items-center justify-center rounded-full border border-[var(--accent-color)]/60 text-[var(--primary-ink)]">
-              <Icon size={18} strokeWidth={1.4} />
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-full sm:size-11 border border-[var(--accent-color)]/60 text-[var(--primary-ink)]">
+              <Icon className="size-4 sm:size-[18px]" strokeWidth={1.4} />
             </span>
             <span className="min-w-0">
-              <span className="block font-[family-name:var(--font-playfair)] text-[15px] font-semibold leading-snug text-[var(--primary-ink)]">
+              <span className="block font-[family-name:var(--font-playfair)] text-[13px] font-semibold leading-snug sm:text-[15px] text-[var(--primary-ink)]">
                 {t(`${key}.title`)}
               </span>
-              <span className="block text-xs leading-5 text-[var(--text-light)]">{t(`${key}.desc`)}</span>
+              <span className="mt-0.5 block text-[11px] leading-4 text-[var(--text-light)] sm:text-xs sm:leading-5">{t(`${key}.desc`)}</span>
             </span>
           </li>
         ))}

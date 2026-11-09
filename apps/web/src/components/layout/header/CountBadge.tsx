@@ -54,7 +54,8 @@ export function CountBadge({ count, ready = true, className }: CountBadgeProps) 
   const display = count > 99 ? '99+' : String(count);
 
   return (
-    <span aria-hidden="true" className={cn('pointer-events-none absolute right-0.5 top-1', className)}>
+    /* Neo ngay góc trên-phải của icon (không theo mép ô bấm) → badge không lấn sang icon bên cạnh, các icon trông cách đều */
+    <span aria-hidden="true" className={cn('pointer-events-none absolute left-[calc(50%+4px)] top-0.5 sm:left-auto sm:right-0.5 sm:top-1', className)}>
       <AnimatePresence initial={false}>
         {count > 0 ? (
           <motion.span
@@ -63,7 +64,7 @@ export function CountBadge({ count, ready = true, className }: CountBadgeProps) 
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.3, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 480, damping: 24 }}
-            className="relative grid h-[18px] min-w-[18px] place-items-center overflow-hidden rounded-full bg-[var(--primary-color)] px-1 text-[10px] font-bold leading-none text-white ring-2 ring-[var(--bg-main)] [font-variant-numeric:lining-nums_tabular-nums]"
+            className="relative grid h-4 min-w-4 place-items-center overflow-hidden rounded-full bg-[var(--primary-color)] px-1 text-[9px] sm:h-[18px] sm:min-w-[18px] sm:text-[10px] font-bold leading-none text-white ring-2 ring-[var(--bg-main)] [font-variant-numeric:lining-nums_tabular-nums]"
           >
             <AnimatePresence mode="popLayout" initial={false} custom={tracked.direction}>
               <motion.span

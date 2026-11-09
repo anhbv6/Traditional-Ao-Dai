@@ -1,4 +1,5 @@
 import { type Gender } from "@repo/shared";
+import { type OrderMeasurementKey } from "@repo/shared/orders";
 import { type AuthUser } from "@/features/auth";
 
 /** PUT /api/user/profile — email & SĐT đổi qua luồng xác minh mã, không gửi ở đây */
@@ -59,20 +60,16 @@ export interface PaymentCard {
   isDefault: boolean;
 }
 
-export interface OrderItem {
-  name: { vi: string; en: string };
-  /** Đơn giá (VND) */
-  price: number;
-  quantity: number;
-  image: string;
-}
-
-export interface Order {
+/**
+ * Một bộ số đo đã lưu (khớp bảng `UserMeasurement`): khách có thể lưu nhiều bộ (của mình, của mẹ…), đúng một bộ mặc định.
+ * Giá trị đo theo `ORDER_MEASUREMENT_KEYS` (cm, riêng cân nặng kg).
+ */
+export interface MeasurementProfile {
   id: string;
-  date: string;
-  status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
-  /** Tổng tiền đơn (VND) */
-  total: number;
-  items: OrderItem[];
+  profileName: string;
+  isDefault: boolean;
+  values: Partial<Record<OrderMeasurementKey, number>>;
+  note?: string;
 }
 
+export type MeasurementProfileInput = Omit<MeasurementProfile, "id">;

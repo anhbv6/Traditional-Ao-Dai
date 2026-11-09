@@ -1,36 +1,16 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { Link } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
 import { Reveal } from '@/components/shared/Reveal';
 import { PageIntro } from '@/components/shared/PageIntro';
 import { SectionOrnament } from '@/components/shared/SectionOrnament';
 
 import { useNews } from '../hooks/useNews';
-import { categoryKeys, getAuthor } from '../types/news.types';
-
-/** Hiệu ứng ảnh dùng chung: phóng rất chậm khi rê chuột — đồng bộ với trang chủ / Câu chuyện */
-const IMAGE_HOVER = 'object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]';
-/** Khung viền mảnh hiện trong ảnh khi rê chuột */
-const HOVER_FRAME = 'pointer-events-none absolute inset-3 border border-white/0 transition-colors duration-700 group-hover:border-white/60';
-
-/** Dòng thông tin phụ: các mục cách nhau bằng hình thoi nhỏ (thay cho dấu "—") */
-function MetaLine({ items, className }: { items: string[]; className?: string }) {
-  return (
-    <p className={cn('flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] uppercase tracking-[1.8px]', className)}>
-      {items.map((item, i) => (
-        <React.Fragment key={i}>
-          {i > 0 ? <span aria-hidden="true" className="size-1 rotate-45 bg-[var(--accent-color)]" /> : null}
-          <span>{item}</span>
-        </React.Fragment>
-      ))}
-    </p>
-  );
-}
+import { categoryKeys } from '../types/news.types';
+import { NewsCard } from './NewsCard';
 
 /** Tiêu đề mỗi khối: chữ Playfair thường (không viết hoa đậm), hoạ tiết SectionOrnament bên dưới, link "xem tất cả" */
 function SectionTitle({ title, actionLabel, onAction }: { title: string; actionLabel: string; onAction: () => void }) {
@@ -108,39 +88,7 @@ export function NewsClient() {
           {/* Bài nổi bật — nằm ở màn hình đầu (ảnh LCP) nên không dùng hiệu ứng hiện dần */}
           {heroArticle && (
             <section className="mb-20">
-              <Link href={`/news/${heroArticle.slug}`} className="group block">
-                <div className="relative aspect-[16/10] w-full overflow-hidden bg-[var(--bg-secondary)] md:aspect-[21/9]">
-                  <Image
-                    src={heroArticle.imageSrc}
-                    alt={heroArticle.title[locale]}
-                    fill
-                    loading="eager"
-                    fetchPriority="high"
-                    sizes="100vw"
-                    className={IMAGE_HOVER}
-                  />
-                  <div aria-hidden="true" className={HOVER_FRAME} />
-                  <span className="absolute left-5 top-5 bg-[var(--bg-card)]/95 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[2px] text-[var(--primary-ink)]">
-                    {t('featured')}
-                  </span>
-                </div>
-
-                <div className="mt-6 grid gap-4 lg:grid-cols-[1fr_auto] lg:items-end lg:gap-12">
-                  <div>
-                    <MetaLine
-                      className="text-[var(--text-light)]"
-                      items={[heroArticle.category[locale], getAuthor(heroArticle.id), heroArticle.dateLong[locale], heroArticle.readTime[locale]]}
-                    />
-                    <h2 className="mt-3 max-w-4xl font-[family-name:var(--font-playfair)] text-2xl font-semibold leading-tight text-[var(--primary-ink)] decoration-[var(--accent-color)] decoration-1 underline-offset-[6px] group-hover:underline sm:text-3xl lg:text-[2.5rem]">
-                      {heroArticle.title[locale]}
-                    </h2>
-                  </div>
-                  <span className="inline-flex shrink-0 items-center gap-3 border-b border-[var(--primary-color)]/40 pb-1 text-xs font-semibold uppercase tracking-[2px] text-[var(--primary-ink)] transition-colors group-hover:border-[var(--primary-color)]">
-                    {t('readArticle')}
-                    <ArrowRight size={15} strokeWidth={1.6} className="transition-transform duration-300 group-hover:translate-x-1" />
-                  </span>
-                </div>
-              </Link>
+              <NewsCard variant="featured" article={heroArticle} locale={locale} priority badge={t('featured')} actionLabel={t('readArticle')} />
             </section>
           )}
 
@@ -150,43 +98,11 @@ export function NewsClient() {
               <SectionTitle title={t('sections.latestNews')} actionLabel={t('viewAll')} onAction={() => handleCategoryChange('all')} />
 
               <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
-                {leftLatestArticle && (
-                  <Link
-                    href={`/news/${leftLatestArticle.slug}`}
-                    className="group relative flex min-h-[360px] flex-col justify-end overflow-hidden sm:min-h-[420px]"
-                  >
-                    <Image
-                      src={leftLatestArticle.imageSrc}
-                      alt={leftLatestArticle.title[locale]}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 640px"
-                      className={IMAGE_HOVER}
-                    />
-                    <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-(--bg-wine)/90 via-(--bg-wine)/30 to-transparent" />
-                    <div aria-hidden="true" className={HOVER_FRAME} />
-                    <div className="relative p-6 sm:p-8">
-                      <MetaLine className="text-white/75" items={[leftLatestArticle.category[locale], leftLatestArticle.dateLong[locale]]} />
-                      <h3 className="mt-3 font-[family-name:var(--font-playfair)] text-xl font-semibold leading-snug text-white sm:text-2xl">
-                        {leftLatestArticle.title[locale]}
-                      </h3>
-                    </div>
-                  </Link>
-                )}
+                {leftLatestArticle && <NewsCard variant="overlay" article={leftLatestArticle} locale={locale} />}
 
                 <div className="flex flex-col divide-y divide-[var(--border)]">
                   {rightLatestArticles.map((article) => (
-                    <Link key={article.id} href={`/news/${article.slug}`} className="group flex flex-1 items-center gap-5 py-6">
-                      <div className="min-w-0 flex-1">
-                        <MetaLine className="text-[var(--accent-color)]" items={[article.category[locale], article.dateShort[locale]]} />
-                        <h3 className="mt-2 line-clamp-2 font-[family-name:var(--font-playfair)] text-lg font-semibold leading-snug text-[var(--primary-ink)] decoration-[var(--accent-color)] decoration-1 underline-offset-4 group-hover:underline">
-                          {article.title[locale]}
-                        </h3>
-                        <p className="mt-2 line-clamp-2 text-sm leading-6 text-[var(--text-light)]">{article.description[locale]}</p>
-                      </div>
-                      <div className="relative aspect-[4/5] w-24 shrink-0 overflow-hidden bg-[var(--bg-secondary)] sm:w-32">
-                        <Image src={article.imageSrc} alt={article.title[locale]} fill sizes="130px" className={IMAGE_HOVER} />
-                      </div>
-                    </Link>
+                    <NewsCard key={article.id} variant="horizontal" article={article} locale={locale} className="flex-1 py-5 sm:py-6" />
                   ))}
 
                   {rightLatestArticles.length === 0 && (
@@ -206,22 +122,7 @@ export function NewsClient() {
 
               <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 lg:grid-cols-4 lg:gap-x-8">
                 {trendsArticles.map((article) => (
-                  <Link key={article.id} href={`/news/${article.slug}`} className="group block">
-                    <div className="relative aspect-[3/4] overflow-hidden bg-[var(--bg-secondary)]">
-                      <Image
-                        src={article.imageSrc}
-                        alt={article.title[locale]}
-                        fill
-                        sizes="(max-width: 1024px) 50vw, 320px"
-                        className={IMAGE_HOVER}
-                      />
-                      <div aria-hidden="true" className={HOVER_FRAME} />
-                    </div>
-                    <MetaLine className="mt-4 text-[var(--text-light)]" items={[getAuthor(article.id), article.dateShort[locale]]} />
-                    <h3 className="mt-2 line-clamp-2 font-[family-name:var(--font-playfair)] text-base font-semibold leading-snug text-[var(--primary-ink)] decoration-[var(--accent-color)] decoration-1 underline-offset-4 group-hover:underline sm:text-lg">
-                      {article.title[locale]}
-                    </h3>
-                  </Link>
+                  <NewsCard key={article.id} variant="portrait" article={article} locale={locale} />
                 ))}
               </div>
             </Reveal>
@@ -235,22 +136,14 @@ export function NewsClient() {
               {/* Chỉ kẻ vạch GIỮA các hàng: mỗi bài kẻ vạch trên, bỏ vạch ở hàng đầu theo số cột (1 → 2 → 3 cột) */}
               <div className="grid gap-x-8 md:grid-cols-2 lg:grid-cols-3">
                 {guidesArticles.map((article) => (
-                  <Link
+                  <NewsCard
                     key={article.id}
-                    href={`/news/${article.slug}`}
-                    className="group flex items-start gap-4 border-t border-[var(--border)] py-6 first:border-t-0 md:nth-2:border-t-0 lg:nth-3:border-t-0"
-                  >
-                    <div className="relative aspect-square w-20 shrink-0 overflow-hidden bg-[var(--bg-secondary)] sm:w-24">
-                      <Image src={article.imageSrc} alt={article.title[locale]} fill sizes="100px" className={IMAGE_HOVER} />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <h3 className="line-clamp-2 font-[family-name:var(--font-playfair)] text-base font-semibold leading-snug text-[var(--primary-ink)] decoration-[var(--accent-color)] decoration-1 underline-offset-4 group-hover:underline">
-                        {article.title[locale]}
-                      </h3>
-                      <p className="mt-1.5 line-clamp-2 text-xs leading-5 text-[var(--text-light)] sm:text-sm sm:leading-6">{article.description[locale]}</p>
-                      <MetaLine className="mt-2 text-[var(--text-light)]" items={[article.readTime[locale], getAuthor(article.id)]} />
-                    </div>
-                  </Link>
+                    variant="compact"
+                    article={article}
+                    locale={locale}
+                    showDescription
+                    className="border-t border-[var(--border)] py-5 first:border-t-0 sm:py-6 md:nth-2:border-t-0 lg:nth-3:border-t-0"
+                  />
                 ))}
               </div>
             </Reveal>

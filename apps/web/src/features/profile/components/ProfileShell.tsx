@@ -2,7 +2,7 @@
 
 import { useState, type ReactNode } from "react";
 import { motion } from "motion/react";
-import { LogOut, UserRound } from "lucide-react";
+import { ArrowUpRight, LogOut, Package, UserRound } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/routing";
 import { LogoutDialog, useAuthStore } from "@/features/auth";
@@ -110,6 +110,15 @@ export function ProfileShell({ children }: { children: ReactNode }) {
                     </li>
                   );
                 })}
+
+                {/* Đơn hàng + sổ địa chỉ ở màn riêng /my-orders — mũi tên chéo báo là chuyển sang màn khác */}
+                <li className="shrink-0">
+                  <Link href="/my-orders" className={cn(NAV_ITEM_CLASS, NAV_ITEM_IDLE)}>
+                    <Package aria-hidden="true" className="hidden size-4 shrink-0 text-[var(--primary-ink)] lg:block" strokeWidth={1.6} />
+                    <span className="lg:flex-1">{t("myOrdersLink")}</span>
+                    <ArrowUpRight aria-hidden="true" className="hidden size-3.5 shrink-0 text-[var(--text-light)] lg:block" strokeWidth={1.6} />
+                  </Link>
+                </li>
 
                 {/* Đăng xuất: cùng kiểu mục menu, tách bằng vạch mảnh trên desktop */}
                 <li className="shrink-0 lg:mt-3 lg:border-t lg:border-[var(--border)] lg:pt-3">
