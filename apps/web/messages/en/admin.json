@@ -289,6 +289,105 @@
       "sessions": "Open sessions"
     }
   },
+  "rolePermissions": {
+    "toast": {
+      "saved": "Permissions saved for {count, plural, one {# staff member} other {# staff members}}"
+    },
+    "template": {
+      "SALES": {
+        "name": "Sales & customer care"
+      },
+      "WORKSHOP": {
+        "name": "Workshop tailor"
+      },
+      "STOCK": {
+        "name": "Stock & products"
+      },
+      "CONTENT": {
+        "name": "Content editor"
+      },
+      "STORE_MANAGER": {
+        "name": "Store manager"
+      }
+    },
+    "menu": {
+      "label": "Actions for {name}",
+      "preview": "View as this person",
+      "profile": "Open profile",
+      "applyTemplate": "Apply a role template",
+      "grantAll": "Grant all permissions",
+      "revokeAll": "Revoke all",
+      "reset": "Undo for this person"
+    },
+    "row": {
+      "locked": "Locked",
+      "none": "No permissions — Dashboard only",
+      "template": "Matches: {name}",
+      "custom": "{count, plural, one {# permission} other {# permissions}} · custom",
+      "changed": "unsaved"
+    },
+    "column": {
+      "holders": "{count}/{total} people",
+      "actions": "Actions"
+    },
+    "filter": {
+      "label": "Show",
+      "ALL": "All",
+      "CHANGED": "Editing",
+      "NONE": "No permissions",
+      "LOCKED": "Locked"
+    },
+    "orphaned": "No active staff member holds {names} — all of that work falls back to the Super Admin.",
+    "bulk": {
+      "selectAll": "Select all staff",
+      "summary": "{count} selected",
+      "template": "Apply template",
+      "revoke": "Revoke all"
+    },
+    "note": "Green cells will be granted, red cells revoked — only after you save. Click a name to see the menu that person will get.",
+    "bar": {
+      "summary": "{count, plural, one {# person} other {# people}} changed · unsaved",
+      "discard": "Discard",
+      "review": "Review & save"
+    },
+    "review": {
+      "title": "Save permissions for {count, plural, one {# person} other {# people}}?",
+      "description": "Check each person before saving.",
+      "back": "Back",
+      "saving": "Saving…",
+      "confirm": "Save permissions",
+      "becomesEmpty": "After saving, this person only sees Dashboard and My requests.",
+      "effect": "The admin area checks the session and permissions on every page load — revoked access ends on the next action, no re-login needed. Each person gets one before → after audit entry."
+    },
+    "preview": {
+      "title": "View as staff",
+      "as": "Person",
+      "locked": "This account is locked — they cannot sign in regardless of permissions.",
+      "menu": "Side menu · {count, plural, one {# screen} other {# screens}}",
+      "menuLabel": "Menu of {name}",
+      "new": "new",
+      "lost": "Will lose: {names}",
+      "dashboard": "Dashboard blocks",
+      "block": {
+        "revenue": "Revenue",
+        "inventory": "Stock",
+        "tailoring": "Workshop",
+        "orders": "New orders"
+      },
+      "adminOnly": "Staff never see",
+      "lockCustomers": "Lock / unlock customers",
+      "reviewApprovals": "Review requests"
+    },
+    "history": {
+      "title": "Permission history",
+      "subtitle": "Last 20 changes",
+      "empty": "No permission changes recorded yet.",
+      "created": "{actor} created the account <who>{target}</who>",
+      "updated": "{actor} changed permissions of <who>{target}</who>",
+      "unknown": "(unknown)",
+      "noChange": "No permission changed"
+    }
+  },
   "dashboard": {
     "greeting": "Hello, {name}",
     "description": "Coordinate the atelier, in-store appointments and fabric stock for today.",
@@ -417,16 +516,12 @@
       "description": "Who's a regular, who owes payment, who has measurements on file — including guest buyers."
     },
     "vouchers": {
-      "eyebrow": "Marketing & Promotions",
-      "title": "Discount Codes (Vouchers)",
-      "description": "Enable or disable discount codes and track how many times they were used.",
-      "meta": "<value>{count}</value> promo {count, plural, one {code} other {codes}} in total"
+      "title": "Coupons",
+      "description": "Discount codes: what they give, how long they run, how many times they've been used."
     },
     "cms": {
-      "eyebrow": "Content & Guides",
-      "title": "News & FAQ Management",
-      "description": "Publish or unpublish articles and FAQs shown on the storefront.",
-      "meta": "<value>{articles}</value> {articles, plural, one {article} other {articles}} • <value>{faqs}</value> {faqs, plural, one {question} other {questions}}"
+      "title": "Content & FAQs",
+      "description": "\"Chuyện Của Lụa & Mây\" articles and the frequently asked questions shown on the store."
     },
     "collections": {
       "title": "Collections",
@@ -461,26 +556,16 @@
       "description": "Alteration, exchange, return and warranty tickets — where each garment is and what's next."
     },
     "saleEvents": {
-      "title": "Sale events",
-      "description": "Time-limited discounts for collections, categories or products.",
-      "planned": [
-        "Set start and end times",
-        "Apply to a collection, a category or individual products",
-        "Discount by percentage or fixed amount"
-      ]
+      "title": "Sale campaigns",
+      "description": "Time-boxed discounts: how much, on which items, until when — and how they sell."
     },
     "shippingPayment": {
       "title": "Shipping & payment",
-      "description": "Configure delivery fees and payment methods.",
-      "planned": [
-        "Shipping fees by region",
-        "Payment methods: COD, bank transfer, payment gateway",
-        "Deposit rate for made-to-measure orders"
-      ]
+      "description": "Where we deliver, how long it takes, what it costs — and how customers pay."
     },
     "rolePermissions": {
       "title": "Permissions",
-      "description": "Each staff member's permissions — every permission unlocks a group of admin screens."
+      "description": "Who can do what in the admin area — draft changes, preview each person's menu, then save once."
     },
     "staff": {
       "title": "Staff",
@@ -574,20 +659,189 @@
     }
   },
   "cms": {
-    "tabArticles": "Articles & Guides ({count})",
-    "tabFaqs": "Frequently asked questions ({count})",
-    "newArticle": "New article",
-    "newFaq": "Add question",
-    "visible": "Visible",
-    "hidden": "Hidden",
-    "emptyFaqs": "No FAQ entries yet.",
-    "emptyArticles": "No articles yet.",
-    "colStatus": "Publication status",
-    "colTitle": "Article title",
-    "colDate": "Published on",
-    "draft": "Draft",
-    "colAuthor": "Author",
-    "published": "Published"
+    "actions": "Actions",
+    "cancel": "Cancel",
+    "unsaved": "Unsaved changes",
+    "discard": "Discard",
+    "save": "Save changes",
+    "saving": "Saving…",
+    "lang": "Content language",
+    "missing": "Not translated",
+    "tabsLabel": "Content type",
+    "tab": {
+      "articles": "Articles",
+      "faqs": "FAQs"
+    },
+    "storefrontNote": "The storefront News and FAQs pages still show sample content — what you write here goes live once the storefront is connected to the content API.",
+    "filter": {
+      "label": "Show",
+      "ALL": "All",
+      "PUBLISHED": "Published",
+      "DRAFT": "Drafts",
+      "NO_EN": "Missing English",
+      "topic": "Topic"
+    },
+    "topics": {
+      "sizing": "Sizing & measurements",
+      "shipping": "Shipping",
+      "materials": "Fabrics & care",
+      "refunds": "Returns & refunds",
+      "none": "Uncategorised"
+    },
+    "toast": {
+      "published": "Article published",
+      "unpublished": "Article taken down",
+      "duplicated": "Draft created from this article",
+      "deleted": "Article deleted",
+      "articleSaved": "Article saved",
+      "faqShown": "Question is now on the FAQs page",
+      "faqHidden": "Question hidden",
+      "faqSaved": "Question saved",
+      "faqCreated": "Question added",
+      "faqDeleted": "Question deleted"
+    },
+    "articles": {
+      "search": "Search title, slug…",
+      "create": "New article",
+      "empty": "No articles yet. The first \"Chuyện Của Lụa & Mây\" story starts with New article.",
+      "noMatch": "No articles match this filter.",
+      "column": {
+        "title": "Article",
+        "state": "Status",
+        "read": "Read",
+        "author": "Author"
+      },
+      "published": "Published",
+      "draft": "Draft",
+      "updated": "Edited {date}",
+      "minutes": "~{count} min read",
+      "hasEn": "English ready",
+      "noEn": "Missing English",
+      "menu": {
+        "label": "Actions for {title}",
+        "edit": "Edit",
+        "view": "View on store",
+        "publish": "Publish",
+        "unpublish": "Take down",
+        "unpublishHint": "Back to draft — shared links will show not found",
+        "duplicate": "Duplicate as draft",
+        "delete": "Delete",
+        "deleteBlocked": "Published — take it down before deleting"
+      },
+      "deleteDialog": {
+        "title": "Delete this article?",
+        "body": "The draft is deleted permanently. The action is recorded in the audit log."
+      }
+    },
+    "faqs": {
+      "search": "Search questions and answers…",
+      "count": "{shown}/{total} questions",
+      "add": "Add question",
+      "empty": "No questions yet.",
+      "noMatch": "No questions match.",
+      "hidden": "Hidden",
+      "visible": "Visible",
+      "noEn": "Missing English",
+      "up": "Move up",
+      "down": "Move down",
+      "pick": "Pick a question on the left to edit, or add a new one.",
+      "back": "Back to list",
+      "editTitle": "Edit question",
+      "newTitle": "New question",
+      "langHint": "Switch question and answer between Vietnamese and English",
+      "field": {
+        "topic": "Topic",
+        "topicShort": "Topic",
+        "active": "Show on the FAQs page",
+        "activeHint": "Hide to draft gradually or retire an old answer without losing it.",
+        "question": "Question",
+        "answer": "Answer",
+        "answerHint": "Line breaks are kept. Write as if answering at the counter — short and specific."
+      },
+      "placeholder": {
+        "question": "Please enter the question",
+        "answer": "Please enter the answer"
+      },
+      "errors": {
+        "question": "Please enter the question",
+        "answer": "Please enter the answer"
+      },
+      "preview": "Customers will see",
+      "delete": "Delete question",
+      "hide": "Hide",
+      "show": "Show",
+      "create": "Add question",
+      "deleteDialog": {
+        "title": "Delete this question?",
+        "body": "The question is deleted permanently. Use Hide to take it off the page temporarily."
+      }
+    },
+    "editor": {
+      "back": "Content & FAQs",
+      "newTitle": "New article",
+      "newSubtitle": "Not saved · save a draft to continue later",
+      "savedSubtitle": "{author} · updated {date}",
+      "langHint": "Switch title, summary and body between Vietnamese and English",
+      "view": "View on store",
+      "unpublish": "Take down",
+      "saveDraft": "Save draft",
+      "publish": "Publish",
+      "sections": {
+        "main": "Title & summary",
+        "content": "Body",
+        "cover": "Cover image",
+        "check": "Before publishing",
+        "google": "On Google",
+        "toc": "Contents"
+      },
+      "field": {
+        "title": "Title",
+        "slug": "Slug",
+        "excerpt": "Summary"
+      },
+      "hint": {
+        "slug": "Lowercase without accents, joined by hyphens. Follows the title until you edit it.",
+        "slugPublished": "Published — changing the slug breaks links customers already shared.",
+        "excerpt": "Shown under the title in the article list and on Google. About {min}–{max} characters is ideal."
+      },
+      "placeholder": {
+        "title": "Please enter the article title",
+        "excerpt": "Please enter a one or two sentence summary",
+        "content": "Please enter the body. Leave a blank line between paragraphs; \"## \" starts a section heading; \"> \" is a quote."
+      },
+      "slugFromTitle": "Regenerate from title",
+      "write": "Write",
+      "previewMode": "Preview",
+      "insertHeading": "Section heading",
+      "insertQuote": "Quote",
+      "formatHint": "## heading · > quote · blank line between paragraphs",
+      "previewEmpty": "Nothing to preview yet.",
+      "words": "{words} words · ~{minutes} min read",
+      "minWords": "At least {count} words needed to publish",
+      "removeCover": "Remove cover",
+      "uploading": "Uploading…",
+      "uploadCover": "Upload a cover image",
+      "replaceCover": "Replace image",
+      "coverHint": "Landscape 16:9, up to 5MB. Used in the article list, the article header and social shares.",
+      "googleEmpty": "The summary will appear here."
+    },
+    "check": {
+      "blocking": "{count, plural, one {# blocker} other {# blockers}}",
+      "warnings": "{count, plural, one {# suggestion} other {# suggestions}}",
+      "ready": "Ready",
+      "allGood": "This article is ready to publish."
+    },
+    "issue": {
+      "TITLE": "No title yet",
+      "SLUG": "Slug may only contain lowercase letters, digits and hyphens",
+      "SLUG_TAKEN": "Another article already uses this slug",
+      "EXCERPT": "No summary yet",
+      "THUMBNAIL": "No cover image yet",
+      "CONTENT_SHORT": "Body is under {min} words",
+      "NO_HEADING": "No section headings (##) — long articles will have no table of contents",
+      "EXCERPT_LENGTH": "Keep the summary at 80–160 characters to show fully on Google",
+      "NO_ENGLISH": "No English version — English visitors will see Vietnamese"
+    }
   },
   "customers": {
     "searchPlaceholder": "Search name, email, phone…",
@@ -1239,19 +1493,787 @@
     }
   },
   "vouchers": {
-    "searchPlaceholder": "Search by code or description...",
-    "noMinimum": "No minimum",
-    "empty": "No discount codes yet.",
-    "add": "Create voucher",
-    "colUsage": "Used / Limit",
-    "colMinOrder": "Minimum order",
-    "colCode": "Voucher code",
-    "colStatus": "Status",
-    "expired": "Expired",
-    "colDiscount": "Discount",
-    "colValidity": "Validity",
-    "inactive": "Inactive",
-    "active": "Active"
+    "searchPlaceholder": "Search code, description…",
+    "create": "Create coupon",
+    "cancel": "Cancel",
+    "processing": "Saving…",
+    "unlimited": "Unlimited",
+    "tabsLabel": "Coupon lifecycle",
+    "tab": {
+      "RUNNING": "Running",
+      "SCHEDULED": "Scheduled",
+      "ENDED": "Expired / used up",
+      "DISABLED": "Disabled"
+    },
+    "state": {
+      "RUNNING": "Running",
+      "SCHEDULED": "Scheduled",
+      "ENDED": "Ended",
+      "EXPIRED": "Expired",
+      "USED_UP": "Used up",
+      "DISABLED": "Disabled"
+    },
+    "offer": {
+      "percent": "{value}% off",
+      "fixed": "{amount} off",
+      "cap": "up to {amount}",
+      "min": "Orders from {amount}",
+      "anyOrder": "Any order"
+    },
+    "period": {
+      "left": "{days, plural, one {# day} other {# days}} left",
+      "startsIn": "starts in {days, plural, one {# day} other {# days}}",
+      "ordersUsed": "{count, plural, one {# order} other {# orders}} used it"
+    },
+    "column": {
+      "code": "Code",
+      "offer": "Offer",
+      "period": "Period",
+      "usage": "Usage",
+      "state": "Status",
+      "actions": "Actions"
+    },
+    "empty": "No coupons yet. Press “Create coupon” to start.",
+    "emptyTab": {
+      "RUNNING": "No running coupons.",
+      "SCHEDULED": "No scheduled coupons.",
+      "ENDED": "No ended coupons yet.",
+      "DISABLED": "No disabled coupons."
+    },
+    "menu": {
+      "label": "Actions for {code}",
+      "edit": "Edit",
+      "duplicate": "Duplicate",
+      "enable": "Enable",
+      "disable": "Disable",
+      "delete": "Delete",
+      "deleteBlocked": "Used by orders — can only be disabled"
+    },
+    "deleteDialog": {
+      "title": "Delete coupon {code}?",
+      "description": "No orders use this coupon, so deleting it doesn't affect sales data.",
+      "body": "Customers holding this code won't be able to use it."
+    },
+    "toast": {
+      "created": "Coupon {code} created.",
+      "saved": "Coupon saved.",
+      "enabled": "Coupon enabled.",
+      "disabled": "Coupon disabled.",
+      "duplicated": "Duplicated as {code} (disabled — review, then enable).",
+      "deleted": "Coupon deleted."
+    },
+    "ticket": {
+      "brand": "Thiên Canh",
+      "code": "Enter code",
+      "noDates": "No dates set"
+    },
+    "errors": {
+      "code": "3–30 characters: uppercase letters, digits and hyphens.",
+      "percent": "Discount must be between 0 and 100%.",
+      "amount": "The amount must be greater than 0.",
+      "endRequired": "Please choose an end date.",
+      "endBeforeStart": "The end date must be after the start date."
+    },
+    "editor": {
+      "back": "Coupons",
+      "newTitle": "New coupon",
+      "newSubtitle": "Customers enter the code at checkout.",
+      "usedSubtitle": "Used {used} times · {orders} orders",
+      "save": "Save changes",
+      "create": "Create coupon",
+      "generate": "Generate a random code",
+      "sections": {
+        "code": "Code & description",
+        "discount": "Discount",
+        "limits": "Dates & limits"
+      },
+      "field": {
+        "code": "Coupon code",
+        "description": "Internal description",
+        "type": "Discount type",
+        "percent": "Percent off",
+        "amount": "Amount off",
+        "maxDiscount": "Maximum discount",
+        "minOrder": "Minimum order",
+        "start": "Start date",
+        "end": "End date",
+        "usageLimit": "Total uses",
+        "active": "Status"
+      },
+      "hint": {
+        "code": "Customers type this — keep it short and easy to say over the phone. Converted to uppercase.",
+        "codeLocked": "Orders already use this code, so it can't be changed.",
+        "description": "Staff-only — note the occasion and where the code was shared.",
+        "maxDiscount": "Caps the discount on large orders. Empty = no cap.",
+        "minOrder": "Orders below this don't qualify. Empty = any order.",
+        "usageLimit": "The code stops once used up. Empty = unlimited.",
+        "active": "Disable to pause without losing the setup."
+      },
+      "placeholder": {
+        "description": "E.g. Tet gift for regulars, sent via Zalo",
+        "noLimit": "Unlimited",
+        "anyOrder": "Any order"
+      },
+      "type": {
+        "PERCENTAGE": "Percentage",
+        "FIXED_AMOUNT": "Fixed amount"
+      },
+      "activeOn": "Enabled",
+      "activeOff": "Disabled",
+      "try": {
+        "title": "Try it",
+        "orderValue": "Order value",
+        "discount": "Discount",
+        "pay": "Customer pays",
+        "belowMin": "Below the minimum order, so no discount applies.",
+        "capped": "Hit the maximum discount."
+      },
+      "usage": "Usage",
+      "ordersUsed": "{count, plural, one {# order} other {# orders}} used this code",
+      "checkoutNote": "Note: checkout doesn't apply coupons on the server yet — codes set up here take effect once vouchers are wired into ordering."
+    }
+  },
+  "saleEvents": {
+    "create": "New campaign",
+    "searchPlaceholder": "Search by name, badge…",
+    "tabsLabel": "Filter by lifecycle",
+    "cancel": "Cancel",
+    "productCount": "{count, plural, one {# product} other {# products}}",
+    "empty": "No sale campaigns yet. Click \"New campaign\" to plan the first one.",
+    "emptyTab": {
+      "RUNNING": "Nothing is running — customers see regular prices.",
+      "SCHEDULED": "No upcoming campaigns scheduled.",
+      "DRAFT": "No drafts.",
+      "PAUSED": "No paused campaigns.",
+      "ENDED": "No campaigns have ended yet."
+    },
+    "tab": {
+      "RUNNING": "Running",
+      "SCHEDULED": "Scheduled",
+      "DRAFT": "Drafts",
+      "PAUSED": "Paused",
+      "ENDED": "Ended"
+    },
+    "state": {
+      "RUNNING": "Running",
+      "SCHEDULED": "Scheduled",
+      "DRAFT": "Draft",
+      "PAUSED": "Paused",
+      "ENDED": "Ended",
+      "ENDED_EARLY": "Ended early"
+    },
+    "offer": {
+      "percent": "{value}% off",
+      "amount": "{amount} off",
+      "fixedPrice": "All at {amount}"
+    },
+    "quota": {
+      "unlimited": "{sold} sold"
+    },
+    "filter": {
+      "scope": "Scope",
+      "ALL_SCOPES": "All",
+      "ALL": "Whole shop",
+      "COLLECTIONS": "By collection",
+      "CATEGORIES": "By product type",
+      "PRODUCTS": "Hand-picked products"
+    },
+    "column": {
+      "name": "Campaign",
+      "offer": "Offer",
+      "period": "Period",
+      "result": "Results",
+      "actions": "Actions"
+    },
+    "scopeSummary": {
+      "ALL": "Whole shop",
+      "COLLECTIONS": "Collections: {names}",
+      "CATEGORIES": "Types: {names}",
+      "PRODUCTS": "{count, plural, one {# hand-picked product} other {# hand-picked products}}"
+    },
+    "period": {
+      "left": "{days, plural, one {# day left} other {# days left}}",
+      "startsIn": "{days, plural, one {Starts in # day} other {Starts in # days}}",
+      "pastStart": "Start time has passed",
+      "endedEarly": "Stopped early at {date}",
+      "lasted": "{days, plural, one {Ran # day} other {Ran # days}}"
+    },
+    "result": {
+      "line": "{orders, plural, one {# order} other {# orders}} · {units, plural, one {# item} other {# items}}",
+      "barsLabel": "Daily revenue",
+      "none": "No orders yet"
+    },
+    "timeline": {
+      "title": "Sale calendar",
+      "subtitle": "2 weeks back → 10 weeks ahead · hover a bar for details",
+      "today": "Today",
+      "empty": "No campaigns in this range.",
+      "hidden": "{count, plural, one {# campaign is} other {# campaigns are}} outside the calendar"
+    },
+    "insight": {
+      "title": "Needs attention",
+      "none": "All campaigns look fine.",
+      "more": "Show {count} more",
+      "less": "Show less",
+      "PAUSED": "Paused — customers see regular prices while the campaign is still valid.",
+      "NO_PRODUCTS": "No product is discounted — check the scope or exclusions.",
+      "OUT_OF_STOCK": "{count, plural, one {# ready-made item is} other {# ready-made items are}} out of stock: {names}.",
+      "ENDING_TODAY": "Ends today — extend it or get ready to take the banner down.",
+      "ENDING_SOON": "{days, plural, one {Ends in # day.} other {Ends in # days.}}",
+      "QUOTA_LOW": "{product} has only {left} sale slots left.",
+      "CONFLICT": "{count, plural, one {# product overlaps} other {# products overlap}} with \"{other}\" — customers get the lower price.",
+      "MISSING_EN": "Missing English name / badge — English visitors will see Vietnamese."
+    },
+    "menu": {
+      "label": "Actions for {name}",
+      "view": "View details",
+      "edit": "Edit",
+      "publish": "Publish",
+      "pause": "Pause",
+      "pauseHint": "Customers see regular prices, settings are kept",
+      "resume": "Resume",
+      "duplicate": "Duplicate",
+      "endNow": "End now",
+      "delete": "Delete",
+      "deleteBlocked": "Has orders — can only be ended, not deleted"
+    },
+    "confirm": {
+      "end": {
+        "title": "End \"{name}\"?",
+        "description": "Sale prices are removed from the storefront immediately.",
+        "body": "Placed orders keep their sale price. This cannot be reopened — duplicate it to run again.",
+        "action": "End now"
+      },
+      "delete": {
+        "title": "Delete \"{name}\"?",
+        "description": "The campaign and its per-product prices will be deleted.",
+        "body": "Only campaigns without orders can be deleted. This cannot be undone.",
+        "action": "Delete"
+      }
+    },
+    "toast": {
+      "published": "Published \"{name}\"",
+      "paused": "Paused \"{name}\"",
+      "resumed": "\"{name}\" is selling at sale prices again",
+      "ended": "Ended \"{name}\"",
+      "deleted": "Deleted \"{name}\"",
+      "saved": "Changes saved",
+      "savedDraft": "Draft saved",
+      "createdDraft": "Created draft \"{name}\" (sample data — not saved to the database)",
+      "createdPublished": "Created \"{name}\" (sample data — not saved to the database)"
+    },
+    "picker": {
+      "description": "Tick to select, then Apply to update the scope.",
+      "search": "Search by name, code…",
+      "selectVisible": "Select all shown",
+      "selected": "{count} selected",
+      "apply": "Apply",
+      "empty": "Nothing found.",
+      "inactive": "Discontinued — cannot be put on sale"
+    },
+    "products": {
+      "title": "Products & sale prices",
+      "subtitle": "Prices follow the campaign discount — type in the price box to set one item, or the slots box to cap how many sell at sale price.",
+      "search": "Search products…",
+      "filter": {
+        "ALL": "All {count}",
+        "WARN": "Review {count}",
+        "EXCLUDED": "Excluded {count}"
+      },
+      "column": {
+        "product": "Product",
+        "salePrice": "Sale price",
+        "percent": "Off",
+        "quota": "Slots",
+        "stock": "Stock"
+      },
+      "quotaHint": "How many pieces sell at the sale price. When slots run out the item returns to its regular price even if the campaign is running. Empty = no limit.",
+      "salePriceFor": "Sale price of {name}",
+      "quotaFor": "Sale slots of {name}",
+      "manual": "manual",
+      "custom": "Made to measure",
+      "madeToOrder": "Made to order",
+      "excluded": {
+        "MANUAL": "Excluded from the campaign",
+        "CUSTOM": "Made to measure — not on sale"
+      },
+      "warning": {
+        "CONFLICT": "Overlaps: {names}",
+        "DEEP": "Deep discount",
+        "NO_DISCOUNT": "No discount",
+        "OUT_OF_STOCK": "Out of stock"
+      },
+      "menu": {
+        "label": "Actions for {name}",
+        "resetPrice": "Remove manual price",
+        "include": "Put back in the campaign",
+        "exclude": "Exclude from the campaign",
+        "customLocked": "Made to measure",
+        "customLockedHint": "Turn off \"Exclude made-to-measure\" under Applies to"
+      },
+      "emptyScope": "No products in scope yet — choose collections, product types or products above.",
+      "emptyFilter": "No products match this filter.",
+      "rounding": "Percentage prices are rounded up to the nearest thousand dong.",
+      "roundingHint": "E.g. 15% off 1,890,000 ₫ = 1,606,500 ₫ → shown as 1,607,000 ₫. Customers always see round prices."
+    },
+    "preview": {
+      "title": "Customers will see",
+      "product": "Preview",
+      "empty": "Choose a scope to preview the product card.",
+      "note": "Mock-up of the storefront product card.",
+      "startsIn": "Starts in {days}d {hours}h",
+      "endsIn": "{days}d {hours}h left"
+    },
+    "check": {
+      "title": "Before publishing",
+      "ready": "Ready",
+      "blocking": "{count, plural, one {# error to fix} other {# errors to fix}}",
+      "warnings": "{count, plural, one {# thing to review} other {# things to review}}",
+      "products": "{count, plural, one {# product discounted} other {# products discounted}}",
+      "noProducts": "No product is discounted yet",
+      "noProductsDetail": "Choose a scope under \"Applies to\" or put excluded products back.",
+      "time": "{days, plural, one {Runs # day} other {Runs # days}}",
+      "deep": "{count, plural, one {# product is} other {# products are}} discounted more than {percent}%",
+      "deepDetail": "Double-check for typos — the sale price should still cover fabric and tailoring costs.",
+      "conflict": "{count, plural, one {# product overlaps} other {# products overlap}} with another campaign",
+      "conflictDetail": "Only one sale price applies at a time — customers get the lowest one.",
+      "stock": "{count, plural, one {# ready-made product is} other {# ready-made products are}} out of stock",
+      "stockDetail": "Customers will see \"out of stock\" — restock or exclude it.",
+      "noDiscount": "{count, plural, one {# product is} other {# products are}} already below the fixed price — no discount",
+      "english": "No English name / badge yet",
+      "englishDetail": "English visitors will see Vietnamese text.",
+      "home": "The homepage already features \"{name}\" — turning this on replaces it",
+      "titleLive": "Campaign health"
+    },
+    "results": {
+      "title": "Sales results",
+      "revenue": "Revenue at sale prices",
+      "barsCaption": "One bar per day · {days, plural, one {# day} other {# days}}",
+      "orders": "Orders",
+      "units": "Items",
+      "discount": "Discount share",
+      "discountLine": "Customers saved {amount} compared with regular prices.",
+      "top": "Best sellers this run",
+      "unitsShort": "{count, plural, one {# item} other {# items}}"
+    },
+    "activity": {
+      "title": "Activity",
+      "empty": "No activity yet.",
+      "kind": {
+        "CREATED": "Created",
+        "UPDATED": "Settings changed",
+        "PUBLISHED": "Published",
+        "PAUSED": "Paused",
+        "RESUMED": "Resumed",
+        "ENDED_EARLY": "Ended early",
+        "PRICE_OVERRIDE": "Manual price set"
+      }
+    },
+    "errors": {
+      "name": "Please enter a campaign name",
+      "badge": "Please enter a badge",
+      "value": {
+        "PERCENTAGE": "Please enter a percentage above 0",
+        "FIXED_AMOUNT": "Please enter the amount off",
+        "FIXED_PRICE": "Please enter the fixed price"
+      },
+      "percentMax": "Maximum 90% off",
+      "time": "Please enter a date and a time as HH:mm",
+      "endBeforeStart": "The end must be after the start",
+      "endPast": "The end time has already passed"
+    },
+    "banner": {
+      "paused": "This campaign is paused — customers see regular prices. Click \"Resume\" when ready.",
+      "ended": "This campaign has ended — view only. Click \"Run again\" to duplicate it.",
+      "running": "Running: the start time is locked. Discount / scope changes apply as soon as you save; placed orders keep their price."
+    },
+    "editor": {
+      "back": "Sale campaigns",
+      "newTitle": "New campaign",
+      "more": "More actions",
+      "rerun": "Run again",
+      "saveDraft": "Save draft",
+      "publish": "Save & schedule",
+      "publishNow": "Publish & start now",
+      "save": "Save changes",
+      "newSubtitle": "Not saved · save a draft to continue later",
+      "copySubtitle": "Copy — pick new dates, then save",
+      "savedSubtitle": "Created by {actor} · updated {date}",
+      "endedSubtitle": "View only",
+      "unsaved": "Unsaved changes",
+      "lang": "Content language",
+      "langHint": "Switch name, badge and description between Vietnamese and English",
+      "langMissing": "Not translated",
+      "sections": {
+        "display": "Display",
+        "displayHint": "Internal name plus the badge customers see on product photos.",
+        "offer": "Offer",
+        "time": "Schedule",
+        "scope": "Applies to",
+        "scopeHint": "Picking collections / types also covers products added later.",
+        "rules": "Purchase & display rules"
+      },
+      "field": {
+        "name": "Campaign name",
+        "badge": "Photo badge",
+        "description": "Short description",
+        "percent": "Percentage off",
+        "FIXED_AMOUNT": "Amount off per item",
+        "FIXED_PRICE": "Fixed price",
+        "start": "Start",
+        "end": "End",
+        "time": "Time",
+        "countdown": "Show a countdown on product cards",
+        "excludeCustom": "Exclude made-to-measure",
+        "perCustomer": "Limit per order",
+        "stack": "Allow coupons on top",
+        "home": "Feature on the homepage"
+      },
+      "hint": {
+        "name": "Shown on the banner and the sale listing page",
+        "badge": "Short, max {max} characters — e.g. \"Tết Sale\", \"−20%\"",
+        "description": "One line under the banner / sale page title",
+        "percent": "Applied to each item's regular price, rounded up to the nearest thousand",
+        "FIXED_AMOUNT": "Subtracted from each item; cheaper items drop to 0 ₫ — consider slots",
+        "FIXED_PRICE": "Every item sells at one price; cheaper items keep their price",
+        "startLocked": "Already started — only the end time can change",
+        "excludeCustom": "Made-to-measure is quoted by measurements and fabric — usually not discounted",
+        "excludeCustomCount": "{count, plural, one {The scope has # made-to-measure item} other {The scope has # made-to-measure items}}",
+        "perCustomer": "Maximum sale-priced items per order — extra items are charged at regular price",
+        "stackOn": "Customers may apply a coupon on top of sale prices",
+        "stackOff": "Orders with sale items cannot use a coupon",
+        "home": "Shows a banner at the top of the homepage while running",
+        "homeTaken": "\"{name}\" is featured at the same time — turning this on replaces it"
+      },
+      "placeholder": {
+        "name": "Please enter a name, e.g. Lunar New Year Sale",
+        "badge": "Please enter a badge",
+        "description": "Please enter a short description",
+        "noLimit": "No limit"
+      },
+      "type": {
+        "PERCENTAGE": "% off",
+        "FIXED_AMOUNT": "Amount off",
+        "FIXED_PRICE": "Fixed price"
+      },
+      "example": "Example:",
+      "exampleEmpty": "Enter a discount to see an example price.",
+      "timezone": "Vietnam time (GMT+7)",
+      "quick": {
+        "label": "Quick:",
+        "weekend": "This weekend",
+        "week": "7 days from tomorrow",
+        "month": "Until month end"
+      },
+      "duration": "Lasts {days}d {hours}h",
+      "startsVerySoon": "starts within 2 hours",
+      "scope": {
+        "ALL": "Whole shop",
+        "COLLECTIONS": "Collections",
+        "CATEGORIES": "Product types",
+        "PRODUCTS": "Pick products",
+        "allNote": "Every product on sale, including ones added after the campaign starts.",
+        "none": {
+          "COLLECTIONS": "No collection selected",
+          "CATEGORIES": "No product type selected",
+          "PRODUCTS": "No product selected"
+        },
+        "pick": {
+          "COLLECTIONS": "Choose collections",
+          "CATEGORIES": "Choose product types",
+          "PRODUCTS": "Choose products"
+        },
+        "remove": "Remove {name}",
+        "more": "and {count} more",
+        "summary": "<b>{inScope}</b> in scope · <b>{excluded}</b> excluded · <b>{applied}</b> discounted"
+      },
+      "perOrder": "per order",
+      "tipsTitle": "Tips",
+      "tips": "Save a draft to work on it gradually. Published campaigns start and end on time by themselves. If a product is in several campaigns at once, customers get the lowest price.",
+      "mockNote": "This screen uses sample data — changes live in your browser only and reset on reload."
+    }
+  },
+  "shippingPayment": {
+    "eyebrow": "Settings",
+    "lastSaved": "Last saved {date} · {by}",
+    "you": "You",
+    "tabsLabel": "Settings group",
+    "tab": {
+      "shipping": "Shipping",
+      "payment": "Payment"
+    },
+    "cancel": "Cancel",
+    "actions": "Actions",
+    "noLimit": "No limit",
+    "on": "On",
+    "off": "Off",
+    "hours": "hours",
+    "mockNote": "This screen uses sample data — saving only changes your browser; real orders still use the fixed 30,000 ₫ fee and the bank account from environment variables until the database is connected.",
+    "toast": {
+      "saved": "Shipping & payment settings saved"
+    },
+    "region": {
+      "NORTH": "North",
+      "CENTRAL": "Central",
+      "SOUTH": "South"
+    },
+    "issue": {
+      "titleBlock": "{count, plural, one {# error} other {# errors}} to fix before saving",
+      "titleWarn": "{count, plural, one {# thing} other {# things}} worth reviewing",
+      "go": "Show",
+      "UNASSIGNED": "{count, plural, one {# province is} other {# provinces are}} not in any delivery zone — customers there cannot order: {names}.",
+      "DUPLICATE": "{province} is in several zones: {zones}.",
+      "ZONE_EMPTY": "Zone \"{zone}\" has no provinces.",
+      "ETA_INVALID": "Zone \"{zone}\": minimum delivery days exceed the maximum.",
+      "ZONE_CARRIER_OFF": "Zone \"{zone}\" ships with {carrier}, which is turned off.",
+      "NO_METHOD": "No payment method is enabled.",
+      "NO_TAILORED_METHOD": "Made-to-measure orders cannot use COD — enable Bank transfer or Deposit.",
+      "BANK_INCOMPLETE": "The receiving bank account is incomplete (bank, account number, holder).",
+      "DEPOSIT_RANGE": "The deposit must be between 30% and 50%.",
+      "COD_BELOW_DEPOSIT": "The \"deposit required\" amount is above the COD cap, so it never applies.",
+      "CUTOFF_INVALID": "The order cut-off must be HH:mm."
+    },
+    "bar": {
+      "unsaved": "Unsaved changes",
+      "blocked": "{count, plural, one {# error} other {# errors}} to fix before saving",
+      "discard": "Discard",
+      "save": "Save changes"
+    },
+    "zones": {
+      "title": "Delivery zones & fees",
+      "description": "Every province belongs to exactly one zone. The number on a province is its zone — hover to see the whole zone, click to edit.",
+      "add": "Add zone",
+      "days": "days",
+      "column": {
+        "zone": "Zone",
+        "fee": "Fee",
+        "eta": "Time",
+        "carrier": "Carrier"
+      },
+      "noProvinces": "No provinces yet",
+      "provinceSummary": "{count} provinces: {names}…",
+      "free": "Free",
+      "extra": "+{amount} per extra item",
+      "noExtra": "No extra-item fee",
+      "sameDay": "Same day",
+      "etaRange": "{min}–{max} days",
+      "freeShipYes": "Free-shipping threshold applies",
+      "freeShipNo": "No free shipping",
+      "unassigned": "Not in any zone — click to create one",
+      "empty": "No delivery zones yet.",
+      "menu": {
+        "label": "Actions for {name}",
+        "edit": "Edit zone",
+        "delete": "Delete zone"
+      },
+      "deleteDialog": {
+        "title": "Delete zone \"{name}\"?",
+        "description": "{count, plural, one {# province} other {# provinces}} will have no delivery fee.",
+        "body": "Customers there cannot order until you move those provinces into another zone. Changes apply only after you save."
+      },
+      "errors": {
+        "name": "Please enter a zone name",
+        "fee": "Please enter the fee (0 if free)",
+        "eta": "Minimum days must be less than or equal to maximum",
+        "provinces": "Choose at least one province"
+      },
+      "dialog": {
+        "newTitle": "Add delivery zone",
+        "editTitle": "Edit zone \"{name}\"",
+        "description": "Fee, timing and provinces. Provinces from another zone move into this one.",
+        "picked": "{count, plural, one {# province} other {# provinces}} selected",
+        "moving": "{count, plural, one {# moves} other {# move}} from another zone",
+        "create": "Add zone",
+        "apply": "Apply"
+      },
+      "field": {
+        "name": "Zone name",
+        "baseFee": "First-item fee",
+        "extraFee": "Fee per extra item",
+        "eta": "Delivery time",
+        "etaMin": "Minimum days",
+        "etaMax": "Maximum days",
+        "carrier": "Carrier",
+        "carrierShort": "Ship with",
+        "freeShip": "Free-shipping threshold applies",
+        "provinces": "Provinces"
+      },
+      "hint": {
+        "baseFee": "Fee for a one-item order. Enter 0 if this zone is always free.",
+        "extraFee": "Added from the second item — boxed áo dài make multi-item parcels heavier.",
+        "eta": "Counted from packing. Made-to-measure orders add tailoring time.",
+        "freeShip": "Turn off for remote, costly zones — customers pay even above the threshold."
+      },
+      "placeholder": {
+        "name": "Please enter a zone name, e.g. Mekong Delta"
+      }
+    },
+    "carriers": {
+      "title": "Carriers",
+      "description": "If a carrier is turned off, zones using it need another one.",
+      "add": "Add carrier",
+      "kind": {
+        "COURIER": "Courier",
+        "SHOP_DELIVERY": "Shop delivery",
+        "PICKUP": "In-store pickup"
+      },
+      "pickupUse": "Chosen by customers at checkout — no delivery fee",
+      "usedBy": "Delivering: {names}",
+      "unused": "Not used by any zone",
+      "edit": "Edit",
+      "editNamed": "Edit {name}",
+      "offSuffix": "{name} (off)",
+      "dialog": {
+        "newTitle": "Add carrier",
+        "editTitle": "Edit \"{name}\"",
+        "description": "The name is shown on order tracking; the note is staff-only.",
+        "name": "Carrier name",
+        "namePlaceholder": "Please enter a carrier name",
+        "nameError": "Please enter a carrier name",
+        "kind": "Type",
+        "note": "Internal note",
+        "noteHint": "Pickup time, contact, packing notes…",
+        "notePlaceholder": "Please enter a note",
+        "footnote": "Turn carriers on / off with the switch in the list.",
+        "create": "Add",
+        "apply": "Apply"
+      }
+    },
+    "free": {
+      "title": "Free shipping",
+      "description": "Applies to zones with the threshold turned on.",
+      "threshold": "Orders from",
+      "thresholdHint": "Based on the subtotal after discounts, excluding gift wrap.",
+      "tailored": "Made-to-measure orders always ship free",
+      "tailoredHint": "High-value pieces shipped once, after tailoring.",
+      "excludedZones": "Not applied to: {names}."
+    },
+    "fulfillment": {
+      "title": "Order preparation",
+      "description": "Affects the delivery estimate customers see at checkout.",
+      "prepDays": "Preparation days",
+      "prepDaysHint": "Ready-made: pressing, folding, boxing. Excludes made-to-measure.",
+      "cutoff": "Order cut-off",
+      "cutoffHint": "Orders before this time are prepared from today, after it from tomorrow.",
+      "giftWrap": "Gift wrap",
+      "giftWrapHint": "Dó-paper box and a handwritten card — chosen at checkout.",
+      "giftWrapFee": "Fee",
+      "pause": "Pause deliveries",
+      "pauseHint": "Tết or holidays — customers can still order, checkout shows a notice.",
+      "pauseFrom": "From",
+      "pauseTo": "To",
+      "pauseMessage": "Customer notice",
+      "pauseMessageHint": "Shown in the cart and at checkout during the pause.",
+      "pausePlaceholder": "Please enter a notice"
+    },
+    "methods": {
+      "title": "Payment methods",
+      "description": "This order is the order customers see at checkout. Each method's rules sit right below it.",
+      "name": {
+        "COD": "Cash on delivery (COD)",
+        "BANK_TRANSFER": "Full bank transfer",
+        "DEPOSIT": "Deposit"
+      },
+      "summary": {
+        "COD": "Pay in full on delivery · not for made-to-measure",
+        "CODLimited": "Pay in full on delivery · orders up to {amount} · not for made-to-measure",
+        "BANK_TRANSFER": "Scan VietQR, the shop confirms after reconciling",
+        "DEPOSIT": "Pay {percent}% upfront, the rest on delivery"
+      },
+      "up": "Move up",
+      "down": "Move down",
+      "customerNote": "Note for customers",
+      "customerNoteHint": "One line under the method name at checkout.",
+      "customerNotePlaceholder": "Please enter a note",
+      "gateway": "Payment gateway (cards, e-wallets)",
+      "gatewayHint": "Not integrated — needs a gateway contract and a Backend module.",
+      "notConnected": "Not connected",
+      "cod": {
+        "max": "Maximum COD order",
+        "maxHint": "Larger orders must transfer or pay a deposit — fewer refused parcels.",
+        "verified": "Verified phone numbers only",
+        "verifiedHint": "Guests and unverified numbers will not see COD.",
+        "tailoredLocked": "Made-to-measure orders can never be 100% COD — fixed rule."
+      },
+      "deposit": {
+        "percent": "Deposit rate",
+        "percentHint": "Between {min}% and {max}%. Deposits are rounded up to the nearest thousand dong.",
+        "percentError": "Enter {min}–{max}%",
+        "requiredAbove": "Deposit required from",
+        "requiredAboveHint": "Ready-made orders from this amount lose COD; customers pick deposit or transfer. Made-to-measure always requires it.",
+        "never": "Made-to-measure only"
+      },
+      "transfer": {
+        "remind": "Remind to pay after",
+        "remindHint": "Send a message with the QR code if no payment arrives.",
+        "autoCancel": "Auto-cancel after",
+        "autoCancelHint": "Unpaid orders are cancelled and stock is released. Empty = never.",
+        "never": "Never"
+      }
+    },
+    "bank": {
+      "title": "Receiving bank account",
+      "description": "Used for the VietQR code of Bank transfer and Deposit.",
+      "unused": "Not in use — Bank transfer and Deposit are both off.",
+      "bank": "Bank",
+      "bankShort": "Bank",
+      "accountNumber": "Account number",
+      "accountNumberError": "6–19 digits",
+      "branch": "Branch",
+      "branchPlaceholder": "Please enter a branch",
+      "accountName": "Account holder",
+      "accountNameHint": "Uppercased without accents — exactly as customers' banking apps show it.",
+      "accountNameError": "Please enter the account holder",
+      "preview": "Customers will see",
+      "amount": "Amount",
+      "content": "Reference",
+      "copy": "Copy",
+      "copied": "Copied",
+      "previewNote": "The transfer reference is always THIENCANH + order code for reconciliation — not editable."
+    },
+    "reconcile": {
+      "title": "Automatic reconciliation",
+      "description": "Currently done by hand in Orders → \"Record payment\".",
+      "webhook": "Receive bank credit notices",
+      "webhookHint": "Record payments automatically from the THIENCANH [order code] reference via a balance-notification service — not connected."
+    },
+    "sim": {
+      "title": "Try an order",
+      "description": "Uses the settings you are editing, even unsaved.",
+      "province": "Ship to",
+      "subtotal": "Subtotal",
+      "items": "Items",
+      "less": "One item fewer",
+      "more": "One more item",
+      "tailored": "Includes made-to-measure",
+      "pickup": "Pick up at the showroom",
+      "giftWrap": "Gift wrap",
+      "noZone": "{province} is not in any delivery zone — customers cannot order.",
+      "zoneLine": "{zone} · {carrier}",
+      "shipping": "Shipping",
+      "free": "Free",
+      "freeReason": {
+        "THRESHOLD": "{amount} waived — order above threshold",
+        "TAILORED": "{amount} waived — made-to-measure order",
+        "PICKUP": "In-store pickup"
+      },
+      "missing": "Add {amount} for free shipping",
+      "total": "Customer pays",
+      "etaLabel": "Estimated delivery",
+      "etaTailoredLabel": "Delivered after tailoring",
+      "etaTailored": "{min}–{max} days after the piece is finished",
+      "pauseHit": "Falls within the delivery pause — customers will see the notice.",
+      "methods": "Customer can choose",
+      "prepay": "{amount} upfront",
+      "onDelivery": "{amount} on delivery",
+      "paidUpfront": "Fully paid before shipping",
+      "block": {
+        "DISABLED": "Turned off",
+        "TAILORED_NO_COD": "Not for made-to-measure",
+        "COD_LIMIT": "Above the COD maximum",
+        "DEPOSIT_REQUIRED": "Above the deposit-required amount"
+      }
+    }
   },
   "placeholder": {
     "title": "This screen is under construction",

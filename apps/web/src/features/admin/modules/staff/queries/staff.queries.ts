@@ -1,5 +1,14 @@
 import { prisma } from "../../../core/server/db.server";
-import { type StaffActivity, type StaffBoardData, type StaffDetailData, type StaffMemberItem, type StaffRow } from "../types/staff.types";
+import { STAFF_PERMISSIONS, type Permission } from "../../../core/session/permissions";
+import {
+  type PermissionChangeLog,
+  type RolePermissionsData,
+  type StaffActivity,
+  type StaffBoardData,
+  type StaffDetailData,
+  type StaffMemberItem,
+  type StaffRow,
+} from "../types/staff.types";
 
 /** Các trường của một dòng nhân viên (dùng chung cho danh sách và kết quả tạo mới) */
 export const STAFF_MEMBER_SELECT = {
@@ -141,4 +150,49 @@ export async function getStaffDetailQuery(userId: string): Promise<StaffDetailDa
     activities,
     now: now.toISOString(),
   };
+}
+
+const isPermissionList = (value: unknown): value is Permission[] =>
+  Array.isArray(value) && value.every((item) => typeof item === "string" && (STAFF_PERMISSIONS as readonly string[]).includes(item));
+
+/** Đọc mảng quyền trong metadata AuditLog (dữ liệu JSON cũ có thể thiếu / sai dạng → coi như rỗng) */
+function permissionsIn(metadata: unknown, key: string): Permission[] {
+  if (!metadata || typeof metadata !== "object" || !(key in metadata)) return [];
+  const value = (metadata as Record<string, unknown>)[key];
+  return isPermissionList(value) ? value : [];
+}
+
+/** Màn Phân quyền: nhân viên + 20 lần cấp / đổi quyền gần nhất (ai đổi, cho ai, thêm / bớt quyền gì) */
+export async function getRolePermissionsQuery(currentUserId: string): Promise<RolePermissionsData> {
+  const [board, logs] = await Promise.all([
+    getStaffBoardQuery(currentUserId),
+    prisma.auditLog.findMany({
+      where: { action: { in: ["STAFF_PERMISSIONS_UPDATED", "STAFF_CREATED"] }, targetType: "USER" },
+      select: { id: true, action: true, targetId: true, metadata: true, createdAt: true, actor: { select: { name: true, email: true } } },
+      orderBy: { createdAt: "desc" },
+      take: 20,
+    }),
+  ]);
+
+  const targetIds = [...new Set(logs.map((log) => log.targetId).filter((id): id is string => Boolean(id)))];
+  const targets = targetIds.length ? await prisma.user.findMany({ where: { id: { in: targetIds } }, select: { id: true, name: true, email: true } }) : [];
+  const targetName = new Map(targets.map((user) => [user.id, user.name || user.email]));
+
+  const history: PermissionChangeLog[] = logs.map((log) => {
+    const created = log.action === "STAFF_CREATED";
+    const before = created ? [] : permissionsIn(log.metadata, "before");
+    const after = permissionsIn(log.metadata, created ? "permissions" : "after");
+    return {
+      id: log.id,
+      kind: created ? "CREATED" : "UPDATED",
+      actorName: log.actor?.name || log.actor?.email || null,
+      targetId: log.targetId,
+      targetName: log.targetId ? (targetName.get(log.targetId) ?? null) : null,
+      added: after.filter((permission) => !before.includes(permission)),
+      removed: before.filter((permission) => !after.includes(permission)),
+      createdAt: log.createdAt.toISOString(),
+    };
+  });
+
+  return { ...board, history };
 }

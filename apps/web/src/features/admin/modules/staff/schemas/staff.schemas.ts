@@ -18,3 +18,12 @@ export const createStaffSchema = z.object({
   password: newPasswordSchema,
   permissions: permissionsSchema,
 });
+
+/** Lưu nhiều người cùng lúc ở màn Phân quyền — mỗi người một dòng, không trùng người */
+export const updateStaffPermissionsBatchSchema = z.object({
+  changes: z
+    .array(updateStaffPermissionSchema)
+    .min(1)
+    .max(100)
+    .refine((items) => new Set(items.map((item) => item.userId)).size === items.length, "DUPLICATE_STAFF_IN_BATCH"),
+});

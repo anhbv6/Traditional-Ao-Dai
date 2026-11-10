@@ -289,6 +289,105 @@
       "sessions": "Phiên đang mở"
     }
   },
+  "rolePermissions": {
+    "toast": {
+      "saved": "Đã lưu quyền cho {count} nhân viên"
+    },
+    "template": {
+      "SALES": {
+        "name": "Bán hàng & chăm khách"
+      },
+      "WORKSHOP": {
+        "name": "Thợ xưởng"
+      },
+      "STOCK": {
+        "name": "Kho & sản phẩm"
+      },
+      "CONTENT": {
+        "name": "Biên tập nội dung"
+      },
+      "STORE_MANAGER": {
+        "name": "Quản lý cửa hàng"
+      }
+    },
+    "menu": {
+      "label": "Thao tác cho {name}",
+      "preview": "Xem như người này",
+      "profile": "Mở hồ sơ",
+      "applyTemplate": "Áp vai trò mẫu",
+      "grantAll": "Cấp tất cả quyền",
+      "revokeAll": "Thu hồi tất cả",
+      "reset": "Hoàn tác người này"
+    },
+    "row": {
+      "locked": "Đang khóa",
+      "none": "Chưa có quyền — chỉ thấy Tổng quan",
+      "template": "Khớp mẫu: {name}",
+      "custom": "{count} quyền · tùy chỉnh",
+      "changed": "chưa lưu"
+    },
+    "column": {
+      "holders": "{count}/{total} người",
+      "actions": "Thao tác"
+    },
+    "filter": {
+      "label": "Hiện",
+      "ALL": "Tất cả",
+      "CHANGED": "Đang sửa",
+      "NONE": "Chưa có quyền",
+      "LOCKED": "Đang khóa"
+    },
+    "orphaned": "Không nhân viên đang hoạt động nào giữ quyền {names} — mọi việc của quyền này sẽ dồn về Super Admin.",
+    "bulk": {
+      "selectAll": "Chọn tất cả nhân viên",
+      "summary": "Đã chọn {count} người",
+      "template": "Áp vai trò mẫu",
+      "revoke": "Thu hồi hết"
+    },
+    "note": "Ô nền xanh là quyền sắp cấp, nền đỏ là sắp thu hồi — chỉ có hiệu lực khi bấm Lưu. Bấm tên để xem menu người đó sẽ thấy.",
+    "bar": {
+      "summary": "Đổi quyền {count} người · chưa lưu",
+      "discard": "Hoàn tác",
+      "review": "Xem lại & lưu"
+    },
+    "review": {
+      "title": "Lưu quyền cho {count} người?",
+      "description": "Kiểm tra lại từng người trước khi lưu.",
+      "back": "Quay lại",
+      "saving": "Đang lưu…",
+      "confirm": "Lưu quyền",
+      "becomesEmpty": "Sau khi lưu người này chỉ còn thấy Tổng quan và Yêu cầu của tôi.",
+      "effect": "Khu quản trị kiểm tra phiên và quyền ở mỗi lần tải trang — người bị thu hồi mất quyền ngay ở thao tác kế tiếp, không cần đăng nhập lại. Mỗi người được ghi một dòng nhật ký trước → sau."
+    },
+    "preview": {
+      "title": "Xem như nhân viên",
+      "as": "Người",
+      "locked": "Tài khoản đang khóa — không đăng nhập được dù có quyền.",
+      "menu": "Menu trái · {count} màn",
+      "menuLabel": "Menu của {name}",
+      "new": "mới",
+      "lost": "Sẽ mất: {names}",
+      "dashboard": "Khối ở Tổng quan",
+      "block": {
+        "revenue": "Doanh thu",
+        "inventory": "Tồn kho",
+        "tailoring": "Xưởng may",
+        "orders": "Đơn mới"
+      },
+      "adminOnly": "Nhân viên không bao giờ thấy",
+      "lockCustomers": "Khóa / mở tài khoản khách",
+      "reviewApprovals": "Duyệt yêu cầu"
+    },
+    "history": {
+      "title": "Lịch sử phân quyền",
+      "subtitle": "20 lần gần nhất",
+      "empty": "Chưa có lần đổi quyền nào được ghi lại.",
+      "created": "{actor} tạo tài khoản <who>{target}</who>",
+      "updated": "{actor} đổi quyền của <who>{target}</who>",
+      "unknown": "(không rõ)",
+      "noChange": "Không đổi quyền nào"
+    }
+  },
   "dashboard": {
     "greeting": "Xin chào, {name}",
     "description": "Điều phối xưởng may, lịch hẹn tại tiệm và kho vải trong ngày.",
@@ -417,16 +516,12 @@
       "description": "Ai là khách quen, ai còn nợ, ai đã có số đo để may lại — gồm cả khách đặt không cần tài khoản."
     },
     "vouchers": {
-      "eyebrow": "Marketing & Khuyến mãi",
-      "title": "Mã Giảm Giá (Vouchers)",
-      "description": "Bật/tắt hiệu lực mã giảm giá và theo dõi số lượt đã sử dụng.",
-      "meta": "Tổng cộng <value>{count}</value> mã khuyến mãi"
+      "title": "Coupon",
+      "description": "Mã giảm giá: ưu đãi gì, chạy tới khi nào, đã dùng bao nhiêu lượt."
     },
     "cms": {
-      "eyebrow": "Nội dung & Hướng dẫn",
-      "title": "Quản Trị Tin Tức & FAQs",
-      "description": "Bật/tắt xuất bản bài viết và câu hỏi thường gặp hiển thị trên cửa hàng.",
-      "meta": "<value>{articles}</value> bài viết • <value>{faqs}</value> câu hỏi"
+      "title": "Nội dung & FAQs",
+      "description": "Bài viết \"Chuyện Của Lụa & Mây\" và câu hỏi thường gặp hiển thị ở cửa hàng."
     },
     "collections": {
       "title": "Bộ sưu tập",
@@ -462,25 +557,15 @@
     },
     "saleEvents": {
       "title": "Chương trình sale",
-      "description": "Giảm giá theo thời gian cho bộ sưu tập, danh mục hoặc sản phẩm.",
-      "planned": [
-        "Đặt thời gian bắt đầu - kết thúc",
-        "Áp dụng theo bộ sưu tập, danh mục hoặc từng sản phẩm",
-        "Giảm theo % hoặc số tiền cố định"
-      ]
+      "description": "Đợt giảm giá theo thời gian: giảm bao nhiêu, cho món nào, chạy tới khi nào và bán được ra sao."
     },
     "shippingPayment": {
       "title": "Vận chuyển & thanh toán",
-      "description": "Cấu hình phí giao hàng và phương thức thanh toán.",
-      "planned": [
-        "Phí vận chuyển theo khu vực",
-        "Phương thức thanh toán: COD, chuyển khoản, cổng thanh toán",
-        "Tỉ lệ đặt cọc cho đơn may đo"
-      ]
+      "description": "Giao tới đâu, mất bao lâu, phí bao nhiêu — và khách trả tiền bằng cách nào."
     },
     "rolePermissions": {
       "title": "Phân quyền",
-      "description": "Bảng quyền chi tiết của từng nhân viên — mỗi quyền mở một nhóm màn quản trị."
+      "description": "Ai được làm gì trong khu quản trị — soạn thay đổi, xem trước menu từng người, rồi lưu một lần."
     },
     "staff": {
       "title": "Nhân sự",
@@ -574,20 +659,189 @@
     }
   },
   "cms": {
-    "tabArticles": "Bài viết & Cẩm nang ({count})",
-    "tabFaqs": "Câu hỏi thường gặp FAQs ({count})",
-    "newArticle": "Viết bài mới",
-    "newFaq": "Thêm câu hỏi",
-    "visible": "Hiển thị",
-    "hidden": "Ẩn",
-    "emptyFaqs": "Chưa có câu hỏi FAQ nào.",
-    "emptyArticles": "Chưa có bài viết nào.",
-    "colStatus": "Trạng thái xuất bản",
-    "colTitle": "Tiêu đề bài viết",
-    "colDate": "Ngày đăng",
-    "draft": "Bản nháp",
-    "colAuthor": "Tác giả",
-    "published": "Đã đăng"
+    "actions": "Thao tác",
+    "cancel": "Hủy",
+    "unsaved": "Có thay đổi chưa lưu",
+    "discard": "Hoàn tác",
+    "save": "Lưu thay đổi",
+    "saving": "Đang lưu…",
+    "lang": "Ngôn ngữ nội dung",
+    "missing": "Chưa dịch",
+    "tabsLabel": "Loại nội dung",
+    "tab": {
+      "articles": "Bài viết",
+      "faqs": "Câu hỏi thường gặp"
+    },
+    "storefrontNote": "Trang Tin tức và FAQs ở cửa hàng vẫn đang hiển thị nội dung mẫu — bài và câu hỏi soạn ở đây sẽ lên trang khi storefront nối API nội dung.",
+    "filter": {
+      "label": "Hiện",
+      "ALL": "Tất cả",
+      "PUBLISHED": "Đã đăng",
+      "DRAFT": "Bản nháp",
+      "NO_EN": "Thiếu bản tiếng Anh",
+      "topic": "Chủ đề"
+    },
+    "topics": {
+      "sizing": "Số đo & size",
+      "shipping": "Giao hàng",
+      "materials": "Chất liệu & bảo quản",
+      "refunds": "Đổi trả & hoàn tiền",
+      "none": "Chưa phân loại"
+    },
+    "toast": {
+      "published": "Đã đăng bài",
+      "unpublished": "Đã gỡ bài khỏi cửa hàng",
+      "duplicated": "Đã tạo bản nháp từ bài này",
+      "deleted": "Đã xóa bài viết",
+      "articleSaved": "Đã lưu bài viết",
+      "faqShown": "Câu hỏi đã hiện trên trang FAQs",
+      "faqHidden": "Đã ẩn câu hỏi",
+      "faqSaved": "Đã lưu câu hỏi",
+      "faqCreated": "Đã thêm câu hỏi",
+      "faqDeleted": "Đã xóa câu hỏi"
+    },
+    "articles": {
+      "search": "Tìm theo tiêu đề, đường dẫn…",
+      "create": "Viết bài mới",
+      "empty": "Chưa có bài viết nào. Bài đầu tiên của \"Chuyện Của Lụa & Mây\" bắt đầu từ nút Viết bài mới.",
+      "noMatch": "Không có bài khớp bộ lọc.",
+      "column": {
+        "title": "Bài viết",
+        "state": "Trạng thái",
+        "read": "Đọc",
+        "author": "Tác giả"
+      },
+      "published": "Đã đăng",
+      "draft": "Bản nháp",
+      "updated": "Sửa {date}",
+      "minutes": "~{count} phút đọc",
+      "hasEn": "Có bản EN",
+      "noEn": "Thiếu bản EN",
+      "menu": {
+        "label": "Thao tác cho {title}",
+        "edit": "Sửa bài",
+        "view": "Xem trên cửa hàng",
+        "publish": "Đăng bài",
+        "unpublish": "Gỡ xuống",
+        "unpublishHint": "Bài về nháp, liên kết đã chia sẻ sẽ báo không tìm thấy",
+        "duplicate": "Nhân bản thành nháp",
+        "delete": "Xóa bài",
+        "deleteBlocked": "Bài đang đăng — gỡ xuống trước khi xóa"
+      },
+      "deleteDialog": {
+        "title": "Xóa bài viết này?",
+        "body": "Bài nháp sẽ bị xóa hẳn, không khôi phục được. Thao tác được ghi vào nhật ký."
+      }
+    },
+    "faqs": {
+      "search": "Tìm trong câu hỏi, câu trả lời…",
+      "count": "{shown}/{total} câu hỏi",
+      "add": "Thêm câu hỏi",
+      "empty": "Chưa có câu hỏi nào.",
+      "noMatch": "Không có câu hỏi khớp.",
+      "hidden": "Đang ẩn",
+      "visible": "Đang hiện",
+      "noEn": "Thiếu bản EN",
+      "up": "Đưa lên",
+      "down": "Đưa xuống",
+      "pick": "Chọn một câu hỏi bên trái để sửa, hoặc thêm câu hỏi mới.",
+      "back": "Về danh sách",
+      "editTitle": "Sửa câu hỏi",
+      "newTitle": "Câu hỏi mới",
+      "langHint": "Đổi câu hỏi và câu trả lời giữa tiếng Việt và tiếng Anh",
+      "field": {
+        "topic": "Chủ đề",
+        "topicShort": "Chủ đề",
+        "active": "Hiện trên trang FAQs",
+        "activeHint": "Ẩn để soạn dần hoặc tạm gỡ câu đã cũ mà không mất nội dung.",
+        "question": "Câu hỏi",
+        "answer": "Câu trả lời",
+        "answerHint": "Xuống dòng được giữ nguyên. Viết như đang trả lời khách ở quầy — ngắn, cụ thể."
+      },
+      "placeholder": {
+        "question": "Vui lòng nhập câu hỏi",
+        "answer": "Vui lòng nhập câu trả lời"
+      },
+      "errors": {
+        "question": "Vui lòng nhập câu hỏi",
+        "answer": "Vui lòng nhập câu trả lời"
+      },
+      "preview": "Khách sẽ thấy",
+      "delete": "Xóa câu hỏi",
+      "hide": "Ẩn",
+      "show": "Hiện",
+      "create": "Thêm câu hỏi",
+      "deleteDialog": {
+        "title": "Xóa câu hỏi này?",
+        "body": "Câu hỏi bị xóa hẳn. Muốn tạm gỡ khỏi trang thì dùng nút Ẩn."
+      }
+    },
+    "editor": {
+      "back": "Nội dung & FAQs",
+      "newTitle": "Bài viết mới",
+      "newSubtitle": "Chưa lưu · lưu nháp để viết tiếp sau",
+      "savedSubtitle": "{author} · cập nhật {date}",
+      "langHint": "Đổi tiêu đề, mô tả và thân bài giữa tiếng Việt và tiếng Anh",
+      "view": "Xem trên cửa hàng",
+      "unpublish": "Gỡ xuống",
+      "saveDraft": "Lưu nháp",
+      "publish": "Đăng bài",
+      "sections": {
+        "main": "Tiêu đề & mô tả",
+        "content": "Thân bài",
+        "cover": "Ảnh bìa",
+        "check": "Trước khi đăng",
+        "google": "Trên Google",
+        "toc": "Mục lục"
+      },
+      "field": {
+        "title": "Tiêu đề",
+        "slug": "Đường dẫn",
+        "excerpt": "Mô tả ngắn"
+      },
+      "hint": {
+        "slug": "Chữ thường không dấu, nối bằng gạch ngang. Tự đi theo tiêu đề cho tới khi bạn sửa tay.",
+        "slugPublished": "Bài đã đăng — đổi đường dẫn sẽ làm hỏng liên kết khách đã chia sẻ.",
+        "excerpt": "Hiện dưới tiêu đề ở danh sách bài và trên Google. Khoảng {min}–{max} ký tự là vừa."
+      },
+      "placeholder": {
+        "title": "Vui lòng nhập tiêu đề bài viết",
+        "excerpt": "Vui lòng nhập một hai câu tóm tắt",
+        "content": "Vui lòng nhập thân bài. Cách một dòng trống giữa các đoạn; \"## \" ở đầu dòng là tiêu đề mục; \"> \" là lời trích."
+      },
+      "slugFromTitle": "Tạo lại từ tiêu đề",
+      "write": "Soạn",
+      "previewMode": "Xem trước",
+      "insertHeading": "Tiêu đề mục",
+      "insertQuote": "Lời trích",
+      "formatHint": "## tiêu đề mục · > lời trích · dòng trống ngăn đoạn",
+      "previewEmpty": "Chưa có nội dung để xem trước.",
+      "words": "{words} từ · ~{minutes} phút đọc",
+      "minWords": "Cần tối thiểu {count} từ để đăng",
+      "removeCover": "Bỏ ảnh bìa",
+      "uploading": "Đang tải ảnh…",
+      "uploadCover": "Tải ảnh bìa lên",
+      "replaceCover": "Đổi ảnh",
+      "coverHint": "Ảnh ngang 16:9, tối đa 5MB. Hiện ở danh sách bài, đầu bài và khi chia sẻ lên mạng xã hội.",
+      "googleEmpty": "Mô tả ngắn sẽ hiện ở đây."
+    },
+    "check": {
+      "blocking": "{count} điều chặn đăng",
+      "warnings": "{count} điều nên sửa",
+      "ready": "Sẵn sàng",
+      "allGood": "Bài đã đủ để đăng."
+    },
+    "issue": {
+      "TITLE": "Chưa có tiêu đề",
+      "SLUG": "Đường dẫn chỉ gồm chữ thường không dấu, số và gạch ngang",
+      "SLUG_TAKEN": "Đường dẫn đã có bài khác dùng",
+      "EXCERPT": "Chưa có mô tả ngắn",
+      "THUMBNAIL": "Chưa có ảnh bìa",
+      "CONTENT_SHORT": "Thân bài dưới {min} từ",
+      "NO_HEADING": "Chưa có tiêu đề mục (##) — bài dài sẽ không có mục lục",
+      "EXCERPT_LENGTH": "Mô tả nên dài 80–160 ký tự để hiện trọn trên Google",
+      "NO_ENGLISH": "Chưa có bản tiếng Anh — khách xem bản EN sẽ thấy tiếng Việt"
+    }
   },
   "customers": {
     "searchPlaceholder": "Tìm tên, email, số điện thoại…",
@@ -1239,19 +1493,787 @@
     }
   },
   "vouchers": {
-    "searchPlaceholder": "Tìm theo mã voucher, mô tả...",
-    "noMinimum": "Không yêu cầu",
-    "empty": "Chưa có mã giảm giá nào.",
-    "add": "Tạo mã Voucher mới",
-    "colUsage": "Đã dùng / Giới hạn",
-    "colMinOrder": "Đơn tối thiểu",
-    "colCode": "Mã Voucher",
-    "colStatus": "Trạng thái",
-    "expired": "Đã hết hạn",
-    "colDiscount": "Mức giảm",
-    "colValidity": "Hiệu lực",
-    "inactive": "Đang tắt",
-    "active": "Đang mở"
+    "searchPlaceholder": "Tìm mã, mô tả…",
+    "create": "Tạo coupon",
+    "cancel": "Hủy",
+    "processing": "Đang lưu…",
+    "unlimited": "Không giới hạn",
+    "tabsLabel": "Vòng đời coupon",
+    "tab": {
+      "RUNNING": "Đang chạy",
+      "SCHEDULED": "Sắp diễn ra",
+      "ENDED": "Hết hạn / hết lượt",
+      "DISABLED": "Đã tắt"
+    },
+    "state": {
+      "RUNNING": "Đang chạy",
+      "SCHEDULED": "Sắp diễn ra",
+      "ENDED": "Đã kết thúc",
+      "EXPIRED": "Hết hạn",
+      "USED_UP": "Hết lượt",
+      "DISABLED": "Đã tắt"
+    },
+    "offer": {
+      "percent": "Giảm {value}%",
+      "fixed": "Giảm {amount}",
+      "cap": "tối đa {amount}",
+      "min": "Đơn từ {amount}",
+      "anyOrder": "Mọi đơn hàng"
+    },
+    "period": {
+      "left": "còn {days} ngày",
+      "startsIn": "bắt đầu sau {days} ngày",
+      "ordersUsed": "{count} đơn đã dùng"
+    },
+    "column": {
+      "code": "Mã",
+      "offer": "Ưu đãi",
+      "period": "Thời gian",
+      "usage": "Lượt dùng",
+      "state": "Trạng thái",
+      "actions": "Thao tác"
+    },
+    "empty": "Chưa có coupon nào. Bấm “Tạo coupon” để bắt đầu.",
+    "emptyTab": {
+      "RUNNING": "Không có coupon nào đang chạy.",
+      "SCHEDULED": "Không có coupon nào sắp diễn ra.",
+      "ENDED": "Chưa có coupon nào kết thúc.",
+      "DISABLED": "Không có coupon nào đang tắt."
+    },
+    "menu": {
+      "label": "Thao tác với {code}",
+      "edit": "Sửa",
+      "duplicate": "Nhân bản",
+      "enable": "Bật lại",
+      "disable": "Tắt",
+      "delete": "Xóa",
+      "deleteBlocked": "Đã có đơn dùng — chỉ tắt được"
+    },
+    "deleteDialog": {
+      "title": "Xóa coupon {code}?",
+      "description": "Coupon chưa gắn với đơn nào nên xóa không ảnh hưởng dữ liệu bán hàng.",
+      "body": "Khách đang giữ mã này sẽ không dùng được nữa."
+    },
+    "toast": {
+      "created": "Đã tạo coupon {code}.",
+      "saved": "Đã lưu coupon.",
+      "enabled": "Đã bật coupon.",
+      "disabled": "Đã tắt coupon.",
+      "duplicated": "Đã nhân bản thành {code} (đang tắt — soát lại rồi bật).",
+      "deleted": "Đã xóa coupon."
+    },
+    "ticket": {
+      "brand": "Thiên Canh",
+      "code": "Nhập mã",
+      "noDates": "Chưa chọn thời gian"
+    },
+    "errors": {
+      "code": "Mã 3–30 ký tự, chỉ chữ in hoa, số và gạch ngang.",
+      "percent": "Mức giảm từ 0 đến 100%.",
+      "amount": "Số tiền giảm phải lớn hơn 0.",
+      "endRequired": "Vui lòng chọn ngày kết thúc.",
+      "endBeforeStart": "Ngày kết thúc phải sau ngày bắt đầu."
+    },
+    "editor": {
+      "back": "Coupon",
+      "newTitle": "Coupon mới",
+      "newSubtitle": "Khách nhập mã ở bước thanh toán.",
+      "usedSubtitle": "Đã dùng {used} lượt · {orders} đơn",
+      "save": "Lưu thay đổi",
+      "create": "Tạo coupon",
+      "generate": "Sinh mã ngẫu nhiên",
+      "sections": {
+        "code": "Mã & mô tả",
+        "discount": "Mức giảm",
+        "limits": "Thời gian & giới hạn"
+      },
+      "field": {
+        "code": "Mã coupon",
+        "description": "Mô tả nội bộ",
+        "type": "Kiểu giảm",
+        "percent": "Phần trăm giảm",
+        "amount": "Số tiền giảm",
+        "maxDiscount": "Giảm tối đa",
+        "minOrder": "Đơn tối thiểu",
+        "start": "Ngày bắt đầu",
+        "end": "Ngày kết thúc",
+        "usageLimit": "Tổng lượt dùng",
+        "active": "Trạng thái"
+      },
+      "hint": {
+        "code": "Khách gõ mã này — nên ngắn, dễ đọc qua điện thoại. Tự đổi thành chữ in hoa.",
+        "codeLocked": "Đã có đơn dùng mã này nên không đổi mã được.",
+        "description": "Chỉ nhân viên thấy — ghi dịp phát mã, nơi gửi cho khách.",
+        "maxDiscount": "Chặn số tiền giảm khi đơn lớn. Để trống = không chặn.",
+        "minOrder": "Đơn chưa đạt mức này thì không áp mã. Để trống = mọi đơn.",
+        "usageLimit": "Hết lượt thì mã tự ngừng. Để trống = không giới hạn.",
+        "active": "Tắt để tạm dừng mà không mất cấu hình."
+      },
+      "placeholder": {
+        "description": "VD: tặng khách quen dịp Tết, gửi qua Zalo",
+        "noLimit": "Không giới hạn",
+        "anyOrder": "Mọi đơn"
+      },
+      "type": {
+        "PERCENTAGE": "Theo %",
+        "FIXED_AMOUNT": "Số tiền cố định"
+      },
+      "activeOn": "Đang bật",
+      "activeOff": "Đang tắt",
+      "try": {
+        "title": "Thử tính",
+        "orderValue": "Giá trị đơn",
+        "discount": "Được giảm",
+        "pay": "Khách trả",
+        "belowMin": "Đơn chưa đạt mức tối thiểu nên không được giảm.",
+        "capped": "Đã chạm mức giảm tối đa."
+      },
+      "usage": "Lượt dùng",
+      "ordersUsed": "{count} đơn đã gắn mã này",
+      "checkoutNote": "Lưu ý: thanh toán chưa áp coupon ở server — mã soạn ở đây sẽ có hiệu lực khi nối voucher vào bước đặt hàng."
+    }
+  },
+  "saleEvents": {
+    "create": "Tạo chương trình",
+    "searchPlaceholder": "Tìm theo tên, nhãn…",
+    "tabsLabel": "Lọc theo vòng đời",
+    "cancel": "Hủy",
+    "productCount": "{count} sản phẩm",
+    "empty": "Chưa có chương trình sale nào. Bấm \"Tạo chương trình\" để lên đợt đầu tiên.",
+    "emptyTab": {
+      "RUNNING": "Không có chương trình nào đang chạy — khách đang thấy giá gốc.",
+      "SCHEDULED": "Chưa lên lịch đợt sale nào sắp tới.",
+      "DRAFT": "Không có bản nháp.",
+      "PAUSED": "Không có chương trình nào đang tạm dừng.",
+      "ENDED": "Chưa có chương trình nào kết thúc."
+    },
+    "tab": {
+      "RUNNING": "Đang chạy",
+      "SCHEDULED": "Sắp diễn ra",
+      "DRAFT": "Nháp",
+      "PAUSED": "Tạm dừng",
+      "ENDED": "Đã kết thúc"
+    },
+    "state": {
+      "RUNNING": "Đang chạy",
+      "SCHEDULED": "Sắp diễn ra",
+      "DRAFT": "Nháp",
+      "PAUSED": "Tạm dừng",
+      "ENDED": "Đã kết thúc",
+      "ENDED_EARLY": "Kết thúc sớm"
+    },
+    "offer": {
+      "percent": "Giảm {value}%",
+      "amount": "Giảm {amount}",
+      "fixedPrice": "Đồng giá {amount}"
+    },
+    "quota": {
+      "unlimited": "Đã bán {sold}"
+    },
+    "filter": {
+      "scope": "Phạm vi",
+      "ALL_SCOPES": "Tất cả",
+      "ALL": "Toàn tiệm",
+      "COLLECTIONS": "Theo bộ sưu tập",
+      "CATEGORIES": "Theo loại sản phẩm",
+      "PRODUCTS": "Sản phẩm chọn tay"
+    },
+    "column": {
+      "name": "Chương trình",
+      "offer": "Ưu đãi",
+      "period": "Thời gian",
+      "result": "Kết quả",
+      "actions": "Thao tác"
+    },
+    "scopeSummary": {
+      "ALL": "Toàn tiệm",
+      "COLLECTIONS": "BST: {names}",
+      "CATEGORIES": "Loại: {names}",
+      "PRODUCTS": "{count} sản phẩm chọn tay"
+    },
+    "period": {
+      "left": "Còn {days} ngày",
+      "startsIn": "Bắt đầu sau {days} ngày",
+      "pastStart": "Đã quá giờ bắt đầu",
+      "endedEarly": "Dừng sớm lúc {date}",
+      "lasted": "Chạy {days} ngày"
+    },
+    "result": {
+      "line": "{orders} đơn · {units} món",
+      "barsLabel": "Doanh thu theo ngày",
+      "none": "Chưa có đơn"
+    },
+    "timeline": {
+      "title": "Lịch sale",
+      "subtitle": "2 tuần trước → 10 tuần tới · rê chuột vào thanh để xem chi tiết",
+      "today": "Hôm nay",
+      "empty": "Không có đợt sale nào trong khoảng này.",
+      "hidden": "{count} chương trình nằm ngoài khung lịch"
+    },
+    "insight": {
+      "title": "Cần để ý",
+      "none": "Mọi chương trình đang ổn.",
+      "more": "Xem thêm {count}",
+      "less": "Thu gọn",
+      "PAUSED": "Đang tạm dừng — khách thấy giá gốc trong lúc chương trình vẫn còn hạn.",
+      "NO_PRODUCTS": "Không có sản phẩm nào được giảm — kiểm tra phạm vi hoặc danh sách loại trừ.",
+      "OUT_OF_STOCK": "{count} món may sẵn đã hết hàng: {names}.",
+      "ENDING_TODAY": "Kết thúc trong hôm nay — gia hạn hoặc chuẩn bị gỡ banner.",
+      "ENDING_SOON": "Kết thúc sau {days} ngày.",
+      "QUOTA_LOW": "{product} chỉ còn {left} suất giá sale.",
+      "CONFLICT": "{count} sản phẩm trùng thời gian với \"{other}\" — khách nhận giá thấp hơn.",
+      "MISSING_EN": "Thiếu tên / nhãn tiếng Anh — khách xem bản EN sẽ thấy tiếng Việt."
+    },
+    "menu": {
+      "label": "Thao tác cho {name}",
+      "view": "Xem chi tiết",
+      "edit": "Sửa",
+      "publish": "Công bố",
+      "pause": "Tạm dừng",
+      "pauseHint": "Khách thấy lại giá gốc, giữ nguyên thiết lập",
+      "resume": "Tiếp tục bán",
+      "duplicate": "Nhân bản",
+      "endNow": "Kết thúc ngay",
+      "delete": "Xóa",
+      "deleteBlocked": "Đã có đơn — chỉ kết thúc được, không xóa"
+    },
+    "confirm": {
+      "end": {
+        "title": "Kết thúc \"{name}\"?",
+        "description": "Giá sale gỡ khỏi storefront ngay lập tức.",
+        "body": "Đơn đã đặt giữ nguyên giá sale. Không mở lại được — muốn chạy tiếp thì nhân bản thành chương trình mới.",
+        "action": "Kết thúc ngay"
+      },
+      "delete": {
+        "title": "Xóa \"{name}\"?",
+        "description": "Chương trình và thiết lập giá của từng sản phẩm sẽ bị xóa.",
+        "body": "Chỉ xóa được chương trình chưa có đơn nào. Thao tác không hoàn tác.",
+        "action": "Xóa"
+      }
+    },
+    "toast": {
+      "published": "Đã công bố \"{name}\"",
+      "paused": "Đã tạm dừng \"{name}\"",
+      "resumed": "\"{name}\" bán lại giá sale",
+      "ended": "Đã kết thúc \"{name}\"",
+      "deleted": "Đã xóa \"{name}\"",
+      "saved": "Đã lưu thay đổi",
+      "savedDraft": "Đã lưu nháp",
+      "createdDraft": "Đã tạo nháp \"{name}\" (dữ liệu mẫu — chưa lưu vào cơ sở dữ liệu)",
+      "createdPublished": "Đã tạo \"{name}\" (dữ liệu mẫu — chưa lưu vào cơ sở dữ liệu)"
+    },
+    "picker": {
+      "description": "Tick để chọn, bấm Áp dụng để cập nhật phạm vi.",
+      "search": "Tìm theo tên, mã…",
+      "selectVisible": "Chọn tất cả đang hiện",
+      "selected": "Đã chọn {count}",
+      "apply": "Áp dụng",
+      "empty": "Không tìm thấy mục nào.",
+      "inactive": "Ngừng bán — không đưa vào sale"
+    },
+    "products": {
+      "title": "Sản phẩm & giá sale",
+      "subtitle": "Giá tự tính theo mức giảm chung — gõ vào ô giá để đặt riêng từng món, ô suất để giới hạn số chiếc bán giá sale.",
+      "search": "Tìm sản phẩm…",
+      "filter": {
+        "ALL": "Tất cả {count}",
+        "WARN": "Cần xem {count}",
+        "EXCLUDED": "Đã loại {count}"
+      },
+      "column": {
+        "product": "Sản phẩm",
+        "salePrice": "Giá sale",
+        "percent": "Giảm",
+        "quota": "Suất",
+        "stock": "Tồn"
+      },
+      "quotaHint": "Số chiếc bán giá sale. Hết suất thì món đó tự về giá gốc dù chương trình vẫn chạy. Để trống = không giới hạn.",
+      "salePriceFor": "Giá sale của {name}",
+      "quotaFor": "Số suất sale của {name}",
+      "manual": "đặt tay",
+      "custom": "May đo",
+      "madeToOrder": "May đo",
+      "excluded": {
+        "MANUAL": "Đã loại khỏi chương trình",
+        "CUSTOM": "Áo may đo — đang không áp sale"
+      },
+      "warning": {
+        "CONFLICT": "Trùng: {names}",
+        "DEEP": "Giảm sâu",
+        "NO_DISCOUNT": "Không được giảm",
+        "OUT_OF_STOCK": "Hết hàng"
+      },
+      "menu": {
+        "label": "Thao tác cho {name}",
+        "resetPrice": "Bỏ giá đặt tay",
+        "include": "Đưa lại vào chương trình",
+        "exclude": "Loại khỏi chương trình",
+        "customLocked": "Áo may đo",
+        "customLockedHint": "Tắt \"Không áp cho áo may đo\" ở phần Áp dụng cho để đưa vào"
+      },
+      "emptyScope": "Chưa có sản phẩm nào trong phạm vi — chọn bộ sưu tập, loại sản phẩm hoặc sản phẩm ở trên.",
+      "emptyFilter": "Không có sản phẩm khớp bộ lọc.",
+      "rounding": "Giá theo % được làm tròn lên tới nghìn đồng.",
+      "roundingHint": "VD giảm 15% áo 1.890.000 ₫ = 1.606.500 ₫ → hiển thị 1.607.000 ₫. Khách luôn thấy giá chẵn, tiệm không lỗ phần lẻ."
+    },
+    "preview": {
+      "title": "Khách sẽ thấy",
+      "product": "Xem",
+      "empty": "Chọn phạm vi để xem trước thẻ sản phẩm.",
+      "note": "Mô phỏng thẻ sản phẩm ở danh sách storefront.",
+      "startsIn": "Bắt đầu sau {days} ngày {hours} giờ",
+      "endsIn": "Còn {days} ngày {hours} giờ"
+    },
+    "check": {
+      "title": "Trước khi công bố",
+      "ready": "Sẵn sàng",
+      "blocking": "{count} lỗi cần sửa",
+      "warnings": "{count} điều cần xem",
+      "products": "{count} sản phẩm được giảm",
+      "noProducts": "Chưa có sản phẩm nào được giảm",
+      "noProductsDetail": "Chọn phạm vi ở mục \"Áp dụng cho\" hoặc đưa lại sản phẩm đã loại.",
+      "time": "Chạy {days} ngày",
+      "deep": "{count} sản phẩm giảm sâu hơn {percent}%",
+      "deepDetail": "Kiểm tra lại có gõ nhầm không — giá sale nên còn trên chi phí vải + công may.",
+      "conflict": "{count} sản phẩm trùng với chương trình khác",
+      "conflictDetail": "Cùng lúc chỉ áp một giá sale — khách nhận giá thấp hơn trong các chương trình.",
+      "stock": "{count} sản phẩm may sẵn đang hết hàng",
+      "stockDetail": "Khách bấm vào sẽ thấy hết hàng — nhập thêm hoặc loại khỏi chương trình.",
+      "noDiscount": "{count} sản phẩm giá gốc đã thấp hơn mức đồng giá — không được giảm",
+      "english": "Chưa có tên / nhãn tiếng Anh",
+      "englishDetail": "Khách xem bản tiếng Anh sẽ thấy chữ tiếng Việt.",
+      "home": "Trang chủ đang ghim \"{name}\" — bật sẽ thay thế",
+      "titleLive": "Tình trạng chương trình"
+    },
+    "results": {
+      "title": "Kết quả bán",
+      "revenue": "Doanh thu theo giá sale",
+      "barsCaption": "Mỗi cột một ngày · {days} ngày",
+      "orders": "Đơn",
+      "units": "Món",
+      "discount": "Tỷ lệ giảm",
+      "discountLine": "Đã giảm cho khách {amount} so với giá gốc.",
+      "top": "Bán chạy trong đợt",
+      "unitsShort": "{count} món"
+    },
+    "activity": {
+      "title": "Nhật ký",
+      "empty": "Chưa có hoạt động.",
+      "kind": {
+        "CREATED": "Tạo chương trình",
+        "UPDATED": "Sửa thiết lập",
+        "PUBLISHED": "Công bố",
+        "PAUSED": "Tạm dừng",
+        "RESUMED": "Tiếp tục bán",
+        "ENDED_EARLY": "Kết thúc sớm",
+        "PRICE_OVERRIDE": "Đặt giá riêng"
+      }
+    },
+    "errors": {
+      "name": "Vui lòng nhập tên chương trình",
+      "badge": "Vui lòng nhập nhãn hiển thị",
+      "value": {
+        "PERCENTAGE": "Vui lòng nhập % giảm lớn hơn 0",
+        "FIXED_AMOUNT": "Vui lòng nhập số tiền giảm",
+        "FIXED_PRICE": "Vui lòng nhập giá đồng giá"
+      },
+      "percentMax": "Giảm tối đa 90%",
+      "time": "Vui lòng nhập ngày và giờ dạng HH:mm",
+      "endBeforeStart": "Thời điểm kết thúc phải sau thời điểm bắt đầu",
+      "endPast": "Thời điểm kết thúc đã qua"
+    },
+    "banner": {
+      "paused": "Chương trình đang tạm dừng — khách thấy giá gốc. Bấm \"Tiếp tục bán\" khi sẵn sàng.",
+      "ended": "Chương trình đã kết thúc — màn này chỉ để xem. Muốn chạy lại, bấm \"Chạy lại\" để nhân bản.",
+      "running": "Đang chạy: không đổi được thời điểm bắt đầu. Đổi mức giảm / phạm vi có hiệu lực ngay khi lưu; đơn đã đặt giữ giá cũ."
+    },
+    "editor": {
+      "back": "Chương trình sale",
+      "newTitle": "Chương trình mới",
+      "more": "Thao tác khác",
+      "rerun": "Chạy lại",
+      "saveDraft": "Lưu nháp",
+      "publish": "Lưu & lên lịch",
+      "publishNow": "Công bố & chạy ngay",
+      "save": "Lưu thay đổi",
+      "newSubtitle": "Chưa lưu · lưu nháp để soạn tiếp sau",
+      "copySubtitle": "Bản sao — chọn lại thời gian rồi lưu",
+      "savedSubtitle": "Tạo bởi {actor} · cập nhật {date}",
+      "endedSubtitle": "Chỉ xem",
+      "unsaved": "Có thay đổi chưa lưu",
+      "lang": "Ngôn ngữ nội dung",
+      "langHint": "Đổi tên, nhãn và mô tả giữa tiếng Việt và tiếng Anh",
+      "langMissing": "Chưa dịch",
+      "sections": {
+        "display": "Hiển thị",
+        "displayHint": "Tên để quản lý và nhãn khách thấy trên ảnh sản phẩm.",
+        "offer": "Ưu đãi",
+        "time": "Thời gian",
+        "scope": "Áp dụng cho",
+        "scopeHint": "Chọn theo bộ sưu tập / loại thì sản phẩm mới thêm vào cũng tự được giảm.",
+        "rules": "Quy tắc mua & hiển thị"
+      },
+      "field": {
+        "name": "Tên chương trình",
+        "badge": "Nhãn trên ảnh",
+        "description": "Mô tả ngắn",
+        "percent": "Phần trăm giảm",
+        "FIXED_AMOUNT": "Số tiền giảm mỗi món",
+        "FIXED_PRICE": "Giá đồng giá",
+        "start": "Bắt đầu",
+        "end": "Kết thúc",
+        "time": "Giờ",
+        "countdown": "Hiện đồng hồ đếm ngược trên thẻ sản phẩm",
+        "excludeCustom": "Không áp cho áo may đo",
+        "perCustomer": "Giới hạn mỗi đơn",
+        "stack": "Cho dùng kèm coupon",
+        "home": "Ghim lên trang chủ"
+      },
+      "hint": {
+        "name": "Khách thấy ở banner và trang danh sách sale",
+        "badge": "Ngắn gọn, tối đa {max} ký tự — VD \"Sale Tết\", \"−20%\"",
+        "description": "Một câu hiện dưới tiêu đề banner / trang sale",
+        "percent": "Áp lên giá gốc từng món, làm tròn lên tới nghìn đồng",
+        "FIXED_AMOUNT": "Trừ thẳng vào giá mỗi món; món rẻ hơn mức giảm thì về 0 ₫ — nên đặt suất",
+        "FIXED_PRICE": "Mọi món về cùng giá; món có giá gốc thấp hơn thì giữ nguyên",
+        "startLocked": "Đã bắt đầu — chỉ đổi được thời điểm kết thúc",
+        "excludeCustom": "Áo may đo báo giá theo số đo và vải — thường không giảm chung",
+        "excludeCustomCount": "Phạm vi đang có {count} áo may đo",
+        "perCustomer": "Số món giá sale tối đa trong một đơn — vượt thì món thêm tính giá gốc",
+        "stackOn": "Khách được nhập coupon trên giá đã sale",
+        "stackOff": "Đơn có món giá sale thì không nhập được coupon",
+        "home": "Hiện dải banner đầu trang chủ trong thời gian chạy",
+        "homeTaken": "Đang ghim \"{name}\" cùng thời gian — bật sẽ thay thế"
+      },
+      "placeholder": {
+        "name": "Vui lòng nhập tên, VD Sale Tết Đinh Mùi",
+        "badge": "Vui lòng nhập nhãn",
+        "description": "Vui lòng nhập mô tả ngắn",
+        "noLimit": "Không giới hạn"
+      },
+      "type": {
+        "PERCENTAGE": "Giảm %",
+        "FIXED_AMOUNT": "Giảm tiền",
+        "FIXED_PRICE": "Đồng giá"
+      },
+      "example": "Ví dụ:",
+      "exampleEmpty": "Nhập mức giảm để xem ví dụ giá sau giảm.",
+      "timezone": "Theo giờ Việt Nam (GMT+7)",
+      "quick": {
+        "label": "Nhanh:",
+        "weekend": "Cuối tuần này",
+        "week": "7 ngày từ mai",
+        "month": "Đến hết tháng"
+      },
+      "duration": "Kéo dài {days} ngày {hours} giờ",
+      "startsVerySoon": "bắt đầu trong vòng 2 giờ tới",
+      "scope": {
+        "ALL": "Toàn tiệm",
+        "COLLECTIONS": "Bộ sưu tập",
+        "CATEGORIES": "Loại sản phẩm",
+        "PRODUCTS": "Chọn sản phẩm",
+        "allNote": "Mọi sản phẩm đang bán, kể cả sản phẩm thêm sau khi chương trình bắt đầu.",
+        "none": {
+          "COLLECTIONS": "Chưa chọn bộ sưu tập nào",
+          "CATEGORIES": "Chưa chọn loại sản phẩm nào",
+          "PRODUCTS": "Chưa chọn sản phẩm nào"
+        },
+        "pick": {
+          "COLLECTIONS": "Chọn bộ sưu tập",
+          "CATEGORIES": "Chọn loại sản phẩm",
+          "PRODUCTS": "Chọn sản phẩm"
+        },
+        "remove": "Bỏ {name}",
+        "more": "và {count} sản phẩm khác",
+        "summary": "<b>{inScope}</b> sản phẩm trong phạm vi · loại <b>{excluded}</b> · được giảm <b>{applied}</b>"
+      },
+      "perOrder": "món / đơn",
+      "tipsTitle": "Gợi ý",
+      "tips": "Lưu nháp để soạn dần. Chương trình đã công bố tự chạy và tự kết thúc đúng giờ — không cần bật tay. Một sản phẩm nằm trong nhiều đợt cùng lúc thì khách nhận giá thấp nhất.",
+      "mockNote": "Màn đang dùng dữ liệu mẫu — thao tác chỉ đổi trên trình duyệt, tải lại trang sẽ về như cũ."
+    }
+  },
+  "shippingPayment": {
+    "eyebrow": "Cấu hình",
+    "lastSaved": "Lưu lần cuối {date} · {by}",
+    "you": "Bạn",
+    "tabsLabel": "Nhóm cấu hình",
+    "tab": {
+      "shipping": "Vận chuyển",
+      "payment": "Thanh toán"
+    },
+    "cancel": "Hủy",
+    "actions": "Thao tác",
+    "noLimit": "Không giới hạn",
+    "on": "Bật",
+    "off": "Tắt",
+    "hours": "giờ",
+    "mockNote": "Màn đang dùng dữ liệu mẫu — lưu chỉ đổi trên trình duyệt; đơn thật vẫn tính phí 30.000 ₫ cố định và tài khoản nhận tiền từ biến môi trường cho tới khi nối cơ sở dữ liệu.",
+    "toast": {
+      "saved": "Đã lưu cấu hình vận chuyển & thanh toán"
+    },
+    "region": {
+      "NORTH": "Miền Bắc",
+      "CENTRAL": "Miền Trung",
+      "SOUTH": "Miền Nam"
+    },
+    "issue": {
+      "titleBlock": "{count} lỗi cần sửa trước khi lưu",
+      "titleWarn": "{count} điều nên xem lại",
+      "go": "Xem",
+      "UNASSIGNED": "{count} tỉnh chưa thuộc vùng giao nào — khách ở đây không đặt được hàng: {names}.",
+      "DUPLICATE": "{province} đang nằm trong nhiều vùng: {zones}.",
+      "ZONE_EMPTY": "Vùng \"{zone}\" chưa có tỉnh nào.",
+      "ETA_INVALID": "Vùng \"{zone}\": số ngày giao tối thiểu lớn hơn tối đa.",
+      "ZONE_CARRIER_OFF": "Vùng \"{zone}\" đang giao bằng {carrier} — đơn vị này đã tắt.",
+      "NO_METHOD": "Chưa bật phương thức thanh toán nào.",
+      "NO_TAILORED_METHOD": "Đơn may đo không COD được — cần bật Chuyển khoản hoặc Đặt cọc.",
+      "BANK_INCOMPLETE": "Tài khoản nhận chuyển khoản chưa đủ thông tin (ngân hàng, số tài khoản, chủ tài khoản).",
+      "DEPOSIT_RANGE": "Tỉ lệ cọc phải nằm trong 30–50%.",
+      "COD_BELOW_DEPOSIT": "Mức \"bắt buộc cọc\" cao hơn trần COD nên không bao giờ được dùng tới.",
+      "CUTOFF_INVALID": "Giờ chốt đơn phải có dạng HH:mm."
+    },
+    "bar": {
+      "unsaved": "Có thay đổi chưa lưu",
+      "blocked": "{count} lỗi cần sửa trước khi lưu",
+      "discard": "Hoàn tác",
+      "save": "Lưu thay đổi"
+    },
+    "zones": {
+      "title": "Vùng giao & phí",
+      "description": "Mỗi tỉnh thuộc đúng một vùng. Số trên ô tỉnh là vùng đang phụ trách — rê chuột để thấy cả vùng, bấm để sửa.",
+      "add": "Thêm vùng",
+      "days": "ngày",
+      "column": {
+        "zone": "Vùng",
+        "fee": "Phí giao",
+        "eta": "Thời gian",
+        "carrier": "Đơn vị giao"
+      },
+      "noProvinces": "Chưa có tỉnh nào",
+      "provinceSummary": "{count} tỉnh: {names}…",
+      "free": "Miễn phí",
+      "extra": "+{amount} mỗi món thêm",
+      "noExtra": "Không phụ phí món thêm",
+      "sameDay": "Trong ngày",
+      "etaRange": "{min}–{max} ngày",
+      "freeShipYes": "Có áp miễn phí giao",
+      "freeShipNo": "Không áp miễn phí giao",
+      "unassigned": "Chưa thuộc vùng nào — bấm để tạo vùng mới",
+      "empty": "Chưa có vùng giao nào.",
+      "menu": {
+        "label": "Thao tác cho {name}",
+        "edit": "Sửa vùng",
+        "delete": "Xóa vùng"
+      },
+      "deleteDialog": {
+        "title": "Xóa vùng \"{name}\"?",
+        "description": "{count} tỉnh của vùng này sẽ chưa có phí giao.",
+        "body": "Khách ở các tỉnh đó không đặt được hàng cho tới khi bạn đưa tỉnh vào vùng khác. Thay đổi chỉ có hiệu lực khi bấm Lưu."
+      },
+      "errors": {
+        "name": "Vui lòng nhập tên vùng",
+        "fee": "Vui lòng nhập phí giao (0 nếu miễn phí)",
+        "eta": "Số ngày tối thiểu phải nhỏ hơn hoặc bằng tối đa",
+        "provinces": "Chọn ít nhất một tỉnh"
+      },
+      "dialog": {
+        "newTitle": "Thêm vùng giao",
+        "editTitle": "Sửa vùng \"{name}\"",
+        "description": "Phí, thời gian và các tỉnh của vùng. Tỉnh đang ở vùng khác sẽ chuyển sang vùng này.",
+        "picked": "Đã chọn {count} tỉnh",
+        "moving": "{count} tỉnh chuyển từ vùng khác",
+        "create": "Thêm vùng",
+        "apply": "Áp dụng"
+      },
+      "field": {
+        "name": "Tên vùng",
+        "baseFee": "Phí món đầu",
+        "extraFee": "Phụ phí mỗi món thêm",
+        "eta": "Thời gian giao",
+        "etaMin": "Số ngày tối thiểu",
+        "etaMax": "Số ngày tối đa",
+        "carrier": "Đơn vị giao",
+        "carrierShort": "Giao bằng",
+        "freeShip": "Áp miễn phí giao theo ngưỡng",
+        "provinces": "Tỉnh / thành"
+      },
+      "hint": {
+        "baseFee": "Phí cho đơn một món. Nhập 0 nếu vùng luôn miễn phí.",
+        "extraFee": "Cộng thêm từ món thứ hai — áo dài gấp trong hộp cứng nên đơn nhiều món nặng và to hơn.",
+        "eta": "Tính từ lúc đóng gói xong. Đơn may đo cộng thêm thời gian may.",
+        "freeShip": "Tắt cho vùng xa, phí giao cao — khách ở đây vẫn trả phí dù đơn đạt ngưỡng."
+      },
+      "placeholder": {
+        "name": "Vui lòng nhập tên vùng, VD Miền Tây"
+      }
+    },
+    "carriers": {
+      "title": "Đơn vị giao hàng",
+      "description": "Đơn vị tắt thì vùng đang dùng nó cần chọn đơn vị khác.",
+      "add": "Thêm đơn vị",
+      "kind": {
+        "COURIER": "Hãng vận chuyển",
+        "SHOP_DELIVERY": "Tiệm tự giao",
+        "PICKUP": "Nhận tại tiệm"
+      },
+      "pickupUse": "Khách chọn ở trang thanh toán — không mất phí giao",
+      "usedBy": "Đang giao: {names}",
+      "unused": "Chưa vùng nào dùng",
+      "edit": "Sửa",
+      "editNamed": "Sửa {name}",
+      "offSuffix": "{name} (đã tắt)",
+      "dialog": {
+        "newTitle": "Thêm đơn vị giao",
+        "editTitle": "Sửa \"{name}\"",
+        "description": "Tên hiện cho khách ở trang theo dõi đơn; ghi chú chỉ nhân viên thấy.",
+        "name": "Tên đơn vị",
+        "namePlaceholder": "Vui lòng nhập tên đơn vị",
+        "nameError": "Vui lòng nhập tên đơn vị",
+        "kind": "Loại",
+        "note": "Ghi chú nội bộ",
+        "noteHint": "Giờ lấy hàng, đầu mối, lưu ý đóng gói…",
+        "notePlaceholder": "Vui lòng nhập ghi chú",
+        "footnote": "Bật / tắt đơn vị bằng công tắc ở danh sách.",
+        "create": "Thêm",
+        "apply": "Áp dụng"
+      }
+    },
+    "free": {
+      "title": "Miễn phí giao",
+      "description": "Áp cho các vùng có bật \"miễn phí theo ngưỡng\".",
+      "threshold": "Đơn từ",
+      "thresholdHint": "Tính trên tạm tính sau giảm giá, chưa gồm phí gói quà.",
+      "tailored": "Đơn có áo may đo luôn miễn phí",
+      "tailoredHint": "Áo may đo giá cao và giao một lần sau khi may xong.",
+      "excludedZones": "Không áp cho: {names}."
+    },
+    "fulfillment": {
+      "title": "Chuẩn bị hàng",
+      "description": "Ảnh hưởng ngày giao dự kiến khách thấy ở trang thanh toán.",
+      "prepDays": "Ngày chuẩn bị",
+      "prepDaysHint": "Hàng may sẵn: là, gấp, đóng hộp. Không tính áo may đo.",
+      "cutoff": "Giờ chốt đơn",
+      "cutoffHint": "Đặt trước giờ này thì tính chuẩn bị từ hôm nay, sau giờ này tính từ ngày mai.",
+      "giftWrap": "Gói quà",
+      "giftWrapHint": "Hộp giấy dó, thiệp viết tay — khách chọn ở trang thanh toán.",
+      "giftWrapFee": "Phí",
+      "pause": "Tạm ngưng giao hàng",
+      "pauseHint": "Nghỉ Tết, nghỉ lễ — khách vẫn đặt được, trang thanh toán hiện thông báo.",
+      "pauseFrom": "Từ ngày",
+      "pauseTo": "Đến ngày",
+      "pauseMessage": "Thông báo cho khách",
+      "pauseMessageHint": "Hiện ở giỏ hàng và trang thanh toán trong thời gian nghỉ.",
+      "pausePlaceholder": "Vui lòng nhập thông báo"
+    },
+    "methods": {
+      "title": "Phương thức thanh toán",
+      "description": "Thứ tự ở đây là thứ tự khách thấy ở trang thanh toán. Quy tắc riêng nằm ngay dưới từng phương thức.",
+      "name": {
+        "COD": "Thanh toán khi nhận hàng (COD)",
+        "BANK_TRANSFER": "Chuyển khoản 100%",
+        "DEPOSIT": "Đặt cọc"
+      },
+      "summary": {
+        "COD": "Trả toàn bộ khi nhận · không áp cho đơn may đo",
+        "CODLimited": "Trả toàn bộ khi nhận · đơn tối đa {amount} · không áp cho đơn may đo",
+        "BANK_TRANSFER": "Quét VietQR, tiệm đối soát rồi xác nhận đơn",
+        "DEPOSIT": "Chuyển trước {percent}%, phần còn lại trả khi nhận"
+      },
+      "up": "Đưa lên",
+      "down": "Đưa xuống",
+      "customerNote": "Ghi chú cho khách",
+      "customerNoteHint": "Một dòng dưới tên phương thức ở trang thanh toán.",
+      "customerNotePlaceholder": "Vui lòng nhập ghi chú",
+      "gateway": "Cổng thanh toán (thẻ, ví điện tử)",
+      "gatewayHint": "Chưa tích hợp — cần hợp đồng với cổng thanh toán và module ở Backend.",
+      "notConnected": "Chưa kết nối",
+      "cod": {
+        "max": "Đơn COD tối đa",
+        "maxHint": "Đơn lớn hơn phải chuyển khoản hoặc cọc — giảm rủi ro khách không nhận hàng.",
+        "verified": "Chỉ khách đã xác minh SĐT",
+        "verifiedHint": "Khách vãng lai hoặc SĐT chưa xác minh không thấy lựa chọn COD.",
+        "tailoredLocked": "Đơn may đo không bao giờ được COD 100% — quy tắc cố định."
+      },
+      "deposit": {
+        "percent": "Tỉ lệ cọc",
+        "percentHint": "Trong khoảng {min}–{max}%. Tiền cọc làm tròn lên tới nghìn đồng.",
+        "percentError": "Nhập từ {min} đến {max}%",
+        "requiredAbove": "Bắt buộc cọc khi đơn từ",
+        "requiredAboveHint": "Đơn may sẵn từ mức này không còn COD, khách chọn cọc hoặc chuyển khoản. Đơn may đo luôn bắt buộc.",
+        "never": "Chỉ đơn may đo"
+      },
+      "transfer": {
+        "remind": "Nhắc chuyển khoản sau",
+        "remindHint": "Gửi tin nhắn kèm mã QR nếu chưa thấy tiền.",
+        "autoCancel": "Tự hủy đơn sau",
+        "autoCancelHint": "Đơn chưa nhận tiền sẽ tự hủy và hoàn tồn kho. Để trống = không tự hủy.",
+        "never": "Không tự hủy"
+      }
+    },
+    "bank": {
+      "title": "Tài khoản nhận chuyển khoản",
+      "description": "Dùng cho mã VietQR của Chuyển khoản và Đặt cọc.",
+      "unused": "Đang không dùng — Chuyển khoản và Đặt cọc đều tắt.",
+      "bank": "Ngân hàng",
+      "bankShort": "Ngân hàng",
+      "accountNumber": "Số tài khoản",
+      "accountNumberError": "Số tài khoản gồm 6–19 chữ số",
+      "branch": "Chi nhánh",
+      "branchPlaceholder": "Vui lòng nhập chi nhánh",
+      "accountName": "Chủ tài khoản",
+      "accountNameHint": "Tự in hoa, bỏ dấu — đúng như tên hiện trên app ngân hàng của khách để họ yên tâm.",
+      "accountNameError": "Vui lòng nhập tên chủ tài khoản",
+      "preview": "Khách sẽ thấy",
+      "amount": "Số tiền",
+      "content": "Nội dung",
+      "copy": "Sao chép",
+      "copied": "Đã sao chép",
+      "previewNote": "Nội dung chuyển khoản luôn là THIENCANH + mã đơn để đối soát — không đổi được."
+    },
+    "reconcile": {
+      "title": "Đối soát tự động",
+      "description": "Hiện đối soát tay ở màn Đơn hàng → \"Ghi nhận tiền\".",
+      "webhook": "Nhận báo có từ ngân hàng",
+      "webhookHint": "Tự ghi nhận tiền theo nội dung THIENCANH [mã đơn] qua dịch vụ đọc biến động số dư — chưa kết nối."
+    },
+    "sim": {
+      "title": "Thử tính đơn",
+      "description": "Theo cấu hình đang soạn, kể cả chưa lưu.",
+      "province": "Giao tới",
+      "subtotal": "Tạm tính",
+      "items": "Số món",
+      "less": "Bớt một món",
+      "more": "Thêm một món",
+      "tailored": "Có áo may đo",
+      "pickup": "Nhận tại showroom",
+      "giftWrap": "Gói quà",
+      "noZone": "{province} chưa thuộc vùng giao nào — khách không đặt được.",
+      "zoneLine": "{zone} · {carrier}",
+      "shipping": "Phí giao",
+      "free": "Miễn phí",
+      "freeReason": {
+        "THRESHOLD": "Miễn {amount} — đơn đạt ngưỡng",
+        "TAILORED": "Miễn {amount} — đơn có áo may đo",
+        "PICKUP": "Nhận tại tiệm"
+      },
+      "missing": "Mua thêm {amount} để miễn phí giao",
+      "total": "Khách trả",
+      "etaLabel": "Giao dự kiến",
+      "etaTailoredLabel": "Giao sau khi may xong",
+      "etaTailored": "{min}–{max} ngày sau khi áo hoàn thiện",
+      "pauseHit": "Rơi vào thời gian tạm ngưng giao — khách sẽ thấy thông báo nghỉ.",
+      "methods": "Khách được chọn",
+      "prepay": "Chuyển trước {amount}",
+      "onDelivery": "Thu khi nhận {amount}",
+      "paidUpfront": "Đã trả đủ trước khi giao",
+      "block": {
+        "DISABLED": "Đang tắt",
+        "TAILORED_NO_COD": "Không áp cho đơn may đo",
+        "COD_LIMIT": "Vượt mức COD tối đa",
+        "DEPOSIT_REQUIRED": "Đơn từ mức bắt buộc cọc"
+      }
+    }
   },
   "placeholder": {
     "title": "Màn này đang được xây dựng",

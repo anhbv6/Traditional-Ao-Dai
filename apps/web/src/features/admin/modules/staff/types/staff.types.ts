@@ -59,3 +59,19 @@ export interface StaffDetailData extends StaffRow {
   activities: StaffActivity[];
   now: string;
 }
+
+/** Một lần đổi quyền (AuditLog STAFF_PERMISSIONS_UPDATED / STAFF_CREATED) cho màn Phân quyền */
+export interface PermissionChangeLog {
+  id: string;
+  kind: "UPDATED" | "CREATED";
+  actorName: string | null;
+  targetId: string | null;
+  targetName: string | null;
+  added: Permission[];
+  removed: Permission[];
+  createdAt: string;
+}
+
+export interface RolePermissionsData extends StaffBoardData {
+  history: PermissionChangeLog[];
+}

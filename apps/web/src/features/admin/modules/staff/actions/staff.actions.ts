@@ -16,6 +16,7 @@ import {
   resetStaffPasswordSchema,
   toggleStaffActiveSchema,
   updateStaffPermissionSchema,
+  updateStaffPermissionsBatchSchema,
 } from "../schemas/staff.schemas";
 
 /** Tài khoản nhân viên đang tồn tại (không tác động lên ADMIN hay tài khoản đã xóa) */
@@ -220,5 +221,51 @@ export async function createStaffAction(raw: CreateStaffInput) {
   } catch (error) {
     console.error("Lỗi Action createStaffAction:", error);
     return { success: false as const, error: "STAFF_CREATE_FAILED" };
+  }
+}
+
+/**
+ * Server Action: lưu quyền nhiều nhân viên một lần (màn Phân quyền soạn xong mới lưu). Chạy trong một transaction —
+ * một người không hợp lệ thì không ai bị đổi; mỗi người một dòng AuditLog trước → sau như khi đổi lẻ.
+ */
+export async function updateStaffPermissionsBatchAction(raw: z.input<typeof updateStaffPermissionsBatchSchema>) {
+  const auth = await authorizeAdminAction(ADMIN_MODULE_ACCESS.rolePermissions);
+  if (!auth.success) return auth;
+
+  const input = parseActionInput(updateStaffPermissionsBatchSchema, raw);
+  if (!input.success) return input;
+
+  try {
+    const ids = input.data.changes.map((change) => change.userId);
+    const targets = await prisma.user.findMany({
+      where: { id: { in: ids }, role: "STAFF", status: { not: "DELETED" } },
+      select: { id: true, permissions: true },
+    });
+    if (targets.length !== ids.length) return { success: false as const, error: "STAFF_ONLY_OPERATION" };
+    const before = new Map(targets.map((target) => [target.id, target.permissions]));
+
+    const updated = await prisma.$transaction(
+      input.data.changes.map((change) =>
+        prisma.user.update({ where: { id: change.userId }, data: { permissions: change.permissions }, select: { id: true, permissions: true } })
+      )
+    );
+
+    for (const user of updated) {
+      await recordAudit({
+        actorId: auth.user.id,
+        action: "STAFF_PERMISSIONS_UPDATED",
+        targetType: "USER",
+        targetId: user.id,
+        metadata: { before: before.get(user.id) ?? [], after: user.permissions },
+      });
+    }
+
+    revalidateStaff();
+    for (const user of updated) revalidatePath(`/admin/staff/${user.id}`);
+
+    return { success: true as const, data: updated };
+  } catch (error) {
+    console.error("Lỗi Action updateStaffPermissionsBatchAction:", error);
+    return { success: false as const, error: "STAFF_PERMISSION_UPDATE_FAILED" };
   }
 }
