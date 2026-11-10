@@ -14,19 +14,19 @@ const CANH_KEYS = ["grain", "watch"] as const;
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 /**
- * Câu chuyện thương hiệu, chia hai khối:
- * 1. Ảnh mở như kéo màn (trái) + lời kể (phải).
- * 2. Giải nghĩa tên: hai cột "Thiên" | "Canh" — chữ lớn trồi lên từng ký tự khi cuộn tới,
- *    cột "Canh" liệt kê hai tầng nghĩa của chữ.
+ * Câu chuyện thương hiệu (Minimalism Style):
+ * - Bỏ mọi chi tiết viền lệch trang trí giả tạp chí, ảnh thủ công chuẩn mực với viền hairline tinh gọn.
+ * - Chữ hiển thị "Thiên" & "Canh" chuyển sang tone thương hiệu chuẩn độ tương phản cao (> 11:1).
+ * - Cấu trúc phân giải ngữ nghĩa tên tiệm theo phong cách Swiss Grid cân xứng.
  */
 export function AboutStory() {
   const t = useTranslations("AboutPage.story");
 
   return (
     <section className={containerClassName({ spacing: "section" })}>
-      <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-20">
-        <figure className="relative isolate mx-auto w-full max-w-[520px] lg:mx-0">
-          <ClipReveal className="aspect-[4/3] bg-(--bg-secondary) sm:aspect-[4/5]">
+      <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-20">
+        <figure className="relative mx-auto w-full max-w-[520px] lg:mx-0">
+          <ClipReveal className="aspect-[4/3] border border-(--border) bg-(--bg-secondary) sm:aspect-[4/5]">
             <Image
               src="/images/ex5.jpg"
               alt={t("imageAlt")}
@@ -35,54 +35,63 @@ export function AboutStory() {
               className="object-cover"
             />
           </ClipReveal>
-          {/* Khung viền lệch phía sau ảnh — điểm nhấn kiểu ảnh tạp chí, ẩn ở mobile cho gọn */}
-          <span
-            aria-hidden="true"
-            className="absolute -bottom-4 -right-4 -z-10 hidden h-full w-full border border-(--accent-color)/60 sm:block"
-          />
-          <figcaption className="mt-4 font-[family-name:var(--font-playfair)] text-sm italic text-(--text-light)">
+          <figcaption className="mt-3 text-xs tracking-wide text-(--text-main)/85">
             {t("imageCaption")}
           </figcaption>
         </figure>
 
         <div>
           <AboutHeading eyebrow={t("eyebrow")} title={t("title")} className="mb-8 sm:mb-10" />
-          <div className="flex max-w-xl flex-col gap-5">
+          <div className="flex max-w-xl flex-col gap-5 border-l border-(--border) pl-6">
             {PARAGRAPH_KEYS.map((key, i) => (
               <Reveal key={key} delay={0.1 + i * 0.12}>
-                <p className="text-base leading-8 text-(--text-main)/85">{t(`paragraphs.${key}`)}</p>
+                <p className="text-base leading-relaxed text-(--text-main)">
+                  {t(`paragraphs.${key}`)}
+                </p>
               </Reveal>
             ))}
           </div>
         </div>
       </div>
 
-      <div className="mt-16 sm:mt-24">
+      <div className="mt-20 sm:mt-28">
         <Reveal>
-          <p className="text-center text-[11px] font-semibold uppercase tracking-[3px] text-(--text-light)">
-            {t("nameLabel")}
-          </p>
+          <div className="flex items-center justify-center gap-3">
+            <span aria-hidden="true" className="h-px w-8 bg-(--primary-ink)/30" />
+            <p className="text-center text-xs font-semibold uppercase tracking-[0.25em] text-(--primary-ink)">
+              {t("nameLabel")}
+            </p>
+            <span aria-hidden="true" className="h-px w-8 bg-(--primary-ink)/30" />
+          </div>
         </Reveal>
 
-        <dl className="mt-8 grid border-y border-(--border) md:grid-cols-[1fr_1.4fr]">
-          <div className="py-8 md:py-12 md:pr-12">
+        <dl className="mt-10 grid border-y border-(--border) md:grid-cols-[1fr_1.35fr]">
+          {/* Cột chữ THIÊN */}
+          <div className="py-10 md:py-14 md:pr-14">
             <BigWord word={t("meanings.sky.word")} />
-            <dt className="mt-5 text-[11px] font-semibold uppercase tracking-[2.5px] text-(--primary-ink)">
+            <dt className="mt-6 text-xs font-semibold uppercase tracking-[0.2em] text-(--primary-ink)">
               {t("meanings.sky.title")}
             </dt>
-            <dd className="mt-2 max-w-sm text-[15px] leading-7 text-(--text-light)">{t("meanings.sky.text")}</dd>
+            <dd className="mt-3 max-w-md text-[15px] leading-relaxed text-(--text-main)">
+              {t("meanings.sky.text")}
+            </dd>
           </div>
 
-          <div className="border-t border-(--border) py-8 md:border-l md:border-t-0 md:py-12 md:pl-12">
-            <BigWord word={t("meanings.grain.word")} delay={0.2} />
-            <p className="mt-5 text-[11px] uppercase tracking-[2.5px] text-(--text-light)">{t("canhLabel")}</p>
-            <div className="mt-4 grid gap-6 sm:grid-cols-2">
+          {/* Cột chữ CANH */}
+          <div className="border-t border-(--border) py-10 md:border-l md:border-t-0 md:py-14 md:pl-14">
+            <BigWord word={t("meanings.grain.word")} delay={0.18} />
+            <p className="mt-6 text-xs font-medium uppercase tracking-[0.2em] text-(--text-light)">
+              {t("canhLabel")}
+            </p>
+            <div className="mt-5 grid gap-8 sm:grid-cols-2">
               {CANH_KEYS.map((key, i) => (
-                <Reveal key={key} delay={0.3 + i * 0.12} className="border-l border-(--accent-color) pl-4">
-                  <dt className="text-[11px] font-semibold uppercase tracking-[2.5px] text-(--primary-ink)">
+                <Reveal key={key} delay={0.25 + i * 0.1} className="border-l border-(--primary-ink)/35 pl-4">
+                  <dt className="text-xs font-semibold uppercase tracking-[0.18em] text-(--primary-ink)">
                     {t(`meanings.${key}.title`)}
                   </dt>
-                  <dd className="mt-2 text-[15px] leading-7 text-(--text-light)">{t(`meanings.${key}.text`)}</dd>
+                  <dd className="mt-2 text-[15px] leading-relaxed text-(--text-main)">
+                    {t(`meanings.${key}.text`)}
+                  </dd>
                 </Reveal>
               ))}
             </div>
@@ -93,7 +102,7 @@ export function AboutStory() {
   );
 }
 
-/** Chữ lớn trồi lên từng ký tự từ sau mép che khi cuộn tới */
+/** Chữ lớn trồi lên từng ký tự theo nhịp cuộn, tone đỏ đô tương phản cao >= 11:1 */
 function BigWord({ word, delay = 0 }: { word: string; delay?: number }) {
   const reduceMotion = useReducedMotion();
 
@@ -102,15 +111,15 @@ function BigWord({ word, delay = 0 }: { word: string; delay?: number }) {
       aria-label={word}
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, margin: "0px 0px -15% 0px" }}
-      className="flex overflow-hidden pb-2 font-[family-name:var(--font-playfair)] text-[3.5rem] italic leading-none text-(--accent-color) sm:text-[4.5rem]"
+      viewport={{ once: true, margin: "0px 0px -12% 0px" }}
+      className="flex overflow-hidden pb-1 font-[family-name:var(--font-playfair)] text-[3.75rem] font-semibold italic leading-none text-(--heading-color) sm:text-[4.75rem]"
     >
       {Array.from(word).map((char, i) => (
         <motion.span
           key={i}
           aria-hidden="true"
           variants={{ hidden: { y: "110%" }, visible: { y: 0 } }}
-          transition={reduceMotion ? { duration: 0 } : { duration: 0.9, delay: delay + i * 0.06, ease: EASE }}
+          transition={reduceMotion ? { duration: 0 } : { duration: 0.8, delay: delay + i * 0.05, ease: EASE }}
           className="inline-block"
         >
           {char}

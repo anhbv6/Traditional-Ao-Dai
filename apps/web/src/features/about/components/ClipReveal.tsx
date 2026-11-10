@@ -27,7 +27,7 @@ interface ClipRevealProps {
  */
 export function ClipReveal({ children, className, direction = "up", delay = 0 }: ClipRevealProps) {
   const reduceMotion = useReducedMotion();
-  const transition = reduceMotion ? { duration: 0 } : { duration: 1.4, delay, ease: EASE };
+  const transition = reduceMotion ? { duration: 0 } : { duration: 0.9, delay, ease: EASE };
 
   return (
     <motion.div
@@ -39,10 +39,10 @@ export function ClipReveal({ children, className, direction = "up", delay = 0 }:
     >
       <motion.div
         className="absolute inset-0"
-        initial={{ scale: 1.18 }}
+        initial={{ scale: 1.06 }}
         whileInView={{ scale: 1 }}
         viewport={{ once: true, margin: "0px 0px -10% 0px" }}
-        transition={reduceMotion ? { duration: 0 } : { duration: 1.8, delay, ease: EASE }}
+        transition={reduceMotion ? { duration: 0 } : { duration: 1.1, delay, ease: EASE }}
       >
         {children}
       </motion.div>

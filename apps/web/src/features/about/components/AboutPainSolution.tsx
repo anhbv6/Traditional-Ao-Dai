@@ -7,12 +7,12 @@ import { AboutHeading } from "./AboutHeading";
 import { containerClassName } from "@/components/layout/Container";
 
 const PAIN_KEYS = ["armhole", "belly", "fit"] as const;
-const EASE_CLASS = "ease-[cubic-bezier(0.22,1,0.36,1)]";
 
 /**
- * Ba nỗi lo thường gặp khi mặc áo dài mua sẵn, mỗi nỗi lo đi kèm cách Thiên Canh xử lý.
- * Nội dung luôn hiện sẵn (không giấu sau hover) để đọc một lượt là hiểu; hover chỉ là điểm nhấn:
- * thẻ nhấc lên, vạch đỏ đô chạy dọc mép trên, số thứ tự lớn đậm màu dần.
+ * Ba vấn đề và giải pháp may đo (Minimalism Style):
+ * - Thẻ thiết kế dạng Swiss Grid chuẩn xác: Viền hairline sắc nét, không đổ bóng mờ nhạt (shadow-none).
+ * - Số thứ tự kiến trúc (01, 02, 03) rõ ràng, chỉn chu.
+ * - Phân định rõ ràng giữa "Nỗi băn khoăn" và "Giải pháp khắc phục", toàn bộ văn bản đạt chuẩn WCAG AAA.
  */
 export function AboutPainSolution() {
   const t = useTranslations("AboutPage.pain");
@@ -21,37 +21,41 @@ export function AboutPainSolution() {
     <section className={containerClassName({ spacing: "section" })}>
       <AboutHeading eyebrow={t("eyebrow")} title={t("title")} description={t("description")} />
 
-      <ol className="grid gap-5 md:grid-cols-3 lg:gap-6">
+      <ol className="grid gap-6 md:grid-cols-3">
         {PAIN_KEYS.map((key, i) => (
           <li key={key}>
-            <Reveal delay={i * 0.12} className="h-full">
-              <article
-                className={`group relative flex h-full flex-col overflow-hidden border border-(--border) bg-(--bg-card) p-6 transition-[translate,box-shadow] duration-500 ${EASE_CLASS} hover:-translate-y-1.5 hover:shadow-[0_18px_40px_-24px_rgba(0,0,0,0.35)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 sm:p-8`}
-              >
-                <span
-                  aria-hidden="true"
-                  className={`absolute inset-x-0 top-0 h-0.5 origin-left scale-x-0 bg-(--primary-color) transition-transform duration-700 ${EASE_CLASS} group-hover:scale-x-100`}
-                />
-                <span
-                  aria-hidden="true"
-                  className="absolute right-5 top-3 font-[family-name:var(--font-playfair)] text-[4rem] italic leading-none text-(--accent-color)/25 transition-colors duration-700 group-hover:text-(--accent-color)/60 sm:text-[4.5rem]"
-                >
-                  0{i + 1}
-                </span>
-
-                <p className="text-[11px] uppercase tracking-[2.5px] text-(--text-light)">{t("problemLabel")}</p>
-                <h3 className="mt-3 max-w-[80%] font-[family-name:var(--font-playfair)] text-xl font-semibold text-(--text-main)">
-                  {t(`cards.${key}.title`)}
-                </h3>
-
-                <div className="mt-8 border-t border-dashed border-(--border) pt-5">
-                  <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[2px] text-(--primary-ink)">
-                    <span className="grid size-5 place-items-center rounded-full bg-(--primary-color) text-white transition-transform duration-500 group-hover:scale-110">
-                      <Check aria-hidden="true" className="size-3" strokeWidth={2.5} />
+            <Reveal delay={i * 0.1} className="h-full">
+              <article className="group relative flex h-full flex-col justify-between border border-(--border) bg-(--bg-card) p-7 transition-colors duration-300 hover:border-(--primary-ink)/40 sm:p-8">
+                <div>
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-medium uppercase tracking-[0.2em] text-(--text-light)">
+                      {t("problemLabel")}
+                    </p>
+                    <span className="font-mono text-xs font-semibold tracking-widest text-(--primary-ink)">
+                      0{i + 1}
                     </span>
-                    {t("fixLabel")}
+                  </div>
+
+                  <h3 className="mt-4 font-[family-name:var(--font-playfair)] text-xl font-semibold leading-snug text-(--text-main)">
+                    {t(`cards.${key}.title`)}
+                  </h3>
+                </div>
+
+                <div className="mt-8 border-t border-(--border) pt-6">
+                  <div className="flex items-center gap-2">
+                    <span
+                      aria-hidden="true"
+                      className="grid size-4 place-items-center rounded-full bg-(--primary-color) text-white"
+                    >
+                      <Check className="size-2.5" strokeWidth={3} />
+                    </span>
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-(--primary-ink)">
+                      {t("fixLabel")}
+                    </p>
+                  </div>
+                  <p className="mt-3.5 text-[15px] leading-relaxed text-(--text-main)">
+                    {t(`cards.${key}.fix`)}
                   </p>
-                  <p className="mt-3 text-[15px] leading-7 text-(--text-main)/85">{t(`cards.${key}.fix`)}</p>
                 </div>
               </article>
             </Reveal>
