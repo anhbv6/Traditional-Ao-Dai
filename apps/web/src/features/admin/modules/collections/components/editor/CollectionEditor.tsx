@@ -21,7 +21,11 @@ import {
   type AdminContentLang,
 } from "@/features/admin/core/ui";
 import { saveCollectionAction } from "../../actions/collections.actions";
-import { saveCollectionSchema, type SaveCollectionValues } from "../../schemas/collections.schemas";
+import {
+  COLLECTION_TEXT_LIMITS,
+  saveCollectionSchema,
+  type SaveCollectionValues,
+} from "../../schemas/collections.schemas";
 import {
   type AdminCollectionDetail,
   type AdminCollectionItem,
@@ -245,13 +249,24 @@ export function CollectionEditor({ collection: initial, products, homepageUsedBy
     ) : null;
 
   // SEO nằm trong dialog nên lỗi ở đó không nhìn thấy trên form — bấm lưu mà lỗi ở SEO thì mở dialog ra
+  const langHasError = (lang: ContentLang, source: FieldErrors<SaveCollectionValues> = errors) =>
+    Object.values(LANG_FIELDS[lang]).some((name) => source[name]);
   const seoError = Boolean(
     errors.slug || errors.seoTitle || errors.seoTitleEn || errors.seoDescription || errors.seoDescriptionEn
   );
   const onInvalid = (invalid: FieldErrors<SaveCollectionValues>) => {
     if (invalid.slug || invalid.seoTitle || invalid.seoTitleEn || invalid.seoDescription || invalid.seoDescriptionEn) {
       setIsSeoOpen(true);
+    } else if (!langHasError(contentLang, invalid)) {
+      // Lỗi nằm ở ngôn ngữ đang ẩn thì chuyển sang ngôn ngữ đó để thấy ô bị lỗi
+      const other: ContentLang = contentLang === "vi" ? "en" : "vi";
+      if (langHasError(other, invalid)) setContentLang(other);
     }
+    // Luôn báo bằng toast: có lỗi nằm ở chỗ không nhìn thấy (bảng Tùy chọn, ảnh...) thì bấm lưu không được "im lặng"
+    const firstMessage = Object.values(invalid).find(
+      (fieldError): fieldError is { message: string } => typeof fieldError?.message === "string"
+    )?.message;
+    notify.error(firstMessage, "VALIDATION_ERROR");
   };
 
   const onSubmit = async (data: SaveCollectionValues) => {
@@ -363,6 +378,7 @@ export function CollectionEditor({ collection: initial, products, homepageUsedBy
                       size="sm"
                       min={0}
                       max={99}
+                      error={err(errors.homepageOrder?.message)}
                       {...form.register("homepageOrder", { valueAsNumber: true })}
                       fieldClassName="w-24"
                     />
@@ -400,8 +416,8 @@ export function CollectionEditor({ collection: initial, products, homepageUsedBy
                   hint={t("editor.sections.englishHint")}
                   missingLabel={t("editor.langTabs.untranslated")}
                   status={{
-                    vi: errors.name || errors.code ? "error" : undefined,
-                    en: values.nameEn ? undefined : "missing",
+                    vi: langHasError("vi") || errors.code ? "error" : undefined,
+                    en: langHasError("en") ? "error" : values.nameEn ? undefined : "missing",
                   }}
                 />
               </div>
@@ -413,7 +429,8 @@ export function CollectionEditor({ collection: initial, products, homepageUsedBy
                 required={!isEnglish}
                 className="sm:col-span-2"
                 label={t("field.name")}
-                error={isEnglish ? undefined : err(errors.name?.message)}
+                maxLength={COLLECTION_TEXT_LIMITS.name}
+                error={err(errors[langFields.name]?.message)}
                 shakeKey={form.formState.submitCount}
                 placeholder={t(`field.placeholders.${contentLang}.name`)}
               />
@@ -421,6 +438,8 @@ export function CollectionEditor({ collection: initial, products, homepageUsedBy
                 {...form.register(langFields.season)}
                 label={t("field.season")}
                 hint={t("field.seasonHint")}
+                maxLength={COLLECTION_TEXT_LIMITS.season}
+                error={err(errors[langFields.season]?.message)}
                 placeholder={t(`field.placeholders.${contentLang}.season`)}
               />
               <AdminTextField
@@ -438,6 +457,8 @@ export function CollectionEditor({ collection: initial, products, homepageUsedBy
                 {...form.register(langFields.tagline)}
                 className="sm:col-span-2"
                 label={t("field.tagline")}
+                maxLength={COLLECTION_TEXT_LIMITS.tagline}
+                error={err(errors[langFields.tagline]?.message)}
                 placeholder={t(`field.placeholders.${contentLang}.tagline`)}
               />
               <AdminTextArea
@@ -445,6 +466,8 @@ export function CollectionEditor({ collection: initial, products, homepageUsedBy
                 className="sm:col-span-2"
                 label={t("field.description")}
                 rows={3}
+                maxLength={COLLECTION_TEXT_LIMITS.description}
+                error={err(errors[langFields.description]?.message)}
                 placeholder={t(`field.placeholders.${contentLang}.description`)}
               />
               <AdminTextArea
@@ -453,6 +476,8 @@ export function CollectionEditor({ collection: initial, products, homepageUsedBy
                 label={t("editor.sections.story")}
                 hint={t("editor.sections.storyHint")}
                 rows={5}
+                maxLength={COLLECTION_TEXT_LIMITS.story}
+                error={err(errors[langFields.story]?.message)}
                 placeholder={t(`field.placeholders.${contentLang}.story`)}
               />
               <div className="sm:col-span-2">

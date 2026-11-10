@@ -1,56 +1,69 @@
-export type OrderStatus =
-  | "PENDING"
-  | "CONFIRMED"
-  | "IN_PRODUCTION"
-  | "READY_TO_SHIP"
-  | "SHIPPING"
-  | "DELIVERED"
-  | "CANCELLED"
-  | "REFUNDED";
+import { type OrderStatus, type PaymentMethod, type PaymentStatus, type TailoringStatus } from "@repo/shared/orders";
 
-export type PaymentStatus = "UNPAID" | "PARTIALLY_PAID" | "PAID" | "REFUNDED";
+export type { OrderStatus, PaymentStatus };
 
-export interface OrderItemSummary {
+/** Tab vòng đời đơn trên màn danh sách */
+export const ORDER_TABS = ["ALL", "PENDING", "PROCESSING", "READY_TO_SHIP", "SHIPPING", "DELIVERED", "CLOSED"] as const;
+export type OrderTab = (typeof ORDER_TABS)[number];
+
+export interface AdminOrderLine {
   id: string;
+  productId: string;
   productName: string;
-  variantName?: string | null;
-  sku?: string | null;
+  variantName: string | null;
+  sku: string | null;
+  image: string | null;
   quantity: number;
-  unitPrice: string | number;
-  totalPrice: string | number;
+  unitPrice: number;
+  totalPrice: number;
   isCustomFit: boolean;
-  tailoringStatus: string;
+  tailoringStatus: TailoringStatus;
 }
 
-export interface AdminOrderItem {
+export interface AdminOrderRow {
   id: string;
   orderNumber: string;
   customerName: string;
   customerPhone: string;
-  customerEmail: string;
-  shippingAddress: string;
-  note?: string | null;
-  subTotal: string | number;
-  discountAmount: string | number;
-  shippingFee: string | number;
-  totalAmount: string | number;
   orderStatus: OrderStatus;
   paymentStatus: PaymentStatus;
-  paymentMethod: string;
-  createdAt: Date | string;
-  updatedAt: Date | string;
-  createdBy?: {
-    id: string;
-    name: string | null;
-    email: string | null;
-  } | null;
-  items: OrderItemSummary[];
+  /** COD / BANK_TRANSFER / DEPOSIT (chuỗi lạ từ dữ liệu cũ giữ nguyên) */
+  paymentMethod: PaymentMethod | string;
+  totalAmount: number;
+  paidAmount: number;
+  depositAmount: number;
+  isTailored: boolean;
+  dueDate: string | null;
+  createdAt: string;
+  /** Tên món đầu + số món còn lại — đủ cho dòng danh sách */
+  firstItemName: string;
+  itemCount: number;
+  /** Công đoạn chậm nhất của các món may đo (null nếu không có món may đo) */
+  slowestTailoring: TailoringStatus | null;
+  /** Đang có yêu cầu hủy / hoàn tiền chờ duyệt */
+  pendingApproval: "CANCEL_ORDER" | "REFUND" | "MANUAL_DISCOUNT" | null;
 }
 
-export interface OrderFilterParams {
-  status?: OrderStatus | "ALL";
-  paymentStatus?: PaymentStatus | "ALL";
-  search?: string;
-  page?: number;
-  limit?: number;
+export interface AdminOrdersData {
+  orders: AdminOrderRow[];
+  now: string;
 }
+
+export interface AdminOrderDetail extends AdminOrderRow {
+  customerEmail: string;
+  shippingAddress: string;
+  note: string | null;
+  subTotal: number;
+  discountAmount: number;
+  shippingFee: number;
+  createdByName: string | null;
+  updatedAt: string;
+  lines: AdminOrderLine[];
+  now: string;
+}
+
+/** Thay đổi áp tại chỗ sau một thao tác thành công (danh sách / chi tiết tự áp vào state của mình) */
+export type OrderPatch =
+  | { orderId: string; orderStatus: OrderStatus }
+  | { orderId: string; paidAmount: number; paymentStatus: PaymentStatus }
+  | { orderId: string; pendingApproval: "CANCEL_ORDER" };

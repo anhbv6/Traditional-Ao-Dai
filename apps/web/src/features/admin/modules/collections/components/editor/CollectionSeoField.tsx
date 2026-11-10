@@ -5,7 +5,8 @@ import { Lock } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { AdminTextArea, AdminTextField, type AdminContentLang } from "@/features/admin/core/ui";
-import { type SaveCollectionValues } from "../../schemas/collections.schemas";
+import { useNotify } from "@/hooks/useNotify";
+import { COLLECTION_TEXT_LIMITS, type SaveCollectionValues } from "../../schemas/collections.schemas";
 
 // Độ dài Google thường hiển thị trọn — vượt vẫn lưu được nhưng sẽ bị cắt trên kết quả tìm kiếm
 const TITLE_SOFT_LIMIT = 60;
@@ -33,8 +34,11 @@ export function CollectionSeoField({
   lang: AdminContentLang;
 }) {
   const t = useTranslations("AdminPage.collections.seo");
+  const notify = useNotify();
   const titleKey = lang === "vi" ? "seoTitle" : "seoTitleEn";
   const descriptionKey = lang === "vi" ? "seoDescription" : "seoDescriptionEn";
+  const { errors } = form.formState;
+  const err = (key?: string) => (key ? notify.translateError(key) : undefined);
 
   const values = useWatch({ control: form.control });
   const title = values[titleKey] || (lang === "vi" ? values.name : values.nameEn || values.name) || "";
@@ -65,6 +69,8 @@ export function CollectionSeoField({
           </>
         }
         placeholder={t("titlePlaceholder")}
+        maxLength={COLLECTION_TEXT_LIMITS.seoTitle}
+        error={err(errors[titleKey]?.message)}
       />
       <AdminTextArea
         key={descriptionKey}
@@ -76,6 +82,8 @@ export function CollectionSeoField({
         }
         rows={3}
         placeholder={t("descriptionPlaceholder")}
+        maxLength={COLLECTION_TEXT_LIMITS.seoDescription}
+        error={err(errors[descriptionKey]?.message)}
       />
 
       <div className="rounded-lg border border-[#E4E4E7] bg-white p-4">

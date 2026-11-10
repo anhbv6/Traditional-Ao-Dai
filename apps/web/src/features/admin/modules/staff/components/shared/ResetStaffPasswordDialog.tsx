@@ -10,12 +10,12 @@ import {
   AdminDialog,
   AdminTextField,
 } from "@/features/admin/core/ui";
-import { resetStaffPasswordAction } from "../actions/staff.actions";
-import { type StaffMemberItem } from "../types/staff.types";
+import { resetStaffPasswordAction } from "../../actions/staff.actions";
+import { type StaffMemberItem } from "../../types/staff.types";
 
 interface ResetStaffPasswordDialogProps {
   /** Nhân viên cần đặt lại mật khẩu; null = đóng hộp thoại */
-  staff: StaffMemberItem | null;
+  staff: Pick<StaffMemberItem, "id" | "name" | "email"> | null;
   onClose: () => void;
 }
 

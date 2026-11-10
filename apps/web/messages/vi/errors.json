@@ -165,6 +165,8 @@
   "COLLECTION_DATE_RANGE_INVALID": "Ngày hết mùa phải sau ngày mở bán.",
   "COLLECTION_ACCENT_INVALID": "Màu nhấn phải có dạng #RRGGBB.",
   "COLLECTION_PRODUCT_INVALID": "Danh sách sản phẩm không hợp lệ.",
+  "COLLECTION_TEXT_TOO_LONG": "Nội dung quá dài, hãy rút gọn lại.",
+  "COLLECTION_HOMEPAGE_ORDER_INVALID": "Thứ tự trên trang chủ là số nguyên từ 0 đến 99.",
   "CATEGORY_NAME_REQUIRED": "Vui lòng nhập tên loại sản phẩm.",
   "CATEGORY_SLUG_INVALID": "Đường dẫn chỉ gồm chữ thường không dấu, số và dấu gạch ngang.",
   "CATEGORY_PARENT_INVALID": "Chỉ được đặt loại con dưới một nhóm gốc.",
@@ -250,5 +252,13 @@
   "AFTER_SALES_ITEM_REQUIRED": "Vui lòng chọn món cần xử lý.",
   "AFTER_SALES_REASON_REQUIRED": "Vui lòng chọn lý do.",
   "AFTER_SALES_DESCRIPTION_TOO_SHORT": "Vui lòng mô tả cụ thể hơn (ít nhất 10 ký tự).",
-  "AFTER_SALES_DESCRIPTION_TOO_LONG": "Mô tả quá dài (tối đa 1000 ký tự)."
+  "AFTER_SALES_DESCRIPTION_TOO_LONG": "Mô tả quá dài (tối đa 1000 ký tự).",
+  "INVENTORY_VARIANT_NOT_FOUND": "Có SKU không còn thuộc sản phẩm này. Tải lại trang rồi thử lại.",
+  "TAILORING_ITEM_NOT_FOUND": "Không tìm thấy món may đo này.",
+  "TAILORING_ORDER_CANCELLED": "Đơn đã hủy — không chuyển tiếp công đoạn được.",
+  "ORDER_STATUS_TRANSITION_INVALID": "Không thể chuyển đơn sang trạng thái này từ trạng thái hiện tại.",
+  "ORDER_TAILORING_NOT_DONE": "Còn món may đo chưa xong xưởng — chưa đóng gói được.",
+  "ORDER_CLOSED": "Đơn đã hủy hoặc hoàn tiền.",
+  "ORDER_PAYMENT_EXCEEDS_TOTAL": "Số tiền vượt quá số còn lại của đơn.",
+  "APPROVAL_ALREADY_PENDING": "Đơn này đã có yêu cầu đang chờ duyệt."
 }

@@ -1,6 +1,7 @@
 "use server";
 
 import bcrypt from "bcryptjs";
+import { revalidatePath } from "next/cache";
 import { type z } from "zod";
 import { normalizeEmail, normalizeVietnamPhone, type Permission } from "@repo/shared";
 import { prisma } from "../../../core/server/db.server";
@@ -18,6 +19,13 @@ import {
 } from "../schemas/staff.schemas";
 
 /** Tài khoản nhân viên đang tồn tại (không tác động lên ADMIN hay tài khoản đã xóa) */
+/** Màn Nhân sự, hồ sơ và Phân quyền đọc dữ liệu ở Server Component — tải lại sau mỗi thay đổi */
+function revalidateStaff(userId?: string) {
+  revalidatePath("/admin/staff");
+  revalidatePath("/admin/settings/permissions");
+  if (userId) revalidatePath(`/admin/staff/${userId}`);
+}
+
 async function findStaff(userId: string) {
   return prisma.user.findFirst({
     where: { id: userId, role: "STAFF", status: { not: "DELETED" } },
@@ -70,6 +78,8 @@ export async function updateStaffPermissionAction(userId: string, permissions: P
       metadata: { before: target.permissions, after: updated.permissions },
     });
 
+    revalidateStaff(userId);
+
     return { success: true as const, data: updated };
   } catch (error) {
     console.error("Lỗi Action updateStaffPermissionAction:", error);
@@ -114,6 +124,8 @@ export async function toggleStaffActiveAction(userId: string, isActive: boolean)
       targetType: "USER",
       targetId: userId,
     });
+
+    revalidateStaff(userId);
 
     return { success: true as const, data: updated };
   } catch (error) {
@@ -201,6 +213,8 @@ export async function createStaffAction(raw: CreateStaffInput) {
       targetId: created.id,
       metadata: { permissions },
     });
+
+    revalidateStaff(created.id);
 
     return { success: true as const, data: created };
   } catch (error) {

@@ -143,20 +143,17 @@
     "staffLocked": "Đã khóa tài khoản nhân viên!"
   },
   "staff": {
-    "eyebrow": "Nhân sự & Phân quyền",
-    "title": "Quản Lý Nhân Viên",
-    "description": "Tạo tài khoản nhân viên, bật/tắt từng quyền chi tiết và khóa / mở tài khoản.",
-    "refresh": "Làm mới",
     "create": "Thêm nhân viên",
     "creating": "Đang tạo...",
     "cancel": "Hủy bỏ",
-    "loading": "Đang tải danh sách nhân sự...",
     "empty": {
       "title": "Chưa có tài khoản nhân viên nào",
       "description": "Bấm \"Thêm nhân viên\" để tạo tài khoản Staff đầu tiên."
     },
     "columns": {
       "staff": "Nhân viên",
+      "permissions": "Quyền",
+      "activity": "Hoạt động",
       "status": "Trạng thái",
       "actions": "Thao tác"
     },
@@ -184,7 +181,113 @@
     "resettingPassword": "Đang đặt lại...",
     "resetPasswordTitle": "Đặt lại mật khẩu nhân viên",
     "resetPasswordDescription": "Đặt mật khẩu mới cho {name}. Mọi phiên đăng nhập của nhân viên này sẽ bị đăng xuất.",
-    "resetPasswordSuccess": "Đã đặt lại mật khẩu nhân viên!"
+    "resetPasswordSuccess": "Đã đặt lại mật khẩu nhân viên!",
+    "searchPlaceholder": "Tìm tên, email, số điện thoại…",
+    "noResults": "Không có nhân viên khớp bộ lọc.",
+    "noPermissions": "Chưa cấp quyền",
+    "permissionCount": "{count} / 5 quyền",
+    "lastLogin": "Đăng nhập {time}",
+    "neverLoggedIn": "Chưa đăng nhập lần nào",
+    "activity30d": "{count} thao tác trong 30 ngày",
+    "permissionsHint": "Quyền được quản lý tập trung ở",
+    "permissionsLink": "Cấu hình › Phân quyền",
+    "permissionShort": {
+      "MANAGE_ORDERS": "Đơn hàng",
+      "UPDATE_TAILORING": "Xưởng",
+      "MANAGE_INVENTORY": "Kho & sản phẩm",
+      "VIEW_REPORTS": "Báo cáo",
+      "MANAGE_CONTENT": "Nội dung"
+    },
+    "filter": {
+      "status": "Lọc",
+      "option": {
+        "ALL": "Tất cả",
+        "ACTIVE": "Đang hoạt động",
+        "LOCKED": "Đã khóa",
+        "NO_PERMISSION": "Chưa cấp quyền"
+      }
+    },
+    "menu": {
+      "label": "Thao tác với {name}",
+      "view": "Xem hồ sơ",
+      "lock": "Khóa tài khoản",
+      "unlock": "Mở khóa"
+    },
+    "lockDialog": {
+      "lockTitle": "Khóa {name}?",
+      "unlockTitle": "Mở khóa {name}?",
+      "lockDescription": "Nhân viên bị đăng xuất ngay và không vào được khu quản trị.",
+      "unlockDescription": "Nhân viên đăng nhập lại được với quyền đang có.",
+      "lockBody": "Dữ liệu và nhật ký thao tác của nhân viên vẫn được giữ nguyên.",
+      "unlockBody": "Quyền chi tiết không đổi — kiểm tra lại ở hồ sơ nếu cần.",
+      "lock": "Khóa tài khoản",
+      "unlock": "Mở khóa"
+    },
+    "matrix": {
+      "adminNote": "Super Admin luôn có toàn quyền nên không nằm trong bảng. Bỏ tick là thu hồi quyền ngay ở lần tải trang kế tiếp của nhân viên."
+    },
+    "activity": {
+      "tailoring": "Chuyển công đoạn xưởng: {stage}",
+      "audit": {
+        "APPROVAL_APPROVED": "Duyệt một yêu cầu",
+        "APPROVAL_REJECTED": "Từ chối một yêu cầu",
+        "ATTRIBUTE_CREATED": "Thêm giá trị thuộc tính",
+        "ATTRIBUTE_UPDATED": "Sửa giá trị thuộc tính",
+        "ATTRIBUTE_DELETED": "Xóa giá trị thuộc tính",
+        "ATTRIBUTE_GROUP_CREATED": "Thêm nhóm thuộc tính",
+        "ATTRIBUTE_GROUP_UPDATED": "Sửa nhóm thuộc tính",
+        "ATTRIBUTE_GROUP_DELETED": "Xóa nhóm thuộc tính",
+        "CATEGORY_CREATED": "Thêm loại sản phẩm",
+        "CATEGORY_UPDATED": "Sửa loại sản phẩm",
+        "CATEGORY_DELETED": "Xóa loại sản phẩm",
+        "COLLECTION_CREATED": "Tạo bộ sưu tập",
+        "COLLECTION_UPDATED": "Sửa bộ sưu tập",
+        "COLLECTION_DELETED": "Xóa bộ sưu tập",
+        "COLLECTION_STATUS_CHANGED": "Đổi trạng thái bộ sưu tập",
+        "COLLECTION_HOMEPAGE_UPDATED": "Sửa bộ sưu tập trang chủ",
+        "CUSTOMER_LOCKED": "Khóa tài khoản khách",
+        "CUSTOMER_UNLOCKED": "Mở khóa tài khoản khách",
+        "INVENTORY_ADJUSTED": "Điều chỉnh tồn SKU",
+        "MATERIAL_CREATED": "Thêm chất liệu",
+        "MATERIAL_UPDATED": "Sửa chất liệu",
+        "MATERIAL_DELETED": "Xóa chất liệu",
+        "ORDER_PAYMENT_RECORDED": "Ghi nhận tiền đơn",
+        "ORDER_STATUS_CHANGED": "Chuyển trạng thái đơn",
+        "PRODUCT_CREATED": "Tạo sản phẩm",
+        "PRODUCT_UPDATED": "Sửa sản phẩm",
+        "PRODUCT_VISIBILITY_UPDATED": "Ẩn / hiện sản phẩm",
+        "PRODUCTS_VISIBILITY_BULK_UPDATED": "Ẩn / hiện nhiều sản phẩm",
+        "PRODUCT_CUSTOM_FIT_UPDATED": "Bật / tắt nhận may đo",
+        "SIZE_CHART_CREATED": "Tạo bảng size",
+        "SIZE_CHART_UPDATED": "Sửa bảng size",
+        "SIZE_CHART_DUPLICATED": "Nhân bản bảng size",
+        "SIZE_CHART_ACTIVATED": "Bật bảng size",
+        "SIZE_CHART_DEACTIVATED": "Tắt bảng size",
+        "SIZE_CHART_DELETED": "Xóa bảng size",
+        "STAFF_CREATED": "Tạo tài khoản nhân viên",
+        "STAFF_LOCKED": "Khóa nhân viên",
+        "STAFF_UNLOCKED": "Mở khóa nhân viên",
+        "STAFF_PASSWORD_RESET": "Đặt lại mật khẩu nhân viên",
+        "STAFF_PERMISSIONS_UPDATED": "Đổi quyền nhân viên"
+      }
+    },
+    "detail": {
+      "back": "Nhân sự",
+      "permissions": "Quyền được cấp",
+      "allPermissions": "Xem bảng phân quyền",
+      "opens": "Mở:",
+      "opensReports": "khối doanh thu ở Tổng quan",
+      "noPermissionsHint": "Nhân viên chưa có quyền nào — chỉ thấy màn Tổng quan và Yêu cầu của tôi.",
+      "activity": "Hoạt động gần đây",
+      "noActivity": "Chưa có thao tác nào được ghi lại.",
+      "account": "Tài khoản",
+      "email": "Email đăng nhập",
+      "phone": "Điện thoại",
+      "createdAt": "Tạo ngày",
+      "lastLogin": "Đăng nhập gần nhất",
+      "lastActivity": "Thao tác gần nhất",
+      "sessions": "Phiên đang mở"
+    }
   },
   "dashboard": {
     "greeting": "Xin chào, {name}",
@@ -294,32 +397,24 @@
   },
   "pages": {
     "orders": {
-      "eyebrow": "Quản lý bán hàng",
-      "title": "Đơn Hàng Áo Dài",
-      "description": "Cập nhật trạng thái xử lý, thanh toán và theo dõi đơn may sẵn / may đo.",
-      "meta": "Tổng số <value>{count}</value> đơn hàng"
+      "title": "Đơn hàng",
+      "description": "Đơn nào đang chờ gì: chuyển khoản, xác nhận, xưởng, đóng gói hay giao — và đã thu bao nhiêu."
     },
     "tailoring": {
-      "eyebrow": "Xưởng may đo thủ công",
-      "title": "Tiến Độ May Đo Áo Dài",
-      "description": "Cập nhật từng công đoạn may theo số đo riêng và ghi nhật ký thợ phụ trách.",
-      "meta": "Đang may <value>{count}</value> áo theo số đo riêng"
+      "title": "Xưởng đang may",
+      "description": "Đơn may đo nào cần ra tay trước, đang ở công đoạn nào và còn kịp hẹn không."
     },
     "products": {
       "title": "Sản phẩm",
       "description": "Mẫu bán ra theo loại, hình thức bán (một món, theo bộ, may đo) và SKU tự sinh."
     },
     "inventory": {
-      "eyebrow": "Kho vận & Biến thể",
-      "title": "Quản Lý Tồn Kho",
-      "description": "Theo dõi và điều chỉnh số lượng tồn của từng mã SKU (size, màu).",
-      "meta": "Tổng cộng <value>{count}</value> mã SKU biến thể"
+      "title": "Tồn kho SKU",
+      "description": "Hàng may sẵn còn bao nhiêu theo màu và size, size nào cần nhập thêm."
     },
     "customers": {
-      "eyebrow": "Dữ liệu khách hàng CRM",
-      "title": "Khách Hàng & Số Đo May Riêng",
-      "description": "Tra cứu thông tin liên hệ, lịch sử mua và hồ sơ số đo của khách hàng.",
-      "meta": "Tổng số <value>{count}</value> khách hàng đã đăng ký"
+      "title": "Khách hàng",
+      "description": "Ai là khách quen, ai còn nợ, ai đã có số đo để may lại — gồm cả khách đặt không cần tài khoản."
     },
     "vouchers": {
       "eyebrow": "Marketing & Khuyến mãi",
@@ -355,31 +450,15 @@
     },
     "fabrics": {
       "title": "Số lượng vải",
-      "description": "Theo dõi số mét vải còn lại cho hàng đặt may.",
-      "planned": [
-        "Số mét còn lại theo từng cây vải",
-        "Cảnh báo khi dưới ngưỡng",
-        "Liên kết vải với mẫu áo để ẩn nhanh khi hết vải",
-        "Nhập thêm và điều chỉnh số mét"
-      ]
+      "description": "Số mét còn lại của từng cây vải, còn cắt được bao nhiêu áo và cây nào cần nhập thêm."
     },
     "inventoryHistory": {
       "title": "Lịch sử biến động kho",
-      "description": "Nhật ký nhập, xuất và điều chỉnh tồn kho.",
-      "planned": [
-        "Biến động theo SKU và theo cây vải",
-        "Ai thay đổi, lúc nào, giá trị cũ → mới",
-        "Lọc theo thời gian, sản phẩm, người thực hiện"
-      ]
+      "description": "Nhật ký nhập, xuất, hao hụt và kiểm kê của hàng may sẵn và vải — ai làm, lúc nào, trước → sau."
     },
     "returns": {
       "title": "Bảo hành & hoàn trả",
-      "description": "Tiếp nhận và xử lý yêu cầu sửa đồ, đổi trả, hoàn tiền.",
-      "planned": [
-        "Tiếp nhận yêu cầu bảo hành, sửa đồ, đổi trả",
-        "Theo dõi trạng thái xử lý",
-        "Hoàn tiền gửi qua yêu cầu phê duyệt"
-      ]
+      "description": "Phiếu sửa đồ, đổi, trả, bảo hành — chiếc áo đang ở đâu và việc kế tiếp là gì."
     },
     "saleEvents": {
       "title": "Chương trình sale",
@@ -401,12 +480,11 @@
     },
     "rolePermissions": {
       "title": "Phân quyền",
-      "description": "Quản lý quyền chi tiết của nhân viên ở khu quản trị.",
-      "planned": [
-        "Bảng quyền theo từng nhân viên",
-        "Nhóm quyền mẫu để cấp nhanh",
-        "Lịch sử thay đổi quyền"
-      ]
+      "description": "Bảng quyền chi tiết của từng nhân viên — mỗi quyền mở một nhóm màn quản trị."
+    },
+    "staff": {
+      "title": "Nhân sự",
+      "description": "Ai trong tiệm có tài khoản quản trị, làm được gì và gần đây đã làm gì."
     }
   },
   "measurements": {
@@ -512,86 +590,355 @@
     "published": "Đã đăng"
   },
   "customers": {
-    "ordersCount": "{count} đơn",
-    "measurementsCount": "{count} hồ sơ số đo",
-    "note": "Ghi chú: {note}",
-    "searchPlaceholder": "Tìm theo tên, email, SĐT khách...",
-    "guest": "Khách vãng lai",
-    "toggleSuperAdminOnly": "Chỉ Super Admin được khóa / mở tài khoản khách hàng",
-    "customerFallback": "Khách hàng",
-    "noPhone": "Chưa có SĐT",
-    "noEmail": "Chưa có email",
-    "measurementsEmpty": "Khách hàng này chưa lưu số đo may đo nào.",
-    "measurementsTitle": "Danh sách hồ sơ số đo may riêng",
-    "empty": "Không tìm thấy khách hàng nào.",
-    "totalRevenue": "Tổng doanh thu từ khách:",
-    "profileTitle": "Hồ sơ khách hàng",
-    "noMeasurements": "Chưa lưu số đo",
-    "colPhone": "Số điện thoại",
-    "colSpent": "Tổng chi tiêu",
-    "colMeasurements": "Hồ sơ số đo",
-    "colCustomer": "Khách hàng",
-    "colStatus": "Trạng thái",
-    "active": "Hoạt động",
-    "locked": "Đang khóa",
-    "colOrders": "Đơn hàng",
-    "colDetail": "Chi tiết",
-    "default": "Mặc định"
+    "searchPlaceholder": "Tìm tên, email, số điện thoại…",
+    "cancel": "Hủy",
+    "verified": "Đã xác minh",
+    "tabsLabel": "Loại khách",
+    "tab": {
+      "ACCOUNT": "Có tài khoản",
+      "GUEST": "Khách vãng lai"
+    },
+    "status": {
+      "ACTIVE": "Hoạt động",
+      "LOCKED": "Đã khóa",
+      "GUEST": "Chưa có tài khoản"
+    },
+    "segment": {
+      "LOYAL": "Khách quen",
+      "NEW": "Khách mới",
+      "MEASURED": "Có số đo",
+      "OUTSTANDING": "Còn phải thu",
+      "DORMANT": "Lâu chưa quay lại",
+      "LOCKED": "Đã khóa"
+    },
+    "sort": {
+      "RECENT": "Mua gần nhất",
+      "SPENT": "Chi tiêu nhiều nhất",
+      "JOINED": "Mới tham gia"
+    },
+    "filter": {
+      "segment": "Nhóm khách",
+      "sort": "Sắp xếp",
+      "all": "Tất cả"
+    },
+    "column": {
+      "customer": "Khách hàng",
+      "orders": "Đơn hàng",
+      "spent": "Đã chi",
+      "status": "Tình trạng",
+      "actions": "Thao tác"
+    },
+    "orders": "{count} đơn",
+    "noOrders": "Chưa mua",
+    "outstanding": "Còn thu {amount}",
+    "empty": {
+      "ACCOUNT": "Chưa có khách nào đăng ký tài khoản.",
+      "GUEST": "Chưa có đơn nào đặt không cần tài khoản."
+    },
+    "noResults": "Không có khách khớp bộ lọc.",
+    "menu": {
+      "label": "Thao tác với {name}",
+      "view": "Xem hồ sơ",
+      "lastOrder": "Xem đơn gần nhất",
+      "call": "Gọi điện",
+      "lock": "Khóa tài khoản",
+      "unlock": "Mở khóa"
+    },
+    "toast": {
+      "locked": "Đã khóa tài khoản.",
+      "unlocked": "Đã mở khóa tài khoản."
+    },
+    "lockDialog": {
+      "lockTitle": "Khóa tài khoản {name}?",
+      "unlockTitle": "Mở khóa {name}?",
+      "lockDescription": "Khách bị đăng xuất khỏi mọi thiết bị và không đăng nhập được nữa. Đơn cũ vẫn giữ nguyên.",
+      "unlockDescription": "Khách đăng nhập và đặt hàng lại được như bình thường.",
+      "reason": "Lý do khóa",
+      "reasonPlaceholder": "VD: đặt nhiều đơn ảo, không nhận hàng 3 lần",
+      "unlockBody": "Lý do khóa trước đó sẽ được xóa.",
+      "lock": "Khóa tài khoản",
+      "unlock": "Mở khóa"
+    },
+    "gender": {
+      "MALE": "Nam",
+      "FEMALE": "Nữ",
+      "OTHER": "Khác"
+    },
+    "detail": {
+      "back": "Khách hàng",
+      "since": "Khách từ {date}",
+      "orders": "Đơn hàng ({count})",
+      "measurements": "Hồ sơ số đo",
+      "noMeasurements": "Khách chưa lưu số đo — lần may đo sau cần đo lại.",
+      "emptyProfile": "Hồ sơ chưa có thông số.",
+      "defaultProfile": "Mặc định",
+      "updated": "cập nhật {time}",
+      "addresses": "Địa chỉ giao hàng",
+      "noAddresses": "Chưa lưu địa chỉ.",
+      "defaultAddress": "Mặc định",
+      "overview": "Tổng quan mua hàng",
+      "spent": "Đã chi",
+      "activeOrders": "Đơn còn hiệu lực",
+      "average": "Trung bình / đơn",
+      "lastOrder": "Mua gần nhất",
+      "outstanding": "Còn phải thu",
+      "contact": "Liên hệ",
+      "phone": "Điện thoại",
+      "email": "Email",
+      "gender": "Giới tính",
+      "birthday": "Sinh nhật",
+      "birthdayToday": "Hôm nay!",
+      "birthdayIn": "còn {days} ngày",
+      "account": "Tài khoản",
+      "login": "Đăng nhập bằng",
+      "loginGoogle": "Google",
+      "loginPassword": "Email / SĐT",
+      "lastLogin": "Đăng nhập gần nhất",
+      "lockedAt": "Khóa từ"
+    }
   },
   "inventory": {
-    "units": "{count} cái",
-    "searchPlaceholder": "Tìm theo SKU, tên sản phẩm, size...",
-    "standardColor": "Tiêu chuẩn",
-    "empty": "Không tìm thấy biến thể nào trong kho.",
-    "colStock": "Tồn kho hiện tại",
-    "colSize": "Kích cỡ (Size)",
-    "colStatus": "Trạng thái kho",
-    "colName": "Tên Áo Dài",
-    "colAdjust": "Điều chỉnh",
-    "outOfStock": "Hết hàng",
-    "inStock": "Sẵn sàng",
-    "colColor": "Màu sắc",
-    "lowStock": "Sắp hết",
-    "edit": "Sửa kho",
-    "colSku": "Mã SKU",
-    "uncategorized": "Chưa phân loại"
+    "searchPlaceholder": "Tìm tên, mã sản phẩm, SKU, màu…",
+    "cancel": "Hủy",
+    "processing": "Đang lưu…",
+    "freeSize": "Freesize",
+    "noColor": "Không màu",
+    "colorGap": "Có màu đã hết ở size này",
+    "summaryProducts": "{count} sản phẩm",
+    "summarySkus": "{count} SKU",
+    "empty": "Chưa có SKU may sẵn nào. Thêm biến thể ở màn chi tiết sản phẩm.",
+    "noResults": "Không có kết quả khớp bộ lọc.",
+    "unit": {
+      "PIECE": "cái",
+      "METER": "m"
+    },
+    "view": {
+      "products": "Theo sản phẩm",
+      "skus": "Theo SKU"
+    },
+    "filter": {
+      "group": "Nhóm hàng",
+      "status": "Tình trạng",
+      "all": "Tất cả",
+      "statusOption": {
+        "ATTENTION": "Cần nhập thêm",
+        "OUT": "Hết hàng",
+        "OK": "Còn hàng",
+        "INACTIVE": "Ngừng bán"
+      }
+    },
+    "productStatus": {
+      "OK": "Đủ hàng",
+      "PARTIAL": "Thiếu size",
+      "OUT": "Hết hàng",
+      "INACTIVE": "Ngừng bán"
+    },
+    "skuStatus": {
+      "OK": "Còn hàng",
+      "LOW": "Sắp hết",
+      "OUT": "Hết hàng"
+    },
+    "column": {
+      "product": "Sản phẩm",
+      "sizes": "Tồn theo size",
+      "total": "Tổng",
+      "status": "Tình trạng",
+      "sku": "SKU",
+      "stock": "Tồn",
+      "updated": "Cập nhật",
+      "actions": "Thao tác"
+    },
+    "notice": {
+      "text": "<b>{out} SKU</b> đã hết, <b>{low} SKU</b> sắp hết (còn ≤ {threshold}).",
+      "show": "Xem các SKU này"
+    },
+    "menu": {
+      "label": "Thao tác với {name}",
+      "received": "Nhập hàng",
+      "sold": "Ghi bán tại tiệm",
+      "stocktake": "Kiểm kê",
+      "openProduct": "Mở sản phẩm"
+    },
+    "reason": {
+      "RECEIVED": "Nhập hàng",
+      "STOCKTAKE": "Kiểm kê",
+      "SOLD_IN_STORE": "Bán tại tiệm",
+      "RETURNED": "Khách trả",
+      "DAMAGED": "Hỏng / lỗi"
+    },
+    "adjust": {
+      "title": "Điều chỉnh tồn",
+      "mode": {
+        "ADD": "Nhập số lượng cộng thêm vào từng ô. Ô để trống giữ nguyên.",
+        "SUBTRACT": "Nhập số lượng trừ đi ở từng ô. Ô để trống giữ nguyên.",
+        "SET": "Đếm thực tế rồi nhập số đếm được. Ô để trống giữ nguyên."
+      },
+      "color": "Màu",
+      "cellLabel": "Số lượng cho {sku}",
+      "negative": "Có ô trừ nhiều hơn số đang tồn hoặc số không hợp lệ.",
+      "note": "Ghi chú",
+      "noteHint": "Lưu cùng lý do vào nhật ký để sau này đối chiếu.",
+      "notePlaceholder": {
+        "RECEIVED": "VD: thợ giao đợt 2 tháng 11",
+        "STOCKTAKE": "VD: kiểm kho cuối tháng",
+        "SOLD_IN_STORE": "VD: khách mua trực tiếp ở tiệm",
+        "RETURNED": "VD: mã đơn khách trả",
+        "DAMAGED": "VD: ố vàng ở tà sau"
+      },
+      "meterUnit": "Nhóm Nguyên liệu tính theo mét.",
+      "noChanges": "Chưa có thay đổi",
+      "summary": "Đổi {count} SKU · {delta}",
+      "submit": "Lưu tồn kho",
+      "saved": "Đã cập nhật tồn {count} SKU."
+    }
   },
   "orders": {
+    "searchPlaceholder": "Tìm mã đơn, tên khách, SĐT, sản phẩm…",
+    "cancel": "Hủy",
+    "processing": "Đang lưu…",
+    "tailored": "May đo",
+    "itemCount": "{count} món",
+    "empty": "Chưa có đơn hàng nào.",
+    "noResults": "Không có đơn khớp bộ lọc.",
+    "tabsLabel": "Vòng đời đơn",
+    "tab": {
+      "ALL": "Tất cả",
+      "PENDING": "Chờ xác nhận",
+      "PROCESSING": "Đang xử lý",
+      "READY_TO_SHIP": "Chờ giao",
+      "SHIPPING": "Đang giao",
+      "DELIVERED": "Hoàn tất",
+      "CLOSED": "Hủy / hoàn"
+    },
     "status": {
       "PENDING": "Chờ xác nhận",
       "CONFIRMED": "Đã xác nhận",
-      "IN_PRODUCTION": "Đang may đo",
-      "READY_TO_SHIP": "Chờ xuất kho",
+      "IN_PRODUCTION": "Đang may",
+      "READY_TO_SHIP": "Đã đóng gói",
       "SHIPPING": "Đang giao",
-      "DELIVERED": "Giao thành công",
+      "DELIVERED": "Đã giao",
       "CANCELLED": "Đã hủy",
-      "REFUNDED": "Đã hoàn tiền",
-      "ALL": "Tất cả"
+      "REFUNDED": "Đã hoàn tiền"
     },
-    "itemsCount": "{count} món",
     "payment": {
-      "PAID": "Đã thanh toán",
-      "PARTIALLY_PAID": "Đã cọc",
-      "UNPAID": "Chưa thanh toán"
+      "UNPAID": "Chưa thanh toán",
+      "PARTIALLY_PAID": "Đã cọc / trả một phần",
+      "PAID": "Đã thanh toán đủ",
+      "REFUNDED": "Đã hoàn tiền"
     },
-    "itemSize": "Size: {size}",
-    "itemQuantity": "SL: {count}",
-    "searchPlaceholder": "Tìm theo mã đơn, tên, SĐT...",
-    "empty": "Chưa có đơn hàng nào phù hợp với bộ lọc.",
-    "measurementsReceived": "Đã tiếp nhận số đo may riêng",
-    "updateProgress": "Cập nhật tiến trình đơn",
-    "detailCustomer": "Khách hàng & Địa chỉ",
-    "grandTotal": "Tổng cộng thanh toán",
-    "colItems": "Sản phẩm / Dịch vụ",
-    "detailTitle": "Chi tiết đơn hàng",
-    "detailItems": "Danh mục áo dài",
-    "colStatus": "Trạng thái đơn",
-    "customFit": "May đo riêng",
-    "colNumber": "Mã đơn hàng",
-    "colCustomer": "Khách hàng",
-    "colPayment": "Thanh toán",
-    "colTotal": "Tổng tiền",
-    "colDetail": "Chi tiết"
+    "method": {
+      "COD": "COD",
+      "BANK_TRANSFER": "Chuyển khoản",
+      "DEPOSIT": "Cọc + COD"
+    },
+    "money": {
+      "paidFull": "Đã thu đủ",
+      "paidPart": "Đã thu {paid}",
+      "unpaid": "Chưa thu"
+    },
+    "filter": {
+      "kind": "Loại đơn",
+      "payment": "Thanh toán",
+      "all": "Tất cả",
+      "kindOption": {
+        "ALL": "Tất cả",
+        "READY_MADE": "May sẵn",
+        "TAILORED": "Có may đo"
+      }
+    },
+    "column": {
+      "order": "Đơn",
+      "customer": "Khách hàng",
+      "items": "Sản phẩm",
+      "status": "Tình trạng",
+      "money": "Tiền",
+      "actions": "Thao tác"
+    },
+    "next": {
+      "AWAIT_TRANSFER": "Chờ khách chuyển {amount}",
+      "CONFIRM": "Gọi xác nhận đơn với khách",
+      "WORKSHOP": "Xưởng: {stage}",
+      "WORKSHOP_DUE": "Xưởng: {stage} · hẹn {date}",
+      "PACK": "Đóng gói, chuẩn bị giao",
+      "HAND_OVER": "Giao cho đơn vị vận chuyển",
+      "COLLECT_ON_DELIVERY": "Thu {amount} khi giao",
+      "AWAIT_DELIVERY": "Chờ khách nhận hàng",
+      "COLLECT_REMAINING": "Còn thiếu {amount} — kiểm tra tiền thu hộ",
+      "APPROVAL_PENDING": "Đang chờ duyệt yêu cầu hủy",
+      "DONE": "Hoàn tất",
+      "CLOSED": "Đã đóng"
+    },
+    "action": {
+      "CONFIRMED": "Xác nhận đơn",
+      "READY_TO_SHIP": "Đã đóng gói",
+      "SHIPPING": "Đã giao vận chuyển",
+      "DELIVERED": "Khách đã nhận"
+    },
+    "menu": {
+      "label": "Thao tác với đơn {code}",
+      "view": "Xem chi tiết",
+      "recordPayment": "Ghi nhận tiền",
+      "tailoring": "Mở phiếu may",
+      "requestCancel": "Yêu cầu hủy đơn",
+      "cancelPending": "Đang chờ duyệt"
+    },
+    "toast": {
+      "advanced": "Đã chuyển đơn sang “{status}”.",
+      "paid": "Đã ghi nhận tiền.",
+      "cancelRequested": "Đã gửi yêu cầu hủy — chờ Super Admin duyệt."
+    },
+    "paymentDialog": {
+      "title": "Ghi nhận tiền đã nhận",
+      "description": "Đối soát chuyển khoản theo nội dung “{code}” hoặc tiền mặt / COD đã thu.",
+      "total": "Tổng đơn",
+      "paid": "Đã thu",
+      "remaining": "Còn lại",
+      "amount": "Số tiền nhận",
+      "amountPlaceholder": "Vui lòng nhập số tiền",
+      "presetDeposit": "Đủ cọc",
+      "presetRest": "Toàn bộ còn lại",
+      "note": "Ghi chú",
+      "notePlaceholder": "VD: Vietcombank 10/11, mã GD…",
+      "exceeds": "Vượt số còn lại {remaining}.",
+      "submit": "Ghi nhận"
+    },
+    "cancelDialog": {
+      "title": "Yêu cầu hủy đơn {code}",
+      "description": "Yêu cầu chuyển tới Super Admin; duyệt xong hệ thống tự hủy đơn.",
+      "reason": "Lý do hủy",
+      "reasonPlaceholder": "VD: khách đổi ý, không liên lạc được sau 3 lần gọi",
+      "paidWarning": "Đơn đã thu tiền — sau khi hủy cần hoàn tiền cho khách.",
+      "submit": "Gửi yêu cầu"
+    },
+    "detail": {
+      "back": "Danh sách đơn hàng",
+      "placedAt": "đặt {date}",
+      "more": "Thao tác khác",
+      "progress": "Tiến trình",
+      "closed": {
+        "CANCELLED": "Đơn đã hủy.",
+        "REFUNDED": "Đơn đã hoàn tiền."
+      },
+      "items": "Sản phẩm ({count})",
+      "qtyPrice": "{qty} × {price}",
+      "payment": "Thanh toán",
+      "subTotal": "Tạm tính",
+      "discount": "Giảm giá",
+      "shippingFee": "Phí giao hàng",
+      "total": "Tổng đơn",
+      "method": "Hình thức",
+      "deposit": "Phải chuyển trước",
+      "paid": "Đã thu",
+      "remaining": "Còn lại",
+      "transferContent": "Nội dung chuyển khoản:",
+      "customer": "Khách & giao hàng",
+      "name": "Họ tên",
+      "phone": "Điện thoại",
+      "email": "Email",
+      "address": "Địa chỉ",
+      "dueDate": "Hẹn trả",
+      "createdBy": "Nhân viên tạo"
+    }
   },
   "products": {
     "searchPlaceholder": "Tìm theo tên, mã, loại, chất liệu",
@@ -797,24 +1144,99 @@
     }
   },
   "tailoring": {
+    "searchPlaceholder": "Tìm mã đơn, tên khách, SĐT, mẫu áo…",
     "stage": {
-      "WAITING_FABRIC": "Chờ xuất vải",
-      "FABRIC_CUTTING": "Đang cắt rập",
-      "SEWING": "May ráp tà & cổ",
-      "EMBROIDERY_BEADING": "Thêu & Đính kết",
-      "FITTING_IRONING": "Kiểm form & Ủi",
-      "COMPLETED": "Hoàn tất xưởng"
+      "WAITING_FABRIC": "Chờ vải",
+      "FABRIC_CUTTING": "Cắt vải",
+      "SEWING": "May ráp",
+      "EMBROIDERY_BEADING": "Thêu & đính",
+      "FITTING_IRONING": "Kiểm form & ủi",
+      "COMPLETED": "Xong xưởng"
     },
-    "allStages": "Tất cả công đoạn ({count})",
-    "tailor": "Thợ: {name}",
-    "unassigned": "Chưa phân công",
-    "viewMeasurements": "Xem hồ sơ đo",
-    "ticketTitle": "Phiếu cắt may Áo Dài • {number}",
-    "empty": "Không có mẫu áo dài nào trong công đoạn này.",
-    "measurementsTitle": "Thông số may đo chuẩn (cm / kg)",
-    "bodyNote": "Ghi chú vóc dáng của khách: ",
-    "moveStage": "Chuyển công đoạn xưởng",
-    "print": "In phiếu cắt"
+    "orderStatus": {
+      "PENDING": "Chờ xác nhận",
+      "CONFIRMED": "Đã xác nhận",
+      "IN_PRODUCTION": "Đang may",
+      "READY_TO_SHIP": "Đã đóng gói",
+      "SHIPPING": "Đang giao",
+      "DELIVERED": "Đã giao",
+      "CANCELLED": "Đã hủy",
+      "REFUNDED": "Đã hoàn tiền"
+    },
+    "trackLabel": "Tiến độ: {stage}",
+    "filter": {
+      "due": "Hẹn trả",
+      "dueOption": {
+        "ALL": "Tất cả",
+        "LATE": "Trễ / không kịp",
+        "SOON": "Trong 3 ngày tới",
+        "NO_DUE": "Chưa hẹn ngày"
+      },
+      "stage": "Công đoạn",
+      "all": "Tất cả"
+    },
+    "due": {
+      "none": "Chưa hẹn ngày",
+      "overdue": "Trễ {days} ngày · hẹn {date}",
+      "atRisk": "Không kịp · cần ~{work} ngày, còn {days}",
+      "today": "Hẹn hôm nay · {date}",
+      "left": "Còn {days} ngày · hẹn {date}",
+      "todayAtRisk": "Hẹn hôm nay · còn ~{work} ngày may"
+    },
+    "signal": {
+      "CANCELLED": "Đơn đã hủy — dừng may",
+      "UNCONFIRMED": "Chưa xác nhận số đo / cọc",
+      "DEPOSIT_MISSING": "Thiếu cọc {amount}",
+      "STALLED": "Đứng {days} ngày ở {stage}",
+      "WAITING_PACK": "Chờ đóng gói"
+    },
+    "advance": "Sang {stage}",
+    "moved": "Đã chuyển sang {stage}.",
+    "unknownStaff": "Không rõ thợ",
+    "readyMade": "kèm {count} món may sẵn",
+    "empty": "Xưởng đang trống — chưa có đơn may đo nào.",
+    "noResults": "Không có đơn khớp bộ lọc.",
+    "detail": {
+      "back": "Xưởng đang may",
+      "print": "In phiếu",
+      "itemTitle": "Món {index}: {name}",
+      "material": "Chất liệu",
+      "variant": "Phân loại",
+      "quantity": "Số lượng",
+      "leadTime": "Thời gian may",
+      "days": "{count} ngày",
+      "noteLabel": "Ghi chú cho lần chuyển",
+      "noteHint": "Lưu vào nhật ký xưởng; khách xem được ở trang theo dõi đơn.",
+      "notePlaceholder": "VD: đã ráp xong thân, chờ thợ thêu",
+      "otherStage": "Công đoạn khác",
+      "measurements": "Số đo của khách",
+      "noMeasurements": "Khách chưa nhập số đo.",
+      "bodyNote": "Ghi chú vóc dáng:",
+      "timeline": "Nhật ký xưởng",
+      "noLogs": "Chưa có cập nhật nào từ xưởng.",
+      "schedule": "Hẹn & tiến độ",
+      "dueDate": "Ngày hẹn trả",
+      "state": "Tình trạng",
+      "workLeft": "Ước còn may",
+      "orderedAt": "Đặt",
+      "payment": "Thanh toán",
+      "total": "Tổng đơn",
+      "deposit": "Cọc yêu cầu",
+      "paidAmount": "Đã thu",
+      "remaining": "Còn lại",
+      "customer": "Khách hàng",
+      "name": "Họ tên",
+      "phone": "Điện thoại",
+      "email": "Email",
+      "address": "Địa chỉ",
+      "readyMadeLabel": "Giao kèm"
+    },
+    "table": {
+      "order": "Đơn · món",
+      "due": "Hẹn trả",
+      "actions": "Thao tác",
+      "daysIn": "{days} ngày"
+    }
   },
   "vouchers": {
     "searchPlaceholder": "Tìm theo mã voucher, mô tả...",
@@ -1816,6 +2238,421 @@
       "deleted": "Đã xóa nhóm thuộc tính",
       "deleteTitle": "Xóa nhóm thuộc tính?",
       "deleteBody": "Nhóm đã trống nên xóa không ảnh hưởng sản phẩm nào."
+    }
+  },
+  "fabrics": {
+    "searchPlaceholder": "Tìm tên, mã cây vải, màu, mẫu áo…",
+    "create": "Nhập cây vải mới",
+    "cancel": "Hủy",
+    "meterOf": "/ {total} m",
+    "topsLeft": "{count, plural, =0 {không đủ một áo} other {≈ # áo}}",
+    "noYield": "chưa có định mức",
+    "summary": "{count} cây vải",
+    "summaryMaterials": "{count} chất liệu",
+    "empty": "Chưa có cây vải nào trong kho.",
+    "noResults": "Không có cây vải khớp bộ lọc.",
+    "view": {
+      "rolls": "Theo cây vải",
+      "materials": "Theo chất liệu"
+    },
+    "filter": {
+      "material": "Chất liệu",
+      "status": "Tình trạng",
+      "all": "Tất cả",
+      "statusOption": {
+        "ATTENTION": "Cần nhập thêm",
+        "OK": "Đủ dùng",
+        "OUT": "Hết vải",
+        "INACTIVE": "Ngưng dùng"
+      }
+    },
+    "status": {
+      "OK": "Đủ dùng",
+      "LOW": "Sắp hết",
+      "OUT": "Hết vải",
+      "INACTIVE": "Ngưng dùng"
+    },
+    "column": {
+      "roll": "Cây vải",
+      "remaining": "Còn lại",
+      "product": "Mẫu áo",
+      "status": "Tình trạng",
+      "actions": "Thao tác"
+    },
+    "product": {
+      "visible": "đang bán",
+      "hidden": "đã ẩn"
+    },
+    "notice": {
+      "attention": "<b>{count} cây vải</b> dưới ngưỡng hoặc đã hết.",
+      "selling": "{count} cây đã hết nhưng mẫu áo vẫn đang bán.",
+      "show": "Xem các cây này"
+    },
+    "menu": {
+      "label": "Thao tác với {name}",
+      "CUT": "Ghi cắt may",
+      "RESTOCK": "Nhập thêm",
+      "WASTE": "Ghi hao hụt",
+      "ADJUST": "Kiểm kê",
+      "edit": "Sửa thông tin",
+      "hideProduct": "Ẩn mẫu áo trên web",
+      "showProduct": "Hiện lại mẫu áo",
+      "deactivate": "Ngưng dùng cây vải",
+      "activate": "Dùng lại cây vải"
+    },
+    "movementType": {
+      "CUT": "Cắt may",
+      "RESTOCK": "Nhập thêm",
+      "WASTE": "Hao hụt",
+      "ADJUST": "Kiểm kê"
+    },
+    "movement": {
+      "title": "Ghi số mét",
+      "field": {
+        "meters": "Số mét",
+        "measured": "Số mét đo thực tế",
+        "orderCode": "Mã đơn",
+        "note": "Ghi chú"
+      },
+      "hint": {
+        "CUT": "Số mét cắt ra cho đơn may, tính cả phần chừa đường may.",
+        "RESTOCK": "Số mét nhập thêm vào chính cây vải này (cùng lô, cùng màu).",
+        "WASTE": "Phần vải hỏng không dùng được: lỗi dệt, loang màu, cắt hỏng, ố mốc.",
+        "ADJUST": "Đo lại cả cây rồi nhập số thực tế — chênh lệch được ghi vào lịch sử.",
+        "orderCode": "Không bắt buộc. Gắn mã đơn để biết vải đã đi vào đơn nào."
+      },
+      "placeholder": {
+        "meters": "Vui lòng nhập số mét",
+        "noteCUT": "Vui lòng nhập ghi chú (nếu có)",
+        "noteRESTOCK": "VD: nơi giao, lô dệt",
+        "noteWASTE": "VD: loang màu một khúc",
+        "noteADJUST": "VD: kiểm kho cuối tháng"
+      },
+      "presetTop": "1 thân áo",
+      "presetSet": "1 bộ áo + quần",
+      "preview": "Sau khi ghi",
+      "warnLow": "Cây vải sẽ xuống dưới ngưỡng {threshold} m — nên nhập thêm hoặc ngừng nhận đơn mẫu này.",
+      "warnOut": "Cây vải sẽ hết. Nếu mẫu áo gắn kèm còn bán, nhớ ẩn trên web.",
+      "recent": "Gần đây",
+      "submit": {
+        "CUT": "Ghi cắt may",
+        "RESTOCK": "Ghi nhập thêm",
+        "WASTE": "Ghi hao hụt",
+        "ADJUST": "Lưu kiểm kê"
+      },
+      "errors": {
+        "invalid": "Số mét không hợp lệ.",
+        "exceeds": "Cây vải chỉ còn {remaining} m.",
+        "orderCode": "Mã đơn có dạng TC-YYMM-XXXX."
+      }
+    },
+    "rollDialog": {
+      "createTitle": "Nhập cây vải mới",
+      "createDescription": "Mỗi cây là một cuộn vải cùng chất liệu, cùng màu, cùng lô.",
+      "editTitle": "Sửa thông tin cây vải",
+      "editDescription": "Số mét chỉ đổi qua nhập thêm hoặc kiểm kê để giữ lịch sử.",
+      "create": "Nhập cây vải",
+      "save": "Lưu thay đổi",
+      "noProduct": "Không gắn mẫu áo",
+      "field": {
+        "material": "Chất liệu",
+        "color": "Màu",
+        "name": "Tên cây vải",
+        "code": "Mã cây vải",
+        "meters": "Số mét nhập",
+        "remaining": "Số mét còn lại",
+        "threshold": "Ngưỡng cảnh báo (m)",
+        "product": "Mẫu áo may từ cây này"
+      },
+      "hint": {
+        "color": "Lấy từ thuộc tính Màu — thêm màu mới ở Danh mục › Thuộc tính.",
+        "code": "Tự sinh theo chất liệu + màu + số thứ tự, không đổi sau khi lưu.",
+        "meters": "Khổ vải {width} cm. Đo cả cây khi nhận hàng.",
+        "remaining": "Muốn đổi số mét, dùng Nhập thêm hoặc Kiểm kê trong menu ⋯.",
+        "threshold": "Còn dưới số này thì báo sắp hết. Để trống = đủ một bộ áo + quần theo định mức.",
+        "product": "Khi cây vải hết, màn này nhắc ẩn mẫu áo đang bán trên web."
+      },
+      "placeholder": {
+        "material": "Vui lòng chọn chất liệu",
+        "color": "Vui lòng chọn màu",
+        "name": "Vui lòng nhập tên cây vải",
+        "code": "Chọn chất liệu và màu để tạo mã",
+        "meters": "Vui lòng nhập số mét",
+        "threshold": "Mặc định {value}"
+      },
+      "errors": {
+        "material": "Vui lòng chọn chất liệu.",
+        "color": "Vui lòng chọn màu.",
+        "name": "Vui lòng nhập tên cây vải.",
+        "meters": "Số mét phải lớn hơn 0.",
+        "threshold": "Ngưỡng không hợp lệ."
+      }
+    },
+    "material": {
+      "width": "Khổ {width} cm",
+      "perTop": "{meters} m/áo",
+      "attention": "{count} cây cần nhập",
+      "empty": "Chưa có cây vải nào.",
+      "addRoll": "Thêm cây vải"
+    },
+    "toast": {
+      "CUT": "Đã ghi cắt may — {name} còn {meters} m.",
+      "RESTOCK": "Đã nhập thêm — {name} còn {meters} m.",
+      "WASTE": "Đã ghi hao hụt — {name} còn {meters} m.",
+      "ADJUST": "Đã lưu kiểm kê — {name} còn {meters} m.",
+      "created": "Đã nhập cây vải {name}.",
+      "updated": "Đã lưu thông tin cây vải.",
+      "deactivated": "Đã ngưng dùng cây vải.",
+      "activated": "Đã dùng lại cây vải.",
+      "productHidden": "Đã ẩn {name} trên web.",
+      "productShown": "Đã hiện lại {name} trên web."
+    }
+  },
+  "inventoryHistory": {
+    "searchPlaceholder": "Tìm sản phẩm, SKU, cây vải, mã đơn, ghi chú…",
+    "unit": {
+      "PIECE": "cái",
+      "METER": "m"
+    },
+    "subject": {
+      "SKU": "Hàng may sẵn",
+      "FABRIC": "Vải"
+    },
+    "direction": {
+      "IN": "Nhập vào",
+      "OUT": "Xuất ra",
+      "LOSS": "Hao hụt",
+      "COUNT": "Kiểm kê"
+    },
+    "kind": {
+      "RECEIVED": "Nhập hàng",
+      "RETURNED": "Khách trả",
+      "RESTOCK": "Nhập vải",
+      "SOLD_IN_STORE": "Bán tại tiệm",
+      "ONLINE_ORDER": "Đơn online",
+      "CUT": "Cắt may",
+      "DAMAGED": "Hỏng / lỗi",
+      "WASTE": "Hao hụt vải",
+      "STOCKTAKE": "Kiểm kê",
+      "ADJUST": "Kiểm kê vải"
+    },
+    "filter": {
+      "subject": "Hàng hóa",
+      "direction": "Loại",
+      "period": "Thời gian",
+      "all": "Tất cả"
+    },
+    "period": "{days} ngày qua",
+    "summary": {
+      "lead": "{days} ngày qua: {count} lần biến động",
+      "IN": "nhập",
+      "OUT": "xuất",
+      "LOSS": "hao hụt"
+    },
+    "today": "Hôm nay · {date}",
+    "yesterday": "Hôm qua · {date}",
+    "moreLines": "+ {count} dòng khác",
+    "collapse": "Thu gọn",
+    "actor": {
+      "customer": "Khách {name}",
+      "unknown": "Không rõ người thực hiện"
+    },
+    "orderCancelled": "Đơn đã hủy — tồn chưa hoàn",
+    "loadMore": "Xem thêm ({count} còn lại)",
+    "empty": "Chưa có biến động kho nào.",
+    "noResults": "Không có biến động khớp bộ lọc."
+  },
+  "returns": {
+    "searchPlaceholder": "Tìm mã phiếu, mã đơn, tên khách, SĐT, sản phẩm…",
+    "cancel": "Hủy",
+    "tabsLabel": "Hàng đợi phiếu",
+    "queueLabel": "Danh sách phiếu",
+    "filter": {
+      "service": "Loại yêu cầu",
+      "all": "Tất cả"
+    },
+    "service": {
+      "ALTERATION": "Sửa đồ",
+      "EXCHANGE": "Đổi size / mẫu",
+      "RETURN": "Trả hàng",
+      "WARRANTY": "Bảo hành"
+    },
+    "reason": {
+      "ALTERATION": {
+        "TOO_LOOSE": "Áo rộng",
+        "TOO_TIGHT": "Áo chật",
+        "LENGTH": "Chiều dài tà / quần",
+        "SLEEVE": "Tay áo",
+        "OTHER": "Khác"
+      },
+      "EXCHANGE": {
+        "WRONG_SIZE": "Không vừa size",
+        "CHANGE_COLOR": "Đổi màu",
+        "CHANGE_STYLE": "Đổi mẫu",
+        "OTHER": "Khác"
+      },
+      "RETURN": {
+        "NOT_AS_DESCRIBED": "Không đúng mô tả",
+        "WRONG_ITEM": "Giao nhầm sản phẩm",
+        "CHANGED_MIND": "Không còn nhu cầu",
+        "OTHER": "Khác"
+      },
+      "WARRANTY": {
+        "SEAM": "Bung đường may",
+        "BUTTON_ZIP": "Hỏng khuy / khóa",
+        "EMBROIDERY": "Sút thêu / cườm",
+        "FABRIC_DEFECT": "Lỗi vải",
+        "OTHER": "Khác"
+      }
+    },
+    "handover": {
+      "STORE": "Khách mang tới tiệm",
+      "POST": "Khách gửi bưu điện"
+    },
+    "tab": {
+      "NEW": "Mới gửi",
+      "ACCEPTED": "Chờ nhận áo",
+      "RECEIVED": "Đang xử lý",
+      "READY": "Chờ trả khách",
+      "DONE": "Đã xong",
+      "REJECTED": "Từ chối"
+    },
+    "status": {
+      "NEW": "Mới gửi",
+      "ACCEPTED": "Đã tiếp nhận · chờ nhận áo",
+      "RECEIVED": "Áo đã ở tiệm · đang xử lý",
+      "READY": "Xong · chờ trả khách",
+      "READY_REFUND": "Đang chờ duyệt hoàn tiền",
+      "DONE": "Đã xong",
+      "REJECTED": "Đã từ chối"
+    },
+    "hint": {
+      "customFit": "Áo may đo — không thuộc phạm vi đổi / trả",
+      "outWindow": "Quá hạn chính sách",
+      "waiting": "Khách chờ phản hồi {days} ngày",
+      "appointment": "Hẹn {date}",
+      "inTransit": "Áo đang trên đường gửi tới",
+      "inStatus": "Ở bước này {days} ngày"
+    },
+    "empty": {
+      "NEW": "Không có yêu cầu mới.",
+      "ACCEPTED": "Không có áo nào đang chờ khách gửi tới.",
+      "RECEIVED": "Không có áo nào đang xử lý.",
+      "READY": "Không có áo nào chờ trả khách.",
+      "DONE": "Chưa có phiếu đã xong.",
+      "REJECTED": "Chưa có phiếu bị từ chối."
+    },
+    "pick": {
+      "title": "Chọn một phiếu để xử lý",
+      "NEW": "Phiếu cũ nhất ở trên cùng — khách chờ lâu nhất được trả lời trước.",
+      "ACCEPTED": "Bấm “Đã nhận áo” khi khách mang tới hoặc bưu phẩm về tới tiệm.",
+      "RECEIVED": "Sửa xong thì báo khách tới lấy; phiếu trả hàng thì gửi duyệt hoàn tiền.",
+      "READY": "Khách nhận lại áo hoặc đã hoàn tiền thì đóng phiếu.",
+      "DONE": "Lịch sử các phiếu đã xử lý xong.",
+      "REJECTED": "Các phiếu đã từ chối kèm lý do."
+    },
+    "step": {
+      "ACCEPT": "Tiếp nhận",
+      "REJECT": "Từ chối",
+      "RECEIVE": "Đã nhận áo",
+      "READY": "Đã xử lý xong",
+      "REQUEST_REFUND": "Gửi duyệt hoàn tiền",
+      "DONE": "Đã trả khách"
+    },
+    "event": {
+      "SUBMITTED": "Khách gửi yêu cầu",
+      "ACCEPTED": "Tiếp nhận",
+      "REJECTED": "Từ chối",
+      "RECEIVED": "Đã nhận áo",
+      "READY": "Xử lý xong",
+      "REFUND_REQUESTED": "Gửi duyệt hoàn tiền",
+      "DONE": "Đóng phiếu",
+      "NOTE": "Ghi chú"
+    },
+    "detail": {
+      "back": "Hàng đợi",
+      "order": "Đơn",
+      "policy": "Đối chiếu chính sách",
+      "delivered": "Nhận hàng",
+      "deliveredValue": "{date} · gửi yêu cầu sau {days} ngày",
+      "window": "Hạn {service}",
+      "inWindow": "Trong hạn ({days} ngày)",
+      "outWindow": "Quá hạn {days} ngày",
+      "outWindowHint": {
+        "ALTERATION": "Quá hạn sửa miễn phí — vẫn nhận sửa, báo phí trước cho khách.",
+        "EXCHANGE": "Quá hạn đổi — có thể gợi ý khách chuyển sang sửa đồ.",
+        "RETURN": "Quá hạn trả hàng — thường từ chối, ghi rõ lý do.",
+        "WARRANTY": "Quá hạn bảo hành — nhận sửa có tính phí."
+      },
+      "customFitBlocked": "Áo may đo theo số đo riêng không áp dụng đổi / trả — chỉ sửa đồ và bảo hành. Gọi khách đề xuất sửa lại cho vừa.",
+      "refundAmount": "Số tiền hoàn",
+      "fee": "Phí sửa",
+      "customerSays": "Khách mô tả",
+      "photos": "{count} ảnh khách gửi",
+      "garment": "Chiếc áo",
+      "customFit": "May đo",
+      "appointment": "Hẹn: {date}",
+      "log": "Nhật ký phiếu",
+      "notePlaceholder": "Ghi chú nội bộ: đã gọi khách, hẹn lại…",
+      "addNote": "Thêm"
+    },
+    "dialog": {
+      "note": "Ghi chú",
+      "ACCEPT": {
+        "title": "Tiếp nhận yêu cầu",
+        "description": "Phiếu {code} chuyển sang chờ nhận áo. Nhắn khách cách gửi áo cho tiệm.",
+        "dateStore": "Hẹn khách mang áo tới",
+        "datePost": "Dự kiến nhận bưu phẩm",
+        "dateHint": "Không bắt buộc — để nhắc trên hàng đợi.",
+        "notePlaceholder": "VD: tiệm chịu phí gửi chiều về",
+        "submit": "Tiếp nhận"
+      },
+      "REJECT": {
+        "title": "Từ chối yêu cầu",
+        "description": "Phiếu {code} sẽ đóng. Lý do được ghi vào nhật ký để trả lời khách.",
+        "reason": "Lý do từ chối",
+        "notePlaceholder": "VD: quá hạn đổi 7 ngày, đã gọi gợi ý sửa đồ miễn phí",
+        "submit": "Từ chối"
+      },
+      "RECEIVE": {
+        "title": "Đã nhận áo",
+        "description": "Áo của phiếu {code} đã về tới tiệm.",
+        "tracking": "Mã vận đơn",
+        "trackingPlaceholder": "VD: GHN 5L7Q2K",
+        "notePlaceholder": "VD: áo còn nguyên tem, đo lại tay 56 cm",
+        "submit": "Xác nhận đã nhận"
+      },
+      "READY": {
+        "title": "Đã xử lý xong",
+        "description": "Phiếu {code} chuyển sang chờ trả khách.",
+        "fee": "Phí sửa ngoài chính sách",
+        "feeHint": "Để trống nếu miễn phí (trong hạn hoặc lỗi của tiệm).",
+        "notePlaceholder": "VD: đã bóp eo 2 cm, hẹn khách lấy chiều mai",
+        "submit": "Xong, báo khách"
+      },
+      "REQUEST_REFUND": {
+        "title": "Gửi duyệt hoàn tiền",
+        "description": "Hoàn tiền cho phiếu trả hàng {code} cần Super Admin duyệt.",
+        "amount": "Số tiền đề nghị hoàn",
+        "approvalNote": "Duyệt xong mới chuyển khoản cho khách; phiếu chờ ở “Chờ trả khách”.",
+        "notePlaceholder": "VD: áo còn nguyên tem, lỗi do tiệm giao nhầm",
+        "submit": "Gửi duyệt"
+      },
+      "DONE": {
+        "title": "Đóng phiếu",
+        "description": "Khách đã nhận lại áo hoặc đã được hoàn tiền cho phiếu {code}.",
+        "notePlaceholder": "VD: khách mặc thử vừa",
+        "submit": "Đóng phiếu"
+      }
+    },
+    "toast": {
+      "ACCEPT": "Đã tiếp nhận phiếu {code}.",
+      "REJECT": "Đã từ chối phiếu {code}.",
+      "RECEIVE": "Đã ghi nhận áo của phiếu {code}.",
+      "READY": "Phiếu {code} đã xong, chờ trả khách.",
+      "REQUEST_REFUND": "Đã gửi duyệt hoàn tiền cho phiếu {code}.",
+      "DONE": "Đã đóng phiếu {code}.",
+      "NOTE": "Đã thêm ghi chú."
     }
   }
 }

@@ -7,8 +7,21 @@ import {
   MAX_HIGHLIGHTED_PRODUCTS,
 } from "../utils/collectionLifecycle";
 
+/** Độ dài tối đa từng trường chữ — dùng chung cho schema và thuộc tính `maxLength` của ô nhập ở trình soạn */
+export const COLLECTION_TEXT_LIMITS = {
+  name: 120,
+  slug: 120,
+  tagline: 160,
+  season: 60,
+  description: 3000,
+  story: 8000,
+  seoTitle: 120,
+  seoDescription: 320,
+} as const;
+
 const imageUrl = z.string().regex(/^(https:\/\/|\/)/, "VALIDATION_ERROR");
-const optionalText = (max: number) => z.string().trim().max(max);
+// Thông điệp là mã KEY để trình soạn hiện lỗi dưới ô (không để mặc định tiếng Anh của Zod)
+const optionalText = (max: number) => z.string().trim().max(max, "COLLECTION_TEXT_TOO_LONG");
 const dateInput = z.string().regex(/^(\d{4}-\d{2}-\d{2})?$/, "VALIDATION_ERROR");
 
 const collectionCode = z.string().trim().toUpperCase().regex(COLLECTION_CODE_PATTERN, "COLLECTION_CODE_INVALID");
@@ -16,28 +29,30 @@ const collectionCode = z.string().trim().toUpperCase().regex(COLLECTION_CODE_PAT
 export const collectionIdSchema = z.object({ collectionId: z.uuid() });
 
 export const createCollectionSchema = z.object({
-  name: z.string().trim().min(1, "COLLECTION_NAME_REQUIRED").max(120),
+  name: z.string().trim().min(1, "COLLECTION_NAME_REQUIRED").max(COLLECTION_TEXT_LIMITS.name, "COLLECTION_TEXT_TOO_LONG"),
   code: collectionCode,
 });
 
+const LIMITS = COLLECTION_TEXT_LIMITS;
+
 const collectionFields = z.object({
   collectionId: z.uuid(),
-  name: z.string().trim().min(1, "COLLECTION_NAME_REQUIRED").max(120),
-  nameEn: optionalText(120),
+  name: z.string().trim().min(1, "COLLECTION_NAME_REQUIRED").max(LIMITS.name, "COLLECTION_TEXT_TOO_LONG"),
+  nameEn: optionalText(LIMITS.name),
   code: collectionCode,
   slug: z
     .string()
     .trim()
     .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "COLLECTION_SLUG_INVALID")
-    .max(120),
-  tagline: optionalText(160),
-  taglineEn: optionalText(160),
-  season: optionalText(60),
-  seasonEn: optionalText(60),
-  description: optionalText(3000),
-  descriptionEn: optionalText(3000),
-  story: optionalText(8000),
-  storyEn: optionalText(8000),
+    .max(LIMITS.slug, "COLLECTION_TEXT_TOO_LONG"),
+  tagline: optionalText(LIMITS.tagline),
+  taglineEn: optionalText(LIMITS.tagline),
+  season: optionalText(LIMITS.season),
+  seasonEn: optionalText(LIMITS.season),
+  description: optionalText(LIMITS.description),
+  descriptionEn: optionalText(LIMITS.description),
+  story: optionalText(LIMITS.story),
+  storyEn: optionalText(LIMITS.story),
   coverImage: imageUrl.or(z.literal("")),
   coverImageMobile: imageUrl.or(z.literal("")),
   bannerImage: imageUrl.or(z.literal("")),
@@ -48,12 +63,16 @@ const collectionFields = z.object({
   launchAt: dateInput,
   endAt: dateInput,
   showOnHomepage: z.boolean(),
-  homepageOrder: z.number("VALIDATION_ERROR").int().min(0).max(99),
+  homepageOrder: z
+    .number("COLLECTION_HOMEPAGE_ORDER_INVALID")
+    .int("COLLECTION_HOMEPAGE_ORDER_INVALID")
+    .min(0, "COLLECTION_HOMEPAGE_ORDER_INVALID")
+    .max(99, "COLLECTION_HOMEPAGE_ORDER_INVALID"),
   showInLookbook: z.boolean(),
-  seoTitle: optionalText(120),
-  seoTitleEn: optionalText(120),
-  seoDescription: optionalText(320),
-  seoDescriptionEn: optionalText(320),
+  seoTitle: optionalText(LIMITS.seoTitle),
+  seoTitleEn: optionalText(LIMITS.seoTitle),
+  seoDescription: optionalText(LIMITS.seoDescription),
+  seoDescriptionEn: optionalText(LIMITS.seoDescription),
   products: z
     .array(z.object({ productId: z.uuid("COLLECTION_PRODUCT_INVALID"), isHighlighted: z.boolean() }))
     .max(MAX_COLLECTION_PRODUCTS),

@@ -10,9 +10,9 @@ import {
   AdminDialog,
   AdminTextField,
 } from "@/features/admin/core/ui";
-import { createStaffAction } from "../actions/staff.actions";
-import { type StaffMemberItem } from "../types/staff.types";
-import { STAFF_PERMISSIONS, type Permission } from "../../../core/session/permissions";
+import { createStaffAction } from "../../actions/staff.actions";
+import { type StaffMemberItem } from "../../types/staff.types";
+import { STAFF_PERMISSIONS, type Permission } from "../../../../core/session/permissions";
 
 interface CreateStaffDialogProps {
   open: boolean;

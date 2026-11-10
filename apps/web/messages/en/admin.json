@@ -143,20 +143,17 @@
     "staffLocked": "Staff account locked!"
   },
   "staff": {
-    "eyebrow": "Staff & Permissions",
-    "title": "Staff Management",
-    "description": "Create staff accounts, toggle each permission and lock / unlock accounts.",
-    "refresh": "Refresh",
     "create": "Add staff",
     "creating": "Creating...",
     "cancel": "Cancel",
-    "loading": "Loading staff...",
     "empty": {
       "title": "No staff accounts yet",
       "description": "Click \"Add staff\" to create the first staff account."
     },
     "columns": {
       "staff": "Staff",
+      "permissions": "Permissions",
+      "activity": "Activity",
       "status": "Status",
       "actions": "Actions"
     },
@@ -184,7 +181,113 @@
     "resettingPassword": "Resetting...",
     "resetPasswordTitle": "Reset staff password",
     "resetPasswordDescription": "Set a new password for {name}. All of this staff member's sessions will be signed out.",
-    "resetPasswordSuccess": "Staff password has been reset!"
+    "resetPasswordSuccess": "Staff password has been reset!",
+    "searchPlaceholder": "Search name, email, phone…",
+    "noResults": "No staff match the filters.",
+    "noPermissions": "No permissions",
+    "permissionCount": "{count} / 5 permissions",
+    "lastLogin": "Signed in {time}",
+    "neverLoggedIn": "Never signed in",
+    "activity30d": "{count, plural, one {# action} other {# actions}} in 30 days",
+    "permissionsHint": "Permissions are managed in",
+    "permissionsLink": "Settings › Permissions",
+    "permissionShort": {
+      "MANAGE_ORDERS": "Orders",
+      "UPDATE_TAILORING": "Workshop",
+      "MANAGE_INVENTORY": "Catalog & stock",
+      "VIEW_REPORTS": "Reports",
+      "MANAGE_CONTENT": "Content"
+    },
+    "filter": {
+      "status": "Filter",
+      "option": {
+        "ALL": "All",
+        "ACTIVE": "Active",
+        "LOCKED": "Locked",
+        "NO_PERMISSION": "No permissions"
+      }
+    },
+    "menu": {
+      "label": "Actions for {name}",
+      "view": "View profile",
+      "lock": "Lock account",
+      "unlock": "Unlock"
+    },
+    "lockDialog": {
+      "lockTitle": "Lock {name}?",
+      "unlockTitle": "Unlock {name}?",
+      "lockDescription": "They are signed out right away and can't access the admin area.",
+      "unlockDescription": "They can sign in again with their current permissions.",
+      "lockBody": "Their data and action log are kept.",
+      "unlockBody": "Permissions stay as they are — review them on the profile if needed.",
+      "lock": "Lock account",
+      "unlock": "Unlock"
+    },
+    "matrix": {
+      "adminNote": "Super Admins always have full access, so they aren't listed. Unticking revokes access on the staff member's next page load."
+    },
+    "activity": {
+      "tailoring": "Moved a workshop stage: {stage}",
+      "audit": {
+        "APPROVAL_APPROVED": "Approved a request",
+        "APPROVAL_REJECTED": "Rejected a request",
+        "ATTRIBUTE_CREATED": "Added an attribute value",
+        "ATTRIBUTE_UPDATED": "Edited an attribute value",
+        "ATTRIBUTE_DELETED": "Deleted an attribute value",
+        "ATTRIBUTE_GROUP_CREATED": "Added an attribute group",
+        "ATTRIBUTE_GROUP_UPDATED": "Edited an attribute group",
+        "ATTRIBUTE_GROUP_DELETED": "Deleted an attribute group",
+        "CATEGORY_CREATED": "Added a product type",
+        "CATEGORY_UPDATED": "Edited a product type",
+        "CATEGORY_DELETED": "Deleted a product type",
+        "COLLECTION_CREATED": "Created a collection",
+        "COLLECTION_UPDATED": "Edited a collection",
+        "COLLECTION_DELETED": "Deleted a collection",
+        "COLLECTION_STATUS_CHANGED": "Changed a collection status",
+        "COLLECTION_HOMEPAGE_UPDATED": "Edited homepage collections",
+        "CUSTOMER_LOCKED": "Locked a customer",
+        "CUSTOMER_UNLOCKED": "Unlocked a customer",
+        "INVENTORY_ADJUSTED": "Adjusted SKU stock",
+        "MATERIAL_CREATED": "Added a material",
+        "MATERIAL_UPDATED": "Edited a material",
+        "MATERIAL_DELETED": "Deleted a material",
+        "ORDER_PAYMENT_RECORDED": "Recorded an order payment",
+        "ORDER_STATUS_CHANGED": "Moved an order forward",
+        "PRODUCT_CREATED": "Created a product",
+        "PRODUCT_UPDATED": "Edited a product",
+        "PRODUCT_VISIBILITY_UPDATED": "Showed / hid a product",
+        "PRODUCTS_VISIBILITY_BULK_UPDATED": "Showed / hid several products",
+        "PRODUCT_CUSTOM_FIT_UPDATED": "Toggled made-to-measure",
+        "SIZE_CHART_CREATED": "Created a size chart",
+        "SIZE_CHART_UPDATED": "Edited a size chart",
+        "SIZE_CHART_DUPLICATED": "Duplicated a size chart",
+        "SIZE_CHART_ACTIVATED": "Enabled a size chart",
+        "SIZE_CHART_DEACTIVATED": "Disabled a size chart",
+        "SIZE_CHART_DELETED": "Deleted a size chart",
+        "STAFF_CREATED": "Created a staff account",
+        "STAFF_LOCKED": "Locked a staff member",
+        "STAFF_UNLOCKED": "Unlocked a staff member",
+        "STAFF_PASSWORD_RESET": "Reset a staff password",
+        "STAFF_PERMISSIONS_UPDATED": "Changed staff permissions"
+      }
+    },
+    "detail": {
+      "back": "Staff",
+      "permissions": "Granted permissions",
+      "allPermissions": "View permission table",
+      "opens": "Opens:",
+      "opensReports": "the revenue block on the Dashboard",
+      "noPermissionsHint": "No permissions yet — they only see the Dashboard and My requests.",
+      "activity": "Recent activity",
+      "noActivity": "No recorded actions yet.",
+      "account": "Account",
+      "email": "Sign-in email",
+      "phone": "Phone",
+      "createdAt": "Created",
+      "lastLogin": "Last sign-in",
+      "lastActivity": "Last action",
+      "sessions": "Open sessions"
+    }
   },
   "dashboard": {
     "greeting": "Hello, {name}",
@@ -294,32 +397,24 @@
   },
   "pages": {
     "orders": {
-      "eyebrow": "Sales management",
-      "title": "Áo Dài Orders",
-      "description": "Update processing and payment status, and track ready-made / tailored orders.",
-      "meta": "<value>{count}</value> {count, plural, one {order} other {orders}} in total"
+      "title": "Orders",
+      "description": "What each order is waiting on — transfer, confirmation, workshop, packing or delivery — and how much is paid."
     },
     "tailoring": {
-      "eyebrow": "Handcrafted tailoring workshop",
-      "title": "Tailoring Progress",
-      "description": "Update each made-to-measure stage and log the tailor in charge.",
-      "meta": "<value>{count}</value> made-to-measure {count, plural, one {garment} other {garments}} in progress"
+      "title": "Workshop",
+      "description": "Which tailoring orders need attention first, where each one is, and whether it will make the date."
     },
     "products": {
       "title": "Products",
       "description": "Designs on sale by category and sale mode (single, set, made to measure) with generated SKUs."
     },
     "inventory": {
-      "eyebrow": "Warehouse & Variants",
-      "title": "Inventory Management",
-      "description": "Track and adjust stock for each SKU (size, color).",
-      "meta": "<value>{count}</value> SKU {count, plural, one {variant} other {variants}} in total"
+      "title": "SKU stock",
+      "description": "Ready-made stock by color and size, and which sizes need restocking."
     },
     "customers": {
-      "eyebrow": "Customer data (CRM)",
-      "title": "Customers & Measurements",
-      "description": "Look up contact details, purchase history and measurement profiles.",
-      "meta": "<value>{count}</value> registered {count, plural, one {customer} other {customers}}"
+      "title": "Customers",
+      "description": "Who's a regular, who owes payment, who has measurements on file — including guest buyers."
     },
     "vouchers": {
       "eyebrow": "Marketing & Promotions",
@@ -355,31 +450,15 @@
     },
     "fabrics": {
       "title": "Fabric stock",
-      "description": "Track remaining meters of fabric for made-to-order items.",
-      "planned": [
-        "Remaining meters per fabric roll",
-        "Alerts below the threshold",
-        "Link fabrics to designs to hide them quickly when fabric runs out",
-        "Restock and adjust meters"
-      ]
+      "description": "Meters left on each roll, how many tops it can still make and which rolls need restocking."
     },
     "inventoryHistory": {
       "title": "Stock history",
-      "description": "Log of stock receipts, issues and adjustments.",
-      "planned": [
-        "Changes per SKU and per fabric roll",
-        "Who changed what, when, old value → new value",
-        "Filter by time, product and staff member"
-      ]
+      "description": "Log of stock in, out, loss and stocktakes for ready-made goods and fabric — who, when, before → after."
     },
     "returns": {
       "title": "Warranty & returns",
-      "description": "Receive and handle alteration, exchange and refund requests.",
-      "planned": [
-        "Log warranty, alteration and exchange requests",
-        "Track processing status",
-        "Refunds go through an approval request"
-      ]
+      "description": "Alteration, exchange, return and warranty tickets — where each garment is and what's next."
     },
     "saleEvents": {
       "title": "Sale events",
@@ -401,12 +480,11 @@
     },
     "rolePermissions": {
       "title": "Permissions",
-      "description": "Manage detailed staff permissions in the admin area.",
-      "planned": [
-        "Permission table per staff member",
-        "Permission presets for quick setup",
-        "Permission change history"
-      ]
+      "description": "Each staff member's permissions — every permission unlocks a group of admin screens."
+    },
+    "staff": {
+      "title": "Staff",
+      "description": "Who on the team has admin access, what they can do and what they've done lately."
     }
   },
   "measurements": {
@@ -512,86 +590,355 @@
     "published": "Published"
   },
   "customers": {
-    "ordersCount": "{count, plural, one {# order} other {# orders}}",
-    "measurementsCount": "{count, plural, one {# measurement profile} other {# measurement profiles}}",
-    "note": "Note: {note}",
-    "searchPlaceholder": "Search by name, email or phone...",
-    "guest": "Guest",
-    "toggleSuperAdminOnly": "Only the Super Admin can lock / unlock customer accounts",
-    "customerFallback": "Customer",
-    "noPhone": "No phone number",
-    "noEmail": "No email",
-    "measurementsEmpty": "This customer has not saved any measurements yet.",
-    "measurementsTitle": "Made-to-measure profiles",
-    "empty": "No customers found.",
-    "totalRevenue": "Total revenue from customer:",
-    "profileTitle": "Customer profile",
-    "noMeasurements": "No measurements saved",
-    "colPhone": "Phone",
-    "colSpent": "Total spent",
-    "colMeasurements": "Measurement profiles",
-    "colCustomer": "Customer",
-    "colStatus": "Status",
-    "active": "Active",
-    "locked": "Locked",
-    "colOrders": "Orders",
-    "colDetail": "Details",
-    "default": "Default"
+    "searchPlaceholder": "Search name, email, phone…",
+    "cancel": "Cancel",
+    "verified": "Verified",
+    "tabsLabel": "Customer type",
+    "tab": {
+      "ACCOUNT": "With account",
+      "GUEST": "Guests"
+    },
+    "status": {
+      "ACTIVE": "Active",
+      "LOCKED": "Locked",
+      "GUEST": "No account"
+    },
+    "segment": {
+      "LOYAL": "Regular",
+      "NEW": "New",
+      "MEASURED": "Has measurements",
+      "OUTSTANDING": "Payment due",
+      "DORMANT": "Inactive for a while",
+      "LOCKED": "Locked"
+    },
+    "sort": {
+      "RECENT": "Most recent purchase",
+      "SPENT": "Highest spend",
+      "JOINED": "Newest"
+    },
+    "filter": {
+      "segment": "Segment",
+      "sort": "Sort",
+      "all": "All"
+    },
+    "column": {
+      "customer": "Customer",
+      "orders": "Orders",
+      "spent": "Spent",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "orders": "{count, plural, one {# order} other {# orders}}",
+    "noOrders": "No purchases",
+    "outstanding": "{amount} due",
+    "empty": {
+      "ACCOUNT": "No customer accounts yet.",
+      "GUEST": "No guest orders yet."
+    },
+    "noResults": "No customers match the filters.",
+    "menu": {
+      "label": "Actions for {name}",
+      "view": "View profile",
+      "lastOrder": "View latest order",
+      "call": "Call",
+      "lock": "Lock account",
+      "unlock": "Unlock"
+    },
+    "toast": {
+      "locked": "Account locked.",
+      "unlocked": "Account unlocked."
+    },
+    "lockDialog": {
+      "lockTitle": "Lock {name}'s account?",
+      "unlockTitle": "Unlock {name}?",
+      "lockDescription": "The customer is signed out everywhere and can't sign in. Past orders stay as they are.",
+      "unlockDescription": "The customer can sign in and order again.",
+      "reason": "Reason",
+      "reasonPlaceholder": "E.g. repeated fake orders, refused delivery 3 times",
+      "unlockBody": "The previous lock reason will be cleared.",
+      "lock": "Lock account",
+      "unlock": "Unlock"
+    },
+    "gender": {
+      "MALE": "Male",
+      "FEMALE": "Female",
+      "OTHER": "Other"
+    },
+    "detail": {
+      "back": "Customers",
+      "since": "Customer since {date}",
+      "orders": "Orders ({count})",
+      "measurements": "Measurement profiles",
+      "noMeasurements": "No saved measurements — the next tailored order needs a fitting.",
+      "emptyProfile": "This profile has no values yet.",
+      "defaultProfile": "Default",
+      "updated": "updated {time}",
+      "addresses": "Delivery addresses",
+      "noAddresses": "No saved addresses.",
+      "defaultAddress": "Default",
+      "overview": "Purchase overview",
+      "spent": "Spent",
+      "activeOrders": "Active orders",
+      "average": "Average / order",
+      "lastOrder": "Last purchase",
+      "outstanding": "Payment due",
+      "contact": "Contact",
+      "phone": "Phone",
+      "email": "Email",
+      "gender": "Gender",
+      "birthday": "Birthday",
+      "birthdayToday": "Today!",
+      "birthdayIn": "in {days, plural, one {# day} other {# days}}",
+      "account": "Account",
+      "login": "Signs in with",
+      "loginGoogle": "Google",
+      "loginPassword": "Email / phone",
+      "lastLogin": "Last sign-in",
+      "lockedAt": "Locked since"
+    }
   },
   "inventory": {
-    "units": "{count} pcs",
-    "searchPlaceholder": "Search by SKU, product name or size...",
-    "standardColor": "Standard",
-    "empty": "No variants found in stock.",
-    "colStock": "Current stock",
-    "colSize": "Size",
-    "colStatus": "Stock status",
-    "colName": "Áo dài name",
-    "colAdjust": "Adjust",
-    "outOfStock": "Out of stock",
-    "inStock": "In stock",
-    "colColor": "Color",
-    "lowStock": "Low stock",
-    "edit": "Edit stock",
-    "colSku": "SKU",
-    "uncategorized": "Uncategorized"
+    "searchPlaceholder": "Search name, product code, SKU, color…",
+    "cancel": "Cancel",
+    "processing": "Saving…",
+    "freeSize": "Free size",
+    "noColor": "No color",
+    "colorGap": "A color is out in this size",
+    "summaryProducts": "{count, plural, one {# product} other {# products}}",
+    "summarySkus": "{count, plural, one {# SKU} other {# SKUs}}",
+    "empty": "No ready-made SKUs yet. Add variants on the product detail screen.",
+    "noResults": "Nothing matches the filters.",
+    "unit": {
+      "PIECE": "pcs",
+      "METER": "m"
+    },
+    "view": {
+      "products": "By product",
+      "skus": "By SKU"
+    },
+    "filter": {
+      "group": "Group",
+      "status": "Status",
+      "all": "All",
+      "statusOption": {
+        "ATTENTION": "Needs restock",
+        "OUT": "Out of stock",
+        "OK": "In stock",
+        "INACTIVE": "Not for sale"
+      }
+    },
+    "productStatus": {
+      "OK": "Fully stocked",
+      "PARTIAL": "Missing sizes",
+      "OUT": "Out of stock",
+      "INACTIVE": "Not for sale"
+    },
+    "skuStatus": {
+      "OK": "In stock",
+      "LOW": "Running low",
+      "OUT": "Out of stock"
+    },
+    "column": {
+      "product": "Product",
+      "sizes": "Stock by size",
+      "total": "Total",
+      "status": "Status",
+      "sku": "SKU",
+      "stock": "Stock",
+      "updated": "Updated",
+      "actions": "Actions"
+    },
+    "notice": {
+      "text": "<b>{out, plural, one {# SKU} other {# SKUs}}</b> out, <b>{low, plural, one {# SKU} other {# SKUs}}</b> running low (≤ {threshold} left).",
+      "show": "Show these SKUs"
+    },
+    "menu": {
+      "label": "Actions for {name}",
+      "received": "Receive stock",
+      "sold": "Record in-store sale",
+      "stocktake": "Stocktake",
+      "openProduct": "Open product"
+    },
+    "reason": {
+      "RECEIVED": "Received",
+      "STOCKTAKE": "Stocktake",
+      "SOLD_IN_STORE": "Sold in store",
+      "RETURNED": "Returned",
+      "DAMAGED": "Damaged"
+    },
+    "adjust": {
+      "title": "Adjust stock",
+      "mode": {
+        "ADD": "Enter the quantity to add in each cell. Empty cells stay unchanged.",
+        "SUBTRACT": "Enter the quantity to subtract in each cell. Empty cells stay unchanged.",
+        "SET": "Count the actual stock and enter it. Empty cells stay unchanged."
+      },
+      "color": "Color",
+      "cellLabel": "Quantity for {sku}",
+      "negative": "A cell subtracts more than is in stock or has an invalid number.",
+      "note": "Note",
+      "noteHint": "Saved with the reason in the log for later reconciliation.",
+      "notePlaceholder": {
+        "RECEIVED": "E.g. second November delivery from the tailors",
+        "STOCKTAKE": "E.g. month-end stocktake",
+        "SOLD_IN_STORE": "E.g. walk-in customer",
+        "RETURNED": "E.g. returned order code",
+        "DAMAGED": "E.g. yellow stain on the back panel"
+      },
+      "meterUnit": "Fabric goods are counted in meters.",
+      "noChanges": "No changes yet",
+      "summary": "{count, plural, one {# SKU} other {# SKUs}} changed · {delta}",
+      "submit": "Save stock",
+      "saved": "Stock updated for {count, plural, one {# SKU} other {# SKUs}}."
+    }
   },
   "orders": {
+    "searchPlaceholder": "Search order code, customer, phone, product…",
+    "cancel": "Cancel",
+    "processing": "Saving…",
+    "tailored": "Tailored",
+    "itemCount": "{count, plural, one {# item} other {# items}}",
+    "empty": "No orders yet.",
+    "noResults": "No orders match the filters.",
+    "tabsLabel": "Order lifecycle",
+    "tab": {
+      "ALL": "All",
+      "PENDING": "To confirm",
+      "PROCESSING": "Processing",
+      "READY_TO_SHIP": "To ship",
+      "SHIPPING": "Shipping",
+      "DELIVERED": "Completed",
+      "CLOSED": "Cancelled / refunded"
+    },
     "status": {
       "PENDING": "Awaiting confirmation",
       "CONFIRMED": "Confirmed",
       "IN_PRODUCTION": "In production",
-      "READY_TO_SHIP": "Ready to ship",
+      "READY_TO_SHIP": "Packed",
       "SHIPPING": "Shipping",
       "DELIVERED": "Delivered",
       "CANCELLED": "Cancelled",
-      "REFUNDED": "Refunded",
-      "ALL": "All"
+      "REFUNDED": "Refunded"
     },
-    "itemsCount": "{count, plural, one {# item} other {# items}}",
     "payment": {
-      "PAID": "Paid",
-      "PARTIALLY_PAID": "Deposit paid",
-      "UNPAID": "Unpaid"
+      "UNPAID": "Unpaid",
+      "PARTIALLY_PAID": "Deposit / partly paid",
+      "PAID": "Paid in full",
+      "REFUNDED": "Refunded"
     },
-    "itemSize": "Size: {size}",
-    "itemQuantity": "Qty: {count}",
-    "searchPlaceholder": "Search by order number, name or phone...",
-    "empty": "No orders match the filters.",
-    "measurementsReceived": "Measurements received",
-    "updateProgress": "Update order progress",
-    "detailCustomer": "Customer & Address",
-    "grandTotal": "Grand total",
-    "colItems": "Products / Services",
-    "detailTitle": "Order details",
-    "detailItems": "Items",
-    "colStatus": "Order status",
-    "customFit": "Made to measure",
-    "colNumber": "Order number",
-    "colCustomer": "Customer",
-    "colPayment": "Payment",
-    "colTotal": "Total",
-    "colDetail": "Details"
+    "method": {
+      "COD": "COD",
+      "BANK_TRANSFER": "Bank transfer",
+      "DEPOSIT": "Deposit + COD"
+    },
+    "money": {
+      "paidFull": "Paid in full",
+      "paidPart": "Paid {paid}",
+      "unpaid": "Unpaid"
+    },
+    "filter": {
+      "kind": "Type",
+      "payment": "Payment",
+      "all": "All",
+      "kindOption": {
+        "ALL": "All",
+        "READY_MADE": "Ready-made",
+        "TAILORED": "With tailoring"
+      }
+    },
+    "column": {
+      "order": "Order",
+      "customer": "Customer",
+      "items": "Products",
+      "status": "Status",
+      "money": "Amount",
+      "actions": "Actions"
+    },
+    "next": {
+      "AWAIT_TRANSFER": "Awaiting transfer of {amount}",
+      "CONFIRM": "Call the customer to confirm",
+      "WORKSHOP": "Workshop: {stage}",
+      "WORKSHOP_DUE": "Workshop: {stage} · due {date}",
+      "PACK": "Pack and prepare to ship",
+      "HAND_OVER": "Hand over to the carrier",
+      "COLLECT_ON_DELIVERY": "Collect {amount} on delivery",
+      "AWAIT_DELIVERY": "Waiting for the customer to receive",
+      "COLLECT_REMAINING": "{amount} still due — check COD remittance",
+      "APPROVAL_PENDING": "Cancellation awaiting approval",
+      "DONE": "Completed",
+      "CLOSED": "Closed"
+    },
+    "action": {
+      "CONFIRMED": "Confirm order",
+      "READY_TO_SHIP": "Mark as packed",
+      "SHIPPING": "Handed to carrier",
+      "DELIVERED": "Customer received"
+    },
+    "menu": {
+      "label": "Actions for order {code}",
+      "view": "View details",
+      "recordPayment": "Record payment",
+      "tailoring": "Open tailoring ticket",
+      "requestCancel": "Request cancellation",
+      "cancelPending": "Awaiting approval"
+    },
+    "toast": {
+      "advanced": "Order moved to “{status}”.",
+      "paid": "Payment recorded.",
+      "cancelRequested": "Cancellation requested — waiting for Super Admin approval."
+    },
+    "paymentDialog": {
+      "title": "Record payment received",
+      "description": "Reconcile bank transfers by the reference “{code}”, or cash / COD collected.",
+      "total": "Order total",
+      "paid": "Paid",
+      "remaining": "Remaining",
+      "amount": "Amount received",
+      "amountPlaceholder": "Please enter the amount",
+      "presetDeposit": "Full deposit",
+      "presetRest": "All remaining",
+      "note": "Note",
+      "notePlaceholder": "E.g. bank, date, transaction ID…",
+      "exceeds": "Exceeds the remaining {remaining}.",
+      "submit": "Record"
+    },
+    "cancelDialog": {
+      "title": "Request to cancel {code}",
+      "description": "The request goes to Super Admin; once approved the order is cancelled automatically.",
+      "reason": "Reason",
+      "reasonPlaceholder": "E.g. customer changed their mind, unreachable after 3 calls",
+      "paidWarning": "This order has payments — the customer will need a refund after cancelling.",
+      "submit": "Send request"
+    },
+    "detail": {
+      "back": "Orders",
+      "placedAt": "placed {date}",
+      "more": "More actions",
+      "progress": "Progress",
+      "closed": {
+        "CANCELLED": "This order was cancelled.",
+        "REFUNDED": "This order was refunded."
+      },
+      "items": "Products ({count})",
+      "qtyPrice": "{qty} × {price}",
+      "payment": "Payment",
+      "subTotal": "Subtotal",
+      "discount": "Discount",
+      "shippingFee": "Shipping",
+      "total": "Order total",
+      "method": "Method",
+      "deposit": "Prepay required",
+      "paid": "Paid",
+      "remaining": "Remaining",
+      "transferContent": "Transfer reference:",
+      "customer": "Customer & delivery",
+      "name": "Name",
+      "phone": "Phone",
+      "email": "Email",
+      "address": "Address",
+      "dueDate": "Due",
+      "createdBy": "Created by"
+    }
   },
   "products": {
     "searchPlaceholder": "Search by name, code, category, material",
@@ -797,24 +1144,99 @@
     }
   },
   "tailoring": {
+    "searchPlaceholder": "Search order code, customer, phone, design…",
     "stage": {
-      "WAITING_FABRIC": "Waiting for fabric",
+      "WAITING_FABRIC": "Awaiting fabric",
       "FABRIC_CUTTING": "Cutting",
-      "SEWING": "Sewing panels & collar",
-      "EMBROIDERY_BEADING": "Embroidery & beading",
-      "FITTING_IRONING": "Fitting & ironing",
-      "COMPLETED": "Workshop complete"
+      "SEWING": "Sewing",
+      "EMBROIDERY_BEADING": "Embroidery",
+      "FITTING_IRONING": "Fitting & pressing",
+      "COMPLETED": "Workshop done"
     },
-    "allStages": "All stages ({count})",
-    "tailor": "Tailor: {name}",
-    "unassigned": "Unassigned",
-    "viewMeasurements": "View measurements",
-    "ticketTitle": "Tailoring ticket • {number}",
-    "empty": "No garments in this stage.",
-    "measurementsTitle": "Measurements (cm / kg)",
-    "bodyNote": "Customer body notes: ",
-    "moveStage": "Move to stage",
-    "print": "Print ticket"
+    "orderStatus": {
+      "PENDING": "Awaiting confirmation",
+      "CONFIRMED": "Confirmed",
+      "IN_PRODUCTION": "In production",
+      "READY_TO_SHIP": "Packed",
+      "SHIPPING": "Shipping",
+      "DELIVERED": "Delivered",
+      "CANCELLED": "Cancelled",
+      "REFUNDED": "Refunded"
+    },
+    "trackLabel": "Progress: {stage}",
+    "filter": {
+      "due": "Due",
+      "dueOption": {
+        "ALL": "All",
+        "LATE": "Late / won't make it",
+        "SOON": "Within 3 days",
+        "NO_DUE": "No due date"
+      },
+      "stage": "Stage",
+      "all": "All"
+    },
+    "due": {
+      "none": "No due date",
+      "overdue": "{days, plural, one {# day} other {# days}} late · due {date}",
+      "atRisk": "Won't make it · needs ~{work}d, {days}d left",
+      "today": "Due today · {date}",
+      "left": "{days, plural, one {# day} other {# days}} left · due {date}",
+      "todayAtRisk": "Due today · ~{work}d of work left"
+    },
+    "signal": {
+      "CANCELLED": "Order cancelled — stop work",
+      "UNCONFIRMED": "Measurements / deposit not confirmed",
+      "DEPOSIT_MISSING": "Deposit short {amount}",
+      "STALLED": "Stuck {days, plural, one {# day} other {# days}} at {stage}",
+      "WAITING_PACK": "Waiting to pack"
+    },
+    "advance": "To {stage}",
+    "moved": "Moved to {stage}.",
+    "unknownStaff": "Unknown tailor",
+    "readyMade": "with {count, plural, one {# ready-made item} other {# ready-made items}}",
+    "empty": "The workshop is empty — no tailoring orders yet.",
+    "noResults": "No orders match the filters.",
+    "detail": {
+      "back": "Workshop",
+      "print": "Print ticket",
+      "itemTitle": "Item {index}: {name}",
+      "material": "Material",
+      "variant": "Variant",
+      "quantity": "Quantity",
+      "leadTime": "Lead time",
+      "days": "{count, plural, one {# day} other {# days}}",
+      "noteLabel": "Note for this move",
+      "noteHint": "Saved to the workshop log; customers see it on the order tracking page.",
+      "notePlaceholder": "E.g. body assembled, waiting for embroidery",
+      "otherStage": "Other stage",
+      "measurements": "Customer measurements",
+      "noMeasurements": "No measurements provided.",
+      "bodyNote": "Body note:",
+      "timeline": "Workshop log",
+      "noLogs": "No workshop updates yet.",
+      "schedule": "Due & progress",
+      "dueDate": "Due date",
+      "state": "Status",
+      "workLeft": "Est. work left",
+      "orderedAt": "Ordered",
+      "payment": "Payment",
+      "total": "Order total",
+      "deposit": "Required deposit",
+      "paidAmount": "Paid",
+      "remaining": "Remaining",
+      "customer": "Customer",
+      "name": "Name",
+      "phone": "Phone",
+      "email": "Email",
+      "address": "Address",
+      "readyMadeLabel": "Shipped with"
+    },
+    "table": {
+      "order": "Order · item",
+      "due": "Due",
+      "actions": "Actions",
+      "daysIn": "{days}d"
+    }
   },
   "vouchers": {
     "searchPlaceholder": "Search by code or description...",
@@ -1816,6 +2238,421 @@
       "deleted": "Attribute group deleted",
       "deleteTitle": "Delete attribute group?",
       "deleteBody": "The group is empty, so no product is affected."
+    }
+  },
+  "fabrics": {
+    "searchPlaceholder": "Search name, roll code, color, design…",
+    "create": "Add fabric roll",
+    "cancel": "Cancel",
+    "meterOf": "/ {total} m",
+    "topsLeft": "{count, plural, =0 {not enough for one} one {≈ # top} other {≈ # tops}}",
+    "noYield": "no yield set",
+    "summary": "{count, plural, one {# roll} other {# rolls}}",
+    "summaryMaterials": "{count, plural, one {# material} other {# materials}}",
+    "empty": "No fabric rolls in stock yet.",
+    "noResults": "No rolls match the filters.",
+    "view": {
+      "rolls": "By roll",
+      "materials": "By material"
+    },
+    "filter": {
+      "material": "Material",
+      "status": "Status",
+      "all": "All",
+      "statusOption": {
+        "ATTENTION": "Needs restock",
+        "OK": "In stock",
+        "OUT": "Out",
+        "INACTIVE": "Retired"
+      }
+    },
+    "status": {
+      "OK": "In stock",
+      "LOW": "Running low",
+      "OUT": "Out",
+      "INACTIVE": "Retired"
+    },
+    "column": {
+      "roll": "Roll",
+      "remaining": "Remaining",
+      "product": "Design",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "product": {
+      "visible": "on sale",
+      "hidden": "hidden"
+    },
+    "notice": {
+      "attention": "<b>{count, plural, one {# roll} other {# rolls}}</b> below threshold or out.",
+      "selling": "{count, plural, one {# roll is} other {# rolls are}} out but the design is still on sale.",
+      "show": "Show these rolls"
+    },
+    "menu": {
+      "label": "Actions for {name}",
+      "CUT": "Record cutting",
+      "RESTOCK": "Restock",
+      "WASTE": "Record waste",
+      "ADJUST": "Stocktake",
+      "edit": "Edit details",
+      "hideProduct": "Hide design on web",
+      "showProduct": "Show design again",
+      "deactivate": "Retire roll",
+      "activate": "Reactivate roll"
+    },
+    "movementType": {
+      "CUT": "Cutting",
+      "RESTOCK": "Restock",
+      "WASTE": "Waste",
+      "ADJUST": "Stocktake"
+    },
+    "movement": {
+      "title": "Record meters",
+      "field": {
+        "meters": "Meters",
+        "measured": "Measured meters",
+        "orderCode": "Order code",
+        "note": "Note"
+      },
+      "hint": {
+        "CUT": "Meters cut for a tailoring order, including seam allowance.",
+        "RESTOCK": "Meters added to this same roll (same batch, same color).",
+        "WASTE": "Unusable fabric: weaving faults, dye bleeding, mis-cuts, stains.",
+        "ADJUST": "Measure the whole roll and enter the actual figure — the difference is logged.",
+        "orderCode": "Optional. Link the order code to trace where the fabric went."
+      },
+      "placeholder": {
+        "meters": "Please enter meters",
+        "noteCUT": "Please enter a note (optional)",
+        "noteRESTOCK": "E.g. supplier, weaving batch",
+        "noteWASTE": "E.g. dye bleeding on one section",
+        "noteADJUST": "E.g. month-end stocktake"
+      },
+      "presetTop": "1 top",
+      "presetSet": "1 top + pants",
+      "preview": "After recording",
+      "warnLow": "This roll will drop below the {threshold} m threshold — restock or stop taking orders for this design.",
+      "warnOut": "This roll will run out. If the linked design is still on sale, hide it on the web.",
+      "recent": "Recent",
+      "submit": {
+        "CUT": "Record cutting",
+        "RESTOCK": "Record restock",
+        "WASTE": "Record waste",
+        "ADJUST": "Save stocktake"
+      },
+      "errors": {
+        "invalid": "Invalid meters.",
+        "exceeds": "Only {remaining} m left on this roll.",
+        "orderCode": "Order codes look like TC-YYMM-XXXX."
+      }
+    },
+    "rollDialog": {
+      "createTitle": "Add fabric roll",
+      "createDescription": "Each roll is one bolt of the same material, color and batch.",
+      "editTitle": "Edit fabric roll",
+      "editDescription": "Meters only change through restock or stocktake to keep the history.",
+      "create": "Add roll",
+      "save": "Save changes",
+      "noProduct": "No linked design",
+      "field": {
+        "material": "Material",
+        "color": "Color",
+        "name": "Roll name",
+        "code": "Roll code",
+        "meters": "Meters received",
+        "remaining": "Meters remaining",
+        "threshold": "Low-stock threshold (m)",
+        "product": "Design made from this roll"
+      },
+      "hint": {
+        "color": "From the Color attribute — add new colors under Catalog › Attributes.",
+        "code": "Generated from material + color + sequence; fixed once saved.",
+        "meters": "Fabric width {width} cm. Measure the whole roll on delivery.",
+        "remaining": "To change meters, use Restock or Stocktake in the ⋯ menu.",
+        "threshold": "Flag as running low below this. Leave empty = one top + pants by yield.",
+        "product": "When the roll runs out, this screen reminds you to hide the design on the web."
+      },
+      "placeholder": {
+        "material": "Please select a material",
+        "color": "Please select a color",
+        "name": "Please enter a roll name",
+        "code": "Pick material and color to generate",
+        "meters": "Please enter meters",
+        "threshold": "Default {value}"
+      },
+      "errors": {
+        "material": "Please select a material.",
+        "color": "Please select a color.",
+        "name": "Please enter a roll name.",
+        "meters": "Meters must be greater than 0.",
+        "threshold": "Invalid threshold."
+      }
+    },
+    "material": {
+      "width": "Width {width} cm",
+      "perTop": "{meters} m/top",
+      "attention": "{count, plural, one {# roll to restock} other {# rolls to restock}}",
+      "empty": "No rolls yet.",
+      "addRoll": "Add roll"
+    },
+    "toast": {
+      "CUT": "Cutting recorded — {name} has {meters} m left.",
+      "RESTOCK": "Restocked — {name} has {meters} m left.",
+      "WASTE": "Waste recorded — {name} has {meters} m left.",
+      "ADJUST": "Stocktake saved — {name} has {meters} m left.",
+      "created": "Added roll {name}.",
+      "updated": "Roll details saved.",
+      "deactivated": "Roll retired.",
+      "activated": "Roll reactivated.",
+      "productHidden": "{name} hidden on the web.",
+      "productShown": "{name} visible on the web again."
+    }
+  },
+  "inventoryHistory": {
+    "searchPlaceholder": "Search product, SKU, roll, order code, note…",
+    "unit": {
+      "PIECE": "pcs",
+      "METER": "m"
+    },
+    "subject": {
+      "SKU": "Ready-made",
+      "FABRIC": "Fabric"
+    },
+    "direction": {
+      "IN": "Stock in",
+      "OUT": "Stock out",
+      "LOSS": "Loss",
+      "COUNT": "Stocktake"
+    },
+    "kind": {
+      "RECEIVED": "Received",
+      "RETURNED": "Returned",
+      "RESTOCK": "Fabric restock",
+      "SOLD_IN_STORE": "Sold in store",
+      "ONLINE_ORDER": "Online order",
+      "CUT": "Cutting",
+      "DAMAGED": "Damaged",
+      "WASTE": "Fabric waste",
+      "STOCKTAKE": "Stocktake",
+      "ADJUST": "Fabric stocktake"
+    },
+    "filter": {
+      "subject": "Goods",
+      "direction": "Type",
+      "period": "Period",
+      "all": "All"
+    },
+    "period": "Last {days} days",
+    "summary": {
+      "lead": "Last {days} days: {count, plural, one {# movement} other {# movements}}",
+      "IN": "in",
+      "OUT": "out",
+      "LOSS": "loss"
+    },
+    "today": "Today · {date}",
+    "yesterday": "Yesterday · {date}",
+    "moreLines": "+ {count, plural, one {# more line} other {# more lines}}",
+    "collapse": "Collapse",
+    "actor": {
+      "customer": "Customer {name}",
+      "unknown": "Unknown user"
+    },
+    "orderCancelled": "Order cancelled — stock not restored",
+    "loadMore": "Load more ({count} left)",
+    "empty": "No stock movements yet.",
+    "noResults": "No movements match the filters."
+  },
+  "returns": {
+    "searchPlaceholder": "Search ticket, order code, customer, phone, product…",
+    "cancel": "Cancel",
+    "tabsLabel": "Ticket queue",
+    "queueLabel": "Tickets",
+    "filter": {
+      "service": "Request type",
+      "all": "All"
+    },
+    "service": {
+      "ALTERATION": "Alteration",
+      "EXCHANGE": "Exchange",
+      "RETURN": "Return",
+      "WARRANTY": "Warranty"
+    },
+    "reason": {
+      "ALTERATION": {
+        "TOO_LOOSE": "Too loose",
+        "TOO_TIGHT": "Too tight",
+        "LENGTH": "Hem / trouser length",
+        "SLEEVE": "Sleeves",
+        "OTHER": "Other"
+      },
+      "EXCHANGE": {
+        "WRONG_SIZE": "Wrong size",
+        "CHANGE_COLOR": "Different colour",
+        "CHANGE_STYLE": "Different style",
+        "OTHER": "Other"
+      },
+      "RETURN": {
+        "NOT_AS_DESCRIBED": "Not as described",
+        "WRONG_ITEM": "Wrong item delivered",
+        "CHANGED_MIND": "No longer needed",
+        "OTHER": "Other"
+      },
+      "WARRANTY": {
+        "SEAM": "Loose seam",
+        "BUTTON_ZIP": "Broken button / zip",
+        "EMBROIDERY": "Loose embroidery / beads",
+        "FABRIC_DEFECT": "Fabric defect",
+        "OTHER": "Other"
+      }
+    },
+    "handover": {
+      "STORE": "Customer brings it in",
+      "POST": "Customer ships it"
+    },
+    "tab": {
+      "NEW": "New",
+      "ACCEPTED": "Awaiting garment",
+      "RECEIVED": "In progress",
+      "READY": "Ready to return",
+      "DONE": "Done",
+      "REJECTED": "Rejected"
+    },
+    "status": {
+      "NEW": "New",
+      "ACCEPTED": "Accepted · awaiting garment",
+      "RECEIVED": "At the shop · in progress",
+      "READY": "Done · ready to return",
+      "READY_REFUND": "Refund awaiting approval",
+      "DONE": "Done",
+      "REJECTED": "Rejected"
+    },
+    "hint": {
+      "customFit": "Tailored piece — not eligible for exchange / return",
+      "outWindow": "Outside policy window",
+      "waiting": "Customer waiting {days, plural, one {# day} other {# days}} for a reply",
+      "appointment": "Appointment {date}",
+      "inTransit": "Garment in transit to the shop",
+      "inStatus": "{days, plural, one {# day} other {# days}} at this step"
+    },
+    "empty": {
+      "NEW": "No new requests.",
+      "ACCEPTED": "No garments on their way in.",
+      "RECEIVED": "Nothing in progress.",
+      "READY": "Nothing waiting to be returned.",
+      "DONE": "No completed tickets yet.",
+      "REJECTED": "No rejected tickets yet."
+    },
+    "pick": {
+      "title": "Pick a ticket to work on",
+      "NEW": "Oldest first — the customer who has waited longest gets answered first.",
+      "ACCEPTED": "Press “Garment received” once it is brought in or the parcel arrives.",
+      "RECEIVED": "When the fix is done, tell the customer; for returns, send the refund for approval.",
+      "READY": "Close the ticket once the customer collects the garment or is refunded.",
+      "DONE": "History of completed tickets.",
+      "REJECTED": "Rejected tickets with reasons."
+    },
+    "step": {
+      "ACCEPT": "Accept",
+      "REJECT": "Reject",
+      "RECEIVE": "Garment received",
+      "READY": "Work done",
+      "REQUEST_REFUND": "Send refund for approval",
+      "DONE": "Returned to customer"
+    },
+    "event": {
+      "SUBMITTED": "Customer submitted",
+      "ACCEPTED": "Accepted",
+      "REJECTED": "Rejected",
+      "RECEIVED": "Garment received",
+      "READY": "Work done",
+      "REFUND_REQUESTED": "Refund sent for approval",
+      "DONE": "Closed",
+      "NOTE": "Note"
+    },
+    "detail": {
+      "back": "Queue",
+      "order": "Order",
+      "policy": "Policy check",
+      "delivered": "Delivered",
+      "deliveredValue": "{date} · requested after {days, plural, one {# day} other {# days}}",
+      "window": "{service} window",
+      "inWindow": "Within window ({days} days)",
+      "outWindow": "{days, plural, one {# day} other {# days}} past the window",
+      "outWindowHint": {
+        "ALTERATION": "Past the free alteration window — still accept, quote the fee first.",
+        "EXCHANGE": "Past the exchange window — suggest an alteration instead.",
+        "RETURN": "Past the return window — usually reject with a clear reason.",
+        "WARRANTY": "Past the warranty — repair for a fee."
+      },
+      "customFitBlocked": "Made-to-measure pieces can't be exchanged or returned — only altered or repaired. Call the customer to offer an alteration.",
+      "refundAmount": "Refund amount",
+      "fee": "Fee",
+      "customerSays": "Customer's description",
+      "photos": "{count, plural, one {# photo} other {# photos}} from the customer",
+      "garment": "Garment",
+      "customFit": "Made to measure",
+      "appointment": "Appointment: {date}",
+      "log": "Ticket log",
+      "notePlaceholder": "Internal note: called the customer, rescheduled…",
+      "addNote": "Add"
+    },
+    "dialog": {
+      "note": "Note",
+      "ACCEPT": {
+        "title": "Accept request",
+        "description": "Ticket {code} moves to awaiting garment. Tell the customer how to send it in.",
+        "dateStore": "Appointment to bring it in",
+        "datePost": "Expected parcel arrival",
+        "dateHint": "Optional — shown as a reminder in the queue.",
+        "notePlaceholder": "E.g. shop covers return shipping",
+        "submit": "Accept"
+      },
+      "REJECT": {
+        "title": "Reject request",
+        "description": "Ticket {code} will be closed. The reason is logged so you can reply to the customer.",
+        "reason": "Reason",
+        "notePlaceholder": "E.g. past the 7-day exchange window, offered a free alteration",
+        "submit": "Reject"
+      },
+      "RECEIVE": {
+        "title": "Garment received",
+        "description": "The garment for ticket {code} is at the shop.",
+        "tracking": "Tracking code",
+        "trackingPlaceholder": "E.g. GHN 5L7Q2K",
+        "notePlaceholder": "E.g. tags still on, sleeve re-measured at 56 cm",
+        "submit": "Confirm received"
+      },
+      "READY": {
+        "title": "Work done",
+        "description": "Ticket {code} moves to ready to return.",
+        "fee": "Fee outside policy",
+        "feeHint": "Leave empty if free (within window or the shop's fault).",
+        "notePlaceholder": "E.g. waist taken in 2 cm, pickup tomorrow afternoon",
+        "submit": "Done, notify customer"
+      },
+      "REQUEST_REFUND": {
+        "title": "Send refund for approval",
+        "description": "Refunding return ticket {code} needs Super Admin approval.",
+        "amount": "Proposed refund",
+        "approvalNote": "The transfer happens after approval; the ticket waits under “Ready to return”.",
+        "notePlaceholder": "E.g. tags still on, wrong item shipped by the shop",
+        "submit": "Send for approval"
+      },
+      "DONE": {
+        "title": "Close ticket",
+        "description": "The customer got the garment back or was refunded for ticket {code}.",
+        "notePlaceholder": "E.g. customer tried it on, fits well",
+        "submit": "Close ticket"
+      }
+    },
+    "toast": {
+      "ACCEPT": "Ticket {code} accepted.",
+      "REJECT": "Ticket {code} rejected.",
+      "RECEIVE": "Garment for ticket {code} received.",
+      "READY": "Ticket {code} done, ready to return.",
+      "REQUEST_REFUND": "Refund for ticket {code} sent for approval.",
+      "DONE": "Ticket {code} closed.",
+      "NOTE": "Note added."
     }
   }
 }

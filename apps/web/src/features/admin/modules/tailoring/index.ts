@@ -1,4 +1,4 @@
 export * from "./types/tailoring.types";
 export * from "./queries/tailoring.queries";
-export * from "./actions/tailoring.actions";
-export * from "./components/TailoringBoard";
+export * from "./components/list/TailoringBoard";
+export * from "./components/detail/TailoringOrderDetail";

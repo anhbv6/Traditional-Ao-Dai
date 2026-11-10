@@ -59,7 +59,7 @@ export interface AdminTableColumn<T> {
   header: ReactNode;
   cell: (row: T) => ReactNode;
   align?: "left" | "right";
-  /** Áp cho cả th và td — dùng cho độ rộng hoặc ẩn theo breakpoint (`hidden xl:table-cell`) */
+  /** Áp cho cả th và td — độ rộng hoặc ẩn theo bề rộng bảng (`hidden @4xl:table-cell` — thẻ bảng là container) hay breakpoint màn hình */
   className?: string;
 }
 
@@ -141,7 +141,7 @@ export function AdminDataTable<T>({
     );
 
   return (
-    <section className={cn(ADMIN_CARD_CLASS, "px-3 py-2 sm:px-4")}>
+    <section className={cn(ADMIN_CARD_CLASS, "@container px-3 py-2 sm:px-4")}>
       <div className={cn("relative overflow-x-auto", mobileRow && "hidden md:block")}>
         {selection && selectedCount > 0 && (
           // Thanh hàng loạt đè lên hàng tiêu đề (không thay cột) để độ rộng cột và vị trí bảng giữ nguyên khi chọn dòng

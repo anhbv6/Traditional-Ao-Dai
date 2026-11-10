@@ -165,6 +165,8 @@
   "COLLECTION_DATE_RANGE_INVALID": "The season end date must be after the launch date.",
   "COLLECTION_ACCENT_INVALID": "The accent color must look like #RRGGBB.",
   "COLLECTION_PRODUCT_INVALID": "The product list is invalid.",
+  "COLLECTION_TEXT_TOO_LONG": "This text is too long, please shorten it.",
+  "COLLECTION_HOMEPAGE_ORDER_INVALID": "Homepage order must be a whole number from 0 to 99.",
   "CATEGORY_NAME_REQUIRED": "Please enter the product type name.",
   "CATEGORY_SLUG_INVALID": "Slugs may only contain lowercase letters, numbers and hyphens.",
   "CATEGORY_PARENT_INVALID": "A subtype can only sit under a root group.",
@@ -250,5 +252,13 @@
   "AFTER_SALES_ITEM_REQUIRED": "Please choose an item.",
   "AFTER_SALES_REASON_REQUIRED": "Please choose a reason.",
   "AFTER_SALES_DESCRIPTION_TOO_SHORT": "Please describe it in more detail (at least 10 characters).",
-  "AFTER_SALES_DESCRIPTION_TOO_LONG": "Description is too long (max 1000 characters)."
+  "AFTER_SALES_DESCRIPTION_TOO_LONG": "Description is too long (max 1000 characters).",
+  "INVENTORY_VARIANT_NOT_FOUND": "Some SKUs no longer belong to this product. Reload and try again.",
+  "TAILORING_ITEM_NOT_FOUND": "Tailoring item not found.",
+  "TAILORING_ORDER_CANCELLED": "This order was cancelled — stages can't move forward.",
+  "ORDER_STATUS_TRANSITION_INVALID": "The order can't move to this status from its current one.",
+  "ORDER_TAILORING_NOT_DONE": "Some tailored items aren't finished yet — can't pack.",
+  "ORDER_CLOSED": "This order was cancelled or refunded.",
+  "ORDER_PAYMENT_EXCEEDS_TOTAL": "The amount exceeds what's left to pay.",
+  "APPROVAL_ALREADY_PENDING": "This order already has a pending request."
 }
