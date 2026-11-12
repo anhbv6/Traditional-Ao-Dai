@@ -244,6 +244,7 @@ export function PaymentTab({ data, settings, update }: { data: ShippingPaymentDa
               <AdminFilterSelect
                 label={t("bank.bankShort")}
                 value={bank.bankBin}
+                placeholder={t("bank.bankPlaceholder")}
                 onChange={(bankBin) => setBank({ bankBin, bankName: data.banks.find((item) => item.bin === bankBin)?.name ?? bank.bankName })}
                 options={data.banks.map((item) => ({ value: item.bin, label: `${item.name} · ${item.bin}` }))}
                 className="h-10 w-full"
@@ -255,7 +256,8 @@ export function PaymentTab({ data, settings, update }: { data: ShippingPaymentDa
               value={bank.accountNumber}
               onValueChange={(next) => setBank({ accountNumber: next.replace(/\D/g, "").slice(0, 19) })}
               inputMode="numeric"
-              error={!/^\d{6,19}$/.test(bank.accountNumber) ? t("bank.accountNumberError") : undefined}
+              placeholder={t("bank.accountNumberPlaceholder")}
+              error={bank.accountNumber ? (!/^\d{6,19}$/.test(bank.accountNumber) ? t("bank.accountNumberError") : undefined) : undefined}
               inputClassName="font-mono tabular-nums tracking-wide"
             />
             <AdminTextField
@@ -270,9 +272,9 @@ export function PaymentTab({ data, settings, update }: { data: ShippingPaymentDa
               className="sm:col-span-2"
               label={t("bank.accountName")}
               hint={t("bank.accountNameHint")}
+              placeholder={t("bank.accountNamePlaceholder")}
               value={bank.accountName}
               onValueChange={(next) => setBank({ accountName: normalizeAccountName(next).slice(0, 50) })}
-              error={!bank.accountName.trim() ? t("bank.accountNameError") : undefined}
               inputClassName="font-mono tracking-wide"
             />
           </div>
@@ -280,39 +282,49 @@ export function PaymentTab({ data, settings, update }: { data: ShippingPaymentDa
           {/* Xem trước khung chuyển khoản ở trang cảm ơn / chi tiết đơn của khách */}
           <div className="rounded-2xl border border-[#E4E4E7] bg-[#FAFAFA] p-4">
             <p className="text-xs font-medium text-[#71717A]">{t("bank.preview")}</p>
-            <div className="mt-3 flex gap-3">
-              <span className="grid size-20 shrink-0 place-items-center rounded-lg border border-[#E4E4E7] bg-white text-[#18181B]">
-                <QrCode size={52} strokeWidth={1.25} aria-hidden />
-              </span>
-              <dl className="min-w-0 space-y-1.5 text-xs">
-                <div>
-                  <dt className="text-[#A1A1AA]">{bank.bankName}</dt>
-                  <dd className="truncate font-mono text-sm font-semibold tabular-nums text-[#09090B]">{bank.accountNumber || "—"}</dd>
+            {bank.accountNumber || bank.bankName ? (
+              <>
+                <div className="mt-3 flex gap-3">
+                  <span className="grid size-20 shrink-0 place-items-center rounded-lg border border-[#E4E4E7] bg-white text-[#18181B]">
+                    <QrCode size={52} strokeWidth={1.25} aria-hidden />
+                  </span>
+                  <dl className="min-w-0 space-y-1.5 text-xs">
+                    <div>
+                      <dt className="text-[#A1A1AA]">{bank.bankName || "—"}</dt>
+                      <dd className="truncate font-mono text-sm font-semibold tabular-nums text-[#09090B]">{bank.accountNumber || "—"}</dd>
+                    </div>
+                    <div>
+                      <dt className="sr-only">{t("bank.accountName")}</dt>
+                      <dd className="truncate font-mono text-[#3F3F46]">{bank.accountName || "—"}</dd>
+                    </div>
+                  </dl>
                 </div>
-                <div>
-                  <dt className="sr-only">{t("bank.accountName")}</dt>
-                  <dd className="truncate font-mono text-[#3F3F46]">{bank.accountName || "—"}</dd>
-                </div>
-              </dl>
-            </div>
-            <dl className="mt-3 space-y-2 border-t border-dashed border-[#E4E4E7] pt-3 text-xs">
-              <div className="flex items-center justify-between gap-2">
-                <dt className="text-[#71717A]">{t("bank.amount")}</dt>
-                <dd className="font-mono font-semibold tabular-nums text-[#09090B]">{formatVnd(SAMPLE_AMOUNT, locale)}</dd>
+                <dl className="mt-3 space-y-2 border-t border-dashed border-[#E4E4E7] pt-3 text-xs">
+                  <div className="flex items-center justify-between gap-2">
+                    <dt className="text-[#71717A]">{t("bank.amount")}</dt>
+                    <dd className="font-mono font-semibold tabular-nums text-[#09090B]">{formatVnd(SAMPLE_AMOUNT, locale)}</dd>
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <dt className="text-[#71717A]">{t("bank.content")}</dt>
+                    <dd className="flex items-center gap-1">
+                      <span className="font-mono font-semibold text-[#09090B]">{transferContent}</span>
+                      <AdminTooltip content={t("bank.copy")}>
+                        <button type="button" onClick={() => copy(transferContent)} aria-label={t("bank.copy")} className={cn(ADMIN_ROW_ICON_BUTTON_CLASS, "size-7")}>
+                          <Copy size={13} />
+                        </button>
+                      </AdminTooltip>
+                    </dd>
+                  </div>
+                </dl>
+                <p className="mt-3 text-2xs leading-relaxed text-[#A1A1AA]">{t("bank.previewNote")}</p>
+              </>
+            ) : (
+              <div className="mt-3 flex flex-col items-center justify-center rounded-xl border border-dashed border-[#D4D4D8] bg-white py-8 text-center">
+                <QrCode size={36} strokeWidth={1.25} className="text-[#A1A1AA]" aria-hidden />
+                <p className="mt-2 text-xs font-medium text-[#71717A]">{t("bank.emptyPreview")}</p>
+                <p className="mt-1 text-2xs text-[#A1A1AA]">{t("bank.emptyPreviewHint")}</p>
               </div>
-              <div className="flex items-center justify-between gap-2">
-                <dt className="text-[#71717A]">{t("bank.content")}</dt>
-                <dd className="flex items-center gap-1">
-                  <span className="font-mono font-semibold text-[#09090B]">{transferContent}</span>
-                  <AdminTooltip content={t("bank.copy")}>
-                    <button type="button" onClick={() => copy(transferContent)} aria-label={t("bank.copy")} className={cn(ADMIN_ROW_ICON_BUTTON_CLASS, "size-7")}>
-                      <Copy size={13} />
-                    </button>
-                  </AdminTooltip>
-                </dd>
-              </div>
-            </dl>
-            <p className="mt-3 text-2xs leading-relaxed text-[#A1A1AA]">{t("bank.previewNote")}</p>
+            )}
           </div>
         </div>
       </SettingsCard>

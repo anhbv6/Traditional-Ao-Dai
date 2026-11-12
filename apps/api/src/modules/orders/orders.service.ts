@@ -116,8 +116,11 @@ function buildPaymentInstruction(orderCode: string, amount: number): PaymentInst
     accountName: env.BANK_ACCOUNT_NAME,
     amount,
     transferContent,
-    // Ảnh QR động của VietQR: app ngân hàng quét là điền sẵn số tiền + nội dung
-    qrImageUrl: `https://img.vietqr.io/image/${env.BANK_BIN}-${env.BANK_ACCOUNT_NUMBER}-compact2.png?${params.toString()}`,
+    // Ảnh QR động của VietQR: app ngân hàng quét là điền sẵn số tiền + nội dung (để trống nếu chưa thiết lập bank)
+    qrImageUrl:
+      env.BANK_BIN && env.BANK_ACCOUNT_NUMBER
+        ? `https://img.vietqr.io/image/${env.BANK_BIN}-${env.BANK_ACCOUNT_NUMBER}-compact2.png?${params.toString()}`
+        : '',
   }
 }
 

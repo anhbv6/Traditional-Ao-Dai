@@ -98,7 +98,7 @@ export function getMockShippingPayment(): ShippingPaymentData {
       ],
       cod: { maxOrderValue: 5_000_000, verifiedPhoneOnly: false },
       deposit: { percent: 30, requiredAbove: 4_000_000 },
-      bank: { bankBin: "970407", bankName: "Techcombank", accountNumber: "19034567891011", accountName: "TIEM AO DAI THIEN CANH", branch: "Chi nhánh Sài Gòn" },
+      bank: { bankBin: "", bankName: "", accountNumber: "", accountName: "", branch: "" },
       deadline: { remindAfterHours: 12, autoCancelAfterHours: 48 },
     },
   };

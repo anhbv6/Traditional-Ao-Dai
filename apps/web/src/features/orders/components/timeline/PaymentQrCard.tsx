@@ -24,15 +24,22 @@ export function PaymentQrCard({ payment, title }: { payment: PaymentInstructionD
       <p className="mt-2 text-[13px] leading-6 text-(--text-light)">{t("description")}</p>
 
       <div className="mt-5 grid gap-6 md:grid-cols-[220px_minmax(0,1fr)] md:items-start">
-        <div className="mx-auto w-full max-w-[240px] border border-(--border) bg-white p-2">
-          <Image
-            src={payment.qrImageUrl}
-            alt={t("qrAlt", { amount: formatVnd(payment.amount, locale) })}
-            width={480}
-            height={540}
-            unoptimized
-            className="h-auto w-full"
-          />
+        <div className="mx-auto flex aspect-[4/5] w-full max-w-[240px] items-center justify-center border border-(--border) bg-white p-2">
+          {payment.qrImageUrl ? (
+            <Image
+              src={payment.qrImageUrl}
+              alt={t("qrAlt", { amount: formatVnd(payment.amount, locale) })}
+              width={480}
+              height={540}
+              unoptimized
+              className="h-auto w-full"
+            />
+          ) : (
+            <div className="flex flex-col items-center justify-center p-4 text-center">
+              <QrCode size={40} strokeWidth={1.25} className="text-(--text-muted)" aria-hidden="true" />
+              <p className="mt-2 text-xs text-(--text-light)">{payment.bankName || "—"}</p>
+            </div>
+          )}
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
