@@ -45,3 +45,22 @@ next-env.d.ts
 # Claude Code: cấu hình cá nhân và bộ nhớ đệm của hook
 .claude/settings.local.json
 .claude/.cache/
+
+# AI, Agent, LLM instructions & rules (chỉ giữ ở local, không push lên server)
+AGENTS.md
+**/AGENTS.md
+CLAUDE.md
+**/CLAUDE.md
+.claude/
+gemini.md
+GEMINI.md
+.gemini/
+.cursor/
+.cursorrules
+.github/copilot-instructions.md
+.windsurf/
+.windsurfrules
+.cline/
+.clinerules
+.agent/
+.agents/
