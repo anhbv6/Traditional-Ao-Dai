@@ -1,133 +1,120 @@
-# 🌸 Thiên Canh
+# 🌸 Thiên Canh — Tiệm Áo Dài Truyền Thống
 
-> Canh vải dưới trời mây, khâu tay từng tấc lụa.
+> *"Canh vải dưới trời mây, khâu tay từng tấc lụa."*  
+> *"Weaving fabric beneath the clouds, hand-stitching every inch of silk."*
 
-Website của tiệm áo dài **Thiên Canh** — khởi nguồn từ vùng cao Tây Bắc, bán Áo Dài truyền thống Việt Nam và nhận **may đo theo số đo**. Gồm Storefront (khách hàng) và khu Quản trị (nhân viên, admin). Tên miền hướng đến: `tiemthiencanh`.
-
-> 📐 Quy chuẩn code, kiến trúc, bảo mật: [`AGENTS.md`](AGENTS.md) — đọc trước khi viết code. File này chỉ hướng dẫn cài đặt, chạy và triển khai.
+🌐 **Languages / Ngôn ngữ:** [🇻🇳 Tiếng Việt](#-tiếng-việt) | [🇬🇧 English](#-english)
 
 ---
 
-## 1. Tổng quan
+## 🇻🇳 Tiếng Việt
 
-| Workspace | Vai trò | Công nghệ chính |
-| :--- | :--- | :--- |
-| `apps/web` | Storefront + Admin | Next.js 16, React 19, Tailwind v4, React Query, Zustand, next-intl (vi/en) |
-| `apps/api` | REST API | Express 4, JWT RS256, Zod v4, ioredis, Cloudinary, Nodemailer/Brevo, Swagger |
-| `packages/db` | Database | Prisma 5 + PostgreSQL (schema, migration, seed) |
-| `packages/shared` | Hợp đồng FE ↔ BE | Kiểu DTO/response, hằng số, cookie, tiền tệ, validator Zod |
-| `packages/config` | Cấu hình công cụ | ESLint, tsconfig, Prettier dùng chung |
+### Giới thiệu dự án
+**Thiên Canh** là nền tảng thương mại điện tử chuyên biệt dành cho thương hiệu áo dài truyền thống Việt Nam, khởi nguồn cảm hứng từ vùng cao Tây Bắc. Dự án không chỉ là một trang mua sắm thời trang may sẵn thông thường mà là giải pháp toàn diện kết hợp giữa **thương mại điện tử hiện đại** và **quy trình may đo thủ công cá nhân hóa (Bespoke Tailoring)**.
 
-```text
-Trình duyệt ── /vi/...  ─► apps/web (Next.js)
-            ── /api/... ─► apps/web rewrites ─► apps/api (Express) ─► PostgreSQL
-                                                      └─► Redis (OTP, rate-limit)
-Admin (Server Actions) ─────────── Prisma trực tiếp ─► PostgreSQL
-```
+Hệ thống được xây dựng theo kiến trúc Monorepo phân tách rõ ràng giữa **Storefront (Khách hàng)** và **Admin Portal (Khu quản trị xưởng & nhân sự)**, đảm bảo tính bảo mật cao, trải nghiệm người dùng tinh tế và hiệu năng tối đa.
 
-## 2. Cài đặt
+---
 
-**Yêu cầu:** Node.js ≥ 22.18 (khuyến nghị 24) · pnpm 11 (chỉ pnpm, không npm/yarn) · Docker (Redis) · PostgreSQL.
+### #1 Công nghệ sử dụng
 
-```bash
-git clone <url-repo> && cd learn-ecommerce-shop
-pnpm install
-cp apps/api/.env.example apps/api/.env.local
-cp apps/web/.env.example apps/web/.env.local
-```
+Dự án sử dụng kiến trúc **Monorepo** quản lý bởi **pnpm 11**, toàn bộ mã nguồn viết bằng **TypeScript (Strict Mode)**:
 
-| File | Biến cần điền — mỗi biến có ghi chú `[BẮT BUỘC]` / `[TÙY CHỌN]` và cách lấy trong `.env.example` |
-| :--- | :--- |
-| `apps/api/.env.local` | `DATABASE_URL`, `JWT_PRIVATE_KEY`, `JWT_PUBLIC_KEY`, `GOOGLE_CLIENT_ID`, `CLOUDINARY_*` · email (`BREVO_API_KEY` / `SMTP_*`) bỏ trống khi dev → mã in ra console |
-| `apps/web/.env.local` | `DATABASE_URL` và `JWT_PUBLIC_KEY` **giống hệt** bên API · `NEXT_PUBLIC_GOOGLE_CLIENT_ID` · giữ `NEXT_PUBLIC_API_URL=/api` |
+#### 🖥️ Frontend (`apps/web`)
+* **Framework:** Next.js 16 (App Router), React 19 (Server Components mặc định, Server Actions).
+* **Styling & UI:** Tailwind CSS v4, Base UI, Lucide Icons, hiệu ứng chuyển động Motion 12 (`motion/react`), cuộn mượt Lenis.
+* **State Management:** Zustand (Client state), TanStack React Query (Server state).
+* **Đa ngôn ngữ & Form:** `next-intl` (hỗ trợ song ngữ Tiếng Việt & Tiếng Anh), React Hook Form kết hợp Zod schema.
 
-API và lệnh `pnpm db:*` nạp `.env.local` trước rồi tới `.env` (file trước được ưu tiên); Next.js tự nạp `.env.local`. Production không dùng file — đặt biến trên Render / Vercel ([`RUNBOOK.md`](RUNBOOK.md) §3).
+#### ⚙️ Backend & API (`apps/api`)
+* **Core:** Node.js 22+, Express 4 với thực thi siêu tốc qua `tsx` (Type-stripping).
+* **Bảo mật & Xác thực:** JWT RS256 (cặp khóa bất đối xứng Asymmetric Keys), bảo vệ phiên làm việc qua HttpOnly Cookie, bảo vệ Header với Helmet, kiểm soát tần suất Rate Limiting với Redis.
+* **Tài liệu & Tiện ích:** Swagger UI OpenAPI 3.0 (`/api-docs`), Multer (xử lý upload ảnh), Nodemailer / Brevo API.
 
-**Tạo cặp khóa JWT RS256** (dán chuỗi Base64 vào `.env.local`; web **chỉ** nhận public key):
+#### 🗄️ Cơ sở dữ liệu & Gói dùng chung
+* **Database & ORM (`packages/db`):** PostgreSQL (Neon Serverless) kết nối qua Prisma ORM 5 (hơn 30 models quan hệ chặt chẽ).
+* **Hợp đồng dùng chung (`packages/shared`):** Định nghĩa DTO, bộ quy chuẩn kích thước & phụ phí may đo (`/sizing`), quy trình đơn hàng (`/orders`), báo giá thiết kế riêng (`/bespoke`), schema xác thực Zod (`/validation`).
+* **Cấu hình chuẩn hóa (`packages/config`):** ESLint 9 Flat Config, TypeScript config kế thừa, Prettier.
 
-```bash
-openssl genpkey -algorithm RSA -out private.pem -pkeyopt rsa_keygen_bits:2048
-openssl rsa -in private.pem -pubout -out public.pem
-base64 -w 0 private.pem   # -> JWT_PRIVATE_KEY (chỉ apps/api)
-base64 -w 0 public.pem    # -> JWT_PUBLIC_KEY (cả api và web)
-```
+---
 
-## 3. Chạy dự án
+### #2 Các chức năng đặc biệt
 
-```bash
-docker compose up -d   # 1. Redis
-pnpm db:deploy         # 2. Áp migration
-pnpm db:seed           # 3. Tài khoản + dữ liệu demo
-pnpm dev               # 4. API + Web song song
-```
+1. **Bộ máy may đo theo số đo & Báo giá tự động (Bespoke Tailoring Engine):**
+   * Cho phép khách hàng tùy biến cấu hình chi tiết áo dài (kiểu cổ áo, tay áo, tà áo, phối chất liệu lụa/gấm).
+   * Thuật toán tự động gợi ý kích cỡ dựa trên số đo 3 vòng, tính toán chính xác phụ phí may ngoại cỡ (Bigsize surcharge) và kiểm định tính hợp lệ của số đo trước khi tạo đơn.
 
-| Địa chỉ | Mô tả |
-| :--- | :--- |
-| http://localhost:3000 | Storefront (tự chuyển `/vi` hoặc `/en`) |
-| http://localhost:3000/vi/admin/login | Khu quản trị |
-| http://localhost:3001/api/health | Health check (DB + Redis) |
-| http://localhost:3001/api-docs | Swagger (chỉ ngoài production) |
+2. **Theo dõi tiến độ xưởng may 5 công đoạn thời gian thực (Real-time Tailoring Tracking):**
+   * Minh bạch hóa quy trình may đo thủ công qua 5 bước: *Chờ vải ➔ Cắt vải ➔ May ráp ➔ Đính kết/Thêu hoa ➔ Form dáng & Ủi*.
+   * Khách hàng có thể tra cứu đơn hàng và theo dõi ảnh chụp thực tế tại xưởng thông qua **Magic Link bảo mật** (mã băm HMAC, không cần tạo tài khoản hay nhớ mật khẩu).
 
-**Tài khoản do seed tạo** (một tài khoản dùng được cả storefront lẫn khu quản trị nếu là STAFF/ADMIN):
+3. **Kiến trúc xác thực phiên kép độc lập (Dual-Zone Auth Architecture):**
+   * **Khu vực Storefront:** Access Token trong bộ nhớ RAM kết hợp cơ chế xoay vòng Refresh Token (HttpOnly Cookie) kèm thời gian ân hạn 30 giây (Grace Period) chống xung đột khi mở nhiều tab.
+   * **Khu vực Quản trị (Admin):** Xác thực nghiêm ngặt qua cookie `admin_token`, đối soát phiên DB thời gian thực từng request, cơ chế phân quyền ma trận 5 cấp bậc cho nhân viên (`Permission`).
 
-| Email | Vai trò | Mật khẩu mặc định |
-| :--- | :--- | :--- |
-| `admin@gmail.com` | ADMIN | `admin123` — đổi qua `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` / `SEED_ADMIN_PHONE` |
-| `staff@aodai.local` | STAFF (`MANAGE_ORDERS`, `UPDATE_TAILORING`) | `Demo@123` — đổi qua `SEED_DEMO_PASSWORD` |
-| `customer@aodai.local` | CUSTOMER (có hồ sơ số đo, đơn `AD-SEED-0001`) | `Demo@123` |
+4. **Quản trị danh mục thông minh với Sơ đồ cây tương tác (Dynamic Category Tree & Size Grid):**
+   * Khu quản trị cung cấp sơ đồ cây danh mục trực quan có hiệu ứng kéo thả chuyển cấp, đồng bộ song song với bảng dữ liệu.
+   * Trình soạn thảo bảng size mẫu hỗ trợ sao chép - dán trực tiếp từ bảng tính Excel, tự động nhận diện ngưỡng số đo hợp lệ.
 
-## 4. Lệnh thường dùng
+5. **Thanh toán VietQR động & Quản lý đặt cọc may đo linh hoạt:**
+   * Tự động sinh mã VietQR động theo chuẩn NAPAS với cú pháp chuyển khoản chính xác `THIENCANH <mã đơn>`, người mua quét mã là ngân hàng tự điền đủ số tiền và nội dung.
+   * Hỗ trợ luồng đặt cọc trước 30% – 50% cho đơn may đo thủ công và thu COD phần còn lại khi nhận áo.
 
-| Lệnh | Tác dụng |
-| :--- | :--- |
-| `pnpm dev` | Chạy dev mọi workspace |
-| `pnpm check` | Typecheck + lint toàn repo (gồm cả seed) — **bắt buộc xanh trước khi commit** |
-| `pnpm build` | Build mọi workspace |
-| `pnpm db:migrate --name <ten>` | Tạo + áp migration (dev) |
-| `pnpm db:deploy` | Áp migration có sẵn vào DB local / CI |
-| `pnpm db:status:prod` / `db:deploy:prod` / `db:seed:prod` | Xem / áp migration / seed lên **Neon production** (đọc `apps/api/.env.production`) |
-| `pnpm db:generate` | Sinh Prisma Client (Windows: dừng `pnpm dev` trước, nếu không lỗi `EPERM`) |
-| `pnpm db:seed` / `pnpm db:studio` | Seed dữ liệu / mở Prisma Studio (http://localhost:5555) |
-| `pnpm --filter @repo/<workspace> add <pkg>` | Cài package cho một workspace |
-| `pnpm format` | Prettier (chưa bắt buộc — xem AGENTS.md §12) |
+> 💡 *...Và còn nhiều phân hệ chuyên sâu khác: Quản lý kho vải lụa theo mét, Kho phụ liệu thời trang, Nhật ký kiểm toán viên (Audit Log), Trợ lý tư vấn AI "Thợ phụ Thiên Canh", Hệ thống phiếu giảm giá Voucher đa điều kiện, Lịch hẹn thử áo tại showroom, và Quy trình đổi trả - phê duyệt đa cấp.*
 
-CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)): `install → db:generate → typecheck → lint` cho mọi PR và push lên `main` / `develop`.
+---
 
-## 5. Triển khai
+## 🇬🇧 English
 
-Giai đoạn chạy thử, chi phí gần như 0đ, mọi dịch vụ đặt ở **Singapore**. Trình duyệt chỉ thấy domain Vercel → cookie dùng chung, không cần CORS.
+### Project Overview
+**Thiên Canh** is an e-commerce platform crafted exclusively for a traditional Vietnamese Ao Dai atelier originating from the Northwest highlands of Vietnam. Beyond a standard ready-to-wear fashion store, this platform is an end-to-end digital solution bridging **modern e-commerce** with **custom artisanal bespoke tailoring**.
 
-| Dịch vụ | Vai trò | Địa chỉ / ghi chú |
-| :--- | :--- | :--- |
-| Vercel (Hobby) | Web | https://traditional-ao-dai.vercel.app — Hobby **chỉ cho phi thương mại** |
-| Render (Free) | API | https://aodai.onrender.com — ngủ sau 15 phút, request đầu ~50s |
-| Neon (Free) | PostgreSQL | Project `AoDai`, branch `production` |
-| Upstash (Free) | Redis | Database `aodai` |
-| Cloudinary · Google Cloud · Brevo | Ảnh · OAuth · Email | — |
+Built with a modular Monorepo architecture, the project cleanly decouples the **Storefront (Customer experience)** from the **Admin Portal (Operations, tailoring atelier & staff management)** to guarantee top-tier security, high performance, and an exquisite user journey.
 
-**Render (API)** — Branch `main`, Root Directory trống.
-- Build: `corepack pnpm install --frozen-lockfile && corepack pnpm --filter @repo/db generate`
-- Start: `corepack pnpm --filter @repo/api start` (chạy `tsx src/server.ts`; `build` của API chỉ type-check)
-- Env: `NODE_ENV=production`, `NODE_VERSION=24`, `COREPACK_ENABLE_DOWNLOAD_PROMPT=0`, `DATABASE_URL` (Neon **direct**, không `-pooler`), `REDIS_URL` (`rediss://...`), `FRONTEND_URL`, `TRUST_PROXY=2`, `JWT_PRIVATE_KEY`, `JWT_PUBLIC_KEY`, `GOOGLE_CLIENT_ID`, `CLOUDINARY_*`, `BREVO_API_KEY` (Render free chặn cổng SMTP), `SMTP_FROM`, `MAIL_FROM_NAME`. Không đặt `PORT` và `REDIS_HOST/PORT/PASSWORD`.
+---
 
-**Vercel (Web)** — Root Directory `apps/web`, bật *Include files outside root directory*, region `sin1`.
-- Env (Production + Preview): `API_INTERNAL_URL=https://aodai.onrender.com` (không `/` cuối), `NEXT_PUBLIC_API_URL=/api`, `NEXT_PUBLIC_GOOGLE_CLIENT_ID`, `JWT_PUBLIC_KEY` (**không** private key), `DATABASE_URL` (Neon **pooled** + `&pgbouncer=true&connection_limit=1`), `ENABLE_EXPERIMENTAL_COREPACK=1`.
-- Đổi env phải **Redeploy** (`API_INTERNAL_URL`, `NEXT_PUBLIC_*` đọc lúc build).
+### #1 Tech Stack
 
-**Google OAuth** — Authorized JavaScript origins: `http://localhost:3000` và domain Vercel (bản Preview không đăng nhập Google được).
+Powered by a **pnpm 11 Monorepo** and strictly typed with **TypeScript**:
 
-**Database production** — chạy từ máy local bằng lệnh `:prod`, đọc **duy nhất** `apps/api/.env.production` (gitignored; điền `DATABASE_URL` = Neon **direct**, `SEED_ADMIN_PASSWORD`). Thiếu file thì lệnh dừng, không bao giờ rơi về DB local:
+#### 🖥️ Frontend (`apps/web`)
+* **Framework:** Next.js 16 (App Router), React 19 (Server Components by default, Server Actions for mutations).
+* **Styling & UI:** Tailwind CSS v4, Base UI components, Lucide Icons, Motion 12 (`motion/react`) animations, Lenis smooth scrolling.
+* **State Management:** Zustand (Client-side state), TanStack React Query (Server-side caching).
+* **Internationalization & Forms:** `next-intl` (English & Vietnamese), React Hook Form paired with Zod validation.
 
-```bash
-pnpm db:status:prod    # migration nào chưa áp lên Neon
-pnpm db:deploy:prod    # áp migration lên Neon
-pnpm db:seed:prod      # seed lần đầu — tự tắt dữ liệu demo, bắt buộc SEED_ADMIN_PASSWORD
-```
+#### ⚙️ Backend & API (`apps/api`)
+* **Core Runtime:** Node.js 22+, Express 4 executed via `tsx` (Native TypeScript type-stripping).
+* **Security & Auth:** RS256 Asymmetric JWT key pairs, HttpOnly session cookies, Helmet HTTP headers, Redis-backed Rate Limiting.
+* **Utilities & Tooling:** Swagger UI OpenAPI 3.0 specification (`/api-docs`), Multer media uploader, Nodemailer / Brevo API.
 
-**Quy trình cập nhật:** sửa schema → `pnpm db:migrate --name <ten>` ở local → push `main` (Render + Vercel tự deploy) → có migration mới thì `pnpm db:deploy:prod` → kiểm tra `/api/health` trả `database: ok, redis: ok`.
+#### 🗄️ Database & Shared Packages
+* **Database & ORM (`packages/db`):** PostgreSQL (Neon Serverless) managed through Prisma ORM 5 (30+ relational models).
+* **Shared Contracts (`packages/shared`):** Centralized DTOs, bespoke sizing calculation algorithms (`/sizing`), order lifecycle rules (`/orders`), custom price quotation (`/bespoke`), and Zod validation schemas (`/validation`).
+* **Shared Tooling (`packages/config`):** ESLint 9 Flat Config, shared tsconfig bases, Prettier formatting rules.
 
-👉 Từng tình huống thay đổi (schema, env, package, domain, khóa bí mật, rollback...) và các bước ở Neon / Render / Vercel: [`RUNBOOK.md`](RUNBOOK.md).
+---
 
-## 6. Quy ước Git
+### #2 Special Features & Key Highlights
 
-Nhánh `main` (production), `develop` (tích hợp), `feat/…`, `fix/…`. Commit tiếng Việt có tiền tố `feat:` `fix:` `refactor:` `docs:` `chore:` `test:`. Chỉ `git add` đúng file; không push thẳng `main`; không commit `.env` / `.env.local`. Chi tiết: [`AGENTS.md`](AGENTS.md) §11.
+1. **Bespoke Tailoring Engine & Automated Quotation:**
+   * Empowers shoppers to customize Ao Dai components (collar, sleeve cuts, flap styles, and silk/brocade fabric pairings).
+   * Intelligent algorithm recommending sizes based on customer measurements, calculating bigsize surcharges, and validating tailorability in real-time.
+
+2. **5-Stage Real-time Atelier Tracking Timeline:**
+   * Demystifies the bespoke manufacturing journey through 5 transparent phases: *Awaiting Fabric ➔ Cutting ➔ Sewing ➔ Embroidery & Beading ➔ Fitting & Ironing*.
+   * Customers access progress photos and logs via **Secure Magic Links** (HMAC token hashes, zero login friction).
+
+3. **Dual-Zone Independent Authentication Architecture:**
+   * **Storefront Zone:** In-memory Access Tokens accompanied by rotating HttpOnly Refresh Tokens with a 30-second Grace Period for multi-tab support.
+   * **Admin Zone:** Strict `admin_token` cookie verification validated against database sessions on every single request, fortified by a 5-tier role-permission matrix.
+
+4. **Dynamic Interactive Category Tree & Size Chart Grid:**
+   * Administrative portal featuring an interactive visual category tree with drag-and-drop reordering that mirrors live customer navigation.
+   * Matrix size chart editor with direct Excel paste support, automated dimension boundaries, and bigsize threshold detectors.
+
+5. **Dynamic VietQR Payment & Bespoke Deposit Processing:**
+   * Automated dynamic VietQR generation (NAPAS standard) with deterministic transfer syntax (`THIENCANH <order-code>`).
+   * Tailored order support requiring a 30%–50% bank transfer deposit before craftsmanship begins, collecting remainder via COD upon delivery.
+
+> 💡 *...And many more specialized features: Per-meter raw silk and fabric inventory, Garment accessory warehouse, Comprehensive Audit Logging, AI Assistant "Thợ phụ Thiên Canh", Multi-tier discount vouchers, Showroom fitting appointments, and Multi-level return/refund approval pipelines.*
