@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl";
 import { PRODUCT_GROUPS, type ProductGroup } from "@repo/shared/sizing";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useNotify } from "@/hooks/useNotify";
-import { AdminFilterSelect, AdminListPanel } from "@/features/admin/core/ui";
+import { AdminButton, AdminFilterSelect, AdminListPanel } from "@/features/admin/core/ui";
 import { reorderCategoriesAction, updateCategoryAction } from "../../actions/categories.actions";
 import { type AdminCategoryNode, type SizeChartOption } from "../../types/categories.types";
 import { filterTree, filterTreeByGroup, getSiblings, moveSibling, replaceSiblings } from "../../utils/categoryTree";
@@ -160,7 +160,7 @@ export function CategoryTreeBoard({
         title={tPage("title")}
         description={tPage("description")}
         search={{ value: search, onChange: setSearch, placeholder: t("searchPlaceholder") }}
-        action={{ label: t("createType"), onClick: () => setEditor({ node: null, parent: null }) }}
+        actions={<AdminButton variant="primary" onClick={() => setEditor({ node: null, parent: null })}>{t("createType")}</AdminButton>}
         filters={
           <AdminFilterSelect
             label={t("groupLabel")}

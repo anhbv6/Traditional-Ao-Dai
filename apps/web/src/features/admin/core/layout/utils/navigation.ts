@@ -106,6 +106,37 @@ export function findAdminModuleByPath(pathname: string | null): AdminModule | un
     ?.key;
 }
 
+export interface AdminNavGroupInfo {
+  groupKey?: string;
+  leafKey?: AdminModule;
+}
+
+/**
+ * Tìm thông tin nhóm hoặc module của một URL để hiển thị eyebrow trên header chuẩn
+ */
+export function findAdminNavGroupInfo(pathname: string | null): AdminNavGroupInfo | undefined {
+  if (!pathname) return undefined;
+  const cleanPath = pathname.split("?")[0].split("#")[0];
+
+  const entries: { groupKey?: string; leaf: NavLeafConfig }[] = [];
+  for (const entry of ADMIN_NAV_CONFIG) {
+    if ("group" in entry) {
+      for (const child of entry.children) {
+        entries.push({ groupKey: entry.group, leaf: child });
+      }
+    } else {
+      entries.push({ leaf: entry });
+    }
+  }
+
+  const matched = entries
+    .filter((e) => isUnder(cleanPath, e.leaf.href))
+    .sort((a, b) => b.leaf.href.length - a.leaf.href.length)[0];
+
+  if (!matched) return undefined;
+  return { groupKey: matched.groupKey, leafKey: matched.leaf.key };
+}
+
 /**
  * Menu quản trị: lọc theo ma trận quyền (ADMIN_MODULE_ACCESS), gán active và dịch nhãn.
  * Nhóm không còn mục con nào người dùng vào được thì ẩn luôn — trùng khớp với requireAdminPage ở server.

@@ -6,6 +6,7 @@ export * from "./AdminDatePicker";
 export * from "./AdminInfoTip";
 export * from "./AdminDialog";
 export * from "./adminButtons";
+export * from "./AdminButton";
 export * from "./AdminDetailHeader";
 export * from "./AdminDataTable";
 export * from "./AdminLangSwitch";

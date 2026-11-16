@@ -11,6 +11,7 @@ import { Link, useRouter } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
 import {
   ADMIN_ROW_ICON_BUTTON_CLASS,
+  AdminButton,
   AdminDataTable,
   AdminListPanel,
   AdminStatusText,
@@ -176,7 +177,7 @@ export function SizeChartsBoard({ charts }: { charts: AdminSizeChartListItem[] }
         title={tPage("title")}
         description={tPage("description")}
         search={{ value: search, onChange: setSearch, placeholder: t("searchPlaceholder") }}
-        action={{ label: t("create.open"), onClick: () => setDialog({ chart: null }) }}
+        actions={<AdminButton variant="primary" onClick={() => setDialog({ chart: null })}>{t("create.open")}</AdminButton>}
       />
 
       {/* Tab nhóm hàng ngay trên bảng — kiểu gạch chân tối giản (đơn sắc theo quy chuẩn admin) */}

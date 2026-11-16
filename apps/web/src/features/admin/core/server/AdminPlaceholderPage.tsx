@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { cn } from "@/lib/utils";
 import { requireAdminPage } from "./adminAuth.server";
 import { ADMIN_MODULE_ACCESS, type AdminModule } from "../session/permissions";
+import { ADMIN_NAV_CONFIG } from "../layout/utils/navigation";
 import { ADMIN_CARD_CLASS, AdminPage, AdminPageHeader } from "../ui";
 
 /**
@@ -13,13 +14,22 @@ export async function AdminPlaceholderPage({ module }: { module: AdminModule }) 
   await requireAdminPage(ADMIN_MODULE_ACCESS[module]);
   const t = await getTranslations(`AdminPage.pages.${module}`);
   const tPlaceholder = await getTranslations("AdminPage.placeholder");
+  const tNav = await getTranslations("AdminPage.nav");
+
+  const groupEntry = ADMIN_NAV_CONFIG.find(
+    (e) => "group" in e && e.children.some((c) => c.key === module)
+  );
+  const singleEntry = ADMIN_NAV_CONFIG.find((e) => !("group" in e) && e.key === module);
+
+  const eyebrow = groupEntry && "group" in groupEntry ? tNav(`groups.${groupEntry.group}`) : tNav(module);
+  const Icon = (groupEntry && "icon" in groupEntry ? groupEntry.icon : undefined) ?? (singleEntry && "icon" in singleEntry ? singleEntry.icon : Hammer);
 
   const planned: unknown = t.raw("planned");
   const items = Array.isArray(planned) ? planned.filter((item): item is string => typeof item === "string") : [];
 
   return (
     <AdminPage>
-      <AdminPageHeader title={t("title")} description={t("description")} />
+      <AdminPageHeader icon={Icon} eyebrow={eyebrow} title={t("title")} description={t("description")} />
 
       <section className={cn(ADMIN_CARD_CLASS, "p-5 sm:p-6")}>
         <div className="flex items-start gap-3">

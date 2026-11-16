@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { Grid2x2, Layers, Rows3 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-import { AdminFilterSelect, AdminListPanel } from "@/features/admin/core/ui";
+import { AdminButton, AdminFilterSelect, AdminListPanel } from "@/features/admin/core/ui";
 import { type AdminMaterialListItem } from "../../types/materials.types";
 import { SEASONS, type Season } from "../../utils/materialMeta";
 import { MaterialCard } from "./MaterialCard";
@@ -41,7 +41,7 @@ export function MaterialsBoard({ materials }: { materials: AdminMaterialListItem
         title={tPage("title")}
         description={tPage("description")}
         search={{ value: search, onChange: setSearch, placeholder: t("searchPlaceholder") }}
-        action={{ label: t("create.open"), onClick: () => setIsCreating(true) }}
+        actions={<AdminButton variant="primary" onClick={() => setIsCreating(true)}>{t("create.open")}</AdminButton>}
         filters={
           <>
             <AdminFilterSelect

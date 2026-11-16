@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { GalleryVerticalEnd, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useNotify } from "@/hooks/useNotify";
-import { AdminFilterSelect, AdminListPanel } from "@/features/admin/core/ui";
+import { AdminButton, AdminFilterSelect, AdminListPanel } from "@/features/admin/core/ui";
 import { setCollectionHomepageAction } from "../../actions/collections.actions";
 import { type AdminCollectionItem, type CollectionStatus } from "../../types/collections.types";
 import { COLLECTION_STATUSES } from "../../utils/collectionLifecycle";
@@ -81,7 +81,8 @@ export function CollectionsBoard({ initialCollections }: { initialCollections: A
         title={tPage("title")}
         description={tPage("description")}
         search={{ value: search, onChange: setSearch, placeholder: t("searchPlaceholder") }}
-        action={{ label: t("create.open"), onClick: () => setIsCreating(true) }}
+        // action={{ label: t("create.open"), onClick: () => setIsCreating(true) }}
+        actions={<AdminButton variant="primary" onClick= {() => setIsCreating(true)}>{t("create.open")}</AdminButton>}
         filters={
           <>
             <AdminFilterSelect

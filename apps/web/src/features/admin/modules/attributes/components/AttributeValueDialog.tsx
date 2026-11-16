@@ -110,7 +110,6 @@ export function AttributeValueDialog({
     <AdminDialog
       open
       onOpenChange={onOpenChange}
-      icon={isNew ? Plus : Pencil}
       title={
         isNew
           ? t("dialog.createTitle", { group: groupLabel.toLowerCase() })

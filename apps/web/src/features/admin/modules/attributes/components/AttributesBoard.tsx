@@ -14,6 +14,7 @@ import {
   ADMIN_DIALOG_SECONDARY_BUTTON_CLASS,
   AdminDialog,
   AdminListPanel,
+  AdminButton,
 } from "@/features/admin/core/ui";
 import {
   deleteAttributeAction,
@@ -180,9 +181,9 @@ export function AttributesBoard({ initialData }: { initialData: AdminAttributeDa
         title={tPage("title")}
         description={tPage("description")}
         search={{ value: search, onChange: setSearch, placeholder: t("searchPlaceholder") }}
-        action={
+        actions={
           current
-            ? { label: t("addValue", { group: current.name.toLowerCase() }), onClick: () => setEditor({ value: null }) }
+            ? <AdminButton variant="primary" onClick={() => setEditor({ value: null })}>{t("addValue", { group: current.name.toLowerCase() })}</AdminButton>
             : undefined
         }
       />

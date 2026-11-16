@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
 import { Shirt } from "lucide-react";
 import { useNotify } from "@/hooks/useNotify";
-import { AdminFilterSelect, AdminListPanel, AdminSecondaryButton } from "@/features/admin/core/ui";
+import { AdminButton, AdminFilterSelect, AdminListPanel, AdminSecondaryButton } from "@/features/admin/core/ui";
 import { type AdminProductCategory, type AdminProductItem } from "../../types/products.types";
 import {
   bulkSetProductsActiveAction,
@@ -107,7 +107,7 @@ export function ProductsList({ initialProducts, categories }: ProductsListProps)
         title={tPage("title")}
         description={tPage("description")}
         search={{ value: searchTerm, onChange: setSearchTerm, placeholder: t("searchPlaceholder") }}
-        action={{ label: t("add"), onClick: () => setIsCreating(true) }}
+        actions={<AdminButton variant="primary" onClick={() => setIsCreating(true)}>{t("add")}</AdminButton>}
         filters={
           <>
             <AdminFilterSelect
