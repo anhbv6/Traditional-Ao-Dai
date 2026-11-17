@@ -11,7 +11,7 @@ import { SEASONS, type Season } from "../../utils/materialMeta";
 import { MaterialCard } from "./MaterialCard";
 import { MaterialMatrix } from "./MaterialMatrix";
 
-const CreateMaterialDialog = dynamic(() => import("./CreateMaterialDialog").then((m) => m.CreateMaterialDialog));
+const CreateMaterialDialog = dynamic(() => import("../dialog/CreateMaterialDialog").then((m) => m.CreateMaterialDialog));
 
 type View = "cards" | "matrix";
 type StatusFilter = "ALL" | "ACTIVE" | "INACTIVE";
@@ -104,7 +104,7 @@ export function MaterialsBoard({ materials }: { materials: AdminMaterialListItem
           {materials.length === 0 ? t("empty") : t("noResults")}
         </p>
       ) : view === "cards" ? (
-        <div className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-3 2xl:grid-cols-4">
           {visible.map((material) => (
             <MaterialCard key={material.id} material={material} />
           ))}

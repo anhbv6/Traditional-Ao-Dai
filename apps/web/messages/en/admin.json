@@ -2973,7 +2973,14 @@
       "material": "Material",
       "stock": "Stock",
       "seasons": "Seasons",
-      "perTop": "m / top"
+      "perTop": "Yield / top",
+      "sortBy": "Click to sort by {metric}",
+      "sortDesc": "Sorted descending (highest first)",
+      "sortAsc": "Sorted ascending (lowest first)",
+      "clearSort": "Clear sorting",
+      "activeSort": "Sorting by {metric}",
+      "notEvaluated": "Not evaluated",
+      "viewDetail": "View fabric details"
     },
     "create": {
       "open": "Add material",
@@ -2999,7 +3006,7 @@
       "success": "Material deleted"
     },
     "sections": {
-      "identity": "Identity",
+      "identity": "Fabric information",
       "metrics": "Physical scales",
       "media": "Close-ups & video",
       "process": "Making process",
@@ -3059,7 +3066,10 @@
       "add": "Add fiber",
       "remove": "Remove fiber",
       "total": "Total {total}%",
-      "notFull": "Composition does not add up to 100%."
+      "notFull": "Composition does not add up to 100%.",
+      "quickPresets": "Quick presets:",
+      "addMore": "Add fiber:",
+      "autoBalance": "Auto balance"
     },
     "fiber": {
       "SILK": "Silk",

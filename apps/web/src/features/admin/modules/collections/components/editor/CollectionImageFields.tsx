@@ -4,8 +4,8 @@ import { useRef, useState, type ChangeEvent, type ReactNode } from "react";
 import { ArrowLeft, ArrowRight, ImagePlus, Loader2, Monitor, Smartphone, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useNotify } from "@/hooks/useNotify";
-import { cn } from "@/lib/utils";
 import { uploadImageApi } from "@/features/upload";
+import { AdminImageSlot, AdminMediaGroup } from "@/features/admin/core/ui";
 import { compressCollectionImage } from "../../utils/collectionImage";
 import { MAX_GALLERY_IMAGES } from "../../utils/collectionLifecycle";
 
@@ -54,13 +54,9 @@ export function MediaGroup({
   className?: string;
 }) {
   return (
-    <div className={cn("min-w-0", className)}>
-      <div className="mb-2.5 flex items-baseline justify-between gap-2">
-        <h3 className="truncate text-body font-semibold text-[#09090B]">{title}</h3>
-        <span className="shrink-0 font-mono text-2xs text-[#A1A1AA]">{ratio}</span>
-      </div>
+    <AdminMediaGroup title={title} ratio={ratio} className={className}>
       {children}
-    </div>
+    </AdminMediaGroup>
   );
 }
 
@@ -80,64 +76,24 @@ export function ImageSlot({
   fallback?: string;
 }) {
   const t = useTranslations("AdminPage.collections.media");
-  const inputRef = useRef<HTMLInputElement>(null);
-  const { upload, isUploading } = useImageUploader();
   const DeviceIcon = device === "desktop" ? Monitor : Smartphone;
-  const shown = value || fallback;
-
-  const handleFile = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    event.target.value = "";
-    if (!file) return;
-    const [url] = await upload([file]);
-    if (url) onChange(url);
-  };
 
   return (
-    <div className="min-w-0">
-      <div
-        className={cn("group relative overflow-hidden rounded-xl border border-[#E4E4E7] bg-[#F4F4F5]", aspectClass)}
-      >
-        {shown ? (
-          // eslint-disable-next-line @next/next/no-img-element -- ảnh từ URL tùy ý (blob xem trước / avatar / ảnh do admin nhập), không tối ưu được bằng next/image
-          <img src={shown} alt="" className={cn("size-full object-cover", !value && "opacity-40 grayscale")} />
-        ) : null}
-
-        <button
-          type="button"
-          disabled={isUploading}
-          onClick={() => inputRef.current?.click()}
-          className={cn(
-            "absolute inset-0 flex cursor-pointer flex-col items-center justify-center gap-1 text-xs font-medium transition-colors disabled:cursor-wait",
-            value ? "bg-black/0 text-transparent hover:bg-black/40 hover:text-white" : "text-[#52525B] hover:bg-black/5"
-          )}
-        >
-          {isUploading ? <Loader2 size={18} className="animate-spin text-[#52525B]" /> : <ImagePlus size={18} />}
-          {isUploading ? t("uploading") : value ? t("replace") : fallback ? t("useOwn") : t("upload")}
-        </button>
-
-        {!value && fallback && (
-          <span className="pointer-events-none absolute inset-x-1.5 bottom-1.5 rounded bg-white/90 px-1.5 py-0.5 text-center text-2xs font-medium text-[#52525B]">
-            {t("usingDesktop")}
-          </span>
-        )}
-        {value && (
-          <button
-            type="button"
-            aria-label={t("remove")}
-            onClick={() => onChange("")}
-            className="absolute right-1.5 top-1.5 grid size-6 cursor-pointer place-items-center rounded-md bg-white/90 text-[#3F3F46] shadow-2xs hover:bg-white"
-          >
-            <X size={13} />
-          </button>
-        )}
-      </div>
-      <div className="mt-1.5 flex min-w-0 items-center gap-1.5 text-xs text-[#71717A]">
-        <DeviceIcon size={13} className="shrink-0" aria-hidden />
-        <span className="truncate">{t(device)}</span>
-      </div>
-      <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={handleFile} />
-    </div>
+    <AdminImageSlot
+      value={value}
+      onChange={onChange}
+      aspectClass={aspectClass}
+      fallback={fallback}
+      placeholderText={fallback ? t("useOwn") : t("upload")}
+      replaceText={t("replace")}
+      uploadingText={t("uploading")}
+      label={
+        <>
+          <DeviceIcon size={13} className="shrink-0" aria-hidden />
+          <span className="truncate">{t(device)}</span>
+        </>
+      }
+    />
   );
 }
 

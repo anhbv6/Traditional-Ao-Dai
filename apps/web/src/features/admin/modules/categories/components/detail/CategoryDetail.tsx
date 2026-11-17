@@ -14,7 +14,7 @@ import {
 } from "@/features/admin/core/ui";
 import { SizeChartTable, type AdminSizeChartDetail } from "@/features/admin/modules/size-charts";
 import { type AdminCategoryNode, type SizeChartOption } from "../../types/categories.types";
-import { PRODUCT_GROUP_COLORS, PRODUCT_GROUP_ICONS, groupUsesSizeChart } from "../../utils/productGroupMeta";
+import { groupUsesSizeChart } from "../../utils/productGroupMeta";
 import { categoryName } from "../../utils/categoryName";
 import { CategoryStatusBadge } from "../shared/CategoryStatusBadge";
 
@@ -70,7 +70,6 @@ interface CategoryDetailProps {
  */
 export function CategoryDetail({ node, roots, sizeCharts, sizeChart }: CategoryDetailProps) {
   const t = useTranslations("AdminPage.categories");
-  const tSizing = useTranslations("AdminPage.sizing");
   const router = useRouter();
   const locale = useLocale();
   const [editor, setEditor] = useState<EditorState | null>(null);
@@ -82,10 +81,6 @@ export function CategoryDetail({ node, roots, sizeCharts, sizeChart }: CategoryD
 
   const isRoot = node.parentId === null;
   const parentNode = roots.find((root) => root.id === node.parentId) ?? null;
-  // Cùng sắc với khối trong danh sách: loại con lấy màu nhóm hàng của nhóm gốc
-  const blockGroup = parentNode?.group ?? node.group;
-  const treeColor = PRODUCT_GROUP_COLORS[blockGroup];
-  const BlockIcon = PRODUCT_GROUP_ICONS[blockGroup];
 
   // Số liệu của nhóm gốc tính cả loại con
   const children = node.children;

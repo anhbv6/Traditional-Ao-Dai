@@ -133,8 +133,8 @@ function UnitInput({
 }
 
 /**
- * Màn chi tiết chất liệu vải: nhận diện (xuất xứ, thành phần sợi) → thanh đo vật lý & mùa → ảnh cận / video →
- * quy trình → bảo quản (nhãn may xem trước) → định mức vải. Cột phải: mẫu vải, trạng thái và kho vải theo chất liệu.
+ * Màn chi tiết chất liệu vải: thông tin vải (nhận diện, thành phần sợi, ảnh cận/video, định mức vải) →
+ * thanh đo vật lý & mùa → quy trình → bảo quản (nhãn may xem trước). Cột phải: mẫu vải, trạng thái và kho vải theo chất liệu.
  */
 export function MaterialEditor({ initialMaterial }: { initialMaterial: AdminMaterialDetail }) {
   const t = useTranslations("AdminPage.materials");
@@ -221,22 +221,9 @@ export function MaterialEditor({ initialMaterial }: { initialMaterial: AdminMate
             {baseline.isActive ? t("status.active") : t("status.inactive")}
           </span>
         }
-        subtitle={
-          <>
-            <span className="font-mono">{values.code}</span>
-            {isDirty && <span className="ml-2 text-amber-700">● {t("editor.unsaved")}</span>}
-          </>
-        }
         actions={
           <>
-            {/* Một công tắc ngôn ngữ cho mọi trường song ngữ trên màn (tên, xuất xứ, mô tả, quy trình, ghi chú bảo quản) */}
-            <AdminLangSwitch
-              value={lang}
-              onChange={setLang}
-              label={t("editor.langLabel")}
-              hint={t("editor.langHint")}
-              status={{ en: values.nameEn ? undefined : "missing" }}
-            />
+            
             {material.rolls.length === 0 && (
               <button type="button" onClick={() => setConfirmDelete(true)} className={ADMIN_SECONDARY_BUTTON_CLASS}>
                 <Trash2 size={15} aria-hidden /> {t("delete.open")}
@@ -252,53 +239,123 @@ export function MaterialEditor({ initialMaterial }: { initialMaterial: AdminMate
       <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
         <div className="min-w-0 space-y-5">
 
-          <Card title={t("sections.identity")}>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <AdminTextField
-                key={`name-${lang}`}
-                required={lang === "vi"}
-                label={t("field.name")}
-                value={values[fields.name]}
-                onValueChange={(value) => set(fields.name, value)}
-                placeholder={t(`placeholders.${lang}.name`)}
+          <Card 
+            title={t("sections.identity")} 
+            aside={
+              <AdminLangSwitch
+                value={lang}
+                onChange={setLang}
+                label={t("editor.langLabel")}
+                hint={t("editor.langHint")}
+                status={{ en: values.nameEn ? undefined : "missing" }}
               />
-              <AdminTextField
-                label={t("field.code")}
-                hint={t("hints.code")}
-                value={values.code}
-                onValueChange={(value) => set("code", value.toUpperCase().replace(/[^A-Z0-9-]/g, ""))}
-                placeholder={t("placeholders.code")}
-                inputClassName="font-mono"
-              />
-              <AdminTextField
-                key={`origin-${lang}`}
-                className="sm:col-span-2"
-                label={t("field.origin")}
-                value={values[fields.origin]}
-                onValueChange={(value) => set(fields.origin, value)}
-                placeholder={t(`placeholders.${lang}.origin`)}
-              />
-              <AdminTextArea
-                key={`description-${lang}`}
-                className="sm:col-span-2"
-                label={t("field.description")}
-                value={values[fields.description]}
-                onValueChange={(value) => set(fields.description, value)}
-                rows={3}
-                placeholder={t(`placeholders.${lang}.description`)}
-              />
-            </div>
+            }>
+            <div className="space-y-4">
+              {/* 1. Định danh & nguồn gốc — lưới 2 cột gọn gàng */}
+              <div className="grid gap-3 sm:grid-cols-2">
+                <AdminTextField
+                  key={`name-${lang}`}
+                  required={lang === "vi"}
+                  label={t("field.name")}
+                  value={values[fields.name]}
+                  onValueChange={(value) => set(fields.name, value)}
+                  placeholder={t(`placeholders.${lang}.name`)}
+                />
+                <AdminTextField
+                  label={t("field.code")}
+                  hint={t("hints.code")}
+                  value={values.code}
+                  onValueChange={(value) => set("code", value.toUpperCase().replace(/[^A-Z0-9-]/g, ""))}
+                  placeholder={t("placeholders.code")}
+                  inputClassName="font-mono"
+                />
+                <AdminTextField
+                  key={`origin-${lang}`}
+                  label={t("field.origin")}
+                  value={values[fields.origin]}
+                  onValueChange={(value) => set(fields.origin, value)}
+                  placeholder={t(`placeholders.${lang}.origin`)}
+                />
+                <AdminTextField
+                  key={`description-${lang}`}
+                  label={t("field.description")}
+                  value={values[fields.description]}
+                  onValueChange={(value) => set(fields.description, value)}
+                  placeholder={t(`placeholders.${lang}.description`)}
+                />
+              </div>
 
-            <div className="mt-5 border-t border-dashed border-[#E4E4E7] pt-4">
-              <h3 className="mb-3 flex items-center gap-1.5 text-body font-semibold text-[#09090B]">
-                {t("field.composition")}
-                <AdminInfoTip content={t("hints.composition")} />
-              </h3>
-              <MaterialCompositionField
-                items={values.composition}
-                onChange={(items) => set("composition", items)}
-                inputClassName={ADMIN_INPUT_CLASS}
-              />
+              {/* 2. Thành phần sợi — giao diện chọn trực quan tiên tiến */}
+              <div className="border-t border-[#F4F4F5] pt-3">
+                <div className="mb-2 flex items-center gap-1.5">
+                  <h3 className="text-sm font-semibold text-[#09090B]">
+                    {t("field.composition")}
+                  </h3>
+                  <AdminInfoTip content={t("hints.composition")} />
+                </div>
+                <MaterialCompositionField
+                  items={values.composition}
+                  onChange={(items) => set("composition", items)}
+                />
+              </div>
+
+              {/* 3. Định mức vải cắt may */}
+              <div className="border-t border-[#F4F4F5] pt-3">
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <h3 className="flex items-center gap-1.5 text-sm font-semibold text-[#09090B]">
+                    {t("sections.yield")}
+                    <AdminInfoTip content={t("hints.yield")} />
+                  </h3>
+                  {perSet !== null && (
+                    <span className="font-mono text-xs font-medium text-[#52525B]">
+                      {t("yield.perSet", { meters: format.number(Math.round(perSet * 100) / 100) })}
+                    </span>
+                  )}
+                </div>
+                <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
+                  <UnitInput
+                    label={t("field.widthCm")}
+                    value={values.widthCm}
+                    onChange={(value) => set("widthCm", value === null ? null : Math.round(value))}
+                    unit="cm"
+                    step={1}
+                    placeholder={t("placeholders.widthCm")}
+                  />
+                  <UnitInput
+                    label={t("field.metersPerTop")}
+                    value={values.metersPerTop}
+                    onChange={(value) => set("metersPerTop", value)}
+                    unit="m"
+                    step={0.1}
+                    placeholder={t("placeholders.meters")}
+                  />
+                  <UnitInput
+                    label={t("field.metersPerPants")}
+                    value={values.metersPerPants}
+                    onChange={(value) => set("metersPerPants", value)}
+                    unit="m"
+                    step={0.1}
+                    placeholder={t("placeholders.meters")}
+                  />
+                </div>
+              </div>
+
+              {/* 4. Ảnh cận & video mặt vải */}
+              <div className="border-t border-[#F4F4F5] pt-3">
+                <div className="mb-2 flex items-center gap-1.5">
+                  <h3 className="text-sm font-semibold text-[#09090B]">
+                    {t("sections.media")}
+                  </h3>
+                  <AdminInfoTip content={t("hints.media")} />
+                </div>
+                <MaterialMediaField
+                  images={values.closeupImages}
+                  onImagesChange={(images) => set("closeupImages", images)}
+                  videoUrl={values.videoUrl}
+                  onVideoUrlChange={(url) => set("videoUrl", url)}
+                  inputClassName={ADMIN_INPUT_CLASS}
+                />
+              </div>
             </div>
           </Card>
 
@@ -347,16 +404,6 @@ export function MaterialEditor({ initialMaterial }: { initialMaterial: AdminMate
                 })}
               </div>
             </div>
-          </Card>
-
-          <Card title={t("sections.media")} hint={t("hints.media")}>
-            <MaterialMediaField
-              images={values.closeupImages}
-              onImagesChange={(images) => set("closeupImages", images)}
-              videoUrl={values.videoUrl}
-              onVideoUrlChange={(url) => set("videoUrl", url)}
-              inputClassName={ADMIN_INPUT_CLASS}
-            />
           </Card>
 
           <Card title={t("sections.process")} hint={t("hints.process")}>
@@ -408,40 +455,6 @@ export function MaterialEditor({ initialMaterial }: { initialMaterial: AdminMate
                 <CareLabel codes={values.careCodes} note={values[fields.careNote]} />
               </div>
             </div>
-          </Card>
-
-          <Card title={t("sections.yield")} hint={t("hints.yield")}>
-            <div className="grid gap-4 sm:grid-cols-3">
-                <UnitInput
-                  label={t("field.widthCm")}
-                  value={values.widthCm}
-                  onChange={(value) => set("widthCm", value === null ? null : Math.round(value))}
-                  unit="cm"
-                  step={1}
-                  placeholder={t("placeholders.widthCm")}
-                />
-                <UnitInput
-                  label={t("field.metersPerTop")}
-                  value={values.metersPerTop}
-                  onChange={(value) => set("metersPerTop", value)}
-                  unit="m"
-                  step={0.1}
-                  placeholder={t("placeholders.meters")}
-                />
-                <UnitInput
-                  label={t("field.metersPerPants")}
-                  value={values.metersPerPants}
-                  onChange={(value) => set("metersPerPants", value)}
-                  unit="m"
-                  step={0.1}
-                  placeholder={t("placeholders.meters")}
-                />
-            </div>
-            {perSet !== null && (
-              <p className="mt-3 rounded-lg bg-[#FAFAFA] px-3 py-2 text-xs text-[#52525B]">
-                {t("yield.perSet", { meters: format.number(Math.round(perSet * 100) / 100) })}
-              </p>
-            )}
           </Card>
         </div>
 

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Layers } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useNotify } from "@/hooks/useNotify";
 import { useRouter } from "@/i18n/routing";
@@ -46,7 +45,6 @@ export function CreateMaterialDialog({ onOpenChange }: { onOpenChange: (open: bo
     <AdminDialog
       open
       onOpenChange={onOpenChange}
-      icon={Layers}
       title={t("create.title")}
       description={t("create.description")}
       onSubmit={handleSubmit}

@@ -2973,7 +2973,14 @@
       "material": "Chất liệu",
       "stock": "Tồn kho",
       "seasons": "Mùa",
-      "perTop": "m / áo"
+      "perTop": "Định mức / áo",
+      "sortBy": "Bấm để sắp xếp theo {metric}",
+      "sortDesc": "Đang xếp giảm dần (cao nhất trước)",
+      "sortAsc": "Đang xếp tăng dần (thấp nhất trước)",
+      "clearSort": "Bỏ sắp xếp",
+      "activeSort": "Đang xếp theo {metric}",
+      "notEvaluated": "Chưa đánh giá",
+      "viewDetail": "Xem chi tiết hồ sơ vải"
     },
     "create": {
       "open": "Thêm chất liệu",
@@ -2999,7 +3006,7 @@
       "success": "Đã xóa chất liệu"
     },
     "sections": {
-      "identity": "Nhận diện",
+      "identity": "Thông tin vải",
       "metrics": "Thanh đo vật lý",
       "media": "Ảnh cận & video",
       "process": "Quy trình làm vải",
@@ -3059,7 +3066,10 @@
       "add": "Thêm sợi",
       "remove": "Bỏ sợi",
       "total": "Tổng {total}%",
-      "notFull": "Thành phần chưa đủ 100%."
+      "notFull": "Thành phần chưa đủ 100%.",
+      "quickPresets": "Gợi ý nhanh:",
+      "addMore": "Thêm sợi:",
+      "autoBalance": "Bù đủ 100%"
     },
     "fiber": {
       "SILK": "Tơ tằm",
