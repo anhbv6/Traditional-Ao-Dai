@@ -19,52 +19,34 @@ import { categoryName } from "../../utils/categoryName";
 import { CategoryStatusBadge } from "../shared/CategoryStatusBadge";
 
 // Dialog chỉ cần khi thao tác nên tách khỏi bundle đầu trang
-const CategoryEditorDialog = dynamic(() => import("../tree/CategoryEditorDialog").then((m) => m.CategoryEditorDialog));
+const CategoryEditorDialog = dynamic(() => import("../dialog/CategoryEditorDialog").then((m) => m.CategoryEditorDialog));
 const ConfirmDeleteCategoryDialog = dynamic(() =>
-  import("../tree/ConfirmDeleteCategoryDialog").then((m) => m.ConfirmDeleteCategoryDialog)
+  import("../dialog/ConfirmDeleteCategoryDialog").then((m) => m.ConfirmDeleteCategoryDialog)
 );
 
-function Card({ title, aside, children }: { title: string; aside?: ReactNode; children: ReactNode }) {
+function Card({
+  title,
+  subtitle,
+  aside,
+  children,
+}: {
+  title: string;
+  subtitle?: ReactNode;
+  aside?: ReactNode;
+  children: ReactNode;
+}) {
   return (
-    <section className={cn(ADMIN_CARD_CLASS, "p-4 sm:p-5")}>
-      <header className="mb-4 flex items-center justify-between gap-3">
-        <h2 className="text-lg font-semibold text-[#09090B]">{title}</h2>
+    <section className={cn(ADMIN_CARD_CLASS, "p-5 sm:p-6")}>
+      <header className="mb-5 flex items-start justify-between gap-3">
+        <div>
+          <h2 className="text-base font-semibold text-[#09090B]">{title}</h2>
+          {subtitle && <div className="mt-0.5 text-xs text-[#71717A]">{subtitle}</div>}
+        </div>
         {aside}
       </header>
       {children}
     </section>
   );
-}
-
-/** Nội dung hiển thị theo ngôn ngữ giao diện: tên, mô tả */
-function LangBlock({ name, description, emptyLabel }: { name: ReactNode; description: ReactNode; emptyLabel: string }) {
-  return (
-    <div className="min-w-0 py-1">
-      <p className="text-body font-semibold text-[#09090B]">{name || <Empty>{emptyLabel}</Empty>}</p>
-      <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-[#3F3F46]">
-        {description || <Empty>{emptyLabel}</Empty>}
-      </p>
-    </div>
-  );
-}
-
-function Empty({ children }: { children: ReactNode }) {
-  return <span className="text-[#A1A1AA]">{children}</span>;
-}
-
-/** Ô số liệu trong thẻ Tổng quan */
-function Stat({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="rounded-lg bg-[#FAFAFA] px-3 py-2.5">
-      <p className="font-mono text-xl font-semibold tabular-nums text-[#09090B]">{value}</p>
-      <p className="text-xs text-[#71717A]">{label}</p>
-    </div>
-  );
-}
-
-/** Nét đứt ngăn các phần trong một thẻ */
-function DashedDivider() {
-  return <div aria-hidden className="my-4 border-t border-dashed border-[#E4E4E7]" />;
 }
 
 /** Đang mở dialog: sửa loại này, hoặc thêm loại con vào nó */
@@ -79,19 +61,24 @@ interface CategoryDetailProps {
 }
 
 /**
- * Màn chi tiết loại sản phẩm (chỉ xem). Mỗi thông tin hiện đúng một chỗ:
- * đầu trang = tên, trạng thái, nhóm gốc, đường dẫn · trái = nội dung theo ngôn ngữ giao diện (vi → cột tiếng Việt,
- * en → cột `En`) rồi bảng size (chỉ xem) ·
- * phải = Tổng quan (nhóm hàng, số liệu, loại con / nhóm gốc). Sửa và thêm loại mở CategoryEditorDialog.
+ * Màn chi tiết loại sản phẩm (chỉ xem):
+ * - Toàn bộ thông tin được gom gọn gàng, tự nhiên trong thẻ "Thông tin chung".
+ * - Tách riêng khối loại con thành thẻ Card riêng để bố cục thoáng đãng, không bị dính liền/rối rắm.
+ * - Hiển thị ngôn ngữ theo ngữ cảnh dự án (Tiếng Việt hiện bản Việt, Tiếng Anh và khác mặc định bản Anh).
+ * - Mọi chuỗi ký tự đều dùng hệ thống đa ngôn ngữ (không fix cứng text).
+ * - Màu sắc, kiểu chữ và kích thước chữ đồng bộ chuẩn mực.
  */
 export function CategoryDetail({ node, roots, sizeCharts, sizeChart }: CategoryDetailProps) {
   const t = useTranslations("AdminPage.categories");
+  const tSizing = useTranslations("AdminPage.sizing");
   const router = useRouter();
-  // Chỉ hiện nội dung của ngôn ngữ đang dùng; tiếng Anh chưa nhập thì báo thiếu (tiêu đề lùi về tên tiếng Việt)
   const locale = useLocale();
-  const isEn = locale === "en";
   const [editor, setEditor] = useState<EditorState | null>(null);
   const [deleting, setDeleting] = useState(false);
+
+  const isVi = locale === "vi";
+  const name = categoryName(node, locale);
+  const description = isVi ? (node.description || node.descriptionEn) : (node.descriptionEn || node.description);
 
   const isRoot = node.parentId === null;
   const parentNode = roots.find((root) => root.id === node.parentId) ?? null;
@@ -114,10 +101,8 @@ export function CategoryDetail({ node, roots, sizeCharts, sizeChart }: CategoryD
       <AdminDetailHeader
         backHref="/admin/catalog/categories"
         backLabel={t("detail.back")}
-        title={categoryName(node, locale)}
+        title={name}
         badge={<CategoryStatusBadge isActive={node.isActive} />}
-        // Chỉ đường dẫn — nhóm gốc / số loại con đã có ở thẻ Tổng quan bên phải
-        subtitle={<span className="font-mono">/{node.slug}</span>}
         actions={
           <>
             {canDelete && (
@@ -132,146 +117,169 @@ export function CategoryDetail({ node, roots, sizeCharts, sizeChart }: CategoryD
         }
       />
 
-      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
-        <div className="min-w-0 space-y-5">
-          {/* Nội dung hiển thị trên cửa hàng theo ngôn ngữ đang dùng */}
-          <Card title={t("detail.sections.general")}>
-            {isEn ? (
-              <LangBlock name={node.nameEn} description={node.descriptionEn} emptyLabel={t("detail.info.noEnglish")} />
-            ) : (
-              <LangBlock name={node.name} description={node.description} emptyLabel={t("detail.info.none")} />
-            )}
-          </Card>
-
-          {usesChart && !isRoot && (
-            <Card
-              title={t("detail.sections.sizeChart")}
-              aside={
-                sizeChart && (
-                  <Link
-                    href={`/admin/catalog/size-charts/${sizeChart.id}`}
-                    className="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-sm font-medium text-[#3F3F46] hover:bg-[#F4F4F5] hover:text-[#09090B]"
-                  >
-                    {t("detail.chart.open")} <ArrowUpRight size={14} aria-hidden />
-                  </Link>
-                )
-              }
-            >
-              {sizeChart ? (
-                <>
-                  <p className="-mt-2 mb-3 text-xs text-[#71717A]">
-                    <span className="font-medium text-[#3F3F46]">{sizeChart.name}</span>
-                    {!sizeChart.isActive && <span className="text-amber-700"> · {t("editor.chartInactive")}</span>}
-                  </p>
-                  <SizeChartTable chart={sizeChart} />
-                </>
+      <div className="space-y-5">
+        {/* Thông tin chung */}
+        <Card title={t("detail.sections.general")}>
+          <div className="space-y-5">
+            {/* Mô tả theo ngôn ngữ đang chọn - tự nhiên, mộc mạc như bài viết editorial */}
+            <div className="space-y-1.5">
+              <span className="text-sm font-medium text-[#71717A]">
+                {t("field.description")}
+              </span>
+              {description ? (
+                <p className="whitespace-pre-line text-sm leading-relaxed text-[#18181B]">
+                  {description}
+                </p>
               ) : (
-                <p className="text-sm text-amber-700">{t("noChart")}</p>
+                <p className="text-sm italic text-[#A1A1AA]">
+                  {isVi ? t("detail.info.none") : t("detail.info.noEnglish")}
+                </p>
               )}
-            </Card>
-          )}
-        </div>
-
-        <aside className="lg:sticky lg:top-[8rem]">
-          <Card title={t("detail.sections.overview")}>
-            <div className="space-y-2.5">
-              <div className="flex items-center justify-between gap-3">
-                <span className="text-xs text-[#71717A]">{t("field.isActive")}</span>
-                <CategoryStatusBadge isActive={node.isActive} />
-              </div>
-              {/* <div className="flex items-center justify-between gap-3">
-                <span className="text-xs text-[#71717A]">{t("detail.info.group")}</span>
-                <span className="flex min-w-0 items-center gap-1.5">
-                  <span
-                    aria-hidden
-                    className={cn("grid size-6 shrink-0 place-items-center rounded-md", groupColor.tile)}
-                  >
-                    <GroupIcon size={13} />
-                  </span>
-                  <span className="truncate text-sm font-medium text-[#09090B]">{tSizing(`group.${node.group}`)}</span>
-                  <AdminInfoTip
-                    content={
-                      <>
-                        <span className="block">{tSizing(`groupHint.${node.group}`)}</span>
-                        <span className="mt-1 block text-white/70">
-                          {[
-                            ...getGroupTraitKeys(node.group).map((trait) => tSizing(`trait.${trait}`)),
-                            tSizing(`sellUnit.${traits.sellUnit}`),
-                          ].join(" · ")}
-                        </span>
-                      </>
-                    }
-                  />
-                </span>
-              </div> */}
             </div>
 
-            <DashedDivider />
-            <div className={cn("grid gap-2", isRoot ? "grid-cols-3" : "grid-cols-2")}>
-              <Stat label={t("detail.stats.products")} value={productCount} />
-              <Stat label={t("detail.stats.skus")} value={skuCount} />
-              {isRoot && <Stat label={t("detail.stats.children")} value={children.length} />}
-            </div>
-
-            {isRoot && (
-              <>
-                <DashedDivider />
-                <div className="mb-2 flex items-center justify-between gap-2">
-                  <h3 className="text-body font-semibold text-[#09090B]">{t("detail.sections.children")}</h3>
-                  <button
-                    type="button"
-                    onClick={() => setEditor({ mode: "addChild" })}
-                    className="inline-flex h-7 cursor-pointer items-center gap-1 rounded-md px-2 text-xs font-medium text-[#52525B] hover:bg-[#F4F4F5] hover:text-[#09090B]"
-                  >
-                    <Plus size={13} aria-hidden /> {t("menu.addChild")}
-                  </button>
+            {/* Thuộc tính & số liệu dạng danh sách 2 cột cân đối, thanh nhã */}
+            <div className="border-t border-[#F4F4F5] pt-1">
+              <dl className="grid grid-cols-1 gap-x-12 sm:grid-cols-2">
+                <div className="flex items-center justify-between border-b border-[#F4F4F5] py-3">
+                  <dt className="text-sm text-[#71717A]">{t("slug")}</dt>
+                  <dd className="text-sm font-medium text-[#18181B]">
+                    <span>/{node.slug}</span>
+                  </dd>
                 </div>
-                {children.length === 0 ? (
-                  <p className="text-xs text-[#71717A]">{t("detail.noChildren")}</p>
-                ) : (
-                  // Danh sách loại con kèm dây nối cùng màu khối như ở màn danh sách
-                  <ul className="relative ml-2 space-y-0.5">
-                    <span aria-hidden className={cn("absolute bottom-4 left-0 top-0 w-px", treeColor.line)} />
-                    {children.map((child) => (
-                      <li key={child.id} className="relative pl-4">
-                        <span aria-hidden className={cn("absolute left-0 top-1/2 h-px w-3", treeColor.line)} />
-                        <Link
-                          href={`/admin/catalog/categories/${child.id}`}
-                          className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[#09090B] hover:bg-[#F4F4F5]"
-                        >
-                          <span className="min-w-0 flex-1 truncate">{categoryName(child, locale)}</span>
-                          {!child.isActive && <CategoryStatusBadge isActive={false} />}
-                          <span className="font-mono text-xs tabular-nums text-[#A1A1AA]">{child.productCount}</span>
-                          <ChevronRight size={14} className="text-[#A1A1AA]" aria-hidden />
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </>
-            )}
 
-            {!isRoot && parentNode && (
-              <>
-                <DashedDivider />
-                <h3 className="mb-2 text-body font-semibold text-[#09090B]">{t("field.parent")}</h3>
-                <Link
-                  href={`/admin/catalog/categories/${parentNode.id}`}
-                  className="flex items-center gap-2 rounded-lg border border-[#E4E4E7] px-2.5 py-2 text-sm text-[#09090B] hover:bg-[#FAFAFA]"
-                >
-                  <span
-                    aria-hidden
-                    className={cn("grid size-6 shrink-0 place-items-center rounded-md", treeColor.tile)}
+                {/* Cấp danh mục / Thuộc nhóm */}
+                <div className="flex items-center justify-between border-b border-[#F4F4F5] py-3">
+                  <dt className="text-sm text-[#71717A]">
+                    {isRoot ? t("field.parentShort") : t("field.parent")}
+                  </dt>
+                  <dd className="text-sm font-medium text-[#18181B]">
+                    {isRoot ? (
+                      <span className="text-[#52525B]">{t("detail.info.rootGroup")}</span>
+                    ) : parentNode ? (
+                      <Link
+                        href={`/admin/catalog/categories/${parentNode.id}`}
+                        className="inline-flex items-center gap-1 text-[#18181B] hover:text-emerald-800 hover:underline"
+                      >
+                        <span>{categoryName(parentNode, locale)}</span>
+                        <ArrowUpRight size={14} className="text-[#71717A]" aria-hidden />
+                      </Link>
+                    ) : (
+                      <span className="text-[#A1A1AA]">{t("detail.info.none")}</span>
+                    )}
+                  </dd>
+                </div>
+
+                {/* Số sản phẩm */}
+                <div className="flex items-center justify-between border-b border-[#F4F4F5] py-3">
+                  <dt className="text-sm text-[#71717A]">{t("detail.stats.products")}</dt>
+                  <dd className="text-sm font-medium text-[#18181B]">
+                    <span>{t("detail.stats.productUnit", { count: productCount })}</span>
+                    {isRoot && children.length > 0 && (
+                      <span className="ml-1.5 text-xs text-[#71717A]">
+                        ({t("detail.stats.directCount", { count: node.productCount })})
+                      </span>
+                    )}
+                  </dd>
+                </div>
+
+                {/* Số SKU hoặc Số loại con */}
+                <div className="flex items-center justify-between border-b border-[#F4F4F5] py-3">
+                  <dt className="text-sm text-[#71717A]">
+                    {isRoot ? t("detail.stats.children") : t("detail.stats.skus")}
+                  </dt>
+                  <dd className="text-sm font-medium text-[#18181B]">
+                    {isRoot
+                      ? t("detail.stats.childUnit", { count: children.length })
+                      : t("detail.stats.skuUnit", { count: skuCount })}
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+        </Card>
+
+        {/* Danh sách loại con trực thuộc (tách thành Card riêng biệt cho nhóm gốc) */}
+        {isRoot && (
+          <Card
+            title={`${t("detail.sections.children")} (${children.length})`}
+            subtitle={t("detail.childrenHint", { name })}
+            aside={
+              <button
+                type="button"
+                onClick={() => setEditor({ mode: "addChild" })}
+                className={cn(ADMIN_SECONDARY_BUTTON_CLASS, "h-8 px-3 text-xs")}
+              >
+                <Plus size={14} aria-hidden /> {t("menu.addChild")}
+              </button>
+            }
+          >
+            {children.length === 0 ? (
+              <p className="py-6 text-center text-sm italic text-[#A1A1AA]">
+                {t("detail.noChildren")}
+              </p>
+            ) : (
+              <div className="divide-y divide-[#F4F4F5]">
+                {children.map((child) => (
+                  <Link
+                    key={child.id}
+                    href={`/admin/catalog/categories/${child.id}`}
+                    className="group -mx-2 flex items-center justify-between rounded-lg px-3 py-3.5 transition-colors hover:bg-[#F4F4F5]/70"
                   >
-                    <BlockIcon size={13} />
-                  </span>
-                  <span className="min-w-0 flex-1 truncate font-medium">{categoryName(parentNode, locale)}</span>
-                  <ChevronRight size={14} className="text-[#A1A1AA]" aria-hidden />
-                </Link>
-              </>
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-semibold text-[#18181B] transition-colors group-hover:text-emerald-800">
+                          {categoryName(child, locale)}
+                        </span>
+                        {!child.isActive && <CategoryStatusBadge isActive={false} />}
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-[#71717A]">
+                        <span className="font-mono">/{child.slug}</span>
+                        <span aria-hidden="true" className="text-[#D4D4D8]">·</span>
+                        <span>{t("detail.stats.productUnit", { count: child.productCount })}</span>
+                        <span aria-hidden="true" className="text-[#D4D4D8]">·</span>
+                        <span>{t("detail.stats.skuUnit", { count: child.skuCount })}</span>
+                      </div>
+                    </div>
+                    <ChevronRight
+                      size={16}
+                      className="shrink-0 text-[#A1A1AA] transition-transform group-hover:translate-x-0.5 group-hover:text-[#18181B]"
+                      aria-hidden
+                    />
+                  </Link>
+                ))}
+              </div>
             )}
           </Card>
-        </aside>
+        )}
+
+        {/* Bảng size áp dụng (đối với loại con có size) */}
+        {usesChart && !isRoot && (
+          <Card
+            title={t("detail.sections.sizeChart")}
+            aside={
+              sizeChart && (
+                <Link
+                  href={`/admin/catalog/size-charts/${sizeChart.id}`}
+                  className="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-sm font-medium text-[#3F3F46] hover:bg-[#F4F4F5] hover:text-[#09090B]"
+                >
+                  {t("detail.chart.open")} <ArrowUpRight size={14} aria-hidden />
+                </Link>
+              )
+            }
+          >
+            {sizeChart ? (
+              <>
+                <p className="-mt-2 mb-3 text-xs text-[#71717A]">
+                  <span className="font-medium text-[#3F3F46]">{sizeChart.name}</span>
+                  {!sizeChart.isActive && <span className="text-amber-700"> · {t("editor.chartInactive")}</span>}
+                </p>
+                <SizeChartTable chart={sizeChart} />
+              </>
+            ) : (
+              <p className="text-sm text-amber-700">{t("noChart")}</p>
+            )}
+          </Card>
+        )}
       </div>
 
       {editor && (

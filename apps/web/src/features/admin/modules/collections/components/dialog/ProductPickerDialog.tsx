@@ -1,9 +1,9 @@
 "use client";
 
-import { useLocale, useTranslations } from "next-intl";
-import { CollectionPickerProduct } from "../../types/collections.types";
 import { useState } from "react";
-import { formatVnd, Locale } from "@repo/shared";
+import { useLocale, useTranslations } from "next-intl";
+import { formatVnd, type Locale } from "@repo/shared";
+import type { CollectionPickerProduct } from "../../types/collections.types";
 import { ADMIN_DIALOG_PRIMARY_BUTTON_CLASS, ADMIN_DIALOG_SECONDARY_BUTTON_CLASS, AdminDialog, AdminSearchInput } from "@/features/admin/core/ui";
 import { Thumb } from "../editor/CollectionProductsField";
 import { CollectionStatusBadge } from "../shared/CollectionStatusBadge";

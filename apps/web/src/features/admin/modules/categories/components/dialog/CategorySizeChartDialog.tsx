@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { AlertTriangle, Ruler } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { type ProductGroup } from "@repo/shared/sizing";
 import {
@@ -69,7 +69,6 @@ export function CategorySizeChartDialog({ group, typeName, initial, onCancel, on
     <AdminDialog
       open
       onOpenChange={(open) => !open && onCancel()}
-      icon={Ruler}
       title={typeName.trim() ? t("titleNamed", { name: typeName.trim() }) : t("title")}
       description={t("description")}
       size="5xl"

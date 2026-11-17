@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowDown, ArrowUp, PackagePlus, Plus, Shirt, Star, X } from "lucide-react";
+import { ArrowDown, ArrowUp, Plus, Shirt, Star, X } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { formatVnd, type Locale } from "@repo/shared";
 import { cn } from "@/lib/utils";

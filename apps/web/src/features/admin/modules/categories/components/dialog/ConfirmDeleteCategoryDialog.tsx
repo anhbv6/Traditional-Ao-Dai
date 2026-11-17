@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useNotify } from "@/hooks/useNotify";
 import {
@@ -50,7 +49,6 @@ export function ConfirmDeleteCategoryDialog({
       open
       onOpenChange={onOpenChange}
       tone="danger"
-      icon={Trash2}
       title={t("deleteDialog.title")}
       description={t("deleteDialog.description", { name: categoryName(category, locale) })}
       size="sm"

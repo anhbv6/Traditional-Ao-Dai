@@ -33,9 +33,9 @@ import { compactSlug } from "../../utils/categorySlug";
 import { categoryName } from "../../utils/categoryName";
 import {
   CategorySizeChartDialog,
-  isSizeChartGridComplete,
   type CategorySizeChartGrid,
-} from "./CategorySizeChartDialog";
+  isSizeChartGridComplete,
+} from "../dialog/CategorySizeChartDialog";
 
 const NO_CHART = "__none__";
 type ContentLang = AdminContentLang;

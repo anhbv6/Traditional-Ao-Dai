@@ -15,9 +15,9 @@ import { CategoryListTable, type CategoryRowHandlers } from "./CategoryListTable
 
 // Hộp thoại chỉ cần khi thao tác nên tách khỏi bundle đầu trang
 const ConfirmDeleteCategoryDialog = dynamic(() =>
-  import("./ConfirmDeleteCategoryDialog").then((m) => m.ConfirmDeleteCategoryDialog)
+  import("../dialog/ConfirmDeleteCategoryDialog").then((m) => m.ConfirmDeleteCategoryDialog)
 );
-const CategoryEditorDialog = dynamic(() => import("./CategoryEditorDialog").then((m) => m.CategoryEditorDialog));
+const CategoryEditorDialog = dynamic(() => import("../dialog/CategoryEditorDialog").then((m) => m.CategoryEditorDialog));
 // Sơ đồ dùng motion — tách chunk để danh sách hiện trước; màn nhỏ không tải
 const CategoryTreeDiagram = dynamic(() => import("./CategoryTreeDiagram").then((m) => m.CategoryTreeDiagram));
 

@@ -2629,6 +2629,7 @@
     }
   },
   "categories": {
+    "slug": "Đường dẫn",
     "groupLabel": "Nhóm hàng",
     "filterAll": "Tất cả",
     "searchPlaceholder": "Tìm loại sản phẩm...",
@@ -2759,16 +2760,22 @@
       "stats": {
         "products": "Sản phẩm",
         "skus": "SKU",
-        "children": "Loại con"
+        "children": "Loại con",
+        "productUnit": "{count} sản phẩm",
+        "skuUnit": "{count} SKU",
+        "childUnit": "{count} loại con",
+        "directCount": "{count} trực tiếp"
       },
       "info": {
         "noEnglish": "Chưa có bản tiếng Anh",
         "none": "Chưa có",
-        "group": "Nhóm hàng"
+        "group": "Nhóm hàng",
+        "rootGroup": "Nhóm gốc"
       },
       "chart": {
         "open": "Mở bảng size"
-      }
+      },
+      "childrenHint": "Các loại sản phẩm cụ thể thuộc nhóm {name}"
     },
     "list": {
       "title": "Danh sách loại sản phẩm",

@@ -2629,6 +2629,7 @@
     }
   },
   "categories": {
+    "slug": "Slug",
     "groupLabel": "Product group",
     "filterAll": "All",
     "searchPlaceholder": "Search product types...",
@@ -2759,16 +2760,22 @@
       "stats": {
         "products": "Products",
         "skus": "SKUs",
-        "children": "Subcategories"
+        "children": "Subcategories",
+        "productUnit": "{count} products",
+        "skuUnit": "{count} SKUs",
+        "childUnit": "{count} subcategories",
+        "directCount": "{count} direct"
       },
       "info": {
         "noEnglish": "No English version yet",
         "none": "None",
-        "group": "Product group"
+        "group": "Product group",
+        "rootGroup": "Root group"
       },
       "chart": {
         "open": "Open size chart"
-      }
+      },
+      "childrenHint": "Subcategories belonging to {name}"
     },
     "list": {
       "title": "Product types",

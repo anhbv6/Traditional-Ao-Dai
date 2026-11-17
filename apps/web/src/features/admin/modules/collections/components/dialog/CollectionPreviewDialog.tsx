@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Eye, Monitor, Shirt, Smartphone, Star } from "lucide-react";
+import { Monitor, Shirt, Smartphone, Star } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { formatVnd, type Locale } from "@repo/shared";
 import { cn } from "@/lib/utils";
