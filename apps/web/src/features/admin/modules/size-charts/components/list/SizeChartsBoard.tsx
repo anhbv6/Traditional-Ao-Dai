@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { Copy, Eye, MoreHorizontal, Pencil, Power, PowerOff, Ruler, Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
@@ -13,11 +13,14 @@ import {
   ADMIN_ROW_ICON_BUTTON_CLASS,
   AdminButton,
   AdminDataTable,
+  AdminFilterSelect,
   AdminListPanel,
+  AdminMetaValue,
   AdminStatusText,
+  type AdminFilterOption,
   type AdminTableColumn,
 } from "@/features/admin/core/ui";
-import { PRODUCT_GROUP_COLORS, PRODUCT_GROUP_ICONS, groupUsesSizeChart } from "@/features/admin/modules/categories";
+import { PRODUCT_GROUP_COLORS, groupUsesSizeChart } from "@/features/admin/modules/categories";
 import {
   deleteSizeChartAction,
   duplicateSizeChartAction,
@@ -28,16 +31,34 @@ import { type AdminSizeChartDetail, type AdminSizeChartListItem } from "../../ty
 
 const SizeChartInfoDialog = dynamic(() => import("../shared/SizeChartInfoDialog").then((m) => m.SizeChartInfoDialog));
 
-type GroupTab = "ALL" | ProductGroup;
-// Phụ kiện, vải bán theo mét không có bảng size → 4 tab: Tất cả, Áo dài, Quần, Giày guốc
-const GROUP_TABS: GroupTab[] = ["ALL", ...PRODUCT_GROUPS.filter(groupUsesSizeChart)];
+type GroupFilter = "ALL" | ProductGroup;
+type StatusFilter = "ALL" | "ACTIVE" | "INACTIVE";
+type UsageFilter = "ALL" | "IN_USE" | "UNUSED" | "BIGSIZE" | "EMPTY";
+
+/** Các nhóm hàng thực tế có dùng bảng size (loại trừ phụ kiện & vải mét) */
+const RELEVANT_GROUPS: ProductGroup[] = PRODUCT_GROUPS.filter(groupUsesSizeChart);
 
 /** Đang mở dialog: tạo mới (`chart` null) hoặc sửa thông tin một bảng */
 type DialogState = { chart: AdminSizeChartDetail | null };
 
 /**
- * Màn danh sách bảng size mẫu: tìm kiếm + nút tạo ở đầu, tab nhóm hàng (gạch chân) ngay trên bảng dữ liệu gọn (tên + các size, số sản phẩm dùng,
- * trạng thái), mọi thao tác trong menu ⋯. Tạo mới / sửa thông tin mở SizeChartInfoDialog; số đo sửa ở màn chi tiết.
+ * Lấy tên hiển thị theo ngôn ngữ hiện tại của trang web:
+ * - Tiếng Việt (`vi`): hiển thị tiếng Việt, thiếu thì rơi về tiếng Anh.
+ * - Tiếng Anh (`en`) hoặc bất kỳ ngôn ngữ nào khác: hiển thị tiếng Anh, thiếu thì rơi về tiếng Việt.
+ */
+function resolveSizeChartName(chart: AdminSizeChartListItem, currentLocale: string): string {
+  if (currentLocale === "vi") {
+    return chart.name || chart.nameEn || "";
+  }
+  return chart.nameEn || chart.name || "";
+}
+
+/**
+ * Màn danh sách bảng size mẫu (Atelier Size Charts):
+ * - Hệ thống lọc đa chiều: nhóm hàng (Áo dài, Quần, Giày guốc), trạng thái áp dụng và phạm vi liên kết / cấu hình.
+ * - Bảng dữ liệu hiển thị toàn diện theo phong cách tối giản, chuẩn mực typography: tên & nhóm, dải size trực quan,
+ *   thông số đo áp dụng, ngưỡng bigsize may đo, độ phủ sản phẩm / loại sản phẩm và trạng thái vận hành.
+ * - Thao tác gom gọn trong menu ⋯ theo chuẩn khu quản trị Thiên Canh.
  */
 export function SizeChartsBoard({ charts }: { charts: AdminSizeChartListItem[] }) {
   const t = useTranslations("AdminPage.sizeCharts");
@@ -46,20 +67,62 @@ export function SizeChartsBoard({ charts }: { charts: AdminSizeChartListItem[] }
   const locale = useLocale();
   const notify = useNotify();
   const router = useRouter();
-  const [tab, setTab] = useState<GroupTab>("ALL");
+
+  const [groupFilter, setGroupFilter] = useState<GroupFilter>("ALL");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
+  const [usageFilter, setUsageFilter] = useState<UsageFilter>("ALL");
   const [search, setSearch] = useState("");
   const [dialog, setDialog] = useState<DialogState | null>(null);
 
   const keyword = search.trim().toLowerCase();
-  const searched = charts.filter(
-    (chart) =>
-      !keyword ||
-      [chart.name, chart.nameEn ?? "", ...chart.sizeLabels].some((value) => value.toLowerCase().includes(keyword))
-  );
-  const visible = tab === "ALL" ? searched : searched.filter((chart) => chart.group === tab);
-  const nameOf = (chart: AdminSizeChartListItem) => (locale === "en" && chart.nameEn ? chart.nameEn : chart.name);
 
-  /** Thao tác xong thì tải lại dữ liệu server (danh sách đọc thẳng từ props) */
+  // Tìm kiếm thông minh: tên theo ngôn ngữ hiển thị, ký hiệu size (XS, M, 2XL) hoặc tên thông số đo (ngực, eo, mông, bust...)
+  const visible = useMemo(() => {
+    return charts.filter((chart) => {
+      if (keyword) {
+        const displayName = resolveSizeChartName(chart, locale).toLowerCase();
+        const matchesName =
+          displayName.includes(keyword) ||
+          chart.name.toLowerCase().includes(keyword) ||
+          (chart.nameEn?.toLowerCase().includes(keyword) ?? false);
+        const matchesSize = chart.sizeLabels.some((s) => s.toLowerCase().includes(keyword));
+        const matchesMeasurement = chart.columnKeys.some((k) => {
+          const localized = tSizing(`measurement.${k}`).toLowerCase();
+          return k.toLowerCase().includes(keyword) || localized.includes(keyword);
+        });
+        if (!matchesName && !matchesSize && !matchesMeasurement) return false;
+      }
+
+      if (groupFilter !== "ALL" && chart.group !== groupFilter) {
+        return false;
+      }
+
+      if (statusFilter !== "ALL") {
+        const wantActive = statusFilter === "ACTIVE";
+        if (chart.isActive !== wantActive) return false;
+      }
+
+      if (usageFilter !== "ALL") {
+        if (usageFilter === "IN_USE" && chart.productCount === 0 && chart.categoryCount === 0) return false;
+        if (usageFilter === "UNUSED" && (chart.productCount > 0 || chart.categoryCount > 0)) return false;
+        if (usageFilter === "BIGSIZE" && !chart.hasBigsize) return false;
+        if (usageFilter === "EMPTY" && chart.sizeLabels.length > 0) return false;
+      }
+
+      return true;
+    });
+  }, [charts, keyword, groupFilter, statusFilter, usageFilter, locale, tSizing]);
+
+  const hasActiveFilters = groupFilter !== "ALL" || statusFilter !== "ALL" || usageFilter !== "ALL" || keyword.length > 0;
+
+  const resetFilters = () => {
+    setGroupFilter("ALL");
+    setStatusFilter("ALL");
+    setUsageFilter("ALL");
+    setSearch("");
+  };
+
+  /** Thao tác xong thì tải lại dữ liệu server */
   const run = async <T,>(
     action: () => Promise<{ success: true; data: T } | { success: false; error: string }>,
     fallback: string,
@@ -120,54 +183,152 @@ export function SizeChartsBoard({ charts }: { charts: AdminSizeChartListItem[] }
     ];
   };
 
+  // Cấu hình danh sách lựa chọn cho bộ lọc
+  const groupOptions: AdminFilterOption<GroupFilter>[] = [
+    { value: "ALL", label: `${t("filterAll")} (${charts.length})` },
+    ...RELEVANT_GROUPS.map((g) => ({
+      value: g,
+      label: `${tSizing(`group.${g}`)} (${charts.filter((c) => c.group === g).length})`,
+    })),
+  ];
+
+  const statusOptions: AdminFilterOption<StatusFilter>[] = [
+    { value: "ALL", label: t("filterAll") },
+    { value: "ACTIVE", label: `${t("status.active")} (${charts.filter((c) => c.isActive).length})` },
+    { value: "INACTIVE", label: `${t("status.inactive")} (${charts.filter((c) => !c.isActive).length})` },
+  ];
+
+  const usageOptions: AdminFilterOption<UsageFilter>[] = [
+    { value: "ALL", label: t("filterAllUsage") },
+    {
+      value: "IN_USE",
+      label: `${t("filterUsageInUse")} (${charts.filter((c) => c.productCount > 0 || c.categoryCount > 0).length})`,
+    },
+    {
+      value: "UNUSED",
+      label: `${t("filterUsageUnused")} (${charts.filter((c) => c.productCount === 0 && c.categoryCount === 0).length})`,
+    },
+    { value: "BIGSIZE", label: `${t("filterUsageBigsize")} (${charts.filter((c) => c.hasBigsize).length})` },
+    { value: "EMPTY", label: `${t("filterUsageEmpty")} (${charts.filter((c) => c.sizeLabels.length === 0).length})` },
+  ];
+
+  // Header metric tóm tắt
+  const activeCount = charts.filter((c) => c.isActive).length;
+  const totalProductsCovered = charts.reduce((sum, c) => sum + c.productCount, 0);
+
   const nameCell = (chart: AdminSizeChartListItem) => {
-    const Icon = PRODUCT_GROUP_ICONS[chart.group];
+    const colors = PRODUCT_GROUP_COLORS[chart.group];
     return (
-      <div className="flex min-w-0 items-center gap-3">
-        <span
-          aria-hidden
-          className={cn("grid size-9 shrink-0 place-items-center rounded-xl", PRODUCT_GROUP_COLORS[chart.group].tile)}
+      <div className="min-w-0 space-y-1 py-1">
+        <Link
+          href={`/admin/catalog/size-charts/${chart.id}`}
+          className="block truncate font-medium text-[#09090B] transition-colors hover:underline"
         >
-          <Icon size={16} />
-        </span>
-        <div className="min-w-0">
-          <Link href={`/admin/catalog/size-charts/${chart.id}`} className="font-medium text-[#09090B] hover:underline">
-            {nameOf(chart)}
-          </Link>
-          {/* Dòng phụ: các size (tab Tất cả thêm nhóm hàng) — chi tiết số đo xem ở màn chi tiết */}
-          <p className="mt-0.5 text-xs leading-relaxed text-[#71717A]">
-            {tab === "ALL" && `${tSizing(`group.${chart.group}`)} · `}
-            {chart.sizeLabels.length > 0 ? (
-              <span className="font-mono">{chart.sizeLabels.join(" · ")}</span>
-            ) : (
-              <span className="text-amber-700">{t("noRows")}</span>
-            )}
-          </p>
+          {resolveSizeChartName(chart, locale)}
+        </Link>
+        <div className="flex items-center text-xs">
+          <span className={cn("inline-flex items-center rounded-md px-1.5 py-0.5 text-2xs font-medium", colors.chip)}>
+            {tSizing(`group.${chart.group}`)}
+          </span>
         </div>
       </div>
     );
   };
 
-  const status = (chart: AdminSizeChartListItem) => (
+  const sizesCell = (chart: AdminSizeChartListItem) => {
+    if (chart.sizeLabels.length === 0) {
+      return (
+        <span className="inline-flex items-center gap-1.5 rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-800">
+          <span className="size-1.5 shrink-0 rounded-full bg-amber-500" />
+          {t("noRows")}
+        </span>
+      );
+    }
+    return (
+      <div className="space-y-1 py-1">
+        <div className="text-2xs font-medium text-[#71717A]">
+          {t("sizesCount", { count: chart.sizeLabels.length })}
+        </div>
+        <div className="flex flex-wrap items-center gap-1">
+          {chart.sizeLabels.slice(0, 5).map((size) => (
+            <span
+              key={size}
+              className="inline-block rounded border border-[#E4E4E7] bg-[#FAFAFA] px-1.5 py-0.5 font-mono text-2xs font-semibold text-[#18181B]"
+            >
+              {size}
+            </span>
+          ))}
+          {chart.sizeLabels.length > 5 && (
+            <span className="rounded bg-[#F4F4F5] px-1 py-0.5 font-mono text-2xs font-medium text-[#71717A]">
+              +{chart.sizeLabels.length - 5}
+            </span>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const measurementsCell = (chart: AdminSizeChartListItem) => {
+    if (chart.columnKeys.length === 0) {
+      return <span className="text-xs text-[#A1A1AA]">—</span>;
+    }
+    const names = chart.columnKeys.map((k) => tSizing(`measurement.${k}`));
+    return (
+      <div className="space-y-1 py-1">
+        <div className="text-2xs font-medium text-[#71717A]">
+          {t("measurementsCount", { count: chart.columnKeys.length })}
+        </div>
+        <p className="max-w-[200px] truncate text-xs text-[#3F3F46]" title={names.join(", ")}>
+          {names.slice(0, 3).join(", ")}
+          {names.length > 3 && <span className="text-[#71717A]"> +{names.length - 3}</span>}
+        </p>
+      </div>
+    );
+  };
+
+  const bigsizeCell = (chart: AdminSizeChartListItem) => {
+    if (chart.hasBigsize) {
+      return (
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-violet-200 bg-violet-50/70 px-2.5 py-0.5 text-xs font-medium text-violet-700">
+          <span className="size-1.5 shrink-0 rounded-full bg-violet-600" />
+          {t("bigsize.hasSurcharge")}
+        </span>
+      );
+    }
+    return <span className="text-xs text-[#A1A1AA]">{t("bigsize.standard")}</span>;
+  };
+
+  const usageCell = (chart: AdminSizeChartListItem) => {
+    const hasUsage = chart.productCount > 0 || chart.categoryCount > 0;
+    if (!hasUsage) {
+      return <span className="text-xs text-[#A1A1AA]">{t("usage.none")}</span>;
+    }
+    return (
+      <div className="space-y-0.5 py-1 text-right">
+        <div className="font-mono text-sm font-semibold tabular-nums text-[#09090B]">
+          {chart.productCount}{" "}
+          <span className="font-sans text-xs font-normal text-[#71717A]">{t("usage.products")}</span>
+        </div>
+        {chart.categoryCount > 0 && (
+          <div className="text-2xs text-[#71717A]">{t("usage.categories", { count: chart.categoryCount })}</div>
+        )}
+      </div>
+    );
+  };
+
+  const statusCell = (chart: AdminSizeChartListItem) => (
     <AdminStatusText tone={chart.isActive ? "success" : "neutral"}>
       {chart.isActive ? t("status.active") : t("status.inactive")}
     </AdminStatusText>
   );
 
   const columns: AdminTableColumn<AdminSizeChartListItem>[] = [
-    { key: "name", header: t("column.name"), cell: nameCell },
-    {
-      key: "products",
-      header: t("column.products"),
-      align: "right",
-      className: "w-32 whitespace-nowrap",
-      cell: (chart) => (
-        <span className={cn("font-mono tabular-nums", chart.productCount > 0 ? "text-[#09090B]" : "text-[#A1A1AA]")}>
-          {chart.productCount}
-        </span>
-      ),
-    },
-    { key: "status", header: t("column.status"), className: "w-36 whitespace-nowrap", cell: status },
+    { key: "name", header: t("column.name"), className: "min-w-[220px]", cell: nameCell },
+    { key: "sizes", header: t("column.sizes"), className: "w-44 whitespace-nowrap", cell: sizesCell },
+    { key: "measurements", header: t("column.measurements"), className: "w-52", cell: measurementsCell },
+    { key: "bigsize", header: t("column.bigsize"), className: "w-36 whitespace-nowrap", cell: bigsizeCell },
+    { key: "usage", header: t("column.usage"), align: "right", className: "w-32 whitespace-nowrap", cell: usageCell },
+    { key: "status", header: t("column.status"), className: "w-36 whitespace-nowrap", cell: statusCell },
   ];
 
   return (
@@ -176,30 +337,63 @@ export function SizeChartsBoard({ charts }: { charts: AdminSizeChartListItem[] }
         icon={Ruler}
         title={tPage("title")}
         description={tPage("description")}
+        meta={
+          <div className="flex flex-wrap items-center gap-2 text-xs text-[#71717A] sm:gap-3">
+            <span>
+              {t("meta.total")}: <AdminMetaValue>{charts.length}</AdminMetaValue>
+            </span>
+            <span className="text-[#D4D4D8]">·</span>
+            <span>
+              {t("meta.active")}: <AdminMetaValue>{activeCount}</AdminMetaValue>
+            </span>
+            <span className="text-[#D4D4D8]">·</span>
+            <span>
+              {t("meta.linkedProducts")}: <AdminMetaValue>{totalProductsCovered}</AdminMetaValue>{" "}
+              {t("meta.productsUnit")}
+            </span>
+          </div>
+        }
         search={{ value: search, onChange: setSearch, placeholder: t("searchPlaceholder") }}
-        actions={<AdminButton variant="primary" onClick={() => setDialog({ chart: null })}>{t("create.open")}</AdminButton>}
-      />
-
-      {/* Tab nhóm hàng ngay trên bảng — kiểu gạch chân tối giản (đơn sắc theo quy chuẩn admin) */}
-      <div role="tablist" aria-label={t("groupLabel")} className="flex gap-1 border-b border-[#E4E4E7]">
-        {GROUP_TABS.map((value) => (
-          <button
-            key={value}
-            type="button"
-            role="tab"
-            aria-selected={tab === value}
-            onClick={() => setTab(value)}
-            className={cn(
-              "-mb-px shrink-0 cursor-pointer whitespace-nowrap border-b-2 px-4 py-2.5 text-body transition-colors",
-              tab === value
-                ? "border-[#18181B] font-semibold text-[#09090B]"
-                : "border-transparent text-[#71717A] hover:text-[#09090B]"
+        actions={
+          <AdminButton variant="primary" onClick={() => setDialog({ chart: null })}>
+            {t("create.open")}
+          </AdminButton>
+        }
+        filters={
+          <>
+            <AdminFilterSelect
+              label={t("filterGroup")}
+              value={groupFilter}
+              onChange={setGroupFilter}
+              options={groupOptions}
+              className="w-full sm:w-48"
+            />
+            <AdminFilterSelect
+              label={t("filterStatus")}
+              value={statusFilter}
+              onChange={setStatusFilter}
+              options={statusOptions}
+              className="w-full sm:w-44"
+            />
+            <AdminFilterSelect
+              label={t("filterUsage")}
+              value={usageFilter}
+              onChange={setUsageFilter}
+              options={usageOptions}
+              className="w-full sm:w-56"
+            />
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={resetFilters}
+                className="inline-flex h-9 shrink-0 cursor-pointer items-center rounded-xl border border-[#E4E4E7] bg-white px-3 text-xs font-medium text-[#71717A] shadow-2xs transition-colors hover:bg-[#FAFAFA] hover:text-[#09090B]"
+              >
+                {t("resetFilters")}
+              </button>
             )}
-          >
-            {value === "ALL" ? t("filterAll") : tSizing(`group.${value}`)}
-          </button>
-        ))}
-      </div>
+          </>
+        }
+      />
 
       <AdminDataTable
         rows={visible}
@@ -215,7 +409,7 @@ export function SizeChartsBoard({ charts }: { charts: AdminSizeChartListItem[] }
             trigger={
               <button
                 type="button"
-                aria-label={t("menu.label", { name: nameOf(chart) })}
+                aria-label={t("menu.label", { name: resolveSizeChartName(chart, locale) })}
                 className={ADMIN_ROW_ICON_BUTTON_CLASS}
               >
                 <MoreHorizontal size={18} />
@@ -224,12 +418,47 @@ export function SizeChartsBoard({ charts }: { charts: AdminSizeChartListItem[] }
           />
         )}
         actionsLabel={t("column.actions")}
-        minWidth={560}
+        minWidth={840}
         empty={charts.length === 0 ? t("empty") : t("noResults")}
         mobileRow={(chart) => (
-          <div className="space-y-1.5">
-            {nameCell(chart)}
-            <div className="pl-12 text-xs">{status(chart)}</div>
+          <div className="space-y-2.5 py-2">
+            <div className="flex items-start justify-between gap-3">
+              {nameCell(chart)}
+              <div className="shrink-0">{statusCell(chart)}</div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              {chart.sizeLabels.length > 0 ? (
+                <div className="flex flex-wrap items-center gap-1">
+                  {chart.sizeLabels.map((s) => (
+                    <span
+                      key={s}
+                      className="rounded border border-[#E4E4E7] bg-[#FAFAFA] px-1.5 py-0.5 font-mono text-2xs font-semibold text-[#18181B]"
+                    >
+                      {s}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <span className="text-2xs text-amber-700">{t("noRows")}</span>
+              )}
+
+              {chart.hasBigsize && (
+                <span className="rounded-full bg-violet-50 px-2 py-0.5 text-2xs font-medium text-violet-700">
+                  Bigsize
+                </span>
+              )}
+
+              <span className="ml-auto text-2xs text-[#71717A]">
+                {chart.productCount > 0 ? (
+                  <>
+                    <strong className="font-mono text-[#09090B]">{chart.productCount}</strong> {t("usage.products")}
+                  </>
+                ) : (
+                  t("usage.none")
+                )}
+              </span>
+            </div>
           </div>
         )}
       />

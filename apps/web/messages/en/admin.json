@@ -2806,21 +2806,51 @@
     "create": {
       "open": "Create size chart",
       "title": "Create size chart template",
-      "description": "Enter the details, measuring guide and bigsize surcharge — sizes are entered on the detail page.",
+      "description": "General info, measuring guide and surcharges.",
       "groupHint": "Accessories and fabric sold by the metre don't need a size chart.",
       "submit": "Create size chart",
       "success": "Size chart created"
     },
     "groupLabel": "Product group",
     "filterAll": "All",
-    "searchPlaceholder": "Search by name or size label...",
+    "filterGroup": "Product group",
+    "filterStatus": "Status",
+    "filterUsage": "Scope & Config",
+    "filterAllUsage": "All scopes",
+    "filterUsageInUse": "Used by products",
+    "filterUsageUnused": "Not in use",
+    "filterUsageBigsize": "Has Bigsize config",
+    "filterUsageEmpty": "No measurements yet",
+    "resetFilters": "Reset",
+    "meta": {
+      "total": "Total",
+      "active": "Active",
+      "linkedProducts": "Coverage",
+      "productsUnit": "products"
+    },
+    "searchPlaceholder": "Search by name, size label or measurement...",
     "empty": "No size charts yet.",
     "noResults": "No size charts match.",
     "column": {
-      "name": "Chart",
+      "name": "Chart & Group",
+      "sizes": "Size range",
+      "measurements": "Measurements",
+      "bigsize": "Bigsize threshold",
+      "usage": "Usage link",
       "products": "Products using",
       "status": "Status",
       "actions": "Actions"
+    },
+    "sizesCount": "{count} sizes",
+    "measurementsCount": "{count} measurements",
+    "bigsize": {
+      "hasSurcharge": "Bigsize configured",
+      "standard": "Standard"
+    },
+    "usage": {
+      "products": "products",
+      "categories": "{count} product types",
+      "none": "Unassigned"
     },
     "noRows": "No sizes yet",
     "status": {
@@ -2889,7 +2919,7 @@
     },
     "dialog": {
       "editTitle": "Edit size chart: {name}",
-      "description": "General details, product group, measuring guide and bigsize surcharge of the size chart.",
+      "description": "General info, measuring guide and surcharges.",
       "langLabel": "Content language",
       "langHint": "Name, note and measuring guide change with the language; the other fields are shared.",
       "untranslated": "No English version yet",
@@ -3202,12 +3232,17 @@
       "description": "Short description",
       "hex": "Color code",
       "family": "Color family",
-      "isActive": "In use"
+      "isActive": "In use",
+      "colorSection": "Color & Family",
+      "colorPresets": "Popular shades",
+      "pickColor": "Pick color"
     },
     "hints": {
       "code": "Stable code within the group; sizes use the exact SKU label (S, XL, 35...).",
       "family": "Groups colors in storefront filters.",
-      "isActive": "Turn off to hide from filters and product forms without deleting."
+      "isActive": "Turn off to hide from filters and product forms without deleting.",
+      "pickColorHint": "Click swatch to open color picker or enter HEX code.",
+      "clickPreset": "Click a shade to quickly apply HEX code and name."
     },
     "placeholders": {
       "code": "Please enter a code",

@@ -101,3 +101,100 @@ export function readableOn(hex: string | null): "dark" | "light" {
   const lum = (0.299 * ((n >> 16) & 255) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255;
   return lum > 0.6 ? "dark" : "light";
 }
+
+export interface ColorPreset {
+  name: string;
+  nameEn: string;
+  hex: string;
+}
+
+/**
+ * Các sắc thái màu phổ biến truyền thống trong áo dài & may mặc, phân nhóm theo họ màu.
+ * Giúp người quản trị dễ dàng pick màu chuẩn xác, không phải tự nhớ mã HEX.
+ */
+export const COLOR_PRESETS_BY_FAMILY: Record<ColorFamily, ColorPreset[]> = {
+  RED: [
+    { name: "Đỏ tươi", nameEn: "Bright Red", hex: "#C0262D" },
+    { name: "Đỏ đô", nameEn: "Burgundy", hex: "#8B1E3F" },
+    { name: "Đỏ nhung", nameEn: "Crimson Velvet", hex: "#7B1123" },
+    { name: "Đỏ cam", nameEn: "Scarlet Orange", hex: "#D64028" },
+    { name: "Đỏ gạch", nameEn: "Brick Red", hex: "#A84332" },
+    { name: "Đỏ rượu", nameEn: "Wine Red", hex: "#5C131D" },
+  ],
+  PINK: [
+    { name: "Hồng đào", nameEn: "Peach Pink", hex: "#F2A7B5" },
+    { name: "Hồng phấn", nameEn: "Powder Pink", hex: "#F8C8D5" },
+    { name: "Hồng cánh sen", nameEn: "Lotus Pink", hex: "#E05A88" },
+    { name: "Hồng dâu", nameEn: "Berry Pink", hex: "#D4436E" },
+    { name: "Hồng pastel", nameEn: "Pastel Pink", hex: "#FADADD" },
+    { name: "Hồng đất", nameEn: "Dusty Pink", hex: "#C77B89" },
+  ],
+  ORANGE: [
+    { name: "Cam đất", nameEn: "Terracotta", hex: "#C86036" },
+    { name: "Cam san hô", nameEn: "Coral Orange", hex: "#E8833A" },
+    { name: "Cam cà rốt", nameEn: "Carrot Orange", hex: "#E65C23" },
+    { name: "Cam cháy", nameEn: "Burnt Orange", hex: "#B84A1C" },
+    { name: "Cam pastel", nameEn: "Pastel Orange", hex: "#F5B88D" },
+  ],
+  YELLOW: [
+    { name: "Vàng hoàng yến", nameEn: "Canary Yellow", hex: "#E9C46A" },
+    { name: "Vàng tươi", nameEn: "Bright Yellow", hex: "#F4D03F" },
+    { name: "Vàng mơ", nameEn: "Apricot Yellow", hex: "#F9E4B7" },
+    { name: "Vàng mù tạt", nameEn: "Mustard Yellow", hex: "#D4A325" },
+    { name: "Vàng đồng", nameEn: "Bronze Gold", hex: "#B8860B" },
+    { name: "Vàng kem", nameEn: "Cream Yellow", hex: "#FFF8DC" },
+  ],
+  GREEN: [
+    { name: "Xanh cốm", nameEn: "Young Rice Green", hex: "#A8D582" },
+    { name: "Xanh lá mạ", nameEn: "Sprout Green", hex: "#7CBA59" },
+    { name: "Xanh rêu", nameEn: "Moss Green", hex: "#4F6340" },
+    { name: "Xanh ngọc bích", nameEn: "Jade Green", hex: "#2E8B57" },
+    { name: "Xanh lục bảo", nameEn: "Emerald Green", hex: "#1A5F45" },
+    { name: "Xanh mint", nameEn: "Mint Green", hex: "#A2E8DD" },
+  ],
+  BLUE: [
+    { name: "Xanh ngọc", nameEn: "Turquoise Blue", hex: "#38A3A5" },
+    { name: "Xanh coban", nameEn: "Cobalt Blue", hex: "#1E4D92" },
+    { name: "Xanh dương", nameEn: "Classic Blue", hex: "#3E6FB0" },
+    { name: "Xanh pastel", nameEn: "Pastel Blue", hex: "#A7C7E7" },
+    { name: "Xanh than", nameEn: "Navy Blue", hex: "#1B2A4A" },
+    { name: "Xanh da trời", nameEn: "Sky Blue", hex: "#5DADE2" },
+  ],
+  PURPLE: [
+    { name: "Tím huế", nameEn: "Hue Royal Purple", hex: "#5E2568" },
+    { name: "Tím cẩm", nameEn: "Violet", hex: "#7B4FA0" },
+    { name: "Tím hoa cà", nameEn: "Lilac", hex: "#9E6B9E" },
+    { name: "Tím pastel", nameEn: "Pastel Purple", hex: "#C8A2C8" },
+    { name: "Tím môn", nameEn: "Taro Purple", hex: "#B48EB6" },
+    { name: "Tím than", nameEn: "Deep Purple", hex: "#362247" },
+  ],
+  BROWN: [
+    { name: "Nâu đất", nameEn: "Earth Brown", hex: "#6E473B" },
+    { name: "Nâu tây", nameEn: "Caramel Brown", hex: "#8B5A2B" },
+    { name: "Nâu be", nameEn: "Beige Brown", hex: "#A67B5B" },
+    { name: "Nâu cà phê", nameEn: "Coffee Brown", hex: "#4B3621" },
+    { name: "Nâu hạt dẻ", nameEn: "Chestnut Brown", hex: "#5C3A21" },
+    { name: "Nâu cánh gián", nameEn: "Amber Brown", hex: "#7A2E18" },
+  ],
+  WHITE: [
+    { name: "Trắng sứ", nameEn: "Porcelain White", hex: "#FDFEFE" },
+    { name: "Trắng ngà", nameEn: "Ivory White", hex: "#F7F4EC" },
+    { name: "Trắng kem", nameEn: "Cream White", hex: "#FBF6EE" },
+    { name: "Trắng sữa", nameEn: "Milky White", hex: "#F3F0E6" },
+  ],
+  GRAY: [
+    { name: "Ghi sáng", nameEn: "Light Gray", hex: "#D1D5DB" },
+    { name: "Xám tiêu", nameEn: "Pepper Gray", hex: "#9CA3AF" },
+    { name: "Xám khói", nameEn: "Smoke Gray", hex: "#6B7280" },
+    { name: "Ghi chì", nameEn: "Charcoal Gray", hex: "#4B5563" },
+  ],
+  BLACK: [
+    { name: "Đen tuyền", nameEn: "Pure Black", hex: "#1C1C1E" },
+    { name: "Đen tuyền sâu", nameEn: "Deep Black", hex: "#0A0A0A" },
+    { name: "Đen khói", nameEn: "Faded Black", hex: "#2C2C2E" },
+  ],
+  MULTI: [
+    { name: "Đa sắc hoa văn", nameEn: "Patterned Multi", hex: "#C0262D" },
+    { name: "Ombre chuyển sắc", nameEn: "Ombre Gradient", hex: "#3E6FB0" },
+  ],
+};

@@ -116,8 +116,7 @@ function SkuCount({ count }: { count: number | null }) {
 }
 
 /**
- * Bảng màu như hộp chỉ thêu: gom theo họ màu (đúng cách khách lọc trên cửa hàng), mỗi màu một ô mẫu lớn
- * kèm mã hex và số SKU đang dùng
+ * Bảng màu như hộp chỉ thêu: gom theo họ màu, hiển thị theo hệ thống lưới đều đặn tối đa 4–5 màu trên 1 hàng
  */
 export function ColorPalette({ values, reorderDisabled, ...handlers }: ViewProps) {
   const t = useTranslations("AdminPage.attributes");
@@ -127,41 +126,49 @@ export function ColorPalette({ values, reorderDisabled, ...handlers }: ViewProps
     .filter((section) => section.items.length > 0);
 
   return (
-    // Các họ màu xếp nối nhau theo hàng (không mỗi họ một dòng) cho bảng màu gọn
-    <div className="flex flex-wrap gap-x-6 gap-y-5">
+    <div className="space-y-6">
       {sections.map(({ family, items }) => (
-        <section key={family ?? "none"} className="min-w-0 max-w-full">
-          <h3 className="mb-2.5 flex items-center gap-2 text-body font-semibold text-[#3F3F46]">
+        <section key={family ?? "none"} className="space-y-3">
+          {/* Tiêu đề họ màu */}
+          <div className="flex items-center gap-2 border-b border-dashed border-[#E4E4E7] pb-2">
             <span
               aria-hidden
-              className="size-3 rounded-full border border-black/10"
+              className="size-3.5 rounded-full border border-black/10 shadow-2xs"
               style={{ background: family ? COLOR_FAMILY_HEX[family] : "#F4F4F5" }}
             />
-            {family ? t(`family.${family}`) : t("family.none")}
-            <span className="font-normal normal-case tracking-normal text-[#A1A1AA]">{items.length}</span>
-          </h3>
-          <div className="flex flex-wrap gap-3">
+            <h3 className="text-sm font-semibold text-[#09090B]">
+              {family ? t(`family.${family}`) : t("family.none")}
+            </h3>
+            <span className="font-mono text-xs text-[#71717A]">({items.length})</span>
+          </div>
+
+          {/* Lưới màu: tối đa 4–5 màu trên một hàng, các ô co giãn đều và thẳng cột nhau */}
+          <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">
             {items.map((value) => {
               const index = values.indexOf(value);
               const tone = readableOn(value.hex);
               return (
                 <div
                   key={value.id}
-                  className={cn(ADMIN_CARD_CLASS, "group w-[148px] overflow-hidden", !value.isActive && "opacity-60")}
+                  className={cn(
+                    ADMIN_CARD_CLASS,
+                    "group flex flex-col overflow-hidden transition-shadow hover:shadow-xs",
+                    !value.isActive && "opacity-60"
+                  )}
                 >
                   <button
                     type="button"
                     onClick={() => handlers.onEdit(value)}
                     className={cn(
-                      "flex h-20 w-full cursor-pointer items-end justify-between px-2.5 pb-2 font-mono text-2xs font-medium",
-                      tone === "dark" ? "text-[#09090B]/70" : "text-white/85"
+                      "flex h-20 w-full cursor-pointer items-end justify-between px-2.5 pb-2 font-mono text-2xs font-medium transition-transform group-hover:brightness-95",
+                      tone === "dark" ? "text-[#09090B]/75" : "text-white/90"
                     )}
                     style={{ background: value.hex ?? "#F4F4F5" }}
                   >
-                    {value.hex}
+                    <span>{value.hex}</span>
                     {!value.isActive && <HiddenTag />}
                   </button>
-                  <div className="flex items-start gap-1 px-2.5 py-2">
+                  <div className="flex items-center justify-between gap-1 p-2.5">
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium text-[#09090B]">{value.name}</p>
                       <SkuCount count={value.skuCount} />
@@ -172,7 +179,7 @@ export function ColorPalette({ values, reorderDisabled, ...handlers }: ViewProps
                       total={values.length}
                       reorderDisabled={reorderDisabled}
                       handlers={handlers}
-                      className="-mr-1"
+                      className="-mr-1 shrink-0"
                     />
                   </div>
                 </div>

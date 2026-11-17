@@ -3,10 +3,10 @@
 import { useState, type FormEvent } from "react";
 import { ImagePlus, Loader2, X } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
+import { MAX_IMAGE_BYTES } from "@repo/shared";
 import { PRODUCT_GROUPS, type ProductGroup } from "@repo/shared/sizing";
 import { useNotify } from "@/hooks/useNotify";
 import { useRouter } from "@/i18n/routing";
-import { cn } from "@/lib/utils";
 import {
   ADMIN_DIALOG_PRIMARY_BUTTON_CLASS,
   ADMIN_DIALOG_SECONDARY_BUTTON_CLASS,
@@ -20,7 +20,6 @@ import {
   type AdminContentLang,
 } from "@/features/admin/core/ui";
 import { groupUsesSizeChart } from "@/features/admin/modules/categories";
-import { compressCollectionImage } from "@/features/admin/modules/collections";
 import { uploadImageApi } from "@/features/upload";
 import { createSizeChartAction, updateSizeChartInfoAction } from "../../actions/sizeCharts.actions";
 import { type AdminSizeChartDetail, type SurchargeType } from "../../types/sizeCharts.types";
@@ -69,6 +68,67 @@ function initialValues(chart: AdminSizeChartDetail | null): InfoValues {
   };
 }
 
+/**
+ * Tự động cắt (center-crop) ảnh minh họa đo theo đúng tỉ lệ chuẩn 3:4 của khung mẫu:
+ * - Cắt căn giữa theo tỉ lệ 3:4 để ảnh chỉ vừa vặn trong khung mẫu, không bị méo hay tràn
+ * - Nén sang WebP nhẹ trên trình duyệt trước khi tải lên Cloudinary
+ */
+async function prepareGuideImage(file: File): Promise<{ success: true; file: File } | { success: false; error: string }> {
+  if (file.size > MAX_IMAGE_BYTES) return { success: false, error: "FILE_TOO_LARGE" };
+
+  let bitmap: ImageBitmap;
+  try {
+    bitmap = await createImageBitmap(file);
+  } catch {
+    return { success: false, error: "ONLY_IMAGE_FILES_ALLOWED" };
+  }
+
+  // Tỉ lệ chuẩn 3:4 của khung mẫu minh họa đo
+  const TARGET_ASPECT = 3 / 4;
+  const currentAspect = bitmap.width / bitmap.height;
+
+  let sx = 0;
+  let sy = 0;
+  let sw = bitmap.width;
+  let sh = bitmap.height;
+
+  if (currentAspect > TARGET_ASPECT) {
+    // Ảnh rộng hơn 3:4 -> cắt bớt hai bên
+    sw = Math.round(bitmap.height * TARGET_ASPECT);
+    sx = Math.round((bitmap.width - sw) / 2);
+  } else if (currentAspect < TARGET_ASPECT) {
+    // Ảnh dài hơn 3:4 -> cắt bớt trên dưới
+    sh = Math.round(bitmap.width / TARGET_ASPECT);
+    sy = Math.round((bitmap.height - sh) / 2);
+  }
+
+  // Giới hạn chiều cao tối đa 1600px để tải nhanh
+  const MAX_HEIGHT = 1600;
+  const scale = Math.min(1, MAX_HEIGHT / sh);
+  const outWidth = Math.round(sw * scale);
+  const outHeight = Math.round(sh * scale);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = outWidth;
+  canvas.height = outHeight;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    bitmap.close();
+    return { success: false, error: "IMAGE_PROCESS_FAILED" };
+  }
+
+  ctx.drawImage(bitmap, sx, sy, sw, sh, 0, 0, outWidth, outHeight);
+  bitmap.close();
+
+  const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/webp", 0.88));
+  if (!blob || blob.type !== "image/webp") {
+    return { success: true, file };
+  }
+
+  const name = file.name.replace(/\.[^.]+$/, "") || "guide";
+  return { success: true, file: new File([blob], `${name}.webp`, { type: "image/webp" }) };
+}
+
 interface SizeChartInfoDialogProps {
   /** Bảng đang sửa; `null` = tạo mới (tạo xong chuyển sang màn chi tiết để nhập số đo) */
   chart: AdminSizeChartDetail | null;
@@ -76,8 +136,10 @@ interface SizeChartInfoDialogProps {
 }
 
 /**
- * Dialog thêm / sửa THÔNG TIN bảng size mẫu — các hàng phẳng 2 cột: tên + VI/EN, kiểu phụ phí + nhóm hàng (select),
- * mức phụ phí + vải cộng thêm, ghi chú, hướng dẫn đo + ảnh; nội dung chữ chuyển VI / EN như bộ sưu tập. Lưới số đo nhập ở dialog riêng trên màn chi tiết.
+ * Dialog thêm / sửa THÔNG TIN bảng size mẫu:
+ * - Đẩy switch ngôn ngữ [VI | EN] lên cạnh nút đóng X ở header.
+ * - Mô tả ngắn gọn tránh chèn đè lên tiêu đề / nút đóng.
+ * - Khung ảnh minh họa tỉ lệ chuẩn 3:4, tự động cắt ảnh vừa khít khung mẫu khi tải lên.
  */
 export function SizeChartInfoDialog({ chart, onOpenChange }: SizeChartInfoDialogProps) {
   const t = useTranslations("AdminPage.sizeCharts");
@@ -110,12 +172,12 @@ export function SizeChartInfoDialog({ chart, onOpenChange }: SizeChartInfoDialog
     if (!file) return;
     setIsUploading(true);
     try {
-      const prepared = await compressCollectionImage(file);
+      const prepared = await prepareGuideImage(file);
       if (!prepared.success) {
         notify.error(prepared.error, "IMAGE_UPLOAD_FAILED");
         return;
       }
-      const res = await uploadImageApi(prepared.file, "general");
+      const res = await uploadImageApi(prepared.file, "size-charts");
       set("guideImage", res.data.url);
     } catch (error) {
       notify.error(error, "IMAGE_UPLOAD_FAILED");
@@ -159,15 +221,29 @@ export function SizeChartInfoDialog({ chart, onOpenChange }: SizeChartInfoDialog
     }
   };
 
+  const chartDisplayName = chart ? (locale === "vi" ? chart.name || chart.nameEn : chart.nameEn || chart.name) : "";
+
   return (
     <AdminDialog
       open
       onOpenChange={onOpenChange}
-      title={isNew ? t("create.title") : t("dialog.editTitle", { name: chart.name })}
+      title={isNew ? t("create.title") : t("dialog.editTitle", { name: chartDisplayName })}
       description={isNew ? t("create.description") : t("dialog.description")}
       size="2xl"
       onSubmit={handleSubmit}
       bodyClassName="space-y-5"
+      headerAside={
+        <div className="-mr-1 shrink-0">
+          <AdminLangSwitch
+            value={contentLang}
+            onChange={setContentLang}
+            label={t("dialog.langLabel")}
+            hint={t("dialog.langHint")}
+            missingLabel={t("dialog.untranslated")}
+            status={{ vi: nameError ? "error" : undefined, en: values.nameEn ? undefined : "missing" }}
+          />
+        </div>
+      }
       footer={
         <>
           <button type="button" onClick={() => onOpenChange(false)} className={ADMIN_DIALOG_SECONDARY_BUTTON_CLASS}>
@@ -183,34 +259,22 @@ export function SizeChartInfoDialog({ chart, onOpenChange }: SizeChartInfoDialog
         </>
       }
     >
-      {/* Các hàng cùng khuôn: lưới 2 cột bằng nhau, ô cao 40px; tên / ghi chú / hướng dẫn đổi theo ngôn ngữ đang chọn */}
+      {/* Các trường nhập liệu: tên / ghi chú / hướng dẫn đổi theo ngôn ngữ đang chọn */}
       <div key={`general-${contentLang}`} role="tabpanel" className="space-y-4">
-        {/* Hàng 1: tên bảng + công tắc VI / EN gióng giữa theo ô nhập (bù chiều cao nhãn bằng items-end) */}
-        <div className="flex items-end gap-3">
-          <AdminTextField
-            autoFocus
-            required={contentLang === "vi"}
-            className="min-w-0 flex-1"
-            label={t("field.name")}
-            value={values[fields.name]}
-            onValueChange={(value) => {
-              set(fields.name, value);
-              if (contentLang === "vi") setNameError(false);
-            }}
-            placeholder={t(`dialog.placeholders.${contentLang}.name`)}
-            error={contentLang === "vi" && nameError ? t("dialog.nameRequired") : undefined}
-          />
-          <div className={cn("flex h-10 shrink-0 items-center", nameError && contentLang === "vi" && "mb-6")}>
-            <AdminLangSwitch
-              value={contentLang}
-              onChange={setContentLang}
-              label={t("dialog.langLabel")}
-              hint={t("dialog.langHint")}
-              missingLabel={t("dialog.untranslated")}
-              status={{ vi: nameError ? "error" : undefined, en: values.nameEn ? undefined : "missing" }}
-            />
-          </div>
-        </div>
+        {/* Hàng 1: tên bảng theo ngôn ngữ nội dung đang chọn */}
+        <AdminTextField
+          autoFocus
+          required={contentLang === "vi"}
+          className="w-full"
+          label={t("field.name")}
+          value={values[fields.name]}
+          onValueChange={(value) => {
+            set(fields.name, value);
+            if (contentLang === "vi") setNameError(false);
+          }}
+          placeholder={t(`dialog.placeholders.${contentLang}.name`)}
+          error={contentLang === "vi" && nameError ? t("dialog.nameRequired") : undefined}
+        />
 
         {/* Hàng 2: kiểu phụ phí + nhóm hàng (bảng đang gắn cho loại sản phẩm thì chỉ còn nhóm hiện tại) */}
         <div className="grid gap-4 sm:grid-cols-2">
@@ -289,8 +353,8 @@ export function SizeChartInfoDialog({ chart, onOpenChange }: SizeChartInfoDialog
           placeholder={t(`dialog.placeholders.${contentLang}.description`)}
         />
 
-        {/* Hàng 5: hướng dẫn đo + ảnh minh họa — hai cột cao bằng nhau (ô ảnh giãn theo ô chữ) */}
-        <div className="grid items-stretch gap-4 sm:grid-cols-[minmax(0,1fr)_150px]">
+        {/* Hàng 5: hướng dẫn đo + ảnh minh họa (khung tỉ lệ 3:4 tự động cắt vừa khít khung mẫu) */}
+        <div className="grid items-start gap-4 sm:grid-cols-[minmax(0,1fr)_150px]">
           <AdminTextArea
             label={t("field.measurementGuide")}
             hint={t("dialog.guideHint")}
@@ -299,41 +363,47 @@ export function SizeChartInfoDialog({ chart, onOpenChange }: SizeChartInfoDialog
             onValueChange={(value) => set(fields.guide, value)}
             placeholder={t(`dialog.placeholders.${contentLang}.guide`)}
           />
-          <div className="flex min-h-40 flex-col gap-1.5">
+          <div className="flex flex-col gap-1.5">
             <span className="block text-sm font-medium text-[#3F3F46]">{t("field.guideImage")}</span>
-            {values.guideImage ? (
-              <div className="relative min-h-0 flex-1 overflow-hidden rounded-xl border border-[#E4E4E7]">
-                {/* eslint-disable-next-line @next/next/no-img-element -- ảnh tải lên Cloudinary, chưa khai báo remotePatterns */}
-                <img src={values.guideImage} alt={t("field.guideImage")} className="size-full object-cover" />
-                <button
-                  type="button"
-                  onClick={() => set("guideImage", "")}
-                  aria-label={t("dialog.removeImage")}
-                  className="absolute right-1.5 top-1.5 grid size-7 cursor-pointer place-items-center rounded-md bg-white/90 text-[#3F3F46] shadow-2xs hover:text-rose-600"
-                >
-                  <X size={14} aria-hidden />
-                </button>
-              </div>
-            ) : (
-              <label className="flex min-h-0 flex-1 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[#D4D4D8] text-xs text-[#71717A] transition-colors hover:border-[#18181B] hover:text-[#09090B]">
-                {isUploading ? (
-                  <Loader2 size={18} className="animate-spin" aria-hidden />
-                ) : (
-                  <ImagePlus size={18} aria-hidden />
-                )}
-                {t("dialog.uploadImage")}
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="sr-only"
-                  disabled={isUploading}
-                  onChange={(event) => {
-                    void handleGuideImage(event.target.files?.[0]);
-                    event.target.value = "";
-                  }}
-                />
-              </label>
-            )}
+            <div className="relative aspect-[3/4] w-full overflow-hidden rounded-xl border border-[#E4E4E7] bg-[#F4F4F5]">
+              {values.guideImage ? (
+                <>
+                  {/* eslint-disable-next-line @next/next/no-img-element -- ảnh tải lên Cloudinary, chưa khai báo remotePatterns */}
+                  <img
+                    src={values.guideImage}
+                    alt={t("field.guideImage")}
+                    className="size-full object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => set("guideImage", "")}
+                    aria-label={t("dialog.removeImage")}
+                    className="absolute right-1.5 top-1.5 grid size-7 cursor-pointer place-items-center rounded-md bg-white/90 text-[#3F3F46] shadow-2xs transition-colors hover:bg-white hover:text-rose-600"
+                  >
+                    <X size={14} aria-hidden />
+                  </button>
+                </>
+              ) : (
+                <label className="flex size-full cursor-pointer flex-col items-center justify-center gap-2 border-2 border-dashed border-[#D4D4D8] p-3 text-center text-xs text-[#71717A] transition-colors hover:border-[#18181B] hover:text-[#09090B]">
+                  {isUploading ? (
+                    <Loader2 size={20} className="animate-spin text-[#18181B]" aria-hidden />
+                  ) : (
+                    <ImagePlus size={20} aria-hidden />
+                  )}
+                  <span>{isUploading ? t("processing") : t("dialog.uploadImage")}</span>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    className="sr-only"
+                    disabled={isUploading}
+                    onChange={(event) => {
+                      void handleGuideImage(event.target.files?.[0]);
+                      event.target.value = "";
+                    }}
+                  />
+                </label>
+              )}
+            </div>
           </div>
         </div>
       </div>

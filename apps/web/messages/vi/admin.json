@@ -2806,21 +2806,51 @@
     "create": {
       "open": "Tạo bảng size",
       "title": "Tạo bảng size mẫu",
-      "description": "Nhập thông tin, hướng dẫn đo và phụ phí bigsize — số đo từng size nhập ở màn chi tiết.",
+      "description": "Thông tin chung, hướng dẫn đo và phụ phí.",
       "groupHint": "Phụ kiện và vải bán theo mét không cần bảng size.",
       "submit": "Tạo bảng size",
       "success": "Đã tạo bảng size"
     },
     "groupLabel": "Nhóm hàng",
     "filterAll": "Tất cả",
-    "searchPlaceholder": "Tìm theo tên hoặc ký hiệu size...",
+    "filterGroup": "Nhóm hàng",
+    "filterStatus": "Trạng thái",
+    "filterUsage": "Phạm vi & Cấu hình",
+    "filterAllUsage": "Tất cả phạm vi",
+    "filterUsageInUse": "Đang gán sản phẩm",
+    "filterUsageUnused": "Chưa có sản phẩm",
+    "filterUsageBigsize": "Có cấu hình Bigsize",
+    "filterUsageEmpty": "Chưa nhập số đo",
+    "resetFilters": "Đặt lại",
+    "meta": {
+      "total": "Tổng số",
+      "active": "Đang áp dụng",
+      "linkedProducts": "Phủ sóng",
+      "productsUnit": "sản phẩm"
+    },
+    "searchPlaceholder": "Tìm theo tên, ký hiệu size hoặc thông số...",
     "empty": "Chưa có bảng size nào.",
     "noResults": "Không có bảng size nào khớp.",
     "column": {
-      "name": "Tên bảng",
+      "name": "Bảng size & Nhóm",
+      "sizes": "Dải size",
+      "measurements": "Thông số đo",
+      "bigsize": "Ngưỡng Bigsize",
+      "usage": "Liên kết sử dụng",
       "products": "Sản phẩm dùng",
       "status": "Trạng thái",
       "actions": "Thao tác"
+    },
+    "sizesCount": "{count} size",
+    "measurementsCount": "{count} thông số",
+    "bigsize": {
+      "hasSurcharge": "Có ngưỡng bigsize",
+      "standard": "Tiêu chuẩn"
+    },
+    "usage": {
+      "products": "sản phẩm",
+      "categories": "{count} loại sản phẩm",
+      "none": "Chưa gán"
     },
     "noRows": "Chưa nhập size",
     "status": {
@@ -2889,7 +2919,7 @@
     },
     "dialog": {
       "editTitle": "Sửa bảng size: {name}",
-      "description": "Thông tin chung, nhóm hàng, hướng dẫn đo và phụ phí bigsize của bảng size.",
+      "description": "Thông tin chung, hướng dẫn đo và phụ phí.",
       "langLabel": "Ngôn ngữ nội dung",
       "langHint": "Tên, ghi chú và hướng dẫn đo đổi theo ngôn ngữ; các trường còn lại dùng chung.",
       "untranslated": "Chưa có bản tiếng Anh",
@@ -3202,12 +3232,17 @@
       "description": "Mô tả ngắn",
       "hex": "Mã màu",
       "family": "Họ màu",
-      "isActive": "Đang dùng"
+      "isActive": "Đang dùng",
+      "colorSection": "Màu sắc & Họ màu",
+      "colorPresets": "Sắc thái màu phổ biến",
+      "pickColor": "Chọn màu"
     },
     "hints": {
       "code": "Mã ổn định trong nhóm; size dùng đúng ký hiệu in trên SKU (S, XL, 35...).",
       "family": "Dùng để gom bộ lọc màu trên cửa hàng.",
-      "isActive": "Tắt để ẩn khỏi bộ lọc và form sản phẩm mà không xóa."
+      "isActive": "Tắt để ẩn khỏi bộ lọc và form sản phẩm mà không xóa.",
+      "pickColorHint": "Bấm ô màu để mở bảng chọn hoặc nhập mã HEX.",
+      "clickPreset": "Bấm vào màu để áp dụng nhanh mã HEX và tên màu."
     },
     "placeholders": {
       "code": "Vui lòng nhập mã",

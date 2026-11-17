@@ -9,10 +9,7 @@ import { useNotify } from "@/hooks/useNotify";
 import { cn } from "@/lib/utils";
 import {
   ADMIN_CARD_CLASS,
-  ADMIN_DIALOG_DANGER_BUTTON_CLASS,
   ADMIN_ROW_ICON_BUTTON_CLASS,
-  ADMIN_DIALOG_SECONDARY_BUTTON_CLASS,
-  AdminDialog,
   AdminListPanel,
   AdminButton,
 } from "@/features/admin/core/ui";
@@ -22,17 +19,19 @@ import {
   reorderAttributesAction,
   updateAttributeAction,
 } from "../actions/attributes.actions";
-import { type AdminAttributeData, type AdminAttributeGroup, type AdminAttributeValue } from "../types/attributes.types";
+import { type AdminAttributeData, type AdminAttributeGroup } from "../types/attributes.types";
 import { isVariantGroup, localizedGroup } from "../utils/attributeMeta";
 import { AttributeGroupIcon } from "./AttributeGroupIcon";
 import { ColorPalette, SizeTape, TraitGrid, type ValueHandlers } from "./AttributeValueViews";
+import { type AttributeDeleteTarget } from "./dialog/AttributeDeleteDialog";
+import { type AttributeEditorTarget } from "./dialog/AttributeEditorDialog";
 
-const AttributeValueDialog = dynamic(() => import("./AttributeValueDialog").then((m) => m.AttributeValueDialog));
-const AttributeGroupDialog = dynamic(() => import("./AttributeGroupDialog").then((m) => m.AttributeGroupDialog));
-
-type EditorState = { value: AdminAttributeValue | null };
-/** Đang mở dialog nhóm: sửa `group`, hoặc thêm nhóm mới (`group` null) */
-type GroupEditorState = { group: AdminAttributeGroup | null };
+const AttributeEditorDialog = dynamic(() =>
+  import("./dialog/AttributeEditorDialog").then((m) => m.AttributeEditorDialog)
+);
+const AttributeDeleteDialog = dynamic(() =>
+  import("./dialog/AttributeDeleteDialog").then((m) => m.AttributeDeleteDialog)
+);
 
 /**
  * Màn thuộc tính: thanh trái chọn nhóm (biến thể SKU: màu, size · đặc tính thiết kế: cổ, tay, họa tiết, tà, dịp và các
@@ -44,14 +43,14 @@ export function AttributesBoard({ initialData }: { initialData: AdminAttributeDa
   const tPage = useTranslations("AdminPage.pages.attributes");
   const notify = useNotify();
   const locale = useLocale();
+
   const [groups, setGroups] = useState(initialData.groups);
   const [values, setValues] = useState(initialData.values);
   const [groupId, setGroupId] = useState(() => initialData.groups[0]?.id ?? "");
-  const [groupEditor, setGroupEditor] = useState<GroupEditorState | null>(null);
-  const [deletingGroup, setDeletingGroup] = useState<AdminAttributeGroup | null>(null);
-  const [search, setSearch] = useState("");
-  const [editor, setEditor] = useState<EditorState | null>(null);
-  const [deleting, setDeleting] = useState<AdminAttributeValue | null>(null);
+  const [search, _setSearch] = useState("");
+
+  const [editorTarget, setEditorTarget] = useState<AttributeEditorTarget | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<AttributeDeleteTarget | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const keyword = search.trim().toLowerCase();
@@ -76,8 +75,10 @@ export function AttributesBoard({ initialData }: { initialData: AdminAttributeDa
   };
 
   const handlers: ValueHandlers = {
-    onEdit: (value) => setEditor({ value }),
-    onDelete: setDeleting,
+    onEdit: (value) => {
+      if (group) setEditorTarget({ type: "value", group, value });
+    },
+    onDelete: (value) => setDeleteTarget({ type: "value", value }),
     onToggle: async (value) => {
       const res = await updateAttributeAction({
         attributeId: value.id,
@@ -116,43 +117,42 @@ export function AttributesBoard({ initialData }: { initialData: AdminAttributeDa
     },
   };
 
-  const handleDelete = async () => {
-    if (!deleting) return;
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
     setIsDeleting(true);
     try {
-      const res = await deleteAttributeAction({ attributeId: deleting.id });
-      if (!res.success) {
-        notify.error(res.error, "ATTRIBUTE_DELETE_FAILED");
-        return;
+      if (deleteTarget.type === "group") {
+        const res = await deleteAttributeGroupAction({ groupId: deleteTarget.group.id });
+        if (!res.success) {
+          notify.error(res.error, "ATTRIBUTE_GROUP_DELETE_FAILED");
+          return;
+        }
+        applyData(res.data);
+        setGroupId(res.data.groups[0]?.id ?? "");
+        setDeleteTarget(null);
+        notify.success(t("groupDialog.deleted"));
+      } else {
+        const res = await deleteAttributeAction({ attributeId: deleteTarget.value.id });
+        if (!res.success) {
+          notify.error(res.error, "ATTRIBUTE_DELETE_FAILED");
+          return;
+        }
+        applyData(res.data);
+        setDeleteTarget(null);
+        notify.success(t("deleteDialog.success"));
       }
-      applyData(res.data);
-      setDeleting(null);
-      notify.success(t("deleteDialog.success"));
-    } finally {
-      setIsDeleting(false);
-    }
-  };
-
-  const handleDeleteGroup = async () => {
-    if (!deletingGroup) return;
-    setIsDeleting(true);
-    try {
-      const res = await deleteAttributeGroupAction({ groupId: deletingGroup.id });
-      if (!res.success) {
-        notify.error(res.error, "ATTRIBUTE_GROUP_DELETE_FAILED");
-        return;
-      }
-      applyData(res.data);
-      setGroupId(res.data.groups[0]?.id ?? "");
-      setDeletingGroup(null);
-      notify.success(t("groupDialog.deleted"));
     } finally {
       setIsDeleting(false);
     }
   };
 
   const groupMenu = (target: AdminAttributeGroup): AppMenuEntry[] => [
-    { key: "edit", label: t("groupMenu.edit"), icon: Pencil, onSelect: () => setGroupEditor({ group: target }) },
+    {
+      key: "edit",
+      label: t("groupMenu.edit"),
+      icon: Pencil,
+      onSelect: () => setEditorTarget({ type: "group", group: target }),
+    },
     // Nhóm hệ thống (màu, size, đặc tính có sẵn) không xóa được; nhóm tự thêm phải trống mới xóa
     ...(target.isSystem
       ? []
@@ -165,13 +165,12 @@ export function AttributesBoard({ initialData }: { initialData: AdminAttributeDa
             icon: Trash2,
             tone: "danger" as const,
             disabled: target.valueCount > 0,
-            onSelect: () => setDeletingGroup(target),
+            onSelect: () => setDeleteTarget({ type: "group", group: target }),
           },
         ]),
   ];
 
   const current = group ? localizedGroup(group, locale) : null;
-
   const viewProps = { values: visible, reorderDisabled: keyword.length > 0, ...handlers };
 
   return (
@@ -180,11 +179,15 @@ export function AttributesBoard({ initialData }: { initialData: AdminAttributeDa
         icon={Tags}
         title={tPage("title")}
         description={tPage("description")}
-        search={{ value: search, onChange: setSearch, placeholder: t("searchPlaceholder") }}
         actions={
-          current
-            ? <AdminButton variant="primary" onClick={() => setEditor({ value: null })}>{t("addValue", { group: current.name.toLowerCase() })}</AdminButton>
-            : undefined
+          current && group ? (
+            <AdminButton
+              variant="primary"
+              onClick={() => setEditorTarget({ type: "value", group, value: null })}
+            >
+              {t("addValue", { group: current.name.toLowerCase() })}
+            </AdminButton>
+          ) : undefined
         }
       />
 
@@ -231,7 +234,7 @@ export function AttributesBoard({ initialData }: { initialData: AdminAttributeDa
             {/* Thêm thuộc tính cha mới — luôn là nhóm đặc tính thiết kế */}
             <button
               type="button"
-              onClick={() => setGroupEditor({ group: null })}
+              onClick={() => setEditorTarget({ type: "group", group: null })}
               className="flex h-9 shrink-0 cursor-pointer items-center gap-2.5 rounded-lg border border-dashed border-[#D4D4D8] px-2.5 text-sm text-[#52525B] transition-colors hover:border-[#A1A1AA] hover:text-[#09090B] lg:mt-1"
             >
               <Plus size={15} aria-hidden />
@@ -242,9 +245,6 @@ export function AttributesBoard({ initialData }: { initialData: AdminAttributeDa
 
         <section className="min-w-0 space-y-4">
           <header className="flex items-start gap-3">
-            <span className="grid size-9 shrink-0 place-items-center rounded-full border border-[#E4E4E7] bg-white text-[#52525B]">
-              <AttributeGroupIcon code={group?.code ?? ""} size={16} aria-hidden />
-            </span>
             <div className="min-w-0">
               <h2 className="text-lg font-semibold text-[#09090B]">{current?.name}</h2>
               {current?.description && <p className="text-xs text-[#71717A]">{current.description}</p>}
@@ -283,88 +283,24 @@ export function AttributesBoard({ initialData }: { initialData: AdminAttributeDa
         </section>
       </div>
 
-      {editor && group && (
-        <AttributeValueDialog
-          key={editor.value?.id ?? `new-${group.id}`}
-          group={group}
-          value={editor.value}
-          onOpenChange={(open) => !open && setEditor(null)}
-          onSaved={applyData}
-        />
-      )}
-
-      {groupEditor && (
-        <AttributeGroupDialog
-          key={groupEditor.group?.id ?? "new-group"}
-          group={groupEditor.group}
-          onOpenChange={(open) => !open && setGroupEditor(null)}
-          onSaved={(data, savedId) => {
+      {editorTarget && (
+        <AttributeEditorDialog
+          target={editorTarget}
+          onOpenChange={(open) => !open && setEditorTarget(null)}
+          onSaved={(data, targetGroupId) => {
             applyData(data);
-            setGroupId(savedId);
+            if (targetGroupId) setGroupId(targetGroupId);
           }}
         />
       )}
 
-      {deletingGroup && (
-        <AdminDialog
-          open
-          onOpenChange={(open) => !open && setDeletingGroup(null)}
-          icon={Trash2}
-          tone="danger"
-          size="sm"
-          title={t("groupDialog.deleteTitle")}
-          description={t("deleteDialog.description", { name: localizedGroup(deletingGroup, locale).name })}
-          footer={
-            <>
-              <button
-                type="button"
-                onClick={() => setDeletingGroup(null)}
-                className={ADMIN_DIALOG_SECONDARY_BUTTON_CLASS}
-              >
-                {t("cancel")}
-              </button>
-              <button
-                type="button"
-                disabled={isDeleting}
-                onClick={handleDeleteGroup}
-                className={ADMIN_DIALOG_DANGER_BUTTON_CLASS}
-              >
-                {isDeleting ? t("processing") : t("deleteDialog.confirm")}
-              </button>
-            </>
-          }
-        >
-          <p className="text-sm text-[#52525B]">{t("groupDialog.deleteBody")}</p>
-        </AdminDialog>
-      )}
-
-      {deleting && (
-        <AdminDialog
-          open
-          onOpenChange={(open) => !open && setDeleting(null)}
-          icon={Trash2}
-          tone="danger"
-          size="sm"
-          title={t("deleteDialog.title")}
-          description={t("deleteDialog.description", { name: deleting.name })}
-          footer={
-            <>
-              <button type="button" onClick={() => setDeleting(null)} className={ADMIN_DIALOG_SECONDARY_BUTTON_CLASS}>
-                {t("cancel")}
-              </button>
-              <button
-                type="button"
-                disabled={isDeleting}
-                onClick={handleDelete}
-                className={ADMIN_DIALOG_DANGER_BUTTON_CLASS}
-              >
-                {isDeleting ? t("processing") : t("deleteDialog.confirm")}
-              </button>
-            </>
-          }
-        >
-          <p className="text-sm text-[#52525B]">{t("deleteDialog.body")}</p>
-        </AdminDialog>
+      {deleteTarget && (
+        <AttributeDeleteDialog
+          target={deleteTarget}
+          isDeleting={isDeleting}
+          onClose={() => setDeleteTarget(null)}
+          onConfirm={handleConfirmDelete}
+        />
       )}
     </>
   );
