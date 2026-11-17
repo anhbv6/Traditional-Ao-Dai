@@ -12,7 +12,7 @@ import {
   type AdminContentLang,
 } from "@/features/admin/core/ui";
 import { type SaveCollectionValues } from "../../schemas/collections.schemas";
-import { CollectionSeoField } from "./CollectionSeoField";
+import { CollectionSeoField } from "../editor/CollectionSeoField";
 
 /**
  * Dialog SEO mở từ "Tùy chọn nâng cao": sửa thẳng vào form của màn bộ sưu tập (không lưu riêng) —

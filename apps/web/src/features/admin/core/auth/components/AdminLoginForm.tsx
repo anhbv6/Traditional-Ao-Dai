@@ -2,11 +2,11 @@
 
 import React from "react";
 import Image from "next/image";
-import { ArrowLeft, ArrowRight, Loader2, ShieldCheck } from "lucide-react";
+import { ArrowLeft, ArrowRight, ShieldCheck } from "lucide-react";
 import { Link } from "@/i18n/routing";
 import { AppLoading } from "@/components/shared";
 import { cn } from "@/lib/utils";
-import { ADMIN_CARD_CLASS } from "@/features/admin/core/ui";
+import { ADMIN_CARD_CLASS, AdminButton } from "@/features/admin/core/ui";
 import { useAdminLogin } from "../hooks/useAdminLogin";
 import { AdminLoginBackground } from "./AdminLoginBackground";
 import { AdminLoginFormFields } from "./AdminLoginFormFields";
@@ -27,22 +27,15 @@ export function AdminLoginForm() {
       {/* ---------- Thanh trên ---------- */}
       <header className="relative z-10 border-b border-[#E4E4E7] bg-white/80 backdrop-blur-md">
         <div className="flex h-14 w-full items-center justify-between gap-4 px-5 sm:px-8 lg:px-12">
-          <Link
-            href="/"
-            className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg px-2.5 text-sm font-medium text-[#71717A] transition-colors hover:bg-[#F4F4F5] hover:text-[#09090B]"
-          >
-            <ArrowLeft aria-hidden className="size-4" />
-            {t("backToStore")}
-          </Link>
           <div className="flex min-w-0 items-center gap-2.5">
             <span className="size-8 shrink-0 overflow-hidden rounded-lg bg-white">
               <Image src="/logo.png" alt="" width={64} height={64} priority className="size-full object-contain p-0.5" />
             </span>
             <span className="truncate text-sm font-semibold text-[#09090B]">{t("brand")}</span>
-            <span className="hidden rounded-md border border-[#E4E4E7] bg-[#FAFAFA] px-1.5 py-0.5 text-2xs font-medium text-[#71717A] sm:inline">
-              {t("eyebrow")}
-            </span>
           </div>
+          <span className="hidden rounded-md border border-[#E4E4E7] bg-[#FAFAFA] px-1.5 py-0.5 text-2xs font-medium text-[#71717A] sm:inline">
+            {t("eyebrow")}
+          </span>
         </div>
       </header>
 
@@ -50,25 +43,39 @@ export function AdminLoginForm() {
       <main className="relative z-10 flex flex-1 items-center justify-center px-4 py-12">
         <div className="w-full max-w-[420px]">
           <div className={cn(ADMIN_CARD_CLASS, "overflow-hidden shadow-[0_24px_48px_-24px_rgba(9,9,11,0.18)]")}>
-
             <form onSubmit={handleSubmit} className="space-y-6 px-6 py-6 sm:px-8 sm:py-7" noValidate>
+              {/* Tiêu đề thẻ chuẩn phân cấp visual hierarchy (§8): 20px -> nhãn 14px -> chú thích 13px */}
+              <div className="space-y-1">
+                <h1 className="text-xl text-center font-semibold tracking-tight text-[#09090B]">{t("title")}</h1>
+                <p className="text-xs text-[#71717A]">{t("staffOnly")}</p>
+              </div>
+
               <AdminLoginFormFields form={form} errors={errors} disabled={isLoading} t={t} />
 
-              <button
+              <AdminButton
                 type="submit"
-                disabled={isLoading}
-                className="group inline-flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#18181B] text-sm font-medium text-white shadow-2xs transition-colors hover:bg-[#09090B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#18181B] disabled:cursor-not-allowed disabled:opacity-70"
+                variant="primary"
+                size="lg"
+                loading={isLoading}
+                loadingText={t("submitting")}
+                fullWidth
+                icon={<ArrowRight aria-hidden className="size-4 transition-transform duration-300 group-hover:translate-x-0.5" />}
+                iconPosition="end"
+                className="group h-11 rounded-xl text-sm font-medium mb-3"
               >
-                {isLoading ? <Loader2 aria-hidden className="size-4 animate-spin" /> : null}
-                {isLoading ? t("submitting") : t("submit")}
-                {isLoading ? null : (
-                  <ArrowRight aria-hidden className="size-4 transition-transform duration-300 group-hover:translate-x-0.5" />
-                )}
-              </button>
+                {t("submit")}
+              </AdminButton>
+              <Link
+                href="/"
+                className="flex justify-center h-8 shrink-0 items-center gap-1.5 rounded-lg text-xs font-medium text-[#71717A] transition-colors hover:underline hover:text-[#09090B]"
+              >
+                <ArrowLeft aria-hidden className="size-4" />
+                {t("backToStore")}
+              </Link>
             </form>
           </div>
 
-          <p className="mt-5 px-2 text-center text-xs leading-5 text-[#71717A]">{t("staffOnly")}</p>
+          
         </div>
       </main>
 

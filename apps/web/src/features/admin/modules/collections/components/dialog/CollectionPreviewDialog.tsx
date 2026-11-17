@@ -79,7 +79,6 @@ export function CollectionPreviewDialog({
     <AdminDialog
       open={open}
       onOpenChange={onOpenChange}
-      icon={Eye}
       title={t("title")}
       description={t(`statusNote.${status}`)}
       size="full"

@@ -48,9 +48,9 @@ import { CollectionProductsField } from "./CollectionProductsField";
 import { CollectionProgressDock } from "./CollectionProgressDock";
 
 const CollectionPreviewDialog = dynamic(() =>
-  import("./CollectionPreviewDialog").then((m) => m.CollectionPreviewDialog)
+  import("../dialog/CollectionPreviewDialog").then((m) => m.CollectionPreviewDialog)
 );
-const CollectionSeoDialog = dynamic(() => import("./CollectionSeoDialog").then((m) => m.CollectionSeoDialog));
+const CollectionSeoDialog = dynamic(() => import("../dialog/CollectionSeoDialog").then((m) => m.CollectionSeoDialog));
 const ChangeCollectionStatusDialog = dynamic(() =>
   import("../shared/ChangeCollectionStatusDialog").then((m) => m.ChangeCollectionStatusDialog)
 );
@@ -313,12 +313,6 @@ export function CollectionEditor({ collection: initial, products, homepageUsedBy
         backLabel={t("editor.back")}
         title={values.name || t("editor.untitled")}
         badge={<CollectionStatusBadge status={saved.status} />}
-        subtitle={
-          <>
-            <span className="font-mono">{values.code}</span>
-            {isDirty && <span className="ml-2 text-amber-700">● {t("editor.unsaved")}</span>}
-          </>
-        }
         actions={
           <>
             {/* Không xem trước trên điện thoại: màn quá hẹp để mô phỏng trang khách (chỉ iPad / PC) */}

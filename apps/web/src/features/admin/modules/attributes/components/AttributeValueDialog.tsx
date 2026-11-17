@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Pencil, Plus } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useNotify } from "@/hooks/useNotify";
 import { cn } from "@/lib/utils";

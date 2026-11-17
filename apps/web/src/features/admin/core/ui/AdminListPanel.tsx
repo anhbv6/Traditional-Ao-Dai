@@ -4,9 +4,8 @@ import { type ReactNode } from "react";
 import { type LucideIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { cn } from "@/lib/utils";
 import { findAdminNavGroupInfo } from "../layout/utils/navigation";
-import { ADMIN_CARD_CLASS, AdminPageHeader } from "./AdminPage";
+import { AdminPageHeader } from "./AdminPage";
 import { AdminSearchInput } from "./AdminSearchInput";
 
 export interface AdminListPanelProps {

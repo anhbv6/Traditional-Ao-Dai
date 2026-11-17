@@ -12,7 +12,7 @@ import { COLLECTION_STATUSES } from "../../utils/collectionLifecycle";
 import { CollectionCard } from "./CollectionCard";
 
 // Hộp thoại chỉ cần khi thao tác nên tách khỏi bundle đầu trang
-const CreateCollectionDialog = dynamic(() => import("./CreateCollectionDialog").then((m) => m.CreateCollectionDialog));
+const CreateCollectionDialog = dynamic(() => import("../dialog/CreateCollectionDialog").then((m) => m.CreateCollectionDialog));
 const ChangeCollectionStatusDialog = dynamic(() =>
   import("../shared/ChangeCollectionStatusDialog").then((m) => m.ChangeCollectionStatusDialog)
 );
