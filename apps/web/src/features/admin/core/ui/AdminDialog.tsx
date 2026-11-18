@@ -237,7 +237,7 @@ export function AdminDialog({
             <div className="min-w-0 flex-1 pt-0.5">
               <DialogTitle className="text-lg font-semibold leading-tight text-[#09090B]">{title}</DialogTitle>
               {description && (
-                <DialogDescription className="mt-1 text-sm leading-relaxed text-[#71717A]">
+                <DialogDescription className="mt-1 text-xs leading-relaxed text-[#71717A]">
                   {description}
                 </DialogDescription>
               )}

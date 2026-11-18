@@ -1,14 +1,15 @@
 "use client";
 
 import { ArrowDown, ArrowUp, Eye, EyeOff, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { AppMenu, type AppMenuEntry } from "@/components/shared/AppMenu";
 import { cn } from "@/lib/utils";
 import { ADMIN_CARD_CLASS } from "@/features/admin/core/ui";
 import { type AdminAttributeValue } from "../types/attributes.types";
-import { COLOR_FAMILIES, COLOR_FAMILY_HEX, readableOn, type ColorFamily } from "../utils/attributeMeta";
+import { COLOR_FAMILIES, COLOR_FAMILY_HEX, localizedValue, readableOn, type ColorFamily } from "../utils/attributeMeta";
 
 export interface ValueHandlers {
+  onView?: (value: AdminAttributeValue) => void;
   onEdit: (value: AdminAttributeValue) => void;
   onToggle: (value: AdminAttributeValue) => void;
   onMove: (value: AdminAttributeValue, direction: -1 | 1) => void;
@@ -21,7 +22,7 @@ interface ViewProps extends ValueHandlers {
   reorderDisabled: boolean;
 }
 
-/** Menu ⋯ của một giá trị: sửa, ẩn/hiện, lên/xuống, xóa (màu / size đang có SKU thì khóa xóa) */
+/** Menu ⋯ của một giá trị: xem chi tiết, sửa, ẩn/hiện, lên/xuống, xóa (màu / size đang có SKU thì khóa xóa) */
 function ValueMenu({
   value,
   index,
@@ -40,6 +41,9 @@ function ValueMenu({
   const t = useTranslations("AdminPage.attributes");
   const inUse = (value.skuCount ?? 0) > 0;
   const items: AppMenuEntry[] = [
+    // ...(handlers.onView
+    //   ? [{ key: "view", label: t("menu.view"), icon: Eye, onSelect: () => handlers.onView?.(value) }]
+    //   : []),
     { key: "edit", label: t("menu.edit"), icon: Pencil, onSelect: () => handlers.onEdit(value) },
     {
       key: "toggle",
@@ -120,6 +124,7 @@ function SkuCount({ count }: { count: number | null }) {
  */
 export function ColorPalette({ values, reorderDisabled, ...handlers }: ViewProps) {
   const t = useTranslations("AdminPage.attributes");
+  const locale = useLocale();
   const families: (ColorFamily | null)[] = [...COLOR_FAMILIES, null];
   const sections = families
     .map((family) => ({ family, items: values.filter((value) => value.family === family) }))
@@ -147,6 +152,7 @@ export function ColorPalette({ values, reorderDisabled, ...handlers }: ViewProps
             {items.map((value) => {
               const index = values.indexOf(value);
               const tone = readableOn(value.hex);
+              const { name } = localizedValue(value, locale);
               return (
                 <div
                   key={value.id}
@@ -170,7 +176,7 @@ export function ColorPalette({ values, reorderDisabled, ...handlers }: ViewProps
                   </button>
                   <div className="flex items-center justify-between gap-1 p-2.5">
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-[#09090B]">{value.name}</p>
+                      <p className="truncate text-sm font-medium text-[#09090B]">{name}</p>
                       <SkuCount count={value.skuCount} />
                     </div>
                     <ValueMenu
@@ -198,6 +204,7 @@ export function ColorPalette({ values, reorderDisabled, ...handlers }: ViewProps
  */
 export function SizeTape({ values, reorderDisabled, ...handlers }: ViewProps) {
   const t = useTranslations("AdminPage.attributes");
+  const locale = useLocale();
   return (
     <div className="space-y-4">
       <div className={cn(ADMIN_CARD_CLASS, "overflow-x-auto p-4")}>
@@ -232,66 +239,91 @@ export function SizeTape({ values, reorderDisabled, ...handlers }: ViewProps) {
       </div>
 
       <div className={cn(ADMIN_CARD_CLASS, "divide-y divide-[#F4F4F5]")}>
-        {values.map((value, index) => (
-          <div key={value.id} className="flex items-center gap-3 px-4 py-2.5">
-            <span className="w-24 shrink-0 truncate font-mono text-sm font-semibold text-[#09090B]">{value.code}</span>
-            <div className="min-w-0 flex-1">
-              {/* Tên chỉ hiện khi khác ký hiệu (VD "FREE_SIZE" → "Free size") — tránh lặp "S / S" */}
-              {(value.name !== value.code || !value.isActive) && (
-                <p className="flex items-center gap-2 truncate text-sm text-[#09090B]">
-                  {value.name !== value.code && value.name}
+        {values.map((value, index) => {
+          const { name, description } = localizedValue(value, locale);
+          return (
+            <div key={value.id} className="flex items-center gap-3 px-4 py-2.5">
+              <span className="w-24 shrink-0 truncate font-mono text-sm font-semibold text-[#09090B]">{value.code}</span>
+              <div className="min-w-0 flex-1">
+                {/* Tên chỉ hiện khi khác ký hiệu (VD "FREE_SIZE" → "Free size") — tránh lặp "S / S" */}
+                {(name !== value.code || !value.isActive) && (
+                  <p className="flex items-center gap-2 truncate text-sm text-[#09090B]">
+                    {name !== value.code && name}
+                    {!value.isActive && <HiddenTag />}
+                  </p>
+                )}
+                {description && <p className="truncate text-xs text-[#71717A]">{description}</p>}
+              </div>
+              <SkuCount count={value.skuCount} />
+              <ValueMenu
+                value={value}
+                index={index}
+                total={values.length}
+                reorderDisabled={reorderDisabled}
+                handlers={handlers}
+              />
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/** Đặc tính thiết kế: thẻ đồng đều độ cao, mô tả tối đa 2 dòng kèm "...", bấm vào xem chi tiết */
+export function TraitGrid({ values, reorderDisabled, ...handlers }: ViewProps) {
+  const locale = useLocale();
+
+  return (
+    <div className="grid items-stretch gap-3 sm:grid-cols-2 2xl:grid-cols-3">
+      {values.map((value, index) => {
+        const { name, description } = localizedValue(value, locale);
+
+        return (
+          <div
+            key={value.id}
+            className={cn(
+              ADMIN_CARD_CLASS,
+              "group flex h-full gap-3 p-3.5 transition-all hover:border-[#18181B]/40 hover:shadow-xs",
+              !value.isActive && "opacity-60"
+            )}
+          >
+            <span className="grid size-7 shrink-0 place-items-center rounded-md bg-[#F4F4F5] font-mono text-xs font-semibold text-[#52525B]">
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <button
+              type="button"
+              onClick={() => (handlers.onView ? handlers.onView(value) : handlers.onEdit(value))}
+              className="flex min-w-0 flex-1 cursor-pointer flex-col justify-between text-left outline-none"
+            >
+              <div>
+                <p className="flex items-center gap-2 text-sm font-semibold text-[#09090B] transition-colors group-hover:text-black">
+                  <span className="truncate">{name}</span>
                   {!value.isActive && <HiddenTag />}
                 </p>
-              )}
-              {value.description && <p className="truncate text-xs text-[#71717A]">{value.description}</p>}
-            </div>
-            <SkuCount count={value.skuCount} />
+              </div>
+              {/* Mô tả thuần 1 ngôn ngữ theo trang web, tối đa 2 dòng quá thì "...", cố định min-height 2 dòng (2.5rem) để các thẻ luôn đồng đều độ cao */}
+              <p
+                className={cn(
+                  "mt-2 min-h-[2.5rem] text-xs leading-relaxed line-clamp-2",
+                  description ? "text-[#52525B]" : "italic text-[#A1A1AA]"
+                )}
+                title={description || undefined}
+              >
+                {description || "—"}
+              </p>
+            </button>
             <ValueMenu
               value={value}
               index={index}
               total={values.length}
               reorderDisabled={reorderDisabled}
               handlers={handlers}
+              className="-mr-1 shrink-0"
             />
           </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/** Đặc tính thiết kế: thẻ gọn tên VI / EN + mô tả ngắn, số thứ tự là thứ tự hiện trong bộ lọc */
-export function TraitGrid({ values, reorderDisabled, ...handlers }: ViewProps) {
-  return (
-    <div className="grid gap-3 sm:grid-cols-2 2xl:grid-cols-3">
-      {values.map((value, index) => (
-        <div key={value.id} className={cn(ADMIN_CARD_CLASS, "flex gap-3 p-3.5", !value.isActive && "opacity-60")}>
-          <span className="grid size-7 shrink-0 place-items-center rounded-md bg-[#F4F4F5] font-mono text-xs font-semibold text-[#52525B]">
-            {String(index + 1).padStart(2, "0")}
-          </span>
-          <button
-            type="button"
-            onClick={() => handlers.onEdit(value)}
-            className="min-w-0 flex-1 cursor-pointer text-left"
-          >
-            <p className="flex items-center gap-2 text-sm font-semibold text-[#09090B]">
-              <span className="truncate">{value.name}</span>
-              {!value.isActive && <HiddenTag />}
-            </p>
-            <p className="truncate text-xs text-[#A1A1AA]">
-              {value.nameEn ?? "—"} · <span className="font-mono">{value.code}</span>
-            </p>
-            {value.description && <p className="mt-1.5 line-clamp-2 text-xs text-[#52525B]">{value.description}</p>}
-          </button>
-          <ValueMenu
-            value={value}
-            index={index}
-            total={values.length}
-            reorderDisabled={reorderDisabled}
-            handlers={handlers}
-          />
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

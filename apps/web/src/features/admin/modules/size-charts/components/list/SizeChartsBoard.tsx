@@ -8,7 +8,6 @@ import { PRODUCT_GROUPS, type ProductGroup } from "@repo/shared/sizing";
 import { AppMenu, type AppMenuEntry } from "@/components/shared/AppMenu";
 import { useNotify } from "@/hooks/useNotify";
 import { Link, useRouter } from "@/i18n/routing";
-import { cn } from "@/lib/utils";
 import {
   ADMIN_ROW_ICON_BUTTON_CLASS,
   AdminButton,
@@ -20,7 +19,7 @@ import {
   type AdminFilterOption,
   type AdminTableColumn,
 } from "@/features/admin/core/ui";
-import { PRODUCT_GROUP_COLORS, groupUsesSizeChart } from "@/features/admin/modules/categories";
+import { groupUsesSizeChart } from "@/features/admin/modules/categories";
 import {
   deleteSizeChartAction,
   duplicateSizeChartAction,
@@ -72,6 +71,8 @@ export function SizeChartsBoard({ charts }: { charts: AdminSizeChartListItem[] }
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
   const [usageFilter, setUsageFilter] = useState<UsageFilter>("ALL");
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
   const [dialog, setDialog] = useState<DialogState | null>(null);
 
   const keyword = search.trim().toLowerCase();
@@ -217,101 +218,53 @@ export function SizeChartsBoard({ charts }: { charts: AdminSizeChartListItem[] }
   const totalProductsCovered = charts.reduce((sum, c) => sum + c.productCount, 0);
 
   const nameCell = (chart: AdminSizeChartListItem) => {
-    const colors = PRODUCT_GROUP_COLORS[chart.group];
     return (
-      <div className="min-w-0 space-y-1 py-1">
+      <div className="min-w-0 py-1">
         <Link
           href={`/admin/catalog/size-charts/${chart.id}`}
           className="block truncate font-medium text-[#09090B] transition-colors hover:underline"
         >
           {resolveSizeChartName(chart, locale)}
         </Link>
-        <div className="flex items-center text-xs">
-          <span className={cn("inline-flex items-center rounded-md px-1.5 py-0.5 text-2xs font-medium", colors.chip)}>
-            {tSizing(`group.${chart.group}`)}
-          </span>
-        </div>
+        <p className="mt-0.5 text-xs text-[#71717A]">
+          {tSizing(`group.${chart.group}`)}
+          {chart.hasBigsize && (
+            <>
+              <span className="mx-1 text-[#D4D4D8]">·</span>
+              <span>{t("bigsize.hasSurcharge")}</span>
+            </>
+          )}
+        </p>
       </div>
     );
   };
 
   const sizesCell = (chart: AdminSizeChartListItem) => {
     if (chart.sizeLabels.length === 0) {
-      return (
-        <span className="inline-flex items-center gap-1.5 rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-800">
-          <span className="size-1.5 shrink-0 rounded-full bg-amber-500" />
-          {t("noRows")}
-        </span>
-      );
+      return <span className="text-xs text-[#A1A1AA]">{t("noRows")}</span>;
     }
+    const maxVisible = 6;
+    const isTruncated = chart.sizeLabels.length > maxVisible;
+    const visibleSizes = isTruncated ? chart.sizeLabels.slice(0, maxVisible) : chart.sizeLabels;
+
     return (
-      <div className="space-y-1 py-1">
-        <div className="text-2xs font-medium text-[#71717A]">
-          {t("sizesCount", { count: chart.sizeLabels.length })}
-        </div>
-        <div className="flex flex-wrap items-center gap-1">
-          {chart.sizeLabels.slice(0, 5).map((size) => (
-            <span
-              key={size}
-              className="inline-block rounded border border-[#E4E4E7] bg-[#FAFAFA] px-1.5 py-0.5 font-mono text-2xs font-semibold text-[#18181B]"
-            >
-              {size}
-            </span>
-          ))}
-          {chart.sizeLabels.length > 5 && (
-            <span className="rounded bg-[#F4F4F5] px-1 py-0.5 font-mono text-2xs font-medium text-[#71717A]">
-              +{chart.sizeLabels.length - 5}
-            </span>
-          )}
-        </div>
+      <div className="py-1" title={chart.sizeLabels.join(", ")}>
+        <span className="font-mono text-xs text-[#27272A]">
+          {visibleSizes.join(", ")}
+          {isTruncated && <span className="text-[#71717A]">, ... (+{chart.sizeLabels.length - maxVisible})</span>}
+        </span>
       </div>
     );
   };
 
-  const measurementsCell = (chart: AdminSizeChartListItem) => {
-    if (chart.columnKeys.length === 0) {
+  const productsCell = (chart: AdminSizeChartListItem) => {
+    if (chart.productCount === 0) {
       return <span className="text-xs text-[#A1A1AA]">—</span>;
     }
-    const names = chart.columnKeys.map((k) => tSizing(`measurement.${k}`));
     return (
-      <div className="space-y-1 py-1">
-        <div className="text-2xs font-medium text-[#71717A]">
-          {t("measurementsCount", { count: chart.columnKeys.length })}
-        </div>
-        <p className="max-w-[200px] truncate text-xs text-[#3F3F46]" title={names.join(", ")}>
-          {names.slice(0, 3).join(", ")}
-          {names.length > 3 && <span className="text-[#71717A]"> +{names.length - 3}</span>}
-        </p>
-      </div>
-    );
-  };
-
-  const bigsizeCell = (chart: AdminSizeChartListItem) => {
-    if (chart.hasBigsize) {
-      return (
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-violet-200 bg-violet-50/70 px-2.5 py-0.5 text-xs font-medium text-violet-700">
-          <span className="size-1.5 shrink-0 rounded-full bg-violet-600" />
-          {t("bigsize.hasSurcharge")}
-        </span>
-      );
-    }
-    return <span className="text-xs text-[#A1A1AA]">{t("bigsize.standard")}</span>;
-  };
-
-  const usageCell = (chart: AdminSizeChartListItem) => {
-    const hasUsage = chart.productCount > 0 || chart.categoryCount > 0;
-    if (!hasUsage) {
-      return <span className="text-xs text-[#A1A1AA]">{t("usage.none")}</span>;
-    }
-    return (
-      <div className="space-y-0.5 py-1 text-right">
-        <div className="font-mono text-sm font-semibold tabular-nums text-[#09090B]">
-          {chart.productCount}{" "}
-          <span className="font-sans text-xs font-normal text-[#71717A]">{t("usage.products")}</span>
-        </div>
-        {chart.categoryCount > 0 && (
-          <div className="text-2xs text-[#71717A]">{t("usage.categories", { count: chart.categoryCount })}</div>
-        )}
+      <div className="py-1 text-right">
+        <span className="font-mono text-sm font-medium tabular-nums text-[#09090B]">{chart.productCount}</span>{" "}
+        <span className="text-xs text-[#71717A]">{t("usage.products")}</span>
       </div>
     );
   };
@@ -323,11 +276,15 @@ export function SizeChartsBoard({ charts }: { charts: AdminSizeChartListItem[] }
   );
 
   const columns: AdminTableColumn<AdminSizeChartListItem>[] = [
-    { key: "name", header: t("column.name"), className: "min-w-[220px]", cell: nameCell },
-    { key: "sizes", header: t("column.sizes"), className: "w-44 whitespace-nowrap", cell: sizesCell },
-    { key: "measurements", header: t("column.measurements"), className: "w-52", cell: measurementsCell },
-    { key: "bigsize", header: t("column.bigsize"), className: "w-36 whitespace-nowrap", cell: bigsizeCell },
-    { key: "usage", header: t("column.usage"), align: "right", className: "w-32 whitespace-nowrap", cell: usageCell },
+    { key: "name", header: t("column.name"), className: "min-w-[240px]", cell: nameCell },
+    { key: "sizes", header: t("column.sizes"), className: "w-56", cell: sizesCell },
+    {
+      key: "products",
+      header: t("column.products"),
+      align: "right",
+      className: "w-36 whitespace-nowrap",
+      cell: productsCell,
+    },
     { key: "status", header: t("column.status"), className: "w-36 whitespace-nowrap", cell: statusCell },
   ];
 
@@ -418,49 +375,46 @@ export function SizeChartsBoard({ charts }: { charts: AdminSizeChartListItem[] }
           />
         )}
         actionsLabel={t("column.actions")}
-        minWidth={840}
+        minWidth={680}
         empty={charts.length === 0 ? t("empty") : t("noResults")}
         mobileRow={(chart) => (
-          <div className="space-y-2.5 py-2">
+          <div className="space-y-1.5 py-1.5">
             <div className="flex items-start justify-between gap-3">
               {nameCell(chart)}
               <div className="shrink-0">{statusCell(chart)}</div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2 text-xs">
-              {chart.sizeLabels.length > 0 ? (
-                <div className="flex flex-wrap items-center gap-1">
-                  {chart.sizeLabels.map((s) => (
-                    <span
-                      key={s}
-                      className="rounded border border-[#E4E4E7] bg-[#FAFAFA] px-1.5 py-0.5 font-mono text-2xs font-semibold text-[#18181B]"
-                    >
-                      {s}
-                    </span>
-                  ))}
-                </div>
-              ) : (
-                <span className="text-2xs text-amber-700">{t("noRows")}</span>
-              )}
-
-              {chart.hasBigsize && (
-                <span className="rounded-full bg-violet-50 px-2 py-0.5 text-2xs font-medium text-violet-700">
-                  Bigsize
-                </span>
-              )}
-
-              <span className="ml-auto text-2xs text-[#71717A]">
-                {chart.productCount > 0 ? (
-                  <>
-                    <strong className="font-mono text-[#09090B]">{chart.productCount}</strong> {t("usage.products")}
-                  </>
+            <div className="flex items-center justify-between text-xs text-[#71717A]">
+              <div className="min-w-0 flex-1 truncate">
+                {chart.sizeLabels.length > 0 ? (
+                  <span className="font-mono text-[#27272A]">{chart.sizeLabels.join(", ")}</span>
                 ) : (
-                  t("usage.none")
+                  <span className="text-[#A1A1AA]">{t("noRows")}</span>
                 )}
-              </span>
+              </div>
+
+              <div className="shrink-0 pl-3">
+                {chart.productCount > 0 ? (
+                  <span>
+                    <strong className="font-mono text-[#09090B]">{chart.productCount}</strong> {t("usage.products")}
+                  </span>
+                ) : (
+                  <span className="text-[#A1A1AA]">—</span>
+                )}
+              </div>
             </div>
           </div>
         )}
+        pagination={{
+          page,
+          pageSize,
+          onPageChange: setPage,
+          pageSizeOptions: [10, 20, 50],
+          onPageSizeChange: (size) => {
+            setPageSize(size);
+            setPage(1);
+          },
+        }}
       />
 
       {dialog && (

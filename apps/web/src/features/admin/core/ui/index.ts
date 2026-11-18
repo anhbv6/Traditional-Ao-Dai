@@ -15,3 +15,4 @@ export * from "./AdminTextField";
 export * from "./AdminSearchInput";
 export * from "./AdminTooltip";
 export * from "./AdminImageSlot";
+export * from "./AdminAdvancedOptions";

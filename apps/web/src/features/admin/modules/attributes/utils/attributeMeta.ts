@@ -30,6 +30,27 @@ export function localizedGroup(
   };
 }
 
+/**
+ * Tên / mô tả giá trị thuộc tính theo một ngôn ngữ duy nhất của trang web:
+ * - Tiếng Việt (`vi`): lấy tiếng Việt, thiếu thì lùi về tiếng Anh.
+ * - Tiếng Anh (`en`) hoặc bất kỳ ngôn ngữ nào khác: lấy tiếng Anh, thiếu thì lùi về tiếng Việt.
+ */
+export function localizedValue(
+  value: { name: string; nameEn: string | null; description: string | null; descriptionEn: string | null },
+  locale: string
+) {
+  if (locale === "vi") {
+    return {
+      name: value.name || value.nameEn || "",
+      description: (value.description || value.descriptionEn) ?? "",
+    };
+  }
+  return {
+    name: value.nameEn || value.name || "",
+    description: (value.descriptionEn || value.description) ?? "",
+  };
+}
+
 /** Họ màu để gom bộ lọc màu trên cửa hàng (nhiều sắc "đỏ đô, đỏ son" → một ô "Đỏ") */
 export const COLOR_FAMILIES = [
   "RED",

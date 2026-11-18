@@ -28,6 +28,13 @@
     "secureNote": "The admin session is separate from your shopping account and expires after 8 hours of inactivity.",
     "staffOnly": "For staff and administrators only. No account or forgot your password? Contact a super admin."
   },
+  "pagination": {
+    "showing": "Showing {from}–{to} of {total}",
+    "perPage": "Per page",
+    "prev": "Prev",
+    "next": "Next",
+    "page": "Page {page}"
+  },
   "header": {
     "systemTitle": "Thiên Canh",
     "viewStore": "View Storefront",
@@ -1262,6 +1269,7 @@
       "back": "Products",
       "save": "Save changes",
       "unsaved": "Unsaved",
+      "options": "Options",
       "langLabel": "Content language",
       "langHint": "Applies to name, description and set item names."
     },
@@ -1269,10 +1277,14 @@
       "general": "General information",
       "saleMode": "Sale mode",
       "design": "Material & design",
+      "traits": "Specifications & Attributes",
       "pricing": "Price & SKUs"
     },
     "field": {
       "name": "Product name",
+      "code": "Product code",
+      "categoryParent": "Product Group (Parent)",
+      "categoryParentShort": "Group",
       "category": "Category",
       "categoryShort": "Category",
       "description": "Description",
@@ -1287,13 +1299,28 @@
       "isFeatured": "Featured product"
     },
     "hints": {
+      "code": "Unique product code, cannot be edited.",
+      "categoryParent": "Parent group determines stock unit (piece/meter), bespoke options and size charts.",
+      "categoryChild": "Specific product category under the selected group.",
       "category": "The category's product group decides the allowed sale modes, whether there are sizes, tailoring and whether it sells per piece or per meter.",
       "saleMode": "Single item: ready-made in sizes. Set: several pieces sold together (top + pants...). Made to measure: tailored from the customer's measurements, no finished stock.",
       "isCustomFit": "Customers pick a stock size or send measurements for a tailored piece.",
+      "featuredHint": "Display this product prominently on the homepage.",
       "design": "Fabric specs are inherited from the material profile; design traits power storefront filters.",
+      "traits": "Material profile, tailoring design traits, color variants, SKU size breakdown and product images.",
       "pricing": "Leave a SKU price empty to use the base price.",
       "sizeChart": "Defaults to the category chart; choose another if this design has its own fit (e.g. slim fit).",
-      "notReady": "Complete the items below to put it on sale."
+      "notReady": "Not ready: complete highlighted items to publish.",
+      "readyConditions": "Conditions required to publish",
+      "readyAllMet": "All requirements met to publish."
+    },
+    "preview": {
+      "title": "Configured Specifications",
+      "variants": "Variants & Stock",
+      "designTraits": "Design Traits",
+      "featuredYes": "Featured",
+      "featuredNo": "Standard",
+      "readyPending": "{count} requirements pending"
     },
     "placeholders": {
       "basePrice": "Please enter a price",
@@ -1338,9 +1365,11 @@
     },
     "sku": {
       "colors": "Colors",
+      "colorsPicked": "{count, plural, one {# color} other {# colors}} selected",
       "colorsHint": "Pick colors from the color attributes; with no color, each size gets one SKU.",
       "noColors": "No color attributes yet.",
       "sizes": "Sizes",
+      "sizesPicked": "{count, plural, one {# size} other {# sizes}} selected",
       "sizesFromChart": "from the size chart",
       "sizesFromAttributes": "from size attributes (no size chart linked)",
       "rule": "Generated code: {example}",
@@ -1394,7 +1423,36 @@
       "remove": "Remove image",
       "cover": "Cover image",
       "makeCover": "Set as cover",
+      "uploadCover": "Upload cover",
+      "replaceCover": "Replace cover",
+      "gallery": "Detail & angle images",
+      "galleryCount": "{count}/{max} images",
+      "moveLeft": "Move left",
+      "moveRight": "Move right",
       "hint": "Up to {max} images, under 5MB each, portrait 3:4 or 9:16 only. Images are compressed to WebP. The first image is the cover, the rest are description images."
+    },
+    "options": {
+      "materialAction": "Material & design",
+      "materialNone": "No material selected",
+      "colors": "Colors ({count})",
+      "colorsHint": "Select colors applied to this product to generate SKUs and show in store.",
+      "designTraits": "Design traits",
+      "traitsCount": "{count} traits",
+      "traitNone": "— None —",
+      "warehouseTitle": "Warehouse Links",
+      "skuStock": "View & adjust SKU stock",
+      "fabricStock": "View fabric rolls in warehouse",
+      "unitCustom": "Made to measure (No finished stock)",
+      "unitPiece": "pcs",
+      "unitMeter": "m"
+    },
+    "materialDialog": {
+      "title": "Material & Design Traits",
+      "description": "Select the primary fabric and tailoring traits (collar, sleeve, hem, lining) for this product.",
+      "done": "Done",
+      "materialSection": "Primary fabric material",
+      "designSection": "Design traits",
+      "selectedTraits": "{count} traits"
     }
   },
   "tailoring": {
@@ -3218,6 +3276,7 @@
     },
     "menu": {
       "label": "Actions for {name}",
+      "view": "View details",
       "edit": "Edit",
       "hide": "Hide",
       "show": "Show",
@@ -3225,6 +3284,21 @@
       "moveDown": "Move later",
       "delete": "Delete",
       "deleteBlocked": "Used by {count, plural, one {# SKU} other {# SKUs}} — hide it instead"
+    },
+    "detailDialog": {
+      "title": "Trait details",
+      "groupLabel": "Group: {name}",
+      "name": "Trait name",
+      "code": "Trait code",
+      "status": "Status",
+      "statusActive": "Visible",
+      "statusHidden": "Hidden",
+      "position": "Display order",
+      "positionValue": "Position #{position}",
+      "skuUsage": "Products / SKUs",
+      "noDescription": "No detailed description.",
+      "edit": "Edit",
+      "close": "Close"
     },
     "field": {
       "name": "Name",

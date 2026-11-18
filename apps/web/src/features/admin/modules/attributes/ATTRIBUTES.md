@@ -274,9 +274,10 @@ Giao diện phân hệ Thuộc tính được tổ chức thành cấu trúc **S
 2. `AttributeValueViews.tsx`: Chứa 3 chế độ xem độc lập tùy biến theo bản chất nhóm:
    - `ColorPalette`: Hiển thị bảng màu chuẩn thẩm mỹ hộp chỉ thêu, hiển thị họ màu, tương phản chữ trên nền màu thông minh.
    - `SizeTape`: Hiển thị thước may đo thợ may với nền CSS `repeating-linear-gradient` mô phỏng vạch chia độ chân thực.
-   - `TraitGrid`: Hiển thị danh sách các đặc tính thủ công mỹ nghệ dạng thẻ số hóa.
-3. `AttributeEditorDialog.tsx`: Dialog thông minh 2 trong 1 (vừa tạo/sửa nhóm cha, vừa tạo/sửa giá trị con). Tích hợp công tắc chuyển ngôn ngữ VI/EN (`AdminLangSwitch`), Color Picker native, dải 12 chấm màu nhanh và bộ presets màu may mặc cổ truyền.
-4. `AttributeDeleteDialog.tsx`: Dialog cảnh báo nguy hiểm trước khi xóa nhóm hoặc xóa thuộc tính.
+   - `TraitGrid`: Hiển thị danh sách các đặc tính thủ công mỹ nghệ dạng thẻ số hóa với độ cao đồng đều, mô tả giới hạn tối đa 2 dòng kèm dấu chấm lửng (...), bấm thẻ mở xem chi tiết (chỉ đọc), hiển thị thuần 1 ngôn ngữ theo trang web.
+3. `AttributeDetailDialog.tsx`: Dialog xem chi tiết đặc tính thiết kế (chỉ đọc), hiển thị thông tin gộp thống nhất không tách lẻ, thuần 1 ngôn ngữ theo trang web, loại bỏ toàn bộ icon rườm rà, có nút chuyển nhanh sang biên tập.
+4. `AttributeEditorDialog.tsx`: Dialog biên tập thông minh 2 trong 1 (vừa tạo/sửa nhóm cha, vừa tạo/sửa giá trị con). Tích hợp công tắc chuyển ngôn ngữ VI/EN (`AdminLangSwitch`), Color Picker native, dải 12 chấm màu nhanh và bộ presets màu may mặc cổ truyền.
+5. `AttributeDeleteDialog.tsx`: Dialog cảnh báo nguy hiểm trước khi xóa nhóm hoặc xóa thuộc tính.
 
 ---
 
@@ -289,6 +290,7 @@ apps/web/src/features/admin/modules/attributes/
 ├── components/
 │   ├── dialog/
 │   │   ├── AttributeDeleteDialog.tsx # Dialog xác nhận xóa an toàn
+│   │   ├── AttributeDetailDialog.tsx # Dialog xem chi tiết đặc tính (chỉ đọc)
 │   │   └── AttributeEditorDialog.tsx # Dialog tạo/sửa nhóm và giá trị thuộc tính
 │   ├── AttributeGroupIcon.tsx        # Icon tương ứng với từng mã nhóm hệ thống
 │   ├── AttributesBoard.tsx           # Layout bàn làm việc chính (Split View 2 cột)

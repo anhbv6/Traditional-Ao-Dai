@@ -1,6 +1,5 @@
 "use client";
 
-import { Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import {
   ADMIN_DIALOG_DANGER_BUTTON_CLASS,
@@ -44,7 +43,6 @@ export function AttributeDeleteDialog({
     <AdminDialog
       open
       onOpenChange={(open) => !open && onClose()}
-      icon={Trash2}
       tone="danger"
       size="sm"
       title={title}

@@ -25,7 +25,11 @@ import { AttributeGroupIcon } from "./AttributeGroupIcon";
 import { ColorPalette, SizeTape, TraitGrid, type ValueHandlers } from "./AttributeValueViews";
 import { type AttributeDeleteTarget } from "./dialog/AttributeDeleteDialog";
 import { type AttributeEditorTarget } from "./dialog/AttributeEditorDialog";
+import { type AdminAttributeValue } from "../types/attributes.types";
 
+const AttributeDetailDialog = dynamic(() =>
+  import("./dialog/AttributeDetailDialog").then((m) => m.AttributeDetailDialog)
+);
 const AttributeEditorDialog = dynamic(() =>
   import("./dialog/AttributeEditorDialog").then((m) => m.AttributeEditorDialog)
 );
@@ -50,6 +54,7 @@ export function AttributesBoard({ initialData }: { initialData: AdminAttributeDa
   const [search, _setSearch] = useState("");
 
   const [editorTarget, setEditorTarget] = useState<AttributeEditorTarget | null>(null);
+  const [detailValue, setDetailValue] = useState<AdminAttributeValue | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<AttributeDeleteTarget | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -75,6 +80,7 @@ export function AttributesBoard({ initialData }: { initialData: AdminAttributeDa
   };
 
   const handlers: ValueHandlers = {
+    onView: (value) => setDetailValue(value),
     onEdit: (value) => {
       if (group) setEditorTarget({ type: "value", group, value });
     },
@@ -282,6 +288,18 @@ export function AttributesBoard({ initialData }: { initialData: AdminAttributeDa
           )}
         </section>
       </div>
+
+      {detailValue && group && (
+        <AttributeDetailDialog
+          value={detailValue}
+          group={group}
+          onClose={() => setDetailValue(null)}
+          onEdit={(val) => {
+            setDetailValue(null);
+            setEditorTarget({ type: "value", group, value: val });
+          }}
+        />
+      )}
 
       {editorTarget && (
         <AttributeEditorDialog

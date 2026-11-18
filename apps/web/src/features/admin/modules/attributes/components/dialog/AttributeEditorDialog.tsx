@@ -146,6 +146,15 @@ function GroupEditorForm({
       className="sm:min-h-[380px]"
       onSubmit={handleSubmit}
       bodyClassName="space-y-3.5 min-h-[220px]"
+      headerAside={
+        <AdminLangSwitch
+          value={lang}
+          onChange={setLang}
+          label={t("dialog.langLabel")}
+          status={{ en: values.nameEn ? undefined : "missing" }}
+          className="mt-1"
+        />
+      }
       footer={
         <>
           <button type="button" onClick={() => onOpenChange(false)} className={ADMIN_DIALOG_SECONDARY_BUTTON_CLASS}>
@@ -158,29 +167,18 @@ function GroupEditorForm({
       }
     >
       <div key={lang} role="tabpanel" className="space-y-3.5">
-        <div className="flex items-end gap-3">
-          <AdminTextField
-            autoFocus
-            required={lang === "vi"}
-            className="min-w-0 flex-1"
-            label={t("groupDialog.name")}
-            value={values[fields.name]}
-            onValueChange={(next) => {
-              set(fields.name, next);
-              if (lang === "vi") setNameError(false);
-            }}
-            placeholder={t(`groupDialog.placeholders.${lang}.name`)}
-            error={lang === "vi" && nameError ? t("groupDialog.nameRequired") : undefined}
-          />
-          <div className="flex h-10 shrink-0 items-center">
-            <AdminLangSwitch
-              value={lang}
-              onChange={setLang}
-              label={t("dialog.langLabel")}
-              status={{ en: values.nameEn ? undefined : "missing" }}
-            />
-          </div>
-        </div>
+        <AdminTextField
+          autoFocus
+          required={lang === "vi"}
+          label={t("groupDialog.name")}
+          value={values[fields.name]}
+          onValueChange={(next) => {
+            set(fields.name, next);
+            if (lang === "vi") setNameError(false);
+          }}
+          placeholder={t(`groupDialog.placeholders.${lang}.name`)}
+          error={lang === "vi" && nameError ? t("groupDialog.nameRequired") : undefined}
+        />
         <AdminTextField
           label={t("field.code")}
           hint={codeLocked ? t("groupDialog.codeLocked") : t("groupDialog.codeHint")}

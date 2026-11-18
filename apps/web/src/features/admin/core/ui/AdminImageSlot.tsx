@@ -31,6 +31,8 @@ export interface AdminImageSlotProps {
   allowRemove?: boolean;
   /** Các nút thao tác bổ sung ở góc dưới khung ảnh (VD: nút chuyển trái / phải) */
   actions?: ReactNode;
+  /** Tùy chọn hàm kiểm tra / chuẩn bị ảnh trước khi tải lên (mặc định dùng compressClientImage) */
+  prepareFile?: (file: File) => Promise<{ success: true; file: File } | { success: false; error: string }>;
   /** Vô hiệu hóa ô ảnh */
   disabled?: boolean;
   className?: string;
@@ -56,6 +58,7 @@ export function AdminImageSlot({
   folder = "general",
   allowRemove = true,
   actions,
+  prepareFile,
   disabled = false,
   className,
 }: AdminImageSlotProps) {
@@ -71,7 +74,7 @@ export function AdminImageSlot({
 
     setIsUploading(true);
     try {
-      const prepared = await compressClientImage(file);
+      const prepared = prepareFile ? await prepareFile(file) : await compressClientImage(file);
       if (!prepared.success) {
         notify.error(prepared.error, "IMAGE_UPLOAD_FAILED");
         return;

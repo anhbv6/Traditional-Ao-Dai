@@ -15,13 +15,12 @@ import {
   AdminTextField,
   AdminTooltip,
 } from "@/features/admin/core/ui";
-import { PRODUCT_GROUP_COLORS, PRODUCT_GROUP_ICONS } from "@/features/admin/modules/categories";
 import { createProductAction } from "../../actions/products.actions";
 import { type AdminProductCategory } from "../../types/products.types";
 import { SALE_MODES, SALE_MODE_ICONS, allowedSaleModes, type SaleMode } from "../../utils/saleModes";
 
 /**
- * Tạo nhanh sản phẩm: tên → loại sản phẩm → hình thức bán (chỉ những hình thức nhóm hàng của loại cho phép),
+ * Tạo nhanh sản phẩm: tên → nhóm hàng (cha) → loại sản phẩm (con) → hình thức bán,
  * xong chuyển sang màn chi tiết để nhập giá, ảnh, SKU
  */
 export function CreateProductDialog({
@@ -36,15 +35,28 @@ export function CreateProductDialog({
   const notify = useNotify();
   const router = useRouter();
   const [name, setName] = useState("");
-  const [categoryId, setCategoryId] = useState(categories[0]?.id ?? "");
+
+  const roots = categories.filter((c) => c.parentId === null);
+  const [rootId, setRootId] = useState(roots[0]?.id ?? "");
+
+  // Các loại con thuộc nhóm cha đang chọn
+  const childrenOfRoot = categories.filter((c) => c.parentId === rootId);
+  const [categoryId, setCategoryId] = useState(childrenOfRoot[0]?.id ?? rootId);
   const [mode, setMode] = useState<SaleMode>("SINGLE");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const category = categories.find((c) => c.id === categoryId) ?? null;
+  // Khi đổi nhóm cha: tự động chọn loại con đầu tiên của nhóm đó
+  const handleRootChange = (nextRootId: string) => {
+    setRootId(nextRootId);
+    const nextChildren = categories.filter((c) => c.parentId === nextRootId);
+    const nextCategory = nextChildren[0]?.id ?? nextRootId;
+    setCategoryId(nextCategory);
+  };
+
+  const category = categories.find((c) => c.id === categoryId) ?? categories[0] ?? null;
   const allowed = category ? allowedSaleModes(category.group) : (["SINGLE"] as SaleMode[]);
   // Đổi loại mà hình thức đang chọn không còn hợp lệ thì về "một món"
   const saleMode: SaleMode = allowed.includes(mode) ? mode : "SINGLE";
-  const GroupIcon = category ? PRODUCT_GROUP_ICONS[category.group] : null;
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -97,28 +109,36 @@ export function CreateProductDialog({
         placeholder={t("placeholders.vi.name")}
       />
 
-      <AdminField required label={t("field.category")}>
-        <AdminFilterSelect
-          label={t("field.categoryShort")}
-          value={categoryId}
-          options={categories.map((c) => ({ value: c.id, label: c.label }))}
-          onChange={setCategoryId}
-          className="h-10 w-full"
-        />
-        {category && GroupIcon && (
-          <p className="flex items-center gap-1.5 text-xs text-[#71717A]">
-            <span
-              className={cn(
-                "inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 font-medium",
-                PRODUCT_GROUP_COLORS[category.group].chip
-              )}
-            >
-              <GroupIcon size={12} aria-hidden /> {tSizing(`group.${category.group}`)}
-            </span>
-            {t("create.inheritHint")}
-          </p>
-        )}
-      </AdminField>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <AdminField required label={t("field.categoryParent")}>
+          <AdminFilterSelect
+            label={t("field.categoryParentShort")}
+            value={rootId}
+            options={roots.map((r) => ({ value: r.id, label: r.name }))}
+            onChange={handleRootChange}
+            className="h-10 w-full"
+          />
+        </AdminField>
+
+        <AdminField required label={t("field.category")}>
+          <AdminFilterSelect
+            label={t("field.categoryShort")}
+            value={categoryId}
+            options={(childrenOfRoot.length > 0 ? childrenOfRoot : [roots.find((r) => r.id === rootId) || category]).filter(Boolean).map((c) => ({
+              value: c.id,
+              label: c.name,
+            }))}
+            onChange={setCategoryId}
+            className="h-10 w-full"
+          />
+        </AdminField>
+      </div>
+
+      {category && (
+        <p className="text-xs text-[#71717A]">
+          {tSizing(`group.${category.group}`)} · {t("create.inheritHint")}
+        </p>
+      )}
 
       <fieldset className="space-y-1.5">
         <legend className="text-sm font-medium text-[#3F3F46]">{t("field.saleMode")}</legend>

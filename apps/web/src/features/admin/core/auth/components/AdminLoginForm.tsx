@@ -45,8 +45,8 @@ export function AdminLoginForm() {
           <div className={cn(ADMIN_CARD_CLASS, "overflow-hidden shadow-[0_24px_48px_-24px_rgba(9,9,11,0.18)]")}>
             <form onSubmit={handleSubmit} className="space-y-6 px-6 py-6 sm:px-8 sm:py-7" noValidate>
               {/* Tiêu đề thẻ chuẩn phân cấp visual hierarchy (§8): 20px -> nhãn 14px -> chú thích 13px */}
-              <div className="space-y-1">
-                <h1 className="text-xl text-center font-semibold tracking-tight text-[#09090B]">{t("title")}</h1>
+              <div className="space-y-1 text-center">
+                <h1 className="text-xl font-semibold tracking-tight text-[#09090B]">{t("title")}</h1>
                 <p className="text-xs text-[#71717A]">{t("staffOnly")}</p>
               </div>
 

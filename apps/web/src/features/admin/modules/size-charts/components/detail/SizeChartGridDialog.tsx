@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { AlertTriangle, Ruler } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useNotify } from "@/hooks/useNotify";
 import { useRouter } from "@/i18n/routing";
@@ -63,7 +63,6 @@ export function SizeChartGridDialog({
     <AdminDialog
       open
       onOpenChange={onOpenChange}
-      icon={Ruler}
       title={t("gridDialog.title", { name: title })}
       description={t("gridDialog.description")}
       size="5xl"

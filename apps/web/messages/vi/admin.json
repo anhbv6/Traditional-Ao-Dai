@@ -28,6 +28,13 @@
     "secureNote": "Phiên quản trị tách riêng với tài khoản mua hàng và tự hết hạn sau 8 giờ không hoạt động.",
     "staffOnly": "Chỉ dành cho nhân viên và quản trị viên. Liên hệ quản trị viên cấp cao để biết thêm chi tiết."
   },
+  "pagination": {
+    "showing": "Hiển thị {from}–{to} trên {total}",
+    "perPage": "Mỗi trang",
+    "prev": "Trước",
+    "next": "Sau",
+    "page": "Trang {page}"
+  },
   "header": {
     "systemTitle": "Thiên Canh",
     "viewStore": "Xem cửa hàng",
@@ -1262,6 +1269,7 @@
       "back": "Sản phẩm",
       "save": "Lưu thay đổi",
       "unsaved": "Chưa lưu",
+      "options": "Tùy chọn",
       "langLabel": "Ngôn ngữ nội dung",
       "langHint": "Áp dụng cho tên, mô tả và tên món trong bộ."
     },
@@ -1269,10 +1277,14 @@
       "general": "Thông tin chung",
       "saleMode": "Hình thức bán",
       "design": "Chất liệu & thiết kế",
+      "traits": "Đặc tính",
       "pricing": "Giá & SKU"
     },
     "field": {
       "name": "Tên sản phẩm",
+      "code": "Mã sản phẩm",
+      "categoryParent": "Nhóm hàng (Cấp cha)",
+      "categoryParentShort": "Nhóm hàng",
       "category": "Loại sản phẩm",
       "categoryShort": "Loại",
       "description": "Mô tả",
@@ -1287,13 +1299,28 @@
       "isFeatured": "Sản phẩm nổi bật"
     },
     "hints": {
+      "code": "Mã định danh duy nhất của sản phẩm, không thể chỉnh sửa.",
+      "categoryParent": "Nhóm hàng cha quyết định đơn vị tồn kho (cái/mét), form may đo và bảng size.",
+      "categoryChild": "Phân loại cụ thể của sản phẩm thuộc nhóm hàng đã chọn.",
       "category": "Nhóm hàng của loại quyết định hình thức bán được phép, có size hay không, có nhận may đo không và bán theo cái hay theo mét.",
       "saleMode": "Một món: may sẵn theo size. Theo bộ: nhiều món bán chung (áo + quần...). May đo: may theo số đo khách, không giữ tồn kho thành phẩm.",
       "isCustomFit": "Khách chọn size có sẵn hoặc gửi số đo để may riêng.",
+      "featuredHint": "Sản phẩm được đưa lên vị trí trang trọng ở trang chủ.",
       "design": "Thông số vải kế thừa từ hồ sơ chất liệu; đặc tính thiết kế dùng để lọc trên cửa hàng.",
+      "traits": "Hồ sơ chất liệu, đặc tính thiết kế may đo, dải màu sắc, kích cỡ biến thể SKU và bộ sưu tập hình ảnh.",
       "pricing": "Giá riêng của SKU để trống thì dùng giá bán chung.",
       "sizeChart": "Mặc định theo loại sản phẩm; chọn bảng khác nếu mẫu này có form riêng (VD form ôm).",
-      "notReady": "Hoàn thành các mục bên dưới để mở bán."
+      "notReady": "Chưa đủ điều kiện: cần hoàn thành các mục màu cam để bật mở bán.",
+      "readyConditions": "Điều kiện cần để mở bán",
+      "readyAllMet": "Đã đủ điều kiện mở bán sản phẩm."
+    },
+    "preview": {
+      "title": "Thông số đã cấu hình",
+      "variants": "Biến thể & Tồn kho",
+      "designTraits": "Đặc tính thiết kế",
+      "featuredYes": "Nổi bật",
+      "featuredNo": "Bình thường",
+      "readyPending": "{count} mục chưa đạt"
     },
     "placeholders": {
       "basePrice": "Vui lòng nhập giá",
@@ -1338,9 +1365,11 @@
     },
     "sku": {
       "colors": "Màu",
+      "colorsPicked": "Đã chọn {count} màu",
       "colorsHint": "Chọn màu từ thuộc tính màu; không chọn màu thì mỗi size một SKU.",
       "noColors": "Chưa có thuộc tính màu nào.",
       "sizes": "Size",
+      "sizesPicked": "Đã chọn {count} size",
       "sizesFromChart": "theo bảng size",
       "sizesFromAttributes": "theo thuộc tính size (chưa gắn bảng size)",
       "rule": "Mã tự sinh: {example}",
@@ -1393,8 +1422,37 @@
       "uploading": "Đang tải...",
       "remove": "Xóa ảnh",
       "cover": "Ảnh đại diện",
-      "makeCover": "Đặt đại diện",
+      "makeCover": "Đặt làm đại diện",
+      "uploadCover": "Tải ảnh đại diện",
+      "replaceCover": "Thay ảnh",
+      "gallery": "Ảnh chi tiết & các góc chụp",
+      "galleryCount": "{count}/{max} ảnh",
+      "moveLeft": "Chuyển sang trái",
+      "moveRight": "Chuyển sang phải",
       "hint": "Tối đa {max} ảnh, mỗi ảnh dưới 5MB, bắt buộc ảnh dọc 3:4 hoặc 9:16. Ảnh tự nén sang WebP. Ảnh đầu tiên là ảnh đại diện, các ảnh còn lại là ảnh mô tả."
+    },
+    "options": {
+      "materialAction": "Chất liệu & thiết kế",
+      "materialNone": "Chưa chọn chất liệu",
+      "colors": "Màu sắc ({count})",
+      "colorsHint": "Chọn các màu áp dụng cho sản phẩm này để sinh SKU và hiển thị trên cửa hàng.",
+      "designTraits": "Đặc tính thiết kế",
+      "traitsCount": "{count} đặc tính",
+      "traitNone": "— Chưa chọn —",
+      "warehouseTitle": "Liên kết Danh mục Kho",
+      "skuStock": "Xem & điều chỉnh tồn kho SKU",
+      "fabricStock": "Xem cây vải trong kho vải",
+      "unitCustom": "May theo số đo riêng (Không giữ tồn kho thành phẩm)",
+      "unitPiece": "chiếc",
+      "unitMeter": "m"
+    },
+    "materialDialog": {
+      "title": "Chất liệu & Đặc tính thiết kế",
+      "description": "Chọn chất liệu vải chính và các chi tiết may đo (kiểu cổ, tay, tà, lót) cho sản phẩm.",
+      "done": "Xong",
+      "materialSection": "Chất liệu vải chính",
+      "designSection": "Đặc tính thiết kế",
+      "selectedTraits": "{count} đặc tính"
     }
   },
   "tailoring": {
@@ -3218,6 +3276,7 @@
     },
     "menu": {
       "label": "Thao tác với {name}",
+      "view": "Xem chi tiết",
       "edit": "Sửa",
       "hide": "Ẩn",
       "show": "Hiện",
@@ -3225,6 +3284,21 @@
       "moveDown": "Ra sau",
       "delete": "Xóa",
       "deleteBlocked": "Đang dùng ở {count} SKU — chỉ ẩn được"
+    },
+    "detailDialog": {
+      "title": "Chi tiết đặc tính",
+      "groupLabel": "Thuộc nhóm: {name}",
+      "name": "Tên đặc tính",
+      "code": "Mã kỹ thuật",
+      "status": "Trạng thái",
+      "statusActive": "Đang hiển thị",
+      "statusHidden": "Đang ẩn",
+      "position": "Thứ tự hiển thị",
+      "positionValue": "Vị trí #{position}",
+      "skuUsage": "Sản phẩm / SKU",
+      "noDescription": "Chưa có mô tả chi tiết.",
+      "edit": "Chỉnh sửa",
+      "close": "Đóng"
     },
     "field": {
       "name": "Tên",

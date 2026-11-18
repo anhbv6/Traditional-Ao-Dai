@@ -5,9 +5,11 @@ export interface AdminProductItem {
   id: string;
   code: string;
   name: string;
+  nameEn?: string | null;
   slug: string;
   saleMode: SaleMode;
   materialName: string | null;
+  materialNameEn?: string | null;
   basePrice: number;
   images: string[];
   soldCount: number;
@@ -16,6 +18,7 @@ export interface AdminProductItem {
   isFeatured: boolean;
   categoryId: string;
   categoryName: string | null;
+  categoryNameEn?: string | null;
   categoryGroup: ProductGroup;
   variantsCount: number;
   totalStock: number;
@@ -79,6 +82,7 @@ export interface AdminProductCategory {
   /** "Nhóm gốc › Loại con" để phân biệt các loại trùng tên ở nhóm khác */
   label: string;
   group: ProductGroup;
+  parentId: string | null;
   /** Bảng size mặc định đã tính thừa hưởng (loại con chưa gắn thì lấy của nhóm gốc) */
   defaultSizeChartId: string | null;
 }

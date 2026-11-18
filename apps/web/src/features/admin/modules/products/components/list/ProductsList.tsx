@@ -54,7 +54,9 @@ export function ProductsList({ initialProducts, categories }: ProductsListProps)
   const filtered = products.filter(
     (p) =>
       (!keyword ||
-        `${p.name} ${p.code} ${p.materialName ?? ""} ${p.categoryName ?? ""}`.toLowerCase().includes(keyword)) &&
+        `${p.name} ${p.nameEn ?? ""} ${p.code} ${p.materialName ?? ""} ${p.materialNameEn ?? ""} ${p.categoryName ?? ""} ${p.categoryNameEn ?? ""}`
+          .toLowerCase()
+          .includes(keyword)) &&
       matchesStatusTab(p, statusTab) &&
       (!categoryIds || categoryIds.has(p.categoryId)) &&
       (!saleMode || p.saleMode === saleMode)

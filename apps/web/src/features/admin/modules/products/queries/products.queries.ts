@@ -14,8 +14,8 @@ import {
 import { LOW_STOCK_THRESHOLD } from "../utils/products.utils";
 
 const PRODUCT_LIST_INCLUDE = {
-  category: { select: { id: true, name: true, group: true } },
-  material: { select: { name: true } },
+  category: { select: { id: true, name: true, nameEn: true, group: true } },
+  material: { select: { name: true, nameEn: true } },
   variants: { select: { id: true, stock: true } },
 } satisfies Prisma.ProductInclude;
 
@@ -26,9 +26,11 @@ function toAdminProductItem(p: ProductWithList): AdminProductItem {
     id: p.id,
     code: p.code,
     name: p.name,
+    nameEn: p.nameEn,
     slug: p.slug,
     saleMode: p.saleMode,
     materialName: p.material?.name ?? null,
+    materialNameEn: p.material?.nameEn ?? null,
     basePrice: toVnd(p.basePrice),
     images: p.images,
     soldCount: p.soldCount,
@@ -37,6 +39,7 @@ function toAdminProductItem(p: ProductWithList): AdminProductItem {
     isFeatured: p.isFeatured,
     categoryId: p.categoryId,
     categoryName: p.category.name,
+    categoryNameEn: p.category.nameEn,
     categoryGroup: p.category.group,
     variantsCount: p.variants.length,
     totalStock: p.variants.reduce((sum, v) => sum + v.stock, 0),
@@ -141,7 +144,14 @@ export async function getAdminProductCategoriesQuery(): Promise<AdminProductCate
   });
   const roots = categories.filter((c) => c.parentId === null);
   return roots.flatMap((root) => [
-    { id: root.id, name: root.name, label: root.name, group: root.group, defaultSizeChartId: root.defaultSizeChartId },
+    {
+      id: root.id,
+      name: root.name,
+      label: root.name,
+      group: root.group,
+      parentId: null,
+      defaultSizeChartId: root.defaultSizeChartId,
+    },
     ...categories
       .filter((c) => c.parentId === root.id)
       .map((child) => ({
@@ -149,6 +159,7 @@ export async function getAdminProductCategoriesQuery(): Promise<AdminProductCate
         name: child.name,
         label: `${root.name} › ${child.name}`,
         group: child.group,
+        parentId: root.id,
         defaultSizeChartId: child.defaultSizeChartId,
       })),
   ]);

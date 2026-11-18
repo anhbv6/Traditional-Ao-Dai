@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Lock, Sparkles, Trash2, Unlock } from "lucide-react";
+import { Check, Lock, Sparkles, Trash2, Unlock } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { AdminInfoTip, AdminTooltip } from "@/features/admin/core/ui";
@@ -16,7 +16,7 @@ import {
 import { type VariantRow } from "../../utils/productEditorForm";
 
 const CELL_INPUT =
-  "h-8 w-full rounded-md border border-[#E4E4E7] bg-white px-2 text-sm text-[#09090B] outline-none placeholder:text-[#A1A1AA] focus:border-[#18181B] disabled:bg-[#FAFAFA] disabled:text-[#A1A1AA]";
+  "h-8 w-full rounded-md border border-[#E4E4E7] bg-white px-2.5 text-xs text-[#09090B] outline-none placeholder:text-[#A1A1AA] focus:border-[#18181B] focus:ring-1 focus:ring-[#18181B]/20 disabled:bg-[#FAFAFA] disabled:text-[#A1A1AA] transition-colors";
 
 let rowSeq = 0;
 /** Khóa tạm cho dòng mới (chưa có id) để React giữ đúng ô nhập khi thêm / xóa */
@@ -30,9 +30,10 @@ function axisSizes(axis: SizeAxis): string[] {
 }
 
 /**
- * SKU của sản phẩm: chọn màu (thuộc tính màu) × size (kế thừa từ bảng size / thuộc tính size) rồi sinh các tổ hợp
- * còn thiếu; mã tự sinh theo <mã SP>-<màu>-<size>, khóa lại để nhập tay khi cần. May đo không có size và không
- * giữ tồn kho; hàng bán theo mét tính tồn bằng mét.
+ * SKU của sản phẩm:
+ * - Chọn màu (swatch màu thanh lịch, giữ nguyên trung thực màu vải, không bôi đen nút).
+ * - Chọn size kế thừa từ bảng size / thuộc tính size.
+ * - Bảng danh sách SKU rõ ràng, typography font-mono chuẩn mực cho mã, giá và tồn kho.
  */
 export function ProductSkuField({
   rows,
@@ -63,7 +64,7 @@ export function ProductSkuField({
     return new Set(used.length > 0 ? used : allSizes);
   });
 
-  // Trục size đổi (đổi loại / hình thức bán / bảng size): chỉ giữ size còn thuộc trục
+  // Trục size đổi: chỉ giữ size còn thuộc trục
   const sizes = allSizes.filter((size) => axis.kind !== "sized" || pickedSizes.has(size));
   const colorChoices = colors.filter((c) => c.isActive || pickedColors.has(c.id));
   const comboColors: (string | null)[] = pickedColors.size > 0 ? [...pickedColors] : [null];
@@ -111,16 +112,25 @@ export function ProductSkuField({
   return (
     <div className="space-y-4">
       {/* Bộ sinh tổ hợp màu × size */}
-      <div className="space-y-3 rounded-lg border border-dashed border-[#D4D4D8] p-3">
+      <div className="space-y-3.5 rounded-xl border border-[#E4E4E7] bg-[#FAFAFA]/60 p-3.5">
+        {/* 1. Nhóm chọn màu sắc sản phẩm */}
         <div>
-          <p className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-[#3F3F46]">
-            {t("colors")}
-            <AdminInfoTip content={t("colorsHint")} />
-          </p>
+          <div className="mb-2 flex items-center justify-between">
+            <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[#52525B]">
+              {t("colors")}
+              <AdminInfoTip content={t("colorsHint")} />
+            </p>
+            {pickedColors.size > 0 && (
+              <span className="text-2xs font-medium text-[#71717A]">
+                {t("colorsPicked", { count: pickedColors.size })}
+              </span>
+            )}
+          </div>
+
           {colorChoices.length === 0 ? (
             <p className="text-xs text-[#A1A1AA]">{t("noColors")}</p>
           ) : (
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-2">
               {colorChoices.map((color) => {
                 const on = pickedColors.has(color.id);
                 return (
@@ -130,16 +140,19 @@ export function ProductSkuField({
                     aria-pressed={on}
                     onClick={() => setPickedColors((prev) => toggle(prev, color.id))}
                     className={cn(
-                      "inline-flex h-7 cursor-pointer items-center gap-1.5 rounded-full border pl-1 pr-2.5 text-xs font-medium transition-colors",
-                      on ? "border-[#18181B] bg-[#18181B] text-white" : "border-[#E4E4E7] text-[#3F3F46] hover:border-[#A1A1AA]"
+                      "inline-flex h-8 cursor-pointer items-center gap-2 rounded-lg border px-2.5 text-xs transition-all",
+                      on
+                        ? "border-[#18181B] bg-white font-semibold text-[#09090B] shadow-2xs ring-1 ring-[#18181B]"
+                        : "border-[#E4E4E7] bg-white text-[#52525B] hover:border-[#A1A1AA] hover:text-[#09090B]"
                     )}
                   >
                     <span
                       aria-hidden
-                      className="size-5 rounded-full border border-black/10"
+                      className="size-4 shrink-0 rounded-full border border-black/15 shadow-2xs"
                       style={{ background: color.hex ?? "#F4F4F5" }}
                     />
-                    {color.name}
+                    <span className="truncate">{color.name}</span>
+                    {on && <Check size={12} className="shrink-0 text-[#18181B]" aria-hidden />}
                   </button>
                 );
               })}
@@ -147,14 +160,23 @@ export function ProductSkuField({
           )}
         </div>
 
+        {/* 2. Nhóm chọn size */}
         {axis.kind === "sized" && (
-          <div>
-            <p className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-[#3F3F46]">
-              {t("sizes")}
-              <span className="text-xs font-normal text-[#A1A1AA]">
-                {axis.source === "chart" ? t("sizesFromChart") : t("sizesFromAttributes")}
-              </span>
-            </p>
+          <div className="border-t border-dashed border-[#E4E4E7] pt-3">
+            <div className="mb-2 flex items-center justify-between">
+              <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[#52525B]">
+                {t("sizes")}
+                <span className="font-normal normal-case text-[#A1A1AA]">
+                  ({axis.source === "chart" ? t("sizesFromChart") : t("sizesFromAttributes")})
+                </span>
+              </p>
+              {pickedSizes.size > 0 && (
+                <span className="text-2xs font-medium text-[#71717A]">
+                  {t("sizesPicked", { count: pickedSizes.size })}
+                </span>
+              )}
+            </div>
+
             <div className="flex flex-wrap gap-1.5">
               {axis.sizes.map((size) => {
                 const on = pickedSizes.has(size);
@@ -165,8 +187,10 @@ export function ProductSkuField({
                     aria-pressed={on}
                     onClick={() => setPickedSizes((prev) => toggle(prev, size))}
                     className={cn(
-                      "h-7 min-w-10 cursor-pointer rounded-md border px-2 font-mono text-xs font-semibold transition-colors",
-                      on ? "border-[#18181B] bg-[#18181B] text-white" : "border-[#E4E4E7] text-[#3F3F46] hover:border-[#A1A1AA]"
+                      "h-8 min-w-10 cursor-pointer rounded-lg border px-2.5 font-mono text-xs transition-all",
+                      on
+                        ? "border-[#18181B] bg-[#18181B] font-semibold text-white shadow-xs"
+                        : "border-[#E4E4E7] bg-white font-medium text-[#3F3F46] hover:border-[#A1A1AA] hover:text-[#09090B]"
                     )}
                   >
                     {size}
@@ -177,15 +201,16 @@ export function ProductSkuField({
           </div>
         )}
 
+        {/* 3. Thanh thao tác sinh tổ hợp */}
         <div className="flex flex-wrap items-center justify-between gap-2 border-t border-dashed border-[#E4E4E7] pt-3">
-          <p className="text-xs text-[#71717A]">
+          <p className="font-mono text-2xs text-[#71717A]">
             {t("rule", { example: buildVariantSku({ productCode, colorCode: colorChoices[0]?.code ?? null, size: allSizes[0] }) })}
           </p>
           <button
             type="button"
             disabled={missing.length === 0}
             onClick={generate}
-            className="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-lg bg-[#18181B] px-3 text-xs font-medium text-white hover:bg-[#09090B] disabled:cursor-not-allowed disabled:bg-[#E4E4E7] disabled:text-[#A1A1AA]"
+            className="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-lg bg-[#18181B] px-3 text-xs font-medium text-white hover:bg-[#09090B] disabled:cursor-not-allowed disabled:bg-[#E4E4E7] disabled:text-[#A1A1AA] transition-colors"
           >
             <Sparkles size={13} aria-hidden />
             {missing.length > 0 ? t("generate", { count: missing.length }) : t("allGenerated")}
@@ -193,37 +218,40 @@ export function ProductSkuField({
         </div>
       </div>
 
+      {/* Bảng danh sách biến thể SKU */}
       {rows.length === 0 ? (
         <p className="py-6 text-center text-xs text-[#71717A]">{t("empty")}</p>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[560px] text-body">
+        <div className="overflow-x-auto rounded-xl border border-[#E4E4E7] bg-white">
+          <table className="w-full min-w-[560px] text-left text-xs">
             <thead>
-              <tr className="border-b border-[#E4E4E7] text-left text-body font-semibold text-[#3F3F46]">
-                <th className="py-2 pr-2">{t("color")}</th>
-                <th className="px-2 py-2">{t("size")}</th>
-                <th className="px-2 py-2">{t("code")}</th>
-                <th className="w-32 px-2 py-2">{t("price")}</th>
-                {stockUnit && <th className="w-24 px-2 py-2">{stockUnit === "meter" ? t("stockMeters") : t("stock")}</th>}
-                <th className="w-9 py-2" />
+              <tr className="border-b border-[#E4E4E7] bg-[#FAFAFA] text-2xs font-semibold uppercase tracking-wider text-[#71717A]">
+                <th className="py-2.5 pl-3 pr-2">{t("color")}</th>
+                <th className="px-2 py-2.5">{t("size")}</th>
+                <th className="px-2 py-2.5">{t("code")}</th>
+                <th className="w-32 px-2 py-2.5">{t("price")}</th>
+                {stockUnit && <th className="w-24 px-2 py-2.5">{stockUnit === "meter" ? t("stockMeters") : t("stock")}</th>}
+                <th className="w-9 py-2.5 pr-3" />
               </tr>
             </thead>
             <tbody className="divide-y divide-[#F4F4F5]">
               {rows.map((row) => {
                 const color = row.colorId ? colorById.get(row.colorId) : null;
                 return (
-                  <tr key={row.key}>
-                    <td className="py-2 pr-2">
+                  <tr key={row.key} className="transition-colors hover:bg-[#FAFAFA]/60">
+                    <td className="py-2.5 pl-3 pr-2">
                       <span className="inline-flex items-center gap-2 whitespace-nowrap">
                         <span
                           aria-hidden
-                          className="size-4 shrink-0 rounded-full border border-black/10"
+                          className="size-3.5 shrink-0 rounded-full border border-black/15 shadow-2xs"
                           style={{ background: color?.hex ?? "#F4F4F5" }}
                         />
-                        {color?.name ?? (row.color || <span className="text-[#A1A1AA]">{t("noColor")}</span>)}
+                        <span className="font-medium text-[#09090B]">
+                          {color?.name ?? (row.color || <span className="text-[#A1A1AA]">{t("noColor")}</span>)}
+                        </span>
                       </span>
                     </td>
-                    <td className="px-2 py-2">
+                    <td className="px-2 py-2.5">
                       <AdminTooltip content={sizeInvalid(row.size) ? t("sizeInvalid") : null}>
                         <span
                           className={cn(
@@ -235,63 +263,73 @@ export function ProductSkuField({
                         </span>
                       </AdminTooltip>
                     </td>
-                    <td className="px-2 py-2">
-                      {/* SKU đã lưu giữ nguyên (đã in tem / có đơn) — chỉ dòng mới mới sinh hoặc nhập mã */}
+                    <td className="px-2 py-2.5">
+                      {/* SKU đã lưu giữ nguyên — chỉ dòng mới mới sinh hoặc nhập mã tay */}
                       {row.id ? (
                         <span className="font-mono text-xs text-[#3F3F46]">{row.sku}</span>
                       ) : (
-                      <div className="flex items-center gap-1">
-                        {row.skuAuto ? (
-                          <span className="min-w-0 flex-1 truncate font-mono text-xs text-[#3F3F46]">
-                            {previewSku(row)}
-                          </span>
-                        ) : (
-                          <input
-                            value={row.sku}
-                            onChange={(e) => update(row.key, { sku: e.target.value.toUpperCase() })}
-                            placeholder={t("codePlaceholder")}
-                            className={cn(CELL_INPUT, "font-mono text-xs")}
-                          />
-                        )}
-                        <AdminTooltip content={row.skuAuto ? t("manual") : t("auto")}>
-                          <button
-                            type="button"
-                            onClick={() => update(row.key, { skuAuto: !row.skuAuto, sku: row.skuAuto ? row.sku || previewSku(row) : row.sku })}
-                            aria-label={row.skuAuto ? t("manual") : t("auto")}
-                            className="grid size-7 shrink-0 cursor-pointer place-items-center rounded-md text-[#A1A1AA] hover:bg-[#F4F4F5] hover:text-[#09090B]"
-                          >
-                            {row.skuAuto ? <Lock size={13} /> : <Unlock size={13} />}
-                          </button>
-                        </AdminTooltip>
-                      </div>
+                        <div className="flex items-center gap-1">
+                          {row.skuAuto ? (
+                            <span className="min-w-0 flex-1 truncate font-mono text-xs text-[#71717A]">
+                              {previewSku(row)}
+                            </span>
+                          ) : (
+                            <input
+                              value={row.sku}
+                              onChange={(e) => update(row.key, { sku: e.target.value.toUpperCase() })}
+                              placeholder={t("codePlaceholder")}
+                              className={cn(CELL_INPUT, "font-mono")}
+                            />
+                          )}
+                          <AdminTooltip content={row.skuAuto ? t("manual") : t("auto")}>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                update(row.key, {
+                                  skuAuto: !row.skuAuto,
+                                  sku: row.skuAuto ? row.sku || previewSku(row) : row.sku,
+                                })
+                              }
+                              aria-label={row.skuAuto ? t("manual") : t("auto")}
+                              className="grid size-7 shrink-0 cursor-pointer place-items-center rounded-md text-[#A1A1AA] hover:bg-[#F4F4F5] hover:text-[#09090B]"
+                            >
+                              {row.skuAuto ? <Lock size={13} /> : <Unlock size={13} />}
+                            </button>
+                          </AdminTooltip>
+                        </div>
                       )}
                     </td>
-                    <td className="px-2 py-2">
+                    <td className="px-2 py-2.5">
                       <input
                         type="number"
                         min={0}
                         step={10000}
                         value={row.price ?? ""}
-                        onChange={(e) => update(row.key, { price: e.target.value === "" ? null : Math.max(0, Math.round(Number(e.target.value))) || null })}
+                        onChange={(e) =>
+                          update(row.key, {
+                            price: e.target.value === "" ? null : Math.max(0, Math.round(Number(e.target.value))) || null,
+                          })
+                        }
                         placeholder={basePrice > 0 ? basePrice.toLocaleString("vi-VN") : t("basePrice")}
                         aria-label={t("price")}
                         className={cn(CELL_INPUT, "text-right font-mono tabular-nums")}
                       />
                     </td>
                     {stockUnit && (
-                      <td className="px-2 py-2">
+                      <td className="px-2 py-2.5">
                         <input
                           type="number"
                           min={0}
                           value={row.stock}
-                          onChange={(e) => update(row.key, { stock: Math.max(0, Math.round(Number(e.target.value) || 0)) })}
+                          onChange={(e) =>
+                            update(row.key, { stock: Math.max(0, Math.round(Number(e.target.value) || 0)) })
+                          }
                           aria-label={t("stock")}
                           className={cn(CELL_INPUT, "text-right font-mono tabular-nums")}
                         />
                       </td>
                     )}
-                    <td className="py-2 text-right">
-                      {/* SKU đang dùng thì nút xóa tắt — span bọc ngoài để vẫn rê chuột xem lý do */}
+                    <td className="py-2.5 pr-3 text-right">
                       <AdminTooltip content={row.inUse ? t("inUse") : t("remove")}>
                         <span className="inline-grid" tabIndex={row.inUse ? 0 : undefined}>
                           <button
@@ -313,7 +351,6 @@ export function ProductSkuField({
           </table>
         </div>
       )}
-
     </div>
   );
 }
