@@ -207,6 +207,7 @@ export function MaterialEditor({ initialMaterial }: { initialMaterial: AdminMate
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-5">
       <AdminDetailHeader
+        isDirty={isDirty}
         backHref="/admin/catalog/materials"
         backLabel={t("editor.back")}
         title={values.name || material.name}

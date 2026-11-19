@@ -89,7 +89,7 @@ export function adminButtonClass({
   className?: string;
 } = {}) {
   return cn(
-    "inline-flex cursor-pointer items-center justify-center font-medium transition-colors select-none outline-none disabled:cursor-not-allowed disabled:opacity-50",
+    "inline-flex cursor-pointer items-center justify-center font-medium transition-colors select-none outline-none disabled:cursor-not-allowed disabled:opacity-50 whitespace-nowrap",
     VARIANT_CLASS[variant],
     SIZE_CLASS[size],
     fullWidth && "w-full",

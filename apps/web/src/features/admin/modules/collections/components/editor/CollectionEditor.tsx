@@ -309,6 +309,7 @@ export function CollectionEditor({ collection: initial, products, homepageUsedBy
   return (
     <form onSubmit={form.handleSubmit(onSubmit, onInvalid)} noValidate className="space-y-5">
       <AdminDetailHeader
+        isDirty={isDirty}
         backHref="/admin/catalog/collections"
         backLabel={t("editor.back")}
         title={values.name || t("editor.untitled")}
@@ -407,12 +408,12 @@ export function CollectionEditor({ collection: initial, products, homepageUsedBy
                   value={contentLang}
                   onChange={setContentLang}
                   label={t("editor.langTabs.label")}
-                  hint={t("editor.sections.englishHint")}
+                  // hint={t("editor.sections.englishHint")}
                   missingLabel={t("editor.langTabs.untranslated")}
-                  status={{
-                    vi: langHasError("vi") || errors.code ? "error" : undefined,
-                    en: langHasError("en") ? "error" : values.nameEn ? undefined : "missing",
-                  }}
+                  // status={{
+                  //   vi: langHasError("vi") || errors.code ? "error" : undefined,
+                  //   en: langHasError("en") ? "error" : values.nameEn ? undefined : "missing",
+                  // }}
                 />
               </div>
             }

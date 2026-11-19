@@ -1,12 +1,9 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { Popover } from "@base-ui/react/popover";
-import { Boxes, Check, CircleDashed, ExternalLink, Info, Scissors, Shirt } from "lucide-react";
+import { AlertTriangle, Boxes, Check, ExternalLink, Plus, Ruler, Scissors, ShoppingBag, SlidersHorizontal } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { PRODUCT_GROUP_TRAITS } from "@repo/shared/sizing";
-import { formatVnd, type Locale } from "@repo/shared";
-import { useAnchorPositionMethod } from "@/hooks/useAnchorPositionMethod";
 import { useNotify } from "@/hooks/useNotify";
 import { Link } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
@@ -14,22 +11,28 @@ import {
   ADMIN_CARD_CLASS,
   ADMIN_INPUT_CLASS,
   ADMIN_PRIMARY_BUTTON_CLASS,
-  AdminAdvancedOptions,
   AdminDetailHeader,
   AdminField,
   AdminFilterSelect,
+  AdminInfoTip,
   AdminLangSwitch,
+  AdminNoticeHint,
   AdminStatusText,
   AdminSwitch,
+  AdminTabs,
+  AdminTabsContent,
+  AdminTabsList,
+  AdminTabsTrigger,
   AdminTextArea,
   AdminTextField,
   AdminTooltip,
   type AdminContentLang,
+  type AdminNotice,
 } from "@/features/admin/core/ui";
 import { updateProductAction } from "../../actions/products.actions";
 import { type AdminProductDetail, type AdminProductEditorOptions } from "../../types/products.types";
 import { toFormState, toPayload, type ProductFormState } from "../../utils/productEditorForm";
-import { getActivationIssues, type ActivationIssue } from "../../utils/products.utils";
+import { getActivationIssues, hasDuplicateVariant, MIN_IMAGES_TO_ACTIVATE } from "../../utils/products.utils";
 import {
   allowedSaleModes,
   groupAllowsCustom,
@@ -39,7 +42,9 @@ import {
 } from "../../utils/saleModes";
 import { ProductImagesField } from "./ProductImagesField";
 import { ProductMaterialField } from "./ProductMaterialField";
+import { ProductQuickAttributeGroupDialog } from "./ProductQuickAttributeGroupDialog";
 import { ProductSetItemsField } from "./ProductSetItemsField";
+import { ProductSizeChartDialog } from "./ProductSizeChartDialog";
 import { ProductSkuField } from "./ProductSkuField";
 
 type Lang = AdminContentLang;
@@ -47,142 +52,35 @@ const LANG_FIELDS = {
   vi: { name: "name", description: "description" },
   en: { name: "nameEn", description: "descriptionEn" },
 } as const;
-const INHERIT_CHART = "__inherit__";
-const ISSUES: ActivationIssue[] = ["IMAGES", "PRICE", "SKUS", "DUPLICATE_SKU", "SET_ITEMS"];
 
 /**
- * Popover danh sách điều kiện cần để mở bán (kích hoạt bằng hover hoặc click vào icon ⓘ ở góc Trạng thái).
- */
-function ReadyConditionsPopover({
-  issues,
-  saleMode,
-}: {
-  issues: ActivationIssue[];
-  saleMode: string;
-}) {
-  const { positionMethod, captureAnchor } = useAnchorPositionMethod();
-  const t = useTranslations("AdminPage.products");
-
-  return (
-    <Popover.Root onOpenChange={(open, details) => open && captureAnchor(details.event)}>
-      <Popover.Trigger
-        openOnHover
-        delay={80}
-        closeDelay={120}
-        aria-label={t("hints.readyConditions")}
-        className="inline-grid size-5 cursor-pointer place-items-center rounded-full text-[#A1A1AA] transition-colors hover:bg-[#F4F4F5] hover:text-[#09090B] focus-visible:ring-2 focus-visible:ring-[#18181B]/20 data-popup-open:text-[#09090B]"
-      >
-        <Info size={14} aria-hidden />
-      </Popover.Trigger>
-      <Popover.Portal>
-        <Popover.Positioner
-          positionMethod={positionMethod}
-          side="bottom"
-          align="start"
-          sideOffset={6}
-          collisionPadding={12}
-          className="z-50 outline-none"
-        >
-          <Popover.Popup className="admin-shell w-[290px] origin-[var(--transform-origin)] rounded-xl border border-[#E4E4E7] bg-white p-3.5 shadow-[0_16px_40px_-16px_rgba(9,9,11,0.25)] outline-none transition-[opacity,scale] duration-150 data-ending-style:scale-[0.98] data-ending-style:opacity-0 data-starting-style:scale-[0.97] data-starting-style:opacity-0">
-            <div className="mb-2.5 flex items-center justify-between">
-              <span className="text-xs font-semibold text-[#09090B]">
-                {t("hints.readyConditions")}
-              </span>
-              <span className={cn("text-2xs font-medium", issues.length === 0 ? "text-emerald-700" : "text-amber-700")}>
-                {issues.length === 0 ? t("hints.readyAllMet") : t("preview.readyPending", { count: issues.length })}
-              </span>
-            </div>
-            <ul className="space-y-2 text-xs">
-              {ISSUES.filter((issue) => issue !== "SET_ITEMS" || saleMode === "SET").map((issue) => {
-                const ok = !issues.includes(issue);
-                return (
-                  <li
-                    key={issue}
-                    className={cn("flex items-center gap-2", ok ? "text-[#52525B]" : "font-medium text-[#09090B]")}
-                  >
-                    {ok ? (
-                      <Check size={13} className="shrink-0 text-emerald-600" aria-hidden />
-                    ) : (
-                      <CircleDashed size={13} className="shrink-0 text-amber-600" aria-hidden />
-                    )}
-                    <span>{t(`ready.${issue}`)}</span>
-                  </li>
-                );
-              })}
-            </ul>
-            {issues.length > 0 && (
-              <p className="mt-3 border-t border-dashed border-[#E4E4E7] pt-2 text-2xs text-[#71717A]">
-                {t("hints.notReady")}
-              </p>
-            )}
-          </Popover.Popup>
-        </Popover.Positioner>
-      </Popover.Portal>
-    </Popover.Root>
-  );
-}
-
-/**
- * Thẻ section chuẩn theo cấu trúc module Admin (đồng bộ cùng detail Bộ sưu tập):
- * container query, viền thanh mảnh, typography Thiên Canh mộc mạc và hỗ trợ aside cho công cụ ngữ cảnh.
+ * Thẻ section chuẩn theo cấu trúc module Admin:
+ * viền thanh mảnh, typography chuẩn mực và hỗ trợ aside cho công cụ ngữ cảnh.
  */
 function Section({
   title,
   description,
   aside,
   children,
+  customHeader
 }: {
   title: ReactNode;
   description?: string;
   aside?: ReactNode;
   children: ReactNode;
+  customHeader?: string;
 }) {
   return (
     <section className={cn(ADMIN_CARD_CLASS, "overflow-hidden p-5 sm:p-6")}>
-      <header className="mb-4 flex flex-wrap items-start justify-between gap-2 pb-3">
+      <header className={cn(customHeader, "mb-4 flex flex-wrap items-center justify-between gap-2 pb-3")}>
         <div>
-          <h2 className="text-base font-semibold tracking-tight text-[#09090B]">{title}</h2>
+          <h2 className="text-lg font-semibold tracking-tight text-[#09090B]">{title}</h2>
           {description && <p className="mt-0.5 text-xs text-[#71717A]">{description}</p>}
         </div>
         {aside && <div className="shrink-0">{aside}</div>}
       </header>
       {children}
     </section>
-  );
-}
-
-/** Dòng bật / tắt tùy chọn chuẩn mực dùng công tắc AdminSwitch */
-function ToggleRow({
-  checked,
-  onChange,
-  label,
-  hint,
-  disabled,
-}: {
-  checked: boolean;
-  onChange: (checked: boolean) => void;
-  label: string;
-  hint?: string;
-  disabled?: boolean;
-}) {
-  return (
-    <div
-      className={cn(
-        "flex items-start justify-between gap-3 select-none",
-        disabled && "cursor-not-allowed opacity-50"
-      )}
-    >
-      <div className="min-w-0 flex-1">
-        <span className="block text-sm font-medium text-[#09090B]">{label}</span>
-        {hint && <span className="mt-0.5 block text-xs text-[#71717A]">{hint}</span>}
-      </div>
-      <AdminSwitch
-        checked={checked}
-        onChange={onChange}
-        label={label}
-        disabled={disabled}
-      />
-    </div>
   );
 }
 
@@ -209,6 +107,14 @@ export function ProductEditor({
   const [baseline, setBaseline] = useState(values);
   const [lang, setLang] = useState<Lang>(locale === "en" ? "en" : "vi");
   const [isSaving, setIsSaving] = useState(false);
+  const [sizeCharts, setSizeCharts] = useState(options.sizeCharts);
+  const [attributes, setAttributes] = useState(options.attributes);
+  const [designGroups, setDesignGroups] = useState(options.designGroups);
+  const [quickGroupOpen, setQuickGroupOpen] = useState(false);
+  const [selectedDesignGroupCode, setSelectedDesignGroupCode] = useState<string | null>(null);
+  const [isCustomChart, setIsCustomChart] = useState(() => Boolean(values.sizeChartId));
+  const [unassignedMode, setUnassignedMode] = useState<"preset" | "custom">("preset");
+  const [createChartOpen, setCreateChartOpen] = useState(false);
 
   const fields = LANG_FIELDS[lang];
   const isDirty = JSON.stringify(values) !== JSON.stringify(baseline);
@@ -227,32 +133,43 @@ export function ProductEditor({
   const group = currentCategory.group;
   const traits = PRODUCT_GROUP_TRAITS[group];
   const allowedModes = allowedSaleModes(group);
+  const hasCategoryChart = Boolean(currentCategory.defaultSizeChartId);
+  const categoryChart = hasCategoryChart
+    ? (sizeCharts.find((c) => c.id === currentCategory.defaultSizeChartId) ?? null)
+    : null;
 
   // Bảng size hiệu lực: riêng của sản phẩm, không có thì theo loại (đã tính thừa hưởng nhóm gốc)
   const chartId = values.sizeChartId || currentCategory.defaultSizeChartId;
-  const chart = options.sizeCharts.find((c) => c.id === chartId) ?? null;
-  const sameGroupCharts = options.sizeCharts.filter((c) => c.group === group);
+  const chart = sizeCharts.find((c) => c.id === chartId) ?? null;
+  const sameGroupCharts = sizeCharts.filter((c) => c.group === group);
   const axis = resolveSizeAxis({
     group,
     saleMode: values.saleMode,
     chartSizes: chart?.sizeLabels ?? null,
-    attributeSizes: options.attributes.filter((a) => a.group === "SIZE" && a.isActive).map((a) => a.code),
+    attributeSizes: attributes.filter((a) => a.group === "SIZE" && a.isActive).map((a) => a.code),
   });
-  const colors = options.attributes.filter((a) => a.group === "COLOR");
-  const currentMaterial = options.materials.find((m) => m.id === values.materialId) ?? null;
+  const colors = attributes.filter((a) => a.group === "COLOR");
   const issues = getActivationIssues({ ...values, setItemCount: values.setItems.length });
+  const productNotices: AdminNotice[] = issues
+    .filter((issue) => issue !== "SET_ITEMS" || values.saleMode === "SET")
+    .map((issue) => ({
+      tone: "info",
+      text: t(`ready.${issue}`),
+    }));
   const customAllowed = groupAllowsCustom(group);
   const takesMeasurements = values.saleMode === "CUSTOM" || values.isCustomFit;
 
-  // Tính các màu sắc thực tế và đặc tính thiết kế đã chọn để xem trước
-  const activeColorIds = new Set([
-    ...values.variants.flatMap((row) => (row.colorId ? [row.colorId] : [])),
-    ...values.attributeIds,
-  ]);
-  const selectedColors = colors.filter((c) => activeColorIds.has(c.id));
-  const selectedDesignTraits = options.attributes.filter(
-    (a) => a.group !== "COLOR" && a.group !== "SIZE" && values.attributeIds.includes(a.id)
-  );
+  // Xác định tab có cần điền thông tin bổ sung / điều kiện mở bán hay không
+  const saleModeNeedsData =
+    (values.saleMode === "SET" && values.setItems.length < 2) ||
+    (takesMeasurements && (values.leadTimeDays === null || values.leadTimeDays <= 0)) ||
+    (values.saleMode !== "CUSTOM" && traits.sizing !== "NONE" && !values.sizeChartId && !currentCategory.defaultSizeChartId);
+
+  const traitsNeedsData =
+    values.variants.length === 0 ||
+    hasDuplicateVariant(values.variants) ||
+    values.images.length < MIN_IMAGES_TO_ACTIVATE ||
+    !values.materialId;
 
   // Tính tổng tồn kho hiện tại của các biến thể SKU
   const totalStock = values.variants.reduce((acc, v) => acc + (v.stock || 0), 0);
@@ -336,6 +253,7 @@ export function ProductEditor({
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-5">
       <AdminDetailHeader
+        isDirty={isDirty}
         backHref="/admin/products"
         backLabel={t("editor.back")}
         title={displayName}
@@ -358,64 +276,13 @@ export function ProductEditor({
           <Section
             title={t("sections.general")}
             aside={
-              <div className="flex w-full items-center justify-between gap-2 @lg:w-auto @lg:justify-end">
-                {/* Nút "Tùy chọn" popover đồng bộ như Bộ sưu tập */}
-                <AdminAdvancedOptions
-                  label={t("editor.options")}
-                  activeCount={values.isFeatured ? 1 : 0}
-                  widthClass="w-[320px]"
-                >
-                  <ToggleRow
-                    checked={values.isFeatured}
-                    onChange={(checked) => set("isFeatured", checked)}
-                    label={t("field.isFeatured")}
-                    hint={t("hints.featuredHint")}
-                  />
-
-                  {/* Liên kết nghiệp vụ với Danh mục Kho */}
-                  <div className="border-t border-dashed border-[#E4E4E7] pt-3">
-                    <span className="mb-1.5 block text-2xs font-semibold uppercase tracking-wider text-[#A1A1AA]">
-                      {t("options.warehouseTitle")}
-                    </span>
-                    <div className="space-y-1">
-                      <a
-                        href={`/admin/inventory/skus?search=${product.code}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="flex items-center justify-between rounded-lg px-2 py-1.5 text-xs text-[#3F3F46] hover:bg-[#F4F4F5] hover:text-[#09090B]"
-                      >
-                        <span className="flex items-center gap-2">
-                          <Boxes size={14} className="text-[#71717A]" />
-                          {t("options.skuStock")}
-                        </span>
-                        <ExternalLink size={12} className="text-[#A1A1AA]" />
-                      </a>
-                      {values.materialId && (
-                        <a
-                          href={`/admin/inventory/fabrics?search=${product.code}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="flex items-center justify-between rounded-lg px-2 py-1.5 text-xs text-[#3F3F46] hover:bg-[#F4F4F5] hover:text-[#09090B]"
-                        >
-                          <span className="flex items-center gap-2">
-                            <Scissors size={14} className="text-[#71717A]" />
-                            {t("options.fabricStock")}
-                          </span>
-                          <ExternalLink size={12} className="text-[#A1A1AA]" />
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                </AdminAdvancedOptions>
-
-                <AdminLangSwitch
-                  value={lang}
-                  onChange={setLang}
-                  label={t("editor.langLabel")}
-                  hint={t("editor.langHint")}
-                  status={{ en: values.nameEn ? undefined : "missing" }}
-                />
-              </div>
+              <AdminLangSwitch
+                value={lang}
+                onChange={setLang}
+                label={t("editor.langLabel")}
+                // hint={t("editor.langHint")}
+                status={{ en: values.nameEn ? undefined : "missing" }}
+              />
             }
           >
             <div className="grid gap-4 sm:grid-cols-2">
@@ -443,7 +310,6 @@ export function ProductEditor({
                 hint={t("hints.categoryParent")}
               >
                 <AdminFilterSelect
-                  label={t("field.categoryParentShort")}
                   value={currentRootCategory.id}
                   options={rootCategories.map((r) => ({ value: r.id, label: r.name }))}
                   onChange={handleRootChange}
@@ -456,7 +322,6 @@ export function ProductEditor({
                 hint={t("hints.categoryChild")}
               >
                 <AdminFilterSelect
-                  label={t("field.categoryShort")}
                   value={currentCategory.id}
                   options={(childCategories.length > 0 ? childCategories : [currentRootCategory]).map((c) => ({
                     value: c.id,
@@ -466,20 +331,6 @@ export function ProductEditor({
                   className="h-10 w-full"
                 />
               </AdminField>
-
-              {/* Giá bán chung */}
-              <AdminTextField
-                required
-                className="sm:col-span-2"
-                label={t("field.basePrice")}
-                mask="currency"
-                currencyOptions={{ thousandSeparator: locale === "vi" ? "." : "," }}
-                value={values.basePrice ? String(values.basePrice) : ""}
-                onValueChange={(_display, raw) => set("basePrice", Math.max(0, Math.round(Number(raw) || 0)))}
-                placeholder={t("placeholders.basePrice")}
-                suffix={<span className="text-xs text-[#71717A]">₫</span>}
-                inputClassName="font-mono tabular-nums"
-              />
 
               <AdminTextArea
                 key={`description-${lang}`}
@@ -493,522 +344,655 @@ export function ProductEditor({
             </div>
           </Section>
 
-          {/* 2. Hình thức bán & May đo */}
-          <Section title={t("sections.saleMode")} description={t("hints.saleMode")}>
-            <div className="grid gap-3 sm:grid-cols-3">
-              {SALE_MODES.map((mode) => {
-                const enabled = allowedModes.includes(mode);
-                const selected = values.saleMode === mode;
-                return (
-                  <AdminTooltip
-                    key={mode}
-                    content={enabled ? null : t("mode.notAllowedFor", { group: tSizing(`group.${group}`) })}
-                  >
-                    <span className="grid" tabIndex={enabled ? undefined : 0}>
-                      <button
-                        type="button"
-                        disabled={!enabled}
-                        aria-pressed={selected}
-                        onClick={() => changeMode(mode)}
-                        className={cn(
-                          "relative flex w-full cursor-pointer flex-col items-start gap-1 rounded-xl border p-3.5 text-left transition-all disabled:cursor-not-allowed disabled:opacity-40",
-                          selected
-                            ? "border-[#18181B] bg-[#FAFAFA] ring-1 ring-[#18181B] shadow-xs"
-                            : "border-[#E4E4E7] bg-white hover:border-[#D4D4D8] hover:bg-[#FAFAFA]/50"
-                        )}
-                      >
-                        <div className="flex w-full items-center justify-between gap-2">
-                          <span
-                            className={cn(
-                              "text-sm font-semibold tracking-tight",
-                              selected ? "text-[#09090B]" : "text-[#27272A]"
-                            )}
-                          >
-                            {t(`mode.${mode}.label`)}
-                          </span>
-                          <span
-                            aria-hidden
-                            className={cn(
-                              "grid size-4 shrink-0 place-items-center rounded-full border transition-colors",
-                              selected ? "border-[#18181B] bg-[#18181B]" : "border-[#D4D4D8] bg-white"
-                            )}
-                          >
-                            {selected && <span className="size-1.5 rounded-full bg-white" />}
-                          </span>
-                        </div>
-                        <span className={cn("text-xs leading-normal", selected ? "text-[#52525B]" : "text-[#71717A]")}>
-                          {t(`mode.${mode}.short`)}
-                        </span>
-                      </button>
-                    </span>
-                  </AdminTooltip>
-                );
-              })}
-            </div>
-
-            {values.saleMode === "SET" && (
-              <div className="mt-5 border-t border-dashed border-[#E4E4E7] pt-4">
-                <h3 className="mb-3 text-sm font-semibold text-[#18181B]">{t("set.title")}</h3>
-                <ProductSetItemsField
-                  items={values.setItems}
-                  onChange={(items) => set("setItems", items)}
-                  materials={options.materials}
-                  lang={lang}
-                  inputClassName={ADMIN_INPUT_CLASS}
-                />
-                {values.setItems.length < 2 && <p className="mt-2 text-xs text-amber-700">{t("set.min")}</p>}
-              </div>
-            )}
-
-            {/* Bảng size áp dụng: Chỉ hiện khi bán theo size (Một món hoặc Theo bộ) */}
-            {values.saleMode !== "CUSTOM" && traits.sizing !== "NONE" && (
-              <div className="mt-5 border-t border-dashed border-[#E4E4E7] pt-4">
-                <AdminField label={t("field.sizeChart")} hint={t("hints.sizeChart")}>
-                  <AdminFilterSelect
-                    label={t("field.sizeChartShort")}
-                    value={values.sizeChartId || INHERIT_CHART}
-                    options={[
-                      {
-                        value: INHERIT_CHART,
-                        label: currentCategory.defaultSizeChartId
-                          ? t("sizeChartInherit", {
-                              name: options.sizeCharts.find((c) => c.id === currentCategory.defaultSizeChartId)?.name ?? "—",
-                            })
-                          : t("sizeChartNone"),
-                      },
-                      ...sameGroupCharts.map((c) => ({ value: c.id, label: c.name })),
-                    ]}
-                    onChange={(value) => set("sizeChartId", value === INHERIT_CHART ? "" : value)}
-                    className="h-10 w-full"
+          {/* 2. Cấu hình chi tiết: Hình thức bán & Đặc tính (2 tab gắn kết với khối nội dung) */}
+          <AdminTabs defaultValue="saleMode" className="w-full gap-3">
+            <AdminTabsList>
+              <AdminTabsTrigger value="saleMode">
+                <ShoppingBag size={16} aria-hidden />
+                <span>{t("sections.saleMode")}</span>
+                {saleModeNeedsData && (
+                  <span
+                    className="size-2 shrink-0 rounded-full bg-amber-500 ring-2 ring-amber-500/20"
+                    aria-hidden
                   />
-                </AdminField>
-                {chart && (
-                  <div className="mt-2.5 flex flex-wrap items-center gap-1.5 text-xs text-[#52525B]">
-                    <span className="text-[#71717A]">{t("inherit.sizes")}:</span>
-                    {chart.sizeLabels.map((s) => (
-                      <span
-                        key={s}
-                        className="rounded-md border border-[#E4E4E7] bg-[#FAFAFA] px-2 py-0.5 font-mono text-2xs font-medium text-[#18181B]"
-                      >
-                        {s}
-                      </span>
-                    ))}
+                )}
+              </AdminTabsTrigger>
+              <AdminTabsTrigger value="traits">
+                <SlidersHorizontal size={16} aria-hidden />
+                <span>{t("sections.traits")}</span>
+                {traitsNeedsData && (
+                  <span
+                    className="size-2 shrink-0 rounded-full bg-amber-500 ring-2 ring-amber-500/20"
+                    aria-hidden
+                  />
+                )}
+              </AdminTabsTrigger>
+            </AdminTabsList>
+
+            {/* Tab 1: Hình thức bán & May đo */}
+            <AdminTabsContent value="saleMode">
+              <div className={cn(ADMIN_CARD_CLASS, "p-5 sm:p-6")}>
+                {/* 1. Chọn hình thức bán (dễ nhận diện, mô tả flex theo loại đang chọn) */}
+                <div>
+                  <div className="grid w-full grid-cols-3 gap-3">
+                    {SALE_MODES.map((mode) => {
+                      const enabled = allowedModes.includes(mode);
+                      const selected = values.saleMode === mode;
+                      return (
+                        <AdminTooltip
+                          key={mode}
+                          content={enabled ? null : t("mode.notAllowedFor", { group: tSizing(`group.${group}`) })}
+                        >
+                          <button
+                            type="button"
+                            disabled={!enabled}
+                            aria-pressed={selected}
+                            onClick={() => changeMode(mode)}
+                            className={cn(
+                              "flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-40",
+                              selected
+                                ? "bg-[#18181B] text-white shadow-xs"
+                                : "border border-[#E4E4E7] bg-white text-[#52525B] hover:border-[#A1A1AA] hover:text-[#09090B]"
+                            )}
+                          >
+                            {selected && <Check size={15} className="stroke-[2.5]" aria-hidden />}
+                            <span>{t(`mode.${mode}.label`)}</span>
+                          </button>
+                        </AdminTooltip>
+                      );
+                    })}
+                  </div>
+                  {/* Mô tả flex theo loại đang chọn */}
+                  <p className="mt-3 text-xs leading-relaxed text-[#71717A]">
+                    {values.saleMode === "SINGLE"
+                      ? t("hints.saleModeSingle")
+                      : values.saleMode === "SET"
+                        ? t("hints.saleModeSet")
+                        : t("hints.saleModeCustom")}
+                  </p>
+                </div>
+
+                {values.saleMode === "SET" && (
+                  <div className="mt-5 border-t border-dashed border-[#E4E4E7] pt-4">
+                    <h3 className="mb-3 text-body font-semibold text-[#09090B]">{t("set.title")}</h3>
+                    <ProductSetItemsField
+                      items={values.setItems}
+                      onChange={(items) => set("setItems", items)}
+                      materials={options.materials}
+                      lang={lang}
+                      inputClassName={ADMIN_INPUT_CLASS}
+                      mainMaterialId={values.materialId}
+                    />
+                    {values.setItems.length < 2 && <p className="mt-2 text-xs text-amber-700">{t("set.min")}</p>}
                   </div>
                 )}
-              </div>
-            )}
 
-            {values.saleMode !== "CUSTOM" && customAllowed && (
-              <div className="mt-5 border-t border-dashed border-[#E4E4E7] pt-4">
-                <ToggleRow
-                  checked={values.isCustomFit}
-                  onChange={(checked) => set("isCustomFit", checked)}
-                  label={t("field.isCustomFit")}
-                  hint={t("hints.isCustomFit")}
-                />
-              </div>
-            )}
-
-            {takesMeasurements && traits.customMeasurement && (
-              <div className="mt-5 grid gap-4 rounded-xl border border-[#E4E4E7] bg-[#FAFAFA]/70 p-3.5 sm:grid-cols-[minmax(0,1fr)_160px]">
-                <div>
-                  <p className="mb-1.5 text-sm font-medium text-[#27272A]">
-                    {t("custom.measurements")}{" "}
-                    <span className="text-xs font-normal text-[#71717A]">({t("custom.inherited")})</span>
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {traits.suggestedKeys.map((key) => (
-                      <span
-                        key={key}
-                        className="rounded-md border border-[#E4E4E7] bg-white px-2 py-0.5 text-xs text-[#52525B]"
-                      >
-                        {tSizing(`measurement.${key}`)}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                <AdminTextField
-                  type="number"
-                  label={t("field.leadTimeDays")}
-                  min={1}
-                  max={180}
-                  value={values.leadTimeDays === null ? "" : String(values.leadTimeDays)}
-                  onValueChange={(value) =>
-                    set("leadTimeDays", value === "" ? null : Math.max(1, Math.min(180, Math.round(Number(value)))))
-                  }
-                  placeholder={t("placeholders.leadTimeDays")}
-                  suffix={<span className="text-xs text-[#71717A]">{t("custom.days")}</span>}
-                  inputClassName="font-mono tabular-nums bg-white"
-                />
-              </div>
-            )}
-          </Section>
-
-          {/* 3. Khối Đặc tính (Chất liệu & thiết kế, Màu sắc size SKU, Hình ảnh) */}
-          <Section title={t("sections.traits")} description={t("hints.traits")}>
-            <div className="space-y-6">
-              {/* 3.1 Chất liệu vải & Đặc tính thiết kế may đo */}
-              <div className="space-y-5">
-                {/* Chọn chất liệu vải chính */}
-                <div>
-                  <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-[#71717A]">
-                    {t("materialDialog.materialSection")}
-                  </h3>
-                  <ProductMaterialField
-                    value={values.materialId}
-                    onChange={(materialId) => set("materialId", materialId)}
-                    materials={options.materials}
-                  />
-                </div>
-
-                {/* Đặc tính thiết kế may đo (cổ, tay, tà, lót, họa tiết...) */}
-                {options.designGroups.length > 0 && (
-                  <div className="border-t border-dashed border-[#E4E4E7] pt-4">
-                    <div className="mb-3 flex items-center justify-between">
-                      <h3 className="text-xs font-semibold uppercase tracking-wider text-[#71717A]">
-                        {t("materialDialog.designSection")}
-                      </h3>
-                      <span className="text-2xs text-[#71717A]">
-                        {t("materialDialog.selectedTraits", { count: values.attributeIds.length })}
-                      </span>
+                {/* Bảng size áp dụng: Chỉ hiện khi bán theo size (Một món hoặc Theo bộ) */}
+                {values.saleMode !== "CUSTOM" && traits.sizing !== "NONE" && (
+                  <div className="mt-5 border-t border-dashed border-[#E4E4E7] pt-4">
+                    <div className="mb-3 flex items-center">
+                      <h3 className="text-body font-semibold text-[#09090B]">{t("field.sizeChart")}</h3>
+                      <AdminInfoTip content={t("hints.sizeChart")} />
                     </div>
 
-                    <div className="space-y-4">
-                      {options.designGroups.map((designGroup) => {
-                        const choices = options.attributes.filter(
-                          (a) => a.group === designGroup.code && (a.isActive || values.attributeIds.includes(a.id))
-                        );
-                        if (choices.length === 0) return null;
-                        return (
-                          <div key={designGroup.code} className="grid gap-1.5 sm:grid-cols-[140px_minmax(0,1fr)] sm:gap-4">
-                            <span className="pt-1 text-sm font-medium text-[#3F3F46]">
-                              {locale === "en" && designGroup.nameEn ? designGroup.nameEn : designGroup.name}
+                    {hasCategoryChart ? (
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between gap-3 select-none">
+                          <div className="min-w-0 flex-1">
+                            <span className="block text-sm font-medium text-[#09090B]">
+                              {t("field.sizeChartCustomSwitch")}
                             </span>
-                            <div className="flex flex-wrap gap-1.5">
-                              {choices.map((choice) => {
-                                const on = values.attributeIds.includes(choice.id);
-                                return (
-                                  <button
-                                    key={choice.id}
-                                    type="button"
-                                    aria-pressed={on}
-                                    onClick={() => toggleAttribute(choice.id)}
-                                    className={cn(
-                                      "h-7 cursor-pointer rounded-full border px-3 text-xs font-medium transition-colors",
-                                      on
-                                        ? "border-[#18181B] bg-[#18181B] text-white"
-                                        : "border-[#E4E4E7] bg-white text-[#3F3F46] hover:border-[#A1A1AA]"
-                                    )}
+                            <span className="mt-0.5 block text-xs text-[#71717A]">
+                              {t("field.sizeChartCustomHint")}
+                            </span>
+                          </div>
+                          <AdminSwitch
+                            checked={isCustomChart}
+                            onChange={(checked) => {
+                              setIsCustomChart(checked);
+                              if (!checked) {
+                                set("sizeChartId", "");
+                              }
+                            }}
+                            label={t("field.sizeChartCustomSwitch")}
+                          />
+                        </div>
+
+                        {!isCustomChart ? (
+                          <div className="rounded-lg border border-[#E4E4E7] bg-[#FAFAFA] p-3 text-xs">
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span className="font-medium text-[#18181B]">
+                                  {categoryChart?.name ?? t("sizeChartNone")}
+                                </span>
+                                <span className="inline-flex items-center rounded-full bg-[#E4E4E7] px-2 py-0.5 text-2xs font-medium text-[#52525B]">
+                                  {t("field.sizeChartFromCategory", { name: currentCategory.name })}
+                                </span>
+                              </div>
+                              {categoryChart && (
+                                <Link
+                                  href={`/admin/catalog/size-charts/${categoryChart.id}`}
+                                  target="_blank"
+                                  className="text-2xs text-[#71717A] hover:text-[#18181B] hover:underline"
+                                >
+                                  {t("field.sizeChartDetailLink")} ↗
+                                </Link>
+                              )}
+                            </div>
+                            {categoryChart && categoryChart.sizeLabels.length > 0 && (
+                              <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+                                <span className="text-[#71717A]">{t("sku.sizes")}:</span>
+                                {categoryChart.sizeLabels.map((s) => (
+                                  <span
+                                    key={s}
+                                    className="rounded border border-[#E4E4E7] bg-white px-1.5 py-0.5 font-mono text-2xs font-medium text-[#18181B] shadow-2xs"
                                   >
-                                    {choice.name}
-                                  </button>
-                                );
-                              })}
+                                    {s}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="space-y-3 pt-1">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                              <div className="min-w-0 flex-1">
+                                <AdminFilterSelect
+                                  value={values.sizeChartId || ""}
+                                  options={[
+                                    { value: "", label: t("field.sizeChartSelectPlaceholder") },
+                                    ...sameGroupCharts.map((c) => ({ value: c.id, label: c.name })),
+                                  ]}
+                                  onChange={(value) => set("sizeChartId", value)}
+                                  className="h-10 w-full"
+                                />
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => setCreateChartOpen(true)}
+                                className="inline-flex h-10 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-[#E4E4E7] bg-white px-3 text-xs font-medium text-[#18181B] transition-colors hover:bg-[#F4F4F5]"
+                              >
+                                <Plus size={14} aria-hidden />
+                                <span>{t("field.sizeChartCreateNew")}</span>
+                              </button>
+                            </div>
+
+                            {chart && (
+                              <div className="flex flex-wrap items-center gap-1.5 text-xs text-[#52525B]">
+                                <span className="text-[#71717A]">{t("sku.sizes")}:</span>
+                                {chart.sizeLabels.map((s) => (
+                                  <span
+                                    key={s}
+                                    className="rounded border border-[#E4E4E7] bg-[#F4F4F5] px-1.5 py-0.5 font-mono text-2xs font-medium text-[#18181B]"
+                                  >
+                                    {s}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        <div className="rounded-lg border border-amber-200 bg-amber-50/50 p-3 text-xs text-amber-900">
+                          <div className="flex items-start gap-2">
+                            <AlertTriangle size={15} className="mt-0.5 shrink-0 text-amber-600" aria-hidden />
+                            <div className="min-w-0 flex-1">
+                              <p className="font-semibold text-amber-950">
+                                {t("field.sizeChartUnassignedWarning", { name: currentCategory.name })}
+                              </p>
+                              <p className="mt-0.5 text-amber-800/90 leading-relaxed">
+                                {t("field.sizeChartUnassignedHint")}
+                              </p>
                             </div>
                           </div>
-                        );
-                      })}
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                          <button
+                            type="button"
+                            onClick={() => setUnassignedMode("preset")}
+                            className={cn(
+                              "flex flex-col items-start gap-1 rounded-lg border p-3 text-left transition-colors cursor-pointer",
+                              unassignedMode === "preset"
+                                ? "border-[#18181B] bg-white shadow-2xs ring-1 ring-[#18181B]"
+                                : "border-[#E4E4E7] bg-[#FAFAFA] hover:bg-white hover:border-[#D4D4D8]"
+                            )}
+                          >
+                            <div className="flex items-center gap-1.5 font-medium text-xs text-[#09090B]">
+                              <span className="flex size-4 items-center justify-center rounded-full bg-[#18181B] text-[10px] text-white font-bold">
+                                1
+                              </span>
+                              <span>{t("field.sizeChartOptionPreset")}</span>
+                            </div>
+                            <p className="text-2xs text-[#71717A] leading-normal">
+                              {t("field.sizeChartOptionPresetHint")}
+                            </p>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setUnassignedMode("custom");
+                              setCreateChartOpen(true);
+                            }}
+                            className={cn(
+                              "flex flex-col items-start gap-1 rounded-lg border p-3 text-left transition-colors cursor-pointer",
+                              unassignedMode === "custom"
+                                ? "border-[#18181B] bg-white shadow-2xs ring-1 ring-[#18181B]"
+                                : "border-[#E4E4E7] bg-[#FAFAFA] hover:bg-white hover:border-[#D4D4D8]"
+                            )}
+                          >
+                            <div className="flex items-center gap-1.5 font-medium text-xs text-[#09090B]">
+                              <span className="flex size-4 items-center justify-center rounded-full bg-[#18181B] text-[10px] text-white font-bold">
+                                2
+                              </span>
+                              <span>{t("field.sizeChartOptionCustom")}</span>
+                            </div>
+                            <p className="text-2xs text-[#71717A] leading-normal">
+                              {t("field.sizeChartOptionCustomHint")}
+                            </p>
+                          </button>
+                        </div>
+
+                        {unassignedMode === "preset" ? (
+                          <div className="space-y-2 pt-1">
+                            <AdminFilterSelect
+                              value={values.sizeChartId || ""}
+                              options={[
+                                { value: "", label: t("field.sizeChartSelectPlaceholder") },
+                                ...sameGroupCharts.map((c) => ({ value: c.id, label: c.name })),
+                              ]}
+                              onChange={(value) => set("sizeChartId", value)}
+                              className="h-10 w-full"
+                            />
+                          </div>
+                        ) : (
+                          <div className="flex flex-wrap items-center gap-2 pt-1">
+                            <button
+                              type="button"
+                              onClick={() => setCreateChartOpen(true)}
+                              className="inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-[#18181B] bg-[#18181B] px-3 text-xs font-medium text-white transition-colors hover:bg-black"
+                            >
+                              <Plus size={14} aria-hidden />
+                              <span>
+                                {values.sizeChartId ? t("field.sizeChartEditCustom") : t("field.sizeChartEnterCustom")}
+                              </span>
+                            </button>
+                            {values.sizeChartId && chart && (
+                              <span className="text-xs font-medium text-[#18181B]">
+                                {chart.name}
+                              </span>
+                            )}
+                          </div>
+                        )}
+
+                        {chart && (
+                          <div className="flex flex-wrap items-center gap-1.5 text-xs text-[#52525B]">
+                            <span className="text-[#71717A]">{t("sku.sizes")}:</span>
+                            {chart.sizeLabels.map((s) => (
+                              <span
+                                key={s}
+                                className="rounded border border-[#E4E4E7] bg-[#F4F4F5] px-1.5 py-0.5 font-mono text-2xs font-medium text-[#18181B]"
+                              >
+                                {s}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {values.saleMode !== "CUSTOM" && customAllowed && (
+                  <div className="mt-5 border-t border-dashed border-[#E4E4E7] pt-4">
+                    <div className="flex items-center justify-between gap-3 select-none">
+                      <div className="min-w-0 flex-1">
+                        <span className="block text-sm font-medium text-[#09090B]">{t("field.isCustomFit")}</span>
+                        <span className="mt-0.5 block text-xs text-[#71717A]">{t("hints.isCustomFit")}</span>
+                      </div>
+                      <AdminSwitch
+                        checked={values.isCustomFit}
+                        onChange={(checked) => set("isCustomFit", checked)}
+                        label={t("field.isCustomFit")}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {takesMeasurements && traits.customMeasurement && (
+                  <div className="mt-5 border-t border-dashed border-[#E4E4E7] pt-4">
+                    <div className="space-y-5">
+                      {/* 1. Số đo khách cần gửi (có tooltip i và danh sách pills có icon Ruler, gọn gàng) */}
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-sm font-medium text-[#09090B]">
+                            {t("custom.measurements")}
+                          </span>
+                          <AdminInfoTip content={t("hints.customMeasurements")} />
+                        </div>
+                        <div className="mt-2 flex flex-wrap gap-1.5">
+                          {traits.suggestedKeys.map((key) => (
+                            <span
+                              key={key}
+                              className="inline-flex items-center gap-1 rounded-md bg-[#F4F4F5] px-2 py-0.5 text-2xs font-medium text-[#3F3F46]"
+                            >
+                              <Ruler size={11} className="text-[#71717A]" aria-hidden />
+                              <span>{tSizing(`measurement.${key}`)}</span>
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* 2. Thời gian may (ô nhập vừa vặn, không rộng full, có tooltip i giải thích lý do) */}
+                      <div className="w-36">
+                        <AdminTextField
+                          type="number"
+                          label={t("field.leadTimeDays")}
+                          hint={t("hints.leadTimeReason")}
+                          min={1}
+                          max={180}
+                          value={values.leadTimeDays === null ? "" : String(values.leadTimeDays)}
+                          onValueChange={(value) =>
+                            set("leadTimeDays", value === "" ? null : Math.max(1, Math.min(180, Math.round(Number(value)))))
+                          }
+                          placeholder={t("placeholders.leadTimeDays")}
+                          suffix={<span className="text-xs text-[#71717A]">{t("custom.days")}</span>}
+                          inputClassName="font-mono tabular-nums bg-white"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </AdminTabsContent>
+
+            {/* Tab 2: Đặc tính (Chất liệu, Thiết kế, Màu sắc & Biến thể SKU, Hình ảnh) */}
+            <AdminTabsContent value="traits">
+              <div className={cn(ADMIN_CARD_CLASS, "p-5 sm:p-6")}>
+                <div className="space-y-6">
+                  {/* 2.1 Chất liệu vải & Đặc tính thiết kế may đo */}
+                  <div className="space-y-5">
+                    {/* Chọn chất liệu vải chính */}
+                    <div>
+                      <h3 className="mb-2 text-body font-semibold text-[#09090B]">
+                        {t("materialDialog.materialSection")}
+                      </h3>
+                      <ProductMaterialField
+                        value={values.materialId}
+                        onChange={(materialId) => set("materialId", materialId)}
+                        materials={options.materials}
+                      />
                     </div>
 
-                    <p className="pt-2 text-2xs text-[#71717A]">
-                      {t("design.manage")}{" "}
-                      <Link
-                        href="/admin/catalog/attributes"
-                        target="_blank"
-                        className="font-medium text-[#09090B] hover:underline"
-                      >
-                        {t("design.manageLink")}
-                      </Link>
-                    </p>
+                    {/* Đặc tính thiết kế may đo (cổ, tay, tà, lót, họa tiết...) */}
+                    <div className="border-t border-dashed border-[#E4E4E7] pt-4">
+                      <div className="mb-3 flex items-center justify-between">
+                        <h3 className="text-body font-semibold text-[#09090B]">
+                          {t("materialDialog.designSection")}
+                        </h3>
+                        <div className="flex items-center gap-1 text-xs">
+                          <span className="text-[#71717A]">{t("quickAttribute.missingOptionPrompt")}</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedDesignGroupCode(null);
+                              setQuickGroupOpen(true);
+                            }}
+                            className="font-medium text-[#09090B] hover:text-[#18181B] hover:underline hover:underline-offset-2 cursor-pointer"
+                          >
+                            {t("quickAttribute.addNewAction")}
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        {designGroups.map((designGroup) => {
+                            const choices = attributes.filter(
+                              (a) => a.group === designGroup.code && (a.isActive || values.attributeIds.includes(a.id))
+                            );
+                            return (
+                              <div
+                                key={designGroup.code}
+                                className="grid gap-1.5 sm:grid-cols-[140px_minmax(0,1fr)] sm:gap-4 items-center"
+                              >
+                                <div className="flex items-center gap-1.5 pt-1">
+                                  <span className="text-sm font-medium text-[#3F3F46]">
+                                    {locale === "en" && designGroup.nameEn ? designGroup.nameEn : designGroup.name}
+                                  </span>
+                                </div>
+                                <div className="flex flex-wrap items-center gap-1.5">
+                                  {choices.map((choice) => {
+                                    const on = values.attributeIds.includes(choice.id);
+                                    return (
+                                      <button
+                                        key={choice.id}
+                                        type="button"
+                                        aria-pressed={on}
+                                        onClick={() => toggleAttribute(choice.id)}
+                                        className={cn(
+                                          "h-8 cursor-pointer rounded-full border px-3 text-xs font-medium transition-colors",
+                                          on
+                                            ? "border-[#18181B] bg-[#18181B] text-white"
+                                            : "border-[#E4E4E7] bg-white text-[#3F3F46] hover:border-[#A1A1AA]"
+                                        )}
+                                      >
+                                        {choice.name}
+                                      </button>
+                                    );
+                                  })}
+                                  {choices.length === 0 && (
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setSelectedDesignGroupCode(designGroup.code);
+                                        setQuickGroupOpen(true);
+                                      }}
+                                      className="inline-flex h-8 cursor-pointer items-center gap-1 rounded-full border border-dashed border-[#D4D4D8] px-3 text-xs font-medium text-[#71717A] hover:border-[#18181B] hover:text-[#09090B] transition-colors"
+                                    >
+                                      <Plus size={12} aria-hidden />
+                                      <span>
+                                        {t("design.addTraitForGroup", {
+                                          name: (locale === "en" && designGroup.nameEn ? designGroup.nameEn : designGroup.name).toLowerCase(),
+                                        })}
+                                      </span>
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        <p className="pt-4 text-end text-2xs text-[#71717A]">
+                          {t("materialDialog.selectedTraits", { count: values.attributeIds.length })}
+                        </p>
+                      </div>
                   </div>
-                )}
-              </div>
 
-              {/* 3.2 Màu sắc, Size & Biến thể SKU tồn kho */}
-              <div className="border-t border-dashed border-[#E4E4E7] pt-5">
-                <div className="mb-3">
-                  <h3 className="text-sm font-semibold text-[#09090B]">{t("sections.pricing")}</h3>
-                  <p className="text-xs text-[#71717A]">{t("hints.pricing")}</p>
-                </div>
+                  {/* 2.2 Màu sắc, Size & Biến thể SKU tồn kho */}
+                  <div className="border-t border-dashed border-[#E4E4E7] pt-5">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-body font-semibold text-[#09090B]">{t("sections.pricing")}</h3>
+                        <AdminInfoTip
+                          popupClassName="max-w-[340px]"
+                          content={
+                            <div className="space-y-2 text-xs">
+                              <p className="font-semibold text-white">{t("hints.pricingTitle")}</p>
+                              <p className="text-[#D4D4D8] leading-relaxed">{t("hints.pricingDesc")}</p>
+                              <div className="border-t border-[#3F3F46] pt-1.5 space-y-1 text-2xs text-[#A1A1AA]">
+                                <p className="font-semibold text-white/90">{t("hints.pricingNotesTitle")}:</p>
+                                <p className="flex items-start gap-1">
+                                  <span className="text-amber-400">•</span>
+                                  <span>{t("hints.pricingNote1")}</span>
+                                </p>
+                                <p className="flex items-start gap-1">
+                                  <span className="text-amber-400">•</span>
+                                  <span>{t("hints.pricingNote2")}</span>
+                                </p>
+                                <p className="flex items-start gap-1">
+                                  <span className="text-amber-400">•</span>
+                                  <span>{t("hints.pricingNote3")}</span>
+                                </p>
+                              </div>
+                            </div>
+                          }
+                        />
+                      </div>
+                    </div>
 
-                {/* Thanh thông tin & liên kết Danh mục Kho */}
-                <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-[#FAFAFA] px-3.5 py-2.5 text-xs text-[#52525B]">
-                  <div className="flex items-center gap-2">
-                    <Boxes size={15} className="text-[#71717A]" aria-hidden />
-                    <span>
-                      {stockUnit === null
-                        ? t("options.unitCustom")
-                        : `${t("colStock")}: ${totalStock} ${stockUnit === "meter" ? t("options.unitMeter") : t("options.unitPiece")}`}
-                    </span>
+                    <ProductSkuField
+                      key={`${axis.kind}-${axis.kind === "sized" ? axis.sizes.join(",") : ""}`}
+                      rows={values.variants}
+                      onChange={(rows) => set("variants", rows)}
+                      productCode={product.code}
+                      axis={axis}
+                      colors={colors}
+                      basePrice={values.basePrice}
+                      onBasePriceChange={(price) => set("basePrice", price)}
+                      stockUnit={stockUnit}
+                      totalStock={totalStock}
+                    />
                   </div>
-                  <div className="flex items-center gap-3">
-                    <a
-                      href={`/admin/inventory/skus?search=${product.code}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-1 font-medium text-[#09090B] hover:underline"
-                    >
-                      {t("options.skuStock")} <ExternalLink size={11} aria-hidden />
-                    </a>
-                    {values.materialId && (
-                      <a
-                        href={`/admin/inventory/fabrics?search=${product.code}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1 font-medium text-[#09090B] hover:underline"
-                      >
-                        {t("options.fabricStock")} <ExternalLink size={11} aria-hidden />
-                      </a>
-                    )}
+
+                  {/* 2.3 Hình ảnh sản phẩm */}
+                  <div className="border-t border-dashed border-[#E4E4E7] pt-5">
+                    <div className="mb-3">
+                      <h3 className="text-body font-semibold text-[#09090B]">{t("field.images")}</h3>
+                      <p className="mt-0.5 text-xs text-[#71717A]">{t("image.hint", { max: 8 })}</p>
+                    </div>
+                    <ProductImagesField value={values.images} onChange={(images) => set("images", images)} />
                   </div>
                 </div>
-
-                <ProductSkuField
-                  key={`${axis.kind}-${axis.kind === "sized" ? axis.sizes.join(",") : ""}`}
-                  rows={values.variants}
-                  onChange={(rows) => set("variants", rows)}
-                  productCode={product.code}
-                  axis={axis}
-                  colors={colors}
-                  basePrice={values.basePrice}
-                  stockUnit={values.saleMode === "CUSTOM" ? null : traits.sellUnit === "METER" ? "meter" : "piece"}
-                />
               </div>
-
-              {/* 3.3 Hình ảnh sản phẩm */}
-              <div className="border-t border-dashed border-[#E4E4E7] pt-5">
-                <div className="mb-3">
-                  <h3 className="text-sm font-semibold text-[#09090B]">{t("field.images")}</h3>
-                  <p className="text-xs text-[#71717A]">{t("image.hint", { max: 8 })}</p>
-                </div>
-                <ProductImagesField value={values.images} onChange={(images) => set("images", images)} />
-              </div>
-            </div>
-          </Section>
+            </AdminTabsContent>
+          </AdminTabs>
         </div>
 
-        {/* Cột phụ: Trạng thái phát hành & Thông số kế thừa */}
+        {/* Cột phụ: Trạng thái sản phẩm & Vận hành */}
         <aside className="space-y-5 xl:sticky xl:top-[8rem]">
-          {/* Card xem nhanh sản phẩm & Điều kiện mở bán */}
-          <Section
-            title={
-              <span className="inline-flex items-center gap-1.5">
-                <span>{t("colStatus")}</span>
-                <ReadyConditionsPopover issues={issues} saleMode={values.saleMode} />
-              </span>
-            }
+          <Section 
+            title={t("colStatus")} 
             aside={
-              <div className="flex items-center gap-2">
-                <span
-                  className={cn(
-                    "text-xs font-medium",
-                    values.isActive ? "text-emerald-700" : "text-[#71717A]"
-                  )}
-                >
-                  {values.isActive ? t("active") : t("hidden")}
-                </span>
+              <AdminNoticeHint
+                notices={productNotices}
+                title={t("hints.readyConditions")}
+                emptyText={t("hints.readyAllMet")}
+                ariaLabel={t("hints.readyConditions")}
+              />
+            }
+            // customHeader="border-b border-dashed border-[#E4E4E7]" 
+          >
+            <div className="space-y-4">
+              {/* 1. Trạng thái Mở bán */}
+              <div>
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <span className="block text-sm font-medium text-[#09090B]">{t("field.isActive")}</span>
+                    <p className="mt-0.5 text-xs text-[#71717A]">
+                      {values.isActive ? t("hints.activeStatus") : t("hints.hiddenStatus")}
+                    </p>
+                  </div>
+                  <AdminSwitch
+                    checked={values.isActive}
+                    onChange={(checked) => set("isActive", checked)}
+                    disabled={!values.isActive && issues.length > 0}
+                    label={t("field.isActive")}
+                  />
+                </div>
+              </div>
+
+              {/* 2. Sản phẩm nổi bật */}
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <span className="block text-sm font-medium text-[#09090B]">{t("field.isFeatured")}</span>
+                  <p className="mt-0.5 text-xs text-[#71717A]">{t("hints.featuredHint")}</p>
+                </div>
                 <AdminSwitch
-                  checked={values.isActive}
-                  onChange={(checked) => set("isActive", checked)}
-                  disabled={!values.isActive && issues.length > 0}
-                  label={t("field.isActive")}
+                  checked={values.isFeatured}
+                  onChange={(checked) => set("isFeatured", checked)}
+                  label={t("field.isFeatured")}
                 />
               </div>
-            }
-          >
-            <div className="flex gap-3 pb-3.5">
-              <span className="grid aspect-[3/4] w-14 shrink-0 place-items-center overflow-hidden rounded-md bg-[#F4F4F5] ring-1 ring-[#E4E4E7]/80">
-                {values.images[0] ? (
-                  // eslint-disable-next-line @next/next/no-img-element -- ảnh do admin tải lên (URL tùy ý)
-                  <img src={values.images[0]} alt="" className="size-full object-cover" />
-                ) : (
-                  <Shirt size={18} className="text-[#A1A1AA]" aria-hidden />
-                )}
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="font-mono text-2xs text-[#71717A]">{product.code}</p>
-                <p className="line-clamp-2 text-sm font-semibold text-[#09090B]">
-                  {displayName}
-                </p>
-                <p className="mt-1 font-mono text-sm font-semibold tabular-nums text-[#09090B]">
-                  {values.basePrice > 0 ? formatVnd(values.basePrice, locale as Locale) : "—"}
-                </p>
-              </div>
-            </div>
 
-            {/* Khối xem trước các thông số đã thêm (thay thế vùng khoanh đỏ) */}
-            <div className="border-t border-dashed border-[#E4E4E7] pt-3.5">
-              <p className="mb-2.5 text-2xs font-semibold uppercase tracking-wider text-[#A1A1AA]">
-                {t("preview.title")}
-              </p>
-              <dl className="space-y-2.5 text-xs">
-                {/* Phân loại danh mục */}
-                <div className="flex items-center justify-between gap-2">
-                  <dt className="text-[#71717A]">{t("field.categoryShort")}</dt>
-                  <dd className="font-medium text-[#09090B] text-right">
-                    {currentRootCategory.name} › {currentCategory.name}
-                  </dd>
-                </div>
-
-                {/* Hình thức bán */}
-                <div className="flex items-center justify-between gap-2">
-                  <dt className="text-[#71717A]">{t("field.saleMode")}</dt>
-                  <dd className="font-medium text-[#09090B]">
-                    {t(`mode.${values.saleMode}.label`)}
-                  </dd>
-                </div>
-
-                {/* Màu sắc đã chọn */}
-                <div className="flex items-start justify-between gap-2">
-                  <dt className="text-[#71717A]">{t("sku.colors")}</dt>
-                  <dd className="flex max-w-[65%] flex-wrap items-center justify-end gap-1 text-right font-medium text-[#09090B]">
-                    {selectedColors.length > 0 ? (
-                      selectedColors.map((c) => (
-                        <span
-                          key={c.id}
-                          className="inline-flex items-center gap-1 rounded bg-[#FAFAFA] px-1.5 py-0.5 text-2xs ring-1 ring-[#E4E4E7]"
-                        >
-                          <span
-                            className="size-2 shrink-0 rounded-full border border-black/15 shadow-xs"
-                            style={{ backgroundColor: c.hex ?? "#D4D4D8" }}
-                            aria-hidden
-                          />
-                          <span>{c.name}</span>
-                        </span>
-                      ))
-                    ) : (
-                      <span className="text-[#A1A1AA]">{t("sku.noColor")}</span>
-                    )}
-                  </dd>
-                </div>
-
-                {/* Bảng size & Dải size */}
-                <div className="flex items-start justify-between gap-2">
-                  <dt className="text-[#71717A]">{t("field.sizeChartShort")}</dt>
-                  <dd className="min-w-0 text-right font-medium text-[#09090B]">
-                    <span>{chart ? chart.name : t("sizeChartNone")}</span>
-                    {axis.kind === "sized" && axis.sizes.length > 0 && (
-                      <span className="block font-mono text-2xs font-normal text-[#71717A]">
-                        {axis.sizes.join(" · ")}
-                      </span>
-                    )}
-                  </dd>
-                </div>
-
-                {/* Biến thể SKU & Tồn kho */}
-                <div className="flex items-center justify-between gap-2">
-                  <dt className="text-[#71717A]">{t("preview.variants")}</dt>
-                  <dd className="font-mono font-medium tabular-nums text-[#09090B]">
-                    {values.variants.length} SKU · {totalStock}{" "}
-                    {stockUnit === "meter" ? t("options.unitMeter") : t("options.unitPiece")}
-                  </dd>
-                </div>
-
-                {/* Chất liệu vải chính */}
-                <div className="flex items-center justify-between gap-2">
-                  <dt className="text-[#71717A]">{t("material.label")}</dt>
-                  <dd className="truncate font-medium text-[#09090B]">
-                    {currentMaterial ? currentMaterial.name : t("options.materialNone")}
-                  </dd>
-                </div>
-
-                {/* Đặc tính thiết kế (nếu có chọn) */}
-                {selectedDesignTraits.length > 0 && (
-                  <div className="flex items-start justify-between gap-2">
-                    <dt className="shrink-0 text-[#71717A]">{t("preview.designTraits")}</dt>
-                    <dd className="max-w-[65%] text-right font-medium text-[#09090B]">
-                      {selectedDesignTraits.map((a) => a.name).join(" · ")}
-                    </dd>
-                  </div>
-                )}
-
-                {/* May đo riêng */}
-                <div className="flex items-center justify-between gap-2">
-                  <dt className="text-[#71717A]">{t("custom.measurements")}</dt>
-                  <dd className="font-medium text-[#09090B]">
-                    {takesMeasurements
-                      ? values.leadTimeDays
-                        ? `${t("inherit.custom")} (${values.leadTimeDays} ${t("custom.days")})`
-                        : t("inherit.custom")
-                      : t("inherit.noCustom")}
-                  </dd>
-                </div>
-
-                {/* Sản phẩm nổi bật */}
-                <div className="flex items-center justify-between gap-2 pt-1 border-t border-dashed border-[#F4F4F5]">
-                  <dt className="text-[#71717A]">{t("field.isFeatured")}</dt>
-                  <dd className="flex items-center gap-2">
-                    <span
-                      className={cn(
-                        "text-2xs font-medium",
-                        values.isFeatured ? "text-amber-700" : "text-[#71717A]"
-                      )}
+              {/* 3. Liên kết kho hàng */}
+              <div className="border-t border-dashed border-[#E4E4E7] pt-4">
+                <span className="mb-2 block text-xs font-medium text-[#71717A]">
+                  {t("options.warehouseTitle")}
+                </span>
+                <div className="space-y-1">
+                  <a
+                    href={`/admin/inventory/skus?search=${product.code}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center justify-between rounded-lg px-2.5 py-1.5 text-xs text-[#3F3F46] transition-colors hover:bg-[#F4F4F5] hover:text-[#09090B]"
+                  >
+                    <span className="flex items-center gap-2">
+                      <Boxes size={14} className="text-[#71717A]" />
+                      {t("options.skuStock")}
+                    </span>
+                    <ExternalLink size={12} className="text-[#A1A1AA]" />
+                  </a>
+                  {values.materialId && (
+                    <a
+                      href={`/admin/inventory/fabrics?search=${product.code}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center justify-between rounded-lg px-2.5 py-1.5 text-xs text-[#3F3F46] transition-colors hover:bg-[#F4F4F5] hover:text-[#09090B]"
                     >
-                      {values.isFeatured ? t("preview.featuredYes") : t("preview.featuredNo")}
-                    </span>
-                    <AdminSwitch
-                      checked={values.isFeatured}
-                      onChange={(checked) => set("isFeatured", checked)}
-                      label={t("field.isFeatured")}
-                    />
-                  </dd>
+                      <span className="flex items-center gap-2">
+                        <Scissors size={14} className="text-[#71717A]" />
+                        {t("options.fabricStock")}
+                      </span>
+                      <ExternalLink size={12} className="text-[#A1A1AA]" />
+                    </a>
+                  )}
                 </div>
-              </dl>
+              </div>
             </div>
-          </Section>
-
-          {/* Card Thông số kế thừa từ danh mục & Đơn vị kho */}
-          <Section title={t("inherit.title")} description={t("inherit.hint")}>
-            <dl className="space-y-3 text-xs">
-              <div className="flex items-center justify-between gap-2">
-                <dt className="text-[#71717A]">{t("field.categoryParentShort")}</dt>
-                <dd className="font-medium text-[#09090B]">{currentRootCategory.name}</dd>
-              </div>
-              <div className="flex items-center justify-between gap-2">
-                <dt className="text-[#71717A]">{t("field.categoryShort")}</dt>
-                <dd className="font-medium text-[#09090B]">{currentCategory.name}</dd>
-              </div>
-              <div className="flex items-center justify-between gap-2">
-                <dt className="text-[#71717A]">{t("inherit.sellUnit")}</dt>
-                <dd className="font-medium text-[#09090B]">{tSizing(`sellUnit.${traits.sellUnit}`)}</dd>
-              </div>
-              <div className="flex items-center justify-between gap-2">
-                <dt className="text-[#71717A]">{t("inherit.custom")}</dt>
-                <dd className="text-right font-medium text-[#09090B]">
-                  {traits.customMeasurement ? t(`inherit.measure.${traits.customMeasurement}`) : t("inherit.noCustom")}
-                </dd>
-              </div>
-              <div className="flex items-start justify-between gap-2">
-                <dt className="text-[#71717A]">{t("inherit.sizes")}</dt>
-                <dd className="min-w-0 text-right font-medium text-[#09090B]">
-                  {axis.kind === "custom" ? (
-                    t("sku.customSize")
-                  ) : axis.kind === "free" ? (
-                    t("sku.freeSize")
-                  ) : axis.source === "chart" && chart ? (
-                    <Link href={`/admin/catalog/size-charts/${chart.id}`} className="text-[#09090B] hover:underline">
-                      {chart.name}
-                    </Link>
-                  ) : (
-                    t("inherit.sizesFromAttributes")
-                  )}
-                  {axis.kind === "sized" && (
-                    <span className="block font-mono text-2xs font-normal text-[#71717A]">
-                      {axis.sizes.join(" · ")}
-                    </span>
-                  )}
-                </dd>
-              </div>
-              <div className="flex items-center justify-between gap-2">
-                <dt className="text-[#71717A]">{t("inherit.modes")}</dt>
-                <dd className="text-right font-medium text-[#09090B]">
-                  {allowedModes.map((mode) => t(`mode.${mode}.label`)).join(" · ")}
-                </dd>
-              </div>
-            </dl>
           </Section>
         </aside>
       </div>
+
+      {createChartOpen && (
+        <ProductSizeChartDialog
+          group={group}
+          defaultName={`${values.name || t("field.name")} - ${t("sizeChartDefaultSuffix")}`}
+          onClose={() => setCreateChartOpen(false)}
+          onCreated={(newChart) => {
+            setSizeCharts((prev) => [newChart, ...prev]);
+            set("sizeChartId", newChart.id);
+            setIsCustomChart(true);
+          }}
+        />
+      )}
+
+      {quickGroupOpen && (
+        <ProductQuickAttributeGroupDialog
+          groups={designGroups}
+          initialGroupCode={selectedDesignGroupCode}
+          onClose={() => {
+            setQuickGroupOpen(false);
+            setSelectedDesignGroupCode(null);
+          }}
+          onGroupCreated={(newGroup) => {
+            setDesignGroups((prev) => [...prev, newGroup]);
+          }}
+          onAttributesCreated={(newAttributes) => {
+            setAttributes((prev) => [...prev, ...newAttributes]);
+            setValues((prev) => ({
+              ...prev,
+              attributeIds: [
+                ...prev.attributeIds,
+                ...newAttributes.map((a) => a.id).filter((id) => !prev.attributeIds.includes(id)),
+              ],
+            }));
+          }}
+        />
+      )}
     </form>
   );
 }

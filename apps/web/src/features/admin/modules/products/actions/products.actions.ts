@@ -2,7 +2,9 @@
 
 import { type z } from "zod";
 import { revalidatePath } from "next/cache";
+import { type Prisma } from "@repo/db";
 import { PRODUCT_GROUP_TRAITS, type ProductGroup } from "@repo/shared/sizing";
+import { type SizeChartColumnValue, type SizeChartRowValue } from "@/features/admin/modules/size-charts";
 import { prisma } from "../../../core/server/db.server";
 import { authorizeAdminAction } from "../../../core/server/adminAuth.server";
 import { recordAudit } from "../../../core/server/audit.server";
@@ -443,5 +445,88 @@ export async function toggleProductCustomFitAction(productId: string, isCustomFi
   } catch (error) {
     console.error("Lỗi toggleProductCustomFitAction:", error);
     return { success: false as const, error: "PRODUCT_UPDATE_FAILED" };
+  }
+}
+
+/** Server Action: tạo bảng size mới trực tiếp từ màn soạn sản phẩm (tự tạo bảng size mẫu / bảng riêng) */
+export async function createProductSizeChartAction(raw: {
+  name: string;
+  nameEn?: string;
+  group: ProductGroup;
+  grid: {
+    columns: SizeChartColumnValue[];
+    rows: SizeChartRowValue[];
+  };
+}) {
+  const auth = await authorizeAdminAction(ACCESS);
+  if (!auth.success) return auth;
+
+  const { name, nameEn, group, grid } = raw;
+  if (!name.trim()) {
+    return { success: false as const, error: "VALIDATION_ERROR" };
+  }
+  if (!grid.columns.length || !grid.rows.length) {
+    return { success: false as const, error: "VALIDATION_ERROR" };
+  }
+
+  try {
+    const columnKeys = new Set<string>(grid.columns.map((column) => column.key));
+    const columns = grid.columns.map((column, position) => ({
+      key: column.key,
+      position,
+      validMin: column.validMin ?? null,
+      validMax: column.validMax ?? null,
+      bigsizeFrom: column.bigsizeFrom ?? null,
+    }));
+    const rows = grid.rows.map((row, position) => ({
+      sizeLabel: row.sizeLabel.trim(),
+      position,
+      values: Object.fromEntries(
+        Object.entries(row.values).filter(([key]) => columnKeys.has(key))
+      ) as unknown as Prisma.InputJsonObject,
+    }));
+
+    const created = await prisma.sizeChart.create({
+      data: {
+        name: name.trim(),
+        nameEn: nameEn?.trim() || null,
+        group,
+        isActive: true,
+        columns: { create: columns },
+        rows: { create: rows },
+      },
+      select: {
+        id: true,
+        name: true,
+        group: true,
+        isActive: true,
+        rows: { select: { sizeLabel: true }, orderBy: { position: "asc" } },
+      },
+    });
+
+    await recordAudit({
+      actorId: auth.user.id,
+      action: "SIZE_CHART_CREATED",
+      targetType: "SIZE_CHART",
+      targetId: created.id,
+      metadata: { name: created.name, group: created.group, source: "PRODUCT_EDITOR" },
+    });
+
+    revalidatePath("/admin/catalog/size-charts");
+    revalidatePath("/admin/products");
+
+    return {
+      success: true as const,
+      data: {
+        id: created.id,
+        name: created.name,
+        group: created.group,
+        isActive: created.isActive,
+        sizeLabels: created.rows.map((r) => r.sizeLabel),
+      },
+    };
+  } catch (error) {
+    console.error("Lỗi createProductSizeChartAction:", error);
+    return { success: false as const, error: "SIZE_CHART_CREATE_FAILED" };
   }
 }

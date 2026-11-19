@@ -14,6 +14,7 @@ import {
   AdminFilterSelect,
   AdminTextField,
   AdminTooltip,
+  AdminUnsavedChangesDialog,
 } from "@/features/admin/core/ui";
 import { createProductAction } from "../../actions/products.actions";
 import { type AdminProductCategory } from "../../types/products.types";
@@ -44,6 +45,17 @@ export function CreateProductDialog({
   const [categoryId, setCategoryId] = useState(childrenOfRoot[0]?.id ?? rootId);
   const [mode, setMode] = useState<SaleMode>("SINGLE");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showConfirmLeave, setShowConfirmLeave] = useState(false);
+
+  const isDirty = name.trim().length > 0;
+
+  const handleRequestClose = () => {
+    if (isDirty) {
+      setShowConfirmLeave(true);
+    } else {
+      onOpenChange(false);
+    }
+  };
 
   // Khi đổi nhóm cha: tự động chọn loại con đầu tiên của nhóm đó
   const handleRootChange = (nextRootId: string) => {
@@ -76,30 +88,42 @@ export function CreateProductDialog({
   };
 
   return (
-    <AdminDialog
-      open
-      onOpenChange={onOpenChange}
-      icon={Shirt}
-      title={t("create.title")}
-      description={t("create.description")}
-      size="lg"
-      onSubmit={handleSubmit}
-      bodyClassName="space-y-4"
-      footer={
-        <>
-          <button type="button" onClick={() => onOpenChange(false)} className={ADMIN_DIALOG_SECONDARY_BUTTON_CLASS}>
-            {t("cancel")}
-          </button>
-          <button
-            type="submit"
-            disabled={isSubmitting || !name.trim() || !category}
-            className={ADMIN_DIALOG_PRIMARY_BUTTON_CLASS}
-          >
-            {isSubmitting ? t("saving") : t("create.submit")}
-          </button>
-        </>
-      }
-    >
+    <>
+      <AdminUnsavedChangesDialog
+        isDirty={isDirty}
+        forceOpen={showConfirmLeave}
+        onOpenChange={setShowConfirmLeave}
+        onConfirm={() => {
+          setShowConfirmLeave(false);
+          onOpenChange(false);
+        }}
+      />
+      <AdminDialog
+        open
+        onOpenChange={(open) => {
+          if (!open) handleRequestClose();
+        }}
+        icon={Shirt}
+        title={t("create.title")}
+        description={t("create.description")}
+        size="lg"
+        onSubmit={handleSubmit}
+        bodyClassName="space-y-4"
+        footer={
+          <>
+            <button type="button" onClick={handleRequestClose} className={ADMIN_DIALOG_SECONDARY_BUTTON_CLASS}>
+              {t("cancel")}
+            </button>
+            <button
+              type="submit"
+              disabled={isSubmitting || !name.trim() || !category}
+              className={ADMIN_DIALOG_PRIMARY_BUTTON_CLASS}
+            >
+              {isSubmitting ? t("saving") : t("create.submit")}
+            </button>
+          </>
+        }
+      >
       <AdminTextField
         autoFocus
         required
@@ -112,7 +136,6 @@ export function CreateProductDialog({
       <div className="grid gap-3 sm:grid-cols-2">
         <AdminField required label={t("field.categoryParent")}>
           <AdminFilterSelect
-            label={t("field.categoryParentShort")}
             value={rootId}
             options={roots.map((r) => ({ value: r.id, label: r.name }))}
             onChange={handleRootChange}
@@ -122,7 +145,6 @@ export function CreateProductDialog({
 
         <AdminField required label={t("field.category")}>
           <AdminFilterSelect
-            label={t("field.categoryShort")}
             value={categoryId}
             options={(childrenOfRoot.length > 0 ? childrenOfRoot : [roots.find((r) => r.id === rootId) || category]).filter(Boolean).map((c) => ({
               value: c.id,
@@ -175,5 +197,6 @@ export function CreateProductDialog({
         </div>
       </fieldset>
     </AdminDialog>
+  </>
   );
 }

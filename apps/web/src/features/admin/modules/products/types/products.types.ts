@@ -107,6 +107,9 @@ export interface AdminProductMaterialOption {
   metersPerTop: number | null;
   metersPerPants: number | null;
   isActive: boolean;
+  rollCount: number;
+  remainingMeters: number;
+  topsAvailable: number | null;
 }
 
 /** Giá trị thuộc tính dùng trong form sản phẩm (màu, size, đặc tính thiết kế) */
@@ -122,9 +125,12 @@ export interface AdminProductAttributeOption {
 
 /** Nhóm đặc tính thiết kế (không gồm màu / size) theo thứ tự ở màn Thuộc tính */
 export interface AdminProductDesignGroup {
+  id: string;
   code: string;
   name: string;
   nameEn: string | null;
+  description?: string | null;
+  descriptionEn?: string | null;
 }
 
 /** Dữ liệu tham chiếu cho màn chi tiết sản phẩm */

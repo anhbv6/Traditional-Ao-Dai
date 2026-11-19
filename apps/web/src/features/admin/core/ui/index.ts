@@ -16,3 +16,6 @@ export * from "./AdminSearchInput";
 export * from "./AdminTooltip";
 export * from "./AdminImageSlot";
 export * from "./AdminAdvancedOptions";
+export * from "./AdminNoticeHint";
+export * from "./AdminTabs";
+export * from "./AdminUnsavedChangesDialog";

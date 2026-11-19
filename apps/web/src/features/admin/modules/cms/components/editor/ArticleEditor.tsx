@@ -161,6 +161,7 @@ export function ArticleEditor({ data }: { data: ArticleEditorData }) {
   return (
     <form onSubmit={handleSubmit} noValidate className="contents">
       <AdminDetailHeader
+        isDirty={dirty}
         backHref="/admin/cms"
         backLabel={t("editor.back")}
         title={values.title || t("editor.newTitle")}

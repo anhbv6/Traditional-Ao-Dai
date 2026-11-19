@@ -1,5 +1,6 @@
 import { type Prisma } from "@repo/db";
 import { toVnd } from "@repo/shared";
+import { topsFromRolls } from "@repo/shared/materials";
 import { prisma } from "../../../core/server/db.server";
 import {
   type AdminProductAttributeOption,
@@ -182,7 +183,15 @@ export async function getAdminProductEditorOptionsQuery(): Promise<AdminProductE
       },
       orderBy: { name: "asc" },
     }),
-    prisma.material.findMany({ orderBy: [{ position: "asc" }, { name: "asc" }] }),
+    prisma.material.findMany({
+      orderBy: [{ position: "asc" }, { name: "asc" }],
+      include: {
+        fabrics: {
+          where: { isActive: true },
+          select: { remainingMeters: true },
+        },
+      },
+    }),
     prisma.attributeValue.findMany({
       orderBy: [{ group: { position: "asc" } }, { position: "asc" }],
       include: { group: { select: { code: true } } },
@@ -191,7 +200,7 @@ export async function getAdminProductEditorOptionsQuery(): Promise<AdminProductE
     prisma.attributeGroup.findMany({
       where: { code: { notIn: ["COLOR", "SIZE"] } },
       orderBy: [{ position: "asc" }, { createdAt: "asc" }],
-      select: { code: true, name: true, nameEn: true },
+      select: { id: true, code: true, name: true, nameEn: true, description: true, descriptionEn: true },
     }),
   ]);
 
@@ -200,30 +209,40 @@ export async function getAdminProductEditorOptionsQuery(): Promise<AdminProductE
     sizeLabels: rows.map((row) => row.sizeLabel),
   }));
 
-  const materialOptions: AdminProductMaterialOption[] = materials.map((m) => ({
-    id: m.id,
-    code: m.code,
-    name: m.name,
-    cover: m.closeupImages[0] ?? null,
-    composition: Array.isArray(m.composition)
-      ? m.composition.flatMap((item) => {
-          if (!item || typeof item !== "object" || Array.isArray(item)) return [];
-          const { fiber, percent } = item as Record<string, unknown>;
-          return typeof fiber === "string" && typeof percent === "number" ? [{ fiber, percent }] : [];
-        })
-      : [],
-    metrics: {
-      stretch: m.stretch,
-      thickness: m.thickness,
-      drape: m.drape,
-      sheerness: m.sheerness,
-      sheen: m.sheen,
-    },
-    careCodes: m.careCodes,
-    metersPerTop: m.metersPerTop === null ? null : Number(m.metersPerTop),
-    metersPerPants: m.metersPerPants === null ? null : Number(m.metersPerPants),
-    isActive: m.isActive,
-  }));
+  const materialOptions: AdminProductMaterialOption[] = materials.map((m) => {
+    const rolls = m.fabrics.map((fabric) => ({ remainingMeters: Number(fabric.remainingMeters) }));
+    const metersPerTop = m.metersPerTop === null ? null : Number(m.metersPerTop);
+    const remainingMeters = Math.round(rolls.reduce((sum, roll) => sum + roll.remainingMeters, 0) * 100) / 100;
+    const topsAvailable = topsFromRolls(rolls, metersPerTop);
+
+    return {
+      id: m.id,
+      code: m.code,
+      name: m.name,
+      cover: m.closeupImages[0] ?? null,
+      composition: Array.isArray(m.composition)
+        ? m.composition.flatMap((item) => {
+            if (!item || typeof item !== "object" || Array.isArray(item)) return [];
+            const { fiber, percent } = item as Record<string, unknown>;
+            return typeof fiber === "string" && typeof percent === "number" ? [{ fiber, percent }] : [];
+          })
+        : [],
+      metrics: {
+        stretch: m.stretch,
+        thickness: m.thickness,
+        drape: m.drape,
+        sheerness: m.sheerness,
+        sheen: m.sheen,
+      },
+      careCodes: m.careCodes,
+      metersPerTop,
+      metersPerPants: m.metersPerPants === null ? null : Number(m.metersPerPants),
+      isActive: m.isActive,
+      rollCount: rolls.length,
+      remainingMeters,
+      topsAvailable,
+    };
+  });
 
   const attributeOptions: AdminProductAttributeOption[] = attributes.map((a) => ({
     id: a.id,

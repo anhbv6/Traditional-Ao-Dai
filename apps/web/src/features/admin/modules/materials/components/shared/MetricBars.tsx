@@ -30,7 +30,7 @@ export function MetricBars({ metrics, className }: { metrics: MaterialMetrics; c
                   />
                 ))}
               </div>
-              <span className="text-2xs leading-none text-[#71717A]">{t(`${key}.short`)}</span>
+              <span className="text-2xs leading-none tracking-tight text-[#71717A]">{t(`${key}.short`)}</span>
             </div>
           </AdminTooltip>
         );

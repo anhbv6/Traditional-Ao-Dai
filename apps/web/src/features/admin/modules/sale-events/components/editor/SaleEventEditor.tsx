@@ -364,6 +364,7 @@ export function SaleEventEditor({ data }: { data: SaleEventEditorData }) {
   return (
     <form onSubmit={handleSubmit} noValidate className="contents">
       <AdminDetailHeader
+        isDirty={dirty && !readOnly}
         backHref="/admin/sale-events"
         backLabel={t("editor.back")}
         title={titleText}

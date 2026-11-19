@@ -12,7 +12,15 @@ import { useAnchorPositionMethod } from "@/hooks/useAnchorPositionMethod";
  * Trigger là `<span role="button">` (không phải `<button>`) để đặt được trong `<label>` mà nhãn vẫn gắn đúng với ô nhập.
  * Dùng Popover (mở khi rê chuột) thay vì Tooltip để chạm trên iPad / điện thoại vẫn mở được.
  */
-export function AdminInfoTip({ content, className }: { content: ReactNode; className?: string }) {
+export function AdminInfoTip({
+  content,
+  className,
+  popupClassName,
+}: {
+  content: ReactNode;
+  className?: string;
+  popupClassName?: string;
+}) {
   const { positionMethod, captureAnchor } = useAnchorPositionMethod();
   const t = useTranslations("AdminPage.infoTip");
 
@@ -41,7 +49,12 @@ export function AdminInfoTip({ content, className }: { content: ReactNode; class
           collisionPadding={12}
           className="z-50 outline-none"
         >
-          <Popover.Popup className="admin-shell max-w-[260px] origin-[var(--transform-origin)] rounded-lg bg-[#18181B] px-3 py-2 text-xs leading-relaxed text-white shadow-[0_10px_24px_-12px_rgba(9,9,11,0.5)] outline-none transition-[opacity,scale] duration-150 data-ending-style:scale-[0.98] data-ending-style:opacity-0 data-starting-style:scale-[0.97] data-starting-style:opacity-0">
+          <Popover.Popup
+            className={cn(
+              "admin-shell max-w-[260px] origin-[var(--transform-origin)] rounded-lg bg-[#18181B] px-3 py-2 text-xs leading-relaxed text-white shadow-[0_10px_24px_-12px_rgba(9,9,11,0.5)] outline-none transition-[opacity,scale] duration-150 data-ending-style:scale-[0.98] data-ending-style:opacity-0 data-starting-style:scale-[0.97] data-starting-style:opacity-0",
+              popupClassName
+            )}
+          >
             {content}
           </Popover.Popup>
         </Popover.Positioner>

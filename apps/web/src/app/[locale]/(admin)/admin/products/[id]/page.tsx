@@ -10,7 +10,7 @@ import { AdminPage } from "@/features/admin/core/ui";
 
 export const dynamic = "force-dynamic";
 
-/** Màn chi tiết sản phẩm: dữ liệu sản phẩm + dữ liệu kế thừa từ danh mục (loại, bảng size, chất liệu, thuộc tính) */
+/** Màn chi tiết sản phẩm: thông tin sản phẩm, hình thức bán, chất liệu, đặc tính thiết kế, SKU tồn kho */
 export default async function AdminProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
   await requireAdminPage(ADMIN_MODULE_ACCESS.products);
   const { id } = await params;

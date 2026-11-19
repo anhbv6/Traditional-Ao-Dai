@@ -24,10 +24,12 @@ export function ProductMaterialField({
   value,
   onChange,
   materials,
+  label,
 }: {
   value: string | null;
   onChange: (materialId: string | null) => void;
   materials: AdminProductMaterialOption[];
+  label?: string;
 }) {
   const t = useTranslations("AdminPage.products.material");
   const tCare = useTranslations("AdminPage.materials.careCode");
@@ -37,7 +39,7 @@ export function ProductMaterialField({
   return (
     <div className="space-y-3">
       <AdminFilterSelect
-        label={t("label")}
+        label={label}
         value={value ?? NONE}
         options={[
           { value: NONE, label: t("none") },

@@ -10,8 +10,8 @@ export interface AdminFilterOption<T extends string = string> {
 }
 
 interface AdminFilterSelectProps<T extends string> {
-  /** Tên bộ lọc hiển thị cố định bên trái nút, VD "Danh mục" */
-  label: string;
+  /** Tên bộ lọc hiển thị cố định bên trái nút, VD "Danh mục". Bỏ trống nếu trường đã có nhãn ngoài (AdminField / label). */
+  label?: string;
   value: T;
   options: AdminFilterOption<T>[];
   onChange: (value: T) => void;
@@ -23,7 +23,8 @@ interface AdminFilterSelectProps<T extends string> {
 }
 
 /**
- * Bộ lọc chọn một dùng chung cho các màn admin: nút "Nhãn | Giá trị", mở danh sách có dấu ✓ ở mục đang chọn.
+ * Bộ lọc chọn một dùng chung cho các màn admin: nút "Nhãn | Giá trị" (hoặc chỉ "Giá trị" nếu không có nhãn),
+ * mở danh sách có dấu ✓ ở mục đang chọn.
  * Dựng trên AppMenu nên có sẵn điều hướng bằng phím, tự lật khi sát mép màn hình và không bị khung `overflow-hidden` cắt.
  */
 export function AdminFilterSelect<T extends string>({
@@ -56,13 +57,15 @@ export function AdminFilterSelect<T extends string>({
         trigger={
           <button
             type="button"
-            aria-label={`${label}: ${selectedLabel ?? placeholder ?? ""}`}
+            aria-label={label ? `${label}: ${selectedLabel ?? placeholder ?? ""}` : (selectedLabel ?? placeholder ?? "")}
             className={cn(
               "group flex h-full w-full min-w-0 cursor-pointer items-center rounded-xl border bg-white text-sm shadow-2xs outline-none transition-colors hover:bg-[#FAFAFA] focus-visible:border-[#18181B] data-popup-open:border-[#18181B]",
               invalid ? "border-rose-400" : "border-[#E4E4E7]"
             )}
           >
-            <span className="shrink-0 border-r border-[#E4E4E7] px-3 text-[#71717A]">{label}</span>
+            {label ? (
+              <span className="shrink-0 border-r border-[#E4E4E7] px-3 text-[#71717A]">{label}</span>
+            ) : null}
             <span
               className={cn(
                 "min-w-0 flex-1 truncate px-3 text-left",

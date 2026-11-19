@@ -83,11 +83,27 @@ export function VoucherEditor({ data }: { data: VoucherEditorData }) {
   const valid = Object.values(errors).every((error) => error === null);
   const shown = (key: keyof typeof errors) => (showErrors ? (errors[key] ?? undefined) : undefined);
 
+  const currentSnapshot = JSON.stringify([
+    code,
+    description,
+    discountType,
+    valueRaw,
+    maxRaw,
+    minRaw,
+    limitRaw,
+    startDay,
+    endDay,
+    isActive,
+  ]);
+  const [savedSnapshot, setSavedSnapshot] = useState(currentSnapshot);
+  const isDirty = currentSnapshot !== savedSnapshot;
+
   const save = useMutation({
     mutationFn: (values: VoucherFormValues) =>
       existing ? updateVoucherAction({ voucherId: existing.id, values }) : createVoucherAction(values),
     onSuccess: (res) => {
       if (!res.success) return notify.error(res.error, existing ? "VOUCHER_UPDATE_FAILED" : "VOUCHER_CREATE_FAILED");
+      setSavedSnapshot(currentSnapshot);
       notify.success(existing ? t("toast.saved") : t("toast.created", { code: res.data.code }));
       if (existing) router.refresh();
       else router.replace(`/admin/vouchers/${res.data.id}`);
@@ -120,6 +136,7 @@ export function VoucherEditor({ data }: { data: VoucherEditorData }) {
   return (
     <form onSubmit={handleSubmit} className="contents">
       <AdminDetailHeader
+        isDirty={isDirty}
         backHref="/admin/vouchers"
         backLabel={t("editor.back")}
         title={existing ? existing.code : t("editor.newTitle")}
