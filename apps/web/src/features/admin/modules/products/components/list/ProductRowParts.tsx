@@ -56,45 +56,76 @@ export function ProductThumb({ product, className }: { product: AdminProductItem
   );
 }
 
-/** Trạng thái hiển thị (Đang bán / Tạm ẩn) */
-export function ProductStatus({ isActive }: { isActive: boolean }) {
+/** Trạng thái hiển thị (Đang bán / Tạm ẩn) — gióng thẳng 2 hàng */
+export function ProductStatus({ isActive, inline = false }: { isActive: boolean; inline?: boolean }) {
   const t = useTranslations("AdminPage.products");
+
+  if (inline) {
+    return (
+      <AdminStatusText tone={isActive ? "success" : "neutral"}>
+        {isActive ? t("active") : t("hidden")}
+      </AdminStatusText>
+    );
+  }
+
   return (
-    <AdminStatusText tone={isActive ? "success" : "neutral"}>
-      {isActive ? t("active") : t("hidden")}
-    </AdminStatusText>
+    <div className="min-w-0">
+      <p className="truncate">
+        <AdminStatusText tone={isActive ? "success" : "neutral"}>
+          {isActive ? t("active") : t("hidden")}
+        </AdminStatusText>
+      </p>
+      <p className="mt-0.5 truncate text-xs invisible select-none">—</p>
+    </div>
   );
 }
 
-/** Cột Sản phẩm: Ảnh + Tên (link chi tiết) + Mã & Biến thể SKU */
+/** Cột Sản phẩm: Ảnh + Tên (link chi tiết) + Mã & Biến thể SKU & Cảnh báo sắp hết */
 export function ProductIdentity({ product }: { product: AdminProductItem }) {
   const t = useTranslations("AdminPage.products");
   const locale = useLocale();
   const displayName = resolveProductName(product, locale);
 
+  const isCustomMode = product.saleMode === "CUSTOM";
+  const isLowStock = !isCustomMode && product.lowStockVariants > 0 && product.totalStock > 0;
+  const isOutOfStock = !isCustomMode && product.totalStock === 0 && product.variantsCount > 0;
+
   return (
-    <div className="group/item flex items-center gap-3">
+    <div className="group/item flex items-center gap-3 min-w-0">
       <Link href={`/admin/products/${product.id}`} className="group/thumb shrink-0">
         <ProductThumb product={product} />
       </Link>
-      <div className="min-w-0">
+      <div className="min-w-0 flex-1">
         <Link
           href={`/admin/products/${product.id}`}
           className="block truncate text-body font-medium text-[#09090B] transition-colors hover:text-[#18181B] hover:underline"
+          title={displayName}
         >
           {displayName}
         </Link>
-        <p className="mt-0.5 flex items-center gap-1.5 font-mono text-xs text-[#71717A]">
-          <span>{product.code}</span>
-          <span className="text-[#D4D4D8]">·</span>
-          <span className="font-sans">{t("skuCount", { count: product.variantsCount })}</span>
+        <p className="mt-0.5 truncate text-xs text-[#71717A]">
+          <span className="font-mono">{product.code}</span>
+          <span className="mx-1.5 text-[#D4D4D8]">·</span>
+          <span>{t("skuCount", { count: product.variantsCount })}</span>
+          {isLowStock && (
+            <>
+              <span className="mx-1.5 text-[#D4D4D8]">·</span>
+              <span className="text-amber-700">{t("lowStockSku", { count: product.lowStockVariants })}</span>
+            </>
+          )}
+          {isOutOfStock && (
+            <>
+              <span className="mx-1.5 text-[#D4D4D8]">·</span>
+              <span className="text-rose-600">{t("outOfStock")}</span>
+            </>
+          )}
         </p>
       </div>
     </div>
   );
 }
 
-/** Cột Loại sản phẩm: Tên loại + Chất liệu vải (không màu mè) */
+/** Cột Loại sản phẩm: Tên loại + Chất liệu vải (không màu mè) — gióng thẳng 2 hàng */
 export function ProductCategoryCell({ product }: { product: AdminProductItem }) {
   const locale = useLocale();
   const categoryName = resolveCategoryName(product, locale);
@@ -102,13 +133,17 @@ export function ProductCategoryCell({ product }: { product: AdminProductItem }) 
 
   return (
     <div className="min-w-0">
-      <p className="truncate text-body font-medium text-[#09090B]">{categoryName || "—"}</p>
-      {materialName && <p className="mt-0.5 truncate text-2xs text-[#71717A]">{materialName}</p>}
+      <p className="truncate text-body font-medium text-[#09090B]" title={categoryName || undefined}>
+        {categoryName || "—"}
+      </p>
+      <p className="mt-0.5 truncate text-xs text-[#71717A]" title={materialName || undefined}>
+        {materialName || <span className="invisible select-none">—</span>}
+      </p>
     </div>
   );
 }
 
-/** Cột Hình thức bán: Text thuần túy, không dùng icon rườm rà */
+/** Cột Hình thức bán: Text thuần túy, không dùng icon rườm rà — gióng thẳng 2 hàng */
 export function ProductSaleModeCell({ product, inline = false }: { product: AdminProductItem; inline?: boolean }) {
   const t = useTranslations("AdminPage.products");
   const modeLabel = t(`mode.${product.saleMode}.label`);
@@ -124,39 +159,67 @@ export function ProductSaleModeCell({ product, inline = false }: { product: Admi
   }
 
   return (
-    <div>
-      <p className="text-body font-medium text-[#27272A]">{modeLabel}</p>
-      {canCustomFit && <p className="mt-0.5 text-2xs text-[#71717A]">{t("mode.acceptsCustom")}</p>}
+    <div className="min-w-0">
+      <p className="truncate text-body font-medium text-[#27272A]" title={modeLabel}>
+        {modeLabel}
+      </p>
+      <p className="mt-0.5 truncate text-xs text-[#71717A]">
+        {canCustomFit ? t("mode.acceptsCustom") : <span className="invisible select-none">—</span>}
+      </p>
     </div>
   );
 }
 
-/** Cột Tồn kho + cảnh báo sắp hết/hết hàng; hàng may đo hiện "Đặt may" */
-export function ProductStockCell({ product }: { product: AdminProductItem }) {
+/** Cột Tồn kho: Căn đầu (trái) đồng bộ với bảng, chỉ 2 hàng */
+export function ProductStockCell({ product, inline = false }: { product: AdminProductItem; inline?: boolean }) {
   const t = useTranslations("AdminPage.products");
-  if (product.saleMode === "CUSTOM") {
-    return <span className="text-xs text-[#71717A]">{t("madeToOrder")}</span>;
-  }
-
   const isOutOfStock = product.totalStock === 0 && product.variantsCount > 0;
   const isNoSku = product.variantsCount === 0;
-  const isLowStock = product.lowStockVariants > 0 && !isOutOfStock;
 
-  return (
-    <div className="text-right">
+  if (product.saleMode === "CUSTOM") {
+    if (inline) {
+      return <span className="font-mono text-xs text-[#71717A]">—</span>;
+    }
+    return (
+      <div className="min-w-0">
+        <p className="truncate font-mono text-xs font-medium text-[#71717A]">—</p>
+        <p className="mt-0.5 truncate text-xs invisible select-none">—</p>
+      </div>
+    );
+  }
+
+  if (inline) {
+    return (
       <span
         className={cn(
-          "font-mono text-xs font-semibold tabular-nums text-[#09090B]",
+          "font-mono font-medium tabular-nums text-[#09090B]",
           isOutOfStock && "text-rose-600"
         )}
       >
         {product.totalStock}
       </span>
-      {isOutOfStock && <p className="mt-0.5 text-2xs font-medium text-rose-600">{t("outOfStock")}</p>}
-      {isLowStock && (
-        <p className="mt-0.5 text-2xs text-amber-700">{t("lowStockSku", { count: product.lowStockVariants })}</p>
-      )}
-      {isNoSku && <p className="mt-0.5 text-2xs text-amber-700">{t("noSku")}</p>}
+    );
+  }
+
+  return (
+    <div className="min-w-0">
+      <p
+        className={cn(
+          "truncate font-mono text-xs font-semibold tabular-nums text-[#09090B]",
+          isOutOfStock && "text-rose-600"
+        )}
+      >
+        {product.totalStock}
+      </p>
+      <p className="mt-0.5 truncate text-xs text-[#71717A]">
+        {isOutOfStock ? (
+          <span className="font-medium text-rose-600">{t("outOfStock")}</span>
+        ) : isNoSku ? (
+          <span className="text-amber-700">{t("noSku")}</span>
+        ) : (
+          <span className="invisible select-none">—</span>
+        )}
+      </p>
     </div>
   );
 }
@@ -166,10 +229,17 @@ interface ProductRowActionsProps {
   disabled: boolean;
   onToggleActive: (product: AdminProductItem) => void;
   onToggleCustomFit: (product: AdminProductItem) => void;
+  onPreview?: (product: AdminProductItem) => void;
 }
 
-/** Menu ⋯ của một dòng: mở chi tiết, ẩn / hiện, bật / tắt nhận may đo */
-export function ProductRowActions({ product, disabled, onToggleActive, onToggleCustomFit }: ProductRowActionsProps) {
+/** Menu ⋯ của một dòng: xem chi tiết, sửa sản phẩm, ẩn / hiện, bật / tắt nhận may đo */
+export function ProductRowActions({
+  product,
+  disabled,
+  onToggleActive,
+  onToggleCustomFit,
+  onPreview,
+}: ProductRowActionsProps) {
   const t = useTranslations("AdminPage.products");
   const canToggleCustomFit = product.saleMode !== "CUSTOM" && groupAllowsCustom(product.categoryGroup);
   const visibilityLabel = product.isActive ? t("hideProduct") : t("showProduct");
@@ -182,6 +252,17 @@ export function ProductRowActions({ product, disabled, onToggleActive, onToggleC
       align="end"
       sideOffset={4}
       items={[
+        ...(onPreview
+          ? [
+              {
+                key: "preview",
+                label: t("viewDetail"),
+                icon: Eye,
+                disabled,
+                onSelect: () => onPreview(product),
+              },
+            ]
+          : []),
         { key: "edit", label: t("edit"), icon: Pencil, href: `/admin/products/${product.id}` },
         { type: "separator", key: "sep" },
         {

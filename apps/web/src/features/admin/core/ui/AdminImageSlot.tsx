@@ -33,6 +33,13 @@ export interface AdminImageSlotProps {
   actions?: ReactNode;
   /** Tùy chọn hàm kiểm tra / chuẩn bị ảnh trước khi tải lên (mặc định dùng compressClientImage) */
   prepareFile?: (file: File) => Promise<{ success: true; file: File } | { success: false; error: string }>;
+  /** Tùy chọn xử lý file tự sinh URL (VD: lưu nháp tạo blobUrl thay vì upload Cloudinary ngay) */
+  onFileSelect?: (
+    file: File
+  ) =>
+    | Promise<{ success: true; url: string } | { success: false; error: string }>
+    | { success: true; url: string }
+    | { success: false; error: string };
   /** Vô hiệu hóa ô ảnh */
   disabled?: boolean;
   className?: string;
@@ -59,6 +66,7 @@ export function AdminImageSlot({
   allowRemove = true,
   actions,
   prepareFile,
+  onFileSelect,
   disabled = false,
   className,
 }: AdminImageSlotProps) {
@@ -74,6 +82,15 @@ export function AdminImageSlot({
 
     setIsUploading(true);
     try {
+      if (onFileSelect) {
+        const result = await onFileSelect(file);
+        if (!result.success) {
+          notify.error(result.error, "IMAGE_UPLOAD_FAILED");
+          return;
+        }
+        onChange(result.url);
+        return;
+      }
       const prepared = prepareFile ? await prepareFile(file) : await compressClientImage(file);
       if (!prepared.success) {
         notify.error(prepared.error, "IMAGE_UPLOAD_FAILED");

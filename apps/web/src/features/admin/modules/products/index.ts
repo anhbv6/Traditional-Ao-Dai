@@ -5,3 +5,4 @@ export * from "./queries/products.queries";
 export * from "./actions/products.actions";
 export * from "./components/list/ProductsList";
 export * from "./components/editor/ProductEditor";
+export * from "./components/dialog/ProductDetailPreviewDialog";

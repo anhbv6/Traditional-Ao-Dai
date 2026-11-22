@@ -13,7 +13,7 @@ import {
   type AdminProductDesignGroup,
   type AdminProductMaterialOption,
 } from "../../types/products.types";
-import { ProductMaterialField } from "./ProductMaterialField";
+import { ProductMaterialField } from "../editor/ProductMaterialField";
 
 interface ProductMaterialDesignDialogProps {
   open: boolean;

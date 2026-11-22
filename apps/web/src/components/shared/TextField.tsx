@@ -377,6 +377,15 @@ export function TextField({
   const isPassword = type === "password";
   const htmlType = isPassword && showPassword ? "text" : mask && type === "number" ? "text" : type;
 
+  const handleWheel = (event: React.WheelEvent<HTMLInputElement>) => {
+    inputProps.onWheel?.(event);
+    if (event.defaultPrevented) return;
+    if (htmlType === "number") {
+      // Ngăn lăn chuột làm thay đổi giá trị số và chặn cuộn trang
+      (event.target as HTMLElement).blur();
+    }
+  };
+
   const showClear = clearable && hasValue && isInteractive;
   const showCopy = copyable && hasValue && !disabled;
   const showPasswordToggle = passwordToggle && isPassword && !disabled;
@@ -471,6 +480,7 @@ export function TextField({
           size={fullWidth ? undefined : Math.max(currentValue.length, placeholder?.length ?? 0, 4) + 1}
           {...(isControlled ? { value: currentValue } : { defaultValue: uncontrolledValue })}
           onChange={handleChange}
+          onWheel={handleWheel}
           className={cn(INPUT_CLASS, !fullWidth && "flex-none", inputClassName)}
         />
 

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Shirt } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useNotify } from "@/hooks/useNotify";
 import { useRouter } from "@/i18n/routing";
@@ -103,7 +102,6 @@ export function CreateProductDialog({
         onOpenChange={(open) => {
           if (!open) handleRequestClose();
         }}
-        icon={Shirt}
         title={t("create.title")}
         description={t("create.description")}
         size="lg"

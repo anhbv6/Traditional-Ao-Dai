@@ -1,12 +1,38 @@
 "use client";
 
-import { useId, useState, type ChangeEvent, type ComponentProps, type CSSProperties, type ReactNode } from "react";
+import {
+  useId,
+  useRef,
+  useState,
+  useLayoutEffect,
+  type ChangeEvent,
+  type ComponentProps,
+  type CSSProperties,
+  type ReactNode,
+  type Ref,
+} from "react";
 import { AlertCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { textFieldToneVars, type TextFieldAppearance, type TextFieldTone } from "./textFieldTone";
 
+function getScrollParent(node: HTMLElement | null): HTMLElement | Window {
+  if (typeof window === "undefined" || !node) {
+    return typeof window !== "undefined" ? window : (null as unknown as Window);
+  }
+  let parent = node.parentElement;
+  while (parent && parent !== document.body && parent !== document.documentElement) {
+    const { overflowY } = window.getComputedStyle(parent);
+    if ((overflowY === "auto" || overflowY === "scroll") && parent.scrollHeight > parent.clientHeight) {
+      return parent;
+    }
+    parent = parent.parentElement;
+  }
+  return window;
+}
+
 export interface TextAreaFieldProps extends Omit<ComponentProps<"textarea">, "value" | "defaultValue"> {
+  ref?: Ref<HTMLTextAreaElement>;
   /** Nhãn — không truyền thì nên truyền `aria-label` */
   label?: ReactNode;
   /** `underline` (mặc định, giống TextField / màn Liên hệ): chỉ gạch chân. `outline`: viền hộp */
@@ -51,17 +77,20 @@ const APPEARANCE_CLASS: Record<TextFieldAppearance, string> = {
  * <TextAreaField label={t("message")} rows={4} maxLength={500} showCount value={message} onValueChange={setMessage} />
  */
 export function TextAreaField({
+  ref,
   label,
   appearance = "underline",
   tone = "default",
   helperText,
   error,
   showCount = false,
+  rows = 3,
   autoResize = false,
   value,
   defaultValue,
   onValueChange,
   onChange,
+  onWheel,
   maxLength,
   id: idProp,
   className,
@@ -78,6 +107,7 @@ export function TextAreaField({
   const messageId = `${textareaId}-message`;
   const helperId = `${textareaId}-helper`;
   const counterId = `${textareaId}-counter`;
+  const localRef = useRef<HTMLTextAreaElement | null>(null);
 
   // Tự giữ giá trị khi uncontrolled để bộ đếm vẫn chạy
   const [innerValue, setInnerValue] = useState(defaultValue ?? "");
@@ -95,6 +125,49 @@ export function TextAreaField({
     onChange?.(event);
   };
 
+  const setMergedRefs = (node: HTMLTextAreaElement | null) => {
+    localRef.current = node;
+    if (typeof ref === "function") {
+      ref(node);
+    } else if (ref && typeof ref === "object") {
+      (ref as React.MutableRefObject<HTMLTextAreaElement | null>).current = node;
+    }
+  };
+
+  // Tự động giãn chiều cao theo nội dung khi autoResize bật (tránh sinh thanh cuộn giam giữ con lăn chuột)
+  useLayoutEffect(() => {
+    if (!autoResize) return;
+    const el = localRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    const minHeight = (typeof rows === "number" ? rows : Number(rows) || 3) * 24 + 16;
+    const newHeight = Math.max(el.scrollHeight, minHeight);
+    el.style.height = `${newHeight}px`;
+  }, [currentValue, autoResize, rows]);
+
+  // Xử lý wheel: Khi di chuột qua ô textarea không bị "bắt giữ" thanh cuộn trang
+  const handleWheel = (event: React.WheelEvent<HTMLTextAreaElement>) => {
+    onWheel?.(event);
+    if (event.defaultPrevented) return;
+
+    const el = event.currentTarget;
+    const { scrollTop, scrollHeight, clientHeight } = el;
+    const canScroll = scrollHeight > clientHeight + 1;
+
+    // 1. Nếu textarea không bị tràn (nội dung ngắn): để sự kiện lăn cuộn tự nhiên ra ngoài
+    if (!canScroll) return;
+
+    // 2. Nếu đã cuộn chạm mép theo hướng lăn (đáy hoặc đỉnh): chuyển tiếp cuộn cho container cha / window
+    const deltaY = event.deltaY;
+    const isAtTop = scrollTop <= 0 && deltaY < 0;
+    const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1 && deltaY > 0;
+
+    if (isAtTop || isAtBottom) {
+      const scrollParent = getScrollParent(el);
+      scrollParent.scrollBy({ top: deltaY, behavior: "auto" });
+    }
+  };
+
   return (
     <div
       className={cn("group/field w-full", disabled && "cursor-not-allowed opacity-55", className)}
@@ -107,19 +180,22 @@ export function TextAreaField({
       ) : null}
 
       <textarea
+        ref={setMergedRefs}
         id={textareaId}
         value={value}
         defaultValue={value === undefined ? defaultValue : undefined}
         onChange={handleChange}
+        onWheel={handleWheel}
+        rows={rows}
         maxLength={maxLength}
         disabled={disabled}
         aria-invalid={hasError || undefined}
         aria-describedby={describedBy}
-        /* Lăn chuột cuộn nội dung ô (Lenis mặc định chiếm wheel để cuộn trang) */
-        data-lenis-prevent
+        /* Chỉ gắn data-lenis-prevent ở storefront (nơi có Lenis), khu vực admin không dùng Lenis */
+        {...(tone !== "admin" ? { "data-lenis-prevent": true } : {})}
         className={cn(
-          "scrollbar-brand block w-full overscroll-contain py-2.5 text-[15px] leading-7 text-[var(--tf-text)] outline-none transition-[border-color,box-shadow] duration-300",
-          autoResize ? "field-sizing-content max-h-[19rem] resize-none" : "resize-y",
+          "scrollbar-brand block w-full py-2.5 text-[15px] leading-7 text-[var(--tf-text)] outline-none transition-[border-color,box-shadow] duration-300",
+          autoResize ? "field-sizing-content max-h-[28rem] resize-none" : "resize-y overscroll-y-auto",
           "border-[var(--tf-border)] placeholder:text-[var(--tf-placeholder)]",
           "hover:not-focus:border-[var(--tf-border-hover)] focus:border-[var(--tf-border-focus)] disabled:cursor-not-allowed",
           APPEARANCE_CLASS[appearance],

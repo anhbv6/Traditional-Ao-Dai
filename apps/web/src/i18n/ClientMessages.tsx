@@ -14,7 +14,7 @@ export const CLIENT_NAMESPACES = {
   /** Khung cửa hàng: header (giỏ mini, thông báo, menu tài khoản), footer (QR, newsletter), chat */
   store: ["Common", "Errors", "Footer", "Chat", "CartPage", "NotificationsPage", "ProfilePage.logoutDialog"],
   auth: ["Common", "Auth"],
-  admin: ["Common", "Errors", "AdminPage"],
+  admin: ["Common", "Errors", "AdminPage", "Product"],
   /** Trang tài khoản — thông tin cá nhân + số đo (nhãn số đo lấy từ OrdersPage.measurement) */
   profile: ["Common", "Errors", "ProfilePage", "OrdersPage.measurement"],
   /** Màn Đơn hàng của tôi (/my-orders): danh sách, chi tiết đơn, sổ địa chỉ (ProfilePage.address) */

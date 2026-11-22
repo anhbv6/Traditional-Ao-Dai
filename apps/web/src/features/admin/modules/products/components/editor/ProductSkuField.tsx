@@ -1,17 +1,18 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { AlertTriangle, Check, Lock, Plus, Sparkles, Trash2, Unlock } from "lucide-react";
+import { AlertTriangle, Lock, Plus, Sparkles, Trash2, Unlock } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import {
   AdminButton,
   AdminDataTable,
+  AdminField,
   AdminFilterSelect,
-  AdminInfoTip,
-  AdminSwitch,
+  AdminMultiSelect,
   AdminTextField,
   AdminTooltip,
+  type AdminContentLang,
   type AdminTableColumn,
 } from "@/features/admin/core/ui";
 import { type AdminProductAttributeOption } from "../../types/products.types";
@@ -23,6 +24,9 @@ import {
   type SizeAxis,
 } from "../../utils/saleModes";
 import { type VariantRow } from "../../utils/productEditorForm";
+
+/** Tỷ giá tham chiếu chuẩn quy đổi VND ↔ USD cho hiển thị và nhập liệu (1 USD = 25.000 VNĐ) */
+const VND_PER_USD = 25_000;
 
 const CELL_INPUT =
   "h-8.5 w-full rounded-lg border border-[#E4E4E7] bg-white px-2.5 text-xs text-[#09090B] shadow-2xs outline-none transition-[border-color,box-shadow] duration-200 placeholder:text-[#A1A1AA] hover:border-[#D4D4D8] focus:border-[#18181B] focus:ring-2 focus:ring-[#18181B]/10 disabled:cursor-not-allowed disabled:bg-[#FAFAFA] disabled:text-[#71717A]";
@@ -40,9 +44,10 @@ function axisSizes(axis: SizeAxis): string[] {
 
 /**
  * SKU của sản phẩm:
- * - Bố cục 2 cột chuẩn mực: Cột trái nhãn thông tin + hướng dẫn, cột phải lựa chọn (Màu sắc, Size).
- * - Phía dưới có công tắc (switch) chuyển đổi chế độ thêm (Sinh tự động hoặc Thêm thủ công).
- * - Bảng danh sách biến thể dùng AdminDataTable, hỗ trợ chỉnh sửa trực tiếp (Màu, Size, Mã, Giá, Tồn kho).
+ * - Hàng 1 chia 50 / 50: Giá bán niêm yết (50%) và Màu sắc (50%, Multi-select).
+ * - Hàng 2 chia 50 / 50: Kích cỡ (50%, Multi-select) và Nút tạo SKU (50%, Sinh tổ hợp theo yêu cầu).
+ * - Người dùng bấm nút "Sinh SKU" để tạo các biến thể vào bảng, không tự động add khi chọn.
+ * - Bảng danh sách biến thể dùng AdminDataTable, hỗ trợ thêm biến thể lẻ và chỉnh sửa trực tiếp.
  */
 export function ProductSkuField({
   rows,
@@ -54,6 +59,7 @@ export function ProductSkuField({
   onBasePriceChange,
   stockUnit,
   totalStock,
+  lang,
 }: {
   rows: VariantRow[];
   onChange: (rows: VariantRow[]) => void;
@@ -65,18 +71,65 @@ export function ProductSkuField({
   /** "piece" | "meter" | null (may đo — không tồn kho) */
   stockUnit: "piece" | "meter" | null;
   totalStock?: number;
+  lang?: AdminContentLang;
 }) {
   const t = useTranslations("AdminPage.products.sku");
   const tProd = useTranslations("AdminPage.products");
   const locale = useLocale();
 
-  const [isAutoMode, setIsAutoMode] = useState(true);
+  // Ngôn ngữ áp dụng cho nhập liệu tiền tệ: ưu tiên lang của form biên tập, fallback sang locale hệ thống
+  const activeLang = lang ?? (locale === "en" ? "en" : "vi");
+
+  // Quản lý ghi đè tiền tệ thủ công (khi người dùng bấm nút [VNĐ | USD])
+  const [userCurrencyOverride, setUserCurrencyOverride] = useState<"VND" | "USD" | null>(null);
+  const [prevLang, setPrevLang] = useState(activeLang);
+
+  // Khi người dùng chuyển tab ngôn ngữ VI/EN trên thanh công cụ, đặt lại chế độ ghi đè thủ công
+  if (activeLang !== prevLang) {
+    setPrevLang(activeLang);
+    setUserCurrencyOverride(null);
+  }
+
+  const currencyMode: "VND" | "USD" = userCurrencyOverride ?? (activeLang === "en" ? "USD" : "VND");
+
+  // Lưu trữ chuỗi nhập USD gần nhất do người dùng tự gõ để bảo toàn dấu chấm thập phân / số 0 phía sau
+  const [userUsdInput, setUserUsdInput] = useState<{ vnd: number; text: string } | null>(null);
+
+  // Chuỗi hiển thị cho USD: nếu người dùng đang gõ thì ưu tiên chuỗi gõ, ngược lại quy đổi từ basePrice
+  const usdRaw =
+    userUsdInput && userUsdInput.vnd === basePrice
+      ? userUsdInput.text
+      : basePrice > 0
+        ? String(Math.round((basePrice / VND_PER_USD) * 100) / 100)
+        : "";
+
+  const handleToggleCurrency = (mode: "VND" | "USD") => {
+    setUserCurrencyOverride(mode);
+    if (mode === "USD") {
+      setUserUsdInput(null);
+    }
+  };
+
+  // Giá quy đổi ước tính hiển thị cạnh nhãn
+  const equivalentPriceText = useMemo(() => {
+    if (!basePrice || basePrice <= 0) return null;
+    if (currencyMode === "VND") {
+      const usdEstimate = basePrice / VND_PER_USD;
+      const formattedUsd = usdEstimate.toLocaleString("en-US", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+      });
+      return `≈ $${formattedUsd} USD`;
+    }
+    return `≈ ${basePrice.toLocaleString("vi-VN")} ₫`;
+  }, [basePrice, currencyMode]);
+
   const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
 
   const colorById = useMemo(() => new Map(colors.map((c) => [c.id, c])), [colors]);
   const allSizes = useMemo(() => axisSizes(axis), [axis]);
 
-  // Trạng thái chọn Màu & Size
+  // Trạng thái chọn Màu & Size trong dropdown
   const [pickedColors, setPickedColors] = useState<Set<string>>(
     () => new Set(rows.flatMap((row) => (row.colorId ? [row.colorId] : [])))
   );
@@ -85,36 +138,52 @@ export function ProductSkuField({
     return new Set(used.length > 0 ? used : allSizes);
   });
 
-  const sizes = allSizes.filter((size) => axis.kind !== "sized" || pickedSizes.has(size));
-  const colorChoices = colors.filter((c) => c.isActive || pickedColors.has(c.id));
-  const comboColors: (string | null)[] = pickedColors.size > 0 ? [...pickedColors] : [null];
-  const existing = useMemo(() => new Set(rows.map((row) => comboKey(row.colorId, row.size))), [rows]);
-  const missing = comboColors.flatMap((colorId) =>
-    sizes.filter((size) => !existing.has(comboKey(colorId, size))).map((size) => ({ colorId, size }))
+  const sizes = useMemo(
+    () => allSizes.filter((size) => axis.kind !== "sized" || pickedSizes.has(size)),
+    [allSizes, axis.kind, pickedSizes]
+  );
+  const colorChoices = useMemo(
+    () => colors.filter((c) => c.isActive || pickedColors.has(c.id)),
+    [colors, pickedColors]
   );
 
-  const toggle = (set: Set<string>, value: string) => {
-    const next = new Set(set);
-    if (next.has(value)) next.delete(value);
-    else next.add(value);
-    return next;
+  const comboColors: (string | null)[] = pickedColors.size > 0 ? [...pickedColors] : [null];
+  const existing = useMemo(() => new Set(rows.map((row) => comboKey(row.colorId, row.size))), [rows]);
+  const missing = useMemo(
+    () =>
+      comboColors.flatMap((colorId) =>
+        sizes.filter((size) => !existing.has(comboKey(colorId, size))).map((size) => ({ colorId, size }))
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- comboColors phụ thuộc pickedColors
+    [pickedColors, sizes, existing]
+  );
+
+  /** Cập nhật danh sách màu đã chọn */
+  const handleColorsChange = (nextColorIds: string[]) => {
+    setPickedColors(new Set(nextColorIds));
   };
 
-  const generate = () =>
-    onChange([
-      ...rows,
-      ...missing.map(({ colorId, size }) => ({
-        key: newRowKey(),
-        colorId,
-        color: colorId ? (colorById.get(colorId)?.name ?? "") : "",
-        size,
-        skuAuto: true,
-        sku: "",
-        price: null,
-        stock: 0,
-        inUse: false,
-      })),
-    ]);
+  /** Cập nhật danh sách kích cỡ đã chọn */
+  const handleSizesChange = (nextSizes: string[]) => {
+    setPickedSizes(new Set(nextSizes));
+  };
+
+  /** Sinh các dòng SKU cho các tổ hợp màu & size còn thiếu */
+  const generate = () => {
+    if (missing.length === 0) return;
+    const newRows: VariantRow[] = missing.map(({ colorId, size }) => ({
+      key: newRowKey(),
+      colorId,
+      color: colorId ? (colorById.get(colorId)?.name ?? "") : "",
+      size,
+      skuAuto: true,
+      sku: "",
+      price: null,
+      stock: 0,
+      inUse: false,
+    }));
+    onChange([...rows, ...newRows]);
+  };
 
   const update = (key: string, patch: Partial<VariantRow>) =>
     onChange(rows.map((row) => (row.key === key ? { ...row, ...patch } : row)));
@@ -303,7 +372,13 @@ export function ProductSkuField({
                 price: e.target.value === "" ? null : Math.max(0, Math.round(Number(e.target.value))) || null,
               })
             }
-            placeholder={basePrice > 0 ? basePrice.toLocaleString("vi-VN") : t("basePrice")}
+            placeholder={
+              basePrice > 0
+                ? currencyMode === "USD"
+                  ? `$${(basePrice / VND_PER_USD).toLocaleString("en-US", { maximumFractionDigits: 2 })}`
+                  : `${basePrice.toLocaleString("vi-VN")} ₫`
+                : t("basePrice")
+            }
             aria-label={t("price")}
             className={cn(CELL_INPUT, "text-right font-mono tabular-nums")}
           />
@@ -332,250 +407,169 @@ export function ProductSkuField({
         : []),
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps -- dependencies
-    [rows, colorChoices, allSizes, axis, basePrice, stockUnit, t]
+    [rows, colorChoices, allSizes, axis, basePrice, currencyMode, stockUnit, t]
   );
 
   return (
     <div className="space-y-6">
-      {/* 4 hàng cấu hình đồng bộ: Giá bán niêm yết, Màu sắc, Kích cỡ, Cách tạo SKU */}
-      <div className="space-y-4.5">
-        {/* Hàng 1: Giá bán niêm yết */}
-        <div className="grid grid-cols-1 sm:grid-cols-[200px_minmax(0,1fr)] lg:grid-cols-[220px_minmax(0,1fr)] gap-3 sm:gap-6 items-start">
-          <div className="min-w-0 space-y-1">
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs font-semibold text-[#09090B]">
-                {tProd("field.basePrice")} <span className="text-rose-500">*</span>
+      {/* 2 hàng 50 / 50 kéo dài bằng nhau tăm tắp */}
+      <div className="space-y-4">
+        {/* Hàng 1 chia 50 / 50: Giá bán niêm yết (50%) & Màu sắc (50%) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 items-start">
+          {/* Cột 1: Giá bán niêm yết */}
+          <AdminTextField
+            label={
+              <span className="flex items-center justify-between gap-1.5 w-full">
+                <span>{tProd("field.basePrice")}</span>
+                {equivalentPriceText && (
+                  <span className="text-2xs font-normal text-[#71717A] tabular-nums">
+                    {equivalentPriceText}
+                  </span>
+                )}
               </span>
-              <AdminInfoTip content={tProd("hints.basePriceExplain")} />
-            </div>
-            <p className="text-xs text-[#71717A] leading-relaxed">
-              {tProd("hints.basePriceExplain")}
-            </p>
-          </div>
-
-          <div className="w-full max-w-xs">
-            <AdminTextField
-              required
-              mask="currency"
-              currencyOptions={{ thousandSeparator: locale === "vi" ? "." : "," }}
-              value={basePrice ? String(basePrice) : ""}
-              onValueChange={(_display, raw) =>
-                onBasePriceChange?.(Math.max(0, Math.round(Number(raw) || 0)))
+            }
+            required
+            mask="currency"
+            currencyOptions={
+              currencyMode === "USD"
+                ? { thousandSeparator: ",", decimalScale: 2 }
+                : { thousandSeparator: ".", decimalScale: 0 }
+            }
+            value={currencyMode === "USD" ? usdRaw : basePrice > 0 ? String(basePrice) : ""}
+            onValueChange={(_display, raw) => {
+              if (currencyMode === "USD") {
+                const usdNum = parseFloat(raw);
+                const vnd = Number.isFinite(usdNum) ? Math.max(0, Math.round(usdNum * VND_PER_USD)) : 0;
+                setUserUsdInput({ vnd, text: raw });
+                onBasePriceChange?.(vnd);
+              } else {
+                setUserUsdInput(null);
+                const vnd = Math.max(0, Math.round(Number(raw) || 0));
+                onBasePriceChange?.(vnd);
               }
-              placeholder={tProd("placeholders.basePrice")}
-              suffix={<span className="text-xs font-medium text-[#71717A]">₫</span>}
-              inputClassName="font-mono tabular-nums text-right font-semibold"
+            }}
+            placeholder={currencyMode === "USD" ? "0.00" : "0"}
+            prefix={
+              <span className="text-xs font-medium text-[#71717A]">
+                {currencyMode === "USD" ? "$" : "₫"}
+              </span>
+            }
+            suffix={
+              <div className="flex items-center gap-0.5 rounded-lg border border-[#E4E4E7] bg-[#F4F4F5] p-0.5 text-2xs">
+                <button
+                  type="button"
+                  onClick={() => handleToggleCurrency("VND")}
+                  className={cn(
+                    "cursor-pointer rounded-md px-1.5 py-0.5 font-medium transition-all",
+                    currencyMode === "VND"
+                      ? "bg-white font-semibold text-[#09090B] shadow-2xs"
+                      : "text-[#71717A] hover:text-[#09090B]"
+                  )}
+                >
+                  VNĐ
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleToggleCurrency("USD")}
+                  className={cn(
+                    "cursor-pointer rounded-md px-1.5 py-0.5 font-medium transition-all",
+                    currencyMode === "USD"
+                      ? "bg-white font-semibold text-[#09090B] shadow-2xs"
+                      : "text-[#71717A] hover:text-[#09090B]"
+                  )}
+                >
+                  USD
+                </button>
+              </div>
+            }
+            inputClassName="text-left font-normal text-sm text-[#09090B] tabular-nums"
+          />
+
+          {/* Cột 2: Màu sắc (Multi-select dropdown) */}
+          <AdminField
+            label={t("colors")}
+          >
+            <AdminMultiSelect
+              value={[...pickedColors]}
+              options={colorChoices.map((c) => ({
+                value: c.id,
+                label: c.name,
+                colorHex: c.hex,
+              }))}
+              onChange={handleColorsChange}
+              placeholder={t("selectColorsPlaceholder")}
+              selectAllText={t("selectAll")}
+              deselectAllText={t("deselectAll")}
+              summaryFormatter={(count) => t("colorsPicked", { count })}
             />
-          </div>
+          </AdminField>
         </div>
 
-        {/* Hàng 2: Màu sắc */}
-        <div className="grid grid-cols-1 sm:grid-cols-[200px_minmax(0,1fr)] lg:grid-cols-[220px_minmax(0,1fr)] gap-3 sm:gap-6 items-start border-t border-dashed border-[#E4E4E7] pt-4.5">
-          <div className="min-w-0 space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-[#09090B]">
-                {t("colors")}
-              </span>
-              {pickedColors.size > 0 && (
-                <span className="rounded-full bg-[#18181B] px-1.5 py-0.5 text-3xs font-medium text-white">
-                  {t("colorsPicked", { count: pickedColors.size })}
-                </span>
-              )}
-              <AdminInfoTip content={t("colorsHint")} />
-            </div>
-            <p className="text-xs text-[#71717A] leading-relaxed">{t("colorsHint")}</p>
-            {colorChoices.length > 0 && (
-              <div className="flex items-center gap-1.5 pt-0.5 text-2xs">
-                <button
-                  type="button"
-                  onClick={() => setPickedColors(new Set(colorChoices.map((c) => c.id)))}
-                  className="cursor-pointer text-[#71717A] hover:text-[#09090B] hover:underline"
-                >
-                  {t("selectAll")}
-                </button>
-                <span className="text-[#D4D4D8]">·</span>
-                <button
-                  type="button"
-                  onClick={() => setPickedColors(new Set())}
-                  className="cursor-pointer text-[#71717A] hover:text-[#09090B] hover:underline"
-                >
-                  {t("deselectAll")}
-                </button>
-              </div>
-            )}
-          </div>
-
-          <div className="min-w-0">
-            {colorChoices.length === 0 ? (
-              <p className="py-1 text-xs text-[#A1A1AA]">{t("noColors")}</p>
-            ) : (
-              <div className="flex flex-wrap gap-1.5">
-                {colorChoices.map((color) => {
-                  const on = pickedColors.has(color.id);
-                  return (
-                    <button
-                      key={color.id}
-                      type="button"
-                      aria-pressed={on}
-                      onClick={() => setPickedColors((prev) => toggle(prev, color.id))}
-                      className={cn(
-                        "inline-flex h-7.5 cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 text-xs transition-all",
-                        on
-                          ? "border-[#18181B] bg-white font-medium text-[#09090B] shadow-2xs ring-1 ring-[#18181B]"
-                          : "border-[#E4E4E7] bg-white text-[#52525B] hover:border-[#A1A1AA] hover:text-[#09090B]"
-                      )}
-                    >
-                      <span
-                        aria-hidden
-                        className="size-3 shrink-0 rounded-full border border-black/15 shadow-2xs"
-                        style={{ background: color.hex ?? "#F4F4F5" }}
-                      />
-                      <span className="truncate">{color.name}</span>
-                      {on && <Check size={11} className="shrink-0 text-[#18181B]" aria-hidden />}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Hàng 3: Kích cỡ (Size) */}
-        <div className="grid grid-cols-1 sm:grid-cols-[200px_minmax(0,1fr)] lg:grid-cols-[220px_minmax(0,1fr)] gap-3 sm:gap-6 items-start border-t border-dashed border-[#E4E4E7] pt-4.5">
-          <div className="min-w-0 space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-[#09090B]">
-                {t("sizes")}
-              </span>
-              {axis.kind === "sized" && pickedSizes.size > 0 && (
-                <span className="rounded-full bg-[#18181B] px-1.5 py-0.5 text-3xs font-medium text-white">
-                  {t("sizesPicked", { count: pickedSizes.size })}
-                </span>
-              )}
-            </div>
-            <p className="text-xs text-[#71717A] leading-relaxed">
-              {axis.kind === "sized"
-                ? axis.source === "chart"
-                  ? t("sizesFromChart")
-                  : t("sizesFromAttributes")
-                : axis.kind === "custom"
-                  ? (stockUnit === null ? tProd("options.unitCustom") : t("customSize"))
-                  : t("freeSize")}
-            </p>
-            {axis.kind === "sized" && (
-              <div className="flex items-center gap-1.5 pt-0.5 text-2xs">
-                <button
-                  type="button"
-                  onClick={() => setPickedSizes(new Set(axis.sizes))}
-                  className="cursor-pointer text-[#71717A] hover:text-[#09090B] hover:underline"
-                >
-                  {t("selectAll")}
-                </button>
-                <span className="text-[#D4D4D8]">·</span>
-                <button
-                  type="button"
-                  onClick={() => setPickedSizes(new Set())}
-                  className="cursor-pointer text-[#71717A] hover:text-[#09090B] hover:underline"
-                >
-                  {t("deselectAll")}
-                </button>
-              </div>
-            )}
-          </div>
-
-          <div className="min-w-0">
+        {/* Hàng 2 chia 50 / 50: Kích cỡ (50%) & Nút tạo SKU (50%) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 items-start">
+          {/* Cột 1: Kích cỡ (Multi-select dropdown) */}
+          <AdminField
+            label={t("sizes")}
+            // hint={
+            //   axis.kind === "sized"
+            //     ? axis.source === "chart"
+            //       ? t("sizesFromChart")
+            //       : t("sizesFromAttributes")
+            //     : axis.kind === "custom"
+            //       ? (stockUnit === null ? tProd("options.unitCustom") : t("customSize"))
+            //       : t("freeSize")
+            // }
+          >
             {axis.kind === "sized" ? (
-              <div className="flex flex-wrap gap-1.5">
-                {axis.sizes.map((size) => {
-                  const on = pickedSizes.has(size);
-                  return (
-                    <button
-                      key={size}
-                      type="button"
-                      aria-pressed={on}
-                      onClick={() => setPickedSizes((prev) => toggle(prev, size))}
-                      className={cn(
-                        "h-7.5 min-w-8.5 cursor-pointer rounded-lg border px-2.5 font-mono text-xs transition-all",
-                        on
-                          ? "border-[#18181B] bg-[#18181B] font-semibold text-white shadow-xs"
-                          : "border-[#E4E4E7] bg-white font-medium text-[#3F3F46] hover:border-[#A1A1AA] hover:text-[#09090B]"
-                      )}
-                    >
-                      {size}
-                    </button>
-                  );
-                })}
-              </div>
+              <AdminMultiSelect
+                value={[...pickedSizes]}
+                options={axis.sizes.map((s) => ({
+                  value: s,
+                  label: s,
+                }))}
+                onChange={handleSizesChange}
+                placeholder={t("selectSizesPlaceholder")}
+                selectAllText={t("selectAll")}
+                deselectAllText={t("deselectAll")}
+                summaryFormatter={(count) => t("sizesPicked", { count })}
+              />
             ) : (
-              <div className="flex items-center gap-2 pt-1 text-xs text-[#71717A]">
+              <div className="flex h-10 w-full items-center justify-between rounded-xl border border-[#E4E4E7] bg-[#FAFAFA] px-3 text-xs">
                 <span className="font-semibold text-[#09090B]">{sizeLabel(allSizes[0] ?? "")}</span>
-                <span className="text-2xs text-[#A1A1AA]">
+                <span className="text-2xs text-[#71717A]">
                   ({axis.kind === "custom" ? t("customSize") : t("freeSize")})
                 </span>
               </div>
             )}
-          </div>
-        </div>
+          </AdminField>
 
-        {/* Hàng 4: Cách tạo SKU */}
-        <div className="grid grid-cols-1 sm:grid-cols-[200px_minmax(0,1fr)] lg:grid-cols-[220px_minmax(0,1fr)] gap-3 sm:gap-6 items-center border-t border-dashed border-[#E4E4E7] pt-4.5">
-          <div className="min-w-0 space-y-0.5">
-            <span className="text-xs font-semibold text-[#09090B]">
-              {t("creationModeLabel")}
-            </span>
-            <p className="text-xs text-[#71717A] leading-relaxed">
-              {isAutoMode ? t("modeAutoDesc") : t("modeManualDesc")}
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            {/* Cụm switch chuyển chế độ */}
-            <div className="flex items-center gap-3">
-              <AdminSwitch
-                checked={isAutoMode}
-                onChange={setIsAutoMode}
-                label={t("creationModeLabel")}
-              />
-              <span className="text-xs font-medium text-[#09090B]">
-                {isAutoMode ? t("modeAuto") : t("modeManual")}
-              </span>
-            </div>
-
-            {/* Thao tác tương ứng với chế độ */}
-            {isAutoMode ? (
-              <div className="flex flex-wrap items-center gap-3">
-                {pickedColors.size > 0 && sizes.length > 0 && (
-                  <span className="hidden md:inline-block font-mono text-2xs text-[#71717A]">
-                    {t("comboSummary", {
-                      colors: pickedColors.size,
-                      sizes: sizes.length,
-                      total: pickedColors.size * sizes.length,
-                    })}
-                  </span>
-                )}
-                <AdminButton
-                  variant="primary"
-                  size="sm"
-                  disabled={missing.length === 0}
-                  onClick={generate}
-                  icon={<Sparkles size={13} className="shrink-0" />}
-                  className="shrink-0 whitespace-nowrap"
-                >
-                  {missing.length > 0 ? t("generate", { count: missing.length }) : t("allGenerated")}
-                </AdminButton>
-              </div>
-            ) : (
+          {/* Cột 2: Nút tạo biến thể SKU */}
+          <AdminField
+            label={t("generateSkuAction")}
+          >
+            <div className="flex h-10 items-center gap-2.5">
               <AdminButton
-                variant="secondary"
-                size="sm"
-                onClick={handleAddRow}
-                icon={<Plus size={14} className="shrink-0" />}
-                className="shrink-0 whitespace-nowrap"
+                variant="primary"
+                size="md"
+                disabled={missing.length === 0}
+                onClick={generate}
+                icon={<Sparkles size={13} className="shrink-0" />}
+                className="whitespace-nowrap"
               >
-                {t("addVariant")}
+                {missing.length > 0 ? t("generate", { count: missing.length }) : t("allGenerated")}
               </AdminButton>
-            )}
-          </div>
+
+              {missing.length > 0 && pickedColors.size > 0 && sizes.length > 0 && (
+                <span className="truncate text-xs text-[#71717A]">
+                  ({t("comboSummary", {
+                    colors: pickedColors.size,
+                    sizes: sizes.length,
+                    total: missing.length,
+                  })})
+                </span>
+              )}
+            </div>
+          </AdminField>
         </div>
       </div>
 
@@ -597,16 +591,25 @@ export function ProductSkuField({
                 </span>
               )}
             </div>
-            <AdminButton
-              variant="secondary"
-              size="sm"
-              onClick={handleAddRow}
-              icon={<Plus size={14} className="shrink-0" />}
-              className="shrink-0 whitespace-nowrap"
-            >
-              {t("addSingleSku")}
-            </AdminButton>
           </div>
+        }
+        maxHeight="max-h-[380px]"
+        appendRow={
+          <tr className="group/add-row">
+            <td
+              colSpan={columns.length + 2}
+              className="p-2 border-t border-dashed border-[#E4E4E7]"
+            >
+              <button
+                type="button"
+                onClick={handleAddRow}
+                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-[#D4D4D8] bg-white py-2 text-xs font-medium text-[#71717A] transition-all hover:border-[#18181B] hover:text-[#09090B] hover:bg-[#FAFAFA] active:bg-[#F4F4F5]"
+              >
+                <Plus size={14} className="shrink-0 text-[#71717A] group-hover/add-row:text-[#09090B]" />
+                <span>{t("addSingleSku")}</span>
+              </button>
+            </td>
+          </tr>
         }
         selection={
           rows.length > 0

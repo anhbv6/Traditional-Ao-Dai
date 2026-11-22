@@ -1243,6 +1243,9 @@
     "hideProduct": "Ẩn khỏi cửa hàng",
     "enableCustomFit": "Bật nhận may đo",
     "disableCustomFit": "Tắt nhận may đo",
+    "viewDetail": "Xem chi tiết",
+    "previewTitle": "Xem trước sản phẩm",
+    "previewDesc": "Giao diện khách hàng nhìn thấy trên cửa hàng",
     "add": "Thêm sản phẩm",
     "edit": "Mở chi tiết",
     "cancel": "Hủy",
@@ -1494,7 +1497,10 @@
       "tableTitle": "Danh sách biến thể SKU",
       "selectedCount": "Đã chọn {count} biến thể",
       "deleteSelected": "Xóa đã chọn",
-      "addVariant": "Thêm biến thể"
+      "addVariant": "Thêm biến thể",
+      "selectColorsPlaceholder": "Chọn màu sắc...",
+      "selectSizesPlaceholder": "Chọn kích cỡ...",
+      "generateSkuAction": "Tạo biến thể SKU"
     },
     "ready": {
       "IMAGES": "Ảnh đại diện + ít nhất 1 ảnh mô tả",

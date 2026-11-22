@@ -55,6 +55,8 @@ export interface DisplayProduct {
   originalPriceValue?: number;
   /** Giá riêng theo từng size (nếu sản phẩm có biến thể giá) */
   sizePrices?: SizePrices;
+  /** Danh sách toàn bộ ảnh gallery của sản phẩm */
+  galleryImages?: string[];
   imageSrc: string;
   hoverImageSrc: string;
   imageAlt: string;
@@ -74,6 +76,8 @@ export interface DisplayProduct {
 
 export interface RelatedProductItem {
   id: string;
+  /** Danh sách toàn bộ ảnh gallery của sản phẩm */
+  galleryImages?: string[];
   imageSrc: string;
   hoverImageSrc: string;
   imageAlt: string;

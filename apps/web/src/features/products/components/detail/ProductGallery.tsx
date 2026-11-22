@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react';
 import Image from 'next/image';
 import { AnimatePresence, motion, useMotionValue, useReducedMotion, useSpring, useTransform } from 'motion/react';
+import { cn } from '@/lib/utils';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -19,9 +20,9 @@ const LENS_FADE_CLASS = 'transition-opacity duration-500 ease-[cubic-bezier(0.22
 const FOLLOW_SPRING = { stiffness: 110, damping: 20, mass: 0.6 };
 
 /** Độ phóng của bảng zoom — khung chọn trên ảnh chiếm 1/ZOOM chiều rộng / cao của ảnh */
-const ZOOM = 3;
-/** Bề rộng bảng zoom so với ảnh gốc (độ phóng thực tế = ZOOM_PANEL_WIDTH / LENS ≈ 1.9 lần) */
-const ZOOM_PANEL_CLASS = 'w-[62%]';
+const ZOOM = 2.5;
+/** Bề rộng bảng zoom so với ảnh gốc — cùng tỉ lệ và kích thước với ảnh gốc để 2 khung cân xứng chuẩn xác */
+const ZOOM_PANEL_CLASS = 'w-full';
 const LENS = 1 / ZOOM;
 
 const toPercent = (value: number) => `${value * 100}%`;
@@ -37,6 +38,13 @@ interface ProductGalleryProps {
   defaultImageSrc: string;
   /** Ref tới khung ảnh chính — nguồn của hiệu ứng "bay vào giỏ" */
   imageFrameRef?: React.Ref<HTMLDivElement>;
+  /** Ghim khi cuộn trang chi tiết (mặc định: true, modal preview: false) */
+  isSticky?: boolean;
+  /** Bật khung phóng to khi rê chuột desktop (mặc định: true, modal preview: false) */
+  enableZoom?: boolean;
+  /** Thu nhỏ nhẹ khoảng cách và layout khi nằm trong modal xem trước */
+  compact?: boolean;
+  className?: string;
 }
 
 /**
@@ -58,6 +66,10 @@ export default function ProductGallery({
   imageAlt,
   defaultImageSrc,
   imageFrameRef,
+  isSticky = true,
+  enableZoom = true,
+  compact = false,
+  className,
 }: ProductGalleryProps) {
   const currentSrc = galleryImages[activeImageIndex] || defaultImageSrc;
   const reduceMotion = useReducedMotion();
@@ -87,7 +99,7 @@ export default function ProductGallery({
 
   /** Chỉ zoom bằng chuột trên desktop — rê vào: đo khung, đặt khung chọn ngay tại con trỏ (không trượt từ chỗ cũ) */
   const handlePointerEnter = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (event.pointerType !== 'mouse' || !window.matchMedia('(min-width: 1024px)').matches) return;
+    if (event.pointerType !== 'mouse' || !window.matchMedia('(min-width: 768px)').matches) return;
     const rect = event.currentTarget.getBoundingClientRect();
     frameRectRef.current = rect;
     updatePoint(event, rect);
@@ -110,7 +122,13 @@ export default function ProductGallery({
   };
 
   return (
-    <div className="min-w-0 lg:sticky lg:top-28 lg:z-30 lg:max-w-[calc((100vh-9rem)/1.2)] lg:self-start">
+    <div
+      className={cn(
+        "min-w-0 w-full",
+        isSticky && "lg:sticky lg:top-28 lg:z-30 lg:max-w-[calc((100vh-9rem)/1.2)] lg:self-start",
+        className
+      )}
+    >
       {/* Lớp ngoài KHÔNG cắt: clip-path của hiệu ứng mở màn sẽ cắt mất bảng zoom nằm bên ngoài khung ảnh */}
       <div className="relative z-20">
         <motion.div
@@ -119,11 +137,11 @@ export default function ProductGallery({
           initial={{ clipPath: 'inset(100% 0% 0% 0%)' }}
           animate={{ clipPath: 'inset(0% 0% 0% 0%)' }}
           transition={{ duration: 1.2, ease: EASE }}
-          onPointerEnter={handlePointerEnter}
-          onPointerMove={handlePointerMove}
-          onPointerLeave={handlePointerLeave}
+          onPointerEnter={enableZoom ? handlePointerEnter : undefined}
+          onPointerMove={enableZoom ? handlePointerMove : undefined}
+          onPointerLeave={enableZoom ? handlePointerLeave : undefined}
         >
-          <div className={`relative aspect-[1.05/1] overflow-hidden bg-[var(--bg-secondary)] ${isZooming ? 'cursor-crosshair' : ''}`}>
+          <div className={`relative aspect-[1.05/1] overflow-hidden bg-[var(--bg-secondary)] ${enableZoom && isZooming ? 'cursor-crosshair' : ''}`}>
             <AnimatePresence initial={false} mode="popLayout">
               <motion.div
                 key={currentSrc}
@@ -133,40 +151,51 @@ export default function ProductGallery({
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.7, ease: EASE }}
               >
-                <Image src={currentSrc} alt={imageAlt} fill loading="eager" sizes="(max-width: 1024px) 100vw, 44vw" className="object-cover" />
+                <Image
+                  src={currentSrc}
+                  alt={imageAlt}
+                  fill
+                  loading="eager"
+                  sizes="(max-width: 1024px) 100vw, 44vw"
+                  className="object-cover"
+                />
               </motion.div>
             </AnimatePresence>
 
             {/* Khung chọn vùng đang phóng to — trượt êm theo con trỏ, mờ dần khi vào / ra */}
-            <motion.div
-              aria-hidden="true"
-              className={`pointer-events-none absolute left-0 top-0 z-[5] hidden border border-[var(--primary-color)]/50 bg-white/25 will-change-transform lg:block ${LENS_FADE_CLASS} ${
-                isZooming ? 'opacity-100' : 'opacity-0'
-              }`}
-              style={{ x: lensX, y: lensY, width: toPercent(LENS), height: toPercent(LENS) }}
-            />
+            {enableZoom && (
+              <motion.div
+                aria-hidden="true"
+                className={`pointer-events-none absolute left-0 top-0 z-[5] hidden border border-[var(--primary-color)]/50 bg-white/25 will-change-transform md:block ${LENS_FADE_CLASS} ${
+                  isZooming ? 'opacity-100' : 'opacity-0'
+                }`}
+                style={{ x: lensX, y: lensY, width: toPercent(LENS), height: toPercent(LENS) }}
+              />
+            )}
           </div>
 
         </motion.div>
 
         {/* Bảng phóng to bên ngoài, bên phải ảnh — cùng tỉ lệ khung ảnh nên vùng hiển thị khớp đúng khung chọn.
             Luôn gắn sẵn trên desktop (chỉ ẩn bằng opacity) để ảnh độ phân giải cao tải trước, rê vào là thấy ngay. */}
-        <div
-          aria-hidden="true"
-          className={`pointer-events-none absolute left-[calc(100%+1.5rem)] top-0 z-40 hidden aspect-[1.05/1] ${ZOOM_PANEL_CLASS} overflow-hidden border-[3px] border-[var(--bg-card)] bg-[var(--bg-card)] outline outline-1 outline-[var(--primary-color)]/35 shadow-[0_24px_60px_-24px_rgba(42,10,18,0.35)] lg:block ${FADE_CLASS} ${
-            isZooming ? 'visible scale-100 opacity-100' : 'invisible scale-[0.96] opacity-0'
-          }`}
-        >
-          <motion.div
-            className="absolute left-0 top-0 will-change-transform"
-            style={{ x: zoomX, y: zoomY, width: toPercent(ZOOM), height: toPercent(ZOOM) }}
+        {enableZoom && (
+          <div
+            aria-hidden="true"
+            className={`pointer-events-none absolute left-[calc(100%+1.5rem)] top-0 z-40 hidden aspect-[1.05/1] ${ZOOM_PANEL_CLASS} overflow-hidden border-[3px] border-[var(--bg-card)] bg-[var(--bg-card)] outline outline-1 outline-[var(--primary-color)]/35 shadow-[0_24px_60px_-24px_rgba(42,10,18,0.35)] md:block ${FADE_CLASS} ${
+              isZooming ? 'visible scale-100 opacity-100' : 'invisible scale-[0.96] opacity-0'
+            }`}
           >
-            <Image src={currentSrc} alt="" fill sizes="1600px" quality={90} loading="lazy" className="object-cover" />
-          </motion.div>
-        </div>
+            <motion.div
+              className="absolute left-0 top-0 will-change-transform"
+              style={{ x: zoomX, y: zoomY, width: toPercent(ZOOM), height: toPercent(ZOOM) }}
+            >
+              <Image src={currentSrc} alt="" fill sizes="1600px" quality={90} loading="lazy" className="object-cover" />
+            </motion.div>
+          </div>
+        )}
       </div>
 
-      <div className="mt-4 grid grid-cols-4 gap-2.5 sm:mt-5 sm:gap-4">
+      <div className={cn("grid grid-cols-4 gap-2.5", compact ? "mt-3 gap-2" : "mt-4 sm:mt-5 sm:gap-4")}>
         {galleryImages.map((image, index) => {
           const isActive = activeImageIndex === index;
           return (
@@ -193,7 +222,7 @@ export default function ProductGallery({
               {/* Khung viền đỏ đô trượt sang thumbnail đang chọn */}
               {isActive ? (
                 <motion.span
-                  layoutId="gallery-thumb-frame"
+                  layoutId={compact ? "preview-gallery-thumb-frame" : "gallery-thumb-frame"}
                   className="pointer-events-none absolute inset-0 border-2 border-[var(--primary-color)]"
                   transition={{ type: 'spring', stiffness: 380, damping: 34 }}
                 />

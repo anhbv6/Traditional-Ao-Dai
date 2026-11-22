@@ -3,7 +3,9 @@
 import { type z } from "zod";
 import { revalidatePath } from "next/cache";
 import { type Prisma } from "@repo/db";
+import { formatVnd, toVnd, type Locale } from "@repo/shared";
 import { PRODUCT_GROUP_TRAITS, type ProductGroup } from "@repo/shared/sizing";
+import { type DisplayProduct, productCatalog } from "@/features/products";
 import { type SizeChartColumnValue, type SizeChartRowValue } from "@/features/admin/modules/size-charts";
 import { prisma } from "../../../core/server/db.server";
 import { authorizeAdminAction } from "../../../core/server/adminAuth.server";
@@ -528,5 +530,232 @@ export async function createProductSizeChartAction(raw: {
   } catch (error) {
     console.error("Lỗi createProductSizeChartAction:", error);
     return { success: false as const, error: "SIZE_CHART_CREATE_FAILED" };
+  }
+}
+
+const PREVIEW_PRODUCT_INCLUDE = {
+  category: { select: { id: true, name: true, nameEn: true, group: true } },
+  material: { select: { id: true, name: true, nameEn: true } },
+  variants: {
+    select: {
+      id: true,
+      sku: true,
+      size: true,
+      color: true,
+      colorId: true,
+      price: true,
+      stock: true,
+      colorValue: {
+        select: { id: true, code: true, name: true, nameEn: true, hex: true },
+      },
+    },
+    orderBy: { createdAt: "asc" },
+  },
+  attributes: {
+    include: {
+      attributeValue: {
+        select: { id: true, code: true, name: true, nameEn: true, hex: true, group: { select: { code: true } } },
+      },
+    },
+  },
+  reviews: { select: { rating: true } },
+} satisfies Prisma.ProductInclude;
+
+type ProductWithPreviewPayload = Prisma.ProductGetPayload<{ include: typeof PREVIEW_PRODUCT_INCLUDE }>;
+
+function formatProductForPreview(product: ProductWithPreviewPayload, locale: Locale = "vi"): DisplayProduct {
+  const basePriceVnd = toVnd(product.basePrice);
+  const priceFormatted = formatVnd(basePriceVnd, locale);
+
+  const matchedCatalog = productCatalog.find(
+    (item) => item.id === product.code || item.id === product.slug || item.id === product.id
+  );
+
+  const images =
+    product.images.length > 0
+      ? product.images
+      : matchedCatalog?.imageSrc
+        ? ([matchedCatalog.imageSrc, matchedCatalog.hoverImageSrc].filter(Boolean) as string[])
+        : ["/images/placeholder.jpg"];
+
+  const sizes = Array.from(new Set(product.variants.map((v) => v.size).filter(Boolean)));
+  const finalSizes =
+    sizes.length > 0
+      ? sizes
+      : matchedCatalog?.sizes && matchedCatalog.sizes.length > 0
+        ? matchedCatalog.sizes
+        : ["S", "M", "L", "Free-size"];
+
+  // Gom các màu sắc thực tế từ biến thể sản phẩm trong DB (ưu tiên hex và name chuẩn của colorValue)
+  const colorMap = new Map<string, { name: string; hex: string; imageSrc?: string }>();
+  product.variants.forEach((v, idx) => {
+    const colorName = v.colorValue
+      ? (locale === "vi" ? v.colorValue.name : v.colorValue.nameEn || v.colorValue.name)
+      : v.color;
+    if (colorName && !colorMap.has(colorName)) {
+      colorMap.set(colorName, {
+        name: colorName,
+        hex: v.colorValue?.hex || "#E8B4B8",
+        imageSrc: images[idx] || images[0],
+      });
+    }
+  });
+
+  // Nếu trong variants chưa có, kiểm tra thuộc tính sản phẩm (nhóm COLOR)
+  if (colorMap.size === 0) {
+    const colorAttributes = product.attributes
+      .map((a) => a.attributeValue)
+      .filter((v) => v.group?.code === "COLOR");
+    colorAttributes.forEach((attr, idx) => {
+      const name = locale === "vi" ? attr.name : attr.nameEn || attr.name;
+      if (name && !colorMap.has(name)) {
+        colorMap.set(name, {
+          name,
+          hex: attr.hex || "#E8B4B8",
+          imageSrc: images[idx] || images[0],
+        });
+      }
+    });
+  }
+
+  let colors = Array.from(colorMap.values());
+  if (colors.length === 0) {
+    if (matchedCatalog && matchedCatalog.colors && matchedCatalog.colors.length > 0) {
+      colors = matchedCatalog.colors.map((c) => ({ name: c.name, hex: c.hex, imageSrc: c.imageSrc }));
+    } else {
+      colors = [{ name: locale === "vi" ? "Tiêu chuẩn" : "Standard", hex: "#E8B4B8", imageSrc: images[0] }];
+    }
+  }
+
+  const sizePrices: Record<string, { price: number; originalPrice?: number }> = {};
+  product.variants.forEach((v) => {
+    if (v.price !== null) {
+      sizePrices[v.size] = {
+        price: toVnd(v.price),
+      };
+    }
+  });
+
+  const totalStock = product.variants.reduce((sum, v) => sum + v.stock, 0);
+  const stockText =
+    product.saleMode === 'CUSTOM'
+      ? (locale === 'vi' ? 'Đặt may' : 'Made to order')
+      : totalStock > 0
+        ? (locale === 'vi' ? 'Còn hàng' : 'In Stock')
+        : (locale === 'vi' ? 'Hết hàng' : 'Out of Stock');
+
+  const categoryName =
+    locale === 'vi' ? product.category.name || product.category.nameEn : product.category.nameEn || product.category.name;
+  const materialName =
+    locale === 'vi'
+      ? product.material?.name || product.material?.nameEn || 'Lụa Tơ Tằm'
+      : product.material?.nameEn || product.material?.name || 'Silk';
+
+  const avgRating =
+    product.reviews.length > 0
+      ? (product.reviews.reduce((sum, r) => sum + r.rating, 0) / product.reviews.length).toFixed(1)
+      : '5.0';
+
+  const reviewCountText =
+    product.reviews.length > 0
+      ? (locale === 'vi' ? `${product.reviews.length} đánh giá` : `${product.reviews.length} Reviews`)
+      : (locale === 'vi' ? '121 đánh giá' : '121 Reviews');
+
+  const desc = locale === 'vi' ? product.description || '' : product.descriptionEn || product.description || '';
+
+  return {
+    id: product.code,
+    slug: product.slug,
+    name: locale === 'vi' ? product.name || product.nameEn || '' : product.nameEn || product.name || '',
+    description:
+      desc || (locale === 'vi' ? 'Tông màu sang trọng thêu chim phượng cát tường tinh xảo.' : 'Refined traditional Vietnamese design.'),
+    longDescription:
+      desc ||
+      (locale === 'vi'
+        ? 'Thiết kế được hoàn thiện với phom dáng mềm mại, chất liệu chọn lọc và các chi tiết tinh tế để phù hợp cho những dịp trang trọng. Sản phẩm giữ nét thanh lịch truyền thống nhưng vẫn dễ phối trong nhịp sống hiện đại.'
+        : 'This design is finished with a graceful silhouette, selected fabric, and refined details for formal occasions.'),
+    secondaryDescription: '',
+    price: priceFormatted,
+    priceValue: basePriceVnd,
+    originalPrice: undefined,
+    sizePrices: Object.keys(sizePrices).length > 0 ? sizePrices : undefined,
+    galleryImages: images,
+    imageSrc: images[0] || '/images/placeholder.jpg',
+    hoverImageSrc: images[1] || images[0] || '/images/placeholder.jpg',
+    imageAlt: product.name,
+    category: categoryName || 'Áo dài',
+    material: materialName,
+    purchaseType: product.saleMode === 'CUSTOM' ? 'custom' : product.saleMode === 'SET' ? 'set' : 'ready',
+    sizes: finalSizes,
+    colors,
+    rating: avgRating,
+    reviewCount: reviewCountText,
+    stock: stockText,
+    sku: product.code,
+    related: locale === 'vi' ? 'Sản phẩm liên quan' : 'Related Products',
+  };
+}
+
+/**
+ * Server Action: Lấy dữ liệu chi tiết sản phẩm phục vụ hộp thoại xem trước (Preview) ở Admin.
+ * Tái sử dụng dữ liệu định dạng DisplayProduct để tương thích trực tiếp với ProductPreviewView.
+ */
+export async function getProductPreviewAction(productId: string, locale: Locale = 'vi') {
+  const auth = await authorizeAdminAction(ACCESS);
+  if (!auth.success) return auth;
+
+  try {
+    const product = await prisma.product.findUnique({
+      where: { id: productId },
+      include: PREVIEW_PRODUCT_INCLUDE,
+    });
+
+    if (!product) {
+      const matchedCatalog = productCatalog.find(
+        (item) => item.id === productId || item.id === decodeURIComponent(productId)
+      );
+      if (matchedCatalog) {
+        const display: DisplayProduct = {
+          id: matchedCatalog.id,
+          slug: matchedCatalog.id,
+          name: matchedCatalog.name[locale],
+          description: matchedCatalog.description[locale],
+          price: matchedCatalog.price[locale],
+          priceValue: matchedCatalog.numericPrice,
+          originalPrice: matchedCatalog.originalPrice?.[locale],
+          galleryImages: Array.from(
+            new Set([matchedCatalog.imageSrc, matchedCatalog.hoverImageSrc, ...matchedCatalog.colors.map((c) => c.imageSrc).filter(Boolean)])
+          ).filter(Boolean) as string[],
+          imageSrc: matchedCatalog.imageSrc,
+          hoverImageSrc: matchedCatalog.hoverImageSrc,
+          imageAlt: matchedCatalog.imageAlt,
+          category: matchedCatalog.category,
+          purchaseType: matchedCatalog.purchaseType,
+          material: matchedCatalog.material,
+          sizes: matchedCatalog.sizes,
+          colors: matchedCatalog.colors.map((c) => ({ name: c.name, hex: c.hex, imageSrc: c.imageSrc })),
+          longDescription:
+            locale === 'vi'
+              ? 'Thiết kế được hoàn thiện với phom dáng mềm mại, chất liệu chọn lọc và các chi tiết tinh tế để phù hợp cho những dịp trang trọng. Sản phẩm giữ nét thanh lịch truyền thống nhưng vẫn dễ phối trong nhịp sống hiện đại.'
+              : 'This design is finished with a graceful silhouette, selected fabric, and refined details for formal occasions.',
+          secondaryDescription: '',
+          rating: '5.0',
+          reviewCount: locale === 'vi' ? '121 đánh giá' : '121 Reviews',
+          stock: locale === 'vi' ? 'Còn hàng' : 'In Stock',
+          sku: matchedCatalog.id,
+          related: locale === 'vi' ? 'Sản phẩm liên quan' : 'Related Products',
+        };
+        return { success: true as const, data: display };
+      }
+      return { success: false as const, error: 'PRODUCT_NOT_FOUND' };
+    }
+
+    return {
+      success: true as const,
+      data: formatProductForPreview(product, locale),
+    };
+  } catch (error) {
+    console.error('Lỗi getProductPreviewAction:', error);
+    return { success: false as const, error: 'PRODUCT_QUERY_FAILED' };
   }
 }

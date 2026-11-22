@@ -19,25 +19,29 @@ import { type DisplayProduct } from '../../types/products.types';
 interface ProductInfoProps {
   product: DisplayProduct;
   locale: 'vi' | 'en';
-  customMeasurementFields: Array<{ field_key: string; label: string; placeholder: string; required: boolean }>;
+  customMeasurementFields?: Array<{ field_key: string; label: string; placeholder: string; required: boolean }>;
   selectedColor: string;
   onColorSelect: (colorName: string, imageSrc?: string) => void;
   selectedSize: string;
   onSizeSelect: (size: string) => void;
-  customMeasurements: Record<string, string>;
-  onCustomMeasurementChange: (fieldKey: string, value: string) => void;
-  quantity: number;
-  onQuantityChange: (qty: number) => void;
-  isWishlisted: boolean;
-  onWishlistToggle: () => void;
+  customMeasurements?: Record<string, string>;
+  onCustomMeasurementChange?: (fieldKey: string, value: string) => void;
+  quantity?: number;
+  onQuantityChange?: (qty: number) => void;
+  isWishlisted?: boolean;
+  onWishlistToggle?: () => void;
   /** Trả về `true` khi đã thêm vào giỏ (thiếu số đo -> `false`) */
-  onAddToCart: () => boolean;
+  onAddToCart?: () => boolean;
   /** Giá của size đang chọn (VND) */
   selectedPrice: { price: number; originalPrice?: number };
   /** Ảnh đại diện cho thanh mua nhanh trên mobile */
-  currentImageSrc: string;
+  currentImageSrc?: string;
   /** Bấm số lượt đánh giá -> chuyển sang tab "Đánh giá" */
   onShowReviews?: () => void;
+  /** Chế độ xem trước: ẩn hàng thêm giỏ & form số đo, tối ưu hiển thị trong dialog */
+  previewMode?: boolean;
+  /** Thu nhỏ nhẹ typography và khoảng cách khi nằm trong dialog */
+  compact?: boolean;
 }
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -67,17 +71,19 @@ export default function ProductInfo({
   onColorSelect,
   selectedSize,
   onSizeSelect,
-  customMeasurements,
+  customMeasurements = {},
   onCustomMeasurementChange,
-  quantity,
+  quantity = 1,
   onQuantityChange,
-  isWishlisted,
+  isWishlisted = false,
   onWishlistToggle,
   onAddToCart,
   selectedPrice,
   locale,
-  currentImageSrc,
+  currentImageSrc = '',
   onShowReviews,
+  previewMode = false,
+  compact = false,
 }: ProductInfoProps) {
   const t = useTranslations('Product');
   const [justAdded, setJustAdded] = useState(false);
@@ -92,6 +98,7 @@ export default function ProductInfo({
   }, []);
 
   useEffect(() => {
+    if (previewMode) return;
     const element = actionRowRef.current;
     if (!element) return;
     const observer = new IntersectionObserver(([entry]) => {
@@ -99,7 +106,7 @@ export default function ProductInfo({
     });
     observer.observe(element);
     return () => observer.disconnect();
-  }, []);
+  }, [previewMode]);
 
   const isCustomSizeSelected = /may đo|custom/i.test(selectedSize);
   const priceText = product.sizePrices ? formatVnd(selectedPrice.price, locale) : product.price;
@@ -110,7 +117,7 @@ export default function ProductInfo({
     : product.originalPrice ?? null;
 
   const handleAddToCart = () => {
-    if (!onAddToCart()) return;
+    if (!onAddToCart || !onAddToCart()) return;
     setJustAdded(true);
     if (addedTimerRef.current) clearTimeout(addedTimerRef.current);
     addedTimerRef.current = setTimeout(() => setJustAdded(false), ADDED_FEEDBACK_MS);
@@ -152,21 +159,38 @@ export default function ProductInfo({
   return (
     <div className="min-w-0 lg:pt-1">
       <motion.div variants={stagger} initial="hidden" animate="show">
-        <motion.div variants={rise} className="flex items-start justify-between gap-6">
-          <h1 className="text-[1.5rem] font-semibold leading-tight text-[var(--primary-ink)] sm:text-[1.75rem] xl:text-[2rem]">{product.name}</h1>
-          <span className="mt-1 shrink-0 bg-[var(--bg-secondary)] px-2.5 py-1 text-[11px] font-semibold text-[var(--primary-ink)]">
+        <motion.div variants={rise} className="flex items-start justify-between gap-4">
+          <h1
+            className={cn(
+              "font-semibold leading-tight text-[var(--primary-ink)]",
+              compact ? "text-[1.25rem] sm:text-[1.375rem]" : "text-[1.5rem] sm:text-[1.75rem] xl:text-[2rem]"
+            )}
+          >
+            {product.name}
+          </h1>
+          <span
+            className={cn(
+              "mt-0.5 shrink-0 px-2.5 py-1 text-[11px] font-semibold",
+              compact
+                ? "rounded-md border border-[#E8DFD8] bg-[#F3ECE7] text-[var(--primary-color)] font-medium"
+                : "bg-[var(--bg-secondary)] text-[var(--primary-ink)]"
+            )}
+          >
             {product.stock}
           </span>
         </motion.div>
 
-        <motion.p variants={rise} className="mt-1.5 text-sm text-[var(--text-light)]">
-          {product.description}
-        </motion.p>
+        {/* Chỉ hiện mô tả ngắn nếu khác với mô tả chi tiết, tránh lặp lại 2 lần cùng một đoạn văn */}
+        {product.description && product.longDescription && product.description !== product.longDescription ? (
+          <motion.p variants={rise} className={cn("text-[var(--text-light)]", compact ? "mt-1 text-[13px]" : "mt-1.5 text-sm")}>
+            {product.description}
+          </motion.p>
+        ) : null}
 
-        <motion.div variants={rise} className="mt-3 flex flex-wrap items-center gap-2 text-[13px] text-[var(--text-light)]">
+        <motion.div variants={rise} className={cn("flex flex-wrap items-center gap-2 text-[13px] text-[var(--text-light)]", compact ? "mt-2" : "mt-3")}>
           <Rating style={{ maxWidth: 76 }} value={parseFloat(product.rating) || 5} itemStyles={ratingStyles} readOnly />
           <span className="font-semibold text-[var(--text-main)]">{product.rating}</span>
-          {onShowReviews ? (
+          {onShowReviews && !previewMode ? (
             <button
               type="button"
               onClick={onShowReviews}
@@ -180,7 +204,7 @@ export default function ProductInfo({
         </motion.div>
 
         {/* Giá: đổi size có giá khác -> giá mới "lăn" lên */}
-        <motion.div variants={rise} className="mt-3 flex h-8 items-baseline gap-3 overflow-hidden" aria-live="polite">
+        <motion.div variants={rise} className={cn("flex h-8 items-baseline gap-3 overflow-hidden", compact ? "mt-2.5" : "mt-3")} aria-live="polite">
           <AnimatePresence mode="popLayout" initial={false}>
             <motion.span
               key={priceText}
@@ -188,7 +212,7 @@ export default function ProductInfo({
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: '-100%', opacity: 0 }}
               transition={{ duration: 0.45, ease: EASE }}
-              className="text-[1.375rem]/8 font-semibold text-[var(--primary-ink)]"
+              className={cn("font-semibold text-[var(--primary-ink)]", compact ? "text-[1.25rem]/8" : "text-[1.375rem]/8")}
             >
               {priceText}
             </motion.span>
@@ -206,13 +230,15 @@ export default function ProductInfo({
           </AnimatePresence>
         </motion.div>
 
-        <motion.p variants={rise} className="mt-3 max-w-xl text-sm leading-6 text-[var(--text-main)]/90">
-          {product.longDescription}
-        </motion.p>
+        {product.longDescription || product.description ? (
+          <motion.p variants={rise} className={cn("max-w-xl text-[var(--text-main)]/90", compact ? "mt-2.5 text-[13px] leading-relaxed text-[#5C4D52]" : "mt-3 text-sm leading-6")}>
+            {product.longDescription || product.description}
+          </motion.p>
+        ) : null}
 
         {/* Màu sắc: khung viền trượt theo màu đang chọn */}
         {product.colors.length > 0 ? (
-          <motion.div variants={rise} className="mt-5">
+          <motion.div variants={rise} className={compact ? "mt-3.5" : "mt-5"}>
             <h2 className="text-[13px] font-semibold text-[var(--text-main)]">
               {t('details.color')}: <span className="font-normal text-[var(--text-light)]">{selectedColor}</span>
             </h2>
@@ -231,7 +257,7 @@ export default function ProductInfo({
                   >
                     {isActive ? (
                       <motion.span
-                        layoutId="product-color-ring"
+                        layoutId={previewMode ? "preview-product-color-ring" : "product-color-ring"}
                         className="absolute inset-0 border-2 border-[var(--primary-color)]"
                         transition={{ type: 'spring', stiffness: 420, damping: 32 }}
                       />
@@ -249,7 +275,7 @@ export default function ProductInfo({
 
         {/* Kích thước: nền đỏ đô trượt sang size đang chọn */}
         {product.sizes.length > 0 ? (
-          <motion.div variants={rise} className="mt-5">
+          <motion.div variants={rise} className={compact ? "mt-3.5" : "mt-5"}>
             <h2 className="text-[13px] font-semibold text-[var(--text-main)]">{t('details.size')}</h2>
             <div className="mt-2 flex flex-wrap gap-2">
               {product.sizes.map((size) => {
@@ -268,7 +294,7 @@ export default function ProductInfo({
                   >
                     {isActive ? (
                       <motion.span
-                        layoutId="product-size-fill"
+                        layoutId={previewMode ? "preview-product-size-fill" : "product-size-fill"}
                         className="absolute inset-0 bg-[var(--primary-color)]"
                         transition={{ type: 'spring', stiffness: 420, damping: 34 }}
                       />
@@ -282,9 +308,9 @@ export default function ProductInfo({
         ) : null}
       </motion.div>
 
-      {/* Form số đo: mở ra mượt khi chọn size may đo, ô nhập hiện lần lượt */}
+      {/* Form số đo: chỉ hiện ở trang mua hàng (không hiện ở chế độ xem trước) */}
       <AnimatePresence initial={false}>
-        {isCustomSizeSelected && customMeasurementFields.length > 0 ? (
+        {!previewMode && isCustomSizeSelected && customMeasurementFields.length > 0 ? (
           <motion.div
             key="measurements"
             initial={{ height: 0, opacity: 0 }}
@@ -318,7 +344,7 @@ export default function ProductInfo({
                       placeholder={field.placeholder}
                       required={field.required}
                       value={customMeasurements[field.field_key] || ''}
-                      onChange={(e) => onCustomMeasurementChange(field.field_key, e.target.value)}
+                      onChange={(e) => onCustomMeasurementChange?.(field.field_key, e.target.value)}
                       className="h-9 border border-[var(--border)] bg-[var(--bg-main)] px-2 text-[12px] outline-none transition-colors focus:border-[var(--primary-color)]"
                     />
                   </motion.label>
@@ -329,62 +355,72 @@ export default function ProductInfo({
         ) : null}
       </AnimatePresence>
 
-      {/* Hàng mua: số lượng + thêm vào giỏ + yêu thích */}
-      <motion.div
-        ref={actionRowRef}
-        initial={{ opacity: 0, y: 18 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, delay: 0.75, ease: EASE }}
-        className="mt-6 flex w-full flex-row items-center gap-2 sm:gap-3"
-      >
-        <QuantitySelector
-          value={quantity}
-          onChange={onQuantityChange}
-          max={MAX_LINE_QUANTITY}
-          labels={{ decrease: t('quantity.decrease'), increase: t('quantity.increase') }}
-        />
+      {/* Hàng mua: số lượng + thêm vào giỏ + yêu thích (chỉ hiện ở trang mua hàng) */}
+      {!previewMode ? (
+        <motion.div
+          ref={actionRowRef}
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.75, ease: EASE }}
+          className="mt-6 flex w-full flex-row items-center gap-2 sm:gap-3"
+        >
+          <QuantitySelector
+            value={quantity}
+            onChange={onQuantityChange ?? (() => {})}
+            max={MAX_LINE_QUANTITY}
+            labels={{ decrease: t('quantity.decrease'), increase: t('quantity.increase') }}
+          />
 
-        <ActionButton variant="confirm" size="md" onClick={handleAddToCart} className={cn('min-h-11 flex-1 sm:w-60 sm:flex-none', addedClass)}>
-          {addButtonContent}
-        </ActionButton>
+          <ActionButton variant="confirm" size="md" onClick={handleAddToCart} className={cn('min-h-11 flex-1 sm:w-60 sm:flex-none', addedClass)}>
+            {addButtonContent}
+          </ActionButton>
 
-        {/* Yêu thích: chỉ icon (không viền), tim nảy + toả hạt khi bấm — HeartToggle dùng chung */}
-        <HeartToggle
-          active={isWishlisted}
-          onToggle={onWishlistToggle}
-          labelOn={t('removeFromWishlist')}
-          labelOff={t('addToWishlist')}
-          tone="onSurface"
-          iconSize={22}
-          className="size-11 shrink-0"
-        />
-      </motion.div>
+          {/* Yêu thích: chỉ icon (không viền), tim nảy + toả hạt khi bấm — HeartToggle dùng chung */}
+          <HeartToggle
+            active={isWishlisted}
+            onToggle={onWishlistToggle ?? (() => {})}
+            labelOn={t('removeFromWishlist')}
+            labelOff={t('addToWishlist')}
+            tone="onSurface"
+            iconSize={22}
+            className="size-11 shrink-0"
+          />
+        </motion.div>
+      ) : null}
 
       {/* Thông số */}
       <motion.dl
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 0.9 }}
-        className="mt-6 grid gap-x-6 gap-y-1.5 border-t border-[var(--border)] pt-4 text-[13px] text-[var(--text-light)] sm:grid-cols-2"
+        className={cn(
+          "grid gap-x-6 gap-y-1.5 border-t border-[var(--border)] text-[var(--text-light)] sm:grid-cols-2",
+          compact
+            ? "mt-4 rounded-xl border border-[#E8DFD8] bg-[#F7F2EE]/70 p-3 text-[12px]"
+            : "mt-6 pt-4 text-[13px]"
+        )}
       >
         <div>
-          <dt className="inline font-semibold text-[var(--text-main)]">{t('details.sku')}:</dt> <dd className="inline">{product.id}</dd>
+          <dt className="inline font-medium text-[var(--text-main)]">{t('details.sku')}:</dt>{" "}
+          <dd className="inline font-mono text-[#52525B]">{product.sku || product.id}</dd>
         </div>
         <div>
-          <dt className="inline font-semibold text-[var(--text-main)]">{t('details.category')}:</dt> <dd className="inline">{product.category}</dd>
+          <dt className="inline font-medium text-[var(--text-main)]">{t('details.category')}:</dt>{" "}
+          <dd className="inline text-[#52525B]">{product.category}</dd>
         </div>
         <div>
-          <dt className="inline font-semibold text-[var(--text-main)]">{t('materialLabel')}:</dt> <dd className="inline">{product.material}</dd>
+          <dt className="inline font-medium text-[var(--text-main)]">{t('materialLabel')}:</dt>{" "}
+          <dd className="inline text-[#52525B]">{product.material}</dd>
         </div>
         <div>
-          <dt className="inline font-semibold text-[var(--text-main)]">{t('purchaseTypeLabel')}:</dt>{' '}
-          <dd className="inline">{t(`purchaseTypes.${product.purchaseType}`)}</dd>
+          <dt className="inline font-medium text-[var(--text-main)]">{t('purchaseTypeLabel')}:</dt>{" "}
+          <dd className="inline text-[#52525B]">{t(`purchaseTypes.${product.purchaseType}`)}</dd>
         </div>
       </motion.dl>
 
-      {/* Thanh mua nhanh dính đáy (mobile/tablet) khi hàng nút đã cuộn khỏi màn hình */}
+      {/* Thanh mua nhanh dính đáy (mobile/tablet) khi hàng nút đã cuộn khỏi màn hình (chỉ trang mua hàng) */}
       <AnimatePresence>
-        {isPastActionRow ? (
+        {!previewMode && isPastActionRow ? (
           <motion.div
             initial={{ y: '100%' }}
             animate={{ y: 0 }}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { AlertTriangle, Boxes, Check, ExternalLink, Plus, Ruler, Scissors, ShoppingBag, SlidersHorizontal } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { PRODUCT_GROUP_TRAITS } from "@repo/shared/sizing";
@@ -40,12 +40,13 @@ import {
   SALE_MODES,
   type SaleMode,
 } from "../../utils/saleModes";
+import { clearDraftProductImages, uploadPendingProductImages } from "../../utils/productImage";
 import { ProductImagesField } from "./ProductImagesField";
 import { ProductMaterialField } from "./ProductMaterialField";
-import { ProductQuickAttributeGroupDialog } from "./ProductQuickAttributeGroupDialog";
 import { ProductSetItemsField } from "./ProductSetItemsField";
-import { ProductSizeChartDialog } from "./ProductSizeChartDialog";
 import { ProductSkuField } from "./ProductSkuField";
+import { ProductSizeChartDialog } from "../dialog/ProductSizeChartDialog";
+import { ProductQuickAttributeGroupDialog } from "../dialog/ProductQuickAttributeGroupDialog";
 
 type Lang = AdminContentLang;
 const LANG_FIELDS = {
@@ -118,6 +119,13 @@ export function ProductEditor({
 
   const fields = LANG_FIELDS[lang];
   const isDirty = JSON.stringify(values) !== JSON.stringify(baseline);
+
+  // Dọn dẹp các URL blob nháp khi rời khỏi trang mà không lưu
+  useEffect(() => {
+    return () => {
+      clearDraftProductImages();
+    };
+  }, []);
 
   // Phân cấp Loại sản phẩm (Cấp cha: root có parentId === null; Cấp con: có parentId)
   const rootCategories = options.categories.filter((c) => c.parentId === null);
@@ -233,7 +241,12 @@ export function ProductEditor({
     }
     setIsSaving(true);
     try {
-      const res = await updateProductAction({ ...toPayload(values), productId: product.id });
+      // 1. Chỉ đẩy lên Cloudinary các ảnh nháp thực sự còn được giữ trong danh sách
+      const finalImages = await uploadPendingProductImages(values.images);
+      const nextValues = { ...values, images: finalImages };
+
+      // 2. Lưu thông tin vào database qua Server Action
+      const res = await updateProductAction({ ...toPayload(nextValues), productId: product.id });
       if (!res.success) {
         notify.error(res.error, "PRODUCT_UPDATE_FAILED");
         return;
@@ -243,6 +256,8 @@ export function ProductEditor({
       setProduct(res.data);
       setValues(next);
       setBaseline(next);
+    } catch (error) {
+      notify.error(error, "PRODUCT_UPDATE_FAILED");
     } finally {
       setIsSaving(false);
     }
@@ -301,7 +316,7 @@ export function ProductEditor({
                 readOnly
                 disabled
                 hint={t("hints.code")}
-                inputClassName="font-mono font-medium tabular-nums bg-[#F4F4F5] text-[#52525B] cursor-not-allowed selection:bg-transparent"
+                inputClassName="font-mono font-medium tabular-nums text-[#52525B] cursor-not-allowed selection:bg-transparent"
               />
 
               {/* Tách chọn loại thành: Chọn Nhóm hàng (Cha) → Chọn Loại sản phẩm (Con) */}
@@ -814,34 +829,32 @@ export function ProductEditor({
 
                   {/* 2.2 Màu sắc, Size & Biến thể SKU tồn kho */}
                   <div className="border-t border-dashed border-[#E4E4E7] pt-5">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-body font-semibold text-[#09090B]">{t("sections.pricing")}</h3>
-                        <AdminInfoTip
-                          popupClassName="max-w-[340px]"
-                          content={
-                            <div className="space-y-2 text-xs">
-                              <p className="font-semibold text-white">{t("hints.pricingTitle")}</p>
-                              <p className="text-[#D4D4D8] leading-relaxed">{t("hints.pricingDesc")}</p>
-                              <div className="border-t border-[#3F3F46] pt-1.5 space-y-1 text-2xs text-[#A1A1AA]">
-                                <p className="font-semibold text-white/90">{t("hints.pricingNotesTitle")}:</p>
-                                <p className="flex items-start gap-1">
-                                  <span className="text-amber-400">•</span>
-                                  <span>{t("hints.pricingNote1")}</span>
-                                </p>
-                                <p className="flex items-start gap-1">
-                                  <span className="text-amber-400">•</span>
-                                  <span>{t("hints.pricingNote2")}</span>
-                                </p>
-                                <p className="flex items-start gap-1">
-                                  <span className="text-amber-400">•</span>
-                                  <span>{t("hints.pricingNote3")}</span>
-                                </p>
-                              </div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <h3 className="text-body font-semibold text-[#09090B]">{t("sections.pricing")}</h3>
+                      <AdminInfoTip
+                        popupClassName="max-w-[340px]"
+                        content={
+                          <div className="space-y-2 text-xs">
+                            <p className="font-semibold text-white">{t("hints.pricingTitle")}</p>
+                            <p className="text-[#D4D4D8] leading-relaxed">{t("hints.pricingDesc")}</p>
+                            <div className="border-t border-[#3F3F46] pt-1.5 space-y-1 text-2xs text-[#A1A1AA]">
+                              <p className="font-semibold text-white/90">{t("hints.pricingNotesTitle")}:</p>
+                              <p className="flex items-start gap-1">
+                                <span className="text-amber-400">•</span>
+                                <span>{t("hints.pricingNote1")}</span>
+                              </p>
+                              <p className="flex items-start gap-1">
+                                <span className="text-amber-400">•</span>
+                                <span>{t("hints.pricingNote2")}</span>
+                              </p>
+                              <p className="flex items-start gap-1">
+                                <span className="text-amber-400">•</span>
+                                <span>{t("hints.pricingNote3")}</span>
+                              </p>
                             </div>
-                          }
-                        />
-                      </div>
+                          </div>
+                        }
+                      />
                     </div>
 
                     <ProductSkuField
@@ -855,14 +868,15 @@ export function ProductEditor({
                       onBasePriceChange={(price) => set("basePrice", price)}
                       stockUnit={stockUnit}
                       totalStock={totalStock}
+                      lang={lang}
                     />
                   </div>
 
                   {/* 2.3 Hình ảnh sản phẩm */}
                   <div className="border-t border-dashed border-[#E4E4E7] pt-5">
-                    <div className="mb-3">
+                    <div className="mb-3 flex items-center gap-1.5">
                       <h3 className="text-body font-semibold text-[#09090B]">{t("field.images")}</h3>
-                      <p className="mt-0.5 text-xs text-[#71717A]">{t("image.hint", { max: 8 })}</p>
+                      <AdminInfoTip content={t("image.hint", { max: 8 })} />
                     </div>
                     <ProductImagesField value={values.images} onChange={(images) => set("images", images)} />
                   </div>

@@ -40,13 +40,26 @@ function groupDigits(digits: string, groups: number[], separator: string): strin
 
 /** Tiền tệ: 1250000 → "1,250,000" (raw "1250000") */
 export function maskCurrency(input: string, options: CurrencyMaskOptions = {}): MaskResult {
-  const { thousandSeparator = ",", decimalScale = 0, decimalSeparator = "." } = options;
+  const { thousandSeparator = ",", decimalScale = 0 } = options;
+  const decimalSeparator = options.decimalSeparator ?? (thousandSeparator === "." ? "," : ".");
 
+  if (!input) {
+    return { display: "", raw: "" };
+  }
+
+  // Khi không có phần thập phân (VND hoặc số tiền nguyên): lấy toàn bộ chữ số rồi nhóm hàng nghìn
+  if (decimalScale <= 0) {
+    const integer = onlyDigits(input).replace(/^0+(?=\d)/, "");
+    const grouped = integer.replace(/\B(?=(\d{3})+(?!\d))/g, thousandSeparator);
+    return { display: grouped, raw: integer };
+  }
+
+  const hasDecimal = input.includes(decimalSeparator);
   const [integerInput = "", ...decimalParts] = input.split(decimalSeparator);
   const integer = onlyDigits(integerInput).replace(/^0+(?=\d)/, "");
   const grouped = integer.replace(/\B(?=(\d{3})+(?!\d))/g, thousandSeparator);
 
-  if (decimalScale <= 0 || decimalParts.length === 0) {
+  if (!hasDecimal) {
     return { display: grouped, raw: integer };
   }
 

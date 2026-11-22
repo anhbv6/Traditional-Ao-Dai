@@ -1243,6 +1243,9 @@
     "hideProduct": "Hide from store",
     "enableCustomFit": "Accept made-to-measure",
     "disableCustomFit": "Stop made-to-measure",
+    "viewDetail": "View details",
+    "previewTitle": "Product preview",
+    "previewDesc": "Customer storefront view",
     "add": "Add product",
     "edit": "Open details",
     "cancel": "Cancel",
@@ -1494,7 +1497,10 @@
       "tableTitle": "SKU Variants List",
       "selectedCount": "{count} variants selected",
       "deleteSelected": "Delete selected",
-      "addVariant": "Add variant"
+      "addVariant": "Add variant",
+      "selectColorsPlaceholder": "Select colors...",
+      "selectSizesPlaceholder": "Select sizes...",
+      "generateSkuAction": "Generate SKU variants"
     },
     "ready": {
       "IMAGES": "Cover + at least 1 description image",

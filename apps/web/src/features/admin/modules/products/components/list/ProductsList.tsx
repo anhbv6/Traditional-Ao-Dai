@@ -16,7 +16,10 @@ import { matchesStatusTab, PRODUCT_STATUS_TABS, type ProductStatusTab } from "..
 import { SALE_MODES, type SaleMode } from "../../utils/saleModes";
 import { ProductsTable } from "./ProductsTable";
 
-const CreateProductDialog = dynamic(() => import("./CreateProductDialog").then((m) => m.CreateProductDialog));
+const CreateProductDialog = dynamic(() => import("../dialog/CreateProductDialog").then((m) => m.CreateProductDialog));
+const ProductDetailPreviewDialog = dynamic(() =>
+  import("../dialog/ProductDetailPreviewDialog").then((m) => m.ProductDetailPreviewDialog)
+);
 
 interface ProductsListProps {
   initialProducts: AdminProductItem[];
@@ -33,6 +36,7 @@ export function ProductsList({ initialProducts, categories }: ProductsListProps)
   const notify = useNotify();
   const [products, setProducts] = useState(initialProducts);
   const [isCreating, setIsCreating] = useState(false);
+  const [previewProduct, setPreviewProduct] = useState<AdminProductItem | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusTab, setStatusTab] = useState<ProductStatusTab>("ALL");
   const [categoryId, setCategoryId] = useState("");
@@ -154,6 +158,7 @@ export function ProductsList({ initialProducts, categories }: ProductsListProps)
         empty={products.length === 0 ? t("empty") : t("noResults")}
         onToggleActive={handleToggleActive}
         onToggleCustomFit={handleToggleCustomFit}
+        onPreview={setPreviewProduct}
         bulkActions={
           <>
             <AdminSecondaryButton disabled={isPending} onClick={() => handleBulkActive(true)}>
@@ -170,6 +175,13 @@ export function ProductsList({ initialProducts, categories }: ProductsListProps)
       />
 
       {isCreating && <CreateProductDialog categories={categories} onOpenChange={setIsCreating} />}
+      {previewProduct && (
+        <ProductDetailPreviewDialog
+          open={Boolean(previewProduct)}
+          onOpenChange={(open) => !open && setPreviewProduct(null)}
+          product={previewProduct}
+        />
+      )}
     </>
   );
 }

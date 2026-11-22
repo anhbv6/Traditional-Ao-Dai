@@ -127,6 +127,10 @@ interface AdminDataTableProps<T> {
   className?: string;
   /** Banner hiển thị phía trên bảng (bên trong card bo góc) — ví dụ tiêu chí sắp xếp */
   topBanner?: ReactNode;
+  /** Hàng bổ sung ở cuối tbody (thường là hàng bấm thêm dòng mới) */
+  appendRow?: ReactNode;
+  /** Giới hạn chiều cao tối đa cho phần bảng có cuộn dọc (VD: "max-h-[380px]") */
+  maxHeight?: string;
   /** Cấu hình phân trang tích hợp sẵn */
   pagination?: AdminTablePagination;
 }
@@ -150,6 +154,8 @@ export function AdminDataTable<T>({
   onRowHover,
   className,
   topBanner,
+  appendRow,
+  maxHeight,
   pagination,
 }: AdminDataTableProps<T>) {
   const t = useTranslations("AdminPage");
@@ -200,10 +206,13 @@ export function AdminDataTable<T>({
     <section className={cn(ADMIN_CARD_CLASS, "@container overflow-hidden", className)}>
       {topBanner}
 
-      <div className={cn("relative overflow-x-auto", mobileRow && "hidden md:block")}>
+      <div className={cn("relative overflow-x-auto", maxHeight && "overflow-y-auto", maxHeight, mobileRow && "hidden md:block")}>
         {selection && selectedCount > 0 && (
           // Thanh hàng loạt đè lên hàng tiêu đề để độ rộng cột và vị trí bảng giữ nguyên khi chọn dòng
-          <div className="absolute inset-x-0 top-0 z-10 flex h-11 items-center gap-3 border-b border-dashed border-[#E4E4E7] bg-white px-4">
+          <div className={cn(
+            maxHeight ? "sticky top-0 z-20" : "absolute inset-x-0 top-0 z-10",
+            "flex h-11 items-center gap-3 border-b border-dashed border-[#E4E4E7] bg-white px-4"
+          )}>
             <span className="flex">
               <AdminCheckbox
                 checked={selectedCount === rows.length}
@@ -222,7 +231,7 @@ export function AdminDataTable<T>({
           <thead>
             <tr className="h-11 bg-[#FAFAFA]/80 text-xs font-medium text-[#71717A]">
               {selection && (
-                <th className="w-12 border-b border-dashed border-[#E4E4E7] pl-4 pr-1 text-left">
+                <th className={cn("w-12 border-b border-dashed border-[#E4E4E7] pl-4 pr-1 text-left", maxHeight && "sticky top-0 bg-[#FAFAFA] z-10")}>
                   <span className="flex">
                     <AdminCheckbox
                       checked={selectedCount === rows.length}
@@ -242,6 +251,7 @@ export function AdminDataTable<T>({
                     scope="col"
                     className={cn(
                       "whitespace-nowrap border-b border-dashed border-[#E4E4E7] px-3 py-2.5 text-xs font-medium text-[#71717A]",
+                      maxHeight && "sticky top-0 bg-[#FAFAFA] z-10",
                       isFirst && "pl-4",
                       isLast && "pr-4",
                       column.align === "right" ? "text-right" : "text-left",
@@ -253,7 +263,7 @@ export function AdminDataTable<T>({
                 );
               })}
               {rowActions && (
-                <th className="w-12 border-b border-dashed border-[#E4E4E7] pl-1 pr-4 text-right">
+                <th className={cn("w-12 border-b border-dashed border-[#E4E4E7] pl-1 pr-4 text-right", maxHeight && "sticky top-0 bg-[#FAFAFA] z-10")}>
                   <span className="sr-only">{actionsLabel}</span>
                 </th>
               )}
@@ -303,6 +313,7 @@ export function AdminDataTable<T>({
                 </tr>
               );
             })}
+            {appendRow}
           </tbody>
         </table>
       </div>

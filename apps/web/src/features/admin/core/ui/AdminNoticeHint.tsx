@@ -28,6 +28,7 @@ export interface AdminNoticeHintProps {
  * Icon ⓘ dùng chung ở góc tiêu đề thẻ (aside của Section) thay cho khối cảnh báo:
  * Màu theo mức nặng nhất (xám = ổn · hổ phách = còn thiếu dữ liệu · đỏ hồng = có cảnh báo),
  * kèm chấm tròn thông báo ở góc icon khi có lưu ý. Rê chuột / focus / chạm để xem danh sách.
+ * Popover tối giản, tự nhiên, đổ bóng rõ ràng và có mũi tên định vị trực quan.
  */
 export function AdminNoticeHint({
   notices,
@@ -69,17 +70,29 @@ export function AdminNoticeHint({
           positionMethod={positionMethod}
           side="bottom"
           align="end"
-          sideOffset={6}
+          sideOffset={8}
           collisionPadding={12}
           className="z-50 outline-none"
         >
-          <Popover.Popup className="admin-shell w-[300px] origin-[var(--transform-origin)] rounded-xl border border-[#E4E4E7] bg-white p-3.5 shadow-[0_16px_40px_-16px_rgba(9,9,11,0.25)] outline-none transition-[opacity,scale] duration-150 data-ending-style:scale-[0.98] data-ending-style:opacity-0 data-starting-style:scale-[0.97] data-starting-style:opacity-0">
+          <Popover.Popup className="admin-shell w-[290px] origin-[var(--transform-origin)] rounded-xl border border-[#D4D4D8] bg-white p-3.5 shadow-[0_12px_32px_-8px_rgba(0,0,0,0.18),0_2px_8px_rgba(0,0,0,0.06)] outline-none transition-[opacity,scale] duration-150 data-ending-style:scale-[0.98] data-ending-style:opacity-0 data-starting-style:scale-[0.97] data-starting-style:opacity-0">
+            {/* Mũi tên nhỏ tinh tế trỏ về icon trigger */}
+            <Popover.Arrow className="size-2.5 rotate-45 border-l border-t border-[#D4D4D8] bg-white data-[side=bottom]:-top-[5px] data-[side=top]:-bottom-[5px] data-[side=top]:border-l-0 data-[side=top]:border-t-0 data-[side=top]:border-r data-[side=top]:border-b" />
+
+            {/* Tiêu đề phẳng, tự nhiên */}
             {title && (
-              <Popover.Title className="mb-2 text-body font-semibold text-[#3F3F46]">
-                {title}
-                {hasInfo && <span className="ml-1.5 font-mono tabular-nums text-[#09090B]">{notices.length}</span>}
-              </Popover.Title>
+              <div className="mb-2.5 flex items-center gap-1.5">
+                <Popover.Title className="text-xs font-semibold text-[#09090B]">
+                  {title}
+                </Popover.Title>
+                {hasInfo && (
+                  <span className="font-mono text-2xs text-[#71717A]">
+                    ({notices.length})
+                  </span>
+                )}
+              </div>
             )}
+
+            {/* Danh sách các điều kiện dạng văn bản tự nhiên, không nền/viền hộp thừa */}
             {notices.length === 0 ? (
               emptyText ? (
                 <p className="text-xs leading-relaxed text-[#71717A]">{emptyText}</p>
@@ -87,11 +100,14 @@ export function AdminNoticeHint({
             ) : (
               <ul className="space-y-2">
                 {notices.map((notice, index) => (
-                  <li key={`${notice.text}-${index}`} className="flex items-start gap-2 text-xs leading-relaxed text-[#3F3F46]">
+                  <li
+                    key={`${notice.text}-${index}`}
+                    className="flex items-start gap-2 text-xs leading-relaxed text-[#3F3F46]"
+                  >
                     {notice.tone === "warn" ? (
-                      <TriangleAlert size={14} className="mt-px shrink-0 text-rose-600" aria-hidden />
+                      <TriangleAlert size={14} className="mt-0.5 shrink-0 text-rose-600" aria-hidden />
                     ) : (
-                      <Info size={14} className="mt-px shrink-0 text-amber-500" aria-hidden />
+                      <Info size={14} className="mt-0.5 shrink-0 text-amber-500" aria-hidden />
                     )}
                     <span>{notice.text}</span>
                   </li>

@@ -69,14 +69,23 @@ export interface AdminTextAreaProps extends Omit<TextAreaFieldProps, "tone" | "a
   hint?: ReactNode;
 }
 
-/** Ô nhập nhiều dòng của khu quản trị — cùng kiểu với AdminTextField */
-export function AdminTextArea({ label, hint, rows = 3, textareaClassName, labelClassName, ...props }: AdminTextAreaProps) {
+/** Ô nhập nhiều dòng của khu quản trị — cùng kiểu với AdminTextField, mặc định autoResize để trang web cuộn mượt mà */
+export function AdminTextArea({
+  label,
+  hint,
+  rows = 3,
+  autoResize = true,
+  textareaClassName,
+  labelClassName,
+  ...props
+}: AdminTextAreaProps) {
   return (
     <TextAreaField
       {...props}
       tone="admin"
       appearance="outline"
       rows={rows}
+      autoResize={autoResize}
       label={label ? <FieldLabel label={label} hint={hint} /> : undefined}
       textareaClassName={cn(ADMIN_FIELD_RADIUS_CLASS, "py-2 text-sm leading-relaxed", textareaClassName)}
       labelClassName={cn(LABEL_OVERRIDE_CLASS, labelClassName)}

@@ -26,6 +26,7 @@ interface ProductsTableProps {
   empty: ReactNode;
   onToggleActive: (product: AdminProductItem) => void;
   onToggleCustomFit: (product: AdminProductItem) => void;
+  onPreview: (product: AdminProductItem) => void;
 }
 
 /**
@@ -42,6 +43,7 @@ export function ProductsTable({
   empty,
   onToggleActive,
   onToggleCustomFit,
+  onPreview,
 }: ProductsTableProps) {
   const t = useTranslations("AdminPage.products");
   const locale = useLocale() as Locale;
@@ -61,32 +63,37 @@ export function ProductsTable({
       key: "category",
       header: t("colCategory"),
       cell: (p) => <ProductCategoryCell product={p} />,
-      className: "w-44",
+      className: "w-44 min-w-0",
     },
     {
       key: "saleMode",
       header: t("field.saleMode"),
       cell: (p) => <ProductSaleModeCell product={p} />,
-      className: "w-36 whitespace-nowrap",
+      className: "w-36 min-w-0",
     },
     {
       key: "price",
       header: t("colPrice"),
-      align: "right",
-      className: "w-36 whitespace-nowrap",
-      cell: (p) => <span className="font-mono text-xs font-semibold tabular-nums text-[#09090B]">{price(p)}</span>,
+      className: "w-36 min-w-0",
+      cell: (p) => (
+        <div className="min-w-0">
+          <p className="truncate font-mono text-xs font-semibold tabular-nums text-[#09090B]">
+            {price(p)}
+          </p>
+          <p className="mt-0.5 truncate text-xs invisible select-none">—</p>
+        </div>
+      ),
     },
     {
       key: "stock",
       header: t("colStock"),
-      align: "right",
-      className: "w-32 whitespace-nowrap",
+      className: "w-32 min-w-0",
       cell: (p) => <ProductStockCell product={p} />,
     },
     {
       key: "status",
       header: t("colStatus"),
-      className: "w-32 whitespace-nowrap",
+      className: "w-32 min-w-0",
       cell: (p) => <ProductStatus isActive={p.isActive} />,
     },
   ];
@@ -113,6 +120,7 @@ export function ProductsTable({
           disabled={disabled}
           onToggleActive={onToggleActive}
           onToggleCustomFit={onToggleCustomFit}
+          onPreview={onPreview}
         />
       )}
       mobileRow={(p) => (
@@ -120,7 +128,7 @@ export function ProductsTable({
           <div className="flex items-start justify-between gap-3">
             <ProductIdentity product={p} />
             <div className="shrink-0">
-              <ProductStatus isActive={p.isActive} />
+              <ProductStatus isActive={p.isActive} inline />
             </div>
           </div>
           <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 pl-[56px] text-xs text-[#71717A]">
@@ -131,7 +139,7 @@ export function ProductsTable({
             </div>
             <div className="flex items-center gap-3">
               <span className="font-mono font-medium tabular-nums text-[#09090B]">{price(p)}</span>
-              <ProductStockCell product={p} />
+              <ProductStockCell product={p} inline />
             </div>
           </div>
         </div>
