@@ -156,6 +156,7 @@ function buildRoll(seed: RollSeed, now: number): AdminFabricRoll {
     id: seed.id,
     code: seed.code,
     name: seed.name,
+    nameEn: null,
     materialId: seed.materialId,
     colorId: seed.colorId,
     receivedMeters: seed.received,

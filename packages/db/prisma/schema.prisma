@@ -43,6 +43,13 @@ enum TailoringStatus {
   COMPLETED         // May hoàn tất, chuyển sang đóng gói
 }
 
+enum FabricMovementType {
+  CUT               // Xuất vải cắt may áo / quần
+  RESTOCK           // Nhập thêm mét vào cây vải
+  WASTE             // Hao hụt, lỗi vải
+  ADJUST            // Kiểm kê, điều chỉnh số đo thực tế
+}
+
 enum PaymentStatus {
   UNPAID
   PARTIALLY_PAID    // Đặt cọc (thường áp dụng cho đơn may đo giá trị lớn)
@@ -194,6 +201,7 @@ model User {
   reviewedApprovals  ApprovalRequest[] @relation("ReviewedBy")
   articles           Article[]         @relation("AuthorArticles")
   auditLogs          AuditLog[]        @relation("AuditActor")
+  fabricMovements    FabricMovement[]  @relation("FabricMovementActor")
 
   createdAt          DateTime     @default(now())
   updatedAt          DateTime     @updatedAt
@@ -880,7 +888,11 @@ model Fabric {
   id                String   @id @default(uuid())
   code              String   @unique // Mã cây vải, VD: "LUA-HONG-01"
   name              String   // VD: "Lụa tơ tằm hồng phấn"
+  nameEn            String?  // VD: "Mulberry Silk Powder Pink"
   color             String?
+  colorId           String?
+  colorValue        AttributeValue? @relation(fields: [colorId], references: [id], onDelete: SetNull)
+  receivedMeters    Decimal? @db.Decimal(8, 2) // Số mét lúc nhập cây ban đầu (mốc để tính tỷ lệ hao hụt / vẽ thanh tiến độ)
   remainingMeters   Decimal  @db.Decimal(8, 2)
   lowStockThreshold Decimal  @default(3) @db.Decimal(8, 2) // Dưới ngưỡng này thì cảnh báo (≈ 1 bộ áo dài)
   isActive          Boolean  @default(true)
@@ -893,12 +905,34 @@ model Fabric {
   materialId        String?
   material          Material? @relation(fields: [materialId], references: [id], onDelete: SetNull)
 
+  movements         FabricMovement[]
+
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
   @@index([productId])
   @@index([materialId])
+  @@index([colorId])
   @@index([isActive, remainingMeters])
+}
+
+// Biến động kho vải theo từng cây (cắt may, nhập thêm, hao hụt, kiểm kê)
+model FabricMovement {
+  id           String             @id @default(uuid())
+  fabricId     String
+  fabric       Fabric             @relation(fields: [fabricId], references: [id], onDelete: Cascade)
+  type         FabricMovementType
+  delta        Decimal            @db.Decimal(8, 2) // Số mét thay đổi (dương khi nhập, âm khi trừ)
+  balanceAfter Decimal            @db.Decimal(8, 2) // Số mét còn lại sau biến động
+  orderCode    String?            // Mã đơn may đo nếu cắt may (VD: "TC-2611-0001")
+  note         String?
+  actorId      String?
+  actor        User?              @relation("FabricMovementActor", fields: [actorId], references: [id], onDelete: SetNull)
+  createdAt    DateTime           @default(now())
+
+  @@index([fabricId, createdAt])
+  @@index([actorId])
+  @@index([orderCode])
 }
 
 // Chất liệu vải (định nghĩa loại vải: lụa tơ tằm, đũi, gấm...) — khác Fabric là từng cây vải cụ thể trong kho.
@@ -984,6 +1018,7 @@ model AttributeValue {
 
   products      ProductAttribute[] // Đặc tính thiết kế gắn cho sản phẩm
   variants      ProductVariant[]   // Màu của SKU
+  fabrics       Fabric[]           // Cây vải có màu này
 
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt

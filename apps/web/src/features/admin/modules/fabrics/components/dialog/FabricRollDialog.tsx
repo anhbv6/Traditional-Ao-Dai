@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { PackagePlus, Pencil } from "lucide-react";
 import { useFormatter, useLocale, useTranslations } from "next-intl";
 import {
   ADMIN_DIALOG_PRIMARY_BUTTON_CLASS,
@@ -9,7 +8,9 @@ import {
   AdminDialog,
   AdminField,
   AdminFilterSelect,
+  AdminLangSwitch,
   AdminTextField,
+  type AdminContentLang,
 } from "@/features/admin/core/ui";
 import {
   type AdminFabricRoll,
@@ -38,7 +39,10 @@ interface FabricRollDialogProps {
 
 /**
  * Nhập cây vải mới / sửa thông tin cây vải. Ít trường nên dùng dialog (ngoại lệ quy tắc màn chi tiết như loại sản phẩm).
- * Tên và mã tự gợi ý theo chất liệu + màu; ngưỡng gợi ý = một bộ áo + quần theo định mức.
+ * Hỗ trợ chuyển đổi ngôn ngữ VI / EN qua AdminLangSwitch:
+ * - Tên tiếng Việt bắt buộc, tự gợi ý "<chất liệu> <màu>".
+ * - Tên tiếng Anh tùy chọn, tự gợi ý theo tên EN của chất liệu và màu.
+ * Mã tự gợi ý theo chất liệu + màu; ngưỡng gợi ý = một bộ áo + quần theo định mức.
  * Khi sửa KHÔNG đổi số mét ở đây — số mét chỉ đổi qua biến động (nhập thêm / kiểm kê) để còn lịch sử.
  */
 export function FabricRollDialog({
@@ -54,10 +58,13 @@ export function FabricRollDialog({
   const t = useTranslations("AdminPage.fabrics");
   const locale = useLocale();
   const format = useFormatter();
+  const [contentLang, setContentLang] = useState<AdminContentLang>("vi");
   const [materialId, setMaterialId] = useState(roll?.materialId ?? defaultMaterialId ?? "");
   const [colorId, setColorId] = useState(roll?.colorId ?? "");
   const [name, setName] = useState(roll?.name ?? "");
+  const [nameEn, setNameEn] = useState(roll?.nameEn ?? "");
   const [nameTouched, setNameTouched] = useState(Boolean(roll));
+  const [nameEnTouched, setNameEnTouched] = useState(Boolean(roll?.nameEn));
   const [metersRaw, setMetersRaw] = useState("");
   const [thresholdRaw, setThresholdRaw] = useState(roll ? String(roll.lowStockThreshold) : "");
   const [productId, setProductId] = useState(roll?.productId ?? NO_PRODUCT);
@@ -67,8 +74,12 @@ export function FabricRollDialog({
   const color = colors.find((item) => item.id === colorId);
   const localized = (item: { name: string; nameEn: string | null }) => (locale === "en" && item.nameEn ? item.nameEn : item.name);
 
-  // Gợi ý tên "<chất liệu> <màu>" (tiếng Việt — tên cây vải là dữ liệu nội bộ của tiệm)
+  // Gợi ý tên "<chất liệu> <màu>" tiếng Việt và tiếng Anh
   const effectiveName = nameTouched ? name : [material?.name, color?.name.toLowerCase()].filter(Boolean).join(" ");
+  const effectiveNameEn = nameEnTouched
+    ? nameEn
+    : [material?.nameEn || material?.name, (color?.nameEn || color?.name)?.toLowerCase()].filter(Boolean).join(" ");
+
   const code =
     roll?.code ??
     (material && color ? buildFabricCode(material.code, color.name, existingCodes) : "");
@@ -89,11 +100,15 @@ export function FabricRollDialog({
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setShowErrors(true);
+    if (!effectiveName.trim()) {
+      setContentLang("vi");
+    }
     if (!isValid || !material || !color || meters === null || threshold === null) return;
     onSubmit({
       materialId: material.id,
       colorId: color.id,
       name: effectiveName.trim(),
+      nameEn: (nameEnTouched ? nameEn : effectiveNameEn).trim() || null,
       code,
       receivedMeters: meters,
       lowStockThreshold: threshold,
@@ -105,11 +120,23 @@ export function FabricRollDialog({
     <AdminDialog
       open
       onOpenChange={onOpenChange}
-      icon={roll ? Pencil : PackagePlus}
       title={roll ? t("rollDialog.editTitle") : t("rollDialog.createTitle")}
       description={roll ? t("rollDialog.editDescription") : t("rollDialog.createDescription")}
       size="lg"
       onSubmit={handleSubmit}
+      headerAside={
+        <div className="-mr-1 shrink-0">
+          <AdminLangSwitch
+            value={contentLang}
+            onChange={setContentLang}
+            label={t("rollDialog.langLabel")}
+            status={{
+              vi: showErrors && errors.name ? "error" : undefined,
+              en: (nameEnTouched ? nameEn : effectiveNameEn).trim() ? undefined : "missing",
+            }}
+          />
+        </div>
+      }
       footer={
         <>
           <button type="button" onClick={() => onOpenChange(false)} className={ADMIN_DIALOG_SECONDARY_BUTTON_CLASS}>
@@ -124,7 +151,6 @@ export function FabricRollDialog({
       <div className="grid gap-4 sm:grid-cols-2">
         <AdminField label={t("rollDialog.field.material")} required error={shown("material")}>
           <AdminFilterSelect
-            label={t("rollDialog.field.material")}
             value={materialId}
             onChange={setMaterialId}
             placeholder={t("rollDialog.placeholder.material")}
@@ -135,30 +161,40 @@ export function FabricRollDialog({
         </AdminField>
 
         <AdminField label={t("rollDialog.field.color")} hint={t("rollDialog.hint.color")} required error={shown("color")}>
-          <div className="flex items-center gap-2">
-            <FabricSwatch hex={color?.hex ?? null} className="size-10 rounded-xl" />
-            <AdminFilterSelect
-              label={t("rollDialog.field.color")}
-              value={colorId}
-              onChange={setColorId}
-              placeholder={t("rollDialog.placeholder.color")}
-              invalid={Boolean(shown("color"))}
-              options={colors.map((item) => ({ value: item.id, label: localized(item) }))}
-              className="h-10 flex-1"
-            />
-          </div>
+          <AdminFilterSelect
+            value={colorId}
+            onChange={setColorId}
+            placeholder={t("rollDialog.placeholder.color")}
+            invalid={Boolean(shown("color"))}
+            options={colors.map((item) => ({
+              value: item.id,
+              label: (
+                <span className="flex min-w-0 items-center gap-2.5">
+                  <FabricSwatch hex={item.hex ?? null} size="sm" />
+                  <span className="truncate">{localized(item)}</span>
+                </span>
+              ),
+              text: localized(item),
+            }))}
+            className="h-10 w-full"
+          />
         </AdminField>
 
         <AdminTextField
-          required
+          required={contentLang === "vi"}
           label={t("rollDialog.field.name")}
-          value={effectiveName}
+          value={contentLang === "vi" ? effectiveName : effectiveNameEn}
           onValueChange={(value) => {
-            setNameTouched(true);
-            setName(value);
+            if (contentLang === "vi") {
+              setNameTouched(true);
+              setName(value);
+            } else {
+              setNameEnTouched(true);
+              setNameEn(value);
+            }
           }}
           placeholder={t("rollDialog.placeholder.name")}
-          error={shown("name")}
+          error={contentLang === "vi" ? shown("name") : undefined}
           className="sm:col-span-2"
         />
 
@@ -169,7 +205,7 @@ export function FabricRollDialog({
           readOnly
           disabled
           placeholder={t("rollDialog.placeholder.code")}
-          inputClassName="font-mono text-xs"
+          inputClassName="font-mono text-xs text-[#71717A] bg-[#FAFAFA]"
           className="sm:col-span-2"
         />
 
@@ -206,7 +242,6 @@ export function FabricRollDialog({
 
         <AdminField label={t("rollDialog.field.product")} hint={t("rollDialog.hint.product")} className="sm:col-span-2">
           <AdminFilterSelect
-            label={t("rollDialog.field.product")}
             value={productId}
             onChange={setProductId}
             options={[

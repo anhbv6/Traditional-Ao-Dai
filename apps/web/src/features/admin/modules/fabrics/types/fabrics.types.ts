@@ -53,6 +53,7 @@ export interface AdminFabricRoll {
   id: string;
   code: string;
   name: string;
+  nameEn: string | null;
   materialId: string;
   colorId: string | null;
   /** Số mét lúc nhập cây — mốc để vẽ thanh còn lại */
@@ -76,11 +77,20 @@ export interface AdminFabricStockData {
   now: string;
 }
 
+export interface AdminFabricRollDetailData {
+  roll: AdminFabricRoll;
+  materials: FabricMaterialOption[];
+  colors: FabricColorOption[];
+  products: FabricProductOption[];
+  now: string;
+}
+
 /** Dữ liệu nhập / sửa cây vải từ dialog */
 export interface FabricRollInput {
   materialId: string;
   colorId: string;
   name: string;
+  nameEn?: string | null;
   code: string;
   receivedMeters: number;
   lowStockThreshold: number;

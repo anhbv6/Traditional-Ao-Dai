@@ -66,10 +66,10 @@ const APPOINTMENTS: DemoAppointment[] = [
 
 /** Cây vải dưới ngưỡng 3 m sẽ hiện cảnh báo sắp hết trên dashboard */
 const FABRICS = [
-  { code: 'LUA-HONG-01', name: 'Lụa tơ tằm hồng phấn', color: 'Hồng phấn', remainingMeters: 2.4, productSlug: DEMO_PRODUCT_SLUGS.lotus, materialCode: 'LUA-TO-TAM' },
-  { code: 'GAM-DO-01', name: 'Gấm ruby đỏ nhung', color: 'Đỏ nhung', remainingMeters: 1.6, productSlug: DEMO_PRODUCT_SLUGS.wedding, materialCode: 'GAM-RUBY' },
-  { code: 'LINEN-VANG-01', name: 'Linen vàng cúc', color: 'Vàng cúc', remainingMeters: 14, productSlug: DEMO_PRODUCT_SLUGS.linen, materialCode: 'LINEN-THO' },
-  { code: 'VOAN-TRANG-01', name: 'Voan lụa trắng', color: 'Trắng', remainingMeters: 2.9, productSlug: null, materialCode: 'VOAN-LUA' },
+  { code: 'LUA-HONG-01', name: 'Lụa tơ tằm hồng phấn', nameEn: 'Mulberry Silk Powder Pink', color: 'Hồng phấn', receivedMeters: 20, remainingMeters: 2.4, productSlug: DEMO_PRODUCT_SLUGS.lotus, materialCode: 'LUA-TO-TAM' },
+  { code: 'GAM-DO-01', name: 'Gấm ruby đỏ nhung', nameEn: 'Ruby Brocade Crimson Velvet', color: 'Đỏ nhung', receivedMeters: 15, remainingMeters: 1.6, productSlug: DEMO_PRODUCT_SLUGS.wedding, materialCode: 'GAM-RUBY' },
+  { code: 'LINEN-VANG-01', name: 'Linen vàng cúc', nameEn: 'Raw Linen Chrysanthemum Yellow', color: 'Vàng cúc', receivedMeters: 25, remainingMeters: 14, productSlug: DEMO_PRODUCT_SLUGS.linen, materialCode: 'LINEN-THO' },
+  { code: 'VOAN-TRANG-01', name: 'Voan lụa trắng', nameEn: 'Silk Chiffon Pure White', color: 'Trắng', receivedMeters: 10, remainingMeters: 2.9, productSlug: null, materialCode: 'VOAN-LUA' },
 ]
 
 /**

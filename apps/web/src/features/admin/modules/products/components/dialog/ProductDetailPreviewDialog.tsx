@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
-import { Eye, Pencil } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { type Locale } from "@repo/shared";
 import { AdminButton, AdminDialog, AdminDialogFooter, AdminSecondaryButton } from "@/features/admin/core/ui";
@@ -56,13 +55,12 @@ export function ProductDetailPreviewDialog({ open, onOpenChange, product }: Prod
     <AdminDialog
       open={open}
       onOpenChange={onOpenChange}
-      icon={Eye}
       title={t("previewTitle")}
       description={`${displayName} · ${product.code}`}
       className="max-w-[calc(100vw-2rem)] sm:max-w-[880px] rounded-2xl bg-[#FAF7F5] border border-[#E8DFD8]"
       bodyClassName="p-5 sm:p-7 max-h-[82vh] overflow-y-auto scrollbar-brand bg-[#FAF7F5]"
       footer={
-        <AdminDialogFooter className="w-full justify-between bg-[#F7F2EE]/90 border-t border-[#E8DFD8]">
+        <AdminDialogFooter className="w-full justify-between border-t border-[#E8DFD8]">
           <span className="text-xs text-[#71717A]">
             {t("previewDesc")}
           </span>
@@ -74,7 +72,6 @@ export function ProductDetailPreviewDialog({ open, onOpenChange, product }: Prod
               variant="primary"
               size="sm"
               href={`/admin/products/${product.id}`}
-              icon={<Pencil size={14} aria-hidden />}
             >
               {t("edit")}
             </AdminButton>

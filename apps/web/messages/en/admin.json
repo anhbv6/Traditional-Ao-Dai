@@ -1247,7 +1247,7 @@
     "previewTitle": "Product preview",
     "previewDesc": "Customer storefront view",
     "add": "Add product",
-    "edit": "Open details",
+    "edit": "Open edit",
     "cancel": "Cancel",
     "saving": "Saving...",
     "updateSuccess": "Product saved.",
@@ -3521,6 +3521,8 @@
     }
   },
   "fabrics": {
+    "backToList": "Fabrics",
+    "save": "Save changes",
     "searchPlaceholder": "Search name, roll code, color, design…",
     "create": "Add fabric roll",
     "cancel": "Cancel",
@@ -3528,22 +3530,28 @@
     "topsLeft": "{count, plural, =0 {not enough for one} one {≈ # top} other {≈ # tops}}",
     "noYield": "no yield set",
     "summary": "{count, plural, one {# roll} other {# rolls}}",
-    "summaryMaterials": "{count, plural, one {# material} other {# materials}}",
+    "summaryTotal": "out of {total}",
     "empty": "No fabric rolls in stock yet.",
     "noResults": "No rolls match the filters.",
-    "view": {
-      "rolls": "By roll",
-      "materials": "By material"
-    },
     "filter": {
       "material": "Material",
       "status": "Status",
+      "color": "Color",
+      "product": "Design",
       "all": "All",
       "statusOption": {
+        "AVAILABLE": "In stock",
+        "ALL": "All statuses",
         "ATTENTION": "Needs restock",
-        "OK": "In stock",
-        "OUT": "Out",
+        "OK": "Well stocked",
+        "LOW": "Running low",
+        "OUT": "Out of fabric",
         "INACTIVE": "Retired"
+      },
+      "productOption": {
+        "ALL": "All",
+        "ATTACHED": "Linked to design",
+        "UNATTACHED": "Unlinked"
       }
     },
     "status": {
@@ -3557,7 +3565,13 @@
       "remaining": "Remaining",
       "product": "Design",
       "status": "Status",
-      "actions": "Actions"
+      "actions": "Actions",
+      "time": "Time",
+      "type": "Movement type",
+      "order": "Order code",
+      "delta": "Change",
+      "balance": "Remaining",
+      "note": "Note"
     },
     "product": {
       "visible": "on sale",
@@ -3588,7 +3602,12 @@
     },
     "movement": {
       "title": "Record meters",
+      "currentStock": "Current",
+      "afterStock": "After",
+      "presetLabel": "Preset",
+      "unitTops": "tops",
       "field": {
+        "type": "Action",
         "meters": "Meters",
         "measured": "Measured meters",
         "orderCode": "Order code",
@@ -3634,6 +3653,7 @@
       "create": "Add roll",
       "save": "Save changes",
       "noProduct": "No linked design",
+      "langLabel": "Language",
       "field": {
         "material": "Material",
         "color": "Color",
@@ -3686,6 +3706,25 @@
       "activated": "Roll reactivated.",
       "productHidden": "{name} hidden on the web.",
       "productShown": "{name} visible on the web again."
+    },
+    "detail": {
+      "remainingStock": "Remaining meters",
+      "saving": "Saving...",
+      "infoTitle": "Fabric Roll Information",
+      "infoHint": "Material, color, display name, and thresholds for this roll.",
+      "saveInfo": "Save information",
+      "movementTitle": "Record Stock Movement",
+      "movementHint": "Cut for sewing, restock, waste, or stocktake measured meters.",
+      "historyTitle": "Movement History",
+      "historyEmpty": "No movements recorded yet.",
+      "stockTitle": "Stock & Yield",
+      "stockHint": "Fabric gauge and estimated áo dài yield.",
+      "initialStock": "Initial received",
+      "estimatedTops": "Estimated tops",
+      "threshold": "Alert threshold",
+      "operationTitle": "Operational Info",
+      "createdAt": "Received at",
+      "updatedAt": "Last updated"
     }
   },
   "inventoryHistory": {

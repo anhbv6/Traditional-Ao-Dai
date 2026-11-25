@@ -1,6 +1,5 @@
 import { PRODUCT_GROUP_TRAITS } from "@repo/shared/sizing";
 import { STOCK_ADJUST_REASONS, type StockAdjustReason } from "@/features/admin/modules/inventory";
-import { getMockFabricStock } from "@/features/admin/modules/fabrics";
 import { prisma } from "../../../core/server/db.server";
 import { type StockEvent, type StockEventLine, type StockHistoryData } from "../types/inventoryHistory.types";
 import { HISTORY_PERIODS, toShopDayKey } from "../utils/stockEventMeta";
@@ -50,7 +49,7 @@ export async function getStockHistoryQuery(): Promise<StockHistoryData> {
   const now = new Date();
   const since = new Date(now.getTime() - maxDays * DAY);
 
-  const [logs, orderItems] = await Promise.all([
+  const [logs, orderItems, fabricMovements] = await Promise.all([
     prisma.auditLog.findMany({
       where: { action: "INVENTORY_ADJUSTED", createdAt: { gte: since } },
       select: { id: true, targetId: true, metadata: true, createdAt: true, actor: { select: { name: true, email: true } } },
@@ -70,6 +69,20 @@ export async function getStockHistoryQuery(): Promise<StockHistoryData> {
         order: { select: { id: true, orderNumber: true, orderStatus: true, customerName: true, createdAt: true } },
       },
       orderBy: { order: { createdAt: "desc" } },
+      take: MAX_ROWS_PER_SOURCE,
+    }),
+    prisma.fabricMovement.findMany({
+      where: { createdAt: { gte: since } },
+      include: {
+        fabric: {
+          include: {
+            material: { select: { name: true } },
+            colorValue: { select: { hex: true } },
+          },
+        },
+        actor: { select: { name: true, email: true } },
+      },
+      orderBy: { createdAt: "desc" },
       take: MAX_ROWS_PER_SOURCE,
     }),
   ]);
@@ -166,42 +179,41 @@ export async function getStockHistoryQuery(): Promise<StockHistoryData> {
     };
   });
 
-  // ─── Cây vải (mock tạm — màn Số lượng vải chưa nối DB) ─────────────────────
-  const fabricStock = getMockFabricStock();
-  const fabricEvents: StockEvent[] = fabricStock.rolls.flatMap((roll) => {
-    const material = fabricStock.materials.find((item) => item.id === roll.materialId);
-    const hex = fabricStock.colors.find((item) => item.id === roll.colorId)?.hex ?? null;
-    return roll.movements
-      .filter((movement) => new Date(movement.createdAt) >= since)
-      .map((movement) => ({
-        id: `fabric-${movement.id}`,
-        subject: "FABRIC" as const,
-        kind: movement.type,
-        title: roll.name,
-        code: material?.name ?? "",
-        image: null,
-        hex,
-        unit: "METER" as const,
-        lines: [
-          {
-            code: roll.code,
-            detail: null,
-            hex,
-            from: Math.round((movement.balanceAfter - movement.delta) * 100) / 100,
-            to: movement.balanceAfter,
-            delta: movement.delta,
-          },
-        ],
-        delta: movement.delta,
-        orderCode: movement.orderCode,
-        orderCancelled: false,
-        note: movement.note,
-        actorName: movement.actorName,
-        actorIsCustomer: false,
-        createdAt: movement.createdAt,
-        dayKey: toShopDayKey(new Date(movement.createdAt)),
-        href: "/admin/inventory/fabrics",
-      }));
+  // ─── Biến động cây vải (cắt may, nhập thêm, hao hụt, kiểm kê từ DB) ────────
+  const fabricEvents: StockEvent[] = fabricMovements.map((movement) => {
+    const hex = movement.fabric.colorValue?.hex ?? null;
+    const delta = Number(movement.delta);
+    const balanceAfter = Number(movement.balanceAfter);
+    const from = Math.round((balanceAfter - delta) * 100) / 100;
+    return {
+      id: `fabric-${movement.id}`,
+      subject: "FABRIC" as const,
+      kind: movement.type,
+      title: movement.fabric.name,
+      code: movement.fabric.material?.name ?? movement.fabric.code,
+      image: null,
+      hex,
+      unit: "METER" as const,
+      lines: [
+        {
+          code: movement.fabric.code,
+          detail: null,
+          hex,
+          from,
+          to: balanceAfter,
+          delta,
+        },
+      ],
+      delta,
+      orderCode: movement.orderCode,
+      orderCancelled: false,
+      note: movement.note,
+      actorName: movement.actor?.name ?? movement.actor?.email ?? "Quản trị",
+      actorIsCustomer: false,
+      createdAt: movement.createdAt.toISOString(),
+      dayKey: toShopDayKey(movement.createdAt),
+      href: "/admin/inventory/fabrics",
+    };
   });
 
   const events = [...adjustEvents, ...orderEvents, ...fabricEvents].sort((a, b) => b.createdAt.localeCompare(a.createdAt));

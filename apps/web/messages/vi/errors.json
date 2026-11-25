@@ -291,5 +291,15 @@
   "FAQ_ANSWER_REQUIRED": "Vui lòng nhập câu trả lời.",
   "FAQ_TOPIC_REQUIRED": "Vui lòng chọn chủ đề.",
   "TEXT_TOO_LONG": "Nội dung quá dài.",
-  "INVALID_URL": "Đường dẫn ảnh không hợp lệ."
+  "INVALID_URL": "Đường dẫn ảnh không hợp lệ.",
+  "FABRIC_NOT_FOUND": "Không tìm thấy cây vải.",
+  "FABRIC_INSUFFICIENT_STOCK": "Số mét vải trong cây không đủ để thực hiện.",
+  "FABRIC_MOVEMENT_FAILED": "Không thể ghi nhận biến động cây vải.",
+  "FABRIC_CODE_ALREADY_EXISTS": "Mã cây vải này đã tồn tại trong kho.",
+  "FABRIC_ROLL_SAVE_FAILED": "Không thể lưu thông tin cây vải.",
+  "FABRIC_TOGGLE_ACTIVE_FAILED": "Không thể thay đổi trạng thái cây vải.",
+  "PRODUCT_VISIBILITY_FAILED": "Không thể thay đổi trạng thái hiển thị của sản phẩm.",
+  "FABRIC_NAME_REQUIRED": "Vui lòng nhập tên cây vải.",
+  "FABRIC_CODE_REQUIRED": "Vui lòng nhập mã cây vải.",
+  "FABRIC_METERS_POSITIVE": "Số mét vải phải lớn hơn 0."
 }

@@ -291,5 +291,15 @@
   "FAQ_ANSWER_REQUIRED": "Please enter the answer.",
   "FAQ_TOPIC_REQUIRED": "Please choose a topic.",
   "TEXT_TOO_LONG": "The text is too long.",
-  "INVALID_URL": "The image URL is invalid."
+  "INVALID_URL": "The image URL is invalid.",
+  "FABRIC_NOT_FOUND": "Fabric roll not found.",
+  "FABRIC_INSUFFICIENT_STOCK": "Insufficient fabric meters remaining.",
+  "FABRIC_MOVEMENT_FAILED": "Could not record fabric movement.",
+  "FABRIC_CODE_ALREADY_EXISTS": "This fabric roll code already exists.",
+  "FABRIC_ROLL_SAVE_FAILED": "Could not save fabric roll.",
+  "FABRIC_TOGGLE_ACTIVE_FAILED": "Could not update fabric status.",
+  "PRODUCT_VISIBILITY_FAILED": "Could not update product visibility.",
+  "FABRIC_NAME_REQUIRED": "Please enter the fabric roll name.",
+  "FABRIC_CODE_REQUIRED": "Please enter the fabric roll code.",
+  "FABRIC_METERS_POSITIVE": "Fabric meters must be greater than 0."
 }

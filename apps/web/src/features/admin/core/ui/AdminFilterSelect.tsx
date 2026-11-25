@@ -1,12 +1,15 @@
 "use client";
 
+import { type ReactNode } from "react";
 import { ChevronDown } from "lucide-react";
 import { AppMenu } from "@/components/shared/AppMenu";
 import { cn } from "@/lib/utils";
 
 export interface AdminFilterOption<T extends string = string> {
   value: T;
-  label: string;
+  label: ReactNode;
+  /** Text đại diện khi label là ReactNode — dùng cho aria-label và title */
+  text?: string;
 }
 
 interface AdminFilterSelectProps<T extends string> {
@@ -36,7 +39,9 @@ export function AdminFilterSelect<T extends string>({
   invalid,
   className,
 }: AdminFilterSelectProps<T>) {
-  const selectedLabel = options.find((option) => option.value === value)?.label;
+  const selectedOption = options.find((option) => option.value === value);
+  const selectedLabel = selectedOption?.label;
+  const ariaText = selectedOption?.text ?? (typeof selectedLabel === "string" ? selectedLabel : "");
 
   return (
     /*
@@ -57,7 +62,7 @@ export function AdminFilterSelect<T extends string>({
         trigger={
           <button
             type="button"
-            aria-label={label ? `${label}: ${selectedLabel ?? placeholder ?? ""}` : (selectedLabel ?? placeholder ?? "")}
+            aria-label={label ? `${label}: ${ariaText || placeholder || ""}` : (ariaText || placeholder || "")}
             className={cn(
               "group flex h-full w-full min-w-0 cursor-pointer items-center rounded-xl border bg-white text-sm shadow-2xs outline-none transition-colors hover:bg-[#FAFAFA] focus-visible:border-[#18181B] data-popup-open:border-[#18181B]",
               invalid ? "border-rose-400" : "border-[#E4E4E7]"

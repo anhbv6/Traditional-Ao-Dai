@@ -1247,7 +1247,7 @@
     "previewTitle": "Xem trước sản phẩm",
     "previewDesc": "Giao diện khách hàng nhìn thấy trên cửa hàng",
     "add": "Thêm sản phẩm",
-    "edit": "Mở chi tiết",
+    "edit": "Mở chỉnh sửa",
     "cancel": "Hủy",
     "saving": "Đang lưu...",
     "updateSuccess": "Đã lưu sản phẩm.",
@@ -3521,6 +3521,8 @@
     }
   },
   "fabrics": {
+    "backToList": "Số lượng vải",
+    "save": "Lưu thay đổi",
     "searchPlaceholder": "Tìm tên, mã cây vải, màu, mẫu áo…",
     "create": "Nhập cây vải mới",
     "cancel": "Hủy",
@@ -3528,22 +3530,28 @@
     "topsLeft": "{count, plural, =0 {không đủ một áo} other {≈ # áo}}",
     "noYield": "chưa có định mức",
     "summary": "{count} cây vải",
-    "summaryMaterials": "{count} chất liệu",
+    "summaryTotal": "trên tổng {total}",
     "empty": "Chưa có cây vải nào trong kho.",
     "noResults": "Không có cây vải khớp bộ lọc.",
-    "view": {
-      "rolls": "Theo cây vải",
-      "materials": "Theo chất liệu"
-    },
     "filter": {
       "material": "Chất liệu",
       "status": "Tình trạng",
+      "color": "Màu sắc",
+      "product": "Mẫu áo",
       "all": "Tất cả",
       "statusOption": {
+        "AVAILABLE": "Còn vải",
+        "ALL": "Tất cả tình trạng",
         "ATTENTION": "Cần nhập thêm",
         "OK": "Đủ dùng",
+        "LOW": "Sắp hết",
         "OUT": "Hết vải",
         "INACTIVE": "Ngưng dùng"
+      },
+      "productOption": {
+        "ALL": "Tất cả",
+        "ATTACHED": "Đã gắn mẫu áo",
+        "UNATTACHED": "Chưa gắn mẫu áo"
       }
     },
     "status": {
@@ -3557,7 +3565,13 @@
       "remaining": "Còn lại",
       "product": "Mẫu áo",
       "status": "Tình trạng",
-      "actions": "Thao tác"
+      "actions": "Thao tác",
+      "time": "Thời gian",
+      "type": "Loại biến động",
+      "order": "Mã đơn",
+      "delta": "Biến động",
+      "balance": "Còn lại",
+      "note": "Ghi chú"
     },
     "product": {
       "visible": "đang bán",
@@ -3588,7 +3602,12 @@
     },
     "movement": {
       "title": "Ghi số mét",
+      "currentStock": "Hiện có",
+      "afterStock": "Sau khi ghi",
+      "presetLabel": "Định mức",
+      "unitTops": "áo",
       "field": {
+        "type": "Thao tác",
         "meters": "Số mét",
         "measured": "Số mét đo thực tế",
         "orderCode": "Mã đơn",
@@ -3634,6 +3653,7 @@
       "create": "Nhập cây vải",
       "save": "Lưu thay đổi",
       "noProduct": "Không gắn mẫu áo",
+      "langLabel": "Ngôn ngữ",
       "field": {
         "material": "Chất liệu",
         "color": "Màu",
@@ -3686,6 +3706,25 @@
       "activated": "Đã dùng lại cây vải.",
       "productHidden": "Đã ẩn {name} trên web.",
       "productShown": "Đã hiện lại {name} trên web."
+    },
+    "detail": {
+      "remainingStock": "Số mét còn lại",
+      "saving": "Đang lưu...",
+      "infoTitle": "Thông tin cây vải",
+      "infoHint": "Chất liệu, màu sắc, tên hiển thị và định mức của cây vải.",
+      "saveInfo": "Lưu thông tin",
+      "movementTitle": "Ghi biến động kho",
+      "movementHint": "Cắt may, nhập thêm, hao hụt hoặc kiểm kê số mét thực tế.",
+      "historyTitle": "Lịch sử biến động cây vải",
+      "historyEmpty": "Chưa có biến động nào được ghi lại.",
+      "stockTitle": "Tồn kho & Định mức",
+      "stockHint": "Thước vải và ước tính số lượng áo dài may được.",
+      "initialStock": "Số mét ban đầu",
+      "estimatedTops": "Ước tính may được",
+      "threshold": "Ngưỡng cảnh báo",
+      "operationTitle": "Thông tin vận hành",
+      "createdAt": "Ngày nhập kho",
+      "updatedAt": "Cập nhật gần nhất"
     }
   },
   "inventoryHistory": {
