@@ -20,15 +20,12 @@ import {
   type FabricRollInput,
 } from "../../types/fabrics.types";
 import { buildFabricCode, parseMeters, suggestThreshold } from "../../utils/fabricStock";
-import { FabricSwatch } from "../shared/FabricSwatch";
-
-const NO_PRODUCT = "NONE";
 
 interface FabricRollDialogProps {
   /** null = nhập cây vải mới */
   roll: AdminFabricRoll | null;
   materials: FabricMaterialOption[];
-  colors: FabricColorOption[];
+  colors?: FabricColorOption[];
   products: FabricProductOption[];
   existingCodes: string[];
   /** Chất liệu chọn sẵn khi mở từ thẻ chất liệu */
@@ -48,7 +45,7 @@ interface FabricRollDialogProps {
 export function FabricRollDialog({
   roll,
   materials,
-  colors,
+  colors: _colors,
   products,
   existingCodes,
   defaultMaterialId,
@@ -60,36 +57,35 @@ export function FabricRollDialog({
   const format = useFormatter();
   const [contentLang, setContentLang] = useState<AdminContentLang>("vi");
   const [materialId, setMaterialId] = useState(roll?.materialId ?? defaultMaterialId ?? "");
-  const [colorId, setColorId] = useState(roll?.colorId ?? "");
   const [name, setName] = useState(roll?.name ?? "");
   const [nameEn, setNameEn] = useState(roll?.nameEn ?? "");
   const [nameTouched, setNameTouched] = useState(Boolean(roll));
   const [nameEnTouched, setNameEnTouched] = useState(Boolean(roll?.nameEn));
   const [metersRaw, setMetersRaw] = useState("");
   const [thresholdRaw, setThresholdRaw] = useState(roll ? String(roll.lowStockThreshold) : "");
-  const [productId, setProductId] = useState(roll?.productId ?? NO_PRODUCT);
   const [showErrors, setShowErrors] = useState(false);
 
   const material = materials.find((item) => item.id === materialId);
-  const color = colors.find((item) => item.id === colorId);
   const localized = (item: { name: string; nameEn: string | null }) => (locale === "en" && item.nameEn ? item.nameEn : item.name);
 
-  // Gợi ý tên "<chất liệu> <màu>" tiếng Việt và tiếng Anh
-  const effectiveName = nameTouched ? name : [material?.name, color?.name.toLowerCase()].filter(Boolean).join(" ");
+  // Danh sách các mẫu áo đang sử dụng chất liệu này (tự động theo materialId)
+  const relatedProducts = materialId ? products.filter((item) => item.materialId === materialId) : [];
+
+  // Gợi ý tên cây vải theo chất liệu
+  const effectiveName = nameTouched ? name : (material?.name ?? "");
   const effectiveNameEn = nameEnTouched
     ? nameEn
-    : [material?.nameEn || material?.name, (color?.nameEn || color?.name)?.toLowerCase()].filter(Boolean).join(" ");
+    : (material?.nameEn || material?.name || "");
 
   const code =
     roll?.code ??
-    (material && color ? buildFabricCode(material.code, color.name, existingCodes) : "");
+    (material ? buildFabricCode(material.code, "", existingCodes) : "");
   const thresholdSuggestion = suggestThreshold(material?.metersPerTop ?? null, material?.metersPerPants ?? null);
   const threshold = thresholdRaw.trim() ? parseMeters(thresholdRaw) : thresholdSuggestion;
   const meters = roll ? roll.receivedMeters : parseMeters(metersRaw);
 
   const errors = {
     material: !material ? t("rollDialog.errors.material") : null,
-    color: !color ? t("rollDialog.errors.color") : null,
     name: !effectiveName.trim() ? t("rollDialog.errors.name") : null,
     meters: meters === null || meters <= 0 ? t("rollDialog.errors.meters") : null,
     threshold: threshold === null || threshold < 0 ? t("rollDialog.errors.threshold") : null,
@@ -103,16 +99,18 @@ export function FabricRollDialog({
     if (!effectiveName.trim()) {
       setContentLang("vi");
     }
-    if (!isValid || !material || !color || meters === null || threshold === null) return;
+    if (!isValid || !material || meters === null || threshold === null) return;
+    const autoProductId = roll?.productId ?? relatedProducts[0]?.id ?? null;
+
     onSubmit({
       materialId: material.id,
-      colorId: color.id,
+      colorId: null,
       name: effectiveName.trim(),
       nameEn: (nameEnTouched ? nameEn : effectiveNameEn).trim() || null,
       code,
       receivedMeters: meters,
       lowStockThreshold: threshold,
-      productId: productId === NO_PRODUCT ? null : productId,
+      productId: autoProductId,
     });
   };
 
@@ -160,25 +158,15 @@ export function FabricRollDialog({
           />
         </AdminField>
 
-        <AdminField label={t("rollDialog.field.color")} hint={t("rollDialog.hint.color")} required error={shown("color")}>
-          <AdminFilterSelect
-            value={colorId}
-            onChange={setColorId}
-            placeholder={t("rollDialog.placeholder.color")}
-            invalid={Boolean(shown("color"))}
-            options={colors.map((item) => ({
-              value: item.id,
-              label: (
-                <span className="flex min-w-0 items-center gap-2.5">
-                  <FabricSwatch hex={item.hex ?? null} size="sm" />
-                  <span className="truncate">{localized(item)}</span>
-                </span>
-              ),
-              text: localized(item),
-            }))}
-            className="h-10 w-full"
-          />
-        </AdminField>
+        <AdminTextField
+          label={t("rollDialog.field.code")}
+          hint={t("rollDialog.hint.code")}
+          value={code}
+          readOnly
+          disabled
+          placeholder={t("rollDialog.placeholder.code")}
+          inputClassName="font-mono text-xs text-[#71717A] bg-[#FAFAFA]"
+        />
 
         <AdminTextField
           required={contentLang === "vi"}
@@ -195,17 +183,6 @@ export function FabricRollDialog({
           }}
           placeholder={t("rollDialog.placeholder.name")}
           error={contentLang === "vi" ? shown("name") : undefined}
-          className="sm:col-span-2"
-        />
-
-        <AdminTextField
-          label={t("rollDialog.field.code")}
-          hint={t("rollDialog.hint.code")}
-          value={code}
-          readOnly
-          disabled
-          placeholder={t("rollDialog.placeholder.code")}
-          inputClassName="font-mono text-xs text-[#71717A] bg-[#FAFAFA]"
           className="sm:col-span-2"
         />
 
@@ -240,17 +217,35 @@ export function FabricRollDialog({
           inputClassName="font-mono tabular-nums"
         />
 
-        <AdminField label={t("rollDialog.field.product")} hint={t("rollDialog.hint.product")} className="sm:col-span-2">
-          <AdminFilterSelect
-            value={productId}
-            onChange={setProductId}
-            options={[
-              { value: NO_PRODUCT, label: t("rollDialog.noProduct") },
-              ...products.map((item) => ({ value: item.id, label: `${item.code} · ${item.name}` })),
-            ]}
-            className="h-10 w-full"
-          />
-        </AdminField>
+        {/* Danh sách các mẫu áo may từ chất liệu này (Tự động phát hiện) */}
+        <div className="sm:col-span-2">
+          <div className="mb-1.5 flex items-center justify-between">
+            <span className="text-xs font-medium text-[#09090B]">{t("rollDialog.relatedProductsTitle")}</span>
+            <span className="text-2xs text-[#71717A]">
+              {relatedProducts.length > 0
+                ? t("rollDialog.relatedCount", { count: relatedProducts.length })
+                : t("rollDialog.noRelatedProducts")}
+            </span>
+          </div>
+
+          {relatedProducts.length > 0 ? (
+            <div className="flex flex-wrap gap-2 rounded-xl border border-[#E4E4E7] bg-[#FAFAFA] p-2.5">
+              {relatedProducts.map((p) => (
+                <div
+                  key={p.id}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-[#E4E4E7] bg-white px-2.5 py-1 text-xs text-[#3F3F46] shadow-2xs"
+                >
+                  <span className="font-mono text-2xs font-semibold text-[#71717A]">{p.code}</span>
+                  <span className="font-medium">{p.name}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-xl border border-dashed border-[#E4E4E7] bg-[#FAFAFA] p-3 text-center text-xs text-[#71717A]">
+              {materialId ? t("rollDialog.emptyRelatedForMaterial") : t("rollDialog.selectMaterialFirst")}
+            </div>
+          )}
+        </div>
       </div>
     </AdminDialog>
   );

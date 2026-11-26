@@ -50,10 +50,11 @@ export function suggestThreshold(metersPerTop: number | null, metersPerPants: nu
 }
 
 /**
- * Mã cây vải `<mã chất liệu>-<màu>-<số thứ tự>`, VD "LUA-TO-TAM-HONG-PHAN-02" — số thứ tự tăng theo các cây cùng tiền tố
+ * Mã cây vải `<mã chất liệu>-<màu/nhãn>-<số thứ tự>`, VD "LUA-TO-TAM-01" — số thứ tự tăng theo các cây cùng tiền tố
  */
-export function buildFabricCode(materialCode: string, colorName: string, existingCodes: string[]): string {
-  const prefix = `${materialCode}-${toSlug(colorName).toUpperCase()}`;
+export function buildFabricCode(materialCode: string, colorOrLabel: string, existingCodes: string[]): string {
+  const clean = colorOrLabel ? toSlug(colorOrLabel).toUpperCase() : "";
+  const prefix = clean ? `${materialCode}-${clean}` : materialCode;
   const used = existingCodes
     .filter((code) => code.startsWith(`${prefix}-`))
     .map((code) => Number(code.slice(prefix.length + 1)))

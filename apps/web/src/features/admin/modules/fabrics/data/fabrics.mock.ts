@@ -38,12 +38,12 @@ const COLORS: FabricColorOption[] = [
 ];
 
 const PRODUCTS: FabricProductOption[] = [
-  { id: "p-1", code: "AD0001", name: "Áo dài lụa Mây Hồng", isVisible: true },
-  { id: "p-2", code: "AD0003", name: "Áo dài lanh Sương Sớm", isVisible: true },
-  { id: "p-3", code: "AD0004", name: "Áo dài chàm Bản Lác", isVisible: true },
-  { id: "p-4", code: "AD0006", name: "Áo dài gấm Hoàng Hôn", isVisible: true },
-  { id: "p-5", code: "AD0007", name: "Áo dài the Ngọc Bích", isVisible: false },
-  { id: "p-6", code: "AD0009", name: "Áo dài đũi Mùa Gặt", isVisible: true },
+  { id: "p-1", code: "AD0001", name: "Áo dài lụa Mây Hồng", materialId: "mat-lua", colorIds: ["c-hong"], isVisible: true, basePrice: 2800000, image: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=300" },
+  { id: "p-2", code: "AD0003", name: "Áo dài lanh Sương Sớm", materialId: "mat-lanh", colorIds: ["c-be"], isVisible: true, basePrice: 850000, image: "https://images.unsplash.com/photo-1583391733975-ae434509e51c?w=300" },
+  { id: "p-3", code: "AD0004", name: "Áo dài chàm Bản Lác", materialId: "mat-lanh", colorIds: ["c-cham"], isVisible: true, basePrice: 1200000, image: null },
+  { id: "p-4", code: "AD0006", name: "Áo dài gấm Hoàng Hôn", materialId: "mat-gam", colorIds: ["c-do"], isVisible: true, basePrice: 3200000, image: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=300" },
+  { id: "p-5", code: "AD0007", name: "Áo dài the Ngọc Bích", materialId: "mat-the", colorIds: ["c-ngoc"], isVisible: false, basePrice: 2100000, image: null },
+  { id: "p-6", code: "AD0009", name: "Áo dài đũi Mùa Gặt", materialId: "mat-dui", colorIds: ["c-nghe"], isVisible: true, basePrice: 1450000, image: null },
 ];
 
 const ACTORS = ["Thu Hà", "Mai Anh", "Quản trị"];

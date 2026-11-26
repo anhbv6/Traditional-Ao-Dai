@@ -37,6 +37,7 @@ import { CareLabel } from "../shared/CareLabel";
 import { CompositionBar } from "../shared/CompositionBar";
 import { MaterialSwatch } from "../shared/MaterialSwatch";
 import { MetricScale } from "../shared/MetricBars";
+import { MaterialColorsField } from "./MaterialColorsField";
 import { MaterialCompositionField } from "./MaterialCompositionField";
 import { MaterialMediaField } from "./MaterialMediaField";
 import { MaterialProcessField } from "./MaterialProcessField";
@@ -58,6 +59,7 @@ function toFormValues(material: AdminMaterialDetail): MaterialFormValues {
     originEn: material.originEn ?? "",
     description: material.description ?? "",
     descriptionEn: material.descriptionEn ?? "",
+    colorIds: material.colorIds ?? [],
     composition: material.composition,
     processSteps: material.processSteps,
     closeupImages: material.closeupImages,
@@ -143,6 +145,7 @@ export function MaterialEditor({ initialMaterial }: { initialMaterial: AdminMate
   const notify = useNotify();
   const router = useRouter();
   const [material, setMaterial] = useState(initialMaterial);
+  const [availableColors, setAvailableColors] = useState(initialMaterial.availableColors ?? []);
   const [values, setValues] = useState(() => toFormValues(initialMaterial));
   const [baseline, setBaseline] = useState(values);
   const [lang, setLang] = useState<ContentLang>(locale === "en" ? "en" : "vi");
@@ -283,6 +286,24 @@ export function MaterialEditor({ initialMaterial }: { initialMaterial: AdminMate
                   value={values[fields.description]}
                   onValueChange={(value) => set(fields.description, value)}
                   placeholder={t(`placeholders.${lang}.description`)}
+                />
+              </div>
+
+              {/* Bảng màu chất liệu — dưới xuất xứ và mô tả */}
+              <div className="border-t border-[#F4F4F5] pt-3">
+                <div className="mb-2 flex items-center gap-1.5">
+                  <h3 className="text-sm font-semibold text-[#09090B]">
+                    {t("field.colors")}
+                  </h3>
+                  <AdminInfoTip content={t("hints.colors")} />
+                </div>
+                <MaterialColorsField
+                  colorIds={values.colorIds}
+                  availableColors={availableColors}
+                  onChange={(colorIds) => set("colorIds", colorIds)}
+                  onColorCreated={(newColor) =>
+                    setAvailableColors((prev) => [...prev, newColor])
+                  }
                 />
               </div>
 

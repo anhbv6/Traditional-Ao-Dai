@@ -9,6 +9,7 @@ import {
   ADMIN_ROW_ICON_BUTTON_CLASS,
   AdminDataTable,
   AdminStatusText,
+  AdminTooltip,
   type AdminStatusTone,
   type AdminTableColumn,
 } from "@/features/admin/core/ui";
@@ -69,7 +70,7 @@ export function FabricRollsTable({
 
   const materialOf = (roll: AdminFabricRoll) => materials.find((m) => m.id === roll.materialId);
   const colorOf = (roll: AdminFabricRoll) => colors.find((c) => c.id === roll.colorId);
-  const productOf = (roll: AdminFabricRoll) => products.find((p) => p.id === roll.productId);
+  const productsOf = (roll: AdminFabricRoll) => products.filter((p) => p.materialId === roll.materialId);
   const localized = (item: { name: string; nameEn: string | null } | undefined) =>
     item ? (locale === "en" && item.nameEn ? item.nameEn : item.name) : "";
   const displayName = (roll: AdminFabricRoll) =>
@@ -77,7 +78,7 @@ export function FabricRollsTable({
   const relative = (iso: string) => format.relativeTime(new Date(iso), new Date(now));
 
   const menuItems = (roll: AdminFabricRoll): AppMenuEntry[] => {
-    const product = productOf(roll);
+    const rollProducts = productsOf(roll);
     const movement = (type: FabricMovementType): AppMenuEntry => ({
       key: type,
       label: t(`menu.${type}`),
@@ -92,14 +93,14 @@ export function FabricRollsTable({
       movement("ADJUST"),
       { type: "separator", key: "sep-1" },
       { key: "edit", label: t("menu.edit"), icon: Pencil, href: `/admin/inventory/fabrics/${roll.id}` },
-      ...(product
+      ...(rollProducts.length === 1
         ? [
             {
               key: "product",
-              label: product.isVisible ? t("menu.hideProduct") : t("menu.showProduct"),
-              description: product.code,
-              icon: product.isVisible ? EyeOff : Eye,
-              onSelect: () => onToggleProduct(product.id),
+              label: rollProducts[0].isVisible ? t("menu.hideProduct") : t("menu.showProduct"),
+              description: rollProducts[0].code,
+              icon: rollProducts[0].isVisible ? EyeOff : Eye,
+              onSelect: () => onToggleProduct(rollProducts[0].id),
             },
           ]
         : []),
@@ -141,15 +142,34 @@ export function FabricRollsTable({
   );
 
   const productCell = (roll: AdminFabricRoll) => {
-    const product = productOf(roll);
-    if (!product) return <span className="text-[#A1A1AA]">—</span>;
+    const rollProducts = productsOf(roll);
+    if (rollProducts.length === 0) return <span className="text-[#A1A1AA]">—</span>;
+    if (rollProducts.length === 1) {
+      const p = rollProducts[0];
+      return (
+        <div className="min-w-0">
+          <p className="truncate font-medium text-[#3F3F46]">{p.name}</p>
+          <p className={cn("mt-0.5 text-xs", p.isVisible ? "text-[#71717A]" : "text-[#A1A1AA]")}>
+            <span className="font-mono text-2xs">{p.code}</span> · {p.isVisible ? t("product.visible") : t("product.hidden")}
+          </p>
+        </div>
+      );
+    }
     return (
-      <div className="min-w-0">
-        <p className="truncate text-[#3F3F46]">{product.name}</p>
-        <p className={cn("mt-0.5 text-xs", product.isVisible ? "text-[#71717A]" : "text-[#A1A1AA]")}>
-          <span className="font-mono text-2xs">{product.code}</span> · {product.isVisible ? t("product.visible") : t("product.hidden")}
-        </p>
-      </div>
+      <AdminTooltip
+        content={rollProducts
+          .map((p) => `${p.code} · ${p.name}${p.isVisible ? "" : ` (${t("product.hidden")})`}`)
+          .join("\n")}
+      >
+        <div className="min-w-0 cursor-default">
+          <p className="truncate font-medium text-[#3F3F46]">
+            {rollProducts.length} {t("column.productsCount")}
+          </p>
+          <p className="mt-0.5 truncate font-mono text-2xs text-[#71717A]">
+            {rollProducts.map((p) => p.code).join(", ")}
+          </p>
+        </div>
+      </AdminTooltip>
     );
   };
 
@@ -158,7 +178,7 @@ export function FabricRollsTable({
     return (
       <div>
         <AdminStatusText tone={STATUS_TONE[status]}>{t(`status.${status}`)}</AdminStatusText>
-        <p className="mt-1 pl-4 text-xs text-[#71717A]">{relative(roll.updatedAt)}</p>
+        {/* <p className="mt-1 pl-4 text-xs text-[#71717A]">{relative(roll.updatedAt)}</p> */}
       </div>
     );
   };

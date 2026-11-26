@@ -41,6 +41,13 @@ export interface AdminMaterialListItem {
   topsAvailable: number | null;
 }
 
+export interface MaterialColorOption {
+  id: string;
+  name: string;
+  nameEn: string | null;
+  hex: string;
+}
+
 export interface AdminMaterialDetail {
   id: string;
   code: string;
@@ -50,6 +57,8 @@ export interface AdminMaterialDetail {
   originEn: string | null;
   description: string | null;
   descriptionEn: string | null;
+  colorIds: string[];
+  availableColors: MaterialColorOption[];
   composition: CompositionItem[];
   processSteps: ProcessStep[];
   closeupImages: string[];

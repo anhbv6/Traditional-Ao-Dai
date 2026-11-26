@@ -72,7 +72,7 @@ export function FabricsBoard({ data }: { data: AdminFabricStockData }) {
 
   const materialOf = (roll: AdminFabricRoll) => data.materials.find((material) => material.id === roll.materialId);
   const colorOf = (roll: AdminFabricRoll) => data.colors.find((color) => color.id === roll.colorId);
-  const productOf = (roll: AdminFabricRoll) => products.find((product) => product.id === roll.productId);
+  const productsOf = (roll: AdminFabricRoll) => products.filter((product) => product.materialId === roll.materialId);
   const localized = (item: { name: string; nameEn: string | null } | undefined) =>
     item ? (locale === "en" && item.nameEn ? item.nameEn : item.name) : "";
   const fmt = (value: number) => format.number(value, { maximumFractionDigits: 2 });
@@ -100,20 +100,21 @@ export function FabricsBoard({ data }: { data: AdminFabricStockData }) {
 
   const matchesProduct = (roll: AdminFabricRoll) => {
     if (productFilter === "ALL") return true;
-    if (productFilter === "ATTACHED") return Boolean(roll.productId);
-    if (productFilter === "UNATTACHED") return !roll.productId;
-    return roll.productId === productFilter;
+    const rollProducts = productsOf(roll);
+    if (productFilter === "ATTACHED") return rollProducts.length > 0;
+    if (productFilter === "UNATTACHED") return rollProducts.length === 0;
+    return rollProducts.some((p) => p.id === productFilter);
   };
 
   const visible = rolls
     .filter((roll) => {
+      const rollProducts = productsOf(roll);
       const haystack = [
         roll.name,
         roll.nameEn ?? "",
         roll.code,
         localized(colorOf(roll)),
-        productOf(roll)?.name ?? "",
-        productOf(roll)?.code ?? "",
+        ...rollProducts.map((p) => `${p.name} ${p.code}`),
       ];
       return (
         (!keyword || haystack.some((value) => value.toLowerCase().includes(keyword))) &&
@@ -133,7 +134,7 @@ export function FabricsBoard({ data }: { data: AdminFabricStockData }) {
   // Cây cần nhập thêm, và trong đó cây đã hết mà mẫu áo gắn kèm vẫn đang bán (khách đặt được nhưng không có vải)
   const _attention = rolls.filter((roll) => ["LOW", "OUT"].includes(resolveFabricStatus(roll)));
   const _sellingWithoutFabric = _attention.filter(
-    (roll) => resolveFabricStatus(roll) === "OUT" && productOf(roll)?.isVisible
+    (roll) => resolveFabricStatus(roll) === "OUT" && productsOf(roll).some((p) => p.isVisible)
   );
 
   // ─── Thao tác (gọi Server Action lưu DB) ──────────────────────────────────

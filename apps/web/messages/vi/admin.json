@@ -3220,6 +3220,24 @@
       "confirm": "Xóa chất liệu",
       "success": "Đã xóa chất liệu"
     },
+    "colors": {
+      "placeholder": "Chọn màu sắc cho chất liệu...",
+      "summary": "{count} màu đã chọn",
+      "createButton": "Tạo màu mới",
+      "remove": "Bỏ màu {name}",
+      "dialogTitle": "Thêm màu mới vào hệ thống",
+      "dialogDescription": "Màu mới sẽ được lưu vào danh mục thuộc tính màu sắc và tự động gán cho chất liệu này.",
+      "nameLabel": "Tên màu",
+      "namePlaceholder": "Ví dụ: Vàng Cúc, Hồng Sen...",
+      "nameEnLabel": "Tên màu (tiếng Anh)",
+      "nameEnPlaceholder": "Ví dụ: Daisy Yellow, Lotus Pink...",
+      "hexLabel": "Mã màu HEX",
+      "nameRequired": "Vui lòng nhập tên màu",
+      "hexInvalid": "Mã HEX không hợp lệ (dạng #RRGGBB)",
+      "createSuccess": "Đã thêm màu mới thành công",
+      "creating": "Đang tạo...",
+      "submitCreate": "Lưu và thêm màu"
+    },
     "sections": {
       "identity": "Thông tin vải",
       "metrics": "Thanh đo vật lý",
@@ -3233,6 +3251,7 @@
       "code": "Mã",
       "origin": "Xuất xứ",
       "description": "Mô tả",
+      "colors": "Bảng màu áp dụng",
       "composition": "Thành phần sợi",
       "seasons": "Mùa phù hợp",
       "videoUrl": "Video vải chuyển động",
@@ -3244,6 +3263,7 @@
     },
     "hints": {
       "code": "Mã ngắn in trên phiếu nhập kho và tem cây vải, chỉ gồm chữ không dấu, số và gạch nối.",
+      "colors": "Bảng màu tiệm có thể nhuộm hoặc nhập cho chất liệu này. Dùng để quản lý màu sắc cây vải và thiết kế mẫu áo.",
       "composition": "Tổng các thành phần phải đủ 100%.",
       "metrics": "Thang 1–5 thống nhất cho mọi chất liệu để so sánh và tư vấn khách. Bấm lại nấc đang chọn để bỏ đánh giá.",
       "media": "Ảnh đầu tiên là ảnh mẫu vải trên danh sách. Video nên quay vải bay hoặc phủ trên tay để thấy độ rủ và độ bóng.",
@@ -3550,8 +3570,8 @@
       },
       "productOption": {
         "ALL": "Tất cả",
-        "ATTACHED": "Đã gắn mẫu áo",
-        "UNATTACHED": "Chưa gắn mẫu áo"
+        "ATTACHED": "Có mẫu áo sử dụng",
+        "UNATTACHED": "Chưa có mẫu áo"
       }
     },
     "status": {
@@ -3564,6 +3584,7 @@
       "roll": "Cây vải",
       "remaining": "Còn lại",
       "product": "Mẫu áo",
+      "productsCount": "mẫu áo",
       "status": "Tình trạng",
       "actions": "Thao tác",
       "time": "Thời gian",
@@ -3571,7 +3592,11 @@
       "order": "Mã đơn",
       "delta": "Biến động",
       "balance": "Còn lại",
-      "note": "Ghi chú"
+      "note": "Ghi chú",
+      "materialSpecs": "Khổ vải & Định mức",
+      "typeAndOrder": "Thao tác",
+      "deltaAndBalance": "Biến động",
+      "balanceShort": "Còn {amount} m"
     },
     "product": {
       "visible": "đang bán",
@@ -3601,10 +3626,14 @@
       "ADJUST": "Kiểm kê"
     },
     "movement": {
-      "title": "Ghi số mét",
+      "title": "Điều chỉnh tồn kho",
       "currentStock": "Hiện có",
-      "afterStock": "Sau khi ghi",
+      "afterStock": "Dự kiến sau khi chỉnh",
       "presetLabel": "Định mức",
+      "signCut": "Trừ vải",
+      "signRestock": "Cộng thêm",
+      "signWaste": "Hao hụt",
+      "signAdjust": "Đo lại",
       "unitTops": "áo",
       "field": {
         "type": "Thao tác",
@@ -3634,10 +3663,10 @@
       "warnOut": "Cây vải sẽ hết. Nếu mẫu áo gắn kèm còn bán, nhớ ẩn trên web.",
       "recent": "Gần đây",
       "submit": {
-        "CUT": "Ghi cắt may",
-        "RESTOCK": "Ghi nhập thêm",
-        "WASTE": "Ghi hao hụt",
-        "ADJUST": "Lưu kiểm kê"
+        "CUT": "Xác nhận cắt may",
+        "RESTOCK": "Xác nhận nhập thêm",
+        "WASTE": "Ghi nhận hao hụt",
+        "ADJUST": "Cập nhật kiểm kê"
       },
       "errors": {
         "invalid": "Số mét không hợp lệ.",
@@ -3653,6 +3682,12 @@
       "create": "Nhập cây vải",
       "save": "Lưu thay đổi",
       "noProduct": "Không gắn mẫu áo",
+      "relatedProductsTitle": "Mẫu áo sử dụng chất liệu này",
+      "relatedCount": "Tự động phát hiện {count} mẫu áo",
+      "noRelatedProducts": "Chưa có mẫu áo nào",
+      "emptyRelatedForMaterial": "Chưa có sản phẩm nào trong danh mục sử dụng chất liệu này.",
+      "selectMaterialFirst": "Vui lòng chọn chất liệu trước để xem các mẫu áo liên kết.",
+      "colorMatch": "Trùng màu",
       "langLabel": "Ngôn ngữ",
       "field": {
         "material": "Chất liệu",
@@ -3710,21 +3745,30 @@
     "detail": {
       "remainingStock": "Số mét còn lại",
       "saving": "Đang lưu...",
-      "infoTitle": "Thông tin cây vải",
-      "infoHint": "Chất liệu, màu sắc, tên hiển thị và định mức của cây vải.",
+      "infoTitle": "Thông tin chung",
+      "infoHint": "Chất liệu, màu sắc, mã định danh và ngưỡng cảnh báo của cây vải.",
       "saveInfo": "Lưu thông tin",
       "movementTitle": "Ghi biến động kho",
       "movementHint": "Cắt may, nhập thêm, hao hụt hoặc kiểm kê số mét thực tế.",
+      "movementActionHint": "Cắt may, nhập thêm, hao hụt, kiểm kê",
+      "relatedProductsActionHint": "{count} mẫu áo liên quan",
+      "relatedProductsEmpty": "Chưa có mẫu áo nào sử dụng chất liệu này.",
       "historyTitle": "Lịch sử biến động cây vải",
+      "historyHint": "Nhật ký các lần cắt may, nhập thêm, hao hụt và kiểm kê của cây vải này.",
       "historyEmpty": "Chưa có biến động nào được ghi lại.",
-      "stockTitle": "Tồn kho & Định mức",
-      "stockHint": "Thước vải và ước tính số lượng áo dài may được.",
+      "stockTitle": "Thông tin cây vải",
+      "stockHint": "Xem trước các thuộc tính và thông tin chung của cây vải.",
       "initialStock": "Số mét ban đầu",
       "estimatedTops": "Ước tính may được",
       "threshold": "Ngưỡng cảnh báo",
       "operationTitle": "Thông tin vận hành",
       "createdAt": "Ngày nhập kho",
-      "updatedAt": "Cập nhật gần nhất"
+      "updatedAt": "Cập nhật gần nhất",
+      "suggestThreshold": "Gợi ý: {value} m",
+      "tooltipRemaining": "Số mét còn lại",
+      "tooltipReceived": "Số mét ban đầu",
+      "tooltipYield": "Ước tính may được",
+      "tooltipThreshold": "Ngưỡng cảnh báo"
     }
   },
   "inventoryHistory": {

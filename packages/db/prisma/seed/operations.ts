@@ -1,4 +1,11 @@
-import { prisma, type AppointmentType, type OrderStatus, type PaymentStatus, type TailoringStatus } from '../../src'
+import {
+  prisma,
+  type AppointmentType,
+  type FabricMovementType,
+  type OrderStatus,
+  type PaymentStatus,
+  type TailoringStatus,
+} from '../../src'
 import { DEMO_PRODUCT_SLUGS } from './catalog'
 import { type SeededAccounts, type SeededCatalog } from './types'
 
@@ -70,6 +77,98 @@ const FABRICS = [
   { code: 'GAM-DO-01', name: 'Gấm ruby đỏ nhung', nameEn: 'Ruby Brocade Crimson Velvet', color: 'Đỏ nhung', receivedMeters: 15, remainingMeters: 1.6, productSlug: DEMO_PRODUCT_SLUGS.wedding, materialCode: 'GAM-RUBY' },
   { code: 'LINEN-VANG-01', name: 'Linen vàng cúc', nameEn: 'Raw Linen Chrysanthemum Yellow', color: 'Vàng cúc', receivedMeters: 25, remainingMeters: 14, productSlug: DEMO_PRODUCT_SLUGS.linen, materialCode: 'LINEN-THO' },
   { code: 'VOAN-TRANG-01', name: 'Voan lụa trắng', nameEn: 'Silk Chiffon Pure White', color: 'Trắng', receivedMeters: 10, remainingMeters: 2.9, productSlug: null, materialCode: 'VOAN-LUA' },
+]
+
+interface DemoFabricMovement {
+  id: string
+  fabricCode: string
+  type: FabricMovementType
+  delta: number
+  balanceAfter: number
+  orderCode: string | null
+  note: string
+  daysAgo: number
+  byStaff?: boolean
+}
+
+const FABRIC_MOVEMENTS: DemoFabricMovement[] = [
+  {
+    id: '7f1c2a20-0000-4000-8000-000000000001',
+    fabricCode: 'LINEN-VANG-01',
+    type: 'RESTOCK',
+    delta: 25.0,
+    balanceAfter: 25.0,
+    orderCode: null,
+    note: 'Nhập kiện vải Linen vàng cúc dệt thô tự nhiên nguyên đai, khổ 140cm, chiều dài 25m.',
+    daysAgo: 35,
+    byStaff: false,
+  },
+  {
+    id: '7f1c2a20-0000-4000-8000-000000000002',
+    fabricCode: 'LINEN-VANG-01',
+    type: 'CUT',
+    delta: -1.8,
+    balanceAfter: 23.2,
+    orderCode: 'TC-2611-SXFG',
+    note: 'Xuất cắt thân áo dài cách tân dáng suông thêu hoa cho đơn may đo của khách Sùng Thị Hoa.',
+    daysAgo: 24,
+    byStaff: true,
+  },
+  {
+    id: '7f1c2a20-0000-4000-8000-000000000003',
+    fabricCode: 'LINEN-VANG-01',
+    type: 'CUT',
+    delta: -3.2,
+    balanceAfter: 20.0,
+    orderCode: 'TC-2611-ZCU5',
+    note: 'Xuất cắt trọn bộ áo dài (1.8m) + quần suông cùng tông vàng cúc (1.4m) cho khách Vàng Thị Lan.',
+    daysAgo: 18,
+    byStaff: true,
+  },
+  {
+    id: '7f1c2a20-0000-4000-8000-000000000004',
+    fabricCode: 'LINEN-VANG-01',
+    type: 'WASTE',
+    delta: -0.6,
+    balanceAfter: 19.4,
+    orderCode: null,
+    note: 'Cắt bỏ 60cm biên vải bị lỗi rút sợi trong quá trình xử lý ngâm co giãn tự nhiên.',
+    daysAgo: 12,
+    byStaff: true,
+  },
+  {
+    id: '7f1c2a20-0000-4000-8000-000000000005',
+    fabricCode: 'LINEN-VANG-01',
+    type: 'CUT',
+    delta: -2.2,
+    balanceAfter: 17.2,
+    orderCode: 'TC-2611-Y2BR',
+    note: 'Xuất cắt áo dài dáng suông dài tà theo số đo ngoại cỡ cho đơn của khách Lò Thị Mai.',
+    daysAgo: 7,
+    byStaff: true,
+  },
+  {
+    id: '7f1c2a20-0000-4000-8000-000000000006',
+    fabricCode: 'LINEN-VANG-01',
+    type: 'CUT',
+    delta: -2.0,
+    balanceAfter: 15.2,
+    orderCode: 'TC-2611-UJVT',
+    note: 'Xuất cắt áo dài cách tân tay lỡ dáng suông cho đơn may đo của khách Khach Hai.',
+    daysAgo: 3,
+    byStaff: true,
+  },
+  {
+    id: '7f1c2a20-0000-4000-8000-000000000007',
+    fabricCode: 'LINEN-VANG-01',
+    type: 'ADJUST',
+    delta: -1.2,
+    balanceAfter: 14.0,
+    orderCode: null,
+    note: 'Kiểm kê kho vải định kỳ tháng 11: trừ 1.2m cắt mẫu thử phom áo mới tại tiệm. Số mét tồn thực tế khớp 14.0m.',
+    daysAgo: 1,
+    byStaff: false,
+  },
 ]
 
 /**
@@ -144,13 +243,36 @@ export async function seedOperations({
   }
   console.log(`   📅 ${APPOINTMENTS.length} lịch hẹn hôm nay`)
 
+  const fabricMap: Record<string, string> = {}
   for (const { productSlug, materialCode, ...fabric } of FABRICS) {
     const data = {
       ...fabric,
       productId: productSlug ? catalog[productSlug].id : null,
       materialId: materials[materialCode] ?? null,
     }
-    await prisma.fabric.upsert({ where: { code: fabric.code }, update: data, create: data })
+    const saved = await prisma.fabric.upsert({ where: { code: fabric.code }, update: data, create: data })
+    fabricMap[fabric.code] = saved.id
   }
   console.log(`   🧶 ${FABRICS.length} cây vải`)
+
+  for (const m of FABRIC_MOVEMENTS) {
+    const fabricId = fabricMap[m.fabricCode]
+    if (!fabricId) continue
+    const data = {
+      fabricId,
+      type: m.type,
+      delta: m.delta,
+      balanceAfter: m.balanceAfter,
+      orderCode: m.orderCode,
+      note: m.note,
+      actorId: m.byStaff ? (accounts.staff?.id ?? null) : (accounts.admin?.id ?? null),
+      createdAt: inDays(-m.daysAgo),
+    }
+    await prisma.fabricMovement.upsert({
+      where: { id: m.id },
+      update: data,
+      create: { id: m.id, ...data },
+    })
+  }
+  console.log(`   📜 ${FABRIC_MOVEMENTS.length} biến động kho vải demo`)
 }

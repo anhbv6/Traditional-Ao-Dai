@@ -3220,6 +3220,24 @@
       "confirm": "Delete material",
       "success": "Material deleted"
     },
+    "colors": {
+      "placeholder": "Select colors for this material...",
+      "summary": "{count} colors selected",
+      "createButton": "New color",
+      "remove": "Remove {name}",
+      "dialogTitle": "Add new color to system",
+      "dialogDescription": "The new color will be saved to color attributes and automatically assigned to this material.",
+      "nameLabel": "Color name",
+      "namePlaceholder": "e.g. Daisy Yellow, Lotus Pink...",
+      "nameEnLabel": "Color name (English)",
+      "nameEnPlaceholder": "e.g. Daisy Yellow, Lotus Pink...",
+      "hexLabel": "HEX code",
+      "nameRequired": "Please enter a color name",
+      "hexInvalid": "Invalid HEX code (#RRGGBB)",
+      "createSuccess": "Color created successfully",
+      "creating": "Creating...",
+      "submitCreate": "Save and add color"
+    },
     "sections": {
       "identity": "Fabric information",
       "metrics": "Physical scales",
@@ -3233,6 +3251,7 @@
       "code": "Code",
       "origin": "Origin",
       "description": "Description",
+      "colors": "Color palette",
       "composition": "Fiber composition",
       "seasons": "Seasons",
       "videoUrl": "Fabric-in-motion video",
@@ -3244,6 +3263,7 @@
     },
     "hints": {
       "code": "Short code printed on stock slips and roll tags: unaccented letters, digits and hyphens.",
+      "colors": "Color palette this material can be dyed or sourced in. Used when receiving fabric rolls and designing products.",
       "composition": "Components must add up to 100%.",
       "metrics": "A shared 1–5 scale for every material, used to compare and advise customers. Click the selected step again to clear it.",
       "media": "The first image is the swatch shown in the list. Film the fabric moving or draped over a hand to show drape and sheen.",
@@ -3550,8 +3570,8 @@
       },
       "productOption": {
         "ALL": "All",
-        "ATTACHED": "Linked to design",
-        "UNATTACHED": "Unlinked"
+        "ATTACHED": "Has linked designs",
+        "UNATTACHED": "No linked designs"
       }
     },
     "status": {
@@ -3564,6 +3584,7 @@
       "roll": "Roll",
       "remaining": "Remaining",
       "product": "Design",
+      "productsCount": "designs",
       "status": "Status",
       "actions": "Actions",
       "time": "Time",
@@ -3571,7 +3592,11 @@
       "order": "Order code",
       "delta": "Change",
       "balance": "Remaining",
-      "note": "Note"
+      "note": "Note",
+      "materialSpecs": "Width & Consumption",
+      "typeAndOrder": "Action",
+      "deltaAndBalance": "Change",
+      "balanceShort": "Bal: {amount} m"
     },
     "product": {
       "visible": "on sale",
@@ -3601,10 +3626,14 @@
       "ADJUST": "Stocktake"
     },
     "movement": {
-      "title": "Record meters",
-      "currentStock": "Current",
-      "afterStock": "After",
+      "title": "Adjust stock",
+      "currentStock": "Current stock",
+      "afterStock": "Expected after change",
       "presetLabel": "Preset",
+      "signCut": "Deduct",
+      "signRestock": "Add",
+      "signWaste": "Waste",
+      "signAdjust": "Recount",
       "unitTops": "tops",
       "field": {
         "type": "Action",
@@ -3634,10 +3663,10 @@
       "warnOut": "This roll will run out. If the linked design is still on sale, hide it on the web.",
       "recent": "Recent",
       "submit": {
-        "CUT": "Record cutting",
-        "RESTOCK": "Record restock",
+        "CUT": "Confirm cutting",
+        "RESTOCK": "Confirm restock",
         "WASTE": "Record waste",
-        "ADJUST": "Save stocktake"
+        "ADJUST": "Update stocktake"
       },
       "errors": {
         "invalid": "Invalid meters.",
@@ -3653,6 +3682,12 @@
       "create": "Add roll",
       "save": "Save changes",
       "noProduct": "No linked design",
+      "relatedProductsTitle": "Products using this material",
+      "relatedCount": "Auto-detected {count} products",
+      "noRelatedProducts": "No products linked",
+      "emptyRelatedForMaterial": "No products in catalog are currently using this material.",
+      "selectMaterialFirst": "Please select a material first to see linked products.",
+      "colorMatch": "Color match",
       "langLabel": "Language",
       "field": {
         "material": "Material",
@@ -3710,21 +3745,30 @@
     "detail": {
       "remainingStock": "Remaining meters",
       "saving": "Saving...",
-      "infoTitle": "Fabric Roll Information",
-      "infoHint": "Material, color, display name, and thresholds for this roll.",
+      "infoTitle": "General Information",
+      "infoHint": "Material, color, code, and alert threshold of the fabric roll.",
       "saveInfo": "Save information",
       "movementTitle": "Record Stock Movement",
       "movementHint": "Cut for sewing, restock, waste, or stocktake measured meters.",
+      "movementActionHint": "Cut, restock, waste, adjust",
+      "relatedProductsActionHint": "{count} related products",
+      "relatedProductsEmpty": "No products using this material yet.",
       "historyTitle": "Movement History",
+      "historyHint": "Activity log of cuts, restocks, waste, and stocktakes for this roll.",
       "historyEmpty": "No movements recorded yet.",
-      "stockTitle": "Stock & Yield",
-      "stockHint": "Fabric gauge and estimated áo dài yield.",
+      "stockTitle": "Fabric Roll Information",
+      "stockHint": "Preview of general attributes and specifications of this roll.",
       "initialStock": "Initial received",
       "estimatedTops": "Estimated tops",
       "threshold": "Alert threshold",
       "operationTitle": "Operational Info",
       "createdAt": "Received at",
-      "updatedAt": "Last updated"
+      "updatedAt": "Last updated",
+      "suggestThreshold": "Suggest: {value} m",
+      "tooltipRemaining": "Remaining meters",
+      "tooltipReceived": "Initial received",
+      "tooltipYield": "Estimated yield",
+      "tooltipThreshold": "Alert threshold"
     }
   },
   "inventoryHistory": {

@@ -71,16 +71,32 @@ export async function getAdminMaterialsQuery(): Promise<AdminMaterialListItem[]>
 
 /** Query: chi tiết một chất liệu kèm các cây vải trong kho */
 export async function getAdminMaterialDetailQuery(id: string): Promise<AdminMaterialDetail | null> {
-  const material = await prisma.material.findUnique({
-    where: { id },
-    include: {
-      fabrics: {
-        where: { isActive: true },
-        orderBy: { remainingMeters: "desc" },
-        select: { id: true, code: true, name: true, color: true, remainingMeters: true, lowStockThreshold: true },
+  const [material, colors] = await Promise.all([
+    prisma.material.findUnique({
+      where: { id },
+      include: {
+        fabrics: {
+          where: { isActive: true },
+          orderBy: { remainingMeters: "desc" },
+          select: { id: true, code: true, name: true, color: true, remainingMeters: true, lowStockThreshold: true },
+        },
       },
-    },
-  });
+    }),
+    prisma.attributeValue.findMany({
+      where: {
+        group: { code: "COLOR" },
+        isActive: true,
+      },
+      select: {
+        id: true,
+        name: true,
+        nameEn: true,
+        hex: true,
+      },
+      orderBy: { position: "asc" },
+    }),
+  ]);
+
   if (!material) return null;
   return {
     id: material.id,
@@ -91,6 +107,15 @@ export async function getAdminMaterialDetailQuery(id: string): Promise<AdminMate
     originEn: material.originEn,
     description: material.description,
     descriptionEn: material.descriptionEn,
+    colorIds: material.colorIds ?? [],
+    availableColors: colors
+      .filter((c): c is typeof c & { hex: string } => Boolean(c.hex))
+      .map((c) => ({
+        id: c.id,
+        name: c.name,
+        nameEn: c.nameEn,
+        hex: c.hex,
+      })),
     composition: parseComposition(material.composition),
     processSteps: parseSteps(material.processSteps),
     closeupImages: material.closeupImages,

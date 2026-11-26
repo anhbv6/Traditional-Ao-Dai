@@ -31,6 +31,7 @@ export const materialFormSchema = z.object({
   originEn: optionalText(120),
   description: optionalText(1000),
   descriptionEn: optionalText(1000),
+  colorIds: z.array(z.string().uuid()).default([]),
   composition: z
     .array(z.object({ fiber: z.enum(FIBERS), percent: z.number().int().min(1).max(100) }))
     .max(MAX_COMPOSITION_ITEMS)
@@ -66,4 +67,25 @@ export const materialFormSchema = z.object({
 export const updateMaterialSchema = materialFormSchema.extend({ materialId: z.uuid() });
 export const materialIdSchema = z.object({ materialId: z.uuid() });
 
+export const createMaterialColorSchema = z.object({
+  code: z
+    .string()
+    .trim()
+    .toUpperCase()
+    .regex(/^[A-Z0-9]+([-_][A-Z0-9]+)*$/, "ATTRIBUTE_CODE_INVALID")
+    .max(40)
+    .optional(),
+  name: z.string().trim().min(1, "ATTRIBUTE_NAME_REQUIRED").max(80),
+  nameEn: z.string().trim().max(80).nullable().optional(),
+  description: z.string().trim().max(300).nullable().optional(),
+  descriptionEn: z.string().trim().max(300).nullable().optional(),
+  hex: z
+    .string()
+    .trim()
+    .toUpperCase()
+    .regex(/^#[0-9A-F]{6}$/i, "ATTRIBUTE_HEX_INVALID"),
+  family: z.string().trim().max(40).nullable().optional(),
+});
+
 export type MaterialFormValues = z.infer<typeof materialFormSchema>;
+export type CreateMaterialColorInput = z.infer<typeof createMaterialColorSchema>;

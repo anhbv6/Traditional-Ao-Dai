@@ -33,8 +33,16 @@ export interface FabricProductOption {
   id: string;
   code: string;
   name: string;
+  /** Chất liệu chính của mẫu áo */
+  materialId: string | null;
+  /** Danh sách ID màu từ các biến thể SKU */
+  colorIds?: string[];
   /** Mẫu áo đang hiện trên web */
   isVisible: boolean;
+  /** Ảnh đại diện sản phẩm */
+  image?: string | null;
+  /** Giá bán cơ bản */
+  basePrice?: number;
 }
 
 export interface FabricMovement {
@@ -88,7 +96,7 @@ export interface AdminFabricRollDetailData {
 /** Dữ liệu nhập / sửa cây vải từ dialog */
 export interface FabricRollInput {
   materialId: string;
-  colorId: string;
+  colorId?: string | null;
   name: string;
   nameEn?: string | null;
   code: string;

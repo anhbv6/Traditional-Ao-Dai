@@ -946,6 +946,7 @@ model Material {
   originEn       String?
   description    String?
   descriptionEn  String?
+  colorIds       String[] // Danh sách ID màu sắc (AttributeValue COLOR) của chất liệu
   composition    Json     @default("[]") // Thành phần sợi: [{ fiber: "SILK", percent: 100 }]
   processSteps   Json     @default("[]") // Quy trình: [{ title, titleEn, detail, detailEn }]
   closeupImages  String[] // Ảnh chụp cận mặt vải
