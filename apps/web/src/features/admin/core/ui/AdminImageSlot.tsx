@@ -2,6 +2,7 @@
 
 import { useRef, useState, type ChangeEvent, type ReactNode } from "react";
 import { ImagePlus, Loader2, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useNotify } from "@/hooks/useNotify";
 import { cn } from "@/lib/utils";
 import { compressClientImage, uploadImageApi } from "@/features/upload";
@@ -42,6 +43,8 @@ export interface AdminImageSlotProps {
     | { success: false; error: string };
   /** Vô hiệu hóa ô ảnh */
   disabled?: boolean;
+  /** Sử dụng khung nét đứt màu trắng/xám mảnh khi chưa có ảnh (chuẩn phong cách thêm ảnh) */
+  dashedPlaceholder?: boolean;
   className?: string;
 }
 
@@ -59,21 +62,27 @@ export function AdminImageSlot({
   label,
   badge,
   fallback,
-  placeholderText = "Tải ảnh lên",
-  replaceText = "Thay ảnh",
-  uploadingText = "Đang tải...",
+  placeholderText,
+  replaceText,
+  uploadingText,
   folder = "general",
   allowRemove = true,
   actions,
   prepareFile,
   onFileSelect,
   disabled = false,
+  dashedPlaceholder = false,
   className,
 }: AdminImageSlotProps) {
+  const t = useTranslations("AdminPage.imageSlot");
   const notify = useNotify();
   const inputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const shown = value || fallback;
+
+  const effectivePlaceholder = placeholderText ?? t("upload");
+  const effectiveReplace = replaceText ?? t("replace");
+  const effectiveUploading = uploadingText ?? t("uploading");
 
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -109,7 +118,10 @@ export function AdminImageSlot({
     <div className={cn("min-w-0", className)}>
       <div
         className={cn(
-          "group relative overflow-hidden rounded-xl border border-[#E4E4E7] bg-[#F4F4F5] transition-colors",
+          "group relative overflow-hidden rounded-xl transition-colors",
+          dashedPlaceholder && !shown
+            ? "border border-dashed border-[#D4D4D8] bg-white hover:border-[#18181B] hover:bg-[#FAFAFA]"
+            : "border border-[#E4E4E7] bg-[#F4F4F5]",
           aspectClass
         )}
       >
@@ -132,7 +144,9 @@ export function AdminImageSlot({
             "absolute inset-0 flex cursor-pointer flex-col items-center justify-center gap-1.5 text-xs font-medium transition-all duration-200 disabled:cursor-wait",
             value
               ? "bg-black/0 text-transparent hover:bg-black/45 hover:text-white"
-              : "text-[#52525B] hover:border-[#18181B] hover:bg-black/5 hover:text-[#09090B]"
+              : dashedPlaceholder
+                ? "text-[#71717A] hover:text-[#09090B]"
+                : "text-[#52525B] hover:border-[#18181B] hover:bg-black/5 hover:text-[#09090B]"
           )}
         >
           {isUploading ? (
@@ -140,7 +154,7 @@ export function AdminImageSlot({
           ) : (
             <ImagePlus size={18} className="shrink-0" />
           )}
-          <span>{isUploading ? uploadingText : value ? replaceText : placeholderText}</span>
+          <span>{isUploading ? effectiveUploading : value ? effectiveReplace : effectivePlaceholder}</span>
         </button>
 
         {/* Badge góc trên bên trái (VD: "Ảnh bìa") */}
@@ -153,7 +167,7 @@ export function AdminImageSlot({
         {/* Nhãn thông báo đang dùng fallback */}
         {!value && fallback && (
           <span className="pointer-events-none absolute inset-x-1.5 bottom-1.5 rounded bg-white/90 px-1.5 py-0.5 text-center text-2xs font-medium text-[#52525B] shadow-2xs">
-            Dùng ảnh mặc định
+            {t("defaultBadge")}
           </span>
         )}
 
@@ -161,14 +175,14 @@ export function AdminImageSlot({
         {value && allowRemove && !disabled && (
           <button
             type="button"
-            aria-label="Xóa ảnh"
+            aria-label={t("remove")}
             onClick={(e) => {
               e.stopPropagation();
               onChange("");
             }}
-            className="absolute right-1.5 top-1.5 z-10 grid size-6 cursor-pointer place-items-center rounded-md bg-white/95 text-[#3F3F46] shadow-2xs transition-colors hover:bg-white hover:text-rose-600"
+            className="absolute right-1.5 top-1.5 z-10 grid size-6 cursor-pointer place-items-center rounded-full bg-white/95 text-[#3F3F46] shadow-2xs transition-colors hover:bg-white hover:text-rose-600"
           >
-            <X size={13} />
+            <X size={12} />
           </button>
         )}
 

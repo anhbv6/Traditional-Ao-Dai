@@ -10,6 +10,8 @@
     "typecheck": "pnpm --filter \"*\" typecheck",
     "check": "pnpm typecheck && pnpm lint",
     "db:generate": "pnpm --filter @repo/db generate",
+    "db:push": "pnpm --filter @repo/db db:push",
+    "db:push:prod": "pnpm --filter @repo/db db:push:prod",
     "db:migrate": "pnpm --filter @repo/db migrate:dev",
     "db:deploy": "pnpm --filter @repo/db migrate:deploy",
     "db:deploy:prod": "pnpm --filter @repo/db migrate:deploy:prod",

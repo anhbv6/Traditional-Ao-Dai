@@ -1500,7 +1500,18 @@
       "addVariant": "Add variant",
       "selectColorsPlaceholder": "Select colors...",
       "selectSizesPlaceholder": "Select sizes...",
-      "generateSkuAction": "Generate SKU variants"
+      "generateSkuAction": "Generate SKU variants",
+      "previewColorImage": "Color photo preview",
+      "removePhoto": "Remove this photo",
+      "close": "Close",
+      "draft": "Draft",
+      "previewPhotoTitle": "Click to view enlarged photo",
+      "addPhoto": "Add color photo",
+      "addAlbumPhoto": "Add album photo",
+      "addPhotoWithCount": "Add photo ({count}/2)",
+      "addMainAlbumPhotoTitle": "Add photo to primary album",
+      "addMainCoverPhotoTitle": "Add cover photo for primary color",
+      "selectVariant": "Select {size}"
     },
     "ready": {
       "IMAGES": "Cover + at least 1 description image",
@@ -1538,7 +1549,19 @@
       "galleryCount": "{count}/{max} images",
       "moveLeft": "Move left",
       "moveRight": "Move right",
-      "hint": "Up to {max} images, under 5MB each, portrait 3:4 or 9:16 only. Images are compressed to WebP. The first image is the cover, the rest are description images."
+      "hint": "Up to {max} images, under 5MB each, portrait 3:4 or 9:16 only. Images are compressed to WebP. The first image is the cover, the rest are description images.",
+      "primaryColorGallery": "Primary Color Gallery",
+      "primaryColorBadge": "Primary",
+      "secondaryColorsTitle": "Secondary Color Images",
+      "secondaryColorsDesc": "Upload up to 2 photos (3:4 ratio) for each secondary color",
+      "setAsPrimary": "Set as primary",
+      "secondaryColorBadge": "Secondary",
+      "secondaryCount": "{count}/2 photos",
+      "addSecondaryPhoto": "Add angle photo",
+      "slotCover": "Secondary cover photo",
+      "slotDetail": "Angle photo 2",
+      "noColorsHint": "No colors selected yet. Choose colors in the SKU section to enable color-specific photos.",
+      "draft": "Draft"
     },
     "options": {
       "materialAction": "Material & design",
@@ -3236,7 +3259,18 @@
       "hexInvalid": "Invalid HEX code (#RRGGBB)",
       "createSuccess": "Color created successfully",
       "creating": "Creating...",
-      "submitCreate": "Save and add color"
+      "submitCreate": "Save and add color",
+      "primaryBadge": "Primary color",
+      "primaryCoverHint": "• Fabric preview image uses the first photo in \"Texture & Weave Close-up\" below",
+      "secondaryTitle": "Additional color sample photos ({count})",
+      "secondaryHint": "Upload 1 or 2 fabric sample photos (1:1 ratio)",
+      "setPrimary": "Set as primary",
+      "setPrimaryTooltip": "Set this color as the primary color",
+      "photo1": "Sample photo",
+      "photo2": "Photo 2",
+      "addPhoto": "Add photo",
+      "changePhoto": "Change photo",
+      "removeColor": "Remove {name}"
     },
     "sections": {
       "identity": "Fabric information",
@@ -3304,7 +3338,12 @@
       "notFull": "Composition does not add up to 100%.",
       "quickPresets": "Quick presets:",
       "addMore": "Add fiber:",
-      "autoBalance": "Auto balance"
+      "autoBalance": "Auto balance",
+      "remaining": "(missing {count}%)",
+      "overflow": "(exceeds by {count}%)",
+      "topUpTitle": "Top up remaining {remaining}% into {fiber}",
+      "decrease": "Decrease by 5%",
+      "increase": "Increase by 5%"
     },
     "fiber": {
       "SILK": "Silk",
@@ -3364,7 +3403,9 @@
       "remove": "Remove image",
       "moveLeft": "Move earlier",
       "moveRight": "Move later",
-      "openVideo": "Open video"
+      "openVideo": "Open video",
+      "hint": "Close-up weave and texture (first image is swatch cover)",
+      "replace": "Change photo"
     },
     "process": {
       "empty": "No steps yet. E.g. grow mulberry → reel silk → hand-loom → leaf dye.",
@@ -3689,6 +3730,10 @@
       "selectMaterialFirst": "Please select a material first to see linked products.",
       "colorMatch": "Color match",
       "langLabel": "Language",
+      "customSpecsSwitch": "Custom width & yield for this roll",
+      "standardSpecs": "Standard material width: {width} cm • Yield: {perTop} m/top",
+      "noStandardSpecs": "This material has no standard width set.",
+      "customWidthBadge": "Width {width}cm",
       "field": {
         "material": "Material",
         "color": "Color",
@@ -3697,7 +3742,9 @@
         "meters": "Meters received",
         "remaining": "Meters remaining",
         "threshold": "Low-stock threshold (m)",
-        "product": "Design made from this roll"
+        "product": "Design made from this roll",
+        "customWidth": "Custom width (cm)",
+        "customMetersPerTop": "Yield per top (m/top)"
       },
       "hint": {
         "color": "From the Color attribute — add new colors under Catalog › Attributes.",
@@ -3705,7 +3752,9 @@
         "meters": "Fabric width {width} cm. Measure the whole roll on delivery.",
         "remaining": "To change meters, use Restock or Stocktake in the ⋯ menu.",
         "threshold": "Flag as running low below this. Leave empty = one top + pants by yield.",
-        "product": "When the roll runs out, this screen reminds you to hide the design on the web."
+        "product": "When the roll runs out, this screen reminds you to hide the design on the web.",
+        "customWidth": "Enter the actual width of this roll if different from the material standard.",
+        "customMetersPerTop": "Meters of fabric required to tailor one top with this width."
       },
       "placeholder": {
         "material": "Please select a material",
@@ -3713,15 +3762,36 @@
         "name": "Please enter a roll name",
         "code": "Pick material and color to generate",
         "meters": "Please enter meters",
-        "threshold": "Default {value}"
+        "threshold": "Default {value}",
+        "customWidth": "e.g. 140",
+        "customMetersPerTop": "e.g. 1.8"
       },
       "errors": {
         "material": "Please select a material.",
         "color": "Please select a color.",
         "name": "Please enter a roll name.",
         "meters": "Meters must be greater than 0.",
-        "threshold": "Invalid threshold."
-      }
+        "threshold": "Invalid threshold.",
+        "customWidth": "Width must be an integer between 30 and 400 cm.",
+        "customMetersPerTop": "Yield per top must be greater than 0 and up to 20 m."
+      },
+      "noColorsForMaterial": "This material has no active colors",
+      "swatchViewTooltip": "Click to view larger fabric sample photo",
+      "swatchPreviewTitle": "Fabric sample preview",
+      "removePhoto": "Remove this photo",
+      "close": "Close",
+      "cancel": "Cancel",
+      "draftBadge": "Draft",
+      "specsCustom": "Custom",
+      "specsStandard": "Standard",
+      "specsDialog": {
+        "description": "Customize fabric width and tailoring yield specifically for this roll.",
+        "standardTitle": "Material standard specs:",
+        "hintCustom": "Enable to enter custom width and yield if different from material standard.",
+        "hintStandard": "Automatically inherit from the material standard specs above."
+      },
+      "metersPerTop": "m/top",
+      "specsSummary": "{width}cm · {quota} m/top"
     },
     "material": {
       "width": "Width {width} cm",
@@ -4017,5 +4087,12 @@
       "DONE": "Ticket {code} closed.",
       "NOTE": "Note added."
     }
+  },
+  "imageSlot": {
+    "upload": "Upload image",
+    "replace": "Change photo",
+    "uploading": "Uploading...",
+    "remove": "Remove photo",
+    "defaultBadge": "Using default image"
   }
 }

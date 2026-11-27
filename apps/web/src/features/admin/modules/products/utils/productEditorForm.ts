@@ -21,6 +21,8 @@ export function toFormState(product: AdminProductDetail): ProductFormState {
     sizeChartId: product.sizeChartId ?? "",
     basePrice: product.basePrice,
     images: product.images,
+    primaryColorId: product.primaryColorId ?? null,
+    colorImages: product.colorImages ?? [],
     attributeIds: product.attributeIds,
     isActive: product.isActive,
     isCustomFit: product.isCustomFit,

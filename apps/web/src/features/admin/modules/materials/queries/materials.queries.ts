@@ -4,6 +4,7 @@ import {
   type AdminMaterialDetail,
   type AdminMaterialListItem,
   type CompositionItem,
+  type MaterialColorImage,
   type MaterialMetrics,
   type ProcessStep,
 } from "../types/materials.types";
@@ -31,6 +32,32 @@ function parseSteps(value: Prisma.JsonValue): ProcessStep[] {
   });
 }
 
+function parseColorImages(value: Prisma.JsonValue): MaterialColorImage[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((item) => {
+    if (!item || typeof item !== "object" || Array.isArray(item)) return [];
+    const ci = item as Record<string, unknown>;
+    const colorId = typeof ci.colorId === "string" ? ci.colorId : "";
+    if (!colorId) return [];
+
+    const images: string[] = Array.isArray(ci.images)
+      ? ci.images.filter((img): img is string => typeof img === "string" && Boolean(img))
+      : typeof ci.image === "string" && ci.image
+        ? [ci.image]
+        : [];
+    const primaryImg = typeof ci.image === "string" && ci.image ? ci.image : images[0] ?? "";
+    if (!primaryImg && images.length === 0) return [];
+
+    return [
+      {
+        colorId,
+        image: primaryImg || images[0]!,
+        images: images.length > 0 ? images : [primaryImg],
+      },
+    ];
+  });
+}
+
 type MetricColumns = Record<keyof MaterialMetrics, number | null>;
 const toMetrics = (m: MetricColumns): MaterialMetrics => ({
   stretch: m.stretch,
@@ -46,10 +73,13 @@ const decimalToNumber = (value: Prisma.Decimal | null) => (value === null ? null
 export async function getAdminMaterialsQuery(): Promise<AdminMaterialListItem[]> {
   const materials = await prisma.material.findMany({
     orderBy: [{ position: "asc" }, { name: "asc" }],
-    include: { fabrics: { where: { isActive: true }, select: { remainingMeters: true } } },
+    include: { fabrics: { where: { isActive: true }, select: { remainingMeters: true, metersPerTop: true } } },
   });
   return materials.map((material) => {
-    const rolls = material.fabrics.map((fabric) => ({ remainingMeters: Number(fabric.remainingMeters) }));
+    const rolls = material.fabrics.map((fabric) => ({
+      remainingMeters: Number(fabric.remainingMeters),
+      metersPerTop: fabric.metersPerTop ? Number(fabric.metersPerTop) : null,
+    }));
     const metersPerTop = decimalToNumber(material.metersPerTop);
     return {
       id: material.id,
@@ -108,6 +138,7 @@ export async function getAdminMaterialDetailQuery(id: string): Promise<AdminMate
     description: material.description,
     descriptionEn: material.descriptionEn,
     colorIds: material.colorIds ?? [],
+    colorImages: parseColorImages(material.colorImages),
     availableColors: colors
       .filter((c): c is typeof c & { hex: string } => Boolean(c.hex))
       .map((c) => ({

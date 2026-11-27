@@ -131,7 +131,7 @@ export async function upsertFabricRollAction(raw: z.input<typeof upsertFabricRol
   if (!auth.success) return auth;
   const input = parseActionInput(upsertFabricRollSchema, raw);
   if (!input.success) return input;
-  const { id, materialId, colorId, name, nameEn, code, receivedMeters, lowStockThreshold, productId } = input.data;
+  const { id, materialId, colorId, name, nameEn, code, receivedMeters, lowStockThreshold, productId, widthCm, metersPerTop, image } = input.data;
 
   try {
     // Lấy thông tin màu sắc (snapshot tên màu)
@@ -163,6 +163,9 @@ export async function upsertFabricRollAction(raw: z.input<typeof upsertFabricRol
           code,
           lowStockThreshold,
           productId: productId || null,
+          widthCm: widthCm ?? null,
+          metersPerTop: metersPerTop ?? null,
+          image: image ?? null,
         },
       });
 
@@ -171,7 +174,7 @@ export async function upsertFabricRollAction(raw: z.input<typeof upsertFabricRol
         action: "FABRIC_ROLL_UPDATED",
         targetType: "FABRIC",
         targetId: id,
-        metadata: { code, name, nameEn, materialId, colorId },
+        metadata: { code, name, nameEn, materialId, colorId, widthCm, metersPerTop, image },
       });
 
       revalidatePath("/admin/inventory/fabrics");
@@ -202,6 +205,9 @@ export async function upsertFabricRollAction(raw: z.input<typeof upsertFabricRol
           remainingMeters: receivedMeters,
           lowStockThreshold,
           productId: productId || null,
+          widthCm: widthCm ?? null,
+          metersPerTop: metersPerTop ?? null,
+          image: image ?? null,
           isActive: true,
         },
       });
@@ -225,7 +231,7 @@ export async function upsertFabricRollAction(raw: z.input<typeof upsertFabricRol
       action: "FABRIC_ROLL_CREATED",
       targetType: "FABRIC",
       targetId: created.id,
-      metadata: { code, name, receivedMeters, materialId },
+      metadata: { code, name, receivedMeters, materialId, widthCm, metersPerTop },
     });
 
     revalidatePath("/admin/inventory/fabrics");

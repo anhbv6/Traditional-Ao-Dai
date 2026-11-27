@@ -31,6 +31,9 @@ export async function getFabricStockDataQuery(): Promise<AdminFabricStockData> {
         widthCm: true,
         metersPerTop: true,
         metersPerPants: true,
+        colorIds: true,
+        colorImages: true,
+        closeupImages: true,
       },
       orderBy: { name: "asc" },
     }),
@@ -77,6 +80,9 @@ export async function getFabricStockDataQuery(): Promise<AdminFabricStockData> {
       lowStockThreshold: Number(f.lowStockThreshold),
       isActive: f.isActive,
       productId: f.productId,
+      widthCm: f.widthCm,
+      metersPerTop: f.metersPerTop ? Number(f.metersPerTop) : null,
+      image: f.image,
       receivedAt: f.createdAt.toISOString(),
       updatedAt: f.updatedAt.toISOString(),
       movements: f.movements.map((m) => ({
@@ -98,6 +104,9 @@ export async function getFabricStockDataQuery(): Promise<AdminFabricStockData> {
       widthCm: m.widthCm,
       metersPerTop: m.metersPerTop ? Number(m.metersPerTop) : null,
       metersPerPants: m.metersPerPants ? Number(m.metersPerPants) : null,
+      colorIds: m.colorIds ?? [],
+      colorImages: (m.colorImages as { colorId: string; image: string; images?: string[] }[]) ?? [],
+      closeupImages: m.closeupImages ?? [],
     })),
     colors: colors
       .filter((c): c is typeof c & { hex: string } => Boolean(c.hex))
@@ -146,6 +155,9 @@ export async function getAdminFabricRollDetailQuery(id: string): Promise<AdminFa
         widthCm: true,
         metersPerTop: true,
         metersPerPants: true,
+        colorIds: true,
+        colorImages: true,
+        closeupImages: true,
       },
       orderBy: { name: "asc" },
     }),
@@ -194,6 +206,9 @@ export async function getAdminFabricRollDetailQuery(id: string): Promise<AdminFa
       lowStockThreshold: Number(fabric.lowStockThreshold),
       isActive: fabric.isActive,
       productId: fabric.productId,
+      widthCm: fabric.widthCm,
+      metersPerTop: fabric.metersPerTop ? Number(fabric.metersPerTop) : null,
+      image: fabric.image,
       receivedAt: fabric.createdAt.toISOString(),
       updatedAt: fabric.updatedAt.toISOString(),
       movements: fabric.movements.map((m) => ({
@@ -215,6 +230,9 @@ export async function getAdminFabricRollDetailQuery(id: string): Promise<AdminFa
       widthCm: m.widthCm,
       metersPerTop: m.metersPerTop ? Number(m.metersPerTop) : null,
       metersPerPants: m.metersPerPants ? Number(m.metersPerPants) : null,
+      colorIds: m.colorIds ?? [],
+      colorImages: (m.colorImages as { colorId: string; image: string; images?: string[] }[]) ?? [],
+      closeupImages: m.closeupImages ?? [],
     })),
     colors: colors
       .filter((c): c is typeof c & { hex: string } => Boolean(c.hex))

@@ -40,7 +40,7 @@ import {
   SALE_MODES,
   type SaleMode,
 } from "../../utils/saleModes";
-import { clearDraftProductImages, uploadPendingProductImages } from "../../utils/productImage";
+import { clearDraftProductImages, uploadPendingColorImages, uploadPendingProductImages } from "../../utils/productImage";
 import { ProductImagesField } from "./ProductImagesField";
 import { ProductMaterialField } from "./ProductMaterialField";
 import { ProductSetItemsField } from "./ProductSetItemsField";
@@ -157,6 +157,12 @@ export function ProductEditor({
     attributeSizes: attributes.filter((a) => a.group === "SIZE" && a.isActive).map((a) => a.code),
   });
   const colors = attributes.filter((a) => a.group === "COLOR");
+  const variantColorIds = Array.from(
+    new Set(values.variants.flatMap((v) => (v.colorId ? [v.colorId] : [])))
+  );
+  const [skuPickedColorIds, setSkuPickedColorIds] = useState<string[]>(variantColorIds);
+  const activeProductColors = Array.from(new Set([...skuPickedColorIds, ...variantColorIds]));
+  const effectivePrimaryColorId = values.primaryColorId ?? activeProductColors[0] ?? null;
   const issues = getActivationIssues({ ...values, setItemCount: values.setItems.length });
   const productNotices: AdminNotice[] = issues
     .filter((issue) => issue !== "SET_ITEMS" || values.saleMode === "SET")
@@ -242,8 +248,11 @@ export function ProductEditor({
     setIsSaving(true);
     try {
       // 1. Chỉ đẩy lên Cloudinary các ảnh nháp thực sự còn được giữ trong danh sách
-      const finalImages = await uploadPendingProductImages(values.images);
-      const nextValues = { ...values, images: finalImages };
+      const [finalImages, finalColorImages] = await Promise.all([
+        uploadPendingProductImages(values.images),
+        uploadPendingColorImages(values.colorImages),
+      ]);
+      const nextValues = { ...values, images: finalImages, colorImages: finalColorImages };
 
       // 2. Lưu thông tin vào database qua Server Action
       const res = await updateProductAction({ ...toPayload(nextValues), productId: product.id });
@@ -869,6 +878,14 @@ export function ProductEditor({
                       stockUnit={stockUnit}
                       totalStock={totalStock}
                       lang={lang}
+                      pickedColorIds={skuPickedColorIds}
+                      onPickedColorIdsChange={setSkuPickedColorIds}
+                      colorImages={values.colorImages}
+                      onColorImagesChange={(colorImages) => set("colorImages", colorImages)}
+                      primaryColorId={effectivePrimaryColorId}
+                      onPrimaryColorChange={(id) => set("primaryColorId", id)}
+                      primaryImages={values.images}
+                      onPrimaryImagesChange={(images) => set("images", images)}
                     />
                   </div>
 
@@ -878,7 +895,10 @@ export function ProductEditor({
                       <h3 className="text-body font-semibold text-[#09090B]">{t("field.images")}</h3>
                       <AdminInfoTip content={t("image.hint", { max: 8 })} />
                     </div>
-                    <ProductImagesField value={values.images} onChange={(images) => set("images", images)} />
+                    <ProductImagesField
+                      value={values.images}
+                      onChange={(images) => set("images", images)}
+                    />
                   </div>
                 </div>
               </div>

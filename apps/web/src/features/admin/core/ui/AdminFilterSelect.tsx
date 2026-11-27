@@ -20,8 +20,12 @@ interface AdminFilterSelectProps<T extends string> {
   onChange: (value: T) => void;
   /** Chữ mờ hiện khi `value` chưa khớp lựa chọn nào (trường bắt buộc chưa chọn), VD "Vui lòng chọn nhóm" */
   placeholder?: string;
+  /** Nội dung thông báo hiển thị trong menu xổ xuống khi không có lựa chọn nào */
+  emptyText?: ReactNode;
   /** Viền đỏ khi trường bắt buộc chưa chọn — thông báo lỗi đặt ở AdminField */
   invalid?: boolean;
+  /** Vô hiệu hóa bộ lọc */
+  disabled?: boolean;
   className?: string;
 }
 
@@ -36,12 +40,16 @@ export function AdminFilterSelect<T extends string>({
   options,
   onChange,
   placeholder,
+  emptyText,
   invalid,
+  disabled = false,
   className,
 }: AdminFilterSelectProps<T>) {
   const selectedOption = options.find((option) => option.value === value);
   const selectedLabel = selectedOption?.label;
   const ariaText = selectedOption?.text ?? (typeof selectedLabel === "string" ? selectedLabel : "");
+  const effectiveEmptyText = emptyText ?? placeholder ?? "Không có lựa chọn nào";
+  const displayTitle = ariaText || placeholder || undefined;
 
   return (
     /*
@@ -55,16 +63,19 @@ export function AdminFilterSelect<T extends string>({
         width="trigger"
         align="start"
         sideOffset={6}
+        emptyText={effectiveEmptyText}
         // Danh sách dài tự cuộn; mục đang chọn luôn có nền xám để dễ nhận ra khi vừa mở
         className="max-h-72 max-w-80 overflow-y-auto [&_[role=menuitemradio]]:text-sm [&_[role=menuitemradio][data-checked]]:bg-[#F4F4F5]"
-        selection={{ value, onValueChange: (next) => onChange(next as T) }}
+        selection={options.length > 0 ? { value, onValueChange: (next) => onChange(next as T) } : undefined}
         items={options.map((option) => ({ key: option.value, label: option.label }))}
         trigger={
           <button
             type="button"
+            disabled={disabled}
+            title={displayTitle}
             aria-label={label ? `${label}: ${ariaText || placeholder || ""}` : (ariaText || placeholder || "")}
             className={cn(
-              "group flex h-full w-full min-w-0 cursor-pointer items-center rounded-xl border bg-white text-sm shadow-2xs outline-none transition-colors hover:bg-[#FAFAFA] focus-visible:border-[#18181B] data-popup-open:border-[#18181B]",
+              "group flex h-full w-full min-w-0 cursor-pointer items-center rounded-xl border bg-white text-sm shadow-2xs outline-none transition-colors hover:bg-[#FAFAFA] focus-visible:border-[#18181B] data-popup-open:border-[#18181B] disabled:cursor-not-allowed disabled:bg-[#FAFAFA] disabled:opacity-70 disabled:hover:bg-[#FAFAFA]",
               invalid ? "border-rose-400" : "border-[#E4E4E7]"
             )}
           >

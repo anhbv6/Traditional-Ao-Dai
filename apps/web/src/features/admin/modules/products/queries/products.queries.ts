@@ -88,6 +88,19 @@ function parseSetItems(value: Prisma.JsonValue): ProductSetItem[] {
   });
 }
 
+function parseColorImages(raw: unknown): { colorId: string; images: string[] }[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((item) => {
+      if (typeof item !== "object" || item === null) return null;
+      const { colorId, images } = item as { colorId?: unknown; images?: unknown };
+      if (typeof colorId !== "string" || !Array.isArray(images)) return null;
+      const validImages = images.filter((img): img is string => typeof img === "string");
+      return { colorId, images: validImages };
+    })
+    .filter((item): item is { colorId: string; images: string[] } => Boolean(item));
+}
+
 /** Query: chi tiết sản phẩm cho màn chi tiết */
 export async function getAdminProductDetailQuery(productId: string): Promise<AdminProductDetail | null> {
   const product = await prisma.product.findUnique({
@@ -118,6 +131,8 @@ export async function getAdminProductDetailQuery(productId: string): Promise<Adm
     sizeChartId: product.sizeChartId,
     basePrice: toVnd(product.basePrice),
     images: product.images,
+    primaryColorId: product.primaryColorId,
+    colorImages: parseColorImages(product.colorImages),
     isActive: product.isActive,
     isCustomFit: product.isCustomFit,
     isFeatured: product.isFeatured,

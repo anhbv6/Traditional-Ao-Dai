@@ -77,7 +77,7 @@ export function FabricMovementDialog({
   const afterTops = after !== null ? topsLeft(Math.max(after, 0), material?.metersPerTop ?? null) : null;
 
   // Nút nhanh khi cắt may: một thân áo / một bộ áo + quần theo định mức
-  const presets =
+  const _presets =
     type === "CUT" && material?.metersPerTop
       ? [
           { key: "top", label: t("movement.presetTop"), value: material.metersPerTop },

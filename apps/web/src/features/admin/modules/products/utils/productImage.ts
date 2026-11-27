@@ -147,6 +147,21 @@ export async function uploadPendingProductImages(
   return results;
 }
 
+/**
+ * Tải các ảnh nháp trong danh sách colorImages ({ colorId, images }) lên Cloudinary thật sự.
+ */
+export async function uploadPendingColorImages(
+  colorImages: { colorId: string; images: string[] }[],
+  onProgress?: (current: number, total: number) => void
+): Promise<{ colorId: string; images: string[] }[]> {
+  const results: { colorId: string; images: string[] }[] = [];
+  for (const item of colorImages) {
+    const uploadedImages = await uploadPendingProductImages(item.images, onProgress);
+    results.push({ colorId: item.colorId, images: uploadedImages });
+  }
+  return results;
+}
+
 /** Xóa và thu hồi toàn bộ ảnh nháp còn lại khi đóng trang hoặc hủy chỉnh sửa */
 export function clearDraftProductImages(): void {
   for (const url of draftImages.keys()) {

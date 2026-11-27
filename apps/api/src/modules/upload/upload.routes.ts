@@ -48,7 +48,7 @@ const upload = multer({
  *         name: folder
  *         schema:
  *           type: string
- *           enum: [avatars, products, general, reviews]
+ *           enum: [avatars, products, materials, articles, size-charts, general, reviews]
  *           default: general
  *         description: Target Cloudinary folder name
  *     requestBody:

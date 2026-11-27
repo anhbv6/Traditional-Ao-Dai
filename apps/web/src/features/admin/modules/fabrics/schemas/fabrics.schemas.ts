@@ -20,6 +20,9 @@ export const upsertFabricRollSchema = z.object({
   receivedMeters: z.number().positive("FABRIC_METERS_POSITIVE").max(10_000),
   lowStockThreshold: z.number().min(0).max(100),
   productId: z.string().uuid().nullable().optional(),
+  widthCm: z.number().int().min(30).max(400).nullable().optional(),
+  metersPerTop: z.number().min(0.1).max(20).nullable().optional(),
+  image: z.string().url().nullable().optional(),
 });
 
 export const toggleFabricActiveSchema = z.object({

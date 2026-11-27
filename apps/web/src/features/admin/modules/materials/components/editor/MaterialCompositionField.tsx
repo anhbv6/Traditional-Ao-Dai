@@ -190,7 +190,7 @@ export function MaterialCompositionField({
                       <button
                         type="button"
                         onClick={() => balanceIntoFiber(item.fiber)}
-                        title={`Bù ${remaining}% còn thiếu vào sợi ${t(`fiber.${item.fiber}`)}`}
+                        title={t("composition.topUpTitle", { remaining, fiber: t(`fiber.${item.fiber}`) })}
                         className="cursor-pointer rounded border border-emerald-200 bg-emerald-50 px-1.5 py-0.5 font-mono text-2xs font-medium text-emerald-800 hover:bg-emerald-100"
                       >
                         +{remaining}%
@@ -203,7 +203,7 @@ export function MaterialCompositionField({
                         type="button"
                         disabled={item.percent <= 1}
                         onClick={() => stepPercent(index, -5)}
-                        aria-label="Giảm 5%"
+                        aria-label={t("composition.decrease")}
                         className="grid size-7 cursor-pointer place-items-center rounded text-[#71717A] hover:bg-[#F4F4F5] hover:text-[#09090B] disabled:pointer-events-none disabled:opacity-30"
                       >
                         <Minus size={13} />
@@ -227,7 +227,7 @@ export function MaterialCompositionField({
                         type="button"
                         disabled={item.percent >= 100}
                         onClick={() => stepPercent(index, 5)}
-                        aria-label="Tăng 5%"
+                        aria-label={t("composition.increase")}
                         className="grid size-7 cursor-pointer place-items-center rounded text-[#71717A] hover:bg-[#F4F4F5] hover:text-[#09090B] disabled:pointer-events-none disabled:opacity-30"
                       >
                         <Plus size={13} />
@@ -270,12 +270,12 @@ export function MaterialCompositionField({
               </span>
               {total < 100 && (
                 <span className="font-sans text-xs text-amber-700">
-                  (còn thiếu {100 - total}%)
+                  {t("composition.remaining", { count: 100 - total })}
                 </span>
               )}
               {total > 100 && (
                 <span className="font-sans text-xs text-rose-600">
-                  (vượt quá {total - 100}%)
+                  {t("composition.overflow", { count: total - 100 })}
                 </span>
               )}
             </div>

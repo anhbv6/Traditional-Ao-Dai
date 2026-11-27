@@ -61,9 +61,20 @@ export function isCareCode(value: unknown): value is CareCode {
  * Số thân áo còn may được từ các cây vải: tính TỪNG cây (vải khác cây khác màu/lô không ghép chung một thân áo).
  * Chưa có định mức thì trả null.
  */
-export function topsFromRolls(rolls: { remainingMeters: number }[], metersPerTop: number | null): number | null {
-  if (!metersPerTop || metersPerTop <= 0) return null
-  return rolls.reduce((sum, roll) => sum + Math.floor(roll.remainingMeters / metersPerTop), 0)
+export function topsFromRolls(
+  rolls: { remainingMeters: number; metersPerTop?: number | null }[],
+  defaultMetersPerTop: number | null
+): number | null {
+  let hasValidQuota = Boolean(defaultMetersPerTop && defaultMetersPerTop > 0)
+  let total = 0
+  for (const roll of rolls) {
+    const quota = roll.metersPerTop && roll.metersPerTop > 0 ? roll.metersPerTop : defaultMetersPerTop
+    if (quota && quota > 0) {
+      hasValidQuota = true
+      total += Math.floor(roll.remainingMeters / quota)
+    }
+  }
+  return hasValidQuota ? total : null
 }
 
 // ─── Thư mục vải storefront ────────────────────────────────────────────────────

@@ -74,7 +74,7 @@ export function MaterialMediaField({
       <div>
         <div className="mb-2 flex items-center justify-between gap-2">
           <span className="text-xs text-[#71717A]">
-            Ảnh cận sợi và bề mặt dệt (ảnh đầu là ảnh bìa mẫu vải)
+            {t("media.hint")}
           </span>
           <span className="font-mono text-xs tabular-nums text-[#71717A]">
             {images.length}/{MAX_CLOSEUP_IMAGES}
@@ -103,7 +103,7 @@ export function MaterialMediaField({
                   onImagesChange(next);
                 }
               }}
-              replaceText="Thay ảnh"
+              replaceText={t("media.replace")}
               actions={
                 images.length > 1 ? (
                   <div className="flex w-full justify-between opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100">

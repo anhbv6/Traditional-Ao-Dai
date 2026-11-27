@@ -32,6 +32,15 @@ export const materialFormSchema = z.object({
   description: optionalText(1000),
   descriptionEn: optionalText(1000),
   colorIds: z.array(z.string().uuid()).default([]),
+  colorImages: z
+    .array(
+      z.object({
+        colorId: z.string().uuid(),
+        image: z.string().url(),
+        images: z.array(z.string().url()).max(2).optional(),
+      })
+    )
+    .default([]),
   composition: z
     .array(z.object({ fiber: z.enum(FIBERS), percent: z.number().int().min(1).max(100) }))
     .max(MAX_COMPOSITION_ITEMS)

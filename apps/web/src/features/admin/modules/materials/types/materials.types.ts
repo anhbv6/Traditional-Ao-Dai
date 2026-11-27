@@ -48,6 +48,12 @@ export interface MaterialColorOption {
   hex: string;
 }
 
+export interface MaterialColorImage {
+  colorId: string;
+  image: string;
+  images?: string[];
+}
+
 export interface AdminMaterialDetail {
   id: string;
   code: string;
@@ -58,6 +64,7 @@ export interface AdminMaterialDetail {
   description: string | null;
   descriptionEn: string | null;
   colorIds: string[];
+  colorImages: MaterialColorImage[];
   availableColors: MaterialColorOption[];
   composition: CompositionItem[];
   processSteps: ProcessStep[];

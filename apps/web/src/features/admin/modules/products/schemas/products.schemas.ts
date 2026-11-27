@@ -38,6 +38,11 @@ const setItemSchema = z.object({
   materialId: z.uuid().nullable(),
 });
 
+export const productColorImageSchema = z.object({
+  colorId: z.string().uuid(),
+  images: z.array(z.string().regex(/^(https:\/\/|\/|blob:)/)).max(2),
+});
+
 const productFields = z.object({
   name: z.string().trim().min(1, "PRODUCT_NAME_REQUIRED").max(200),
   nameEn: z.string().trim().max(200),
@@ -53,6 +58,8 @@ const productFields = z.object({
   basePrice: z.number("PRODUCT_PRICE_INVALID").int("PRODUCT_PRICE_INVALID").min(0, "PRODUCT_PRICE_INVALID"),
   // Chỉ nhận ảnh https hoặc đường dẫn trong site — giá trị này được đưa thẳng vào thẻ ảnh của storefront
   images: z.array(z.string().regex(/^(https:\/\/|\/)/)).max(8),
+  primaryColorId: z.string().uuid().nullable().optional(),
+  colorImages: z.array(productColorImageSchema).default([]),
   attributeIds: z.array(z.uuid()).max(40),
   isActive: z.boolean(),
   isCustomFit: z.boolean(),

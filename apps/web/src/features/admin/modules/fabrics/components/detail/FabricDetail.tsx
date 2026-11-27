@@ -6,7 +6,10 @@ import {
   ChevronRight,
   Power,
   PowerOff,
+  Ruler,
   Shirt,
+  Trash2,
+  X,
 } from "lucide-react";
 import { useFormatter, useLocale, useTranslations } from "next-intl";
 import { useNotify } from "@/hooks/useNotify";
@@ -17,6 +20,7 @@ import {
   ADMIN_PRIMARY_BUTTON_CLASS,
   ADMIN_SECONDARY_BUTTON_CLASS,
   AdminDetailHeader,
+  AdminDialog,
   AdminField,
   AdminFilterSelect,
   AdminInfoTip,
@@ -47,6 +51,7 @@ import {
 } from "../../actions/fabrics.actions";
 import { FabricMovementDialog } from "../dialog/FabricMovementDialog";
 import { FabricRelatedProductsDialog } from "../dialog/FabricRelatedProductsDialog";
+import { FabricSpecsDialog } from "../dialog/FabricSpecsDialog";
 import { FabricMeter } from "../shared/FabricMeter";
 
 const STATUS_TONE: Record<FabricStockStatus, AdminStatusTone> = {
@@ -87,26 +92,52 @@ export function FabricDetail({ data }: FabricDetailProps) {
   // ─── Form Thông tin chung ──────────────────────────────────────────────────
   const [contentLang, setContentLang] = useState<AdminContentLang>("vi");
   const [materialId, setMaterialId] = useState(roll.materialId);
+  const [colorId, setColorId] = useState(roll.colorId ?? "");
   const [name, setName] = useState(roll.name);
   const [nameEn, setNameEn] = useState(roll.nameEn ?? "");
   const [thresholdRaw, setThresholdRaw] = useState(String(roll.lowStockThreshold));
+  const [isCustomSpecs, setIsCustomSpecs] = useState(Boolean(roll.widthCm || roll.metersPerTop));
+  const [customWidthRaw, setCustomWidthRaw] = useState(roll.widthCm ? String(roll.widthCm) : "");
+  const [customMetersPerTopRaw, setCustomMetersPerTopRaw] = useState(roll.metersPerTop ? String(roll.metersPerTop) : "");
 
   // ─── Dialogs ─────────────────────────────────────────────────────────────
   const [isMovementOpen, setIsMovementOpen] = useState(false);
   const [isProductsDialogOpen, setIsProductsDialogOpen] = useState(false);
+  const [isSpecsDialogOpen, setIsSpecsDialogOpen] = useState(false);
+  const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null);
+  const [isImageDeleted, setIsImageDeleted] = useState(false);
 
   const material = data.materials.find((m) => m.id === materialId);
+  const color = data.colors.find((c) => c.id === colorId);
+  const availableColors = materialId
+    ? data.colors.filter((c) => material?.colorIds?.includes(c.id))
+    : [];
+  const swatchImg = isImageDeleted
+    ? null
+    : (roll.image ||
+      material?.closeupImages?.[0] ||
+      material?.colorImages?.find((ci) => ci.colorId === colorId)?.image ||
+      null);
 
   // Danh sách các mẫu áo sử dụng chất liệu này (tự động theo materialId)
   const relatedProducts = materialId ? products.filter((p) => p.materialId === materialId) : [];
   const sortedRelatedProducts = relatedProducts;
+
+  const parsedCustomWidth = customWidthRaw.trim() ? Number(customWidthRaw) : null;
+  const parsedCustomMetersPerTop = customMetersPerTopRaw.trim() ? parseMeters(customMetersPerTopRaw) : null;
+  const effectiveWidth = isCustomSpecs
+    ? (parsedCustomWidth ?? material?.widthCm ?? null)
+    : (material?.widthCm ?? null);
+  const effectiveMetersPerTop = isCustomSpecs
+    ? (parsedCustomMetersPerTop ?? material?.metersPerTop ?? null)
+    : (material?.metersPerTop ?? null);
 
   const localized = (item: { name: string; nameEn: string | null } | undefined) =>
     item ? (locale === "en" && item.nameEn ? item.nameEn : item.name) : "";
   const fmt = (value: number) => format.number(value, { maximumFractionDigits: 2 });
   const status = resolveFabricStatus(roll);
   const displayName = locale === "en" && roll.nameEn ? roll.nameEn : roll.name;
-  const currentTops = topsLeft(roll.remainingMeters, material?.metersPerTop ?? null);
+  const currentTops = topsLeft(roll.remainingMeters, effectiveMetersPerTop);
 
   // ─── Actions ───────────────────────────────────────────────────────────────
   const handleSaveInfo = (event?: FormEvent) => {
@@ -117,26 +148,48 @@ export function FabricDetail({ data }: FabricDetailProps) {
       return;
     }
 
-    const thresholdSuggestion = suggestThreshold(material?.metersPerTop ?? null, material?.metersPerPants ?? null);
+    const thresholdSuggestion = suggestThreshold(effectiveMetersPerTop, material?.metersPerPants ?? null);
     const threshold = thresholdRaw.trim() ? parseMeters(thresholdRaw) : thresholdSuggestion;
     if (threshold === null || threshold < 0) {
       notify.error(t("rollDialog.errors.threshold"));
       return;
     }
 
+    if (
+      isCustomSpecs &&
+      parsedCustomWidth !== null &&
+      (parsedCustomWidth < 30 || parsedCustomWidth > 400 || !Number.isInteger(parsedCustomWidth))
+    ) {
+      notify.error(t("rollDialog.errors.customWidth"));
+      return;
+    }
+    if (
+      isCustomSpecs &&
+      parsedCustomMetersPerTop !== null &&
+      (parsedCustomMetersPerTop <= 0 || parsedCustomMetersPerTop > 20)
+    ) {
+      notify.error(t("rollDialog.errors.customMetersPerTop"));
+      return;
+    }
+
     const autoProductId = roll.productId ?? sortedRelatedProducts[0]?.id ?? null;
+    const finalWidthCm = isCustomSpecs ? parsedCustomWidth : null;
+    const finalMetersPerTop = isCustomSpecs ? parsedCustomMetersPerTop : null;
 
     startTransition(async () => {
       const res = await upsertFabricRollAction({
         id: roll.id,
         materialId,
-        colorId: null,
+        colorId: colorId || null,
         name: name.trim(),
         nameEn: nameEn.trim() || null,
         code: roll.code,
         receivedMeters: roll.receivedMeters,
         lowStockThreshold: threshold,
         productId: autoProductId,
+        widthCm: finalWidthCm,
+        metersPerTop: finalMetersPerTop,
+        image: swatchImg,
       });
 
       if (!res.success) {
@@ -147,13 +200,67 @@ export function FabricDetail({ data }: FabricDetailProps) {
       setRoll((prev) => ({
         ...prev,
         materialId,
-        colorId: null,
+        colorId: colorId || null,
         name: name.trim(),
         nameEn: nameEn.trim() || null,
         lowStockThreshold: threshold,
         productId: autoProductId,
+        widthCm: finalWidthCm,
+        metersPerTop: finalMetersPerTop,
+        image: swatchImg,
       }));
 
+      notify.success(t("toast.updated"));
+      router.refresh();
+    });
+  };
+
+  const handleSpecsSave = (specs: {
+    isCustomSpecs: boolean;
+    widthCm: number | null;
+    metersPerTop: number | null;
+    widthRaw: string;
+    metersPerTopRaw: string;
+  }) => {
+    setIsCustomSpecs(specs.isCustomSpecs);
+    setCustomWidthRaw(specs.widthRaw);
+    setCustomMetersPerTopRaw(specs.metersPerTopRaw);
+
+    const thresholdSuggestion = suggestThreshold(
+      specs.isCustomSpecs ? (specs.metersPerTop ?? material?.metersPerTop ?? null) : (material?.metersPerTop ?? null),
+      material?.metersPerPants ?? null
+    );
+    const threshold = thresholdRaw.trim() ? parseMeters(thresholdRaw) : thresholdSuggestion;
+    const autoProductId = roll.productId ?? sortedRelatedProducts[0]?.id ?? null;
+
+    startTransition(async () => {
+      const res = await upsertFabricRollAction({
+        id: roll.id,
+        materialId,
+        colorId: colorId || null,
+        name: name.trim(),
+        nameEn: nameEn.trim() || null,
+        code: roll.code,
+        receivedMeters: roll.receivedMeters,
+        lowStockThreshold: threshold ?? roll.lowStockThreshold,
+        productId: autoProductId,
+        widthCm: specs.widthCm,
+        metersPerTop: specs.metersPerTop,
+        image: swatchImg,
+      });
+
+      if (!res.success) {
+        notify.error(res.error);
+        return;
+      }
+
+      setRoll((prev) => ({
+        ...prev,
+        widthCm: specs.widthCm,
+        metersPerTop: specs.metersPerTop,
+      }));
+
+      setIsSpecsDialogOpen(false);
       notify.success(t("toast.updated"));
       router.refresh();
     });
@@ -228,7 +335,6 @@ export function FabricDetail({ data }: FabricDetailProps) {
         backHref="/admin/inventory/fabrics"
         backLabel={t("backToList")}
         title={displayName}
-        // icon={<FabricSwatch hex={color?.hex ?? null} size="sm" />}
         badge={<AdminStatusText tone={STATUS_TONE[status]}>{t(`status.${status}`)}</AdminStatusText>}
         // subtitle={
         //   <span className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-[#71717A]">
@@ -303,11 +409,80 @@ export function FabricDetail({ data }: FabricDetailProps) {
                 <AdminField label={t("rollDialog.field.material")} required>
                   <AdminFilterSelect
                     value={materialId}
-                    onChange={setMaterialId}
+                    onChange={(nextMatId) => {
+                      setMaterialId(nextMatId);
+                      const nextMat = data.materials.find((m) => m.id === nextMatId);
+                      if (nextMat?.colorIds && nextMat.colorIds.length > 0) {
+                        if (!nextMat.colorIds.includes(colorId)) {
+                          setColorId(nextMat.colorIds[0]);
+                        }
+                      } else {
+                        setColorId("");
+                      }
+                    }}
                     placeholder={t("rollDialog.placeholder.material")}
                     options={data.materials.map((item) => ({ value: item.id, label: localized(item) }))}
                     className="h-10 w-full"
                   />
+                </AdminField>
+
+                <AdminField label={t("rollDialog.field.color")}>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 min-w-0">
+                      <AdminFilterSelect
+                        value={colorId}
+                        onChange={setColorId}
+                        disabled={!materialId}
+                        placeholder={
+                          !materialId
+                            ? t("rollDialog.selectMaterialFirst")
+                            : availableColors.length === 0
+                              ? t("rollDialog.noColorsForMaterial")
+                              : t("rollDialog.placeholder.color")
+                        }
+                        emptyText={
+                          !materialId
+                            ? t("rollDialog.selectMaterialFirst")
+                            : t("rollDialog.noColorsForMaterial")
+                        }
+                        options={availableColors.map((c) => ({
+                          value: c.id,
+                          label: (
+                            <span className="flex items-center gap-2">
+                              {c.hex && (
+                                <span
+                                  aria-hidden
+                                  className="size-3 shrink-0 rounded-full border border-black/15 shadow-2xs"
+                                  style={{ backgroundColor: c.hex }}
+                                />
+                              )}
+                              <span>{c.name}</span>
+                            </span>
+                          ),
+                          text: c.name,
+                        }))}
+                        className="h-10 w-full"
+                      />
+                    </div>
+                    {swatchImg ? (
+                      <AdminTooltip content={t("rollDialog.swatchViewTooltip")}>
+                        <button
+                          type="button"
+                          onClick={() => setPreviewImageUrl(swatchImg)}
+                          className="size-10 shrink-0 cursor-pointer overflow-hidden rounded-xl border border-black/10 bg-[#FAFAFA] shadow-2xs transition-transform hover:scale-105 hover:ring-2 hover:ring-[#18181B]"
+                          aria-label={t("rollDialog.swatchViewTooltip")}
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element -- Preview ảnh mẫu vải kế thừa từ chất liệu (URL linh hoạt) */}
+                          <img src={swatchImg} alt="" className="size-full object-cover" />
+                        </button>
+                      </AdminTooltip>
+                    ) : color?.hex ? (
+                      <span
+                        className="size-10 shrink-0 rounded-xl border border-black/10 shadow-2xs"
+                        style={{ backgroundColor: color.hex }}
+                      />
+                    ) : null}
+                  </div>
                 </AdminField>
 
                 <AdminTextField
@@ -317,6 +492,7 @@ export function FabricDetail({ data }: FabricDetailProps) {
                   readOnly
                   disabled
                   inputClassName="font-mono text-xs text-[#71717A]"
+                  className="sm:col-span-2"
                 />
 
                 <AdminTextField
@@ -507,7 +683,7 @@ export function FabricDetail({ data }: FabricDetailProps) {
                 <div className="flex items-center justify-between py-2.5">
                   <span className="text-[#71717A]">{t("column.materialSpecs")}</span>
                   <span className="font-mono text-[#09090B]">
-                    {material.widthCm ? `${material.widthCm}cm` : "—"} · {material.metersPerTop ? `${fmt(material.metersPerTop)}m/áo` : "—"}
+                    {effectiveWidth && effectiveMetersPerTop ? t("rollDialog.specsSummary", { width: effectiveWidth, quota: fmt(effectiveMetersPerTop) }) : "—"}
                   </span>
                 </div>
               )}
@@ -573,6 +749,24 @@ export function FabricDetail({ data }: FabricDetailProps) {
                   </div>
                   <ChevronRight size={15} className="text-[#A1A1AA] transition-transform group-hover:translate-x-0.5" aria-hidden />
                 </button>
+
+                <button
+                  type="button"
+                  onClick={() => setIsSpecsDialogOpen(true)}
+                  className="group -mx-1.5 mt-1 flex w-[calc(100%+0.75rem)] cursor-pointer items-center gap-3 rounded-xl px-2 py-2 text-left transition-colors hover:bg-[#F4F4F5]"
+                >
+                  <span className="grid size-9 shrink-0 place-items-center rounded-full border border-[#E4E4E7] bg-white text-[#52525B] shadow-2xs transition-colors group-hover:border-[#D4D4D8] group-hover:text-[#09090B]">
+                    <Ruler size={16} aria-hidden />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-xs font-semibold text-[#09090B]">{t("rollDialog.customSpecsSwitch")}</p>
+                    <p className="truncate text-2xs text-[#71717A]">
+                      {effectiveWidth && effectiveMetersPerTop ? t("rollDialog.specsSummary", { width: effectiveWidth, quota: fmt(effectiveMetersPerTop) }) : "—"}
+                      {isCustomSpecs ? ` · ${t("rollDialog.specsCustom")}` : ` · ${t("rollDialog.specsStandard")}`}
+                    </p>
+                  </div>
+                  <ChevronRight size={15} className="text-[#A1A1AA] transition-transform group-hover:translate-x-0.5" aria-hidden />
+                </button>
               </div>
             </div>
           </section>
@@ -600,6 +794,76 @@ export function FabricDetail({ data }: FabricDetailProps) {
           isPending={isPending}
           onToggleProduct={handleToggleProduct}
         />
+      )}
+
+      {isSpecsDialogOpen && (
+        <FabricSpecsDialog
+          open={isSpecsDialogOpen}
+          onOpenChange={setIsSpecsDialogOpen}
+          material={material}
+          isCustomSpecs={isCustomSpecs}
+          customWidthRaw={customWidthRaw}
+          customMetersPerTopRaw={customMetersPerTopRaw}
+          isPending={isPending}
+          onSave={handleSpecsSave}
+        />
+      )}
+
+      {/* Dialog xem ảnh chi tiết khi click vào ảnh swatch nhỏ */}
+      {previewImageUrl && (
+        <AdminDialog
+          open={Boolean(previewImageUrl)}
+          onOpenChange={(open) => {
+            if (!open) setPreviewImageUrl(null);
+          }}
+          title={<span className="sr-only">{t("rollDialog.swatchPreviewTitle")}</span>}
+          bare
+          disableDivider
+          size="sm"
+          className="max-w-[340px] overflow-hidden rounded-2xl sm:max-w-[400px] [&>header]:hidden"
+        >
+          <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-[#F4F4F5]">
+            {/* eslint-disable-next-line @next/next/no-img-element -- Preview ảnh mẫu vải phóng to */}
+            <img
+              src={previewImageUrl}
+              alt=""
+              className="size-full select-none object-cover"
+            />
+
+            {/* Góc trên bên trái: Tag trạng thái Nháp */}
+            {previewImageUrl.startsWith("blob:") && (
+              <span className="pointer-events-none absolute left-3 top-3 z-10 rounded-md bg-amber-500/95 px-2 py-0.5 text-xs font-semibold text-white shadow-md backdrop-blur-xs">
+                {t("rollDialog.draftBadge")}
+              </span>
+            )}
+
+            {/* Góc trên bên phải: Icon thùng rác xóa ảnh và nút Đóng */}
+            <div className="absolute right-3 top-3 z-10 flex items-center gap-1.5">
+              <button
+                type="button"
+                title={t("rollDialog.removePhoto")}
+                aria-label={t("rollDialog.removePhoto")}
+                onClick={() => {
+                  setIsImageDeleted(true);
+                  setPreviewImageUrl(null);
+                }}
+                className="grid size-8 cursor-pointer place-items-center rounded-full bg-black/60 text-white shadow-md backdrop-blur-xs transition-colors hover:bg-rose-600 focus-visible:outline-none"
+              >
+                <Trash2 size={15} />
+              </button>
+
+              <button
+                type="button"
+                title={t("rollDialog.close")}
+                aria-label={t("rollDialog.close")}
+                onClick={() => setPreviewImageUrl(null)}
+                className="grid size-8 cursor-pointer place-items-center rounded-full bg-black/60 text-white shadow-md backdrop-blur-xs transition-colors hover:bg-black/80 focus-visible:outline-none"
+              >
+                <X size={15} />
+              </button>
+            </div>
+          </div>
+        </AdminDialog>
       )}
     </div>
   );

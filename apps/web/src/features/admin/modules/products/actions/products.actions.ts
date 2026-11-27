@@ -275,6 +275,8 @@ export async function updateProductAction(raw: z.input<typeof updateProductSchem
           sizeChartId: normalized.sizeChartId || null,
           basePrice: normalized.basePrice,
           images: normalized.images,
+          primaryColorId: normalized.primaryColorId || null,
+          colorImages: normalized.colorImages,
           isActive: normalized.isActive,
           isCustomFit: normalized.isCustomFit,
           isFeatured: normalized.isFeatured,
@@ -587,16 +589,22 @@ function formatProductForPreview(product: ProductWithPreviewPayload, locale: Loc
         : ["S", "M", "L", "Free-size"];
 
   // Gom các màu sắc thực tế từ biến thể sản phẩm trong DB (ưu tiên hex và name chuẩn của colorValue)
+  const colorImagesList = Array.isArray(product.colorImages)
+    ? (product.colorImages as { colorId?: string; images?: string[] }[])
+    : [];
+
   const colorMap = new Map<string, { name: string; hex: string; imageSrc?: string }>();
-  product.variants.forEach((v, idx) => {
+  product.variants.forEach((v) => {
     const colorName = v.colorValue
       ? (locale === "vi" ? v.colorValue.name : v.colorValue.nameEn || v.colorValue.name)
       : v.color;
     if (colorName && !colorMap.has(colorName)) {
+      const secEntry = v.colorId ? colorImagesList.find((ci) => ci.colorId === v.colorId) : null;
+      const secImg = secEntry?.images?.[0];
       colorMap.set(colorName, {
         name: colorName,
         hex: v.colorValue?.hex || "#E8B4B8",
-        imageSrc: images[idx] || images[0],
+        imageSrc: secImg || images[0],
       });
     }
   });
@@ -606,13 +614,15 @@ function formatProductForPreview(product: ProductWithPreviewPayload, locale: Loc
     const colorAttributes = product.attributes
       .map((a) => a.attributeValue)
       .filter((v) => v.group?.code === "COLOR");
-    colorAttributes.forEach((attr, idx) => {
+    colorAttributes.forEach((attr) => {
       const name = locale === "vi" ? attr.name : attr.nameEn || attr.name;
       if (name && !colorMap.has(name)) {
+        const secEntry = colorImagesList.find((ci) => ci.colorId === attr.id);
+        const secImg = secEntry?.images?.[0];
         colorMap.set(name, {
           name,
           hex: attr.hex || "#E8B4B8",
-          imageSrc: images[idx] || images[0],
+          imageSrc: secImg || images[0],
         });
       }
     });
@@ -679,7 +689,7 @@ function formatProductForPreview(product: ProductWithPreviewPayload, locale: Loc
     priceValue: basePriceVnd,
     originalPrice: undefined,
     sizePrices: Object.keys(sizePrices).length > 0 ? sizePrices : undefined,
-    galleryImages: images,
+    galleryImages: Array.from(new Set([...images, ...colorImagesList.flatMap((ci) => ci.images ?? [])])),
     imageSrc: images[0] || '/images/placeholder.jpg',
     hoverImageSrc: images[1] || images[0] || '/images/placeholder.jpg',
     imageAlt: product.name,

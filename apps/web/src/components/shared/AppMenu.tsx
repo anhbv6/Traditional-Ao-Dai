@@ -52,6 +52,8 @@ export interface AppMenuProps {
   header?: ReactNode;
   /** Khối cuối danh sách */
   footer?: ReactNode;
+  /** Nội dung hiển thị khi danh sách trống */
+  emptyText?: ReactNode;
   /**
    * Chế độ chọn một (VD sắp xếp, ngôn ngữ): các mục thành radio, mục được chọn có dấu ✓.
    * `value` là `key` của mục đang chọn.
@@ -146,6 +148,7 @@ export function AppMenu({
   items,
   header,
   footer,
+  emptyText,
   selection,
   side = "bottom",
   align = "end",
@@ -296,13 +299,19 @@ export function AppMenu({
               </div>
             ) : null}
 
-            {selection ? (
-              <Menu.RadioGroup value={selection.value} onValueChange={(value) => selection.onValueChange(String(value))}>
-                {list}
-              </Menu.RadioGroup>
-            ) : (
-              <Fragment>{list}</Fragment>
-            )}
+            {list.length > 0 ? (
+              selection ? (
+                <Menu.RadioGroup value={selection.value} onValueChange={(value) => selection.onValueChange(String(value))}>
+                  {list}
+                </Menu.RadioGroup>
+              ) : (
+                <Fragment>{list}</Fragment>
+              )
+            ) : emptyText ? (
+              <div className={cn("px-3.5 py-3 text-center text-xs text-[#71717A] select-none", isAdmin && "font-medium")}>
+                {emptyText}
+              </div>
+            ) : null}
 
             {footer ? <div className="mt-1.5 border-t border-[var(--border)] px-4 pb-1 pt-2.5">{footer}</div> : null}
           </Menu.Popup>

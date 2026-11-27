@@ -9,6 +9,7 @@ import {
   ADMIN_DIALOG_PRIMARY_BUTTON_CLASS,
   ADMIN_DIALOG_SECONDARY_BUTTON_CLASS,
   AdminDialog,
+  AdminImageSlot,
   AdminLangSwitch,
   AdminMultiSelect,
   AdminTextField,
@@ -25,12 +26,14 @@ import {
   suggestColorFamily,
 } from "@/features/admin/modules/attributes";
 import { createMaterialColorAction } from "../../actions/materials.actions";
-import { type MaterialColorOption } from "../../types/materials.types";
+import { type MaterialColorImage, type MaterialColorOption } from "../../types/materials.types";
 
 interface MaterialColorsFieldProps {
   colorIds: string[];
+  colorImages?: MaterialColorImage[];
   availableColors: MaterialColorOption[];
   onChange: (colorIds: string[]) => void;
+  onColorImagesChange?: (colorImages: MaterialColorImage[]) => void;
   onColorCreated?: (newColor: MaterialColorOption) => void;
 }
 
@@ -43,8 +46,10 @@ interface MaterialColorsFieldProps {
  */
 export function MaterialColorsField({
   colorIds,
+  colorImages = [],
   availableColors,
   onChange,
+  onColorImagesChange,
   onColorCreated,
 }: MaterialColorsFieldProps) {
   const t = useTranslations("AdminPage.materials");
@@ -69,6 +74,9 @@ export function MaterialColorsField({
     .map((id) => availableColors.find((c) => c.id === id))
     .filter((c): c is MaterialColorOption => Boolean(c));
 
+  const primaryColor = selectedColors[0] ?? null;
+  const secondaryColors = selectedColors.slice(1);
+
   const multiSelectOptions = availableColors.map((c) => ({
     value: c.id,
     label: c.name,
@@ -77,6 +85,54 @@ export function MaterialColorsField({
 
   const handleRemoveColor = (idToRemove: string) => {
     onChange(colorIds.filter((id) => id !== idToRemove));
+    if (onColorImagesChange) {
+      onColorImagesChange(colorImages.filter((ci) => ci.colorId !== idToRemove));
+    }
+  };
+
+  const handleUpdateColorSlot = (colorId: string, slotIndex: number, newUrl: string) => {
+    if (!onColorImagesChange) return;
+
+    const prevEntry = colorImages.find((ci) => ci.colorId === colorId);
+    const prevImgs =
+      prevEntry?.images && prevEntry.images.length > 0
+        ? [...prevEntry.images]
+        : prevEntry?.image
+          ? [prevEntry.image]
+          : [];
+
+    if (!newUrl) {
+      const nextImgs = prevImgs.filter((_, idx) => idx !== slotIndex);
+      if (nextImgs.length === 0) {
+        onColorImagesChange(colorImages.filter((ci) => ci.colorId !== colorId));
+      } else {
+        onColorImagesChange(
+          colorImages.map((ci) =>
+            ci.colorId === colorId ? { colorId, image: nextImgs[0]!, images: nextImgs } : ci
+          )
+        );
+      }
+      return;
+    }
+
+    const nextImgs = [...prevImgs];
+    if (slotIndex < nextImgs.length) {
+      nextImgs[slotIndex] = newUrl;
+    } else {
+      nextImgs.push(newUrl);
+    }
+    const cappedImgs = nextImgs.slice(0, 2);
+
+    const exists = colorImages.some((ci) => ci.colorId === colorId);
+    if (exists) {
+      onColorImagesChange(
+        colorImages.map((ci) =>
+          ci.colorId === colorId ? { colorId, image: cappedImgs[0]!, images: cappedImgs } : ci
+        )
+      );
+    } else {
+      onColorImagesChange([...colorImages, { colorId, image: cappedImgs[0]!, images: cappedImgs }]);
+    }
   };
 
   const effectiveCode = codeTouched ? code : toSlug(name).toUpperCase().replace(/[^A-Z0-9_-]/g, "");
@@ -194,30 +250,148 @@ export function MaterialColorsField({
         </button>
       </div>
 
-      {/* Danh sách các màu đã chọn dạng chip */}
-      {selectedColors.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2 pt-1">
-          {selectedColors.map((color) => (
+      {/* Thanh hiển thị màu chủ đạo gọn gàng (không dùng chip rời rạc) */}
+      {primaryColor && (
+        <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#E4E4E7] bg-white px-3.5 py-2 text-xs shadow-2xs">
+          <div className="flex flex-wrap items-center gap-2">
             <span
-              key={color.id}
-              className="inline-flex items-center gap-1.5 rounded-full border border-[#E4E4E7] bg-white py-1 pl-1.5 pr-2 text-xs font-medium text-[#09090B] shadow-2xs"
-            >
-              <span
-                className="size-3.5 shrink-0 rounded-full border border-black/10"
-                style={{ backgroundColor: color.hex }}
-                aria-hidden
-              />
-              <span className="truncate max-w-[140px]">{color.name}</span>
-              <button
-                type="button"
-                onClick={() => handleRemoveColor(color.id)}
-                className="ml-0.5 grid size-4 cursor-pointer place-items-center rounded-full text-[#A1A1AA] hover:bg-[#F4F4F5] hover:text-rose-600 transition-colors"
-                aria-label={t("colors.remove", { name: color.name })}
-              >
-                <X size={11} />
-              </button>
+              className="size-3.5 shrink-0 rounded-full border border-black/15 shadow-2xs"
+              style={{ backgroundColor: primaryColor.hex }}
+              aria-hidden
+            />
+            <span className="font-semibold text-[#09090B]">{primaryColor.name}</span>
+            <span className="rounded bg-[#18181B] px-1.5 py-0.5 text-2xs font-semibold text-white shadow-2xs">
+              {t("colors.primaryBadge")}
             </span>
-          ))}
+            <span className="text-2xs text-[#71717A]">
+              {t("colors.primaryCoverHint")}
+            </span>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => handleRemoveColor(primaryColor.id)}
+            className="grid size-5 cursor-pointer place-items-center rounded-full text-[#71717A] transition-colors hover:bg-[#F4F4F5] hover:text-rose-600"
+            title={t("colors.removeColor", { name: primaryColor.name })}
+            aria-label={t("colors.removeColor", { name: primaryColor.name })}
+          >
+            <X size={13} />
+          </button>
+        </div>
+      )}
+
+      {/* Danh sách thẻ ảnh gọn gàng cho các màu bổ sung (giao diện chuẩn như Ảnh 2) */}
+      {secondaryColors.length > 0 && (
+        <div className="space-y-2.5 pt-1">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-semibold text-[#09090B]">
+              {t("colors.secondaryTitle", { count: secondaryColors.length })}
+            </span>
+            <span className="text-2xs text-[#71717A]">
+              {t("colors.secondaryHint")}
+            </span>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            {secondaryColors.map((color) => {
+              const entry = colorImages.find((ci) => ci.colorId === color.id);
+              const images =
+                entry?.images && entry.images.length > 0
+                  ? entry.images
+                  : entry?.image
+                    ? [entry.image]
+                    : [];
+
+              return (
+                <div
+                  key={color.id}
+                  className="flex flex-col gap-2 rounded-xl border border-[#E4E4E7] bg-white p-2.5 shadow-2xs transition-colors hover:border-[#D4D4D8]"
+                >
+                  {/* Header thẻ: Tên màu + Chấm màu + Nút Đặt chủ đạo + Nút X gỡ màu */}
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <span
+                        className="size-3 shrink-0 rounded-full border border-black/15 shadow-2xs"
+                        style={{ backgroundColor: color.hex }}
+                        aria-hidden
+                      />
+                      <span className="truncate text-xs font-semibold text-[#09090B]">
+                        {color.name}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const reordered = [color.id, ...colorIds.filter((id) => id !== color.id)];
+                          onChange(reordered);
+                        }}
+                        className="cursor-pointer text-2xs text-[#71717A] hover:text-[#09090B] hover:underline"
+                        title={t("colors.setPrimaryTooltip")}
+                      >
+                        {t("colors.setPrimary")}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveColor(color.id)}
+                        className="grid size-4.5 cursor-pointer place-items-center rounded-full text-[#71717A] transition-colors hover:bg-[#F4F4F5] hover:text-rose-600"
+                        title={t("colors.removeColor", { name: color.name })}
+                        aria-label={t("colors.removeColor", { name: color.name })}
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Thân thẻ: Các ô ảnh theo giao diện Ảnh 2 */}
+                  <div className="flex items-center gap-2">
+                    {/* Ô ảnh 1 */}
+                    <div className="size-24 shrink-0 sm:size-26">
+                      <AdminImageSlot
+                        value={images[0] || ""}
+                        onChange={(url) => handleUpdateColorSlot(color.id, 0, url)}
+                        aspectClass="aspect-square"
+                        folder="general"
+                        dashedPlaceholder
+                        placeholderText={t("colors.addPhoto")}
+                        replaceText={t("colors.changePhoto")}
+                        badge={
+                          images[0] ? (
+                            <span className="rounded bg-[#18181B]/90 px-1.5 py-0.5 text-2xs font-medium text-white shadow-2xs">
+                              {t("colors.photo1")}
+                            </span>
+                          ) : undefined
+                        }
+                      />
+                    </div>
+
+                    {/* Ô ảnh 2 (chỉ hiện khi ô 1 đã có ảnh) */}
+                    {images[0] && (
+                      <div className="size-24 shrink-0 sm:size-26">
+                        <AdminImageSlot
+                          value={images[1] || ""}
+                          onChange={(url) => handleUpdateColorSlot(color.id, 1, url)}
+                          aspectClass="aspect-square"
+                          folder="general"
+                          dashedPlaceholder
+                          placeholderText={t("colors.addPhoto")}
+                          replaceText={t("colors.changePhoto")}
+                          badge={
+                            images[1] ? (
+                              <span className="rounded bg-[#18181B]/90 px-1.5 py-0.5 text-2xs font-medium text-white shadow-2xs">
+                                {t("colors.photo2")}
+                              </span>
+                            ) : undefined
+                          }
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
 
@@ -282,7 +456,7 @@ export function MaterialColorsField({
                   setNameEn(next);
                 }
               }}
-              placeholder={lang === "vi" ? "Ví dụ: Đỏ đô, Vàng hoàng yến..." : "e.g. Burgundy, Canary Yellow..."}
+              placeholder={lang === "vi" ? t("colors.namePlaceholder") : t("colors.nameEnPlaceholder")}
               error={lang === "vi" && nameError ? tAttr("groupDialog.nameRequired") : undefined}
             />
             <AdminTextField

@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 export const uploadQuerySchema = z.object({
   query: z.object({
-    folder: z.enum(['avatars', 'products', 'general', 'reviews']).optional().default('general'),
+    folder: z.enum(['avatars', 'products', 'materials', 'articles', 'size-charts', 'general', 'reviews']).optional().default('general'),
   }),
 })
 

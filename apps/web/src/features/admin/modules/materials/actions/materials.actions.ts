@@ -39,6 +39,7 @@ function toMaterialData(values: MaterialFormValues) {
     description: values.description || null,
     descriptionEn: values.descriptionEn || null,
     colorIds: values.colorIds,
+    colorImages: values.colorImages,
     composition: values.composition,
     processSteps: values.processSteps,
     closeupImages: values.closeupImages,

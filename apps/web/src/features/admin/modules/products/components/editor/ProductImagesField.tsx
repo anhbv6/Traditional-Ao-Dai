@@ -21,12 +21,15 @@ interface ProductImagesFieldProps {
 }
 
 /**
- * Quản lý ảnh sản phẩm:
+ * Quản lý bộ ảnh chính của sản phẩm (ảnh bìa đại diện + các góc chụp chi tiết, tối đa 8 ảnh tỉ lệ 3:4):
  * - Tự động cắt ảnh vừa vặn tỉ lệ 3:4 và giữ nguyên chất lượng HD dù ảnh gốc tải lên không chuẩn tỉ lệ.
  * - Toàn bộ ảnh tải lên chỉ lưu ở dạng NHÁP (local blob) dưới trình duyệt, phản hồi tức thì và không tốn Cloudinary.
  * - Chỉ khi người dùng bấm nút "Lưu thay đổi" (Save) ở form chính thì ảnh mới được đẩy lên Cloudinary thật sự.
  */
-export function ProductImagesField({ value, onChange }: ProductImagesFieldProps) {
+export function ProductImagesField({
+  value,
+  onChange,
+}: ProductImagesFieldProps) {
   const t = useTranslations("AdminPage.products.image");
   const notify = useNotify();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -120,7 +123,7 @@ export function ProductImagesField({ value, onChange }: ProductImagesFieldProps)
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="@container">
         <div className="grid gap-6 @lg:grid-cols-[180px_minmax(0,1fr)]">
           {/* Nhóm 1: Ảnh đại diện */}
@@ -148,14 +151,14 @@ export function ProductImagesField({ value, onChange }: ProductImagesFieldProps)
                     </span>
                     {isDraftProductImage(coverImage) && (
                       <span className="rounded-md bg-amber-500 px-1.5 py-0.5 text-2xs font-medium text-white shadow-2xs">
-                        Nháp
+                        {t("draft")}
                       </span>
                     )}
                   </div>
                 }
                 placeholderText={t("uploadCover")}
                 replaceText={t("replaceCover")}
-                uploadingText="Đang xử lý ảnh..."
+                uploadingText={t("uploading")}
               />
             </div>
           </AdminMediaGroup>
@@ -177,7 +180,7 @@ export function ProductImagesField({ value, onChange }: ProductImagesFieldProps)
                   {/* Huy hiệu Nháp cho ảnh chi tiết chưa đẩy lên Cloudinary */}
                   {isDraftProductImage(url) && (
                     <span className="pointer-events-none absolute left-1.5 top-1.5 z-10 rounded-md bg-amber-500 px-1.5 py-0.5 text-2xs font-medium text-white shadow-2xs">
-                      Nháp
+                      {t("draft")}
                     </span>
                   )}
 

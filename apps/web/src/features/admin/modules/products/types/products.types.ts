@@ -49,6 +49,11 @@ export interface ProductSetItem {
   materialId: string | null;
 }
 
+export interface ProductColorImage {
+  colorId: string;
+  images: string[];
+}
+
 export interface AdminProductDetail {
   id: string;
   code: string;
@@ -66,6 +71,8 @@ export interface AdminProductDetail {
   sizeChartId: string | null;
   basePrice: number;
   images: string[];
+  primaryColorId: string | null;
+  colorImages: ProductColorImage[];
   isActive: boolean;
   isCustomFit: boolean;
   isFeatured: boolean;

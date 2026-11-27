@@ -348,6 +348,8 @@ model Product {
   leadTimeDays Int?            // May đo: số ngày may dự kiến
   basePrice   Decimal          @db.Decimal(12, 2)
   images      String[]
+  primaryColorId String?          // ID thuộc tính màu chủ đạo
+  colorImages Json             @default("[]") // Danh sách ảnh theo màu phụ [{ colorId: string, images: string[] }]
   soldCount   Int              @default(0)
   isCustomFit Boolean          @default(true) // Cho phép đặt may theo số đo riêng
   isActive    Boolean          @default(true)
@@ -905,6 +907,11 @@ model Fabric {
   materialId        String?
   material          Material? @relation(fields: [materialId], references: [id], onDelete: SetNull)
 
+  // Khổ vải & định mức riêng của cây vải (null = kế thừa từ Material)
+  widthCm           Int?                       // Khổ vải riêng nếu khác chuẩn của chất liệu (cm)
+  metersPerTop      Decimal? @db.Decimal(5, 2) // Định mức thân áo tương ứng với khổ riêng (m/áo)
+  image             String?                    // Ảnh thực tế của cây vải (null = kế thừa ảnh màu từ Material)
+
   movements         FabricMovement[]
 
   createdAt         DateTime @default(now())
@@ -947,6 +954,7 @@ model Material {
   description    String?
   descriptionEn  String?
   colorIds       String[] // Danh sách ID màu sắc (AttributeValue COLOR) của chất liệu
+  colorImages    Json     @default("[]") // Ảnh mẫu vải theo từng màu: [{ colorId, image }]
   composition    Json     @default("[]") // Thành phần sợi: [{ fiber: "SILK", percent: 100 }]
   processSteps   Json     @default("[]") // Quy trình: [{ title, titleEn, detail, detailEn }]
   closeupImages  String[] // Ảnh chụp cận mặt vải

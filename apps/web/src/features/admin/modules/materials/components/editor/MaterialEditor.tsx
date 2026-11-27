@@ -60,6 +60,7 @@ function toFormValues(material: AdminMaterialDetail): MaterialFormValues {
     description: material.description ?? "",
     descriptionEn: material.descriptionEn ?? "",
     colorIds: material.colorIds ?? [],
+    colorImages: material.colorImages ?? [],
     composition: material.composition,
     processSteps: material.processSteps,
     closeupImages: material.closeupImages,
@@ -299,8 +300,10 @@ export function MaterialEditor({ initialMaterial }: { initialMaterial: AdminMate
                 </div>
                 <MaterialColorsField
                   colorIds={values.colorIds}
+                  colorImages={values.colorImages}
                   availableColors={availableColors}
                   onChange={(colorIds) => set("colorIds", colorIds)}
+                  onColorImagesChange={(colorImages) => set("colorImages", colorImages)}
                   onColorCreated={(newColor) =>
                     setAvailableColors((prev) => [...prev, newColor])
                   }

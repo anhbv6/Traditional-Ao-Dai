@@ -1500,7 +1500,18 @@
       "addVariant": "Thêm biến thể",
       "selectColorsPlaceholder": "Chọn màu sắc...",
       "selectSizesPlaceholder": "Chọn kích cỡ...",
-      "generateSkuAction": "Tạo biến thể SKU"
+      "generateSkuAction": "Tạo biến thể SKU",
+      "previewColorImage": "Xem ảnh màu",
+      "removePhoto": "Xóa ảnh này",
+      "close": "Đóng",
+      "draft": "Nháp",
+      "previewPhotoTitle": "Bấm để xem ảnh phóng to",
+      "addPhoto": "Thêm ảnh màu",
+      "addAlbumPhoto": "Thêm ảnh album",
+      "addPhotoWithCount": "Thêm ảnh ({count}/2)",
+      "addMainAlbumPhotoTitle": "Thêm ảnh vào album chính",
+      "addMainCoverPhotoTitle": "Thêm ảnh đại diện màu chính",
+      "selectVariant": "Chọn {size}"
     },
     "ready": {
       "IMAGES": "Ảnh đại diện + ít nhất 1 ảnh mô tả",
@@ -1538,7 +1549,19 @@
       "galleryCount": "{count}/{max} ảnh",
       "moveLeft": "Chuyển sang trái",
       "moveRight": "Chuyển sang phải",
-      "hint": "Tối đa {max} ảnh, mỗi ảnh dưới 5MB, bắt buộc ảnh dọc 3:4 hoặc 9:16. Ảnh tự nén sang WebP. Ảnh đầu tiên là ảnh đại diện, các ảnh còn lại là ảnh mô tả."
+      "hint": "Tối đa {max} ảnh, mỗi ảnh dưới 5MB, bắt buộc ảnh dọc 3:4 hoặc 9:16. Ảnh tự nén sang WebP. Ảnh đầu tiên là ảnh đại diện, các ảnh còn lại là ảnh mô tả.",
+      "primaryColorGallery": "Bộ ảnh Màu chủ đạo",
+      "primaryColorBadge": "Màu chính",
+      "secondaryColorsTitle": "Ảnh các Màu phụ",
+      "secondaryColorsDesc": "Mỗi màu phụ tải tối đa 2 ảnh chụp mẫu sản phẩm với màu tương ứng (tỉ lệ 3:4)",
+      "setAsPrimary": "Đặt làm màu chính",
+      "secondaryColorBadge": "Màu phụ",
+      "secondaryCount": "{count}/2 ảnh",
+      "addSecondaryPhoto": "Thêm ảnh góc chụp",
+      "slotCover": "Ảnh đại diện màu phụ",
+      "slotDetail": "Ảnh góc chụp 2",
+      "noColorsHint": "Sản phẩm chưa có màu nào được chọn. Chọn màu ở phần Biến thể SKU để kích hoạt tải ảnh theo màu.",
+      "draft": "Nháp"
     },
     "options": {
       "materialAction": "Chất liệu & thiết kế",
@@ -3236,7 +3259,18 @@
       "hexInvalid": "Mã HEX không hợp lệ (dạng #RRGGBB)",
       "createSuccess": "Đã thêm màu mới thành công",
       "creating": "Đang tạo...",
-      "submitCreate": "Lưu và thêm màu"
+      "submitCreate": "Lưu và thêm màu",
+      "primaryBadge": "Màu chủ đạo",
+      "primaryCoverHint": "• Ảnh đại diện vải lấy từ ảnh đầu mục “Ảnh cận sợi và bề mặt dệt” bên dưới",
+      "secondaryTitle": "Ảnh mẫu màu bổ sung ({count})",
+      "secondaryHint": "Tải 1 hoặc 2 ảnh mẫu vải (tỉ lệ 1:1)",
+      "setPrimary": "Đặt chủ đạo",
+      "setPrimaryTooltip": "Đổi màu này lên làm màu chủ đạo",
+      "photo1": "Ảnh mẫu",
+      "photo2": "Ảnh 2",
+      "addPhoto": "Thêm ảnh",
+      "changePhoto": "Thay ảnh",
+      "removeColor": "Bỏ màu {name}"
     },
     "sections": {
       "identity": "Thông tin vải",
@@ -3304,7 +3338,12 @@
       "notFull": "Thành phần chưa đủ 100%.",
       "quickPresets": "Gợi ý nhanh:",
       "addMore": "Thêm sợi:",
-      "autoBalance": "Bù đủ 100%"
+      "autoBalance": "Bù đủ 100%",
+      "remaining": "(còn thiếu {count}%)",
+      "overflow": "(vượt quá {count}%)",
+      "topUpTitle": "Bù {remaining}% còn thiếu vào sợi {fiber}",
+      "decrease": "Giảm 5%",
+      "increase": "Tăng 5%"
     },
     "fiber": {
       "SILK": "Tơ tằm",
@@ -3364,7 +3403,9 @@
       "remove": "Gỡ ảnh",
       "moveLeft": "Chuyển lên trước",
       "moveRight": "Chuyển ra sau",
-      "openVideo": "Mở video"
+      "openVideo": "Mở video",
+      "hint": "Ảnh cận sợi và bề mặt dệt (ảnh đầu là ảnh bìa mẫu vải)",
+      "replace": "Thay ảnh"
     },
     "process": {
       "empty": "Chưa có bước nào. VD: trồng dâu → ươm tơ → dệt khung → nhuộm lá.",
@@ -3689,6 +3730,10 @@
       "selectMaterialFirst": "Vui lòng chọn chất liệu trước để xem các mẫu áo liên kết.",
       "colorMatch": "Trùng màu",
       "langLabel": "Ngôn ngữ",
+      "customSpecsSwitch": "Khổ vải & định mức riêng cho cây này",
+      "standardSpecs": "Khổ chuẩn theo chất liệu: {width} cm • Định mức: {perTop} m/áo",
+      "noStandardSpecs": "Chất liệu này chưa có thông số khổ chuẩn.",
+      "customWidthBadge": "Khổ {width}cm",
       "field": {
         "material": "Chất liệu",
         "color": "Màu",
@@ -3697,7 +3742,9 @@
         "meters": "Số mét nhập",
         "remaining": "Số mét còn lại",
         "threshold": "Ngưỡng cảnh báo (m)",
-        "product": "Mẫu áo may từ cây này"
+        "product": "Mẫu áo may từ cây này",
+        "customWidth": "Khổ vải riêng (cm)",
+        "customMetersPerTop": "Định mức thân áo (m/áo)"
       },
       "hint": {
         "color": "Lấy từ thuộc tính Màu — thêm màu mới ở Danh mục › Thuộc tính.",
@@ -3705,7 +3752,9 @@
         "meters": "Khổ vải {width} cm. Đo cả cây khi nhận hàng.",
         "remaining": "Muốn đổi số mét, dùng Nhập thêm hoặc Kiểm kê trong menu ⋯.",
         "threshold": "Còn dưới số này thì báo sắp hết. Để trống = đủ một bộ áo + quần theo định mức.",
-        "product": "Khi cây vải hết, màn này nhắc ẩn mẫu áo đang bán trên web."
+        "product": "Khi cây vải hết, màn này nhắc ẩn mẫu áo đang bán trên web.",
+        "customWidth": "Nhập khổ vải thực tế của cuộn này nếu khác chuẩn chất liệu.",
+        "customMetersPerTop": "Số mét vải cần để may một thân áo với khổ này."
       },
       "placeholder": {
         "material": "Vui lòng chọn chất liệu",
@@ -3713,15 +3762,36 @@
         "name": "Vui lòng nhập tên cây vải",
         "code": "Chọn chất liệu và màu để tạo mã",
         "meters": "Vui lòng nhập số mét",
-        "threshold": "Mặc định {value}"
+        "threshold": "Mặc định {value}",
+        "customWidth": "VD: 140",
+        "customMetersPerTop": "VD: 1.8"
       },
       "errors": {
         "material": "Vui lòng chọn chất liệu.",
         "color": "Vui lòng chọn màu.",
         "name": "Vui lòng nhập tên cây vải.",
         "meters": "Số mét phải lớn hơn 0.",
-        "threshold": "Ngưỡng không hợp lệ."
-      }
+        "threshold": "Ngưỡng không hợp lệ.",
+        "customWidth": "Khổ vải phải là số nguyên từ 30 đến 400 cm.",
+        "customMetersPerTop": "Định mức thân áo phải lớn hơn 0 và tối đa 20 m."
+      },
+      "noColorsForMaterial": "Chất liệu này chưa có màu áp dụng",
+      "swatchViewTooltip": "Bấm để xem ảnh mẫu vải lớn hơn",
+      "swatchPreviewTitle": "Xem ảnh mẫu vải",
+      "removePhoto": "Xóa ảnh này",
+      "close": "Đóng",
+      "cancel": "Hủy",
+      "draftBadge": "Nháp",
+      "specsCustom": "Riêng",
+      "specsStandard": "Chuẩn",
+      "specsDialog": {
+        "description": "Tùy chỉnh thông số khổ vải và định mức tiêu hao may mặc cho riêng cây vải này.",
+        "standardTitle": "Thông số chuẩn theo chất liệu:",
+        "hintCustom": "Bật để nhập khổ vải và định mức riêng nếu khác chuẩn chất liệu.",
+        "hintStandard": "Tự động áp dụng theo thông số chuẩn của chất liệu ở trên."
+      },
+      "metersPerTop": "m/áo",
+      "specsSummary": "{width}cm · {quota} m/áo"
     },
     "material": {
       "width": "Khổ {width} cm",
@@ -4017,5 +4087,12 @@
       "DONE": "Đã đóng phiếu {code}.",
       "NOTE": "Đã thêm ghi chú."
     }
+  },
+  "imageSlot": {
+    "upload": "Tải ảnh lên",
+    "replace": "Thay ảnh",
+    "uploading": "Đang tải...",
+    "remove": "Xóa ảnh",
+    "defaultBadge": "Dùng ảnh mặc định"
   }
 }

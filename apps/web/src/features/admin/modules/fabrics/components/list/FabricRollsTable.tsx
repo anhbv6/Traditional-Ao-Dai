@@ -113,33 +113,57 @@ export function FabricRollsTable({
     ];
   };
 
-  const nameCell = (roll: AdminFabricRoll) => (
-    <div className="flex min-w-0 items-center gap-3">
-      <FabricSwatch hex={colorOf(roll)?.hex ?? null} className={cn(!roll.isActive && "opacity-40")} />
-      <div className="min-w-0">
-        <Link
-          href={`/admin/inventory/fabrics/${roll.id}`}
-          className="block max-w-full truncate text-left font-medium text-[#09090B] hover:underline"
-        >
-          {displayName(roll)}
-        </Link>
-        <p className="mt-0.5 truncate text-xs text-[#71717A]">
-          <span className="font-mono text-2xs">{roll.code}</span> · {localized(materialOf(roll))}
-          {locale === "en" && roll.nameEn && <span className="text-[#A1A1AA]"> ({roll.name})</span>}
-        </p>
-      </div>
-    </div>
-  );
+  const nameCell = (roll: AdminFabricRoll) => {
+    const mat = materialOf(roll);
+    const color = colorOf(roll);
+    const customWidth = roll.widthCm;
+    const hasCustomWidth = customWidth != null && customWidth !== mat?.widthCm;
+    const effectiveWidth = customWidth ?? mat?.widthCm ?? null;
+    const swatchImg =
+      roll.image ||
+      mat?.closeupImages?.[0] ||
+      mat?.colorImages?.find((ci) => ci.colorId === roll.colorId)?.image ||
+      null;
 
-  const meterCell = (roll: AdminFabricRoll) => (
-    <FabricMeter
-      remaining={roll.remainingMeters}
-      received={roll.receivedMeters}
-      threshold={roll.lowStockThreshold}
-      status={resolveFabricStatus(roll)}
-      tops={topsLeft(roll.remainingMeters, materialOf(roll)?.metersPerTop ?? null)}
-    />
-  );
+    return (
+      <div className="flex min-w-0 items-center gap-3">
+        <FabricSwatch hex={color?.hex ?? null} image={swatchImg} className={cn(!roll.isActive && "opacity-40")} />
+        <div className="min-w-0">
+          <div className="flex items-center gap-1.5">
+            <Link
+              href={`/admin/inventory/fabrics/${roll.id}`}
+              className="block truncate text-left font-medium text-[#09090B] hover:underline"
+            >
+              {displayName(roll)}
+            </Link>
+            {hasCustomWidth && customWidth != null && (
+              <span className="inline-flex shrink-0 items-center rounded-sm bg-[#F4F4F5] px-1 py-0.5 font-mono text-2xs font-medium text-[#3F3F46]">
+                {t("rollDialog.customWidthBadge", { width: customWidth })}
+              </span>
+            )}
+          </div>
+          <p className="mt-0.5 truncate text-xs text-[#71717A]">
+            <span className="font-mono text-2xs">{roll.code}</span> · {localized(mat)}
+            {effectiveWidth && ` · khổ ${effectiveWidth}cm`}
+            {locale === "en" && roll.nameEn && <span className="text-[#A1A1AA]"> ({roll.name})</span>}
+          </p>
+        </div>
+      </div>
+    );
+  };
+
+  const meterCell = (roll: AdminFabricRoll) => {
+    const effectiveMetersPerTop = roll.metersPerTop ?? materialOf(roll)?.metersPerTop ?? null;
+    return (
+      <FabricMeter
+        remaining={roll.remainingMeters}
+        received={roll.receivedMeters}
+        threshold={roll.lowStockThreshold}
+        status={resolveFabricStatus(roll)}
+        tops={topsLeft(roll.remainingMeters, effectiveMetersPerTop)}
+      />
+    );
+  };
 
   const productCell = (roll: AdminFabricRoll) => {
     const rollProducts = productsOf(roll);

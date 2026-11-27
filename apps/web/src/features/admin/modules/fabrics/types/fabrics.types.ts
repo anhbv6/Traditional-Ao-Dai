@@ -20,6 +20,9 @@ export interface FabricMaterialOption {
   /** Định mức mét cho một thân áo — null = chất liệu chưa có định mức */
   metersPerTop: number | null;
   metersPerPants: number | null;
+  colorIds?: string[];
+  colorImages?: { colorId: string; image: string; images?: string[] }[];
+  closeupImages?: string[];
 }
 
 export interface FabricColorOption {
@@ -70,6 +73,12 @@ export interface AdminFabricRoll {
   lowStockThreshold: number;
   isActive: boolean;
   productId: string | null;
+  /** Khổ vải riêng của cây (cm) — null = theo chất liệu */
+  widthCm?: number | null;
+  /** Định mức mét thân áo riêng của cây — null = theo chất liệu */
+  metersPerTop?: number | null;
+  /** Ảnh thực tế của cây vải — null = kế thừa từ chất liệu */
+  image?: string | null;
   receivedAt: string;
   updatedAt: string;
   /** Biến động gần nhất, mới nhất trước */
@@ -103,6 +112,9 @@ export interface FabricRollInput {
   receivedMeters: number;
   lowStockThreshold: number;
   productId: string | null;
+  widthCm?: number | null;
+  metersPerTop?: number | null;
+  image?: string | null;
 }
 
 /** Dữ liệu ghi một biến động từ dialog */
